@@ -555,6 +555,9 @@ trap_check_rom( void )
   if( plusd_available && plusd_active )
     return 0;		/* +D must not be active */
 
+  if( opus_available && opus_active )
+    return 0;		/* Opus must not be active */
+
   if( memory_custom_rom() )
     return 0;           /* and we can't be using a custom ROM */
 

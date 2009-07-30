@@ -109,6 +109,7 @@ libspectrum_snap_alloc( void )
 
   libspectrum_snap_set_beta_active( snap, 0 );
   libspectrum_snap_set_beta_paged( snap, 0 );
+  libspectrum_snap_set_beta_drive_count( snap, 0 );
   libspectrum_snap_set_beta_custom_rom( snap, 0 );
   libspectrum_snap_set_beta_direction( snap, 0 );
   libspectrum_snap_set_beta_system( snap, 0 );
@@ -120,6 +121,7 @@ libspectrum_snap_alloc( void )
 
   libspectrum_snap_set_plusd_active( snap, 0 );
   libspectrum_snap_set_plusd_paged( snap, 0 );
+  libspectrum_snap_set_plusd_drive_count( snap, 0 );
   libspectrum_snap_set_plusd_custom_rom( snap, 0 );
   libspectrum_snap_set_plusd_direction( snap, 0 );
   libspectrum_snap_set_plusd_control( snap, 0 );
@@ -129,6 +131,24 @@ libspectrum_snap_alloc( void )
   libspectrum_snap_set_plusd_status( snap, 0 );
   libspectrum_snap_set_plusd_rom( snap, 0, NULL );
   libspectrum_snap_set_plusd_ram( snap, 0, NULL );
+
+  libspectrum_snap_set_opus_active( snap, 0 );
+  libspectrum_snap_set_opus_paged ( snap, 0 );
+  libspectrum_snap_set_opus_drive_count( snap, 0 );
+  libspectrum_snap_set_opus_custom_rom( snap, 0 );
+  libspectrum_snap_set_opus_direction ( snap, 0 );
+  libspectrum_snap_set_opus_track ( snap, 0 );
+  libspectrum_snap_set_opus_sector( snap, 0 );
+  libspectrum_snap_set_opus_data  ( snap, 0 );
+  libspectrum_snap_set_opus_status( snap, 0 );
+  libspectrum_snap_set_opus_data_reg_a( snap, 0 );
+  libspectrum_snap_set_opus_data_dir_a( snap, 0 );
+  libspectrum_snap_set_opus_control_a ( snap, 0 );
+  libspectrum_snap_set_opus_data_reg_b( snap, 0 );
+  libspectrum_snap_set_opus_data_dir_b( snap, 0 );
+  libspectrum_snap_set_opus_control_b ( snap, 0 );
+  libspectrum_snap_set_opus_rom( snap, 0, NULL );
+  libspectrum_snap_set_opus_ram( snap, 0, NULL );
 
   libspectrum_snap_set_zxatasp_active( snap, 0 );
   libspectrum_snap_set_zxatasp_upload( snap, 0 );

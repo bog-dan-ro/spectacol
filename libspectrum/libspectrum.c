@@ -547,6 +547,9 @@ libspectrum_identify_file_raw( libspectrum_id_t *type, const char *filename,
       { LIBSPECTRUM_ID_DISK_TD0,      "td0", 3, "TD",               0, 2, 4 },
       { LIBSPECTRUM_ID_DISK_TD0,      "td0", 3, "td",               0, 2, 4 },
 
+      { LIBSPECTRUM_ID_DISK_OPD,      "opd", 3, NULL,		    0, 0, 0 },
+      { LIBSPECTRUM_ID_DISK_OPD,      "opu", 3, NULL,		    0, 0, 0 },
+
       { -1, NULL, 0, NULL, 0, 0, 0 }, /* End marker */
 
     };
@@ -668,6 +671,9 @@ libspectrum_identify_class( libspectrum_class_t *libspectrum_class,
   case LIBSPECTRUM_ID_DISK_IMG:
   case LIBSPECTRUM_ID_DISK_MGT:
     *libspectrum_class = LIBSPECTRUM_CLASS_DISK_PLUSD; return 0;
+
+  case LIBSPECTRUM_ID_DISK_OPD:
+    *libspectrum_class = LIBSPECTRUM_CLASS_DISK_OPUS; return 0;
 
   case LIBSPECTRUM_ID_DISK_SCL:
   case LIBSPECTRUM_ID_DISK_TRD:

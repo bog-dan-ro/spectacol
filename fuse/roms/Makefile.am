@@ -25,6 +25,7 @@ AUTOMAKE_OPTIONS = foreign
 
 ROMS =  128-0.rom 128-1.rom \
 	48.rom \
+	opus.rom \
 	plus2-0.rom plus2-1.rom \
 	plus3-0.rom plus3-1.rom plus3-2.rom plus3-3.rom \
 	plus3e-0.rom plus3e-1.rom plus3e-2.rom plus3e-3.rom \

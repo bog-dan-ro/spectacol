@@ -3172,3 +3172,11 @@
 20090710 disk/{fdd.c,wd_fdc.c}: save disk selected status over reset and
          reset motor or head when resetting WD FDC to fix Mr Gluck ROM handling
          on reset with a disk present (patch #2819220) (Gergely Szasz).
+20090710 AUTHORS,ChangeLog,README,
+         disk/{Makefile.am,beta.c,disk.c,opus.[ch],plusd.c,wd_fdc.[ch]},fuse.c,
+         machines/{spec128.c,spec16.c,spec48.c,spec_se.c,specplus2.c,tc2048.c},
+         man/fuse.1,memory.c,menu.[ch],menu_data.dat,periph.[ch],
+         roms/Makefile.am,roms/opus.rom,settings.dat,tape.c,ui.c,ui/options.dat,
+         ui/sdl/sdldisplay.c,ui/ui.h,utils.c,z80/coretest.c,z80/z80_checks.h,
+         z80/z80_ops.c: add Opus Discovery support (patch #2823760) (Gergely
+         Szasz and Fredrick Meunier).

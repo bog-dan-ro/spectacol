@@ -34,16 +34,19 @@ Fuse has been brought to you by:
 * Marek Januszewski: Some patches making Fuse much closer to compiling under
   Win32, and fixing up the GTK+ 2.0 interface.
 
-* Stuart Brady: for the Scorpion emulation and HP-UX sound support.
+* Stuart Brady: for the Scorpion, +D interface emulation and HP-UX sound
+  support.
 
 * Garry Lancaster: the simple 8-bit IDE, ZXATASP and ZXCF support.
 
-* Gergely Szasz: Interface I/microdrive emulation, the 'movie' code and the
-  ao sound driver.
+* Gergely Szasz: +3, +D, Opus and Interface I/microdrive emulation, the 'movie'
+  code and the ao sound driver.
 
 * Bjoern Giesler: the original Wii port.
 
 * Shay Green: the Blip_Buffer band pass filter for beeper and AY output.
+
+* Michael D Wynne: the Opus Discovery emulation (for EightyOne).
 
 * Philip Kendall: everything else.
 

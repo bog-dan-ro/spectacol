@@ -208,6 +208,8 @@ typedef enum libspectrum_id_t {
   LIBSPECTRUM_ID_DISK_SAD,		/* .sad generic disk image */
   LIBSPECTRUM_ID_DISK_TD0,		/* .td0 generic disk image */
 
+  LIBSPECTRUM_ID_DISK_OPD,		/* .opu/.opd Opus Discovery disk image */
+
 } libspectrum_id_t;
 
 /* And 'classes' of file */
@@ -218,6 +220,7 @@ typedef enum libspectrum_class_t {
   LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX,	/* Timex cartridges */
   LIBSPECTRUM_CLASS_DISK_PLUS3,		/* +3 disk */
   LIBSPECTRUM_CLASS_DISK_TRDOS,		/* TR-DOS disk */
+  LIBSPECTRUM_CLASS_DISK_OPUS,		/* Opus Discovery disk*/
   LIBSPECTRUM_CLASS_RECORDING,		/* Input recording */
   LIBSPECTRUM_CLASS_SNAPSHOT,		/* Snapshot */
   LIBSPECTRUM_CLASS_TAPE,		/* Tape */

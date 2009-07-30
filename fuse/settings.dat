@@ -63,6 +63,7 @@ mdr_len, numeric, 180
 mdr_random_len, boolean, 1
 interface2, boolean, 1
 snapsasz80, null, 0
+opus, boolean, 0
 pal_tv2x, boolean, 0
 plusd, boolean, 0
 beta128, boolean, 0
@@ -122,6 +123,7 @@ snapshot, string, NULL, 's'
 tape_file, string, NULL, 't', tape, tapefile
 start_machine, string, "48", 'm', machine
 record_file, string, NULL, 'r', record, recordfile
+opusdisk_file, string, NULL,, opusdisk
 playback_file, string, NULL, 'p', playback, playbackfile
 plus3disk_file, string, NULL,, plus3disk
 plusddisk_file, string, NULL,, plusddisk
@@ -205,6 +207,7 @@ rom_scorpion_3, string, "256s-3.rom",
 rom_spec_se_0, string, "se-0.rom",
 rom_spec_se_1, string, "se-1.rom",
 rom_interface_i, string, "if1-2.rom",
+rom_opus, string, "opus.rom",
 rom_plusd, string, "plusd.rom",
 rom_beta128, string, "trdos.rom",
 
@@ -216,6 +219,8 @@ drive_beta128c_type, string, NULL
 drive_beta128d_type, string, NULL
 drive_plusd1_type, string, NULL
 drive_plusd2_type, string, NULL
+drive_opus1_type, string, NULL
+drive_opus2_type, string, NULL
 
 disk_try_merge, string, NULL
 disk_ask_merge, boolean, 1

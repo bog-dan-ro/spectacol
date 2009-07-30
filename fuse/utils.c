@@ -123,6 +123,11 @@ utils_open_file( const char *filename, int autoload,
     error = plusd_disk_insert( PLUSD_DRIVE_1, filename, autoload );
     break;
 
+  case LIBSPECTRUM_CLASS_DISK_OPUS:
+
+    error = opus_disk_insert( OPUS_DRIVE_1, filename, autoload );
+    break;
+
   case LIBSPECTRUM_CLASS_DISK_TRDOS:
 
     if( !( machine_current->capabilities &

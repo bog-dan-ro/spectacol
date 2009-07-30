@@ -220,14 +220,14 @@ read_id( wd_fdc *f )
   wd_fdc_drive *d = f->current_drive;
 
   f->id_mark = WD_FDC_AM_NONE;
-  
+
   if( f->rev <= 0 )
     return 1;
 
   while( i == f->rev ) {
     crc_preset( f );
     if( f->dden ) {	/* double density (MFM) */
-      fdd_read_write_data( &d->fdd, FDD_READ ); 
+      fdd_read_write_data( &d->fdd, FDD_READ );
       if( d->fdd.index ) f->rev--;
       crc_add(f, d);
       if( d->fdd.data == 0xffa1 ) {
@@ -397,7 +397,7 @@ wd_fdc_seek_verify_read_id( wd_fdc *f )
 {
   int i;
   f->read_id = 1;
-  
+
   event_remove_type( fdc_event );
   if( f->id_mark == WD_FDC_AM_NONE ) {
     while( f->rev ) {
@@ -444,8 +444,8 @@ wd_fdc_seek_verify( wd_fdc *f )
     }
     if( f->head_load )
       f->status_register |= WD_FDC_SR_SPINUP;	
-    			/* when set, it indicates head is loaded and enganged.
-    			   This bit is logical "and" of HLD and "HLT" signals.  */
+			/* when set, it indicates head is loaded and enganged.
+			   This bit is logical "and" of HLD and "HLT" signals.  */
   }
 
   if( d->fdd.tr00 )
@@ -510,6 +510,7 @@ type_i_noupdate:
 
 type_i_verify:
   if( b & 0x04 ) {
+
     if( f->type == WD1773 || f->type == FD1793 ) {
       f->head_load = 1;
       event_remove_type( motor_off_event );
@@ -519,22 +520,27 @@ type_i_verify:
         fdd_head_load( &f->current_drive->fdd, 1 );
       event_remove_type( fdc_event );
       event_add_with_data( tstates + 15 * 				/* 15ms */
-    		    machine_current->timings.processor_speed / 1000,
+		    machine_current->timings.processor_speed / 1000,
 			fdc_event, f );
       statusbar_update( 1 );
     }
 
+    f->state = WD_FDC_STATE_VERIFY;
+
     if( ( f->type == WD1770 || f->type == WD1772 ) &&
 	!( f->status_register & WD_FDC_SR_MOTORON ) ) {
       f->status_register |= WD_FDC_SR_MOTORON;
+      fdd_motoron( &f->current_drive->fdd, 1 );
       statusbar_update( 1 );
       delay = 6 * 200;
       event_remove_type( fdc_event );
       event_add_with_data( tstates + 12 * 		/* 6 revolution 6 * 200 / 1000 */
-    		    machine_current->timings.processor_speed / 10,
+		    machine_current->timings.processor_speed / 10,
 			fdc_event, f );
+      return;
     }
-    f->state = WD_FDC_STATE_VERIFY;
+
+    wd_fdc_seek_verify( f );
     return;
   }
 
@@ -777,23 +783,27 @@ wd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
     statusbar_update( 0 );
     return;
   }
-  
+
   if( ( f->type == WD1773 || f->type == FD1793 ) &&
         f->hlt_time > 0 && f->head_load && !f->hlt )
     f->hlt = 1;
 
   if( ( ( f->type == WD1770 || f->type == WD1772 ) &&
-	( f->status_register & WD_FDC_SR_MOTORON ) ) ||
+	( f->status_register & WD_FDC_SR_MOTORON ) && 
+	f->status_type == WD_FDC_STATUS_TYPE1 ) ||
       ( ( f->type == WD1773 || f->type == FD1793 ) &&
 	( f->state == WD_FDC_STATE_SEEK ||
 	  f->state == WD_FDC_STATE_SEEK_DELAY ) &&
 	f->head_load ) ) {
     f->status_register |= WD_FDC_SR_SPINUP;
   }
-  
+
   if( f->read_id ) {
     if( f->state == WD_FDC_STATE_VERIFY )
       wd_fdc_seek_verify_read_id( f );
+    else if( ( f->state == WD_FDC_STATE_READ || f->state == WD_FDC_STATE_WRITE ) &&
+	     f->datarq )
+      f->datarq = 0, wd_fdc_set_datarq( f );
     else if( f->state == WD_FDC_STATE_READ || f->state == WD_FDC_STATE_WRITE )
       wd_fdc_type_ii_seek( f );
     else if( f->state == WD_FDC_STATE_READID )
@@ -802,8 +812,16 @@ wd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
     wd_fdc_type_i( f );
   else if( f->state == WD_FDC_STATE_VERIFY )
     wd_fdc_seek_verify( f );
+  else if( ( f->state == WD_FDC_STATE_READ || f->state == WD_FDC_STATE_WRITE ) &&
+	   f->datarq )
+    f->datarq = 0, wd_fdc_set_datarq( f );
   else if( f->state == WD_FDC_STATE_READ || f->state == WD_FDC_STATE_WRITE )
     wd_fdc_type_ii( f );
+  else if( ( f->state == WD_FDC_STATE_READTRACK  ||
+	     f->state == WD_FDC_STATE_READID     ||
+	     f->state == WD_FDC_STATE_WRITETRACK   ) &&
+	   f->datarq )
+      f->datarq = 0, wd_fdc_set_datarq( f );
   else if( f->state == WD_FDC_STATE_READTRACK  ||
 	   f->state == WD_FDC_STATE_READID     ||
 	   f->state == WD_FDC_STATE_WRITETRACK    )
@@ -992,6 +1010,10 @@ wd_fdc_dr_read( wd_fdc *f )
 {
   wd_fdc_drive *d = f->current_drive;
 
+  if( f->flags & WD_FLAG_OPUS &&
+	f->status_register & WD_FDC_SR_BUSY )
+    event_remove_type( fdc_event );
+
   if( f->state == WD_FDC_STATE_READ ) {
     f->data_offset++;				/* count read bytes */
     fdd_read_write_data( &d->fdd, FDD_READ ); crc_add(f, d); /* read a byte */
@@ -1078,6 +1100,12 @@ wd_fdc_dr_read( wd_fdc *f )
       wd_fdc_reset_datarq( f );
     }
   }
+  if( ( f->flags & WD_FLAG_OPUS ) &&
+	( f->status_register & WD_FDC_SR_BUSY ) ) {	/* we need a next datarq */
+    event_add_with_data( tstates + 30 * 		/* 30 us delay */
+			       machine_current->timings.processor_speed / 1000000,
+			       fdc_event, f );
+  }
   return f->data_register;
 }
 
@@ -1158,5 +1186,12 @@ wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b )
       wd_fdc_set_intrq( f );
       wd_fdc_reset_datarq( f );
     }
+  }
+  if( ( f->flags & WD_FLAG_OPUS ) &&
+	f->status_register & WD_FDC_SR_BUSY ) {	/* we need a next datarq */
+//    wd_fdc_reset_datarq( f );
+    event_add_with_data( tstates + 30 * 		/* 30 us delay */
+			       machine_current->timings.processor_speed / 1000000,
+			       fdc_event, f );
   }
 }

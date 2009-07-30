@@ -161,6 +161,14 @@ static const libspectrum_byte ZXSTPDRT_CUSTOM = 2;
 
 #define ZXSTBID_PLUSDDISK "PDSK"
 
+#define ZXSTBID_OPUS "OPUS"
+static const libspectrum_dword ZXSTOPUSF_PAGED = 1;
+static const libspectrum_dword ZXSTOPUSF_COMPRESSED = 2;
+static const libspectrum_dword ZXSTOPUSF_SEEKLOWER = 4;
+static const libspectrum_dword ZXSTOPUSF_CUSTOMROM = 8;
+
+#define ZXSTBID_OPUSDISK "ODSK"
+
 #define ZXSTBID_SIMPLEIDE "SIDE"
 static const libspectrum_word ZXSTSIDE_ENABLED = 1;
 
@@ -227,6 +235,9 @@ write_scld_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 static libspectrum_error
 write_b128_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress );
+static libspectrum_error
+write_opus_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, libspectrum_snap *snap, int compress  );
 static libspectrum_error
 write_plsd_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress  );
@@ -418,7 +429,7 @@ read_b128_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_snap_set_beta_custom_rom( snap,
                                         !!( flags & ZXSTBETAF_CUSTOMROM ) );
 
-  (*buffer)++;		/* Skip the number of drives */
+  libspectrum_snap_set_beta_drive_count( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_beta_system( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_beta_track ( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_beta_sector( snap, **buffer ); (*buffer)++;
@@ -486,6 +497,195 @@ read_b128_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 }
      
 static libspectrum_error
+read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
+		  const libspectrum_byte **buffer,
+		  const libspectrum_byte *end GCC_UNUSED, size_t data_length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ram_data = NULL, *rom_data = NULL;
+  libspectrum_dword flags;
+  size_t disc_ram_length;
+  size_t disc_rom_length;
+  size_t expected_length = 0x800;
+
+  if( data_length < 23 ) {
+    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			     "szx_read_opus_chunk: length %lu too short",
+			     (unsigned long)data_length );
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+  }
+
+  libspectrum_snap_set_opus_active( snap, 1 );
+
+  flags = libspectrum_read_dword( buffer );
+  libspectrum_snap_set_opus_paged( snap, flags & ZXSTOPUSF_PAGED );
+  libspectrum_snap_set_opus_direction( snap,
+				       !( flags & ZXSTOPUSF_SEEKLOWER ) );
+
+  disc_ram_length = libspectrum_read_dword( buffer );
+  disc_rom_length = libspectrum_read_dword( buffer );
+
+  libspectrum_snap_set_opus_custom_rom( snap, flags & ZXSTOPUSF_CUSTOMROM );
+  if( libspectrum_snap_opus_custom_rom( snap ) && !disc_rom_length ) {
+    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			     "szx_read_opus_chunk: block flagged as custom "
+                             "ROM but there is no custom ROM stored in the "
+                             "snapshot" );
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+  }
+
+  libspectrum_snap_set_opus_control_a( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_data_reg_a( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_data_dir_a( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_control_b( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_data_reg_b( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_data_dir_b( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_drive_count( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_track ( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_sector( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_data  ( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_opus_status( snap, **buffer ); (*buffer)++;
+
+  if( flags & ZXSTOPUSF_COMPRESSED ) {
+
+#ifdef HAVE_ZLIB_H
+
+    size_t uncompressed_length = 0;
+
+    if( (!libspectrum_snap_opus_custom_rom( snap ) &&
+         disc_rom_length != 0 ) ||
+        (libspectrum_snap_opus_custom_rom( snap ) &&
+         disc_rom_length == 0 ) ) {
+      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			       "%s:read_opus_chunk: invalid ROM length "
+                               "in compressed file, should be %lu, file "
+                               "has %lu",
+			       __FILE__, 
+                               0UL,
+                               (unsigned long)disc_rom_length );
+      return LIBSPECTRUM_ERROR_UNKNOWN;
+    }
+
+    if( data_length < 23 + disc_ram_length + disc_rom_length ) {
+      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			       "%s:read_opus_chunk: length %lu too short, "
+			       "expected %lu" ,
+			       __FILE__, (unsigned long)data_length,
+			       (unsigned long)23 + disc_ram_length +
+                                 disc_rom_length );
+      return LIBSPECTRUM_ERROR_UNKNOWN;
+    }
+
+    error = libspectrum_zlib_inflate( *buffer, disc_ram_length, &ram_data,
+				      &uncompressed_length );
+    if( error ) return error;
+
+    if( uncompressed_length != expected_length ) {
+      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			       "%s:read_opus_chunk: invalid RAM length "
+                               "in compressed file, should be %lu, file "
+                               "has %lu",
+			       __FILE__, 
+                               (unsigned long)expected_length,
+                               (unsigned long)uncompressed_length );
+      return LIBSPECTRUM_ERROR_UNKNOWN;
+    }
+
+    *buffer += disc_ram_length;
+
+    if( libspectrum_snap_opus_custom_rom( snap ) ) {
+      error = libspectrum_zlib_inflate( *buffer, disc_rom_length, &rom_data,
+                                        &uncompressed_length );
+      if( error ) return error;
+
+      expected_length = 0x2000;
+
+      if( uncompressed_length != expected_length ) {
+        libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+                                 "%s:read_plsd_chunk: invalid ROM length "
+                                 "in compressed file, should be %lu, file "
+                                 "has %lu",
+                                 __FILE__, 
+                                 (unsigned long)expected_length,
+                                 (unsigned long)disc_rom_length );
+        return LIBSPECTRUM_ERROR_UNKNOWN;
+      }
+
+      *buffer += disc_rom_length;
+    }
+
+#else			/* #ifdef HAVE_ZLIB_H */
+
+    libspectrum_print_error(
+      LIBSPECTRUM_ERROR_UNKNOWN,
+      "%s:read_opus_chunk: zlib needed for decompression\n",
+      __FILE__
+    );
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+
+#endif			/* #ifdef HAVE_ZLIB_H */
+
+  } else {
+
+    if( disc_ram_length != expected_length ) {
+      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			       "%s:read_opus_chunk: invalid RAM length "
+                               "in uncompressed file, should be %lu, file "
+                               "has %lu",
+			       __FILE__, 
+                               (unsigned long)expected_length,
+                               (unsigned long)disc_rom_length );
+      return LIBSPECTRUM_ERROR_UNKNOWN;
+    }
+
+    expected_length = 0x2000;
+
+    if( (libspectrum_snap_opus_custom_rom( snap ) &&
+         disc_rom_length != expected_length ) ||
+        (!libspectrum_snap_opus_custom_rom( snap ) &&
+         disc_rom_length != 0 ) ) {
+      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			       "%s:read_opus_chunk: invalid ROM length "
+                               "in uncompressed file, should be %lu, file "
+                               "has %lu",
+			       __FILE__, 
+                               libspectrum_snap_opus_custom_rom( snap ) ?
+                                 expected_length : 0UL,
+                               (unsigned long)disc_rom_length );
+      return LIBSPECTRUM_ERROR_UNKNOWN;
+    }
+
+    if( data_length < 23 + disc_ram_length + disc_rom_length ) {
+      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			       "%s:read_opus_chunk: length %lu too short, "
+			       "expected %lu" ,
+			       __FILE__, (unsigned long)data_length,
+			       (unsigned long)23 + disc_ram_length + disc_rom_length );
+      return LIBSPECTRUM_ERROR_UNKNOWN;
+    }
+
+    expected_length = 0x800;
+
+    ram_data = libspectrum_malloc( expected_length );
+    memcpy( ram_data, *buffer, expected_length );
+    *buffer += expected_length;
+
+    if( libspectrum_snap_opus_custom_rom( snap ) ) {
+      expected_length = 0x2000;
+      rom_data = libspectrum_malloc( expected_length );
+      memcpy( rom_data, *buffer, expected_length );
+      *buffer += expected_length;
+    }
+
+  }
+
+  libspectrum_snap_set_opus_ram( snap, 0, ram_data );
+  libspectrum_snap_set_opus_rom( snap, 0, rom_data );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+     
+static libspectrum_error
 read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 		  const libspectrum_byte **buffer,
 		  const libspectrum_byte *end GCC_UNUSED, size_t data_length )
@@ -526,7 +726,7 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   }
 
   libspectrum_snap_set_plusd_control( snap, **buffer ); (*buffer)++;
-  (*buffer)++;		/* Skip the number of drives */
+  libspectrum_snap_set_plusd_drive_count( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_plusd_track ( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_plusd_sector( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_plusd_data  ( snap, **buffer ); (*buffer)++;
@@ -1608,6 +1808,8 @@ static struct read_chunk_t read_chunks[] = {
   { ZXSTBID_MICRODRIVE,	    skip_chunk      },
   { ZXSTBID_MOUSE,	    read_amxm_chunk },
   { ZXSTBID_MULTIFACE,	    skip_chunk      },
+  { ZXSTBID_OPUS,	    read_opus_chunk },
+  { ZXSTBID_OPUSDISK,	    skip_chunk      },
   { ZXSTBID_PLUS3DISK,	    skip_chunk      },
   { ZXSTBID_PLUSD,	    read_plsd_chunk },
   { ZXSTBID_PLUSDDISK,	    skip_chunk      },
@@ -1916,6 +2118,11 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
 
   if( libspectrum_snap_interface1_active( snap ) ) {
     error = write_if1_chunk( buffer, &ptr, length, snap, compress );
+    if( error ) return error;
+  }
+
+  if( libspectrum_snap_opus_active( snap ) ) {
+    error = write_opus_chunk( buffer, &ptr, length, snap, compress );
     if( error ) return error;
   }
 
@@ -2575,7 +2782,7 @@ write_b128_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   if( use_compression ) flags |= ZXSTBETAF_COMPRESSED;
   libspectrum_write_dword( ptr, flags );
 
-  *(*ptr)++ = 2;	/* 2 drives connected */
+  *(*ptr)++ = libspectrum_snap_beta_drive_count( snap );
   *(*ptr)++ = libspectrum_snap_beta_system( snap );
   *(*ptr)++ = libspectrum_snap_beta_track ( snap );
   *(*ptr)++ = libspectrum_snap_beta_sector( snap );
@@ -2675,6 +2882,100 @@ write_if1_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 }
 
 static libspectrum_error
+write_opus_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, libspectrum_snap *snap, int compress  )
+{
+  libspectrum_error error;
+  libspectrum_byte *rom_data, *ram_data; 
+  libspectrum_byte *compressed_rom_data = NULL, *compressed_ram_data = NULL;
+  size_t disk_rom_length, disk_ram_length, block_size;
+  libspectrum_dword flags = 0;
+  int use_compression = 0;
+
+  rom_data = libspectrum_snap_opus_rom( snap, 0 );
+  disk_rom_length = 0x2000;
+  ram_data = libspectrum_snap_opus_ram( snap, 0 );
+  disk_ram_length = 0x800;
+
+  compressed_ram_data = compressed_rom_data = NULL;
+
+  block_size = 0;
+
+#ifdef HAVE_ZLIB_H
+
+  if( compress ) {
+
+    size_t compressed_rom_length, compressed_ram_length;
+
+    error = libspectrum_zlib_compress( rom_data, disk_rom_length,
+				       &compressed_rom_data, &compressed_rom_length );
+    if( error ) return error;
+
+    error = libspectrum_zlib_compress( ram_data, disk_ram_length,
+				       &compressed_ram_data, &compressed_ram_length );
+    if( error ) {
+      if( compressed_rom_data ) libspectrum_free( compressed_rom_data );
+      return error;
+    }
+
+    if( compress & LIBSPECTRUM_FLAG_SNAPSHOT_ALWAYS_COMPRESS ||
+        (compressed_rom_length + compressed_ram_length) <
+        (disk_rom_length + disk_ram_length ) ) {
+      use_compression = 1;
+      rom_data = compressed_rom_data;
+      disk_rom_length = compressed_rom_length;
+      ram_data = compressed_ram_data;
+      disk_ram_length = compressed_ram_length;
+    }
+
+  }
+
+#endif				/* #ifdef HAVE_ZLIB_H */
+
+  block_size = 23 + disk_ram_length;
+  if( libspectrum_snap_opus_custom_rom( snap ) ) {
+    block_size += disk_rom_length;
+  }
+
+  write_chunk_header( buffer, ptr, length, ZXSTBID_OPUS, block_size );
+
+  if( libspectrum_snap_opus_paged( snap ) ) flags |= ZXSTPLUSDF_PAGED;
+  if( use_compression ) flags |= ZXSTPLUSDF_COMPRESSED;
+  if( !libspectrum_snap_opus_direction( snap ) ) flags |= ZXSTPLUSDF_SEEKLOWER;
+  if( libspectrum_snap_opus_custom_rom( snap ) ) flags |= ZXSTOPUSF_CUSTOMROM;
+  libspectrum_write_dword( ptr, flags );
+
+  libspectrum_write_dword( ptr, disk_ram_length );
+  if( libspectrum_snap_opus_custom_rom( snap ) ) {
+    libspectrum_write_dword( ptr, disk_rom_length );
+  } else {
+    libspectrum_write_dword( ptr, 0 );
+  }
+  *(*ptr)++ = libspectrum_snap_opus_control_a( snap );
+  *(*ptr)++ = libspectrum_snap_opus_data_reg_a( snap );
+  *(*ptr)++ = libspectrum_snap_opus_data_dir_a( snap );
+  *(*ptr)++ = libspectrum_snap_opus_control_b( snap );
+  *(*ptr)++ = libspectrum_snap_opus_data_reg_b( snap );
+  *(*ptr)++ = libspectrum_snap_opus_data_dir_b( snap );
+  *(*ptr)++ = libspectrum_snap_opus_drive_count( snap );
+  *(*ptr)++ = libspectrum_snap_opus_track  ( snap );
+  *(*ptr)++ = libspectrum_snap_opus_sector ( snap );
+  *(*ptr)++ = libspectrum_snap_opus_data   ( snap );
+  *(*ptr)++ = libspectrum_snap_opus_status ( snap );
+
+  memcpy( *ptr, ram_data, disk_ram_length ); *ptr += disk_ram_length;
+
+  if( libspectrum_snap_opus_custom_rom( snap ) ) {
+    memcpy( *ptr, rom_data, disk_rom_length ); *ptr += disk_rom_length;
+  }
+
+  if( compressed_rom_data ) libspectrum_free( compressed_rom_data );
+  if( compressed_ram_data ) libspectrum_free( compressed_ram_data );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
 write_plsd_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress  )
 {
@@ -2746,7 +3047,7 @@ write_plsd_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
     *(*ptr)++ = ZXSTPDRT_GDOS;
   }
   *(*ptr)++ = libspectrum_snap_plusd_control( snap );
-  *(*ptr)++ = 2;	/* 2 drives connected */
+  *(*ptr)++ = libspectrum_snap_plusd_drive_count( snap );
   *(*ptr)++ = libspectrum_snap_plusd_track  ( snap );
   *(*ptr)++ = libspectrum_snap_plusd_sector ( snap );
   *(*ptr)++ = libspectrum_snap_plusd_data   ( snap );

@@ -732,3 +732,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20090627 doc/libspectrum.txt,libspectrum.h.in,make-perl.c,myglib/gslist.c,
          tape.c,tzx_write.c,warajevo_read.c: fix loading Warajevo TAPs of raw
          samples (e.g. BRUCELEE.TAP) (Fred).
+20090729 accessor.pl,libspectrum.c,libspectrum.h.in,sna.c,snap_accessors.txt,
+         snapshot.c,szx.c,z80.c: add snapshot support for Opus Discovery
+         (Fred & Gergely)

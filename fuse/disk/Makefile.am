@@ -33,6 +33,7 @@ libdisk_a_SOURCES = beta.c \
 		    crc.c \
 		    disk.c \
 		    fdd.c \
+		    opus.c \
 		    plusd.c \
 		    upd_fdc.c \
 		    wd_fdc.c
@@ -41,6 +42,7 @@ noinst_HEADERS = beta.h \
 		 crc.h \
 		 disk.h \
 		 fdd.h \
+		 opus.h \
 		 plusd.h \
 		 upd_fdc.h \
 		 wd_fdc.h

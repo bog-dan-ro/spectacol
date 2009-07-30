@@ -708,6 +708,11 @@ beta_from_snapshot( libspectrum_snap *snap )
                              1 ) )
     return;
 
+  /* ignore drive count for now, there will be an issue with loading snaps where
+     drives have been disabled
+  libspectrum_snap_beta_drive_count( snap )
+   */
+
   beta_fdc->direction = libspectrum_snap_beta_direction( snap );
 
   beta_cr_write ( 0x001f, 0 );
@@ -723,6 +728,7 @@ beta_to_snapshot( libspectrum_snap *snap )
   int attached;
   wd_fdc *f = beta_fdc;
   libspectrum_byte *buffer;
+  int drive_count = 0;
 
   if( !periph_beta128_active ) return;
 
@@ -744,6 +750,12 @@ beta_to_snapshot( libspectrum_snap *snap )
     libspectrum_snap_set_beta_rom( snap, 0, buffer );
     libspectrum_snap_set_beta_custom_rom( snap, 1 );
   }
+
+  drive_count++; /* Drive A is not removable */
+  if( option_enumerate_diskoptions_drive_beta128b_type() > 0 ) drive_count++;
+  if( option_enumerate_diskoptions_drive_beta128c_type() > 0 ) drive_count++;
+  if( option_enumerate_diskoptions_drive_beta128d_type() > 0 ) drive_count++;
+  libspectrum_snap_set_beta_drive_count( snap, drive_count );
 
   libspectrum_snap_set_beta_paged ( snap, beta_active );
   libspectrum_snap_set_beta_direction( snap, beta_fdc->direction );

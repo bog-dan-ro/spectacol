@@ -29,6 +29,7 @@
 
 #include "dck.h"
 #include "disk/beta.h"
+#include "disk/opus.h"
 #include "disk/plusd.h"
 #include "event.h"
 #include "fuse.h"
@@ -374,6 +375,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert_new )
   case 3:
     if1_mdr_insert( which, NULL );
     break;
+  case 4:
+    opus_disk_insert( which, NULL, 0 );
+    break;
   }
 }
 
@@ -402,6 +406,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
   case 3:
     snprintf( title, 80, "Fuse - Insert Microdrive Cartridge %i", which + 1 );
     break;
+  case 4:
+    snprintf( title, 80, "Fuse - Insert Opus Disk %i", which + 1 );
+    break;
   default:
     return;
   }
@@ -420,6 +427,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
     break;
   case 3:
     if1_mdr_insert( which, filename );
+    break;
+  case 4:
+    opus_disk_insert( which, filename, 0 );
     break;
   }
 
@@ -452,6 +462,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_eject )
   case 3:
     if1_mdr_eject( which, write );
     break;
+  case 4:
+    opus_disk_eject( which, write );
+    break;
   }
 }
 
@@ -475,6 +488,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_flip )
     break;
   case 2:
     plusd_disk_flip( which, flip );
+    break;
+  case 4:
+    opus_disk_flip( which, flip );
     break;
   }
 }
@@ -502,6 +518,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect )
     break;
   case 3:
     if1_mdr_writeprotect( which, wrprot );
+    break;
+  case 4:
+    opus_disk_writeprotect( which, wrprot );
     break;
   }
 
@@ -861,6 +880,12 @@ menu_check_media_changed( void )
   confirm = beta_disk_eject( BETA_DRIVE_D, 0 );
   if( confirm ) return 1;
 
+  confirm = opus_disk_eject( OPUS_DRIVE_1, 0 );
+  if( confirm ) return 1;
+
+  confirm = opus_disk_eject( OPUS_DRIVE_2, 0 );
+  if( confirm ) return 1;
+
   confirm = plusd_disk_eject( PLUSD_DRIVE_1, 0 );
   if( confirm ) return 1;
 
@@ -1018,6 +1043,22 @@ const char*
 menu_beta128d_detail( void )
 {
   fdd_t *f = beta_get_fdd( BETA_DRIVE_D );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_opus1_detail( void )
+{
+  fdd_t *f = opus_get_fdd( OPUS_DRIVE_1 );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_opus2_detail( void )
+{
+  fdd_t *f = opus_get_fdd( OPUS_DRIVE_2 );
 
   return menu_disk_detail( f );
 }

@@ -138,6 +138,8 @@ MENU_DETAIL( menu_beta128a_detail );
 MENU_DETAIL( menu_beta128b_detail );
 MENU_DETAIL( menu_beta128c_detail );
 MENU_DETAIL( menu_beta128d_detail );
+MENU_DETAIL( menu_opus1_detail );
+MENU_DETAIL( menu_opus2_detail );
 MENU_DETAIL( menu_plusd1_detail );
 MENU_DETAIL( menu_plusd2_detail );
 MENU_CALLBACK_WITH_ACTION( menu_options_joysticks_select );

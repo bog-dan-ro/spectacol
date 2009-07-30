@@ -47,6 +47,7 @@ Checkbox, (D)ivIDE interface, divide_enabled, INPUT_KEY_d
 Checkbox, DivIDE w(r)ite protect, divide_wp, INPUT_KEY_r
 Checkbox, +D i(n)terface, plusd, INPUT_KEY_n
 Checkbox, (B)eta 128 interface, beta128, INPUT_KEY_b
+Checkbox, Opus Discovery in(t)erface, opus, INPUT_KEY_t
 Posthook, periph_update
 
 rzx
@@ -77,6 +78,8 @@ Combo, Beta 128 Drive (C), drive_beta128c_type, INPUT_KEY_c, Disabled|Single-sid
 Combo, Beta 128 Drive (D), drive_beta128d_type, INPUT_KEY_d, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, +D Drive (1), drive_plusd1_type, INPUT_KEY_1, Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, +D Drive (2), drive_plusd2_type, INPUT_KEY_2, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
+Combo, Opus Drive (1), drive_opus1_type, INPUT_KEY_1, *Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
+Combo, Opus Drive (2), drive_opus2_type, INPUT_KEY_2, Disabled|*Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
 Combo, (T)ry merge 'B' side of disks, disk_try_merge, INPUT_KEY_t, Never|*With single-sided drives|Always
 Checkbox, Con(f)irm merge disk sides, disk_ask_merge, INPUT_KEY_f
 

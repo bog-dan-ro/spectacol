@@ -476,6 +476,18 @@ option.
 Specify Interface I Microdrive cartridge files to open.
 .RE
 .PP
+.I \-\-opus
+.RS
+Emulate a Opus Discovery interface. Same as the Peripherals Options dialog's
+.I "Opus Discovery interface"
+option.
+.RE
+.PP
+.I "\-\-opusdisk file"
+.RS
+Insert the specified file into the emulated Opus Discovery's drive 1.
+.RE
+.PP
 .I "\-p file"
 .br
 .I "\-\-playback file"
@@ -601,6 +613,8 @@ Specify an RZX file to begin recording to.
 .br
 .I "\-\-rom\-interface\-1 file"
 .br
+.I "\-\-rom\-opus file"
+.br
 .I "\-\-rom\-plusd file"
 .br
 .I "\-\-rom\-beta128 file"
@@ -632,6 +646,8 @@ the two ROMs for the Spectrum SE
 .RI ( se\-0.rom " and " se\-1.rom ),
 the Interface I ROM
 .RI ( if1\-2.rom ),
+the Opus Discovery ROM
+.RI ( opus.rom ),
 the +D ROM
 .RI ( plusd.rom ),
 and the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
@@ -1799,6 +1815,14 @@ jumper. See the
 section for more details.
 .RE
 .PP
+.I "Opus Discovery interface"
+.RS
+If this option is selected, Fuse will emulate the Opus Discovery interface.
+See the
+.B "OPUS DISCOVERY EMULATION"
+section for more details.
+.RE
+.PP
 .I "+D interface"
 .RS
 If this option is selected, Fuse will emulate the +D interface.  See the
@@ -2352,11 +2376,12 @@ as the RS-232 TxD or RxD wire.
 .I "Media, Disk"
 .RS
 Virtual floppy disk images are accessible when emulating a +3, +3e,
-Pentagon or Scorpion, or when the Beta 128 or +D interface options
-are enabled and a machine compatible with the chosen interface is
+Pentagon or Scorpion, or when the Beta 128, Opus Discovery or +D interface
+options are enabled and a machine compatible with the chosen interface is
 selected. (See
 .BR "THE .DSK FORMAT" ,
 .B "BETA 128 EMULATION"
+.B "OPUS DISCOVERY EMULATION"
 and
 .B "+D EMULATION"
 sections below for notes on the file formats supported).
@@ -2433,6 +2458,23 @@ Disable the write protect tab for the image in Beta drive A:.
 .I "Media, Disk, Beta, Drive D:, ..."
 .RS
 As above, but for the remaining emulated Beta disk interface drives.
+.RE
+.PP
+.I "Media, Disk, Opus, Drive 1, Insert New"
+.br
+.I "Media, Disk, Opus, Drive 1, Insert..."
+.br
+.I "Media, Disk, Opus, Drive 1, Eject"
+.br
+.I "Media, Disk, Opus, Drive 1, Eject and write..."
+.br
+.I "Media, Disk, Opus, Drive 1, Write protect, Enable"
+.br
+.I "Media, Disk, Opus, Drive 1, Write protect, Disable"
+.br
+.I "Media, Disk, Opus, Drive 2, ..."
+.RS
+As above, but for the emulated Opus Discovery drives.
 .RE
 .PP
 .I "Media, Disk, +D, Drive 1, Insert New"
@@ -2793,8 +2835,9 @@ Serial printer (text-only)
 .IR +2A ", " +3
 Parallel printer (text-only)
 .PP
-If +D emulation is in use and printer emulation is enabled, text-only
-emulation of the +D's parallel printer interface is provided.
+If Opus Discovery or +D emulation is in use and printer emulation is enabled,
+text-only emulation of the disk interface's parallel printer interface is
+provided.
 .PP
 Any printout is appended to one (or both) of two files, depending on
 the printer \- these default to
@@ -3420,6 +3463,17 @@ dialog is enabled.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH OPUS DISCOVERY EMULATION
+.PP
+Fuse supports .OPD and .OPU images in its Opus Discovery emulation. The Opus
+Discovery's printer port is emulated. (See the
+.B "PRINTER EMULATION"                                             
+section for more details.) The Opus Discovery may only be
+used with 16K, 48K, 128K, TC2048 and +2 (not +2A) emulation.  To access disks,
+use the same syntax as Interface I and Microdrives.
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH +D EMULATION
 .PP
 Fuse supports .MGT and .IMG images in its +D emulation. The +D's
@@ -3513,8 +3567,14 @@ section and the CPCEMU manual section 7.7.1
 .I http://www.cpc-emu.org/linux/cpcemu_e.txt
 .RE
 .PP
+.I .OPD
+.I .OPU
+.RS
+Opus Discovery file formats.
+.RE
+.PP
 Fuse supports most of the above formats for writing:
-.I .UDI .FDI .MGT .IMG .SAD .TRD .SCL .DSK
+.I .UDI .FDI .MGT .IMG .SAD .TRD .SCL .OPD .OPU .DSK
 (only the old CPC format).
 .br
 You can save disk images with any output
@@ -3654,3 +3714,6 @@ Gergely Szasz wrote the Interface I and Microdrive emulation, the PAL
 TV scalers, the TV 3x scaler, the movie logging code, the libao sound
 code, the upd765 disk controller used in the +3 and made many
 improvements to the widget code.
+.PP
+Michael D Wynne wrote the original Opus disk interface emulation
+(for EightyOne).

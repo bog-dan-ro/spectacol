@@ -29,6 +29,7 @@
 
 #include "debugger/debugger.h"
 #include "disk/beta.h"
+#include "disk/opus.h"
 #include "disk/plusd.h"
 #include "event.h"
 #include "ide/divide.h"
@@ -231,6 +232,18 @@ z80_do_opcodes( void )
       divide_set_automap( 1 );
     }
     
+    END_CHECK
+
+    CHECK( opus, opus_available )
+
+    if( opus_active ) {
+      if( PC == 0x1748 ) {
+        opus_unpage();
+      }
+    } else if( PC == 0x0008 || PC == 0x0048 || PC == 0x1708 ) {
+      opus_page();
+    }
+
     END_CHECK
 
   end_opcode:

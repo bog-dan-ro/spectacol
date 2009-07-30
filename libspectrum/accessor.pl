@@ -119,6 +119,7 @@ struct libspectrum_snap {
   /* Betadisk status */
   int beta_active;
   int beta_paged;
+  int beta_drive_count;
   int beta_custom_rom;
   int beta_direction;	/* FDC seek direction:
 			      zero => towards lower cylinders (hubwards)
@@ -130,6 +131,7 @@ struct libspectrum_snap {
   /* Plus D status */
   int plusd_active;
   int plusd_paged;
+  int plusd_drive_count;
   int plusd_custom_rom;
   int plusd_direction;	/* FDC seek direction:
 			      zero => towards lower cylinders (hubwards)
@@ -138,6 +140,20 @@ struct libspectrum_snap {
     plusd_status;
   libspectrum_byte *plusd_rom[1];
   libspectrum_byte *plusd_ram[1];
+
+  /* Opus Discovery status */
+  int opus_active;
+  int opus_paged;
+  int opus_drive_count;
+  int opus_custom_rom;
+  int opus_direction;	/* FDC seek direction:
+			      zero => towards lower cylinders (hubwards)
+			  non-zero => towards higher cylinders (rimwards) */
+  libspectrum_byte opus_track, opus_sector, opus_data, opus_status;
+  libspectrum_byte opus_data_reg_a, opus_data_dir_a, opus_control_a;
+  libspectrum_byte opus_data_reg_b, opus_data_dir_b, opus_control_b;
+  libspectrum_byte *opus_rom[1];
+  libspectrum_byte *opus_ram[1];
 
   /* ZXATASP status */
   int zxatasp_active;

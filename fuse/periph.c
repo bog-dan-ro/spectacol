@@ -30,6 +30,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuller.h"
+#include "disk/opus.h"
 #include "ide/divide.h"
 #include "ide/simpleide.h"
 #include "ide/zxatasp.h"
@@ -324,6 +325,12 @@ periph_present beta128_present;
 /* Is the Beta 128 currently active */
 int periph_beta128_active;
 
+/* What sort of Opus interface does the current machine have */
+periph_present opus_present;
+
+/* Is the Opus currently active */
+int periph_opus_active;
+
 /* What sort of Fuller Box does the current machine have */
 periph_present fuller_present;
 
@@ -362,6 +369,7 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   interface2_present = PERIPH_PRESENT_NEVER;
   plusd_present = PERIPH_PRESENT_NEVER;
   beta128_present = PERIPH_PRESENT_NEVER;
+  opus_present = PERIPH_PRESENT_NEVER;
   fuller_present = PERIPH_PRESENT_NEVER;
   melodik_present = PERIPH_PRESENT_NEVER;
 
@@ -396,6 +404,11 @@ periph_setup_beta128( periph_present present ) {
 void
 periph_register_beta128( void ) {
   periph_register_n( beta_peripherals, beta_peripherals_count );
+}
+
+void
+periph_setup_opus( periph_present present ) {
+  opus_present = present;
 }
 
 void
@@ -491,6 +504,13 @@ periph_update( void )
     periph_beta128_active = settings_current.beta128; break;
   case PERIPH_PRESENT_ALWAYS: periph_beta128_active = 1;
     break;
+  }
+
+  switch( opus_present ) {
+  case PERIPH_PRESENT_NEVER: periph_opus_active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    periph_opus_active = settings_current.opus; break;
+  case PERIPH_PRESENT_ALWAYS: periph_opus_active = 1; break;
   }
 
   if( ui_mouse_present ) {

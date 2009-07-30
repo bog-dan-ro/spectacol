@@ -296,6 +296,10 @@ libspectrum_sna_write( libspectrum_byte **buffer, size_t *length,
   if( libspectrum_snap_beta_active( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
 
+  /* We don't store Opus info at all */
+  if( libspectrum_snap_opus_active( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+
   /* We don't save IDE interface info at all */
   if( libspectrum_snap_zxatasp_active( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;

@@ -98,6 +98,9 @@ extern int periph_plusd_active;
 /* Is the Beta 128 active */
 extern int periph_beta128_active;
 
+/* Is the Opus active */
+extern int periph_opus_active;
+
 /* Is the Fuller Box active */
 extern int periph_fuller_active;
 
@@ -110,6 +113,7 @@ void periph_setup_interface1( periph_present present );
 void periph_setup_interface2( periph_present present );
 void periph_setup_plusd( periph_present present );
 void periph_setup_beta128( periph_present present );
+void periph_setup_opus( periph_present present );
 void periph_setup_fuller( periph_present present );
 void periph_setup_melodik( periph_present present );
 void periph_update( void );

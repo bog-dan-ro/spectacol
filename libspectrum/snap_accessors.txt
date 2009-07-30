@@ -68,6 +68,7 @@ size_t interface1_rom_length 1
 
 int beta_active
 int beta_paged
+int beta_drive_count
 int beta_custom_rom
 int beta_direction
 libspectrum_byte beta_system
@@ -79,6 +80,7 @@ libspectrum_byte* beta_rom 1
 
 int plusd_active
 int plusd_paged
+int plusd_drive_count
 int plusd_custom_rom
 int plusd_direction
 libspectrum_byte plusd_control
@@ -88,6 +90,24 @@ libspectrum_byte plusd_data
 libspectrum_byte plusd_status
 libspectrum_byte* plusd_rom 1
 libspectrum_byte* plusd_ram 1
+
+int opus_active
+int opus_paged
+int opus_drive_count
+int opus_custom_rom
+int opus_direction
+libspectrum_byte opus_track
+libspectrum_byte opus_sector
+libspectrum_byte opus_data
+libspectrum_byte opus_status
+libspectrum_byte opus_data_reg_a
+libspectrum_byte opus_data_dir_a
+libspectrum_byte opus_control_a
+libspectrum_byte opus_data_reg_b
+libspectrum_byte opus_data_dir_b
+libspectrum_byte opus_control_b
+libspectrum_byte* opus_rom 1
+libspectrum_byte* opus_ram 1
 
 int custom_rom
 size_t custom_rom_pages

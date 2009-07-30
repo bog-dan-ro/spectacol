@@ -31,6 +31,7 @@
 
 #include "debugger/debugger.h"
 #include "display.h"
+#include "disk/opus.h"
 #include "fuse.h"
 #include "machines/spec128.h"
 #include "memory.h"
@@ -197,6 +198,9 @@ readbyte( libspectrum_word address )
   if( mapping->contended ) tstates += ula_contention[ tstates ];
   tstates += 3;
 
+  if( opus_active && address >= 0x2800 && address < 0x3800 )
+    return opus_read( address );
+
   return mapping->page[ address & 0x1fff ];
 }
 
@@ -275,7 +279,9 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
   libspectrum_word bank = address >> 13;
   memory_page *mapping = &memory_map_write[ bank ];
 
-  if( mapping->writable || settings_current.writable_roms ) {
+  if( opus_active && address >= 0x2800 && address < 0x3800 ) {
+    opus_write( address, b );
+  } else if( mapping->writable || settings_current.writable_roms ) {
     libspectrum_word offset = address & 0x1fff;
     libspectrum_byte *memory = mapping->page;
 

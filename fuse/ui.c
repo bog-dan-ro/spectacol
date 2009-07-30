@@ -452,6 +452,40 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Disk/+D/Drive 2/Write protect/Enable",
     "/Media/Disk/+D/Drive 2/Write protect/Disable", 1 },
 
+  { UI_MENU_ITEM_MEDIA_DISK_OPUS, "/Media/Disk/Opus" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_OPUS_1, "/Media/Disk/Opus/Drive 1" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_OPUS_1_EJECT,
+    "/Media/Disk/Opus/Drive 1/Eject",
+    "/Media/Disk/Opus/Drive 1/Eject and write...", 0,
+    "/Media/Disk/Opus/Drive 1/Flip disk", 0,
+    "/Media/Disk/Opus/Drive 1/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_OPUS_1_FLIP_SET,
+    "/Media/Disk/Opus/Drive 1/Flip disk/Turn upside down",
+    "/Media/Disk/Opus/Drive 1/Flip disk/Turn back", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_OPUS_1_WP_SET,
+    "/Media/Disk/Opus/Drive 1/Write protect/Enable",
+    "/Media/Disk/Opus/Drive 1/Write protect/Disable", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_OPUS_2, "/Media/Disk/Opus/Drive 2" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_OPUS_2_EJECT,
+    "/Media/Disk/Opus/Drive 2/Eject",
+    "/Media/Disk/Opus/Drive 2/Eject and write...", 0,
+    "/Media/Disk/Opus/Drive 2/Flip disk", 0,
+    "/Media/Disk/Opus/Drive 2/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_OPUS_2_FLIP_SET,
+    "/Media/Disk/Opus/Drive 2/Flip disk/Turn upside down",
+    "/Media/Disk/Opus/Drive 2/Flip disk/Turn back", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_OPUS_2_WP_SET,
+    "/Media/Disk/Opus/Drive 2/Write protect/Enable",
+    "/Media/Disk/Opus/Drive 2/Write protect/Disable", 1 },
+
   { UI_MENU_ITEM_MEDIA_IDE, "/Media/IDE" },
 
   { UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT, "/Media/IDE/Simple 8-bit" },
@@ -557,7 +591,7 @@ ui_menu_activate( ui_menu_item item, int active )
 void
 ui_menu_disk_update( void )
 {
-  int plus3, beta, plusd;
+  int plus3, beta, plusd, opus;
   int capabilities;
 
   capabilities = machine_current->capabilities;
@@ -565,9 +599,10 @@ ui_menu_disk_update( void )
   /* Set the disk menu items and statusbar appropriately */
   plus3 = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK;
   beta = beta_available;
+  opus = opus_available;
   plusd = plusd_available;
 
-  if( plus3 || beta || plusd ) {
+  if( plus3 || beta || opus || plusd ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 1 );
     ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
   } else {
@@ -578,6 +613,7 @@ ui_menu_disk_update( void )
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3, plus3 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA, beta );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_OPUS, opus );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD, plusd );
 }
 
@@ -648,6 +684,33 @@ ui_beta_disk_write( beta_drive_number which )
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   beta_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
+}
+
+int
+ui_opus_disk_write( opus_drive_number which )
+{
+  char drive, *filename, title[80];
+
+  switch( which ) {
+    case OPUS_DRIVE_1: drive = '1'; break;
+    case OPUS_DRIVE_2: drive = '2'; break;
+    default: drive = '?'; break;
+  }
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write Opus Disk %c", drive );
+
+  filename = ui_get_save_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  opus_disk_write( which, filename );
 
   free( filename );
 

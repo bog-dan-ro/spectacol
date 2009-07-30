@@ -317,6 +317,30 @@ Media/Disk/+D/Drive 2/Write _protect, Branch
 Media/Disk/+D/Drive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x122
 Media/Disk/+D/Drive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x022
 
+Media/Disk/_Opus, Branch
+Media/Disk/Opus/Drive _1, Branch,,,menu_opus1_detail
+Media/Disk/Opus/Drive 1/Insert _New, Item,, menu_media_insert_new,, 0x41
+Media/Disk/Opus/Drive 1/_Insert..., Item,, menu_media_insert,, 0x41
+Media/Disk/Opus/Drive 1/_Eject, Item,, menu_media_eject,, 0x041
+Media/Disk/Opus/Drive 1/Eject and _write..., Item,, menu_media_eject,, 0x141
+Media/Disk/Opus/Drive 1/_Flip disk, Branch
+Media/Disk/Opus/Drive 1/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x141
+Media/Disk/Opus/Drive 1/Flip disk/Turn _back, Item,, menu_media_flip,, 0x041
+Media/Disk/Opus/Drive 1/Write _protect, Branch
+Media/Disk/Opus/Drive 1/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x141
+Media/Disk/Opus/Drive 1/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x041
+Media/Disk/Opus/Drive _2, Branch,,,menu_opus2_detail
+Media/Disk/Opus/Drive 2/Insert _New, Item,, menu_media_insert_new,, 0x42
+Media/Disk/Opus/Drive 2/_Insert..., Item,, menu_media_insert,, 0x42
+Media/Disk/Opus/Drive 2/_Eject, Item,, menu_media_eject,, 0x042
+Media/Disk/Opus/Drive 2/Eject and _write..., Item,, menu_media_eject,, 0x142
+Media/Disk/Opus/Drive 2/_Flip disk, Branch
+Media/Disk/Opus/Drive 2/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x142
+Media/Disk/Opus/Drive 2/Flip disk/Turn _back, Item,, menu_media_flip,, 0x042
+Media/Disk/Opus/Drive 2/Write _protect, Branch
+Media/Disk/Opus/Drive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x142
+Media/Disk/Opus/Drive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x042
+
 Media/_Cartridge, Branch
 Media/Cartridge/_Timex Dock, Branch
 Media/Cartridge/Timex Dock/_Insert..., Item

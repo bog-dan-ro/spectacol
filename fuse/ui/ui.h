@@ -36,6 +36,7 @@
 
 #include "compat.h"
 #include "disk/beta.h"
+#include "disk/opus.h"
 #include "disk/plusd.h"
 #include "machines/specplus3.h"
 #include "ui/scaler/scaler.h"
@@ -116,6 +117,7 @@ int ui_tape_write( void );
 /* Write a +3, Beta or +D disk out */
 int ui_plus3_disk_write( specplus3_drive_number which );
 int ui_beta_disk_write( beta_drive_number which );
+int ui_opus_disk_write( opus_drive_number which );
 int ui_plusd_disk_write( plusd_drive_number which );
 int ui_mdr_write( int which );
 
@@ -188,6 +190,15 @@ typedef enum ui_menu_item {
   UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
   UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_FLIP_SET,
   UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
+  UI_MENU_ITEM_MEDIA_DISK_OPUS,
+  UI_MENU_ITEM_MEDIA_DISK_OPUS_1,
+  UI_MENU_ITEM_MEDIA_DISK_OPUS_1_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_OPUS_1_FLIP_SET,
+  UI_MENU_ITEM_MEDIA_DISK_OPUS_1_WP_SET,
+  UI_MENU_ITEM_MEDIA_DISK_OPUS_2,
+  UI_MENU_ITEM_MEDIA_DISK_OPUS_2_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_OPUS_2_FLIP_SET,
+  UI_MENU_ITEM_MEDIA_DISK_OPUS_2_WP_SET,
   UI_MENU_ITEM_MEDIA_IDE,
   UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT,
   UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT,

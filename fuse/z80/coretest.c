@@ -447,6 +447,21 @@ event_register( event_fn_t fn GCC_UNUSED, const char *string GCC_UNUSED )
   return 0;
 }
 
+int opus_available = 0;
+int opus_active = 0;
+
+void
+opus_page( void )
+{
+  abort();
+}
+
+void
+opus_unpage( void )
+{
+  abort();
+}
+
 int plusd_available = 0;
 int plusd_active = 0;
 

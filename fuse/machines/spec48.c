@@ -94,6 +94,7 @@ spec48_reset( void )
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_opus( PERIPH_PRESENT_OPTIONAL );
   periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
   periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
   periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );

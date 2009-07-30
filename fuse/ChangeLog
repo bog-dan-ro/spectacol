@@ -4,6 +4,8 @@
 
         FIXME: Just a start, mostly changes visible on Fuse for OS X at the
         moment
+        * Add Opus Discovery disk interface support (Gergely Szasz and Fredrick
+          Meunier).
         * Wii support.
         * Many improvements to Win32 UI (Marek Januszewski).
         * Add support for flipping disk images in single sided drives (Gergely
@@ -16,7 +18,7 @@
         * Allow beeper and AY volumes to be set (Fredrick Meunier).
         * Enable Beta 128 interface in 48K and TC2048 machines (thanks,
           Omikron) (Fredrick Meunier).
-        * Add emulation of the Fuller Audio Box (Stuart Brady & Fredrick
+        * Add emulation of the Fuller Audio Box (Stuart Brady and Fredrick
           Meunier).
         * Allow sound to run from 2% speed up (Fredrick Meunier).
         * Add emulation of the Melodik and similar 48K-compatible AY interfaces
