@@ -1102,7 +1102,7 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
 	  plus3_fix = CPC_ISSUE_NONE;
       }
       trlen += seclen;
-      if( seclen == 0x80 )		/* every 128byte length sector padded */
+      if( seclen % 0x100 )		/* every? 128/384/...byte length sector padded */
 	sector_pad++;
     }
     if( i < 84 ) {
@@ -1136,6 +1136,7 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
       preindex_add( d, gap );
     postindex_add( d, gap );
 
+    sector_pad = 0;
     for( j = 0; j < hdrb[0x15]; j++ ) {			/* each sector */
       seclen = d->type == DISK_ECPC ? hdrb[ 0x1e + 8 * j ] +	/* data length in sector */
 				      256 * hdrb[ 0x1f + 8 * j ]
@@ -1199,10 +1200,11 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
 					/* ( ( N * len ) / len - 1 ) * len */
         }
       }
-      if( seclen == 0x80 )		/* every 128byte length sector padded */
-	buffer->index += 0x80;
+      if( seclen % 0x100 )		/* every? 128/384/...byte length sector padded */
+	sector_pad++;
     }
     gap4_add( d, gap );
+    buffer->index += sector_pad * 0x80;
   }
   return d->status = DISK_OK;
 }
@@ -2114,7 +2116,9 @@ write_log( FILE *file, disk_t *d )
 {
   int i, j, k, del, rev;
   int h, t, s, b;
+  char str[17];
 
+  str[16] = '\0';
   fprintf( file, "DISK tracks log!\n" );
   fprintf( file, "Sides: %d, cylinders: %d\n", d->sides, d->cylinders );
   for( j = 0; j < d->cylinders; j++ ) {	/* ALT :) */
@@ -2153,9 +2157,11 @@ write_log( FILE *file, disk_t *d )
 	  if( !( k % 16 ) )
 	    fprintf( file, "0x%08x:", k );
 	  fprintf( file, " 0x%02x", d->track[ d->i ] );
+	  str[ k & 0x0f ] = d->track[ d->i ] >= 32 &&
+			    d->track[ d->i ] < 127 ? d->track[ d->i ] : '.';
 	  k++;
 	  if( !( k % 16 ) )
-	    fprintf( file, "\n" );
+	    fprintf( file, " | %s\n", str );
 	  d->i++;
 	  if( d->i >= d->bpt ) {
 	    d->i = 0;
