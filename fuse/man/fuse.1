@@ -3465,8 +3465,10 @@ dialog is enabled.
 .\"
 .SH OPUS DISCOVERY EMULATION
 .PP
+By default, Fuse emulates the Opus Discovery interface with the optional 2k RAM
+expansion and a second 40 track single sided disk drive.
 Fuse supports .OPD and .OPU images in its Opus Discovery emulation. The Opus
-Discovery's printer port is emulated. (See the
+Discovery's printer port is also emulated for output only. (See the
 .B "PRINTER EMULATION"                                             
 section for more details.) The Opus Discovery may only be
 used with 16K, 48K, 128K, TC2048 and +2 (not +2A) emulation.  To access disks,
@@ -3480,8 +3482,8 @@ Fuse supports .MGT and .IMG images in its +D emulation. The +D's
 printer port is emulated. (See the
 .B "PRINTER EMULATION"                                             
 section for more details.) The +D may only be
-used with 48K, 128K and +2 (not +2A) emulation.  To access disks,
-load G+DOS, by inserting a disk containing the DOS file (+SYS) and
+used with 48K, 128K and +2 (not +2A) emulation.  To access disks, you will first
+need to load G+DOS, by inserting a disk containing the DOS file (+SYS) and
 entering "RUN".  Once DOS is loaded, you can load to/from +D disks
 by prefixing filenames with
 .RI `d n '

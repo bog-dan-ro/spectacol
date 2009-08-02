@@ -3182,3 +3182,4 @@
          Szasz and Fredrick Meunier).
 20090731 disk/disk.c: tweak sector padding to fix ATC+Techonicn Ted.dsk Opus
          disk (thanks, Simon Owen) (Gergely Szasz).
+20090803 man/fuse.1: tweak some details in the Opus and +D sections (Fred).
