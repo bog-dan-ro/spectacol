@@ -289,3 +289,7 @@
 20090203 man/audio2tape.1: correct documentation of default trigger (Fred).
 20090411 tape2wav.c: use the new tape flag for end of tape (part of fixes for
          bug #2743838) (Fred).
+20090803 Makefile.am,compat.h,compat/amiga/{Makefile.am,osname.c},
+         compat/unix/{Makefile.am,osname.c},configure.in,snap2tzx.c,utils.c:
+         add OS compatibility stubs ala Fuse (patch #2315512) (Chris Young &
+         Fred).

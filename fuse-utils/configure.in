@@ -133,7 +133,24 @@ if test "$audiofile" = yes; then
 fi
 AM_CONDITIONAL(BUILD_AUDIOTOOLS, test "$audiofile" = yes)
 
+dnl Work out which compatibility routines to use
+AC_MSG_CHECKING(which compatibility routines to use)
+case "$target_os" in
+  amigaos)
+    COMPAT_OSNAME='amiga'
+    ;;
+  *)
+    COMPAT_OSNAME='unix'
+  ;;
+esac
+AC_MSG_RESULT($COMPAT_OSNAME)
+COMPAT_SUBDIR="compat/$COMPAT_OSNAME"
+AC_SUBST(COMPAT_SUBDIR)
+AC_SUBST(COMPAT_OSNAME)
+
 AC_OUTPUT(Makefile \
+compat/amiga/Makefile \
+compat/unix/Makefile \
 fuse-utils.qpg \
 hacking/Makefile \
 man/Makefile)

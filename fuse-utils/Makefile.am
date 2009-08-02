@@ -23,8 +23,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = hacking \
-	man
+SUBDIRS = @COMPAT_SUBDIR@ \
+          hacking \
+          man
 
 bin_PROGRAMS = createhdf \
 	       listbasic \
@@ -53,45 +54,47 @@ INCLUDES = @LIBSPEC_CFLAGS@ @AUDIOFILE_CFLAGS@ `pkg-config --cflags glib-2.0`
 createhdf_SOURCES = ide.c createhdf.c
 
 listbasic_SOURCES = listbasic.c utils.c
-listbasic_LDADD = @LIBSPEC_LIBS@
+listbasic_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 profile2map_SOURCES = profile2map.c utils.c
-profile2map_LDADD = @LIBSPEC_LIBS@
+profile2map_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 raw2hdf_SOURCES = ide.c raw2hdf.c
 
 rzxcheck_SOURCES = rzxcheck.c keys.c utils.c
-rzxcheck_LDADD = @LIBSPEC_LIBS@
+rzxcheck_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 rzxdump_SOURCES = rzxdump.c utils.c
-rzxdump_LDADD = @LIBSPEC_LIBS@
+rzxdump_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 rzxtool_SOURCES = rzxtool.c utils.c
-rzxtool_LDADD = @LIBSPEC_LIBS@
+rzxtool_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 scl2trd_SOURCES = scl2trd.c
 
 snap2tzx_SOURCES = snap2tzx.c utils.c
-snap2tzx_LDADD = @LIBSPEC_LIBS@
+snap2tzx_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 snapconv_SOURCES = snapconv.c utils.c
-snapconv_LDADD = @LIBSPEC_LIBS@
+snapconv_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 tapeconv_SOURCES = tapeconv.c utils.c
-tapeconv_LDADD = @LIBSPEC_LIBS@
+tapeconv_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 tzxlist_SOURCES = tzxlist.c utils.c
-tzxlist_LDADD = @LIBSPEC_LIBS@
+tzxlist_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 audio2tape_SOURCES = audio2tape.cc importer/soundfile.cc importer/trigger.cc \
                      converter/findpilot.cc converter/findsync1.cc \
                      converter/getpulse1.cc converter/getpulse2.cc \
                      converter/getsync2.cc converter/romloader.cc \
                      converter/romloaderstate.cc utils.c
-audio2tape_LDADD = @LIBSPEC_LIBS@ @AUDIOFILE_LIBS@
+audio2tape_LDADD = @LIBSPEC_LIBS@ @AUDIOFILE_LIBS@ \
+                   compat/@COMPAT_OSNAME@/libcompatos.a
 
 tape2wav_SOURCES = tape2wav.c utils.c
-tape2wav_LDADD = @LIBSPEC_LIBS@ @AUDIOFILE_LIBS@
+tape2wav_LDADD = @LIBSPEC_LIBS@ @AUDIOFILE_LIBS@ \
+                 compat/@COMPAT_OSNAME@/libcompatos.a
 
 noinst_HEADERS = compat.h ide.h utils.h audio2tape.h importer/interpolator.h \
                  importer/schmitt.h importer/simple.h importer/soundfile.h \

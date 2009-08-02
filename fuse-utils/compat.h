@@ -47,4 +47,7 @@
 #define S_IWOTH 0
 #endif				/* #ifndef S_IWOTH */
 
+char *compat_basename( char *path );
+int compat_osname( char *buffer, size_t length );
+
 #endif				/* #ifndef FUSE_UTILS_COMPAT_H */

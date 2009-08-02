@@ -29,7 +29,6 @@
 #include <config.h>
 
 #include <errno.h>
-#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,6 +36,7 @@
 
 #include <libspectrum.h>
 
+#include "compat.h"
 #include "utils.h"
 
 char *progname;			/* argv[0] */
@@ -315,7 +315,7 @@ print_usage( int title )
     return;
   }
 
-  buffer2 = basename( buffer );
+  buffer2 = compat_basename( buffer );
   
   if( title ) {
     printf(
@@ -451,7 +451,7 @@ parse_args( settings_t *settings, int argc, char **argv )
     return 1;
   }
 
-  buffer2 = basename( buffer );
+  buffer2 = compat_basename( buffer );
   last_dot = strrchr( buffer2, '.' ); if( last_dot ) *last_dot = '\0';
 
   if( !got_out_filename ) {

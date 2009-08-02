@@ -70,15 +70,11 @@ get_creator( libspectrum_creator **creator, const char *program )
   size_t i;
 
 #ifndef WIN32
-  struct utsname buf;
+  char osname[ 256 ];
   int sys_error;
 
-  sys_error = uname( &buf );
-  if( sys_error == -1 ) {
-    fprintf( stderr, "%s: error getting system information: %s\n", progname,
-	     strerror( errno ) );
-    return 1;
-  }
+  sys_error = compat_osname( osname, sizeof( osname ) );
+  if( sys_error ) return 1;
 #endif
 
   *creator = libspectrum_creator_alloc();
@@ -110,9 +106,9 @@ get_creator( libspectrum_creator **creator, const char *program )
   snprintf( custom, 256, "libspectrum: %s\nsystem: windows\n",
 	    libspectrum_version() );
 #else
-  snprintf( custom, 256, "libspectrum: %s\nuname: %s %s %s\n",
+  snprintf( custom, 256, "libspectrum: %s\nuname: %s\n",
 	    libspectrum_version(),
-	    buf.sysname, buf.machine, buf.release );
+	    osname );
 #endif
 
   error = libspectrum_creator_set_custom( *creator,
