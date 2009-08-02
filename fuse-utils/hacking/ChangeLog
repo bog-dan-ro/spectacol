@@ -293,3 +293,5 @@
          compat/unix/{Makefile.am,osname.c},configure.in,snap2tzx.c,utils.c:
          add OS compatibility stubs ala Fuse (patch #2315512) (Chris Young &
          Fred).
+20090803 compat/amiga/basename.c,compat/unix/basename.c: missed a couple of
+         files (Fred).
