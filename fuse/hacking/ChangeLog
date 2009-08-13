@@ -3183,3 +3183,5 @@
 20090731 disk/disk.c: tweak sector padding to fix ATC+Techonicn Ted.dsk Opus
          disk (thanks, Simon Owen) (Gergely Szasz).
 20090803 man/fuse.1: tweak some details in the Opus and +D sections (Fred).
+20090813 compat/wii/paths.c: Wii: Modified compat_is_absolute_path function to
+	 recognize 'sd:/' prefix (Marek).

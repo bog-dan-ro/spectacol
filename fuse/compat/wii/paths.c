@@ -50,5 +50,8 @@ compat_is_absolute_path( const char *path )
   if(strlen(path) >= strlen("fat:/") &&
      strncmp(path, "fat:/", strlen("fat:/")) == 0)
     return 1;
+  if(strlen(path) >= strlen("sd:/") &&
+     strncmp(path, "sd:/", strlen("sd:/")) == 0)
+    return 1;
   return 0;
 }
