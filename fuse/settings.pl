@@ -57,7 +57,7 @@ while(<>) {
 }
 
 print Fuse::GPL( 'settings.c: Handling configuration settings',
-		 'Copyright (c) 2002 Philip Kendall' );
+		 '2002 Philip Kendall' );
 
 print hashline( __LINE__ ), << 'CODE';
 
