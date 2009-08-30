@@ -43,6 +43,10 @@
 #include <SDL.h>		/* Needed on MacOS X and Windows */
 #endif				/* #ifdef UI_SDL */
 
+#ifdef GEKKO
+#include <fat.h>
+#endif				/* #ifdef GEKKO */
+
 #include "ay.h"
 #include "dck.h"
 #include "debugger/debugger.h"
@@ -155,6 +159,10 @@ int main(int argc, char **argv)
   SetErrorMode( SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX );
 #endif
 
+#ifdef GEKKO
+  fatInitDefault();
+#endif				/* #ifdef GEKKO */
+  
   if(fuse_init(argc,argv)) {
     fprintf(stderr,"%s: error initialising -- giving up!\n", fuse_progname);
     return 1;

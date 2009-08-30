@@ -3188,3 +3188,5 @@
 20090830 settings-header.pl,settings.pl: Minor correction to the perl code that
 	 was creating duplicate 'Copyright (c)' string in generated c files.
 	 (Marek).
+20090830 fuse.c,ui/wii/wiidisplay.c: Wii: Moved filesystem init to main() where
+	 it belongs (Marek).

@@ -31,7 +31,6 @@
 #include <stdlib.h>
 
 /* Wii includes */
-#include <fat.h>
 #include <gccore.h>
 #include <ogcsys.h>
 
@@ -317,8 +316,6 @@ int wiidisplay_init(void)
   VIDEO_WaitVSync();
   if(rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-  fatInitDefault(); /* FIXME: doesn't belong in display init */
-  
   return 0;
 }
 
