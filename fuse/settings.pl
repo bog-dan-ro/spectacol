@@ -330,7 +330,7 @@ static int
 settings_command_line( settings_info *settings, int *first_arg,
                        int argc, char **argv )
 {
-#ifdef UI_WII
+#ifdef GEKKO
   /* No argv on the Wii. Just return */
   return 0;
 #endif

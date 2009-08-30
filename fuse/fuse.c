@@ -207,7 +207,7 @@ static int fuse_init(int argc, char **argv)
   
   libspectrum_error_function = ui_libspectrum_error;
 
-#ifdef UI_WII
+#ifdef GEKKO
   /* On the Wii, init the display first so we have a way of outputting
      messages */
   if( display_init(&argc,&argv) ) return 1;
@@ -255,7 +255,7 @@ static int fuse_init(int argc, char **argv)
 
   if( event_init() ) return 1;
   
-#ifndef UI_WII
+#ifndef GEKKO
   if( display_init(&argc,&argv) ) return 1;
 #endif
 
@@ -538,7 +538,7 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
   libspectrum_class_t class;
   int error;
 
-#ifdef UI_WII
+#ifdef GEKKO
   /* No argv on the Wii. Just return */
   return 0;
 #endif

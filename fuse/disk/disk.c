@@ -1513,14 +1513,14 @@ disk_open2( disk_t *d, const char *filename, int preindex )
   libspectrum_id_t type;
   int error;
 
-#ifdef UI_WII		/* Wii doesn't have access() */
+#ifdef GEKKO		/* Wii doesn't have access() */
   d->wrprot = 0;
-#else			/* #ifdef UI_WII */
+#else			/* #ifdef GEKKO */
   if( access( filename, W_OK ) == -1 )		/* file read only */
     d->wrprot = 1;
   else
     d->wrprot = 0;
-#endif			/* #ifdef UI_WII */
+#endif			/* #ifdef GEKKO */
 
   if( utils_read_file( filename, &buffer.file ) )
     return d->status = DISK_OPEN;

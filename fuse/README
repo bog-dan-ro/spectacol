@@ -138,7 +138,7 @@ Then, use this configure line:
 	    --with-wii \
 	    --without-libxml2 --without-libiconv --without-gpm \
 	    --without-x --without-glib \
-	    CFLAGS="-g -I$DEVKITPPC/include -I$DEVKITPRO/libogc/include" \
+	    CFLAGS="-g -I$DEVKITPPC/include -I$DEVKITPRO/libogc/include -DGEKKO" \
 	    LDFLAGS="-g -mrvl -mcpu=750 -meabi -mhard-float \
                      -Wl,-Map,fuse.elf.map -L$DEVKITPPC/lib \
                      -L$DEVKITPRO/libogc/lib/wii" \

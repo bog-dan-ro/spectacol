@@ -3190,3 +3190,8 @@
 	 (Marek).
 20090830 fuse.c,ui/wii/wiidisplay.c: Wii: Moved filesystem init to main() where
 	 it belongs (Marek).
+20090830 utils.c,fuse.c,compat.h,disk/disk.c,input.c,README,settings.pl
+	 ui/widget/{menu.c,filesel.c}: Wii: Use GEKKO macro instead of UI_WII
+	 for non-UI code that needs to be compiled when compiling for Wii. This
+	 will allow to compile Fuse for Wii either native or SDL UI (Marek).
+

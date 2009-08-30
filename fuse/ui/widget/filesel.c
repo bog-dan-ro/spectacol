@@ -759,10 +759,10 @@ widget_filesel_chdir( void )
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     return 1;
   }
-#ifndef UI_WII
+#ifndef GEKKO
   /* Wii getcwd() already has the slash on the end */
   strcat( fn, FUSE_DIR_SEP_STR );
-#endif				/* #ifndef UI_WII */
+#endif				/* #ifndef GEKKO */
   strcat( fn, widget_filenames[ current_file ]->name );
 
 /*

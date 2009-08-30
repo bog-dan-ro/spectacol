@@ -78,11 +78,11 @@ int compat_is_absolute_path( const char *path );
 
 typedef FILE* compat_fd;
 
-#ifndef UI_WII
+#ifndef GEKKO
 typedef DIR* compat_dir;
-#else                           /* #ifndef UI_WII */
+#else                           /* #ifndef GEKKO */
 typedef DIR_ITER* compat_dir;
-#endif                          /* #ifndef UI_WII */
+#endif                          /* #ifndef GEKKO */
 
 extern const compat_fd COMPAT_FILE_OPEN_FAILED;
 

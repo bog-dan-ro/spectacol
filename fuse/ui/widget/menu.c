@@ -157,16 +157,16 @@ SUBMENU_KEY_SELECTIONS( 5 )
 SUBMENU_KEY_SELECTIONS( 6 )
 SUBMENU_KEY_SELECTIONS( 7 )
 SUBMENU_KEY_SELECTIONS( 8 )
-#ifndef UI_WII
+#ifndef GEKKO
 SUBMENU_KEY_SELECTIONS( 9 )
 SUBMENU_KEY_SELECTIONS( 10 )
-#endif  /* #ifndef UI_WII */
+#endif  /* #ifndef GEKKO */
 #endif  /* #ifdef USE_JOYSTICK */
 
 #ifdef USE_JOYSTICK
 static widget_menu_entry submenu_joystick_buttons[] = {
   { "Select joystick button" },
-#ifndef UI_WII
+#ifndef GEKKO
   { "Button \0121\011", INPUT_KEY_1, submenu_select_key_for_button_1, NULL, get_key_name_for_button_1, 0 },
   { "Button \0122\011", INPUT_KEY_2, submenu_select_key_for_button_2, NULL, get_key_name_for_button_2, 0 },
   { "Button \0123\011", INPUT_KEY_3, submenu_select_key_for_button_3, NULL, get_key_name_for_button_3, 0 },
@@ -177,7 +177,7 @@ static widget_menu_entry submenu_joystick_buttons[] = {
   { "Button \0128\011", INPUT_KEY_8, submenu_select_key_for_button_8, NULL, get_key_name_for_button_8, 0 },
   { "Button \0129\011", INPUT_KEY_9, submenu_select_key_for_button_9, NULL, get_key_name_for_button_9, 0 },
   { "Button 1\0120\011", INPUT_KEY_0, submenu_select_key_for_button_10, NULL, get_key_name_for_button_10, 0 },
-#else  /* #ifndef UI_WII */
+#else  /* #ifndef GEKKO */
   { "Button \0121\011", INPUT_KEY_1, submenu_select_key_for_button_1, NULL, get_key_name_for_button_1, 0 },
   { "Button \0122\011", INPUT_KEY_2, submenu_select_key_for_button_2, NULL, get_key_name_for_button_2, 0 },
   { "Button \012A\011", INPUT_KEY_a, submenu_select_key_for_button_3, NULL, get_key_name_for_button_3, 0 },
@@ -186,7 +186,7 @@ static widget_menu_entry submenu_joystick_buttons[] = {
   { "Button \012M\011inus", INPUT_KEY_m, submenu_select_key_for_button_6, NULL, get_key_name_for_button_6, 0 },
   { "Button \012Z\011 on Nunchuck", INPUT_KEY_z, submenu_select_key_for_button_7, NULL, get_key_name_for_button_7, 0 },
   { "Button \012C\011 on Nunchuck", INPUT_KEY_c, submenu_select_key_for_button_8, NULL, get_key_name_for_button_8, 0 },
-#endif  /* #ifndef UI_WII */
+#endif  /* #ifndef GEKKO */
   { NULL }
 };
 #endif  /* #ifdef USE_JOYSTICK */

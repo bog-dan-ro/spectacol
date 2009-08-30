@@ -331,15 +331,15 @@ get_next_path( path_context *ctx )
     /* Then where we may have installed the data files */
   case 2:
 
-#ifdef UI_WII
+#ifdef GEKKO 
     path2 = "sd:/apps/fuse";
-#else				/* #ifdef UI_WII */
+#else				/* #ifdef GEKKO */
 #ifndef ROMSDIR
     path2 = FUSEDATADIR;
 #else				/* #ifndef ROMSDIR */
     path2 = ctx->type == UTILS_AUXILIARY_ROM ? ROMSDIR : FUSEDATADIR;
 #endif				/* #ifndef ROMSDIR */
-#endif				/* #ifdef UI_WII */
+#endif				/* #ifdef GEKKO */
     strncpy( ctx->path, path2, PATH_MAX ); buffer[ PATH_MAX - 1 ] = '\0';
     return 1;
 
