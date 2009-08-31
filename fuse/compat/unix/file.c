@@ -41,7 +41,7 @@ const compat_fd COMPAT_FILE_OPEN_FAILED = NULL;
 compat_fd
 compat_file_open( const char *path, int write )
 {
-  return fopen( path, write ? "w" : "r" );
+  return fopen( path, write ? "wb" : "rb" );
 }
 
 off_t
