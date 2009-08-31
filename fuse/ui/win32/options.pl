@@ -29,6 +29,8 @@ use Fuse;
 use Fuse::Dialog;
 
 die "No data file specified" unless @ARGV;
+my %combo_sets;
+my %combo_default;
 
 my @dialogs = Fuse::Dialog::read( shift @ARGV );
 
@@ -46,7 +48,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include "display.h"
 #include "fuse.h"
-#include "options.h"
+#include "options_internals.h"
 #include "periph.h"
 #include "settings.h"
 #include "win32internals.h"
@@ -167,6 +169,54 @@ menu_options_$_->{name}( int action )
 
 CODE
 }
+
+foreach( @dialogs ) {
+    foreach my $widget ( @{ $_->{widgets} } ) {
+	if( $widget->{type} eq "Combo" ) {
+	    my $n = 0;
+
+	    foreach( split /\|/, $widget->{data1} ) {
+		if( s/^\*// ) {
+		    $combo_default{$widget->{value}} = $n;
+		}
+		$n++;
+	    }
+	    $widget->{data1} =~ s/^\*//;
+	    $widget->{data1} =~ s/\|\*/|/;
+	    if( not exists( $combo_sets{$widget->{data1}} ) ) {
+		$combo_sets{$widget->{data1}} = "widget_$widget->{value}_combo";
+
+		print << "CODE";
+static const char *widget_$widget->{value}_combo[] = {
+CODE
+		foreach( split /\|/, $widget->{data1} ) {
+		    print << "CODE";
+  "$_",
+CODE
+		}
+		print << "CODE";
+  NULL
+};
+
+CODE
+	    } else {
+		print << "CODE";
+\#define widget_$widget->{value}_combo $combo_sets{$widget->{data1}}
+
+CODE
+	    }
+		print << "CODE";
+int
+option_enumerate_$_->{name}_$widget->{value}() {
+  return 0;
+}
+
+CODE
+	}
+    }
+}
+
+
 
     print << "CODE";
 

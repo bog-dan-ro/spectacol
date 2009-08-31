@@ -150,7 +150,7 @@ compat/@COMPAT_OSNAME@/libcompatos.a \
 BUILT_SOURCES = options.h settings.c settings.h
 
 windres.o: windres.rc winfuse.ico
-	@WINDRES@ -I$(srcdir) -I. $(srcdir)/windres.rc windres.o
+	@WINDRES@ -I$(srcdir) -I. $(srcdir)/windres.rc @LIBSPEC_CFLAGS@ windres.o
 
 settings.c: settings.pl settings.dat
 	@PERL@ -I$(srcdir)/perl $(srcdir)/settings.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@

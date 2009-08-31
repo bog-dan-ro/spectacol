@@ -83,3 +83,10 @@ ui_confirm_save_specific( const char *message )
 
   return confirm;
 }
+
+int
+ui_query( const char *message )
+{
+  return win32ui_confirm( message );
+}
+

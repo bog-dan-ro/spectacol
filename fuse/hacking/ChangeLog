@@ -3194,4 +3194,5 @@
 	 ui/widget/{menu.c,filesel.c}: Wii: Use GEKKO macro instead of UI_WII
 	 for non-UI code that needs to be compiled when compiling for Wii. This
 	 will allow to compile Fuse for Wii either native or SDL UI (Marek).
-
+20090830 Makefile.am,ui/win32/{options-resource.pl,confirm.c,options.pl}: Win32:
+	 Fixes to compile fuse for win32 again (patch #2801706) (Gergely Szasz).
