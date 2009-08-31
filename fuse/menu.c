@@ -244,13 +244,11 @@ MENU_CALLBACK( menu_options_filter )
   fuse_emulation_unpause();
 }
 
-#ifdef HAVE_LIB_XML2
 MENU_CALLBACK( menu_options_save )
 {
   WIDGET_END;
   settings_write_config( &settings_current );
 }
-#endif				/* #ifdef HAVE_LIB_XML2 */
 
 MENU_CALLBACK( menu_machine_profiler_start )
 {

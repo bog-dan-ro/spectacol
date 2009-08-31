@@ -99,10 +99,8 @@ Options/_Filter..., Item,,, menu_filter_detail
 
 Options/_Disk options..., Item
 
-#ifdef HAVE_LIB_XML2
 Options/separator, Separator
 Options/S_ave, Item
-#endif
 
 _Machine, Branch
 

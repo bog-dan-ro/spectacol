@@ -554,7 +554,7 @@ AC_MSG_RESULT($libxml2)
 if test "$libxml2" = yes; then
   AM_PATH_XML2(2.0.0,AC_DEFINE([HAVE_LIB_XML2], 1,
                [Defined if we've got libxml2]),
-               AC_WARN(libxml2 not found - config file use disabled))
+               AC_WARN(libxml2 not found - config file will use ini format))
 fi
 
 dnl Work out which timer routines to use

@@ -3198,3 +3198,6 @@
 	 Fixes to compile fuse for win32 again (patch #2801706) (Gergely Szasz).
 20090830 README: Win32: Added some instructions to README about cross-compiling
 	 fuse with MinGW (patch #2801706) (Gergely Szasz).
+20090831 menu.c,configure.in,menu_data.dat,settings.pl: Added ability to
+	 read/write the config file in ini format in case libxml2 is not
+	 present (Marek).

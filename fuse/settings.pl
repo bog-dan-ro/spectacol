@@ -119,9 +119,12 @@ print hashline( __LINE__ ), << 'CODE';
   /* show_version */ 0,
 };
 
-#ifdef HAVE_LIB_XML2
 static int read_config_file( settings_info *settings );
+
+#ifdef HAVE_LIB_XML2
 static int parse_xml( xmlDocPtr doc, settings_info *settings );
+#else				/* #ifdef HAVE_LIB_XML2 */
+static int parse_ini( utils_file *file, settings_info *settings );
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
 static int settings_command_line( settings_info *settings, int *first_arg,
@@ -141,10 +144,8 @@ settings_init( int *first_arg, int argc, char **argv )
     return error;
   }
 
-#ifdef HAVE_LIB_XML2
   error = read_config_file( &settings_current );
   if( error ) return error;
-#endif				/* #ifdef HAVE_LIB_XML2 */
 
   error = settings_command_line( &settings_current, first_arg, argc, argv );
   if( error ) return error;
@@ -319,6 +320,238 @@ CODE
   print hashline( __LINE__ ), << 'CODE';
 
   xmlSaveFormatFile( path, doc, 1 );
+
+  return 0;
+}
+
+#else				/* #ifdef HAVE_LIB_XML2 */
+
+/* Read options from the config file as ini file (if libxml2 is not available) */
+
+static int
+read_config_file( settings_info *settings )
+{
+  const char *home; char path[256];
+  struct stat stat_info;
+  int error;
+
+  utils_file file;
+
+  home = compat_get_home_path(); if( !home ) return 1;
+
+  snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
+
+  /* See if the file exists; if doesn't, it's not a problem */
+  if( stat( path, &stat_info ) ) {
+    if( errno == ENOENT ) {
+      return 0;
+    } else {
+      ui_error( UI_ERROR_ERROR, "couldn't stat '%s': %s", path,
+		strerror( errno ) );
+      return 1;
+    }
+  }
+
+  error = utils_read_file( path, &file );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "error reading config file" );
+    return 1;
+  }
+
+  if( parse_ini( &file, settings ) ) { utils_close_file( &file ); return 1; }
+
+  utils_close_file( &file );
+
+  return 0;
+}
+
+/* special_trim() trims that are characters less then equal than space (32).
+   This will eliminate extra tabs, \r (if line ends with \r\n, or \n\r),
+   and spaces (if someone edits the config with external editor),
+   both leading and trailing.
+ */
+static void
+special_trim( char string[80] ) {
+
+  size_t trim_pos;
+
+  /* Trim leading chars */
+  trim_pos = 0;
+  while( string[ trim_pos ] && ( string[ trim_pos ] <= 32 ) )
+    trim_pos++;
+  if( trim_pos > 0 )
+    strcpy( string, &string[ trim_pos ] );
+       
+  /* Trim trailing chars */
+  trim_pos = strlen( string );
+  while( ( --trim_pos > 0 ) && ( string[ trim_pos ] <= 32 ) ) {
+    string[ trim_pos ] = '\0';
+  }
+}
+
+static int
+parse_ini( utils_file *file, settings_info *settings )
+{
+  unsigned char* current_pos;
+  char setting_name[80], setting_value[80];
+  size_t chars_copied;
+  
+  current_pos = file->buffer;
+
+  /* Read until the end of file */
+  while( current_pos < file->buffer + file->length ) {
+
+    /* Safely copy the text to setting_name, delimted by "=", until \n or eof */
+    chars_copied = 0;
+    while( ( current_pos < file->buffer + file->length )
+        && ( *current_pos != '\n' ) && ( *current_pos != '=' )
+        && ( chars_copied < 79 ) ) { /* leave one char for \0 */
+      setting_name[ chars_copied ] = *current_pos;
+      current_pos++;
+      chars_copied++;
+    }
+    setting_name[ chars_copied ] = '\0';
+    
+    if( *current_pos != '=' ) {
+      /* line misses the "=" delimiter, skip to next line */
+      current_pos++;
+      continue; 
+    }
+    
+    /* Safely copy the text to setting_value, until \n or eof */
+    current_pos++;
+    chars_copied = 0;
+    while( ( current_pos < file->buffer + file->length )
+        && ( *current_pos != '\n' )
+        && ( chars_copied < 79 ) ) { /* leave one char for \0 */
+      setting_value[ chars_copied ] = *current_pos;
+      current_pos++;
+      chars_copied++;
+    }
+    setting_value[ chars_copied ] = '\0';
+
+    current_pos++;
+    
+    special_trim( setting_name );
+    special_trim( setting_value );
+
+CODE
+
+foreach my $name ( sort keys %options ) {
+
+    my $type = $options{$name}->{type};
+
+    if( $type eq 'boolean' or $type eq 'numeric' ) {
+
+	print << "CODE";
+    if( !strcmp( setting_name, "$options{$name}->{configfile}" ) ) {
+      settings->$name = atoi( setting_value );
+    } else
+CODE
+
+    } elsif( $type eq 'string' ) {
+
+	    print << "CODE";
+    if( !strcmp( setting_name, "$options{$name}->{configfile}" ) ) {
+      free( settings->$name );
+      settings->$name = strdup( setting_value );
+    } else
+CODE
+
+    } elsif( $type eq 'null' ) {
+
+	    print << "CODE";
+    if( !strcmp( setting_name, "$options{$name}->{configfile}" ) ) {
+      /* Do nothing */
+    } else
+CODE
+
+    } else {
+	die "Unknown setting type `$type'";
+    }
+}
+
+print hashline( __LINE__ ), << 'CODE';
+    if( !strcmp( setting_name, "text" ) ) {
+      /* Do nothing */
+    } else {
+      ui_error( UI_ERROR_WARNING, "Unknown setting '%s' in config file",
+		setting_name );
+    }
+  }
+
+  return 0;
+}
+
+int
+settings_write_config( settings_info *settings )
+{
+  const char *home; char path[256], buffer[80]; 
+
+  compat_fd doc;
+
+  home = compat_get_home_path(); if( !home ) return 1;
+
+  snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
+
+  doc = compat_file_open( path, 1 );
+  if( doc == COMPAT_FILE_OPEN_FAILED ) {
+    ui_error( UI_ERROR_ERROR, "couldn't open `%s' for writing: %s\n",
+    	      path, strerror( errno ) );
+    return 1;
+  }
+
+CODE
+
+foreach my $name ( sort keys %options ) {
+
+    my $type = $options{$name}->{type};
+
+    if( $type eq 'boolean' ) {
+
+	print << "CODE";
+	snprintf( buffer, 80, "%s=%s\\n", "$options{$name}->{configfile}", settings->$name ? "1" : "0" );
+  if( compat_file_write( doc, ( const unsigned char * ) buffer,
+                         strlen( buffer ) > 80 ? 80 : strlen( buffer ) ) ) {
+    compat_file_close( doc );
+    return 1;
+  }
+CODE
+
+    } elsif( $type eq 'string' ) {
+	print << "CODE";
+  if( settings->$name ) {
+	  snprintf( buffer, 80, "%s=%s\\n", "$options{$name}->{configfile}", settings->$name );
+  if( compat_file_write( doc, ( const unsigned char * ) buffer,
+                         strlen( buffer ) > 80 ? 80 : strlen( buffer ) ) ) {
+      compat_file_close( doc );
+      return 1;
+    }
+  }
+CODE
+
+    } elsif( $type eq 'numeric' ) {
+	print << "CODE";
+  if( settings->$name ) {
+	  snprintf( buffer, 80, "%s=%d\\n", "$options{$name}->{configfile}", settings->$name );
+  if( compat_file_write( doc, ( const unsigned char * ) buffer,
+                         strlen( buffer ) > 80 ? 80 : strlen( buffer ) ) ) {
+      compat_file_close( doc );
+      return 1;
+    }
+  }
+CODE
+
+    } elsif( $type eq 'null' ) {
+	# Do nothing
+    } else {
+	die "Unknown setting type `$type'";
+    }
+}
+
+  print hashline( __LINE__ ), << 'CODE';
+
+  compat_file_close( doc );
 
   return 0;
 }
@@ -571,10 +804,8 @@ print hashline( __LINE__ ), << 'CODE';
 int
 settings_end( void )
 {
-#ifdef HAVE_LIB_XML2
   if( settings_current.autosave_settings )
     settings_write_config( &settings_current );
-#endif			/* #ifdef HAVE_LIB_XML2 */
 
   settings_free( &settings_current );
 
