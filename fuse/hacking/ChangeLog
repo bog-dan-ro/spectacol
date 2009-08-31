@@ -3207,3 +3207,5 @@
 20090831 Makefile.am: Win32: Fixed building the main resource file and made
 	 sure it is rebuilt if any of the included resource files are rebuilt
 	 (Marek).
+20090831 windres.rc: Win32: Added version information to the executable
+	 (Marek).

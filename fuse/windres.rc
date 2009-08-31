@@ -1,5 +1,5 @@
 /* windres.rc: resources for Windows
-   Copyright (c) 2007 Stuart Brady
+   Copyright (c) 2007-2009 Stuart Brady, Marek Januszewski
 
    $Id$
 
@@ -25,6 +25,8 @@
 
 #include "config.h"
 
+#include <windows.h>
+
 win32_icon ICON "winfuse.ico"
 
 #ifdef UI_WIN32
@@ -44,3 +46,35 @@ win32_icon ICON "winfuse.ico"
 #include "ui/win32/win32joystick.rc"    /* reserved ids: 1700 - 1799 */
 
 #endif
+
+/* VERSIONINFO specs: http://msdn.microsoft.com/en-us/library/aa381058%28VS.85%29.aspx */
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION    	0,10,0,1
+PRODUCTVERSION 	0,10,0,1
+FILEFLAGSMASK  	VS_FFI_FILEFLAGSMASK
+FILEFLAGS      	0x0L
+FILEOS         	VOS__WINDOWS32
+FILETYPE       	VFT_APP
+FILESUBTYPE    	VFT2_UNKNOWN
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904B0"
+    BEGIN
+      VALUE "CompanyName",      "\0"
+      VALUE "FileDescription",  "Fuse\n"
+      VALUE "FileVersion",      VERSION##"\0"
+      VALUE "InternalName",     "Fuse\n"
+      VALUE "LegalCopyright",   "Copyright (c) 1999-2009 Philip Kendall and others; see the file 'AUTHORS' for more details.\0"
+      VALUE "OriginalFilename", "fuse.exe\0"
+      VALUE "ProductName",      "Fuse - the Free Unix Spectrum Emulator\0"
+      VALUE "ProductVersion",   VERSION##"\0"
+    END
+ END
+
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END
+
