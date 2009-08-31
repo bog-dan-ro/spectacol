@@ -3200,7 +3200,7 @@
 	 fuse with MinGW (patch #2801706) (Gergely Szasz).
 20090831 menu.c,configure.in,menu_data.dat,settings.pl: Added ability to
 	 read/write the config file in ini format in case libxml2 is not
-	 present (Marek).
+	 present (patch #2801706) (Marek).
 20090831 compat/unix/file.c: Added 'b' to mode argument of fopen in
 	 compat_file_open - this is ignored for POSIX systems, but for others,
 	 like Win32, it is neccessary (Marek).
