@@ -3204,3 +3204,6 @@
 20090831 compat/unix/file.c: Added 'b' to mode argument of fopen in
 	 compat_file_open - this is ignored for POSIX systems, but for others,
 	 like Win32, it is neccessary (Marek).
+20090831 Makefile.am: Win32: Fixed building the main resource file and made
+	 sure it is rebuilt if any of the included resource files are rebuilt
+	 (Marek).
