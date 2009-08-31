@@ -151,6 +151,42 @@ EXEEXT=".elf" make -e
 This should build fuse.elf, which you can run on your Wii via the usual
 methods.
 
+Building the Win32 version of Fuse on Linux
+--------------------------------
+
+You'll need to have the standard MinGW programming tool set. e.g. on Debian
+`apt-get install mingw32 mingw-binutils mingw32-runtime'
+ <http://www.mingw.org/>
+
+First, have to compile libspectrum:
+
+./configure --host=i586-mingw32msvc --without-libaudiofile --without-zlib \
+	    --without-libgcrypt --without-bzip2 --without-glib --prefix=`pwd`
+make install
+
+This should compile libspectrum without any external lib, and `install' into the
+source directory. All of the external libs needed by libspectrum and fuse
+compile with successfully with MingGW environment - in case of problems
+with compiling any of the libs please refer to the lib's homepage for help.
+
+Then, compile fuse:
+
+./configure --host=i586-mingw32msvc --without-glib --prefix=`pwd` \
+	    --with-libspectrum-prefix=`pwd`/../libspectrum --with-win32 \
+	    --without-libxml2 --without-x
+make
+
+You have to use the real path of libspectrum with `--with-libspectrum-prefix='.
+This should build `fuse.exe' without any external lib, but you can run it on
+Windows or Linux (with Wine).
+
+Note: you need `libspectrum-7.dll' and the `roms' directory and the `lib'
+  directory to `fuse' run perfectly. You may copy this file and directories
+  into that directory where `fuse.exe' exists. On windows you may need to
+  copy all files from `lib/uncompressed' into `lib'.
+  With wine you need `fltmgr.sys' in Windows `system32' directory. (e.g.:
+  ~/.wine/c_drive/windows/system32).
+
 Closing comments
 ----------------
 

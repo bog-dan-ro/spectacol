@@ -3196,3 +3196,5 @@
 	 will allow to compile Fuse for Wii either native or SDL UI (Marek).
 20090830 Makefile.am,ui/win32/{options-resource.pl,confirm.c,options.pl}: Win32:
 	 Fixes to compile fuse for win32 again (patch #2801706) (Gergely Szasz).
+20090830 README: Win32: Added some instructions to README about cross-compiling
+	 fuse with MinGW (patch #2801706) (Gergely Szasz).
