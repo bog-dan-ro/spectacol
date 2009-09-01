@@ -2829,8 +2829,6 @@ write_if1_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   compressed_rom_data = NULL;
 
-  block_size = 0;
-
 #ifdef HAVE_ZLIB_H
 
   if( rom_data && compress ) {
@@ -2898,8 +2896,6 @@ write_opus_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   disk_ram_length = 0x800;
 
   compressed_ram_data = compressed_rom_data = NULL;
-
-  block_size = 0;
 
 #ifdef HAVE_ZLIB_H
 
@@ -2992,8 +2988,6 @@ write_plsd_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   disk_ram_length = 0x2000;
 
   compressed_ram_data = compressed_rom_data = NULL;
-
-  block_size = 0;
 
 #ifdef HAVE_ZLIB_H
 

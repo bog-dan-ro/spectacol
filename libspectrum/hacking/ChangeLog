@@ -740,3 +740,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20090901 rzx.c,snapshot.c,tape.c: remove unused uncompressed variable (Fred).
 20090901 plusd.c: remove unused buffer modification in
          libspectrum_plusd_read_header (Fred).
+20090901 szx.c: remove unused block_size initialisation (Fred).
