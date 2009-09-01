@@ -671,13 +671,12 @@ libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
 {
   libspectrum_error error;
   const libspectrum_byte *ptr, *end;
-  int uncompressed;
   libspectrum_byte *new_buffer;
   libspectrum_id_t raw_type;
   libspectrum_class_t class;
 
   /* Find out if this file needs decompression */
-  uncompressed = 0; new_buffer = NULL;
+  new_buffer = NULL;
 
   error = libspectrum_identify_file_raw( &raw_type, NULL, buffer, length );
   if( error ) return error;
@@ -693,7 +692,6 @@ libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
 					 raw_type, buffer, length, NULL );
     if( error ) return error;
     buffer = new_buffer; length = new_length;
-    uncompressed = 1;
   }
 
   ptr = buffer; end = buffer + length;

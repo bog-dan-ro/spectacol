@@ -737,3 +737,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (Fred & Gergely).
 20090901 dck.c,rzx.c,snapshot.c,tape.c: give up if file decompression fails
          (Fred).
+20090901 rzx.c,snapshot.c,tape.c: remove unused uncompressed variable (Fred).
