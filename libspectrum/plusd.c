@@ -108,8 +108,6 @@ libspectrum_plusd_read_header( const libspectrum_byte *buffer,
   /* Make a guess at the interrupt mode depending on what I was set to */
   libspectrum_snap_set_im( snap, ( i == 0 || i == 63 ) ? 1 : 2 );
 
-  buffer += PLUSD_HEADER_LENGTH;
-
   return LIBSPECTRUM_ERROR_NONE;
 }
 
