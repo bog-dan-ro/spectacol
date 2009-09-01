@@ -734,4 +734,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          samples (e.g. BRUCELEE.TAP) (Fred).
 20090729 accessor.pl,libspectrum.c,libspectrum.h.in,sna.c,snap_accessors.txt,
          snapshot.c,szx.c,z80.c: add snapshot support for Opus Discovery
-         (Fred & Gergely)
+         (Fred & Gergely).
+20090901 dck.c,rzx.c,snapshot.c,tape.c: give up if file decompression fails
+         (Fred).

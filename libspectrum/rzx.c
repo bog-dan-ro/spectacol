@@ -691,6 +691,7 @@ libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
 
     error = libspectrum_uncompress_file( &new_buffer, &new_length, NULL,
 					 raw_type, buffer, length, NULL );
+    if( error ) return error;
     buffer = new_buffer; length = new_length;
     uncompressed = 1;
   }
