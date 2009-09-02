@@ -3216,3 +3216,5 @@
 20090902 z80/z80.c: NMI is intended to advance time (Fred).
 20090902 display.c: remove unused variable start in copy_critical_region_line
          (Fred).
+20090902 rzx.c: rzx_sentinel is intended to reduce tstates by
+         RZX_SENTINEL_TIME_REDUCE (Fred).

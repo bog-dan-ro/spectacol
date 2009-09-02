@@ -111,7 +111,7 @@ static int start_playback( libspectrum_rzx *rzx );
 static int recording_frame( void );
 static int playback_frame( void );
 static int counter_reset( void );
-static void rzx_sentinel( libspectrum_dword tstates, int type,
+static void rzx_sentinel( libspectrum_dword ts, int type,
 			  void *user_data );
 
 static int sentinel_event;
@@ -647,7 +647,7 @@ rzx_rollback_to( void )
 }
 
 static void
-rzx_sentinel( libspectrum_dword tstates, int type, void *user_data )
+rzx_sentinel( libspectrum_dword ts, int type, void *user_data )
 {
   int error;
 
