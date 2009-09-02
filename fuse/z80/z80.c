@@ -66,7 +66,7 @@ int z80_interrupt_event, z80_nmi_event;
 static void z80_init_tables(void);
 static void z80_from_snapshot( libspectrum_snap *snap );
 static void z80_to_snapshot( libspectrum_snap *snap );
-static void z80_nmi( libspectrum_dword tstates, int type, void *user_data );
+static void z80_nmi( libspectrum_dword ts, int type, void *user_data );
 
 static module_info_t z80_module_info = {
 
@@ -194,7 +194,7 @@ z80_interrupt( void )
 
 /* Process a z80 non-maskable interrupt */
 static void
-z80_nmi( libspectrum_dword tstates, int type, void *user_data )
+z80_nmi( libspectrum_dword ts, int type, void *user_data )
 {
   if( z80.halted ) { PC++; z80.halted = 0; }
 
