@@ -61,7 +61,7 @@ libspectrum_plusd_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
   buffer += PLUSD_HEADER_LENGTH;
 
   error = libspectrum_plusd_read_data( buffer, snap );
-  if( error != LIBSPECTRUM_ERROR_NONE );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
