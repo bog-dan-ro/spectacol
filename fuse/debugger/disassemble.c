@@ -161,7 +161,7 @@ disassemble_00xxxxxx( libspectrum_word address, char *buffer, size_t buflen,
 
   case 0x00: case 0x08:
     if( b <= 0x08 ) {
-      snprintf( buffer, buflen, opcode_00xxx000[ b >> 3 ] ); *length = 1;
+      snprintf( buffer, buflen, "%s", opcode_00xxx000[ b >> 3 ] ); *length = 1;
     } else {
       get_offset( buffer2, 40, address + 2, readbyte_internal( address + 1 ) );
       snprintf( buffer, buflen, "%s%s", opcode_00xxx000[ b >> 3 ], buffer2 );
@@ -540,7 +540,7 @@ disassemble_ed( libspectrum_word address, char *buffer, size_t buflen,
       break;
 
     case 0x07: case 0x0f:
-      snprintf( buffer, buflen, opcode_01xxx111[ ( b >> 3 ) & 0x07 ] );
+      snprintf( buffer, buflen, "%s", opcode_01xxx111[ ( b >> 3 ) & 0x07 ] );
       *length = 1;
       break;
 
@@ -560,7 +560,7 @@ disassemble_ed( libspectrum_word address, char *buffer, size_t buflen,
     snprintf( buffer, buflen, "NOPD" ); *length = 1; *length = 1;
   } else {
     /* Note: 0xbc to 0xbf already removed */
-    snprintf( buffer, buflen, opcode_101xxxxx[ b & 0x1f ] ); *length = 1;
+    snprintf( buffer, buflen, "%s", opcode_101xxxxx[ b & 0x1f ] ); *length = 1;
   }
 }
 
@@ -713,7 +713,7 @@ single_reg( int i, enum hl_type use_hl, libspectrum_byte offset,
     return 1;
   } else {
     const char *regs[] = { "B", "C", "D", "E", "H", "L", "(HL)", "A" };
-    snprintf( buffer, buflen, regs[i] );
+    snprintf( buffer, buflen, "%s", regs[i] );
     return 0;
   }
 }

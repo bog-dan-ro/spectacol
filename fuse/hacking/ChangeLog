@@ -3219,3 +3219,5 @@
 20090902 rzx.c: rzx_sentinel is intended to reduce tstates by
          RZX_SENTINEL_TIME_REDUCE (Fred).
 20090902 tape.c: remove unused variable block from tape_play (Fred).
+20090902 debugger/disassemble.c,printer.c: reduce GCC 4.2 string format warnings
+         (Fred).

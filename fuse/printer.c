@@ -156,7 +156,7 @@ if((printer_graphics_file=fopen(settings_current.printer_graphics_filename,
 if(overwrite)
   {
   /* we reserve 10 chars for height */
-  fprintf(printer_graphics_file,pbmstart);
+  fputs(pbmstart,printer_graphics_file);
   fprintf(printer_graphics_file,"%10d\n",0);
   }
 else
