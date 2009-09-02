@@ -21,8 +21,10 @@
 
 #include <errno.h>
 #include <unistd.h>
-#include <CoreAudio/AudioHardware.h>
+
 #include <AudioUnit/AudioUnit.h>
+#include <CoreAudio/AudioHardware.h>
+#include <CoreServices/CoreServices.h>
 
 #include "settings.h"
 #include "sfifo.h"
@@ -70,7 +72,7 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
                                   &count, (void *)&device );
   if ( err != kAudioHardwareNoError ) {
     ui_error( UI_ERROR_ERROR,
-              "get kAudioHardwarePropertyDefaultOutputDevice error %ld",
+              "get kAudioHardwarePropertyDefaultOutputDevice error %d",
               err );
     return 1;
   }
@@ -80,7 +82,7 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
   err = AudioDeviceGetProperty( device, 0, false, kAudioDevicePropertyBufferSize,
                                 &count, &deviceBufferSize );
   if( err != kAudioHardwareNoError ) {
-    ui_error( UI_ERROR_ERROR, "get kAudioDevicePropertyBufferSize error %ld",
+    ui_error( UI_ERROR_ERROR, "get kAudioDevicePropertyBufferSize error %d",
               err );
     return 1;
   }
@@ -92,7 +94,7 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
                                 &deviceFormat );
   if( err != kAudioHardwareNoError ) {
     ui_error( UI_ERROR_ERROR,
-              "get kAudioDevicePropertyStreamFormat error %ld", err );
+              "get kAudioDevicePropertyStreamFormat error %d", err );
     return 1;
   }
 
@@ -125,7 +127,7 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
 
   err = OpenAComponent( comp, &gOutputUnit );
   if( comp == NULL ) {
-    ui_error( UI_ERROR_ERROR, "OpenAComponent=%ld", err );
+    ui_error( UI_ERROR_ERROR, "OpenAComponent=%d", err );
     return 1;
   }
 
@@ -141,7 +143,7 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
                               &input,
                               sizeof( input ) );
   if( err ) {
-    ui_error( UI_ERROR_ERROR, "AudioUnitSetProperty-CB=%ld", err );
+    ui_error( UI_ERROR_ERROR, "AudioUnitSetProperty-CB=%d", err );
     return 1;
   }
 
@@ -152,13 +154,13 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
                               &deviceFormat,
                               sizeof( AudioStreamBasicDescription ) );
   if( err ) {
-    ui_error( UI_ERROR_ERROR, "AudioUnitSetProperty-SF=%4.4s, %ld", (char*)&err, err );
+    ui_error( UI_ERROR_ERROR, "AudioUnitSetProperty-SF=%4.4s, %d", (char*)&err, err );
     return 1;
   }
 
   err = AudioUnitInitialize( gOutputUnit );
   if( err ) {
-    ui_error( UI_ERROR_ERROR, "AudioUnitInitialize=%ld", err );
+    ui_error( UI_ERROR_ERROR, "AudioUnitInitialize=%d", err );
     return 1;
   }
 
@@ -199,7 +201,7 @@ sound_lowlevel_end( void )
 
   err = AudioUnitUninitialize( gOutputUnit );
   if( err ) {
-    printf( "AudioUnitUninitialize=%ld", err );
+    printf( "AudioUnitUninitialize=%d", err );
   }
 
   CloseComponent( gOutputUnit );
@@ -238,7 +240,7 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
        default device */
     OSStatus err = AudioOutputUnitStart( gOutputUnit );
     if( err ) {
-      ui_error( UI_ERROR_ERROR, "AudioOutputUnitStart=%ld", err );
+      ui_error( UI_ERROR_ERROR, "AudioOutputUnitStart=%d", err );
       return;
     }
 

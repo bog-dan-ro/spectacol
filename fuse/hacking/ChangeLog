@@ -3209,3 +3209,5 @@
 	 (Marek).
 20090831 windres.rc: Win32: Added version information to the executable
 	 (Marek).
+20090902 sound/coreaudiosound.c: add missing header and clean up some format
+         warnings (Fred).
