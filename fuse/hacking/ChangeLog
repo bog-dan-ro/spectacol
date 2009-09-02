@@ -3221,3 +3221,5 @@
 20090902 tape.c: remove unused variable block from tape_play (Fred).
 20090902 debugger/disassemble.c,printer.c: reduce GCC 4.2 string format warnings
          (Fred).
+20090902 ui/win32/{options.pl,options-{resource,header}.pl}: Win32: Implemented
+	 comboboxes in options dialogs (Marek).

@@ -82,7 +82,10 @@ if( $internal ) {
 		printf "#define IDC_%s_LABEL_%s %s\n",
 		    $optname, uc( $widget->{value} ), $optnum++;
 	    } elsif( $widget->{type} eq "Combo" ) {
-		print STDERR "'Combo' - not implemented yet..\n";
+		printf "#define IDC_%s_%s %s\n",
+		    $optname, uc( $widget->{value} ), $optnum++;
+		printf "#define IDC_%s_LABEL_%s %s\n",
+		    $optname, uc( $widget->{value} ), $optnum++;
 	    } else {
 		die "Unknown type '$widget->{type}'";
 	    }
@@ -111,3 +114,4 @@ CODE
 #endif				/* #ifndef FUSE_OPTIONS_H */
 CODE
 }
+

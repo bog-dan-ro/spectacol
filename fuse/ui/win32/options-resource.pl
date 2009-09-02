@@ -51,17 +51,22 @@ foreach( @dialogs ) {
 
 	my $text = $widget->{text}; $text =~ s/\((.)\)/&$1/;
 	if( $widget->{type} eq "Checkbox" ) {
-	    $buffer .= sprintf "  AUTOCHECKBOX \"%s\",IDC_%s_%s,5,$y,130,12\n",
+	    $buffer .= sprintf "  AUTOCHECKBOX \"%s\",IDC_%s_%s,5,$y,160,12\n",
 		$text, $optname, uc( $widget->{value}, );
 	    $y += 12;
 	} elsif( $widget->{type} eq "Entry" ) {
-	    $buffer .= sprintf "  LTEXT \"%s\",IDC_%s_LABEL_%s,5,$y,60,12\n",
+	    $buffer .= sprintf "  LTEXT \"%s\",IDC_%s_LABEL_%s,5,$y,90,12\n",
 		$text, $optname, uc( $widget->{value} );
-	    $buffer .= sprintf "  EDITTEXT IDC_%s_%s,70,$y,85,10\n",
+	    $buffer .= sprintf "  EDITTEXT IDC_%s_%s,100,$y,85,10\n",
 		$optname, uc( $widget->{value} );
 	    $y += 12;
 	} elsif( $widget->{type} eq "Combo" ) {
-	    ;	# FIXME: implement
+	    $buffer .= sprintf "  LTEXT \"%s\",IDC_%s_LABEL_%s,5,$y,90,12\n",
+		$text, $optname, uc( $widget->{value} );
+	    $buffer .= sprintf "  COMBOBOX IDC_%s_%s,100,$y,85,90,"
+	        . "CBS_DROPDOWNLIST | CBS_HASSTRINGS\n",
+		$optname, uc( $widget->{value} );
+	    $y += 12;
 	} else {
 	    die "Unknown type '$widget->{type}'";
 	}
@@ -70,14 +75,14 @@ foreach( @dialogs ) {
 
     $y += 5;
 
-    $buffer .= sprintf "  DEFPUSHBUTTON \"OK\",IDOK,40,$y,40,13\n", $optname;
-    $buffer .= sprintf "  PUSHBUTTON \"Cancel\",IDCANCEL,85,$y,40,13\n", $optname;
+    $buffer .= sprintf "  DEFPUSHBUTTON \"OK\",IDOK,55,$y,40,13\n", $optname;
+    $buffer .= sprintf "  PUSHBUTTON \"Cancel\",IDCANCEL,100,$y,40,13\n", $optname;
 
     $y += 13 + 5; #height of the buttons + 5 margin
    
     print << "CODE";
 
-IDD_$optname DIALOGEX 6,5,160,$y
+IDD_$optname DIALOGEX 6,5,190,$y
   CAPTION "Fuse - $_->{title}"
   FONT 8,"Ms Shell Dlg 2",400,0,1
   STYLE WS_POPUP | WS_CAPTION | WS_BORDER | WS_SYSMENU
