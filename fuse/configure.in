@@ -308,10 +308,7 @@ AC_MSG_CHECKING(whether libspectrum supports compressed szx snaps)
 ac_save_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
 AC_TRY_COMPILE([#include <libspectrum.h>],[
-void test()
-{
   int test = LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION;
-}
 ],
   AUTOLOAD_SNAPS=compressed; AC_MSG_RESULT(yes),
   AUTOLOAD_SNAPS=uncompressed; AC_MSG_RESULT(no))

@@ -3211,3 +3211,5 @@
 	 (Marek).
 20090902 sound/coreaudiosound.c: add missing header and clean up some format
          warnings (Fred).
+20090902 configure.in: apparently AC_TRY_COMPILE should just have the body of
+         the function, which is placed inside main() (Fred).
