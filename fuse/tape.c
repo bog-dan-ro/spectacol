@@ -608,12 +608,8 @@ trap_check_rom( void )
 static int
 tape_play( int autoplay )
 {
-  libspectrum_tape_block* block;
-
   if( !libspectrum_tape_present( tape ) ) return 1;
   
-  block = libspectrum_tape_current_block( tape );
-
   /* Otherwise, start the tape going */
   tape_playing = 1;
   tape_autoplay = autoplay;
