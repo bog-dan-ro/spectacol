@@ -3214,3 +3214,5 @@
 20090902 configure.in: apparently AC_TRY_COMPILE should just have the body of
          the function, which is placed inside main() (Fred).
 20090902 z80/z80.c: NMI is intended to advance time (Fred).
+20090902 display.c: remove unused variable start in copy_critical_region_line
+         (Fred).

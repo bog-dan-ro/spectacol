@@ -706,7 +706,6 @@ display_write_if_dirty_sinclair( int x, int y )
 static void
 copy_critical_region_line( int y, int x, int end )
 {
-  int start;
   libspectrum_dword bit_mask, dirty;
 
   if( x < DISPLAY_WIDTH_COLS ) {
@@ -739,8 +738,6 @@ copy_critical_region_line( int y, int x, int end )
       x++;
 
     }
-
-    start = x;
 
     /* Walk to the end of the dirty region, writing the bytes to the
        drawing area along the way */
