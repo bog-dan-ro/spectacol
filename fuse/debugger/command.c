@@ -83,7 +83,7 @@ yywrap( void )
 
 /* Called to get up to 'max_size' bytes of the command to be parsed */
 int
-debugger_command_input( char *buf, int *result, int max_size )
+debugger_command_input( char *buf, size_t *result, int max_size )
 {
   size_t length = strlen( command_ptr );
 
