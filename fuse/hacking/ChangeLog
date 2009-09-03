@@ -3223,3 +3223,4 @@
          (Fred).
 20090902 ui/win32/{options.pl,options-{resource,header}.pl}: Win32: Implemented
 	 comboboxes in options dialogs (Marek).
+20090903 disk/disk.c: remove a couple of unneeded settings of bpt (Fred).

@@ -995,7 +995,6 @@ open_fdi( buffer_t *buffer, disk_t *d, int preindex )
     if( preindex )
       preindex_add( d, gap );
     postindex_add( d, gap );
-    bpt = 0;
     for( j = 0; j < head[0x06]; j++ ) {
       if( j % 35 == 0 ) {			/* if we have more than 35 sector in a track,
 						   we have to seek back to the next sector
@@ -1346,7 +1345,6 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
       return d->status = DISK_OPEN;
     if( buff[1] + 1 > d->cylinders )	/* find the biggest cylinder number */
       d->cylinders = buff[1] + 1;
-    bpt = 0;
     sector_offset = track_offset + 4;
     mfm = buff[2] & 0x80 ? 0 : 1;	/* 0x80 == 1 => SD track */
     bpt = postindex_len( d, mfm_old || mfm ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM ) +
