@@ -3228,3 +3228,4 @@
 20090903 debugger/{command.c,debugger_internals.h}: we put a size_t argument in
          the result argument of debugger_command_input rather than an int
          (Fred).
+20090903 ui/win32/picture.c: use a compat_fd rather than an int (Fred).

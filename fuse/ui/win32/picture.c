@@ -142,10 +142,11 @@ picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 static int
 read_screen( const char *filename, utils_file *screen )
 {
-  int fd, error;
+  int error;
+  compat_fd fd;
 
   fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
-  if( fd == -1 ) {
+  if( fd == COMPAT_FILE_OPEN_FAILED ) {
     ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
               filename );
     return 1;
