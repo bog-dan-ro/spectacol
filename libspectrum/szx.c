@@ -1205,14 +1205,14 @@ read_z80r_chunk( libspectrum_snap *snap, libspectrum_word version,
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
 
-  libspectrum_snap_set_a   ( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_f   ( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_a   ( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_bc  ( snap, libspectrum_read_word( buffer ) );
   libspectrum_snap_set_de  ( snap, libspectrum_read_word( buffer ) );
   libspectrum_snap_set_hl  ( snap, libspectrum_read_word( buffer ) );
 
-  libspectrum_snap_set_a_  ( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_f_  ( snap, **buffer ); (*buffer)++;
+  libspectrum_snap_set_a_  ( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_bc_ ( snap, libspectrum_read_word( buffer ) );
   libspectrum_snap_set_de_ ( snap, libspectrum_read_word( buffer ) );
   libspectrum_snap_set_hl_ ( snap, libspectrum_read_word( buffer ) );
@@ -2229,14 +2229,14 @@ write_z80r_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   write_chunk_header( buffer, ptr, length, ZXSTBID_Z80REGS, 37 );
 
-  *(*ptr)++ = libspectrum_snap_a ( snap );
   *(*ptr)++ = libspectrum_snap_f ( snap );
+  *(*ptr)++ = libspectrum_snap_a ( snap );
   libspectrum_write_word( ptr, libspectrum_snap_bc  ( snap ) );
   libspectrum_write_word( ptr, libspectrum_snap_de  ( snap ) );
   libspectrum_write_word( ptr, libspectrum_snap_hl  ( snap ) );
 
-  *(*ptr)++ = libspectrum_snap_a_( snap );
   *(*ptr)++ = libspectrum_snap_f_( snap );
+  *(*ptr)++ = libspectrum_snap_a_( snap );
   libspectrum_write_word( ptr, libspectrum_snap_bc_ ( snap ) );
   libspectrum_write_word( ptr, libspectrum_snap_de_ ( snap ) );
   libspectrum_write_word( ptr, libspectrum_snap_hl_ ( snap ) );

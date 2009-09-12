@@ -742,3 +742,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          libspectrum_plusd_read_header (Fred).
 20090901 szx.c: remove unused block_size initialisation (Fred).
 20090902 plusd.c: return error from libspectrum_plusd_read_data (Fred).
+20090912 szx.c: libspectrum was reading and writing AF and AF' in the wrong
+         order in SZX files (fixes bug #2857419; thanks, velesoft) (Fred).
