@@ -3229,3 +3229,4 @@
          the result argument of debugger_command_input rather than an int
          (Fred).
 20090903 ui/win32/picture.c: use a compat_fd rather than an int (Fred).
+20090916 README: change reference to CVS to be Subversion (Fred).

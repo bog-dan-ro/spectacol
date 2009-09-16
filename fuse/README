@@ -111,9 +111,9 @@ do this bit.
 
 Once you've got Fuse configured and built, read the man page :-)
 
-Note that if you're using version of Fuse from CVS rather than one of
-the released tarballs, you'll need to run `autogen.sh' before running
-'configure' for the first time.
+Note that if you're using version of Fuse from Subversion rather than
+one of the released tarballs, you'll need to run `autogen.sh' before
+running 'configure' for the first time.
 
 Building the OS X version of Fuse
 ---------------------------------
