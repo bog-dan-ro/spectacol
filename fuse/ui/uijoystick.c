@@ -61,6 +61,8 @@
 
 static js_data_struct jsd[2];
 
+static int js_button_states[2][10];
+
 static void poll_joystick( int which );
 static void do_axis( int which, double position, input_key negative,
 		     input_key positive );
@@ -144,6 +146,7 @@ ui_joystick_init( void )
   const char *home;
   char *calibration;
   int error;
+  size_t i, j;
 
   home = compat_get_home_path(); if( !home ) return 1;
 
@@ -157,6 +160,12 @@ ui_joystick_init( void )
   }
 
   sprintf( calibration, "%s/%s", home, JSDefaultCalibration );
+
+  for( i = 0; i<2; i++ ) {
+    for( j = 0; j<10; j++ ) {
+      js_button_states[i][j] = 0;
+    }
+  }
 
   /* If we can't init the first, don't try the second */
   error = open_joystick( 0, settings_current.joystick_1, calibration );
@@ -218,7 +227,11 @@ poll_joystick( int which )
 
     event.types.joystick.button = INPUT_JOYSTICK_FIRE_1 + i;
 
-    input_event( &event );
+    if( js_button_states[which][i] != fire ) {
+      js_button_states[which][i] = fire;
+      input_event( &event );
+    }
+
   }
 
 }

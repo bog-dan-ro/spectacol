@@ -3230,3 +3230,6 @@
          (Fred).
 20090903 ui/win32/picture.c: use a compat_fd rather than an int (Fred).
 20090916 README: change reference to CVS to be Subversion (Fred).
+20091006 ui/uijoystick.c: only send a joystick button event if there has been
+         an actual change in button state since last poll in the libjsw code
+         (fixes bug #2863656) (thanks, Phil Reynolds) (Fred).  
