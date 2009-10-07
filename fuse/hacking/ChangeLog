@@ -3232,4 +3232,6 @@
 20090916 README: change reference to CVS to be Subversion (Fred).
 20091006 ui/uijoystick.c: only send a joystick button event if there has been
          an actual change in button state since last poll in the libjsw code
-         (fixes bug #2863656) (thanks, Phil Reynolds) (Fred).  
+         (fixes bug #2863656) (thanks, Phil Reynolds) (Fred).
+20091007 settings.pl: numeric settings don't need to be non-zero to save into
+         the settings file (fixes bug #2873277) (thanks, Phil Reynolds) (Fred).

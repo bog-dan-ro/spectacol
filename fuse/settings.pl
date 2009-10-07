@@ -305,10 +305,8 @@ foreach my $name ( sort keys %options ) {
 CODE
     } elsif( $type eq 'numeric' ) {
 	print << "CODE";
-  if( settings->$name ) {
-    snprintf( buffer, 80, "%d", settings->$name );
-    xmlNewTextChild( root, NULL, (const xmlChar*)"$options{$name}->{configfile}", (const xmlChar*)buffer );
-  }
+  snprintf( buffer, 80, "%d", settings->$name );
+  xmlNewTextChild( root, NULL, (const xmlChar*)"$options{$name}->{configfile}", (const xmlChar*)buffer );
 CODE
     } elsif( $type eq 'null' ) {
 	# Do nothing
@@ -532,13 +530,11 @@ CODE
 
     } elsif( $type eq 'numeric' ) {
 	print << "CODE";
-  if( settings->$name ) {
-	  snprintf( buffer, 80, "%s=%d\\n", "$options{$name}->{configfile}", settings->$name );
+  snprintf( buffer, 80, "%s=%d\\n", "$options{$name}->{configfile}", settings->$name );
   if( compat_file_write( doc, ( const unsigned char * ) buffer,
                          strlen( buffer ) > 80 ? 80 : strlen( buffer ) ) ) {
-      compat_file_close( doc );
-      return 1;
-    }
+    compat_file_close( doc );
+    return 1;
   }
 CODE
 
