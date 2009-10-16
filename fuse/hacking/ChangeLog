@@ -3235,3 +3235,6 @@
          (fixes bug #2863656) (thanks, Phil Reynolds) (Fred).
 20091007 settings.pl: numeric settings don't need to be non-zero to save into
          the settings file (fixes bug #2873277) (thanks, Phil Reynolds) (Fred).
+20091016 fuse.1: update link to ResiDOS homepage in fuse man page (patch
+         #2875612) (Gergely Szasz).
+
