@@ -3237,4 +3237,5 @@
          the settings file (fixes bug #2873277) (thanks, Phil Reynolds) (Fred).
 20091016 fuse.1: update link to ResiDOS homepage in fuse man page (patch
          #2875612) (Gergely Szasz).
-
+20091019 disk/disk.c: correct mapping of sector length to SECLEN_* macros
+         (patch #2875613) (Gergely Szasz).

@@ -580,6 +580,19 @@ calc_sectorlen( int mfm, int sector_length, int gaptype )
   return len;
 }
 
+static int
+calc_lenid( int sector_length )
+{
+  int id = 0;
+
+  while( sector_length > 0x80 ) {
+    id++;
+    sector_length >>= 1;
+  }
+
+  return id;
+}
+
 #define NO_INTERLEAVE 1
 #define INTERLEAVE_2 2
 #define INTERLEAVE_OPUS 13
@@ -608,7 +621,7 @@ trackgen( disk_t *d, buffer_t *buffer, int head, int track,
   pos = i = 0;
   for( s = sector_base; s < sector_base + sectors; s++ ) {
     d->i = idx + pos * slen;
-    if( id_add( d, head, track, s, sector_length >> 8, gap, CRC_OK ) )
+    if( id_add( d, head, track, s, calc_lenid( sector_length ), gap, CRC_OK ) )
       return 1;
     if( data_add( d, buffer, NULL, sector_length, NO_DDAM, gap, CRC_OK, autofill ) )
       return 1;
