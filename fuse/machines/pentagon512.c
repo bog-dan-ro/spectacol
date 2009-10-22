@@ -51,6 +51,8 @@ static int pentagon_memory_map( void );
 int 
 pentagon512_init( fuse_machine_info *machine )
 {
+  int i;
+
   machine->machine = LIBSPECTRUM_MACHINE_PENT512;
   machine->id = "pentagon512";
 
@@ -66,6 +68,7 @@ pentagon512_init( fuse_machine_info *machine )
   machine->shutdown = NULL;
 
   machine->memory_map = pentagon_memory_map;
+  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   return 0;
 }
@@ -85,7 +88,7 @@ pentagon_reset(void)
   error = machine_load_rom( 4, 2, settings_current.rom_pentagon512_3,
                             settings_default.rom_pentagon512_3, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom_bank( memory_map_romcs, 0, 0,
+  error = machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
                                  settings_current.rom_pentagon512_2,
                                  settings_default.rom_pentagon512_2, 0x4000 );
   if( error ) return error;

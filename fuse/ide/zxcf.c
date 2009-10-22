@@ -39,6 +39,9 @@
 #include "ui/ui.h"
 #include "zxcf.h"
 
+/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
+static memory_page zxcf_memory_map_romcs[2];
+
 /*
   TBD: Allow memory size selection (128K/512K/1024K)
   TBD: Add secondary channel
@@ -98,7 +101,7 @@ static int page_event, unpage_event;
 int
 zxcf_init( void )
 {
-  int error;
+  int error, i;
 
   last_memctl = 0x00;
                                 
@@ -114,6 +117,7 @@ zxcf_init( void )
   }
 
   module_register( &zxcf_module_info );
+  for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
@@ -188,7 +192,7 @@ set_zxcf_bank( int bank )
 
   for( i = 0; i < 2; i++ ) {
 
-    page = &memory_map_romcs[i];
+    page = &zxcf_memory_map_romcs[i];
     offset = i & 1 ? MEMORY_PAGE_SIZE : 0x0000;
     
     page->page = &ZXCFMEM[ bank ][ offset ];
@@ -271,12 +275,12 @@ zxcf_memory_map( void )
   if( !settings_current.zxcf_active ) return;
 
   if( !settings_current.zxcf_upload ) {
-    memory_map_read[0] = memory_map_romcs[0];
-    memory_map_read[1] = memory_map_romcs[1];
+    memory_map_read[0] = zxcf_memory_map_romcs[0];
+    memory_map_read[1] = zxcf_memory_map_romcs[1];
   }
 
-  memory_map_write[0] = memory_map_romcs[0];
-  memory_map_write[1] = memory_map_romcs[1];
+  memory_map_write[0] = zxcf_memory_map_romcs[0];
+  memory_map_write[1] = zxcf_memory_map_romcs[1];
 }
 
 static void

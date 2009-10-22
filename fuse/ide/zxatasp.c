@@ -39,6 +39,9 @@
 #include "ui/ui.h"
 #include "zxatasp.h"
 
+/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
+static memory_page zxatasp_memory_map_romcs[2];
+
 /*
   TBD: Allow memory size selection (128K/512K)
   TBD: Should support for secondary channel be removed?
@@ -156,7 +159,7 @@ static module_info_t zxatasp_module_info = {
 int
 zxatasp_init( void )
 {
-  int error = 0;
+  int error = 0, i;
 
   zxatasp_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   zxatasp_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
@@ -179,6 +182,7 @@ zxatasp_init( void )
   }
 
   module_register( &zxatasp_module_info );
+  for( i = 0; i < 2; i++ ) zxatasp_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
@@ -444,7 +448,7 @@ set_zxatasp_bank( int bank )
 
   for( i = 0; i < 2; i++ ) {
 
-    page = &memory_map_romcs[i];
+    page = &zxatasp_memory_map_romcs[i];
     offset = i & 1 ? MEMORY_PAGE_SIZE : 0x0000;
 
     page->page = &ZXATASPMEM[ bank ][ offset ];
@@ -498,21 +502,23 @@ zxatasp_memory_map( void )
 
   if( !settings_current.zxatasp_active ) return;
 
-  if( settings_current.zxatasp_wp && ( memory_map_romcs[0].page_num & 1 ) ) {
+  if( settings_current.zxatasp_wp &&
+      ( zxatasp_memory_map_romcs[0].page_num & 1 ) ) {
     writable = 0;
   } else {
     writable = 1;
   }
 
-  memory_map_romcs[0].writable = memory_map_romcs[1].writable = writable;
+  zxatasp_memory_map_romcs[0].writable =
+    zxatasp_memory_map_romcs[1].writable = writable;
 
   if( !settings_current.zxatasp_upload ) {
-    memory_map_read[0] = memory_map_romcs[0];
-    memory_map_read[1] = memory_map_romcs[1];
+    memory_map_read[0] = zxatasp_memory_map_romcs[0];
+    memory_map_read[1] = zxatasp_memory_map_romcs[1];
   }
 
-  memory_map_write[0] = memory_map_romcs[0];
-  memory_map_write[1] = memory_map_romcs[1];
+  memory_map_write[0] = zxatasp_memory_map_romcs[0];
+  memory_map_write[1] = zxatasp_memory_map_romcs[1];
 }
 
 static void

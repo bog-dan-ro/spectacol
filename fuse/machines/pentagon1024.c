@@ -67,6 +67,8 @@ static const size_t peripherals_count =
 int
 pentagon1024_init( fuse_machine_info *machine )
 {
+  int i;
+
   machine->machine = LIBSPECTRUM_MACHINE_PENT1024;
   machine->id = "pentagon1024";
 
@@ -82,6 +84,8 @@ pentagon1024_init( fuse_machine_info *machine )
   machine->shutdown = NULL;
 
   machine->memory_map = pentagon1024_memory_map;
+
+  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   return 0;
 }
@@ -101,7 +105,7 @@ pentagon1024_reset(void)
   error = machine_load_rom( 4, 2, settings_current.rom_pentagon1024_3,
                             settings_default.rom_pentagon1024_3, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom_bank( memory_map_romcs, 0, 0,
+  error = machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
                                  settings_current.rom_pentagon1024_2,
                                  settings_default.rom_pentagon1024_2, 0x4000 );
   if( error ) return error;

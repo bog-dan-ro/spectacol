@@ -61,6 +61,9 @@ const size_t divide_peripherals_count =
 static const libspectrum_byte DIVIDE_CONTROL_CONMEM = 0x80;
 static const libspectrum_byte DIVIDE_CONTROL_MAPRAM = 0x40;
 
+/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
+static memory_page divide_memory_map_romcs[2];
+
 int divide_automapping_enabled = 0;
 int divide_active = 0;
 static libspectrum_byte divide_control;
@@ -103,7 +106,7 @@ static int page_event, unpage_event;
 int
 divide_init( void )
 {
-  int error;
+  int error, i;
 
   divide_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   divide_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
@@ -126,6 +129,7 @@ divide_init( void )
   }
 
   module_register( &divide_module_info );
+  for( i = 0; i < 2; i++ ) divide_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
@@ -349,26 +353,26 @@ divide_memory_map( void )
   upper_ram_page = divide_control & (DIVIDE_PAGES - 1);
   
   if( divide_control & DIVIDE_CONTROL_CONMEM ) {
-    memory_map_romcs[0].page = divide_eprom;
-    memory_map_romcs[0].writable = !settings_current.divide_wp;
-    memory_map_romcs[1].page = divide_ram[ upper_ram_page ];
-    memory_map_romcs[1].writable = 1;
+    divide_memory_map_romcs[0].page = divide_eprom;
+    divide_memory_map_romcs[0].writable = !settings_current.divide_wp;
+    divide_memory_map_romcs[1].page = divide_ram[ upper_ram_page ];
+    divide_memory_map_romcs[1].writable = 1;
   } else {
     if( divide_control & DIVIDE_CONTROL_MAPRAM ) {
-      memory_map_romcs[0].page = divide_ram[3];
-      memory_map_romcs[0].writable = 0;
-      memory_map_romcs[1].page = divide_ram[ upper_ram_page ];
-      memory_map_romcs[1].writable = ( upper_ram_page != 3 );
+      divide_memory_map_romcs[0].page = divide_ram[3];
+      divide_memory_map_romcs[0].writable = 0;
+      divide_memory_map_romcs[1].page = divide_ram[ upper_ram_page ];
+      divide_memory_map_romcs[1].writable = ( upper_ram_page != 3 );
     } else {
-      memory_map_romcs[0].page = divide_eprom;
-      memory_map_romcs[0].writable = 0;
-      memory_map_romcs[1].page = divide_ram[ upper_ram_page ];
-      memory_map_romcs[1].writable = 1;
+      divide_memory_map_romcs[0].page = divide_eprom;
+      divide_memory_map_romcs[0].writable = 0;
+      divide_memory_map_romcs[1].page = divide_ram[ upper_ram_page ];
+      divide_memory_map_romcs[1].writable = 1;
     }
   }
 
-  memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
-  memory_map_read[1] = memory_map_write[1] = memory_map_romcs[1];
+  memory_map_read[0] = memory_map_write[0] = divide_memory_map_romcs[0];
+  memory_map_read[1] = memory_map_write[1] = divide_memory_map_romcs[1];
 }
 
 static void

@@ -58,6 +58,9 @@
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
+/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
+memory_page beta_memory_map_romcs[2];
+
 int beta_available = 0;
 int beta_active = 0;
 int beta_builtin = 0;
@@ -124,8 +127,8 @@ beta_memory_map( void )
 {
   if( !beta_active ) return;
 
-  memory_map_read[0] = memory_map_write[0] = memory_map_romcs[ 0 ];
-  memory_map_read[1] = memory_map_write[1] = memory_map_romcs[ 1 ];
+  memory_map_read[0] = memory_map_write[0] = beta_memory_map_romcs[0];
+  memory_map_read[1] = memory_map_write[1] = beta_memory_map_romcs[1];
 }
 
 static void
@@ -165,6 +168,7 @@ beta_init( void )
   if( index_event == -1 ) return 1;
 
   module_register( &beta_module_info );
+  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   return 0;
 }
@@ -199,15 +203,15 @@ beta_reset( int hard_reset GCC_UNUSED )
   }
 
   if( !beta_builtin ) {
-    machine_load_rom_bank( memory_map_romcs, 0, 0,
+    machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
 			   settings_current.rom_beta128,
 			   settings_default.rom_beta128, 0x4000 );
 
-    memory_map_romcs[ 0 ].writable = 0;
-    memory_map_romcs[ 1 ].writable = 0;
+    beta_memory_map_romcs[ 0 ].writable = 0;
+    beta_memory_map_romcs[ 1 ].writable = 0;
 
-    memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-    memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
+    beta_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
+    beta_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
     beta_active = 0;
 
@@ -702,7 +706,7 @@ beta_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_beta_custom_rom( snap ) &&
       libspectrum_snap_beta_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             memory_map_romcs, 0, 0,
+                             beta_memory_map_romcs, 0, 0,
                              libspectrum_snap_beta_rom( snap, 0 ),
                              MEMORY_PAGE_SIZE * 2,
                              1 ) )
@@ -734,7 +738,7 @@ beta_to_snapshot( libspectrum_snap *snap )
 
   libspectrum_snap_set_beta_active( snap, 1 );
 
-  if( memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
+  if( beta_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
     size_t rom_length = MEMORY_PAGE_SIZE * 2;
 
     buffer = malloc( rom_length );
@@ -743,8 +747,8 @@ beta_to_snapshot( libspectrum_snap *snap )
       return;
     }
 
-    memcpy( buffer, memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
-    memcpy( buffer + MEMORY_PAGE_SIZE, memory_map_romcs[1].page,
+    memcpy( buffer, beta_memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
+    memcpy( buffer + MEMORY_PAGE_SIZE, beta_memory_map_romcs[1].page,
 	    MEMORY_PAGE_SIZE );
 
     libspectrum_snap_set_beta_rom( snap, 0, buffer );

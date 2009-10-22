@@ -45,9 +45,6 @@
 memory_page memory_map_read[8];
 memory_page memory_map_write[8];
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-memory_page memory_map_romcs[2];
-
 /* Mappings for the 'home' (normal ROM/RAM) pages, the Timex DOCK and
    the Timex EXROM */
 memory_page *memory_map_home[8];
@@ -130,8 +127,6 @@ memory_init( void )
   for( i = 0; i < 8; i++ )
     memory_map_home[i] = memory_map_dock[i] = memory_map_exrom[i] =
       &memory_map_ram[0];
-
-  for( i = 0; i < 2; i++ ) memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   module_register( &memory_module_info );
 

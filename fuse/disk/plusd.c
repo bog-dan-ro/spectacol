@@ -45,6 +45,9 @@
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
+/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
+static memory_page plusd_memory_map_romcs[2];
+
 int plusd_available = 0;
 int plusd_active = 0;
 
@@ -100,8 +103,8 @@ plusd_memory_map( void )
 {
   if( !plusd_active ) return;
 
-  memory_map_read[ 0 ] = memory_map_write[ 0 ] = memory_map_romcs[ 0 ];
-  memory_map_read[ 1 ] = memory_map_write[ 1 ] = memory_map_romcs[ 1 ];
+  memory_map_read[ 0 ] = memory_map_write[ 0 ] = plusd_memory_map_romcs[ 0 ];
+  memory_map_read[ 1 ] = memory_map_write[ 1 ] = plusd_memory_map_romcs[ 1 ];
 }
 
 const periph_t plusd_peripherals[] = {
@@ -151,6 +154,7 @@ plusd_init( void )
   index_event = event_register( plusd_event_index, "+D index" );
 
   module_register( &plusd_module_info );
+  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   return 0;
 }
@@ -170,19 +174,19 @@ plusd_reset( int hard_reset )
   if( !periph_plusd_active )
     return;
 
-  machine_load_rom_bank( memory_map_romcs, 0, 0,
+  machine_load_rom_bank( plusd_memory_map_romcs, 0, 0,
 			 settings_current.rom_plusd,
 			 settings_default.rom_plusd, 0x2000 );
 
-  memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
+  plusd_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
-  memory_map_romcs[1].page = plusd_ram;
-  memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
+  plusd_memory_map_romcs[1].page = plusd_ram;
+  plusd_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
 
-  memory_map_romcs[ 0 ].writable = 0;
-  memory_map_romcs[ 1 ].writable = 1;
+  plusd_memory_map_romcs[ 0 ].writable = 0;
+  plusd_memory_map_romcs[ 1 ].writable = 1;
 
   plusd_available = 1;
   plusd_active = 1;
@@ -643,7 +647,7 @@ plusd_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_plusd_custom_rom( snap ) &&
       libspectrum_snap_plusd_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             memory_map_romcs, 0, 0,
+                             plusd_memory_map_romcs, 0, 0,
                              libspectrum_snap_plusd_rom( snap, 0 ),
                              MEMORY_PAGE_SIZE,
                              1 ) )
@@ -684,10 +688,10 @@ plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
 
   libspectrum_snap_set_plusd_active( snap, 1 );
 
-  buffer = alloc_and_copy_page( memory_map_romcs[0].page );
+  buffer = alloc_and_copy_page( plusd_memory_map_romcs[0].page );
   if( !buffer ) return;
   libspectrum_snap_set_plusd_rom( snap, 0, buffer );
-  if( memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM )
+  if( plusd_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM )
     libspectrum_snap_set_plusd_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( plusd_ram );

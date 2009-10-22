@@ -3239,3 +3239,8 @@
          #2875612) (Gergely Szasz).
 20091019 disk/disk.c: correct mapping of sector length to SECLEN_* macros
          (patch #2875613) (Gergely Szasz).
+20091019 disk/{beta.[ch],opus.c,plusd.c},ide/{divide.c,zxatasp.c,zxcf.c},if1.c,
+         if2.c,machines/{pentagon.c,pentagon1024.c,pentagon512.c,scorpion.c},
+         memory.[ch]: make each peripheral/machine that uses memory paged in via
+         /ROMCS have its own copy of the relevant struct (part of patch
+         #2880415) (Gergely Szasz).

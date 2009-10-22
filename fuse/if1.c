@@ -153,6 +153,9 @@ RS232:
     every other 0x00 + 0x## are discarded
 */
 
+/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
+static memory_page if1_memory_map_romcs[2];
+
 /* IF1 paged out ROM activated? */
 int if1_active = 0;
 int if1_available = 0;
@@ -285,7 +288,7 @@ update_menu( enum if1_menu_item what )
 int
 if1_init( void )
 {
-  int m;
+  int m, i;
 
   if1_ula.fd_r = -1;
   if1_ula.fd_t = -1;
@@ -323,6 +326,7 @@ if1_init( void )
   }
 
   module_register( &if1_module_info );
+  for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
@@ -359,12 +363,12 @@ if1_reset( int hard_reset GCC_UNUSED )
 
   if( !periph_interface1_active ) return;
 
-  machine_load_rom_bank( memory_map_romcs, 0, 0,
+  machine_load_rom_bank( if1_memory_map_romcs, 0, 0,
 			 settings_current.rom_interface_i,
 			 settings_default.rom_interface_i,
 			 MEMORY_PAGE_SIZE );
 
-  memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
+  if1_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
   
@@ -410,7 +414,7 @@ if1_memory_map( void )
 {
   if( !if1_active ) return;
 
-  memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
+  memory_map_read[0] = memory_map_write[0] = if1_memory_map_romcs[0];
 }
 
 static void
@@ -428,7 +432,7 @@ if1_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_interface1_custom_rom( snap ) &&
       libspectrum_snap_interface1_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             memory_map_romcs, 0, 0,
+                             if1_memory_map_romcs, 0, 0,
                              libspectrum_snap_interface1_rom( snap, 0 ),
                              libspectrum_snap_interface1_rom_length( snap, 0 ),
                              1 ) )
@@ -452,10 +456,10 @@ if1_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_interface1_paged ( snap, if1_active );
   libspectrum_snap_set_interface1_drive_count( snap, 8 );
 
-  if( memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
+  if( if1_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
     size_t rom_length = MEMORY_PAGE_SIZE;
 
-    if( memory_map_romcs[1].source == MEMORY_SOURCE_CUSTOMROM ) {
+    if( if1_memory_map_romcs[1].source == MEMORY_SOURCE_CUSTOMROM ) {
       rom_length <<= 1;
     }
 
@@ -468,10 +472,10 @@ if1_to_snapshot( libspectrum_snap *snap )
       return;
     }
 
-    memcpy( buffer, memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
+    memcpy( buffer, if1_memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
 
     if( rom_length == MEMORY_PAGE_SIZE*2 ) {
-      memcpy( buffer + MEMORY_PAGE_SIZE, memory_map_romcs[1].page,
+      memcpy( buffer + MEMORY_PAGE_SIZE, if1_memory_map_romcs[1].page,
               MEMORY_PAGE_SIZE );
     }
 
