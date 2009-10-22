@@ -62,9 +62,15 @@ soundfile::soundfile( std::string filename, trigger* edge_detector,
     throw audio2tape_exception("couldn't set virtual sample format");
   }
 
+  if( afSetVirtualChannels( handle, track, 1 ) ) {
+    afCloseFile( handle );
+    throw audio2tape_exception("couldn't set virtual channel count");
+  }
+
   int length = afGetFrameCount( handle, track );
 
-  libspectrum_byte *buffer = (libspectrum_byte *)malloc(length);
+  libspectrum_byte *buffer =
+    (libspectrum_byte *)malloc(length * afGetChannels(handle, track));
 
   int frames = afReadFrames( handle, track, buffer, length );
   if( frames == -1 ) {

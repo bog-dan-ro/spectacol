@@ -295,3 +295,6 @@
          Fred).
 20090803 compat/amiga/basename.c,compat/unix/basename.c: missed a couple of
          files (Fred).
+20091022 importer/soundfile.cc: we expect mono sound files, tell audiofile to
+         make the required adjustments (fixes bug #2883135; thanks, Gilberto
+         Almeida) (Fred).

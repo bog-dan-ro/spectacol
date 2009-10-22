@@ -73,12 +73,22 @@ libspectrum_wav_read( libspectrum_tape *tape, const char *filename )
     return LIBSPECTRUM_ERROR_LOGIC;
   }
 
+  if( afSetVirtualChannels( handle, track, 1 ) ) {
+    afCloseFile( handle );
+    libspectrum_print_error(
+      LIBSPECTRUM_ERROR_LOGIC,
+      "libspectrum_wav_read: audiofile failed to set virtual channel count"
+    );
+    return LIBSPECTRUM_ERROR_LOGIC;
+  }
+
   length = afGetFrameCount( handle, track );
 
   tape_length = length;
   if( tape_length%8 ) tape_length += 8 - (tape_length%8);
 
-  buffer = libspectrum_calloc( tape_length, sizeof( *buffer ) );
+  buffer = libspectrum_calloc( tape_length * afGetChannels(handle, track),
+                               sizeof( *buffer ) );
 
   frames = afReadFrames( handle, track, buffer, length );
   if( frames == -1 ) {
