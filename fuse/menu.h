@@ -66,6 +66,7 @@ MENU_CALLBACK( menu_file_movies_stopmovierecording );
 MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select );
 MENU_CALLBACK( menu_options_filter );
 MENU_DETAIL( menu_filter_detail );
+MENU_CALLBACK( menu_options_fullscreen );
 MENU_CALLBACK( menu_options_save );
 
 MENU_CALLBACK( menu_machine_profiler_start );

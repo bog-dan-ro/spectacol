@@ -244,6 +244,12 @@ MENU_CALLBACK( menu_options_filter )
   fuse_emulation_unpause();
 }
 
+MENU_CALLBACK( menu_options_fullscreen )
+{
+  WIDGET_END;
+  settings_current.full_screen = !settings_current.full_screen;
+}
+
 MENU_CALLBACK( menu_options_save )
 {
   WIDGET_END;

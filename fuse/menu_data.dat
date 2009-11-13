@@ -97,6 +97,10 @@ Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select,, 18
 
 Options/_Filter..., Item,,, menu_filter_detail
 
+#ifdef UI_SDL
+Options/F_ull screen, Item, F11
+#endif
+
 Options/_Disk options..., Item
 
 Options/separator, Separator
