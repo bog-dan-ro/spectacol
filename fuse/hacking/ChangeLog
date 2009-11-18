@@ -3247,3 +3247,4 @@
 20091113 man/fuse.1,menu.[ch],menu_data.dat: add a menu item with a hot key to
          allow full screen and windowed mode switching for SDL (feature
          request #1515888) (György Szombathelyi).
+20091118 sound/coreaudiosound.c: replace some deprecated functions (Fred).

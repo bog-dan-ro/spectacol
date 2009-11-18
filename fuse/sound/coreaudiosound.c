@@ -54,52 +54,75 @@ static AudioUnit gOutputUnit;
 /* Records sound writer status information */
 static int audio_output_started;
 
-int
-sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
+/* get the default output device for the HAL */
+static int
+get_default_output_device(AudioDeviceID* device)
 {
   OSStatus err = kAudioHardwareNoError;
   UInt32 count;
-  AudioDeviceID device = kAudioDeviceUnknown; /* the default device */
-  UInt32 deviceBufferSize;  /* bufferSize returned by
-                               kAudioDevicePropertyBufferSize */
-  int error;
-  float hz;
-  int sound_framesiz;
+
+  AudioObjectPropertyAddress property_address = { 
+    kAudioHardwarePropertyDefaultOutputDevice, 
+    kAudioObjectPropertyScopeGlobal,
+    kAudioObjectPropertyElementMaster
+  }; 
 
   /* get the default output device for the HAL */
-  count = sizeof( device );
-  err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice,
-                                  &count, (void *)&device );
-  if ( err != kAudioHardwareNoError ) {
+  count = sizeof( *device );
+  err = AudioObjectGetPropertyData( kAudioObjectSystemObject, &property_address,
+                                    0, NULL, &count, device); 
+  if ( err != kAudioHardwareNoError && device != kAudioObjectUnknown ) {
     ui_error( UI_ERROR_ERROR,
               "get kAudioHardwarePropertyDefaultOutputDevice error %d",
               err );
     return 1;
   }
 
-  /* get the buffersize that the default device uses for IO */
-  count = sizeof( deviceBufferSize );
-  err = AudioDeviceGetProperty( device, 0, false, kAudioDevicePropertyBufferSize,
-                                &count, &deviceBufferSize );
-  if( err != kAudioHardwareNoError ) {
-    ui_error( UI_ERROR_ERROR, "get kAudioDevicePropertyBufferSize error %d",
+  return 0;
+}
+
+/* get the nominal sample rate used by the supplied device */
+static int
+get_default_sample_rate( AudioDeviceID device, Float64 *rate )
+{
+  OSStatus err = kAudioHardwareNoError;
+  UInt32 count;
+
+  AudioObjectPropertyAddress property_address = { 
+    kAudioDevicePropertyNominalSampleRate,
+    kAudioObjectPropertyScopeGlobal,
+    kAudioObjectPropertyElementMaster
+  }; 
+
+  /* get the default output device for the HAL */
+  count = sizeof( *rate );
+  err = AudioObjectGetPropertyData( device, &property_address, 0, NULL, &count,
+                                    rate);
+  if ( err != kAudioHardwareNoError ) {
+    ui_error( UI_ERROR_ERROR,
+              "get kAudioDevicePropertyNominalSampleRate error %d",
               err );
     return 1;
   }
 
-  /* get a description of the data format used by the default device */
-  count = sizeof( deviceFormat );
-  err = AudioDeviceGetProperty( device, 0, false,
-                                kAudioDevicePropertyStreamFormat, &count,
-                                &deviceFormat );
-  if( err != kAudioHardwareNoError ) {
-    ui_error( UI_ERROR_ERROR,
-              "get kAudioDevicePropertyStreamFormat error %d", err );
-    return 1;
-  }
+  return 0;
+}
+
+int
+sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
+{
+  OSStatus err = kAudioHardwareNoError;
+  AudioDeviceID device = kAudioObjectUnknown; /* the default device */
+  int error;
+  float hz;
+  int sound_framesiz;
+
+  if( get_default_output_device(&device) ) return 1;
+  if( get_default_sample_rate( device, &deviceFormat.mSampleRate ) ) return 1;
 
   *freqptr = deviceFormat.mSampleRate;
 
+  deviceFormat.mFormatID =  kAudioFormatLinearPCM;
   deviceFormat.mFormatFlags =  kLinearPCMFormatFlagIsSignedInteger
 #ifdef WORDS_BIGENDIAN
                     | kLinearPCMFormatFlagIsBigEndian
