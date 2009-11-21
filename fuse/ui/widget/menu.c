@@ -313,6 +313,7 @@ widget_menu_keyhandler( input_key key )
     return;
 
   case INPUT_KEY_Return:
+  case INPUT_KEY_KP_Enter:
   case INPUT_JOYSTICK_FIRE_1:
     ptr=&menu[1 + highlight_line];
     if(!ptr->inactive) {

@@ -143,6 +143,7 @@ my %ui_data = (
 					   'Meta_L', 'Meta_R',
 					   'Hyper_L','Hyper_R',
 					   'Super_L','Super_R',
+					   'KP_Enter',
 					   'Mode_switch' ) },
 	      function => \&wii_keysym
 	    },
@@ -163,7 +164,7 @@ my %ui_data = (
                          BackSpace Tab Caps_Lock Return Shift_L Shift_R
                          Control_L Control_R Alt_L Alt_R Meta_L Meta_R
                          Super_L Super_R Mode_switch Up Down Left Right
-                         Insert Delete Home End Page_Up Page_Down ) },
+                         Insert Delete Home End Page_Up Page_Down KP_Enter ) },
 	      translations => {
 		  apostrophe  => 'QUOTE',
 		  Control_L   => 'LCTRL',	 
@@ -219,6 +220,7 @@ my %ui_data = (
 					   'Alt_R','Meta_R',
 					   'Hyper_L','Hyper_R',
 					   'Super_L','Super_R',
+					   'KP_Enter',
 					   'A' .. 'Z' ) },
 	      translations => { 
 		  numbersign  => 'OEM_5',

@@ -3248,3 +3248,8 @@
          allow full screen and windowed mode switching for SDL (feature
          request #1515888) (György Szombathelyi).
 20091118 sound/coreaudiosound.c: replace some deprecated functions (Fred).
+20091121 input.h,keyboard.[c|dat|pl],ui/widget/{browse.c,debugger.c,error.c,
+         filesel.c,memory.c,menu.c,options.pl,picture.c,pokefinder.c,query.c,
+         roms.c,select.c,text.c}: some notebooks wire the "standard" return
+         key to the same keysym as enter on the number pad, so treat the two
+         equivalently (thanks, Marce) (Fred).

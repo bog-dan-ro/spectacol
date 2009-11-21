@@ -125,6 +125,8 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_Up,          { KEYBOARD_7,     KEYBOARD_Caps   } },
   { INPUT_KEY_Right,       { KEYBOARD_8,     KEYBOARD_Caps   } },
 
+  { INPUT_KEY_KP_Enter,    { KEYBOARD_Enter, KEYBOARD_NONE   } },
+
   { INPUT_KEY_NONE, { KEYBOARD_NONE, KEYBOARD_NONE } } /* End marker */
 
 };

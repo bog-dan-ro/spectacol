@@ -123,6 +123,7 @@ widget_roms_keyhandler( input_key key )
     return;
 
   case INPUT_KEY_Return:
+  case INPUT_KEY_KP_Enter:
     widget_end_all( WIDGET_FINISHED_OK );
     return;
 

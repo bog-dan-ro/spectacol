@@ -127,6 +127,8 @@ typedef enum input_key {
 
   INPUT_KEY_BackSpace = 0x7f,
 
+  INPUT_KEY_KP_Enter = 0x8d,
+
   INPUT_KEY_Up = 0x100,
   INPUT_KEY_Down,
   INPUT_KEY_Left,

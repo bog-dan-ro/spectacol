@@ -179,6 +179,7 @@ widget_pokefinder_keyhandler( input_key key )
     break;
 
   case INPUT_KEY_Return:
+  case INPUT_KEY_KP_Enter:
   case INPUT_KEY_s:		/* Search */
     if( value < 256 ) {
       pokefinder_search( value );

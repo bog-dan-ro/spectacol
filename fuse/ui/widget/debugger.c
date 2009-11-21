@@ -164,6 +164,7 @@ void widget_debugger_keyhandler( input_key key )
 
   case INPUT_KEY_c:
   case INPUT_KEY_Return:	/* Close widget */
+  case INPUT_KEY_KP_Enter:
     widget_end_all( WIDGET_FINISHED_OK );
     debugger_run();
     break;

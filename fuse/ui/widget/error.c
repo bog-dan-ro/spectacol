@@ -173,6 +173,7 @@ widget_error_keyhandler( input_key key )
     return;
 
   case INPUT_KEY_Return:
+  case INPUT_KEY_KP_Enter:
     widget_end_widget( WIDGET_FINISHED_OK );
     return;
 

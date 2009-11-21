@@ -227,6 +227,7 @@ widget_query_generic_keyhandler( widget_query_entry *query, int num_entries,
     break;
 
   case INPUT_KEY_Return:
+  case INPUT_KEY_KP_Enter:
   case INPUT_JOYSTICK_FIRE_1:
     query[highlight_line].click();
     widget_end_all( WIDGET_FINISHED_OK );

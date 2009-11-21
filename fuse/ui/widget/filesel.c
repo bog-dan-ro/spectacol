@@ -917,6 +917,7 @@ widget_filesel_keyhandler( input_key key )
     break;
 
   case INPUT_KEY_Return:
+  case INPUT_KEY_KP_Enter:
   case INPUT_JOYSTICK_FIRE_1:
 #ifdef WIN32
     if( is_drivesel ) {
