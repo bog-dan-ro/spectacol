@@ -298,3 +298,5 @@
 20091022 importer/soundfile.cc: we expect mono sound files, tell audiofile to
          make the required adjustments (fixes bug #2883135; thanks, Gilberto
          Almeida) (Fred).
+20091212 importer/romloader.cc: guard against array underrun on empty block
+         (Fred).

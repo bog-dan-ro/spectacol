@@ -250,13 +250,14 @@ bool
 romloader::check_checksum()
 {
   libspectrum_byte checksum = 0;
+  bool retval = false;
   if( data.size() ) {
     for( size_t i = 0; i < data.size()-1; i++ ) {
       checksum ^= data[i];
     }
+    retval = checksum == data[data.size()-1];
   }
 
-  bool retval = checksum == data[data.size()-1];
   std::cout << "Checksum:" << (retval ? "PASS" : "FAIL") << "\n";
   return retval;
 }
