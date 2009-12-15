@@ -35,6 +35,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "rectangle.h"
 #include "screenshot.h"
 #include "settings.h"
 #include "spectrum.h"
@@ -101,17 +102,6 @@ static int display_redraw_all;
 /* Value used to signify a border line has more than one colour on it. */
 static const int display_border_mixed = 0xff;
 
-/* Used for grouping screen writes together */
-struct rectangle { int x,y; int w,h; };
-
-/* Those rectangles which were modified on the last line to be displayed */
-struct rectangle *active_rectangle = NULL;
-size_t active_rectangle_count = 0, active_rectangle_allocated = 0;
-
-/* Those rectangles which weren't */
-struct rectangle *inactive_rectangle = NULL;
-size_t inactive_rectangle_count = 0, inactive_rectangle_allocated = 0;
-
 /* The last point at which we updated the screen display */
 int critical_region_x = 0, critical_region_y = 0;
 
@@ -135,9 +125,6 @@ static void display_dirty64( libspectrum_word address );
 
 static void display_get_attr( int x, int y,
 			      libspectrum_byte *ink, libspectrum_byte *paper);
-
-static int add_rectangle( int y, int x, int w );
-static int end_line( int y );
 
 static int border_changes_last = 0;
 static struct border_change_t *border_changes = NULL;
@@ -221,167 +208,6 @@ display_init( int *argc, char ***argv )
   error = add_border_sentinel(); if( error ) return error;
   display_last_border = scld_last_dec.name.hires ?
                             display_hires_border : display_lores_border;
-
-  return 0;
-}
-
-/* Add the rectangle { x, line, w, 1 } to the list of rectangles to be
-   redrawn, either by extending an existing rectangle or creating a
-   new one */
-static int
-add_rectangle( int y, int x, int w )
-{
-  size_t i;
-  struct rectangle *ptr;
-
-  /* Check through all 'active' rectangles (those which were modified
-     on the previous line) and see if we can use this new rectangle
-     to extend them */
-  for( i = 0; i < active_rectangle_count; i++ ) {
-
-    if( active_rectangle[i].x == x &&
-	active_rectangle[i].w == w    ) {
-      active_rectangle[i].h++;
-      return 0;
-    }
-  }
-
-  /* We couldn't find a rectangle to extend, so create a new one */
-  if( ++active_rectangle_count > active_rectangle_allocated ) {
-
-    size_t new_alloc;
-
-    new_alloc = active_rectangle_allocated     ?
-                2 * active_rectangle_allocated :
-                8;
-
-    ptr = realloc( active_rectangle, new_alloc * sizeof( struct rectangle ) );
-    if( !ptr ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
-    }
-
-    active_rectangle_allocated = new_alloc; active_rectangle = ptr;
-  }
-
-  ptr = &active_rectangle[ active_rectangle_count - 1 ];
-
-  ptr->x = x; ptr->y = y;
-  ptr->w = w; ptr->h = 1;
-
-  return 0;
-}
-
-#ifndef MAX
-#define MAX(a,b)    (((a) > (b)) ? (a) : (b))
-#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
-#endif
-
-inline static int
-compare_and_merge_rectangles( struct rectangle *source )
-{
-  size_t z;
-
-  /* Now look to see if there is an overlapping rectangle in the inactive
-     list.  These occur when frame skip is on and the same lines are
-     covered more than once... */
-  for( z = 0; z < inactive_rectangle_count; z++ ) {
-    if( inactive_rectangle[z].x == source->x &&
-          inactive_rectangle[z].w == source->w ) {
-      if( inactive_rectangle[z].y == source->y &&
-            inactive_rectangle[z].h == source->h )
-        return 1;
-
-      if( ( inactive_rectangle[z].y < source->y && 
-          ( source->y < ( inactive_rectangle[z].y +
-            inactive_rectangle[z].h + 1 ) ) ) ||
-          ( source->y < inactive_rectangle[z].y && 
-          ( inactive_rectangle[z].y < ( source->y + source->h + 1 ) ) ) ) {
-        /* rects overlap or touch in the y dimension, merge */
-        inactive_rectangle[z].h = MAX( inactive_rectangle[z].y +
-                                    inactive_rectangle[z].h,
-                                    source->y + source->h ) -
-                                  MIN( inactive_rectangle[z].y, source->y );
-        inactive_rectangle[z].y = MIN( inactive_rectangle[z].y, source->y );
-
-        return 1;
-      }
-    }
-    if( inactive_rectangle[z].y == source->y &&
-          inactive_rectangle[z].h == source->h ) {
-
-      if( (inactive_rectangle[z].x < source->x && 
-          ( source->x < ( inactive_rectangle[z].x +
-            inactive_rectangle[z].w + 1 ) ) ) ||
-          ( source->x < inactive_rectangle[z].x && 
-          ( inactive_rectangle[z].x < ( source->x + source->w + 1 ) ) ) ) {
-        /* rects overlap or touch in the x dimension, merge */
-        inactive_rectangle[z].w = MAX( inactive_rectangle[z].x +
-          inactive_rectangle[z].w, source->x +
-          source->w ) - MIN( inactive_rectangle[z].x, source->x );
-        inactive_rectangle[z].x = MIN( inactive_rectangle[z].x, source->x );
-        return 1;
-      }
-    }
-     /* Handle overlaps offset by both x and y? how much overlap and hence 
-        overdraw can be tolerated? */
-  }
-  return 0;
-}
-
-/* Move all rectangles not updated on this line to the inactive list */
-static int
-end_line( int y )
-{
-  size_t i;
-  struct rectangle *ptr;
-
-  for( i = 0; i < active_rectangle_count; i++ ) {
-
-    /* Skip if this rectangle was updated this line */
-    if( active_rectangle[i].y + active_rectangle[i].h == y + 1 ) continue;
-
-    if ( settings_current.frame_rate > 1 &&
-	 compare_and_merge_rectangles( &active_rectangle[i] ) ) {
-
-      /* Mark the active rectangle as done */
-      active_rectangle[i].h = 0;
-      continue;
-    }
-
-    /* We couldn't find a rectangle to extend, so create a new one */
-    if( ++inactive_rectangle_count > inactive_rectangle_allocated ) {
-
-      size_t new_alloc;
-
-      new_alloc = inactive_rectangle_allocated     ?
-	          2 * inactive_rectangle_allocated :
-	          8;
-
-      ptr = realloc( inactive_rectangle,
-		     new_alloc * sizeof( struct rectangle ) );
-      if( !ptr ) {
-	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d",
-		  __FILE__, __LINE__ );
-	return 1;
-      }
-
-      inactive_rectangle_allocated = new_alloc; inactive_rectangle = ptr;
-    }
-
-    inactive_rectangle[ inactive_rectangle_count - 1 ] = active_rectangle[i];
-
-    /* Mark the active rectangle as done */
-    active_rectangle[i].h = 0;
-  }
-
-  /* Compress the list of active rectangles */
-  for( i = 0, ptr = active_rectangle; i < active_rectangle_count; i++ ) {
-    if( active_rectangle[i].h == 0 ) continue;
-    *ptr = active_rectangle[i]; ptr++;
-  }
-
-  active_rectangle_count = ptr - active_rectangle;
 
   return 0;
 }
@@ -485,7 +311,7 @@ display_get_attr_byte( int x, int y )
 static void
 update_dirty_rects( void )
 {
-  int start, y, error;
+  int start, y;
 
   for( y=0; y<DISPLAY_SCREEN_HEIGHT; y++ ) {
     int x = 0;
@@ -505,16 +331,15 @@ update_dirty_rects( void )
         x++;
       } while( display_is_dirty[y] & 0x01 );
 
-      error = add_rectangle( y, start, x - start );
-      if( error ) return;
+      rectangle_add( y, start, x - start );
     }
 
     /* compress the active rectangles list */
-    error = end_line( y ); if( error ) return;
+    rectangle_end_line( y );
   }
 
   /* Force all rectangles into the inactive list */
-  error = end_line( DISPLAY_SCREEN_HEIGHT ); if( error ) return;
+  rectangle_end_line( DISPLAY_SCREEN_HEIGHT );
 }
 
 void
@@ -1066,15 +891,15 @@ update_ui_screen( void )
 		      scale * DISPLAY_SCREEN_HEIGHT );
       display_redraw_all = 0;
     } else {
-      for( i = 0, ptr = inactive_rectangle;
-	   i < inactive_rectangle_count;
+      for( i = 0, ptr = rectangle_inactive;
+	   i < rectangle_inactive_count;
 	   i++, ptr++ ) {
             uidisplay_area( 8 * scale * ptr->x, scale * ptr->y,
 			8 * scale * ptr->w, scale * ptr->h );
       }
     }
 
-    inactive_rectangle_count = 0;
+    rectangle_inactive_count = 0;
     
     uidisplay_frame_end();
   }

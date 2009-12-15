@@ -3253,3 +3253,5 @@
          roms.c,select.c,text.c}: some notebooks wire the "standard" return
          key to the same keysym as enter on the number pad, so treat the two
          equivalently (thanks, Marce) (Fred).
+20091215 Makefile.am,display.c,rectangle.[ch]: extract dirty rectangle handling
+         to its own files (Fred).
