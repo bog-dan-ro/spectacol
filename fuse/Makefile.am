@@ -81,6 +81,7 @@ fuse_SOURCES = ay.c \
 	printer.c \
 	profile.c \
 	psg.c \
+	rectangle.c \
 	rzx.c \
 	scld.c \
 	screenshot.c \
@@ -191,6 +192,7 @@ noinst_HEADERS = ay.h \
 	module.h \
 	periph.h \
 	psg.h \
+	rectangle.h \
 	rzx.h \
 	screenshot.h \
 	settings.h \
