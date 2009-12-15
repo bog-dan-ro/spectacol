@@ -3235,7 +3235,7 @@
          (fixes bug #2863656) (thanks, Phil Reynolds) (Fred).
 20091007 settings.pl: numeric settings don't need to be non-zero to save into
          the settings file (fixes bug #2873277) (thanks, Phil Reynolds) (Fred).
-20091016 fuse.1: update link to ResiDOS homepage in fuse man page (patch
+20091016 man/fuse.1: update link to ResiDOS homepage in fuse man page (patch
          #2875612) (Gergely Szasz).
 20091019 disk/disk.c: correct mapping of sector length to SECLEN_* macros
          (patch #2875613) (Gergely Szasz).
@@ -3255,3 +3255,4 @@
          equivalently (thanks, Marce) (Fred).
 20091215 Makefile.am,display.c,rectangle.[ch]: extract dirty rectangle handling
          to its own files (Fred).
+20091215 man/fuse.1: fix typo (Fred).
