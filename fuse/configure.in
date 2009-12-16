@@ -345,33 +345,41 @@ AC_LINK_FILES([
 	lib/tape_ts2068.szx])
 
 dnl Check if a version of libpng which supplies png_write_png is available
-AC_PATH_PROG([LIBPNG_CONFIG], [libpng-config])
-if test -n "$LIBPNG_CONFIG"; then
-  PNG_CFLAGS=`libpng-config --cflags`
-  PNG_LIBS=`libpng-config --ldflags`
-  PNG_LIBS=`echo " $PNG_LIBS" | sed 's/ -l[[^ ]][[^ ]]*//g'`
-fi
+AC_MSG_CHECKING(whether PNG support requested)
+AC_ARG_WITH(png,
+[  --without-png           don't use libpng],
+if test "$withval" = no; then libpng=no; else libpng=yes; fi,
+libpng=yes)
+AC_MSG_RESULT($libpng)
+if test "$libpng" = yes; then
+  AC_PATH_PROG([LIBPNG_CONFIG], [libpng-config])
+  if test -n "$LIBPNG_CONFIG"; then
+    PNG_CFLAGS=`libpng-config --cflags`
+    PNG_LIBS=`libpng-config --ldflags`
+    PNG_LIBS=`echo " $PNG_LIBS" | sed 's/ -l[[^ ]][[^ ]]*//g'`
+  fi
 
-ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
-ac_save_LDFLAGS="$LDFLAGS"
-LDFLAGS="$PNG_LIBS $LDFLAGS"
+  ac_save_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
+  ac_save_LDFLAGS="$LDFLAGS"
+  LDFLAGS="$PNG_LIBS $LDFLAGS"
 
-AC_CHECK_LIB( png, png_write_png,
-  [AC_CHECK_HEADER(
-    png.h,
-    [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
-    [AC_CHECK_HEADERS(libpng/png.h,
-                 [CPPFLAGS="$ac_save_CPPFLAGS $PNG_CFLAGS/libpng"
-                  AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
-                 [AC_MSG_WARN(png.h not found - saving screenshots disabled)
-                  PNG_LIBS='']
+  AC_CHECK_LIB( png, png_write_png,
+    [AC_CHECK_HEADER(
+      png.h,
+      [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
+      [AC_CHECK_HEADERS(libpng/png.h,
+                   [CPPFLAGS="$ac_save_CPPFLAGS $PNG_CFLAGS/libpng"
+                    AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
+                   [AC_MSG_WARN(png.h not found - saving screenshots disabled)
+                    PNG_LIBS='']
+      )],
     )],
-  )],
-  [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)
-   PNG_LIBS='']
-)
-AC_SUBST(PNG_LIBS)
+    [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)
+     PNG_LIBS='']
+  )
+  AC_SUBST(PNG_LIBS)
+fi
 
 LDFLAGS="$ac_save_LDFLAGS"
 

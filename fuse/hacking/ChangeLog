@@ -3256,3 +3256,5 @@
 20091215 Makefile.am,display.c,rectangle.[ch]: extract dirty rectangle handling
          to its own files (Fred).
 20091215 man/fuse.1: fix typo (Fred).
+20091216 configure.in: add a '--without-png' option for Gentoo (patch #2915091)
+         (José Manuel Ferrer Ortiz).
