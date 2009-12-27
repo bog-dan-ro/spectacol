@@ -63,6 +63,8 @@ ui_init( int *argc, char ***argv )
 
   /* Allocate memory for various things */
 
+  if( ui_widget_init() ) return 1;
+
   if(!(wmHints = XAllocWMHints())) {
     fprintf(stderr,"%s: failure allocating memory\n", fuse_progname);
     return 1;
@@ -252,6 +254,8 @@ int ui_end(void)
 
   /* And disconnect from the X server */
   XCloseDisplay(display);
+
+  ui_widget_end();
 
   return 0;
 }

@@ -49,6 +49,8 @@ int ui_init(int *argc, char ***argv)
 {
   int error;
 
+  if( ui_widget_init() ) return 1;
+
   error = svgadisplay_init();
   if(error) return error;
 
@@ -105,6 +107,8 @@ int ui_end(void)
 
   error = svgadisplay_end();
   if(error) return error;
+
+  ui_widget_end();
 
   return 0;
 }

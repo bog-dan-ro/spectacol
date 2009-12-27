@@ -87,10 +87,6 @@
 #include "unittests/unittests.h"
 #include "utils.h"
 
-#ifdef USE_WIDGET
-#include "ui/widget/widget.h"
-#endif                          /* #ifdef USE_WIDGET */
-
 #include "z80/z80.h"
 
 /* What name were we called under? */
@@ -248,10 +244,6 @@ static int fuse_init(int argc, char **argv)
      hairy */
   fuse_joystick_init ();
   fuse_keyboard_init();
-
-#ifdef USE_WIDGET
-  if( widget_init() ) return 1;
-#endif				/* #ifdef USE_WIDGET */
 
   if( event_init() ) return 1;
   
@@ -834,10 +826,6 @@ static int fuse_end(void)
   event_end();
   fuse_joystick_end();
   ui_end();
-
-#ifdef USE_WIDGET
-  widget_end();
-#endif                          /* #ifdef USE_WIDGET */
 
   libspectrum_creator_free( fuse_creator );
 

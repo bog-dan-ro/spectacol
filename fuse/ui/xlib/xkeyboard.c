@@ -38,9 +38,7 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
-#ifdef USE_WIDGET
-#include "ui/widget/widget.h"
-#endif				/* #ifdef USE_WIDGET */
+#include "ui/ui.h"
 #include "xkeyboard.h"
 
 static void

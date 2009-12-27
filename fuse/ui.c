@@ -41,6 +41,9 @@
 
 #define MESSAGE_MAX_LENGTH 256
 
+/* We don't start in a widget */
+int ui_widget_level = -1;
+
 static char last_message[ MESSAGE_MAX_LENGTH ] = "";
 static size_t frames_since_last_message = 0;
 
@@ -766,3 +769,27 @@ ui_mdr_write( int which )
 
   return 0;
 }
+
+int
+ui_widget_init( void )
+{
+  return widget_init();
+}
+
+int
+ui_widget_end( void )
+{
+  return widget_end();
+}
+
+#ifndef USE_WIDGET
+void
+ui_popup_menu( int native_key )
+{
+}
+
+void
+ui_widget_keyhandler( int native_key )
+{
+}
+#endif				/* #ifndef USE_WIDGET */

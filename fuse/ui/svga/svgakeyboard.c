@@ -38,10 +38,8 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "ui/ui.h"
 #include "utils.h"
-#ifdef USE_WIDGET
-#include "ui/widget/widget.h"
-#endif				/* #ifdef USE_WIDGET */
 
 static void svgakeyboard_keystroke(int scancode, int press);
 static int svgakeyboard_keypress( int keysym );

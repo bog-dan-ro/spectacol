@@ -29,15 +29,11 @@
 #include "input.h"
 #include "joystick.h"
 #include "keyboard.h"
-#include "menu.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
 #include "ui/ui.h"
 #include "utils.h"
-#ifdef USE_WIDGET
-#include "ui/widget/widget.h"
-#endif				/* #ifdef USE_WIDGET */
 
 static int keypress( const input_event_key_t *event );
 static int keyrelease( const input_event_key_t *event );
@@ -71,12 +67,10 @@ keypress( const input_event_key_t *event )
   int swallow;
   const keyboard_spectrum_keys_t *ptr;
 
-#ifdef USE_WIDGET
-  if( widget_level >= 0 ) {
-    widget_keyhandler( event->native_key );
+  if( ui_widget_level >= 0 ) {
+    ui_widget_keyhandler( event->native_key );
     return 0;
   }
-#endif				/* #ifdef USE_WIDGET */
 
   /* Escape => ask UI to end mouse grab, return if grab ended */
   if( event->native_key == INPUT_KEY_Escape && ui_mouse_grabbed ) {
@@ -111,61 +105,7 @@ keypress( const input_event_key_t *event )
     keyboard_press( ptr->key2 );
   }
 
-#ifdef USE_WIDGET
-  switch( event->native_key ) {
-  case INPUT_KEY_F1:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MENU, &widget_menu );
-    fuse_emulation_unpause();
-    break;
-  case INPUT_KEY_F2:
-    fuse_emulation_pause();
-    menu_file_savesnapshot( 0 );
-    fuse_emulation_unpause();
-    break;
-  case INPUT_KEY_F3:
-    fuse_emulation_pause();
-    menu_file_open( 0 );
-    fuse_emulation_unpause();
-    break;
-  case INPUT_KEY_F4:
-    fuse_emulation_pause();
-    menu_options_general( 0 );
-    fuse_emulation_unpause();
-    break;
-  case INPUT_KEY_F5:
-    fuse_emulation_pause();
-    menu_machine_reset( 0 );
-    fuse_emulation_unpause();
-    break;
-  case INPUT_KEY_F6:
-    fuse_emulation_pause();
-    menu_media_tape_write( 0 );
-    fuse_emulation_unpause();
-    break;
-  case INPUT_KEY_F7:
-    fuse_emulation_pause();
-    menu_media_tape_open( 0 );
-    fuse_emulation_unpause();
-    break;
-  case INPUT_KEY_F8:
-    menu_media_tape_play( 0 );
-    break;
-  case INPUT_KEY_F9:
-    fuse_emulation_pause();
-    menu_machine_select( 0 );
-    fuse_emulation_unpause();
-    break;
-  case INPUT_KEY_F10:
-    fuse_emulation_pause();
-    menu_file_exit( 0 );
-    fuse_emulation_unpause();
-    break;
-
-  default: break;		/* Remove gcc warning */
-
-  }
-#endif				/* #ifdef USE_WIDGET */
+  ui_popup_menu( event->native_key );
 
   return 0;
 }
@@ -252,19 +192,15 @@ do_joystick( const input_event_joystick_t *joystick_event, int press )
   int which;
 
 #ifdef USE_WIDGET
-  if( widget_level >= 0 ) {
-    if( press ) widget_keyhandler( joystick_event->button );
+  if( ui_widget_level >= 0 ) {
+    if( press ) ui_widget_keyhandler( joystick_event->button );
     return 0;
   }
 
 #ifndef GEKKO /* Home button opens the menu on Wii */
   switch( joystick_event->button ) {
   case INPUT_JOYSTICK_FIRE_2:
-    if( press ) {
-      fuse_emulation_pause();
-      widget_do( WIDGET_TYPE_MENU, &widget_menu );
-      fuse_emulation_unpause();
-    }
+    if( press ) ui_widget_keyhandler( INPUT_KEY_F1 );
     break;
 
   default: break;		/* Remove gcc warning */

@@ -51,6 +51,8 @@ ui_init( int *argc, char ***argv )
 {
   int error;
 
+  if( ui_widget_init() ) return 1;
+
 /* Comment out to Work around a bug in OS X 10.1 related to OpenGL in windowed
    mode */
   atexit(atexit_proc);
@@ -113,13 +115,9 @@ ui_event( void )
 #endif			/* if defined USE_JOYSTICK && !defined HAVE_JSW_H */
 
     case SDL_QUIT:
-#ifdef USE_WIDGET
       fuse_emulation_pause();
       menu_file_exit(0);
       fuse_emulation_unpause();
-#else 				/* #ifdef USE_WIDGET */
-      fuse_exiting = 1;
-#endif				/* #ifdef USE_WIDGET */
       break;
     case SDL_VIDEOEXPOSE:
       display_refresh_all();
@@ -149,6 +147,8 @@ ui_end( void )
   sdlkeyboard_end();
 
   SDL_Quit();
+
+  ui_widget_end();
 
   return 0;
 }

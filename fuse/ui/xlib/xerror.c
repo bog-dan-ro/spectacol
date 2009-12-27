@@ -31,9 +31,6 @@
 #include <X11/Xlib.h>
 
 #include "fuse.h"
-#ifdef USE_WIDGET
-#include "ui/widget/widget.h"
-#endif				/* #ifdef USE_WIDGET */
 
 /* Are we expecting an X error to occur? */
 int xerror_expecting;

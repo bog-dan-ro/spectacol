@@ -45,6 +45,8 @@ ui_init( int *argc, char ***argv )
   struct sigaction handler;
   int error;
 
+  if( ui_widget_init() ) return 1;
+
   error = atexit( fb_end );
   if( error ) {
     ui_error( UI_ERROR_ERROR, "ui_init: couldn't set atexit function" );
@@ -93,6 +95,8 @@ int ui_end(void)
   
   error = fbkeyboard_end(); if( error ) return error;
   error = fbdisplay_end(); if( error ) return error;
+
+  ui_widget_end();
 
   return 0;
 }

@@ -59,10 +59,8 @@
 #include "xdisplay.h"
 #include "xui.h"
 #include "ui/scaler/scaler.h"
+#include "ui/ui.h"
 #include "ui/uidisplay.h"
-#ifdef USE_WIDGET
-#include "ui/widget/widget.h"
-#endif				/* #ifdef USE_WIDGET */
 #include "scld.h"
 
 typedef enum {
@@ -729,11 +727,7 @@ uidisplay_frame_end( void )
     updated_rects[0].h = image_height;
   }
 
-#ifdef USE_WIDGET
-  if ( !( widget_level >= 0 ) && num_rects == 0 ) return;
-#else                   /* #ifdef USE_WIDGET */
-  if ( num_rects == 0 ) return;
-#endif                  /* #ifdef USE_WIDGET */
+  if ( !( ui_widget_level >= 0 ) && num_rects == 0 ) return;
 
   last_rect = updated_rects + num_rects;
 

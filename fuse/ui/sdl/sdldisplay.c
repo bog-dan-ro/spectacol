@@ -42,9 +42,6 @@
 #include "ui/scaler/scaler.h"
 #include "ui/uidisplay.h"
 #include "utils.h"
-#ifdef USE_WIDGET
-#include "ui/widget/widget.h"
-#endif				/* #ifdef USE_WIDGET */
 
 SDL_Surface *sdldisplay_gc = NULL;   /* Hardware screen */
 static SDL_Surface *tmp_screen=NULL; /* Temporary screen for scalers */
@@ -712,11 +709,8 @@ uidisplay_frame_end( void )
     updated_rects[0].h = image_height;
   }
 
-#ifdef USE_WIDGET
-  if ( !(widget_level >= 0) && num_rects == 0 && !sdl_status_updated ) return;
-#else                   /* #ifdef USE_WIDGET */
-  if ( num_rects == 0 && !sdl_status_updated ) return;
-#endif                  /* #ifdef USE_WIDGET */
+  if ( !(ui_widget_level >= 0) && num_rects == 0 && !sdl_status_updated )
+    return;
 
   if( SDL_MUSTLOCK( sdldisplay_gc ) ) SDL_LockSurface( sdldisplay_gc );
 

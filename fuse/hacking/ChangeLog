@@ -3258,3 +3258,10 @@
 20091215 man/fuse.1: fix typo (Fred).
 20091216 configure.in: add a '--without-png' option for Gentoo (patch #2915091)
          (José Manuel Ferrer Ortiz).
+20091216 fuse.c,input.c,menu.c,ui.c,ui/fb/{fbkeyboard.c,fbui.c},
+         ui/sdl/{sdldisplay.c,sdlkeyboard.c,sdlui.c},
+         ui/svga/{svgadisplay.c,svgakeyboard.c,svgaui.c},
+         ui/ui.h,ui/widget/widget.[ch],ui/wii/{wiikeyboard.c,wiiui.c},
+         ui/xlib/{xdisplay.c,xerror.c,xkeyboard.c,xui.c}: move widget UI hooks
+         to the UI code, remove unnecessary #ifdef WIDGET_UI (patch #2918210)
+         (Gergely Szasz).

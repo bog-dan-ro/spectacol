@@ -37,10 +37,8 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "ui/ui.h"
 #include "utils.h"
-#ifdef USE_WIDGET
-#include "ui/widget/widget.h"
-#endif				/* #ifdef USE_WIDGET */
 #include "sdlkeyboard.h"
 
 /* Map low byte of UCS-2(?) Unicode to Fuse input layer keysym for

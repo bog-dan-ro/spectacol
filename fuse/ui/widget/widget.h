@@ -30,9 +30,6 @@
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
 
-/* How many levels deep have we recursed through widgets; -1 => none */
-extern int widget_level;
-
 /* Code called at start and end of emulation */
 int widget_init( void );
 int widget_end( void );

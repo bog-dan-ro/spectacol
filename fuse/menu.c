@@ -51,15 +51,8 @@
 #include "tape.h"
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
-#include "ui/widget/widget.h"
 #include "utils.h"
 #include "z80/z80.h"
-
-#ifdef USE_WIDGET
-#define WIDGET_END widget_finish()
-#else				/* #ifdef USE_WIDGET */
-#define WIDGET_END
-#endif				/* #ifdef USE_WIDGET */
 
 MENU_CALLBACK( menu_file_open )
 {
@@ -86,7 +79,7 @@ MENU_CALLBACK( menu_file_recording_insertsnapshot )
 
   if( !rzx_recording ) return;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   libspectrum_rzx_stop_input( rzx );
 
@@ -106,7 +99,7 @@ MENU_CALLBACK( menu_file_recording_rollback )
   
   if( !rzx_recording ) return;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   fuse_emulation_pause();
 
@@ -122,7 +115,7 @@ MENU_CALLBACK( menu_file_recording_rollbackto )
 
   if( !rzx_recording ) return;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   fuse_emulation_pause();
 
@@ -158,7 +151,7 @@ MENU_CALLBACK( menu_file_recording_stop )
 {
   if( !( rzx_recording || rzx_playback ) ) return;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   if( rzx_recording ) rzx_stop_recording();
   if( rzx_playback  ) rzx_stop_playback( 1 );
@@ -168,7 +161,7 @@ MENU_CALLBACK( menu_file_aylogging_stop )
 {
   if ( !psg_recording ) return;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   psg_stop_recording();
   ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
@@ -192,7 +185,7 @@ MENU_CALLBACK( menu_file_openscrscreenshot )
 
 MENU_CALLBACK( menu_file_movies_stopmovierecording )
 {
-  WIDGET_END;
+  ui_widget_finish();
 
   screenshot_movie_record = 0;
   ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 0 );
@@ -246,19 +239,19 @@ MENU_CALLBACK( menu_options_filter )
 
 MENU_CALLBACK( menu_options_fullscreen )
 {
-  WIDGET_END;
+  ui_widget_finish();
   settings_current.full_screen = !settings_current.full_screen;
 }
 
 MENU_CALLBACK( menu_options_save )
 {
-  WIDGET_END;
+  ui_widget_finish();
   settings_write_config( &settings_current );
 }
 
 MENU_CALLBACK( menu_machine_profiler_start )
 {
-  WIDGET_END;
+  ui_widget_finish();
   profile_start();
 }
 
@@ -280,7 +273,7 @@ MENU_CALLBACK( menu_machine_profiler_stop )
 
 MENU_CALLBACK( menu_machine_nmi )
 {
-  WIDGET_END;
+  ui_widget_finish();
   event_add( 0, z80_nmi_event );
 }
 
@@ -302,19 +295,19 @@ MENU_CALLBACK( menu_media_tape_open )
 
 MENU_CALLBACK( menu_media_tape_play )
 {
-  WIDGET_END;
+  ui_widget_finish();
   tape_toggle_play( 0 );
 }
 
 MENU_CALLBACK( menu_media_tape_rewind )
 {
-  WIDGET_END;
+  ui_widget_finish();
   tape_select_block( 0 );
 }
 
 MENU_CALLBACK( menu_media_tape_clear )
 {
-  WIDGET_END;
+  ui_widget_finish();
   tape_close();
 }
 
@@ -325,13 +318,13 @@ MENU_CALLBACK( menu_media_tape_write )
 
 MENU_CALLBACK( menu_media_tape_recordstart )
 {
-  WIDGET_END;
+  ui_widget_finish();
   tape_record_start();
 }
 
 MENU_CALLBACK( menu_media_tape_recordstop )
 {
-  WIDGET_END;
+  ui_widget_finish();
   tape_record_stop();
 }
 
@@ -342,7 +335,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 )
   fuse_emulation_pause();
 
   if( action & 0xf0 ) {
-    WIDGET_END;
+    ui_widget_finish();
     if1_unplug( action & 0x0f );
   } else {
     filename = ui_get_open_filename( "Fuse - Select File for Communication" );
@@ -360,7 +353,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert_new )
 {
   int which, type;
   
-  WIDGET_END;
+  ui_widget_finish();
 
   action--;
   which = action & 0x0f;
@@ -446,7 +439,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_eject )
 {
   int which, write, type;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   action--;
   which = action & 0x00f;
@@ -476,7 +469,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_flip )
 {
   int which, type, flip;
   
-  WIDGET_END;
+  ui_widget_finish();
 
   action--;
   which = action & 0x0f;
@@ -503,7 +496,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect )
 {
   int which, wrprot, type;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   action--;
   which = action & 0x00f;
@@ -548,7 +541,7 @@ MENU_CALLBACK( menu_media_cartridge_timexdock_insert )
 
 MENU_CALLBACK( menu_media_cartridge_timexdock_eject )
 {
-  WIDGET_END;
+  ui_widget_finish();
   dck_eject();
 }
 
@@ -570,7 +563,7 @@ MENU_CALLBACK( menu_media_cartridge_interfaceii_insert )
 
 MENU_CALLBACK( menu_media_cartridge_interfaceii_eject )
 {
-  WIDGET_END;
+  ui_widget_finish();
   if2_eject();
 }
 
@@ -614,7 +607,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_commit )
 
   fuse_emulation_unpause();
 
-  WIDGET_END;
+  ui_widget_finish();
 }
 
 MENU_CALLBACK_WITH_ACTION( menu_media_ide_eject )
@@ -633,39 +626,39 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_eject )
 
   fuse_emulation_unpause();
 
-  WIDGET_END;
+  ui_widget_finish();
 }
 
 MENU_CALLBACK( menu_media_ide_zxatasp_upload )
 {
   settings_current.zxatasp_upload = !settings_current.zxatasp_upload;
-  WIDGET_END;
+  ui_widget_finish();
 }
 
 MENU_CALLBACK( menu_media_ide_zxatasp_writeprotect )
 {
   settings_current.zxatasp_wp = !settings_current.zxatasp_wp;
-  WIDGET_END;
+  ui_widget_finish();
 }
 
 MENU_CALLBACK( menu_media_ide_zxcf_upload )
 {
   settings_current.zxcf_upload = !settings_current.zxcf_upload;
-  WIDGET_END;
+  ui_widget_finish();
 }
 
 MENU_CALLBACK( menu_media_ide_divide_writeprotect )
 {
   settings_current.divide_wp = !settings_current.divide_wp;
   divide_refresh_page_state();
-  WIDGET_END;
+  ui_widget_finish();
 }
 
 MENU_CALLBACK( menu_file_savesnapshot )
 {
   char *filename;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   fuse_emulation_pause();
 
@@ -683,7 +676,7 @@ MENU_CALLBACK( menu_file_savescreenasscr )
 {
   char *filename;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   fuse_emulation_pause();
 
@@ -704,7 +697,7 @@ MENU_CALLBACK( menu_file_savescreenaspng )
   scaler_type scaler;
   char *filename;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   fuse_emulation_pause();
 
@@ -730,7 +723,7 @@ MENU_CALLBACK( menu_file_movies_recordmovieasscr )
 {
   char *filename;
 
-  WIDGET_END;
+  ui_widget_finish();
   
   fuse_emulation_pause();
 
@@ -753,7 +746,7 @@ MENU_CALLBACK( menu_file_movies_recordmovieaspng )
 {
   char *filename;
 
-  WIDGET_END;
+  ui_widget_finish();
 
   fuse_emulation_pause();
 
