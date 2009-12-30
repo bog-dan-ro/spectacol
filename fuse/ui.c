@@ -33,11 +33,12 @@
 #include <libspectrum.h>
 
 #include "fuse.h"
-#include "ui/ui.h"
 #include "if1.h"
 #include "kempmouse.h"
 #include "settings.h"
 #include "tape.h"
+#include "ui/ui.h"
+#include "ui/widget/widget.h"
 
 #define MESSAGE_MAX_LENGTH 256
 
