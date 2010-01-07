@@ -771,6 +771,7 @@ ui_mdr_write( int which )
   return 0;
 }
 
+#ifdef USE_WIDGET
 int
 ui_widget_init( void )
 {
@@ -782,8 +783,19 @@ ui_widget_end( void )
 {
   return widget_end();
 }
+#else
+int
+ui_widget_init( void )
+{
+  return 0;
+}
 
-#ifndef USE_WIDGET
+int
+ui_widget_end( void )
+{
+  return 0;
+}
+
 void
 ui_popup_menu( int native_key )
 {
