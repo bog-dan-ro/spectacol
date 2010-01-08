@@ -88,7 +88,7 @@ fuse_SOURCES = ay.c \
 	settings.c \
 	slt.c \
 	snapshot.c \
-	sound.cpp \
+	sound.c \
 	spectrum.c \
 	tape.c \
 	ui.c \

@@ -3269,3 +3269,6 @@
          from patch #2918210) (Gergely Szasz).
 20100107 ui.c: supply dummy ui_widget_init and ui_widget_end definitions (more
          from patch #2918210) (Gergely Szasz).
+20100107 Makefile.am,configure.in,sound.[c|cpp],
+         sound/{Blip_Buffer.[cpp|h],Makefile.am,blipbuffer.[ch]}: convert
+         Blip_Buffer to plain C (patch #2922796) (Gergely Szasz).

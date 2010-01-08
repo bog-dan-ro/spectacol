@@ -29,7 +29,7 @@ INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@ @SDL_CFLAGS@
 
 noinst_LIBRARIES = libsound.a
 
-libsound_a_SOURCES = Blip_Buffer.cpp
+libsound_a_SOURCES = blipbuffer.c
 
 EXTRA_libsound_a_SOURCES = dxsound.c \
 		     	   alsasound.c \
@@ -46,4 +46,4 @@ EXTRA_libsound_a_SOURCES = dxsound.c \
 libsound_a_LIBADD = $(SOUND_LIBADD)
 libsound_a_DEPENDENCIES = $(SOUND_LIBADD)
 
-noinst_HEADERS = sfifo.h Blip_Buffer.h
+noinst_HEADERS = sfifo.h blipbuffer.h

@@ -1,4 +1,4 @@
-/* sound.cpp: Sound support
+/* sound.c: Sound support
    Copyright (c) 2000-2009 Russell Marks, Matan Ziv-Av, Philip Kendall,
                            Fredrick Meunier
 
@@ -28,7 +28,6 @@
  * MAME's licence explicitly permits free use of info (even encourages it).
  */
 
-extern "C" {
 #include "fuse.h"
 #include "machine.h"
 #include "options.h"
@@ -36,9 +35,7 @@ extern "C" {
 #include "sound.h"
 #include "tape.h"
 #include "ui/ui.h"
-}
-
-#include "sound/Blip_Buffer.h"
+#include "sound/blipbuffer.h"
 
 /* Do we have any of our sound devices available? */
 
@@ -87,15 +84,14 @@ struct ay_change_tag
 static struct ay_change_tag ay_change[ AY_CHANGE_MAX ];
 static int ay_change_count;
 
-Blip_Buffer *left_buf;
-Blip_Buffer *right_buf;
-blip_sample_t *samples;
+Blip_Buffer *left_buf = NULL;
+Blip_Buffer *right_buf = NULL;
+blip_sample_t *samples = NULL;
 
-typedef Blip_Synth<blip_good_quality, blip_unscaled> fuse_synth;
-fuse_synth *left_beeper_synth, *right_beeper_synth;
+Blip_Synth *left_beeper_synth = NULL, *right_beeper_synth = NULL;
 
-fuse_synth *ay_a_synth, *ay_b_synth, *ay_c_synth;
-fuse_synth *ay_a_synth_r, *ay_b_synth_r, *ay_c_synth_r;
+Blip_Synth *ay_a_synth = NULL, *ay_b_synth = NULL, *ay_c_synth = NULL;
+Blip_Synth *ay_a_synth_r = NULL, *ay_b_synth_r = NULL, *ay_c_synth_r = NULL;
 
 struct speaker_type_tag
 {
@@ -123,29 +119,29 @@ sound_get_effective_processor_speed( void )
            settings_current.emulation_speed;
 }
 
-bool
-sound_init_blip( Blip_Buffer **buf, fuse_synth **synth )
+int
+sound_init_blip( Blip_Buffer **buf, Blip_Synth **synth )
 {
-  *buf = new Blip_Buffer();
-  (*buf)->clock_rate( sound_get_effective_processor_speed() );
+  *buf = new_Blip_Buffer();
+  blip_buffer_set_clock_rate( *buf, sound_get_effective_processor_speed() );
   /* Allow up to 1s of playback buffer - this allows us to cope with slowing
      down to 2% of speed where a single Speccy frame generates just under 1s
      of sound */
-  if ( (*buf)->set_sample_rate( settings_current.sound_freq, 1000 ) ) {
+  if ( blip_buffer_set_sample_rate( *buf, settings_current.sound_freq, 1000 ) ) {
     sound_end();
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return false;
+    return 0;
   }
 
-  *synth = new fuse_synth();
+  *synth = new_Blip_Synth();
 
-  (*synth)->volume( sound_get_volume( settings_current.volume_beeper ) );
-  (*synth)->output( *buf );
+  blip_synth_set_volume( *synth, sound_get_volume( settings_current.volume_beeper ) );
+  blip_synth_set_output( *synth, *buf );
 
-  (*buf)->bass_freq( speaker_type[ option_enumerate_sound_speaker_type() ].bass );
-  (*synth)->treble_eq( speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+  blip_buffer_set_bass_freq( *buf, speaker_type[ option_enumerate_sound_speaker_type() ].bass );
+  blip_synth_set_treble_eq( *synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
 
-  return true;
+  return 1;
 }
 
 static void
@@ -206,19 +202,19 @@ sound_init( const char *device )
   if( !sound_init_blip(&left_buf, &left_beeper_synth) ) return;
   if( sound_stereo && !sound_init_blip(&right_buf, &right_beeper_synth) ) return;
 
-  ay_a_synth = new fuse_synth();
-  ay_a_synth->volume( sound_get_volume( settings_current.volume_ay) );
-  ay_a_synth->output( left_buf );
-  ay_a_synth->treble_eq( speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+  ay_a_synth = new_Blip_Synth();
+  blip_synth_set_volume( ay_a_synth, sound_get_volume( settings_current.volume_ay) );
+  blip_synth_set_output( ay_a_synth, left_buf );
+  blip_synth_set_treble_eq( ay_a_synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
 
-  ay_b_synth = new fuse_synth();
-  ay_b_synth->volume( sound_get_volume( settings_current.volume_ay) );
-  ay_b_synth->treble_eq( speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+  ay_b_synth = new_Blip_Synth();
+  blip_synth_set_volume( ay_b_synth, sound_get_volume( settings_current.volume_ay) );
+  blip_synth_set_treble_eq( ay_b_synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
 
-  ay_c_synth = new fuse_synth();
-  ay_c_synth->volume( sound_get_volume( settings_current.volume_ay) );
-  ay_c_synth->output( left_buf );
-  ay_c_synth->treble_eq( speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+  ay_c_synth = new_Blip_Synth();
+  blip_synth_set_volume( ay_c_synth, sound_get_volume( settings_current.volume_ay) );
+  blip_synth_set_output( ay_c_synth, left_buf );
+  blip_synth_set_treble_eq( ay_c_synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
 
   /* important to override these settings if not using stereo
    * (it would probably be confusing to mess with the stereo
@@ -229,33 +225,33 @@ sound_init( const char *device )
     sound_stereo_ay = 0;
   }
 
-  ay_a_synth_r = 0;
-  ay_b_synth_r = 0;
-  ay_c_synth_r = 0;
+  ay_a_synth_r = NULL;
+  ay_b_synth_r = NULL;
+  ay_c_synth_r = NULL;
 
   if( sound_stereo ) {
-    ay_c_synth_r = new fuse_synth();
-    ay_c_synth_r->volume( sound_get_volume( settings_current.volume_ay ) );
-    ay_c_synth_r->output( right_buf );
+    ay_c_synth_r = new_Blip_Synth();
+    blip_synth_set_volume( ay_c_synth_r, sound_get_volume( settings_current.volume_ay ) );
+    blip_synth_set_output( ay_c_synth_r, right_buf );
 
     if( sound_stereo_ay ) {
       /* stereo with ACB stereo. */
-      ay_b_synth->output( right_buf );
+      blip_synth_set_output( ay_b_synth, right_buf );
     } else {
-      ay_a_synth_r = new fuse_synth();
-      ay_a_synth_r->volume( sound_get_volume( settings_current.volume_ay ) );
-      ay_a_synth_r->output( right_buf );
-      ay_a_synth_r->treble_eq( speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+      ay_a_synth_r = new_Blip_Synth();
+      blip_synth_set_volume( ay_a_synth_r, sound_get_volume( settings_current.volume_ay ) );
+      blip_synth_set_output( ay_a_synth_r, right_buf );
+      blip_synth_set_treble_eq( ay_a_synth_r, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
 
-      ay_b_synth->output( left_buf );
+      blip_synth_set_output( ay_b_synth, left_buf );
 
-      ay_b_synth_r = new fuse_synth();
-      ay_b_synth_r->volume( sound_get_volume( settings_current.volume_ay ) );
-      ay_b_synth_r->output( right_buf );
-      ay_b_synth_r->treble_eq( speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+      ay_b_synth_r = new_Blip_Synth();
+      blip_synth_set_volume( ay_b_synth_r, sound_get_volume( settings_current.volume_ay ) );
+      blip_synth_set_output( ay_b_synth_r, right_buf );
+      blip_synth_set_treble_eq( ay_b_synth_r, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
     }
   } else {
-    ay_b_synth->output( left_buf );
+    blip_synth_set_output( ay_b_synth, left_buf );
   }
 
   sound_enabled = sound_enabled_ever = 1;
@@ -297,17 +293,17 @@ void
 sound_end( void )
 {
   if( sound_enabled ) {
-    delete left_beeper_synth; left_beeper_synth = 0;
-    delete left_buf; left_buf = 0;
-    delete right_beeper_synth; right_beeper_synth = 0;
-    delete right_buf; right_buf = 0;
+    delete_Blip_Synth( &left_beeper_synth );
+    delete_Blip_Buffer( &left_buf );
+    delete_Blip_Synth( &right_beeper_synth );
+    delete_Blip_Buffer( &right_buf );
 
-    delete ay_a_synth; ay_a_synth = 0;
-    delete ay_b_synth; ay_b_synth = 0;
-    delete ay_c_synth; ay_c_synth = 0;
-    delete ay_a_synth_r; ay_a_synth_r = 0;
-    delete ay_b_synth_r; ay_b_synth_r = 0;
-    delete ay_c_synth_r; ay_c_synth_r = 0;
+    delete_Blip_Synth( &ay_a_synth );
+    delete_Blip_Synth( &ay_b_synth );
+    delete_Blip_Synth( &ay_c_synth );
+    delete_Blip_Synth( &ay_a_synth_r );
+    delete_Blip_Synth( &ay_b_synth_r );
+    delete_Blip_Synth( &ay_c_synth_r );
 
     sound_lowlevel_end();
     free( samples );
@@ -316,9 +312,9 @@ sound_end( void )
 }
 
 static inline void
-ay_do_tone( int level, unsigned int tone_count, int& var, int chan )
+ay_do_tone( int level, unsigned int tone_count, int *var, int chan )
 {
-  var = 0;
+  *var = 0;
 
   ay_tone_tick[ chan ] += tone_count;
 
@@ -329,9 +325,9 @@ ay_do_tone( int level, unsigned int tone_count, int& var, int chan )
 
   if( level ) {
     if( ay_tone_high[ chan ] )
-      var = level;
+      *var = level;
     else {
-      var = -level;
+      *var = -level;
     }
   }
 
@@ -346,7 +342,7 @@ ay_do_tone( int level, unsigned int tone_count, int& var, int chan )
    * frequency wave and hope it's a sample
    */
   if( ay_tone_period[ chan ] == 1 ) {
-      var = -level;
+      *var = -level;
   }
 }
 
@@ -506,38 +502,38 @@ sound_ay_overlay( void )
 
     if( ( mixer & 1 ) == 0 ) {
       level = chan1;
-      ay_do_tone( level, tone_count, chan1, 0 );
+      ay_do_tone( level, tone_count, &chan1, 0 );
     }
     if( ( mixer & 0x08 ) == 0 && noise_toggle )
       chan1 = 0;
 
     if( ( mixer & 2 ) == 0 ) {
       level = chan2;
-      ay_do_tone( level, tone_count, chan2, 1 );
+      ay_do_tone( level, tone_count, &chan2, 1 );
     }
     if( ( mixer & 0x10 ) == 0 && noise_toggle )
       chan2 = 0;
 
     if( ( mixer & 4 ) == 0 ) {
       level = chan3;
-      ay_do_tone( level, tone_count, chan3, 2 );
+      ay_do_tone( level, tone_count, &chan3, 2 );
     }
     if( ( mixer & 0x20 ) == 0 && noise_toggle )
       chan3 = 0;
 
     if( last_chan1 != chan1 ) {
-      ay_a_synth->update( f, chan1 );
-      if( ay_a_synth_r ) ay_a_synth_r->update( f, chan1 );
+      blip_synth_update( ay_a_synth, f, chan1 );
+      if( ay_a_synth_r ) blip_synth_update( ay_a_synth_r, f, chan1 );
       last_chan1 = chan1;
     }
     if( last_chan2 != chan2 ) {
-      ay_b_synth->update( f, chan2 );
-      if( ay_b_synth_r ) ay_b_synth_r->update( f, chan2 );
+      blip_synth_update( ay_b_synth, f, chan2 );
+      if( ay_b_synth_r ) blip_synth_update( ay_b_synth_r, f, chan2 );
       last_chan2 = chan2;
     }
     if( last_chan3 != chan3 ) {
-      ay_c_synth->update( f, chan3 );
-      if( ay_c_synth_r ) ay_c_synth_r->update( f, chan3 );
+      blip_synth_update( ay_c_synth, f, chan3 );
+      if( ay_c_synth_r ) blip_synth_update( ay_c_synth_r, f, chan3 );
       last_chan3 = chan3;
     }
 
@@ -606,18 +602,18 @@ sound_frame( void )
   /* overlay AY sound */
   sound_ay_overlay();
 
-  left_buf->end_frame( machine_current->timings.tstates_per_frame );
+  blip_buffer_end_frame( left_buf, machine_current->timings.tstates_per_frame );
 
   if( sound_stereo ) {
-    right_buf->end_frame( machine_current->timings.tstates_per_frame );
+    blip_buffer_end_frame( right_buf, machine_current->timings.tstates_per_frame );
 
     /* Read left channel into even samples, right channel into odd samples:
        LRLRLRLRLR... */
-    count = left_buf->read_samples( samples, sound_framesiz, 1 );
-    right_buf->read_samples( samples + 1, count, 1 );
+    count = blip_buffer_read_samples( left_buf, samples, sound_framesiz, 1 );
+    blip_buffer_read_samples( right_buf, samples + 1, count, 1 );
     count <<= 1;
   } else {
-    count = left_buf->read_samples( samples, sound_framesiz );
+    count = blip_buffer_read_samples( left_buf, samples, sound_framesiz, BLIP_BUFFER_DEF_STEREO );
   }
 
   sound_lowlevel_frame( samples, count );
@@ -645,8 +641,8 @@ sound_beeper( int on )
 
   val = -beeper_ampl[3] + ampl*2;
 
-  left_beeper_synth->update( tstates, val );
+  blip_synth_update( left_beeper_synth, tstates, val );
   if( sound_stereo ) {
-    right_beeper_synth->update( tstates, val );
+    blip_synth_update( right_beeper_synth, tstates, val );
   }
 }
