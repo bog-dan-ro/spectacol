@@ -1,5 +1,5 @@
 /* disk.c: Routines for handling disk images
-   Copyright (c) 2007 Gergely Szasz
+   Copyright (c) 2007-2010 Gergely Szasz
 
    $Id$
 
@@ -53,7 +53,7 @@ static const char *disk_error[] = {
   "Cannot close file",		/* DISK_CLOSE */
   "Cannot write disk image",	/* DISK_WRFILE */
   "Partially written file",	/* DISK_WRPART */
-  
+
   "Unknown error code"		/* DISK_LAST_ERROR */
 };
 
@@ -135,7 +135,7 @@ static int
 id_read( disk_t *d, int *head, int *track, int *sector, int *length )
 {
   int a1mark = 0;
-  
+
   while( d->i < d->bpt ) {
     if( d->track[ d->i ] == 0xa1 && 
 	bitmap_test( d->clocks, d->i ) ) {		/* 0xa1 with clock */
@@ -210,9 +210,8 @@ savetrack( disk_t *d, FILE *file, int head, int track,
 {
   int s;
   int del;
-  
-  d->track = d->data + ( ( d->sides * track + head ) * d->tlen );
-  d->clocks = d->track + d->bpt;
+
+  DISK_SET_TRACK( d, head, track );
   d->i = 0;
   for( s = sector_base; s < sector_base + sectors; s++ ) {
     if( id_seek( d, s ) ) {
@@ -232,9 +231,8 @@ saverawtrack( disk_t *d, FILE *file, int head, int track  )
 {
   int h, t, s, seclen;
   int del;
-  
-  d->track = d->data + ( ( d->sides * track + head ) * d->tlen );
-  d->clocks = d->track + d->bpt;
+
+  DISK_SET_TRACK( d, head, track );
   d->i = 0;
   while( id_read( d, &h, &t, &s, &seclen ) ) {
     if( datamark_read( d, &del ) ) {		/* write data if we have data */
@@ -253,6 +251,8 @@ saverawtrack( disk_t *d, FILE *file, int head, int track  )
 #define DISK_DDAM 32
 #define DISK_CORRUPT_SECTOR 64
 #define DISK_UNFORMATTED_TRACK 128
+#define DISK_FM_DATA 256
+#define DISK_WEAK_DATA 512
 
 static int
 guess_track_geom( disk_t *d, int head, int track, int *sector_base,
@@ -266,8 +266,7 @@ guess_track_geom( disk_t *d, int head, int track, int *sector_base,
   *seclen = -1;
   *mfm = -1;
 
-  d->track = d->data + ( d->sides * track + head ) * d->tlen;
-  d->clocks = d->track + d->bpt;
+  DISK_SET_TRACK( d, head, track );
   d->i = 0;
   while( id_read( d, &h, &t, &s, &sl ) ) {
     if( *sector_base == -1 )
@@ -294,6 +293,31 @@ guess_track_geom( disk_t *d, int head, int track, int *sector_base,
   return r;
 }
 
+static void
+update_tracks_mode( disk_t *d )
+{
+  int i, j, bpt;
+  int mfm, fm, weak;
+
+  for( i = 0; i < d->cylinders * d->sides; i++ ) {
+    DISK_SET_TRACK_IDX( d, i );
+    mfm = 0, fm = 0, weak = 0;
+    bpt = d->track[-3] + 256 * d->track[-2];
+    for( j = DISK_CLEN( bpt ) - 1; j >= 0; j-- ) {
+      mfm  |= ~d->fm[j];
+      fm   |= d->fm[j];
+      weak |= d->weak[j];
+    }
+    if( mfm && !fm ) d->track[-1] = 0x00;
+    if( !mfm && fm ) d->track[-1] = 0x01;
+    if( mfm &&  fm ) d->track[-1] = 0x02;
+    if( weak ) {
+      d->track[-1] |= 0x80;
+      d->have_weak = 1;
+    }
+  }
+}
+
 static int
 check_disk_geom( disk_t *d, int *sector_base, int *sectors,
 		 int *seclen, int *mfm, int *unf )
@@ -301,7 +325,7 @@ check_disk_geom( disk_t *d, int *sector_base, int *sectors,
   int h, t, s, slen, sbase, m;
   int r = 0;
 
-  d->track = d->data; d->clocks = d->track + d->bpt;
+  DISK_SET_TRACK_IDX( d, 0 );
   d->i = 0;
   *sector_base = -1;
   *sectors = -1;
@@ -310,6 +334,9 @@ check_disk_geom( disk_t *d, int *sector_base, int *sectors,
   *unf = -1;
   for( t = 0; t < d->cylinders; t++ ) {
     for( h = 0; h < d->sides; h++ ) {
+      r |= ( d->track[-1] & 0x80 ) ? DISK_WEAK_DATA : 0;
+      r |= ( d->track[-1] & 0x03 ) == 0x02 ? DISK_MFM_VARI : 0;
+      r |= ( d->track[-1] & 0x03 ) == 0x01 ? DISK_FM_DATA : 0;
       r |= guess_track_geom( d, h, t, &sbase, &s, &slen, &m );
       if( *sector_base == -1 )
 	*sector_base = sbase;
@@ -512,7 +539,7 @@ datamark_add( disk_t *d, int ddam, int gaptype )
 /* if 'buffer' == NULL, then copy data bytes from 'data' */  
 static int
 data_add( disk_t *d, buffer_t *buffer, unsigned char *data, int len, int ddam,
-		int gaptype, int crc_error, int autofill )
+		int gaptype, int crc_error, int autofill, int *start_data )
 {
   int length;
   libspectrum_word crc = 0xffff;
@@ -532,6 +559,7 @@ data_add( disk_t *d, buffer_t *buffer, unsigned char *data, int len, int ddam,
   if( d->i + len + 2 >= d->bpt )  		/* too many data bytes */
     return 1;
 /*------------------------------      data      ------------------------------*/
+  if( start_data != NULL ) *start_data = d->i;	/* record data start position */
   if( buffer == NULL ) {
     memcpy( d->track + d->i, data, len );
     length = len;
@@ -610,8 +638,7 @@ trackgen( disk_t *d, buffer_t *buffer, int head, int track,
   int idx;
 
   d->i = 0;
-  d->track = d->data + ( ( d->sides * track + head ) * d->tlen );
-  d->clocks = d->track + d->bpt;
+  DISK_SET_TRACK( d, head, track );
   if( preindex && preindex_add( d, gap ) )
     return 1;
   if( postindex_add( d, gap ) )
@@ -623,7 +650,7 @@ trackgen( disk_t *d, buffer_t *buffer, int head, int track,
     d->i = idx + pos * slen;
     if( id_add( d, head, track, s, calc_lenid( sector_length ), gap, CRC_OK ) )
       return 1;
-    if( data_add( d, buffer, NULL, sector_length, NO_DDAM, gap, CRC_OK, autofill ) )
+    if( data_add( d, buffer, NULL, sector_length, NO_DDAM, gap, CRC_OK, autofill, NULL ) )
       return 1;
     pos += interleave;
     if( pos >= sectors ) {	/* wrap around */
@@ -685,8 +712,8 @@ disk_alloc( disk_t *d )
   }
 
   if( d->bpt > 0 )
-    d->tlen = d->bpt + d->bpt / 8 + ( d->bpt % 8 ? 1 : 0 );
-  dlen = d->sides * d->cylinders * d->tlen;		/* track len with clock marks */
+    d->tlen = 4 + d->bpt + 3 * DISK_CLEN( d->bpt );
+  dlen = d->sides * d->cylinders * d->tlen;	/* track len with clock and other marks */
 
   if( ( d->data = calloc( 1, dlen ) ) == NULL )
     return d->status = DISK_MEM;
@@ -752,10 +779,220 @@ int disk_preformat( disk_t *d )
     if( d->sides < 1 || d->sides > 2 || \
        d->cylinders < 1 || d->cylinders > 85 ) return d->status = DISK_GEOM
 
+#ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+static int
+udi_read_compressed( const libspectrum_byte *buffer,
+		   size_t compr_size, size_t uncompr_size,
+		   libspectrum_byte **data, size_t *data_size )
+{
+  libspectrum_error error;
+  libspectrum_byte *tmp;
+  size_t olength = uncompr_size;
+
+  tmp = NULL;
+
+  error = libspectrum_zlib_inflate( buffer, compr_size, &tmp, &olength );
+  if( error ) {
+    if( *data ) free( *data );
+    *data_size = 0;
+    return error;
+  }
+  if( *data_size < uncompr_size ) {
+    *data = libspectrum_realloc( *data, uncompr_size );
+    *data_size = uncompr_size;
+  }
+  memcpy( *data, tmp, uncompr_size );
+  libspectrum_free( tmp );
+
+  return 0;
+}
+
+static int
+udi_write_compressed( const libspectrum_byte *buffer,
+		      size_t uncompr_size, size_t *compr_size,
+		      libspectrum_byte **data, size_t *data_size )
+{
+  libspectrum_error error;
+  libspectrum_byte *tmp;
+
+  tmp = NULL;
+  error = libspectrum_zlib_compress( buffer, uncompr_size,
+                                     &tmp, compr_size );
+  if( error ) return error;
+
+  if( *data_size < *compr_size ) {
+    *data = libspectrum_realloc( *data, *compr_size );
+    *data_size = *compr_size;
+  }
+  memcpy( *data, tmp, *compr_size );
+  libspectrum_free( tmp );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+#endif			/* #ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION */
+
+static void
+udi_pack_tracks( disk_t *d )
+{
+  int i, tlen, clen, ttyp;
+  libspectrum_byte *tmp;
+
+  for( i = 0; i < d->sides * d->cylinders; i++ ) {
+    DISK_SET_TRACK_IDX( d, i );
+    tmp = d->track;
+    ttyp = tmp[-1];
+    tlen = tmp[-3] + 256 * tmp[-2];
+    clen = DISK_CLEN( tlen );
+    tmp += tlen;
+    /* copy clock if needed */
+    if( tmp != d->clocks )
+      memcpy( tmp, d->clocks, clen );
+    if( ttyp == 0x00 || ttyp == 0x01 ) continue;
+    tmp += clen;
+    if( ttyp & 0x02 ) {		/* copy FM marks */
+      if( tmp != d->fm )
+        memcpy( tmp, d->fm, clen );
+      tmp += clen;
+    }
+    if( ! ( ttyp & 0x80 ) ) continue;
+    if( tmp != d->weak )		/* copy WEAK marks*/
+      memcpy( tmp, d->weak, clen );
+  }
+}
+
+static void
+udi_unpack_tracks( disk_t *d )
+{
+  int i, tlen, clen, ttyp;
+  libspectrum_byte *tmp;
+  libspectrum_byte mask[] = { 0xff, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe };
+
+  for( i = 0; i < d->sides * d->cylinders; i++ ) {
+    DISK_SET_TRACK_IDX( d, i );
+    tmp = d->track;
+    ttyp = tmp[-1];
+    tlen = tmp[-3] + 256 * tmp[-2];
+    clen = DISK_CLEN( tlen );
+    tmp += tlen;
+    if( ttyp & 0x80 ) tmp += clen;
+    if( ttyp & 0x02 ) tmp += clen;
+    if( ( ttyp & 0x80 ) ) {	/* copy WEAK marks*/
+      if( tmp != d->weak )
+        memcpy( d->weak, tmp, clen );
+      tmp -= clen;
+    } else {			/* clear WEAK marks*/
+      memset( d->weak, 0, clen );
+    }
+    if( ttyp & 0x02 ) {		/* copy FM marks */
+      if( tmp != d->fm )
+        memcpy( d->fm, tmp, clen );
+      tmp -= clen;
+    } else {			/* set/clear FM marks*/
+      memset( d->fm, ttyp & 0x01 ? 0xff : 0, clen );
+      if( tlen % 8 ) {		/* adjust last byte */
+        d->fm[clen - 1] &= mask[ tlen % 8 ];
+      }
+    }
+    /* copy clock if needed */
+    if( tmp != d->clocks )
+      memcpy( d->clocks, tmp, clen );
+  }
+}
+
+/* calculate track len from type, if type eq. 0x00/0x01/0x02/0x80/0x81/0x82
+   !!! not for 0x83 nor 0xf0 !!!
+*/
+#define UDI_TLEN( type, bpt ) ( ( bpt ) + DISK_CLEN( bpt ) * ( 1 + \
+					( type & 0x02 ? 1 : 0 ) + \
+					( type & 0x80 ? 1 : 0 ) ) )
+
+static int
+udi_uncompress_tracks( disk_t *d )
+{
+  int i;
+  libspectrum_byte *data = NULL;
+#ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+  size_t data_size = 0;
+  int bpt, tlen, clen, ttyp;
+#endif			/* #ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION */
+
+  for( i = 0; i < d->sides * d->cylinders; i++ ) {
+    DISK_SET_TRACK_IDX( d, i );
+    if( d->track[-1] != 0xf0 ) continue;	/* if not compressed */
+
+#ifndef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+    /* if libspectrum cannot support */
+    return d->status = DISK_UNSUP;
+#else 			/* #ifndef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION */
+    clen = d->track[-3] + 256 * d->track[-2] + 1;
+    ttyp = d->track[0];				/* compressed track type   */
+    bpt = d->track[1] + 256 * d->track[2];	/* compressed track len... */
+    tlen = UDI_TLEN( ttyp, bpt );
+    d->track[-1] = ttyp;
+    d->track[-3] = d->track[1];
+    d->track[-2] = d->track[2];
+    if( udi_read_compressed( d->track + 3, clen, tlen, &data, &data_size ) ) {
+      if( data ) libspectrum_free( data );
+      return d->status = DISK_UNSUP;
+    }
+    memcpy( d->track, data, tlen );		/* read track */
+#endif			/* #ifndef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION */
+  }
+  if( data ) libspectrum_free( data );
+  return DISK_OK;
+}
+
+#ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+static int
+udi_compress_tracks( disk_t *d )
+{
+  int i, tlen;
+  libspectrum_byte *data = NULL;
+  size_t clen, data_size = 0;
+
+  for( i = 0; i < d->sides * d->cylinders; i++ ) {
+    DISK_SET_TRACK_IDX( d, i );
+    if( d->track[-1] == 0xf0 ) continue;	/* already compressed??? */
+
+    tlen = UDI_TLEN( d->track[-1], d->track[-3] + 256 * d->track[-2] );
+	/* if fail to compress, skip ... */
+    if( udi_write_compressed( d->track, tlen, &clen, &data, &data_size ) ||
+							clen < 1 ) continue;
+	/* if compression too large, skip... */
+    if( clen > 65535 || clen >= tlen ) continue;
+    d->track[0] = d->track[-1];			/* track type... */
+    d->track[1] = d->track[-3];			/* compressed track len... */
+    d->track[2] = d->track[-2];			/* compressed track len... */
+    memcpy( d->track + 3, data, clen );		/* read track */
+    clen--;
+    d->track[-1] = 0xf0;
+    d->track[-3] = clen & 0xff;
+    d->track[-2] = ( clen >> 8 ) & 0xff;
+  }
+  if( data ) libspectrum_free( data );
+  return DISK_OK;
+}
+#endif			/* #ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION */
+
 static int
 open_udi( buffer_t *buffer, disk_t *d )
 {
-  int i, j, bpt;
+  int i, bpt, ttyp, tlen, error;
+  size_t clen, eof;
+  libspectrum_dword crc;
+
+  crc = ~(libspectrum_dword) 0;
+
+  /* check file length */
+  eof = buff[4] + 256 * buff[5] + 65536 * buff[6] + 16777216 * buff[7];
+  if( eof != buffer->file.length - 4 )
+    return d->status = DISK_OPEN;
+  /* check CRC32 */
+  for( i = 0; i < eof; i++ )
+    crc = crc_udi( crc, buff[i] );
+  if( crc != buff[eof] + 256 * buff[eof + 1] + 65536 * buff[eof + 2] +
+						16777216 * buff[eof + 3] )
+    return d->status = DISK_OPEN;
 
   d->sides = buff[10] + 1;
   d->cylinders = buff[9] + 1;
@@ -765,15 +1002,35 @@ open_udi( buffer_t *buffer, disk_t *d )
   d->bpt = 0;
 
   /* scan file for the longest track */
-  for( i = 0; i < d->sides * d->cylinders; i++ ) {
+  for( i = 0; buffer->index < eof; i++ ) {
     if( buffavail( buffer ) < 3 )
       return d->status = DISK_OPEN;
-    if( buff[0] != 0x00 )
+    ttyp = buff[0];
+    if( ttyp != 0x00 && ttyp != 0x01 && ttyp != 0x02 && ttyp != 0x80 &&
+        ttyp != 0x81 && ttyp != 0x82 && ttyp != 0x83 && ttyp != 0xf0 )
       return d->status = DISK_UNSUP;
-    bpt = buff[1] + 256 * buff[2];		/* current track len... */
+
+    /* if libspectrum cannot suppot*/
+#ifndef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+    if( ttyp == 0xf0 ) d->status = DISK_UNSUP;
+#endif			/* #ifndef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION */
+    if( ttyp == 0x83 ) {			/* multiple read */
+      if( i == 0 ) return d->status = DISK_GEOM;	/* cannot be first track */
+      i--; bpt = 0;					/* not a real track */
+      tlen = buff[1] + 256 * buff[2];		/* current track len... */
+      tlen = ( tlen & 0xfff8 ) * ( tlen & 0x07 );
+    } else if( ttyp == 0xf0 ) {			/* compressed track */
+      if( buffavail( buffer ) < 7 )
+        return d->status = DISK_OPEN;
+      bpt = buff[4] + 256 * buff[5];
+      tlen = 7 + buff[1] + 256 * buff[2];
+    } else {
+      bpt = buff[1] + 256 * buff[2];		/* current track len... */
+      tlen = 3 + UDI_TLEN( ttyp, bpt );
+    }
     if( bpt > d->bpt )
       d->bpt = bpt;
-    if( buffseek( buffer, 3 + bpt + bpt / 8 + ( bpt % 8 ? 1 : 0 ), SEEK_CUR ) == -1 )
+    if( buffseek( buffer, tlen, SEEK_CUR ) == -1 )
       return d->status = DISK_OPEN;
   }
 
@@ -781,33 +1038,46 @@ open_udi( buffer_t *buffer, disk_t *d )
     return d->status = DISK_GEOM;
 
   bpt = d->bpt;		/* save the maximal value */
-  d->tlen = bpt + bpt / 8 + ( bpt % 8 ? 1 : 0 );
+  d->tlen = 3 + bpt + 3 * DISK_CLEN( bpt );
   d->bpt = 0;		/* we know exactly the track len... */
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
   d->bpt = bpt;		/* restore the maximal byte per track */
   buffer->index = 16;
-  d->track = d->data;
 
-  for( i = 0; i < d->sides * d->cylinders; i++ ) {
+  for( i = 0; buffer->index < eof; i++ ) {
+    DISK_SET_TRACK_IDX( d, i );
+    ttyp = buff[0];
     bpt = buff[1] + 256 * buff[2];		/* current track len... */
-    buffer->index += 3;
+    clen = DISK_CLEN( bpt );
+
+    memset( d->track, d->bpt, 0x4e );		/* fillup */
 						/* read track + clocks */
-    if( d->bpt == bpt ) {		/* if udi track length equal with the maximal track length */
-      buffread( d->track, bpt + bpt / 8 + ( bpt % 8 ? 1 : 0 ), buffer );
+    if( ttyp == 0x83 ) {			/* multiple read */
+      i--;					/* not a real track */
+      DISK_SET_TRACK_IDX( d, i );		/* back to previouse track */
+      d->weak += buff[3] + 256 * buff[4];	/* add offset to weak */
+      tlen = ( buff[1] + 256 * buff[2] ) >> 3;	/* weak len in bytes */
+      for( tlen--; tlen >= 0; tlen-- )
+        d->weak[tlen] = 0xff;
+      tlen = buff[1] + 256 * buff[2];		/* current track len... */
+      tlen = ( tlen & 0xfff8 ) * ( tlen & 0x07 );
+      buffseek( buffer, tlen, SEEK_CUR );
     } else {
-      buffread( d->track, bpt, buffer );	/* first the data */
-      d->track += bpt;
-      for( j = d->bpt - bpt; j > 0; j--, d->track++ )
-        *d->track = 0x4e;	/* fill track data with 0x4e */
-      buffread( d->track, bpt / 8 + ( bpt % 8 ? 1 : 0 ), buffer );
-      d->track += bpt / 8 + ( bpt % 8 ? 1 : 0 );
-      for( j = ( d->bpt / 8 + ( d->bpt % 8 ? 1 : 0 ) ) -
-    		 ( bpt / 8 + ( bpt % 8 ? 1 : 0 ) ); j > 0; j--, d->track++ )
-        *d->track = 0x00;	/* fill the clocks with 0x00 */
+      if( ttyp == 0xf0 )			/* compressed */
+        tlen = bpt + 4;
+      else
+        tlen = UDI_TLEN( ttyp, bpt );
+      d->track[-1] = ttyp;
+      d->track[-3] = buff[1];
+      d->track[-2] = buff[2];
+      buffer->index += 3;
+      buffread( d->track, tlen, buffer );	/* first read data */
     }
-    d->track += d->tlen;
   }
+  error = udi_uncompress_tracks( d );
+  if( error ) return error;
+  udi_unpack_tracks( d );
 
   return d->status = DISK_OK;
 }
@@ -1003,7 +1273,7 @@ open_fdi( buffer_t *buffer, disk_t *d, int preindex )
     buffread( head, 7, buffer );	/* 7 = track head */
     track_offset = head[0x00] + 256 * head[0x01] +
     			 65536 * head[0x02] + 16777216 * head[0x03];
-    d->track = d->data + i * d->tlen; d->clocks = d->track + d->bpt;
+    DISK_SET_TRACK_IDX( d, i );
     d->i = 0;
     if( preindex )
       preindex_add( d, gap );
@@ -1024,12 +1294,34 @@ open_fdi( buffer_t *buffer, disk_t *d, int preindex )
       data_add( d, buffer, NULL, ( head[ 0x0b + 7 * ( j % 35 ) ] & 0x3f ) == 0 ? 
 			       -1 : 0x80 << head[ 0x0a + 7 * ( j % 35 ) ],
 		head[ 0x0b + 7 * ( j % 35 ) ] & 0x80 ? DDAM : NO_DDAM,
-		gap, CRC_OK, NO_AUTOFILL );
+		gap, CRC_OK, NO_AUTOFILL, NULL );
     }
     head_offset += 7 + 7 * head[0x06];
     gap4_add( d, gap );
   }
   return d->status = DISK_OK;
+}
+
+static void
+cpc_set_weak_range( disk_t *d, int idx, buffer_t *buffer, int n, int len )
+{
+  int i, j, first = -1, last = -1;
+  libspectrum_byte *t, *w;
+
+  t = d->track + idx;
+  w = buffer->file.buffer + buffer->index;
+
+  for( i = 0; i < len; i++, t++, w++ ) {
+    for( j = 0; j < n - 1; j ++ ) {
+      if( *t != w[j * len] ) {
+        if( first == -1 ) first = idx + i;
+        last = idx + i;
+      }
+    }
+  }
+  for( ; first <= last; first++ ) {
+    bitmap_set( d->weak, first );
+  }
 }
 
 #define CPC_ISSUE_NONE 0
@@ -1042,7 +1334,7 @@ open_fdi( buffer_t *buffer, disk_t *d, int preindex )
 static int
 open_cpc( buffer_t *buffer, disk_t *d, int preindex )
 {
-  int i, j, seclen, idlen, gap, sector_pad;
+  int i, j, seclen, idlen, gap, sector_pad, idx;
   int bpt, max_bpt = 0, trlen;
   int fix[84], plus3_fix;
   unsigned char *hdrb;
@@ -1134,7 +1426,7 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
 
-  d->track = d->data; d->clocks = d->track + d->bpt;
+  DISK_SET_TRACK_IDX( d, 0 );
   buffer->index = 256;				/* rewind to first track */
   for( i = 0; i < d->sides*d->cylinders; i++ ) {
     hdrb = buff;
@@ -1142,7 +1434,7 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
     gap = (unsigned char)hdrb[0x16] == 0xff ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM;
 
     i = hdrb[0x10] * d->sides + hdrb[0x11];		/* adjust track No. */
-    d->track = d->data + i * d->tlen; d->clocks = d->track + d->bpt;
+    DISK_SET_TRACK_IDX( d, i );
     d->i = 0;
     if( preindex)
       preindex_add( d, gap );
@@ -1170,7 +1462,7 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
         data_add( d, buffer, NULL, seclen, 
 		hdrb[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
 		hdrb[ 0x1c + 8 * j ] & 0x20 && hdrb[ 0x1d + 8 * j ] & 0x20 ?
-		CRC_ERROR : CRC_OK, 0x00 );
+		CRC_ERROR : CRC_OK, 0x00, NULL );
       } else if( i < 84 && fix[i] == CPC_ISSUE_2 && j == 0 ) {	/* 6144, 10x512 */
         datamark_add( d, hdrb[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap );
         gap_add( d, 2, gap );
@@ -1179,13 +1471,13 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
         data_add( d, buffer, NULL, 128, 
 		hdrb[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
 		hdrb[ 0x1c + 8 * j ] & 0x20 && hdrb[ 0x1d + 8 * j ] & 0x20 ?
-		CRC_ERROR : CRC_OK, 0x00 );
+		CRC_ERROR : CRC_OK, 0x00, NULL );
         buffer->index += seclen - 128;
       } else if( i < 84 && fix[i] == CPC_ISSUE_4 ) {	/* Nx8192 (max 6384 byte ) */
         data_add( d, buffer, NULL, 6384,
 		hdrb[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
 		hdrb[ 0x1c + 8 * j ] & 0x20 && hdrb[ 0x1d + 8 * j ] & 0x20 ?
-		CRC_ERROR : CRC_OK, 0x00 );
+		CRC_ERROR : CRC_OK, 0x00, NULL );
         buffer->index += seclen - 6384;
       } else if( i < 84 && fix[i] == CPC_ISSUE_5 ) {	/* 9x512 */
       /* 512 256 512 256 512 256 512 256 512 */
@@ -1193,22 +1485,22 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
           data_add( d, NULL, buff, 512,
 		hdrb[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap,
 		hdrb[ 0x1c + 8 * j ] & 0x20 && hdrb[ 0x1d + 8 * j ] & 0x20 ?
-		CRC_ERROR : CRC_OK, 0x00 );
+		CRC_ERROR : CRC_OK, 0x00, NULL );
 	  buffer->index += idlen;
         } else {
           data_add( d, buffer, NULL, idlen,
 		hdrb[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap,
 		hdrb[ 0x1c + 8 * j ] & 0x20 && hdrb[ 0x1d + 8 * j ] & 0x20 ?
-		CRC_ERROR : CRC_OK, 0x00 );
+		CRC_ERROR : CRC_OK, 0x00, NULL );
 	}
       } else {
         data_add( d, buffer, NULL, seclen > idlen ? idlen : seclen,
 		hdrb[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap,
 		hdrb[ 0x1c + 8 * j ] & 0x20 && hdrb[ 0x1d + 8 * j ] & 0x20 ?
-		CRC_ERROR : CRC_OK, 0x00 );
+		CRC_ERROR : CRC_OK, 0x00, &idx );
         if( seclen > idlen ) {		/* weak sector with multiple copy  */
-          buffer->index +=( seclen / ( 0x80 << hdrb[ 0x1b + 8 * j ] ) - 1 ) *
-				     ( 0x80 << hdrb[ 0x1b + 8 * j ] );
+          cpc_set_weak_range( d, idx, buffer, seclen / idlen, idlen );
+          buffer->index += ( seclen / idlen - 1 ) * idlen;
 					/* ( ( N * len ) / len - 1 ) * len */
         }
       }
@@ -1248,8 +1540,7 @@ open_scl( buffer_t *buffer, disk_t *d )
     return d->status = DISK_GEOM;	/* too many file */
   buffer->index = 9;		/* read SCL entries */
 
-  d->track = d->data;			/* track 0 */
-  d->clocks = d->track + d->bpt;
+  DISK_SET_TRACK_IDX( d, 0 );
   d->i = 0;
   postindex_add( d, GAP_TRDOS );
   scl_i = d->i;			/* the position of first sector */
@@ -1278,7 +1569,7 @@ open_scl( buffer_t *buffer, disk_t *d )
     if( j == 256 ) {			/* one sector ready */
       d->i = scl_i + ( ( s - 1 ) % 8 * 2 + ( s - 1 ) / 8 ) * seclen;	/* 1 9 2 10 3 ... */
       id_add( d, 0, 0, s, SECLEN_256, GAP_TRDOS, CRC_OK );
-      data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL );
+      data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL, NULL );
       memset( head, 0, 256 );
       s++;
       j = 0;
@@ -1288,7 +1579,7 @@ open_scl( buffer_t *buffer, disk_t *d )
   if( j != 0 ) {	/* we have to add this sector  */
     d->i = scl_i + ( ( s - 1 ) % 8 * 2 + ( s - 1 ) / 8 ) * seclen;	/* 1 9 2 10 3 ... */
     id_add( d, 0, 0, s, SECLEN_256, GAP_TRDOS, CRC_OK );
-    data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL );
+    data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL, NULL );
     s++;
   }
 			/* and add empty sectors up to No. 16 */
@@ -1308,7 +1599,7 @@ open_scl( buffer_t *buffer, disk_t *d )
       head[244] = scl_deleted;	/* number of deleted files */
       memcpy( head + 245, "FUSE-SCL", 8 );
     }
-    data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL );
+    data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL, NULL );
     if( s == 9 )
       memset( head, 0, 256 );		/* clear sector data... */
   }
@@ -1393,15 +1684,14 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
 
-  d->track = d->data; d->clocks = d->track + d->bpt;
+  DISK_SET_TRACK_IDX( d, 0 );
 
   buffer->index = data_offset;		/* first track header */
   while( 1 ) {
     if( ( sectors = buff[0] ) == 255 ) /* sector number 255 => end of tracks */
       break;
 
-    d->track = d->data + ( d->sides * buff[1] + ( buff[2] & 0x01 ) ) * d->tlen;
-    d->clocks = d->track + d->bpt;
+    DISK_SET_TRACK( d, ( buff[2] & 0x01 ), buff[1] );
     d->i = 0;
     			/* later teledisk -> if buff[2] & 0x80 -> FM track */
     gap = mfm_old || buff[2] & 0x80 ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM;
@@ -1429,7 +1719,7 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
 	    return d->status = DISK_OPEN;
 	  }
 	  if( data_add( d, buffer, NULL, hdrb[6] + 256 * hdrb[7] - 1,
-			hdrb[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL ) ) {
+			hdrb[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL, NULL ) ) {
 	    if( uncomp_buff )
 	      free( uncomp_buff );
 	    return d->status = DISK_OPEN;
@@ -1454,7 +1744,7 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
 	    i += 2 * ( hdrb[9] + 256 * hdrb[10] );
 	  }
 	  if( data_add( d, NULL, uncomp_buff, hdrb[6] + 256 * hdrb[7] - 1,
-		      hdrb[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL ) ) {
+		      hdrb[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL, NULL ) ) {
 	    free( uncomp_buff );
 	    return d->status = DISK_OPEN;
 	  }
@@ -1493,7 +1783,7 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
 	    }
 	  }
 	  if( data_add( d, NULL, uncomp_buff, hdrb[6] + 256 * hdrb[7] - 1,
-	      hdrb[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL ) ) {
+	      hdrb[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL, NULL ) ) {
 	    free( uncomp_buff );
 	    return d->status = DISK_OPEN;
 	  }
@@ -1512,6 +1802,21 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
   if( uncomp_buff )
     free( uncomp_buff );
   return d->status = DISK_OK;
+}
+
+/* update tracks TLEN */
+void
+disk_update_tlens( disk_t *d )
+{
+  int i;
+
+  for( i = 0; i < d->sides * d->cylinders; i++ ) {	/* check tracks */
+    DISK_SET_TRACK_IDX( d, i );
+    if( d->track[-3] + 256 * d->track[-2] == 0 ) {
+      d->track[-3] = d->bpt & 0xff;
+      d->track[-2] = ( d->bpt >> 8 ) & 0xff;
+    }
+  }
 }
 
 /* open a disk image file, read and convert to our format
@@ -1593,6 +1898,8 @@ disk_open2( disk_t *d, const char *filename, int preindex )
   }
   utils_close_file( &buffer.file );
   d->dirty = 0;
+  disk_update_tlens( d );
+  update_tracks_mode( d );
   return d->status = DISK_OK;
 }
 
@@ -1621,7 +1928,7 @@ disk_merge_sides( disk_t *d, disk_t *d1, disk_t *d2, int autofill )
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
 
-  clen = d->bpt / 8 + ( d->bpt % 8 ? 1 : 0 );
+  clen = DISK_CLEN( d->bpt );
   d->track = d->data;
   d1->track = d1->data;
   d2->track = d2->data;
@@ -1629,19 +1936,25 @@ disk_merge_sides( disk_t *d, disk_t *d1, disk_t *d2, int autofill )
     if( i < d1->cylinders )
       memcpy( d->track, d1->track, d->tlen );
     else {
-      memset( d->track, d->bpt, autofill & 0xff );		/* fill data */
-      memset( d->track + d->bpt, clen, 0x00 );			/* no clock marks */
+      d->track[0] = d->bpt & 0xff;
+      d->track[1] = ( d->bpt >> 8 ) & 0xff;
+      d->track[2] = 0x00;
+      memset( d->track + 3, d->bpt, autofill & 0xff );		/* fill data */
+      memset( d->track + 3 + d->bpt, 3 * clen, 0x00 );		/* no clock and other marks */
     }
-    d->track = d->track + d->tlen;
-    d1->track = d1->track + d1->tlen;
+    d->track += d->tlen;
+    d1->track += d1->tlen;
     if( i < d2->cylinders )
       memcpy( d->track, d2->track, d->tlen );
     else {
-      memset( d->track, d->bpt, autofill & 0xff );		/* fill data */
-      memset( d->track + d->bpt, clen, 0x00 );			/* no clock marks */
+      d->track[0] = d->bpt & 0xff;
+      d->track[1] = ( d->bpt >> 8 ) & 0xff;
+      d->track[2] = 0x00;
+      memset( d->track + 1, d->bpt, autofill & 0xff );		/* fill data */
+      memset( d->track + 1 + d->bpt, 3 * clen, 0x00 );		/* no clock and other marks */
     }
-    d->track = d->track + d->tlen;
-    d2->track = d2->track + d2->tlen;
+    d->track += d->tlen;
+    d2->track += d2->tlen;
   }
   disk_close( d1 );
   disk_close( d2 );
@@ -1733,8 +2046,21 @@ write_udi( FILE *file, disk_t *d )
   size_t len;
   libspectrum_dword crc;
 
+  udi_pack_tracks( d );
+#ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+  udi_compress_tracks( d );
+#endif			/* #ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION */
+
   crc = ~( libspectrum_dword ) 0;
-  len = 16 + ( d->tlen + 3 ) * d->sides * d->cylinders;
+  len = 16;
+
+  for( i = 0; i < d->sides * d->cylinders; i++ ) {	/* check tracks */
+    DISK_SET_TRACK_IDX( d, i );
+    if( d->track[-1] == 0xf0 )
+      len += 7 + d->track[-3] + 256 * d->track[-2];
+    else
+      len += 3 + UDI_TLEN( d->track[-1], d->track[-3] + 256 * d->track[-2] );
+  }
   head[0] = 'U';
   head[1] = 'D';
   head[2] = 'I';
@@ -1751,19 +2077,25 @@ write_udi( FILE *file, disk_t *d )
     return d->status = DISK_WRPART;
   for( j = 0; j < 16; j++ )
     crc = crc_udi( crc, head[j] );
-  d->track = d->data;
-  d->clocks = d->track + d->bpt;
   for( i = 0; i < d->sides * d->cylinders; i++ ) {	/* write tracks */
-    head[0] = 0;
-    head[1] = d->bpt & 0xff;
-    head[2] = d->bpt >> 8;
+    DISK_SET_TRACK_IDX( d, i );
+    head[0] = d->track[-1];		/* track type */
+    head[1] = d->track[-3];		/* track len  */
+    head[2] = d->track[-2];		/* track len2 */
     if( fwrite( head, 3, 1, file ) != 1 )
       return d->status = DISK_WRPART;
+
     for( j = 0; j < 3; j++ )
       crc = crc_udi( crc, head[j] );
-    if( fwrite( d->track, d->tlen, 1, file ) != 1 )
+
+    if( d->track[-1] == 0xf0 )
+      len = 4 + d->track[-3] + 256 * d->track[-2];
+    else
+      len = UDI_TLEN( d->track[-1], d->track[-3] + 256 * d->track[-2] );
+    if( fwrite( d->track, len, 1, file ) != 1 )
       return d->status = DISK_WRPART;
-    for( j = d->tlen; j > 0; j-- ) {
+
+    for( j = len; j > 0; j-- ) {
       crc = crc_udi( crc, *d->track );
       d->track++;
     }
@@ -1774,6 +2106,7 @@ write_udi( FILE *file, disk_t *d )
   head[3] = ( crc >> 24 ) & 0xff;
   if( fwrite( head, 4, 1, file ) != 1 )		/* CRC */
     fclose( file );
+  udi_unpack_tracks( d );
   return d->status = DISK_OK;
 }
 
@@ -1888,8 +2221,7 @@ write_fdi( FILE *file, disk_t *d )
   toff = 0;			/* offset of track data */
   for( i = 0; i < d->cylinders; i++ ) {
     for( j = 0; j < d->sides; j++ ) {
-      d->track = d->data + ( ( d->sides * i + j ) * d->tlen );
-      d->clocks = d->track + d->bpt;
+      DISK_SET_TRACK( d, j, i );
       d->i = 0;
       head[0x00] = toff & 0xff;
       head[0x01] = ( toff >> 8 ) & 0xff;	/* track offset */
@@ -1902,8 +2234,7 @@ write_fdi( FILE *file, disk_t *d )
       if( fwrite( head, 7, 1, file ) != 1 )	/* track header */
 	return d->status = DISK_WRPART;
 
-      d->track = d->data + ( ( d->sides * i + j ) * d->tlen );
-      d->clocks = d->track + d->bpt;
+      DISK_SET_TRACK( d, j, i );
       d->i = 0;
       k = 0;
       soff = 0;
@@ -1953,7 +2284,7 @@ write_cpc( FILE *file, disk_t *d )
   size_t len;
 
   i = check_disk_geom( d, &sbase, &sectors, &seclen, &mfm, &cyl );
-  if( i & DISK_SECLEN_VARI || i & DISK_SPT_VARI )
+  if( i & DISK_SECLEN_VARI || i & DISK_SPT_VARI || i & DISK_WEAK_DATA )
     return d->status = DISK_GEOM;
 
   if( i & DISK_MFM_VARI )
@@ -1974,8 +2305,7 @@ write_cpc( FILE *file, disk_t *d )
   memcpy( head, "Track-Info\r\n", 12 );
   for( i = 0; i < cyl; i++ ) {
     for( j = 0; j < d->sides; j++ ) {
-      d->track = d->data + ( ( d->sides * i + j ) * d->tlen );
-      d->clocks = d->track + d->bpt;
+      DISK_SET_TRACK( d, j, i );
       d->i = 0;
       head[0x10] = i;
       head[0x11] = j;
@@ -2016,8 +2346,7 @@ write_scl( FILE *file, disk_t *d )
       sbase != 1 || seclen != 1 || sectors != 16 )
     return d->status = DISK_GEOM;
 
-  d->track = d->data;
-  d->clocks = d->track + d->bpt;
+  DISK_SET_TRACK_IDX( d, 0 );
 
   /* TR-DOS descriptor */
   if( !id_seek( d, 9 ) || !datamark_read( d, &del ) )
@@ -2065,8 +2394,7 @@ write_scl( FILE *file, disk_t *d )
   j = 1;			/* sector number */
   k = 0;			/* byte offset */
   for( i = 0; i < entries; i++ ) {	/* read TR-DOS dir */
-    d->track = d->data;
-    d->clocks = d->track + d->bpt;	/* set track 0 */
+    DISK_SET_TRACK_IDX( d, 0 );
     if( k == 0 ) {
       if ( !id_seek( d, j ) || !datamark_read( d, &del ) )
 	return d->status = DISK_GEOM;
@@ -2086,16 +2414,14 @@ write_scl( FILE *file, disk_t *d )
 
     if( s % 16 == 0 )
       t--;
-    d->track = d->data + t * d->tlen;
-    d->clocks = d->track + d->bpt;
+    DISK_SET_TRACK_IDX( d, t );
 
     for( ; s < sectors; s++ ) {		/* save all sectors */
       if( s % 16 == 0 ) {
 	t++;
 	if( t >= d->sides * d->cylinders )
 	  return d->status = DISK_GEOM;
-	d->track = d->data + t * d->tlen;
-	d->clocks = d->track + d->bpt;
+        DISK_SET_TRACK_IDX( d, t );
       }
       if( id_seek( d, s % 16 + 1 ) ) {
 	if( datamark_read( d, &del ) ) {	/* write data if we have data */
@@ -2115,10 +2441,10 @@ write_scl( FILE *file, disk_t *d )
   head[1] = ( sum >> 8 ) & 0xff;
   head[2] = ( sum >> 16 ) & 0xff;
   head[3] = ( sum >> 24 ) & 0xff;
-  
+
   if( fwrite( head, 4, 1, file ) != 1 )
     return d->status = DISK_WRPART;
-  
+
   return d->status = DISK_OK;
 }
 
@@ -2134,10 +2460,10 @@ write_log( FILE *file, disk_t *d )
   fprintf( file, "Sides: %d, cylinders: %d\n", d->sides, d->cylinders );
   for( j = 0; j < d->cylinders; j++ ) {	/* ALT :) */
     for( i = 0; i < d->sides; i++ ) {
-      d->track = d->data + ( ( d->sides * j + i ) * d->tlen );
-      d->clocks = d->track + d->bpt;
+      DISK_SET_TRACK( d, i, j );
       d->i = 0;
-      fprintf( file, "\n*********\nSide: %d, cylinder: %d\n", i, j );
+      fprintf( file, "\n*********\nSide: %d, cylinder: %d type: 0x%02x tlen: %5u\n",
+			i, j, d->track[-1], d->track[-3] + 256 * d->track[-2] );
       while( id_read( d, &h, &t, &s, &b ) ) {
 	fprintf( file, "  h:%d t:%d s:%d l:%d(%d)", h, t, s, b, 0x80 << b );
 	if( datamark_read( d, &del ) )
@@ -2150,10 +2476,10 @@ write_log( FILE *file, disk_t *d )
   fprintf( file, "\n***************************\nSector Data Dump:\n" );
   for( j = 0; j < d->cylinders; j++ ) {	/* ALT :) */
     for( i = 0; i < d->sides; i++ ) {
-      d->track = d->data + ( ( d->sides * j + i ) * d->tlen );
-      d->clocks = d->track + d->bpt;
+      DISK_SET_TRACK( d, i, j );
       d->i = 0;
-      fprintf( file, "\n*********\nSide: %d, cylinder: %d\n", i, j );
+      fprintf( file, "\n*********\nSide: %d, cylinder: %d type: 0x%02x tlen: %5u\n",
+			i, j, d->track[-1], d->track[-3] + 256 * d->track[-2] );
       rev = k = 0;
       while( id_read( d, &h, &t, &s, &b ) ) {
 	b = 0x80 << b;
@@ -2187,16 +2513,18 @@ write_log( FILE *file, disk_t *d )
   fprintf( file, "\n***************************\n**Full Dump:\n" );
   for( j = 0; j < d->cylinders; j++ ) {	/* ALT :) */
     for( i = 0; i < d->sides; i++ ) {
-      d->track = d->data + ( ( d->sides * j + i ) * d->tlen );
-      d->clocks = d->track + d->bpt;
+      DISK_SET_TRACK( d, i, j );
       d->i = 0;
-      fprintf( file, "\n*********\nSide: %d, cylinder: %d\n", i, j );
+      fprintf( file, "\n*********\nSide: %d, cylinder: %d type: 0x%02x tlen: %5u\n",
+			i, j, d->track[-1], d->track[-3] + 256 * d->track[-2] );
       k = 0;
       while( d->i < d->bpt ) {
 	if( !( k % 8 ) )
 	  fprintf( file, "0x%08x:", d->i );
 	fprintf( file, " 0x%04x", d->track[ d->i ] |
-		 ( bitmap_test( d->clocks, d->i ) ? 0xff00 : 0x0000 ) );
+		 ( bitmap_test( d->clocks, d->i ) ? 0x0c00 : 0x0000 ) |
+		 ( bitmap_test( d->fm, d->i ) ? 0x1000 : 0x0000 ) |
+		 ( bitmap_test( d->weak, d->i ) ? 0x8000 : 0x0000 ) );
 	k++;
 	if( !( k % 8 ) )
 	  fprintf( file, "\n" );
@@ -2216,7 +2544,7 @@ disk_write( disk_t *d, const char *filename )
 
   if( ( file = fopen( filename, "wb" ) ) == NULL )
     return d->status = DISK_WRFILE;
-  
+
   namelen = strlen( filename );
   if( namelen < 4 )
     ext = NULL;
@@ -2248,6 +2576,7 @@ disk_write( disk_t *d, const char *filename )
       d->type = DISK_UDI;				/* ALT side */
   }
 
+  update_tracks_mode( d );
   switch( d->type ) {
   case DISK_UDI:
     write_udi( file, d );
@@ -2287,6 +2616,6 @@ disk_write( disk_t *d, const char *filename )
 
   if( fclose( file ) == -1 )
     return d->status = DISK_WRFILE;
-  
+
   return d->status = DISK_OK;
 }

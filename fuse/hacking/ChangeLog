@@ -3272,3 +3272,7 @@
 20100107 Makefile.am,configure.in,sound.[c|cpp],
          sound/{Blip_Buffer.[cpp|h],Makefile.am,blipbuffer.[ch]}: convert
          Blip_Buffer to plain C (patch #2922796) (Gergely Szasz).
+20100116 disk/{disk.[ch],fdd.[ch],upd_fdc.[ch]},machines/specplus3.[ch],
+         man/fuse.1,periph.c,settings.dat,ui/options.dat: add weak data handling
+         capability so Fuse can deal with weak data if it present in the disk
+         image (EDSK/UDI) (patch #2927624) (Gergely Szasz).

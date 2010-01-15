@@ -510,6 +510,20 @@ Insert the specified file into the emulated +3's A: drive; also select
 the +3 on startup if available.
 .RE
 .PP
+.I "\-\-plus3-detect-speedlock"
+.RS
+Specify whether the +3 drives try to detect Speedlock protected disks,
+and emulate 'weak' sectors.
+If the disk image file (EDSK or UDI) contains weak sector data, than
+Speedlock detection is automatically omitted.
+See also the
+.B WEAK DISK DATA
+section.
+Same as the Disk Options dialog's
+.I "+3 Detect Speedlock"
+option.
+.RE
+.PP
 .I \-\-plusd
 .RS
 Emulate a +D interface. Same as the Peripherals Options dialog's
@@ -3520,13 +3534,15 @@ For reading:
 .I .UDI
 .RS
 Ultra Disk Image; for specification please see 
+.I http://scratchpad.wikia.com/wiki/Spectrum_emulator_file_format:_udi
+or
 .I http://zxmak.narod.ru/docs.htm
 .br
 This is the only image format which can store all the relevant information
 of the recorded data on a magnetic disk, so it can be used for any
 .I non standard
-disk format. Fuse can store and read not just MFM but FM formatted disk data
-in/from this container.
+disk format. Fuse can read all extended track types too (mixed FM/MFM, or
+tracks with 'WEAK' data or even compressed tracks too).
 .RE
 .PP
 .I .FDI
@@ -3574,6 +3590,8 @@ extended CPC format too. Further information please see the
 .B "THE .DSK FORMAT"
 section and the CPCEMU manual section 7.7.1
 .I http://www.cpc-emu.org/linux/cpcemu_e.txt
+or the
+.I http://www.kjthacker.f2s.com/docs/extdsk.html
 .RE
 .PP
 .I .OPD
@@ -3589,7 +3607,11 @@ Fuse supports most of the above formats for writing:
 You can save disk images with any output
 format, just select the appropriate extension. (e.g.
 .I ` elite3.udi '
-to save as an UDI file)
+to save as an UDI file). If the appropriate libraries were available
+when
+.IR libspectrum (3)
+was compiled, than Fuse will try to create UDI images with compressed
+tracks to save disk space.
 There is a
 .I .LOG
 ` image ' format for debugging purpose. This is a plain text file
@@ -3598,6 +3620,18 @@ Not all image formats can store all disk images.
 You cannot save a disk image with an inappropriate format
 that loses some information (e.g. variable track length or
 sector length).
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH WEAK DISK DATA
+.PP
+Some copy protections have what is described as 'weak/random' data.
+Each time the sector is read one or more bytes will change,
+the value may be random between consecutive reads of the same sector.
+Two disk image formats (Extended DSK and UDI) can store this type
+of data.
+Fuse can read and use weak sector data from EDSK and UDI files when
+present, and can save back weak sector data to UDI image format.
 .\"
 .\"------------------------------------------------------------------
 .\"

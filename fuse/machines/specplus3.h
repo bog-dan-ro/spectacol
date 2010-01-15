@@ -38,6 +38,7 @@ extern const size_t specplus3_peripherals_count;
 int specplus3_port_from_ula( libspectrum_word port );
 
 int specplus3_init( fuse_machine_info *machine );
+void specplus3_765_update_fdd( void );
 void specplus3_765_init( void );
 void specplus3_765_reset( void );
 

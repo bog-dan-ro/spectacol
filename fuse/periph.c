@@ -546,6 +546,7 @@ periph_update( void )
   update_cartridge_menu();
   update_ide_menu();
   if1_update_menu();
+  specplus3_765_update_fdd();
   machine_current->memory_map();
 }
 

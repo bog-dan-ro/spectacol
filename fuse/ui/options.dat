@@ -72,14 +72,14 @@ diskoptions
 Drives Setup
 Combo, +(3) Drive A, drive_plus3a_type, INPUT_KEY_3, *Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
 Combo, +3 Driv(e) B, drive_plus3b_type, INPUT_KEY_e, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
+Checkbox, +3 Detect (S)peedlock, plus3_detect_speedlock, INPUT_KEY_f
 Combo, Beta 128 Drive (A), drive_beta128a_type, INPUT_KEY_a, Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, Beta 128 Drive (B), drive_beta128b_type, INPUT_KEY_b, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, Beta 128 Drive (C), drive_beta128c_type, INPUT_KEY_c, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, Beta 128 Drive (D), drive_beta128d_type, INPUT_KEY_d, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, +D Drive (1), drive_plusd1_type, INPUT_KEY_1, Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, +D Drive (2), drive_plusd2_type, INPUT_KEY_2, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
-Combo, Opus Drive (1), drive_opus1_type, INPUT_KEY_1, *Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
-Combo, Opus Drive (2), drive_opus2_type, INPUT_KEY_2, Disabled|*Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
+Combo, (O)pus Drive 1, drive_opus1_type, INPUT_KEY_o, *Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
+Combo, O(p)us Drive 2, drive_opus2_type, INPUT_KEY_p, Disabled|*Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
 Combo, (T)ry merge 'B' side of disks, disk_try_merge, INPUT_KEY_t, Never|*With single-sided drives|Always
 Checkbox, Con(f)irm merge disk sides, disk_ask_merge, INPUT_KEY_f
-

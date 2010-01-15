@@ -1,5 +1,5 @@
 /* fdd.h: Header for handling raw disk images
-   Copyright (c) 2007 Gergely Szasz
+   Copyright (c) 2007-2010 Gergely Szasz
 
    $Id$
 
@@ -86,19 +86,22 @@ typedef struct fdd_t {
   int index;		/* index hole */
   int wrprot;		/* write protect */
   int data;		/* read/write to data byte 0x00nn or 0xffnn */
-  
+  int marks;		/* read/write other marks 0x01 -> FM 0x02 -> WEAK */
+
   disk_t *disk;		/* pointer to inserted disk */
   int loaded;		/* disk loaded */
   int upsidedown;	/* flipped disk */
   int selected;		/* Drive Select line active */
   int ready;		/* some disk drive offer a ready signal */
-  
+
   fdd_error_t status;
 
 /*--private section, fdc may never use it */
   int unreadable;	/* disk unreadable in this drive */
+  int do_read_weak;
   int c_head;		/* current head (side) */
   int c_cylinder;	/* current cylinder number (0 -> TR00) */
+  int c_bpt;		/* current track length in bytes */
   int motoron;		/* motor on */
   int loadhead;		/* head loaded */
 

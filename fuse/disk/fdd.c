@@ -1,5 +1,5 @@
 /* fdd.c: Routines for emulating floppy disk drives
-   Copyright (c) 2007 Gergely Szasz
+   Copyright (c) 2007-2010 Gergely Szasz
 
    $Id$
 
@@ -107,21 +107,22 @@ fdd_set_data( fdd_t *d, int fact )
       d->c_cylinder >= d->disk->cylinders ) {
     d->disk->track = NULL;
     d->disk->clocks = NULL;
+    d->disk->fm = NULL;
+    d->disk->weak = NULL;
     return;
   }
 
-  d->disk->track = d->disk->data + 
-		   ( d->disk->sides * d->c_cylinder + head ) * d->disk->tlen;
-  d->disk->clocks = d->disk->track + d->disk->bpt;
+  DISK_SET_TRACK( d->disk, head, d->c_cylinder );
+  d->c_bpt = d->disk->track[-3] + 256 * d->disk->track[-2];
   if( fact > 0 ) {
-    /* this generate a bpt/fact +-10% rectangular distribution skip in bytes 
+    /* this generate a bpt/fact +-10% triangular distribution skip in bytes 
        i know, we should use the higher bits of rand(), but we not
        keen on _real_ (pseudo)random numbers... ;)
     */
-    d->disk->i += d->disk->bpt / fact + d->disk->bpt *
+    d->disk->i += d->c_bpt / fact + d->c_bpt *
 		  ( rand() % 10 + rand() % 10 - 9 ) / fact / 100;
-    while( d->disk->i >= d->disk->bpt )
-      d->disk->i -= d->disk->bpt;
+    while( d->disk->i >= d->c_bpt )
+      d->disk->i -= d->c_bpt;
   }
   d->index = d->disk->i ? 0 : 1;
 }
@@ -132,10 +133,12 @@ fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls, int reinit )
 {
   int upsidedown = d->upsidedown;
   int selected = d->selected;
+  int do_read_weak = d->do_read_weak;
   disk_t *disk = d->disk;
-  
+
   d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = 0;
   d->upsidedown = d->unreadable = d->loaded = d->auto_geom = d->selected = 0;
+  d->do_read_weak = 0;
   if( type == FDD_TYPE_NONE )
     d->index = d->tr00 = d->wrprot = 0;
   else
@@ -149,7 +152,10 @@ fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls, int reinit )
     d->auto_geom = 1;
   d->fdd_heads = heads;
   d->fdd_cylinders = cyls;
-  if( reinit ) d->selected = selected;
+  if( reinit ) {
+    d->selected = selected;
+    d->do_read_weak = do_read_weak;
+  }
   if( reinit && disk ) {
     fdd_unload( d );
     fdd_load( d, disk, upsidedown );
@@ -245,6 +251,7 @@ fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
   if( d->type == FDD_SHUGART && d->selected )
     fdd_head_load( d, 1 );
 
+  d->do_read_weak = disk->have_weak;
   fdd_set_data( d, FDD_LOAD_FACT );
   return d->status = FDD_OK;
 }
@@ -300,24 +307,24 @@ fdd_read_write_data( fdd_t *d, fdd_write_t write )
 {
   if( !d->selected || !d->ready || !d->loadhead || d->disk->track == NULL ) {
     if( d->loaded && d->motoron ) {			/* spin the disk */
-      if( d->disk->i >= d->disk->bpt ) {		/* next data byte */
+      if( d->disk->i >= d->c_bpt ) {		/* next data byte */
         d->disk->i = 0;
       }
       if( !write )
         d->data = 0x100;				/* no data */
       d->disk->i++;
-      d->index = d->disk->i >= d->disk->bpt ? 1 : 0;
+      d->index = d->disk->i >= d->c_bpt ? 1 : 0;
     }
     return d->status = FDD_OK;
   }
 
-  if( d->disk->i >= d->disk->bpt ) {		/* next data byte */
+  if( d->disk->i >= d->c_bpt ) {		/* next data byte */
     d->disk->i = 0;
   }
   if( write ) {
     if( d->disk->wrprot ) {
       d->disk->i++;
-      d->index = d->disk->i >= d->disk->bpt ? 1 : 0;
+      d->index = d->disk->i >= d->c_bpt ? 1 : 0;
       return d->status = FDD_RDONLY;
     }
     d->disk->track[ d->disk->i ] = d->data & 0x00ff;
@@ -325,14 +332,35 @@ fdd_read_write_data( fdd_t *d, fdd_write_t write )
       bitmap_set( d->disk->clocks, d->disk->i );
     else
       bitmap_reset( d->disk->clocks, d->disk->i );
+
+    if( d->marks & 0x01 )
+      bitmap_set( d->disk->fm, d->disk->i );
+    else
+      bitmap_reset( d->disk->fm, d->disk->i );
+#if 0		/* hmm... we cannot write weak data with 'standard' hardware */
+    if( d->marks & 0x02 )
+      bitmap_set( d->disk->weak, d->disk->i );
+    else
+      bitmap_reset( d->disk->weak, d->disk->i );
+#else
+    bitmap_reset( d->disk->weak, d->disk->i );
+#endif
     d->disk->dirty = 1;
   } else {	/* read */
     d->data = d->disk->track[ d->disk->i ];
     if( bitmap_test( d->disk->clocks, d->disk->i ) )
       d->data |= 0xff00;
+    d->marks = 0;
+    if( bitmap_test( d->disk->fm, d->disk->i ) )
+      d->marks |= 0x01;
+    if( bitmap_test( d->disk->weak, d->disk->i ) ) {
+      d->marks |= 0x02;
+      /* mess up data byte */
+      d->data &= rand() % 0xff, d->data |= rand() % 0xff;
+    }
   }
   d->disk->i++;
-  d->index = d->disk->i >= d->disk->bpt ? 1 : 0;
+  d->index = d->disk->i >= d->c_bpt ? 1 : 0;
 
   return d->status = FDD_OK;
 }

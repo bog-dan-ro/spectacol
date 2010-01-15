@@ -213,6 +213,7 @@ rom_beta128, string, "trdos.rom",
 
 drive_plus3a_type, string, NULL
 drive_plus3b_type, string, NULL
+plus3_detect_speedlock, boolean, 1
 drive_beta128a_type, string, NULL
 drive_beta128b_type, string, NULL
 drive_beta128c_type, string, NULL

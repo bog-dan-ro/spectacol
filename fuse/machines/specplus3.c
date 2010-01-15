@@ -124,6 +124,12 @@ int specplus3_init( fuse_machine_info *machine )
 }
 
 void
+specplus3_765_update_fdd( void )
+{
+  specplus3_fdc->speedlock = settings_current.plus3_detect_speedlock ? 0 : -1;
+}
+
+void
 specplus3_765_init( void )
 {
   int i;
@@ -149,6 +155,7 @@ specplus3_765_init( void )
   specplus3_fdc->set_datarq = NULL;
   specplus3_fdc->reset_datarq = NULL;
 
+  specplus3_765_update_fdd();
 }
 
 void

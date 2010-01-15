@@ -1,5 +1,5 @@
 /* upd_fdc.h: NEC floppy disk controller emulation
-   Copyright (c) 2003-2007 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Copyright (c) 2003-2010 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Gergely Szasz
 
    $Id$
@@ -98,7 +98,7 @@ typedef struct upd_fdc {
 
   upd_type_t type;		/* UPD765A UPD765B */
   upd_clock_t clock;		/* clock rate ( 4/8 MHz ) */
-  
+
   int stp_rate;			/* stepping rate ms */
   int hut_time;			/* head unload time ms */
   int hld_time;			/* head load time ms */
@@ -131,11 +131,11 @@ typedef struct upd_fdc {
   } id_mark;
 
   unsigned int last_sector_read;/* for Speedlock 'random' sector hack */
-  int do_error;			/* for Speedlock 'random' sector hack */
+  int speedlock;		/* for Speedlock 'random' sector hack, -1 -> disable */
 
   /* state during transfer */
   int data_offset;
-  
+
   int cycle;			/* read/write cycle num */
   int del_data;			/* READ/WRITE deleted data */
   int mt;			/* multitrack operations */

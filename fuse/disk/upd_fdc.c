@@ -1,5 +1,5 @@
 /* upd_fdc.c: NEC floppy disk controller emulation
-   Copyright (c) 2007 Gergely Szasz
+   Copyright (c) 2007-2010 Gergely Szasz
 
    $Id$
 
@@ -118,7 +118,7 @@ static void
 cmd_identify( upd_fdc *f )
 {
   upd_cmd_t *r = cmd;
-  
+
   while( r->id != UPD_CMD_INVALID ) {
     if( ( f->command_register & r->mask ) == r->value )
       break;
@@ -128,7 +128,7 @@ cmd_identify( upd_fdc *f )
   f->mf = ( f->command_register >> 6 ) & 0x01;	/* MFM format */
   f->sk = ( f->command_register >> 5 ) & 0x01;	/* Skip DELETED/NONDELETED sectors */
   f->cmd = r;
-  
+
   return;
 }
 
@@ -140,7 +140,7 @@ upd_fdc_master_reset( upd_fdc *f )
     if( f->drive[i] != NULL )
       fdd_select( &f->drive[i]->fdd, i == 0 ? 1 : 0 );
   f->current_drive = f->drive[0];
-  
+
   f->main_status = UPD_FDC_MAIN_DATAREQ;
   for( i = 0; i < 4; i++ )
     f->status_register[i] = f->pcn[i] = f->seek[i] = 0;
@@ -155,7 +155,8 @@ upd_fdc_master_reset( upd_fdc *f )
   f->cycle = 0;
   f->last_sector_read = 0;
   f->read_id = 0;
-  f->do_error = 0;
+  /* preserve disabled state of speedlock_hack */
+  if( f->speedlock != -1 ) f->speedlock = 0;
 }
 
 static void
@@ -887,11 +888,11 @@ upd_fdc_read_data( upd_fdc *f )
     fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d ); /* read a byte */
 
     /* Speedlock hack */
-    if( f->do_error ) {
+    if( f->speedlock > 0 && !d->fdd.do_read_weak ) {	/* do not conflict with fdd weak reads */
       if( f->data_offset < 64 && d->fdd.data != 0xe5 )
-        f->do_error = 2;		/* W.E.C Le Mans type ... */
-      else if( ( f->do_error > 1 || f->data_offset < 64 ) &&
-    	       !( f->data_offset % 29 ) ) {
+        f->speedlock = 2;		/* W.E.C Le Mans type ... */
+      else if( ( f->speedlock > 1 || f->data_offset < 64 ) &&
+	       !( f->data_offset % 29 ) ) {
 	d->fdd.data ^= f->data_offset;	/* mess up data */
 	crc_add( f, d );			/* mess up crc */
       }
@@ -1272,17 +1273,19 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       break;
     case UPD_CMD_READ_DATA:
     /* Speedlock hack */
-      u = ( f->data_register[2] & 0x01 ) + ( f->data_register[1] << 1 ) +
-    	  ( f->data_register[3] << 8 );
-      if( f->data_register[3] == f->data_register[5] && u == 0x200 ) {
-        if( u == f->last_sector_read ) {
-	  f->do_error++;
+      if( f->speedlock != -1 && !d->fdd.do_read_weak ) {	/* do not conflict with fdd weak read */
+	u = ( f->data_register[2] & 0x01 ) + ( f->data_register[1] << 1 ) +
+	    ( f->data_register[3] << 8 );
+	if( f->data_register[3] == f->data_register[5] && u == 0x200 ) {
+	  if( u == f->last_sector_read ) {
+	    f->speedlock++;
+	  } else {
+	    f->speedlock = 0;
+	    f->last_sector_read = u;
+	  }
 	} else {
-	  f->do_error = 0;
-	  f->last_sector_read = u;
+	  f->last_sector_read = f->speedlock = 0;
 	}
-      } else {
-        f->last_sector_read = f->do_error = 0;
       }
     /* EOSpeedlock hack */
 

@@ -1,5 +1,5 @@
 /* fdd.h: Header for handling raw disk images
-   Copyright (c) 2007 Gergely Szasz
+   Copyright (c) 2007-2010 Gergely Szasz
 
    $Id$
 
@@ -43,7 +43,7 @@ typedef enum disk_error_t {
   DISK_CLOSE,
   DISK_WRFILE,
   DISK_WRPART,
-  
+
   DISK_LAST_ERROR,
 } disk_error_t;
 
@@ -92,17 +92,40 @@ typedef struct disk_t {
   int bpt;		/* bytes per track */
   int wrprot;		/* disk write protect */
   int dirty;		/* disk changed */
+  int have_weak;	/* disk contain weak sectors */
   unsigned int flag;
   disk_error_t status;		/* last error code */
   libspectrum_byte *data;	/* disk data */
 /* private part */
-  int tlen;			/* length of a track with clock marks (bpt + 1/8bpt) */
+  int tlen;			/* length of a track with clock and other marks (bpt + 3/8bpt) */
   libspectrum_byte *track;	/* current track data bytes */
   libspectrum_byte *clocks;	/* clock marks bits */
+  libspectrum_byte *fm;		/* FM/MFM marks bits */
+  libspectrum_byte *weak;	/* weak marks bits/weak data */
   int i;			/* index for track and clocks */
   disk_type_t type;		/* DISK_UDI, ... */
   disk_dens_t density;		/* DISK_SD DISK_DD, or DISK_HD */
 } disk_t;
+
+/* every track data:
+TRACK_LEN TYPE TRACK......DATA CLOCK..MARKS MF..MARKS WEAK..MARKS
+               ^               ^            ^         ^
+               |__ track       |__ clocks   |__ mf    |__ weak
+  so, track[-1] = TYPE
+  TLEN = track[-3] + tarck 256 * track[-2]
+  TYPE is Track type as in UDI spec (0x00, 0x01, 0x02, 0x80, 0x81, 0x82) after update_tracks_mode() !!!
+*/
+
+#define DISK_CLEN( bpt ) ( ( bpt ) / 8 + ( ( bpt ) % 8 ? 1 : 0 ) )
+
+#define DISK_SET_TRACK_IDX( d, idx ) \
+   d->track = d->data + 3 + ( idx ) * d->tlen; \
+   d->clocks = d->track  + d->bpt; \
+   d->fm     = d->clocks + DISK_CLEN( d->bpt ); \
+   d->weak   = d->fm     + DISK_CLEN( d->bpt )
+
+#define DISK_SET_TRACK( d, head, cyl ) \
+   DISK_SET_TRACK_IDX( d, d->sides * cyl + head )
 
 const char *disk_strerror( int error );
 /* create an unformatted disk sides -> (1/2) cylinders -> track/side,
