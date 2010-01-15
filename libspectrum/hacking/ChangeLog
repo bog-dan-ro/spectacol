@@ -746,3 +746,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          order in SZX files (fixes bug #2857419; thanks, velesoft) (Fred).
 20091022 wav.c: we expect mono sound files, tell audiofile to make the required
          adjustments (fixes bug #2883135; thanks, Gilberto Almeida) (Fred).
+20100116 internals.h,libspectrum.h.in,make-perl.c,szx.c: export
+         libspectrum_zlib_inflate() and libspectrum_zlib_compress() (patch
+         #2927624) (Gergely Szasz and Fred).

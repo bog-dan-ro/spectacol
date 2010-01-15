@@ -70,9 +70,6 @@ LIBSPECTRUM_DEFINE_TYPES
 /* glib replacement (if necessary) */
 LIBSPECTRUM_GLIB_REPLACEMENT
 
-/* Library capabilities */
-LIBSPECTRUM_CAPABILITIES
-
 /*
  * General libspectrum routines
  */
@@ -96,6 +93,9 @@ typedef enum libspectrum_error {
   LIBSPECTRUM_ERROR_LOGIC = -1,
 
 } libspectrum_error;
+
+/* Library capabilities */
+LIBSPECTRUM_CAPABILITIES
 
 /* Initialisation */
 

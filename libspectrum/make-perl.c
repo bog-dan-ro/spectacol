@@ -292,7 +292,14 @@ int main(void)
 #ifdef HAVE_ZLIB_H
 
   printf( "\n/* we support snapshots etc. requiring zlib (e.g. compressed szx) */\n" );
-  printf( "#define	LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION	(1)\n" );
+  printf( "#define	LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION	(1)\n\n" );
+  printf( "/* zlib (de)compression routines */\n\n" );
+  printf( "libspectrum_error WIN32_DLL\n" );
+  printf( "libspectrum_zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,\n" );
+  printf( "			  libspectrum_byte **outptr, size_t *outlength );\n\n" );
+  printf( "libspectrum_error WIN32_DLL\n" );
+  printf( "libspectrum_zlib_compress( const libspectrum_byte *data, size_t length,\n" );
+  printf( "			   libspectrum_byte **gzptr, size_t *gzlength );\n\n" );
 
 #endif				/* #ifdef HAVE_ZLIB_H */
 

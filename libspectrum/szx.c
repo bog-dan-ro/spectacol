@@ -408,7 +408,9 @@ read_b128_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 		 const libspectrum_byte **buffer,
 		 const libspectrum_byte *end GCC_UNUSED, size_t data_length )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_byte *rom_data = NULL;
   libspectrum_dword flags;
   const size_t expected_length = 0x4000;
@@ -501,7 +503,9 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 		  const libspectrum_byte **buffer,
 		  const libspectrum_byte *end GCC_UNUSED, size_t data_length )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_byte *ram_data = NULL, *rom_data = NULL;
   libspectrum_dword flags;
   size_t disc_ram_length;
@@ -690,7 +694,9 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 		  const libspectrum_byte **buffer,
 		  const libspectrum_byte *end GCC_UNUSED, size_t data_length )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_byte *ram_data = NULL, *rom_data = NULL;
   libspectrum_byte rom_type;
   libspectrum_dword flags;
@@ -1664,7 +1670,9 @@ read_dide_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 		 const libspectrum_byte **buffer,
 		 const libspectrum_byte *end GCC_UNUSED, size_t data_length )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_word flags;
   libspectrum_byte *eprom_data = NULL;
   const size_t expected_length = 0x2000;
@@ -2429,7 +2437,9 @@ static libspectrum_error
 write_rom_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr, size_t *length,
                  int *out_flags, libspectrum_snap *snap, int compress )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   size_t i, data_length = 0;
   size_t uncompressed_data_length = 0;
   libspectrum_byte *data, *rom_base;
@@ -2640,7 +2650,9 @@ write_ram_page( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		size_t *length, const char *id, const libspectrum_byte *data,
 		size_t data_length, int page, int compress, int extra_flags )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_byte *block_length, *flags, *compressed_data;
   int use_compression;
 
@@ -2734,7 +2746,9 @@ static libspectrum_error
 write_b128_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_byte *rom_data = NULL;
   libspectrum_byte *compressed_rom_data = NULL;
   size_t block_size;
@@ -2802,7 +2816,9 @@ static libspectrum_error
 write_if1_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		 size_t *length, libspectrum_snap *snap, int compress  )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_byte *rom_data = NULL; 
   libspectrum_byte *compressed_rom_data = NULL;
   size_t block_size;
@@ -2883,7 +2899,9 @@ static libspectrum_error
 write_opus_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress  )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_byte *rom_data, *ram_data; 
   libspectrum_byte *compressed_rom_data = NULL, *compressed_ram_data = NULL;
   size_t disk_rom_length, disk_ram_length, block_size;
@@ -2975,7 +2993,9 @@ static libspectrum_error
 write_plsd_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress  )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_byte *rom_data, *ram_data; 
   libspectrum_byte *compressed_rom_data = NULL, *compressed_ram_data = NULL;
   size_t disk_rom_length, disk_ram_length, block_size;
@@ -3209,7 +3229,9 @@ static libspectrum_error
 write_dide_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress )
 {
+#ifdef HAVE_ZLIB_H
   libspectrum_error error;
+#endif
   libspectrum_byte *eprom_data = NULL;
   libspectrum_byte *compressed_eprom_data = NULL;
   size_t block_size;
