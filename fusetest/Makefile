@@ -6,7 +6,7 @@
 Z80AS := pasmo
 Z80ASFLAGS := --alocal
 
-targets := contention.tap findcontention.tap fusetest.tap
+targets := contention.tap findcontention.tap fusetest.tap iocontention.tap
 
 all: $(targets)
 
