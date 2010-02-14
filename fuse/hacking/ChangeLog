@@ -3276,3 +3276,6 @@
          man/fuse.1,periph.c,settings.dat,ui/options.dat: add weak data handling
          capability so Fuse can deal with weak data if it present in the disk
          image (EDSK/UDI) (patch #2927624) (Gergely Szasz).
+20100215 ui/gtk/gtkkeyboard.c: account for group setting on key events to make
+         intertional keyboards work based on key positions rather than default
+         symbol (patch #2951275) (Michal Jurica).
