@@ -51,6 +51,12 @@
 #endif				/* _MSC_VER > 1200 */
 #endif				/* #ifdef _MSC_VER */
 
+/* VC6 lacks M_LN2, and VS2003+ require _USE_MATH_DEFINES defined before math.h
+ */
+#ifndef M_LN2
+#define M_LN2 0.693147180559945309417
+#endif
+
 /* On Win32 systems, map snprintf -> _snprintf, strcasecmp -> _stricmp and
    strncasecmp -> _strnicmp */
 #if !defined(HAVE_SNPRINTF) && defined(HAVE__SNPRINTF)
