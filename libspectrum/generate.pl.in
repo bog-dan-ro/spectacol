@@ -17,23 +17,23 @@ if( /LIBSPECTRUM_SNAP_ACCESSORS/ ) {
 
     my $return_type;
     if( $type =~ /^(.*)\*/ ) {
-	$return_type = "$1 WIN32_DLL *";
+	$return_type = "WIN32_DLL $1 *";
     } else {
-	$return_type = "$type WIN32_DLL";
+	$return_type = "WIN32_DLL $type";
     }
 
     if( $indexed ) {
 
 	print << "CODE";
 $return_type libspectrum_snap_$name( libspectrum_snap *snap, int idx );
-void WIN32_DLL libspectrum_snap_set_$name( libspectrum_snap *snap, int idx, $type $name );
+WIN32_DLL void libspectrum_snap_set_$name( libspectrum_snap *snap, int idx, $type $name );
 CODE
 
     } else {
 
 	print << "CODE";
 $return_type libspectrum_snap_$name( libspectrum_snap *snap );
-void WIN32_DLL libspectrum_snap_set_$name( libspectrum_snap *snap, $type $name );
+WIN32_DLL void libspectrum_snap_set_$name( libspectrum_snap *snap, $type $name );
 CODE
 
     }
@@ -59,23 +59,23 @@ if( /LIBSPECTRUM_TAPE_ACCESSORS/ ) {
 	
 	my $return_type;
 	if( $type =~ /^(.*)\*/ ) {
-	    $return_type = "$1 WIN32_DLL *";
+	    $return_type = "WIN32_DLL $1 *";
 	} else {
-	    $return_type = "$type WIN32_DLL";
+	    $return_type = "WIN32_DLL $type";
 	}
 
 	if( $indexed ) {
 
 	  print << "CODE";
 $return_type libspectrum_tape_block_$name( libspectrum_tape_block *block, size_t idx );
-libspectrum_error WIN32_DLL libspectrum_tape_block_set_$name( libspectrum_tape_block *block, $type \*$name );
+WIN32_DLL libspectrum_error libspectrum_tape_block_set_$name( libspectrum_tape_block *block, $type \*$name );
 CODE
 
 	} else {
 
 	print << "CODE";
 $return_type libspectrum_tape_block_$name( libspectrum_tape_block *block );
-libspectrum_error WIN32_DLL libspectrum_tape_block_set_$name( libspectrum_tape_block *block, $type $name );
+WIN32_DLL libspectrum_error libspectrum_tape_block_set_$name( libspectrum_tape_block *block, $type $name );
 CODE
     
 	}

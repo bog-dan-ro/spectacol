@@ -755,3 +755,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          patch #2533274) (Simon Owen).
 20100221 myglib/ghash.c: should use libspectrum_dword instead of uint32_t (part
          of patch #2533274) (Simon Owen).
+20100221 generate.pl.in,libspectrum.h.in,make-perl.c: WIN32_DLL
+         [__declspec(dllexport)] should be before the return type in
+         declarations, rather than between return type and function name (part
+         of patch #2533274) (Simon Owen).
