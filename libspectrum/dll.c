@@ -30,7 +30,7 @@
 BOOL APIENTRY
 DllMain( HANDLE module, DWORD reason, LPVOID opaque )
 {
-  switch( ul_reason_for_call ) {
+  switch( reason ) {
   case DLL_PROCESS_ATTACH:
   case DLL_THREAD_ATTACH:
   case DLL_THREAD_DETACH:

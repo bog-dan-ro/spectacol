@@ -749,3 +749,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20100116 internals.h,libspectrum.h.in,make-perl.c,szx.c: export
          libspectrum_zlib_inflate() and libspectrum_zlib_compress() (patch
          #2927624) (Gergely Szasz and Fred).
+20100221 dll.c: correct switch variable name (part of patch #2533274) (Simon
+         Owen).
