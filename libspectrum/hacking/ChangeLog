@@ -753,3 +753,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          Owen).
 20100221 warajevo_read.c: don't declare variables mid-block for C89 (part of
          patch #2533274) (Simon Owen).
+20100221 myglib/ghash.c: should use libspectrum_dword instead of uint32_t (part
+         of patch #2533274) (Simon Owen).

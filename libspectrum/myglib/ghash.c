@@ -254,7 +254,7 @@ g_str_hash (gconstpointer v)
 {
   /* 31 bit hash function */
   const signed char *p = v;
-  uint32_t h = *p;
+  libspectrum_dword h = *p;
 
   if (h)
     for (p += 1; *p != '\0'; p++)
