@@ -511,6 +511,7 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
 {
   libspectrum_tape_block *block =
     libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_RAW_DATA );
+  libspectrum_tape_block *last_block;
   libspectrum_error error;
   libspectrum_word compressed_size, decompressed_size;
   const libspectrum_byte *data = ptr + offset + 17;
@@ -585,7 +586,7 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
 
   /* Check if the last block was also a raw block of the same sample rate
      and with all 8 bits used in the last byte */
-  libspectrum_tape_block *last_block = libspectrum_tape_peek_last_block( tape );
+  last_block = libspectrum_tape_peek_last_block( tape );
   if( last_block &&
       libspectrum_tape_block_type( last_block ) ==
         LIBSPECTRUM_TAPE_BLOCK_RAW_DATA && 
