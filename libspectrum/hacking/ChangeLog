@@ -759,3 +759,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          [__declspec(dllexport)] should be before the return type in
          declarations, rather than between return type and function name (part
          of patch #2533274) (Simon Owen).
+20100221 internals.h: define __func__ in MSVC (part of patch #2533274) (Simon
+         Owen).

@@ -43,6 +43,14 @@
 #define GCC_PRINTF( fmtstring, args )
 #endif				/* #ifdef __GNUC__ */
 
+#ifdef _MSC_VER
+#if _MSC_VER > 1200		/* VC2005 or later */
+#define __func__ __FUNCTION__
+#else				/* #if _MSC_VER > 1200 */
+#define __func__ "__func__"
+#endif				/* _MSC_VER > 1200 */
+#endif				/* #ifdef _MSC_VER */
+
 /* On Win32 systems, map snprintf -> _snprintf, strcasecmp -> _stricmp and
    strncasecmp -> _strnicmp */
 #if !defined(HAVE_SNPRINTF) && defined(HAVE__SNPRINTF)
