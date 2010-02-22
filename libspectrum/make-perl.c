@@ -89,12 +89,18 @@ int main(void)
   if( sizeof( long ) == 8 ) {
     printf( "typedef unsigned long libspectrum_qword;\n" );
     printf( "typedef   signed long libspectrum_signed_qword;\n" );
+#if defined(_MSC_VER) && _MSC_VER <= 1200
+  } else {
+    printf( "typedef unsigned __int64 libspectrum_qword;\n" );
+    printf( "typedef   signed __int64 libspectrum_signed_qword;\n" );
+#else
   } else if( sizeof( long long ) == 8 ) {
     printf( "typedef unsigned long long libspectrum_qword;\n" );
     printf( "typedef   signed long long libspectrum_signed_qword;\n" );
   } else {
     fprintf( stderr, "No plausible 64 bit types found\n" );
     return 1;
+#endif
   }
 
 #endif				/* #ifdef HAVE_STDINT_H */
