@@ -53,6 +53,7 @@
 #include "snapshot.h"
 #include "timer/timer.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;
@@ -102,6 +103,42 @@ static gboolean gtkui_delete( GtkWidget *widget, GdkEvent *event,
 static void menu_options_filter_done( GtkWidget *widget, gpointer user_data );
 static void menu_machine_select_done( GtkWidget *widget, gpointer user_data );
 
+static const GtkTargetEntry drag_types[] =
+{
+    { "text/uri-list", GTK_TARGET_OTHER_APP, 0 }
+};
+
+static void gtkui_drag_data_received( GtkWidget *widget,
+                                      GdkDragContext *drag_context,
+                                      gint x, gint y,
+                                      GtkSelectionData *data,
+                                      guint info, guint time )
+{
+  static char uri_prefix[] = "file://";
+  char *filename, *p, *data_end;
+
+  if ( data && data->length > sizeof( uri_prefix ) ) {
+    filename = ( char * )( data->data + sizeof( uri_prefix ) - 1 );
+    data_end = ( char * )( data->data + data->length );
+    p = filename; 
+    do {
+      if ( *p == '\r' || *p == '\n' ) {
+        *p = '\0';
+	break;
+      }
+    } while ( p++ != data_end );
+
+    if ( ( filename = g_uri_unescape_string( filename, NULL ) ) != NULL ) {
+      fuse_emulation_pause();
+      utils_open_file( filename, settings_current.auto_load, NULL );
+      free( filename );
+      display_refresh_all();
+      fuse_emulation_unpause();
+    }
+  }
+  gtk_drag_finish(drag_context, FALSE, FALSE, time);
+}
+
 int
 ui_init( int *argc, char ***argv )
 {
@@ -133,6 +170,16 @@ ui_init( int *argc, char ***argv )
 		      GTK_SIGNAL_FUNC( gtkui_lose_focus ), NULL );
   gtk_signal_connect( GTK_OBJECT( gtkui_window ), "focus-in-event",
 		      GTK_SIGNAL_FUNC( gtkui_gain_focus ), NULL );
+
+  gtk_drag_dest_set( GTK_WIDGET( gtkui_window ),
+                     GTK_DEST_DEFAULT_ALL,
+                     drag_types,
+                     G_N_ELEMENTS( drag_types ),
+                     GDK_ACTION_COPY | GDK_ACTION_PRIVATE );
+                     /* GDK_ACTION_PRIVATE alone DNW with ROX-Filer */
+
+  gtk_signal_connect( GTK_OBJECT( gtkui_window ), "drag-data-received",
+		      GTK_SIGNAL_FUNC( gtkui_drag_data_received ), NULL );
 
   box = gtk_vbox_new( FALSE, 0 );
   gtk_container_add(GTK_CONTAINER(gtkui_window), box);

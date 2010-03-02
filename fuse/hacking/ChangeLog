@@ -3279,3 +3279,5 @@
 20100215 ui/gtk/gtkkeyboard.c: account for group setting on key events to make
          intertional keyboards work based on key positions rather than default
          symbol (patch #2951275) (Michal Jurica).
+20100302 ui/gtk/gtkui.c: implement drag and drop support (patch #2961519)
+         (Dmitry Semyonov).

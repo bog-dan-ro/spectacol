@@ -25,6 +25,7 @@
           that use the 128K sound ports (Fredrick Meunier).
         * Add support for Pentagon 1024SL v2.2 16 colour mode (Fredrick
           Meunier).
+        * Implement GTK+ drag and drop support (Dmitry Semyonov).
 
         * Miscellaneous improvements:
           * Preformat new disks on +3 to allow the format command on +3 to work
