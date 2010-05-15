@@ -3282,3 +3282,4 @@
 20100302 ui/gtk/gtkui.c: implement drag and drop support (patch #2961519)
          (Dmitry Semyonov).
 20100506 debugger/{command.c,debugger_internals.h},ula.c: fix gcc 4.4 warnings.
+20100515 disk/upd_fdc.c: fix valgrind warning.

@@ -396,6 +396,7 @@ upd_fdc_alloc_fdc( upd_type_t type, upd_clock_t clock )
   for( i = 0; i < 4; i++ )
     f->drive[i] = NULL;
   f->current_drive = NULL;
+  f->speedlock = 0;
   upd_fdc_master_reset( f );
   return f;
 }
