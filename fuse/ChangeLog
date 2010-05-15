@@ -1,13 +1,13 @@
-2009-xx-xx  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2010-xx-xx  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
-        * Fuse ?.??.? released
+        * Fuse 0.11.0 released
 
-        FIXME: Just a start, mostly changes visible on Fuse for OS X at the
-        moment
         * Add Opus Discovery disk interface support (Gergely Szasz and Fredrick
           Meunier).
-        * Wii support.
-        * Many improvements to Win32 UI (Marek Januszewski).
+        * Wii support (Bjoern Giesler, Philip Kendall, Marek Januszewski).
+        * Many improvements to Win32 UI, including an installer (Marek
+          Januszewski).
+        * Support weak data in +3 disk images (Gergely Szasz).
         * Add support for flipping disk images in single sided drives (Gergely
           Szasz).
         * Add support for automatically merging both both disk images where
@@ -26,6 +26,17 @@
         * Add support for Pentagon 1024SL v2.2 16 colour mode (Fredrick
           Meunier).
         * Implement GTK+ drag and drop support (Dmitry Semyonov).
+        * Better support for international keyboards (Michal Jurica).
+        * Allow svgalib UI to use full range of bit depths and scalers (Gergely
+          Szasz).
+        * Allow GTK+ scalers to set window size in GTK+ UI (rkd77, Fredrick
+          Meunier).
+        * Allow Beta interfaces to be used in 48K and 128K machines (thanks,
+          Omikron)
+        * Allow selection of "TV speaker" or "beeper"-style sound output
+          (Fredrick Meunier)
+        * Allow hot-key switching between full-screen and windowed mode in
+          SDL UI (György Szombathelyi).
 
         * Miscellaneous improvements:
           * Preformat new disks on +3 to allow the format command on +3 to work
@@ -38,6 +49,30 @@
             notebooks (thanks, Andrew Owen) (Fredrick Meunier).
           * Fixes for speed estimation (Gergely Szasz).
           * Fix border colour in Timex HiRes screenshots (Fredrick Meunier).
+          * Fix accelerated loaders when compiling with gcc 3.x (Carlos
+            Almeida, Alberto Garcia and Philip Kendall).
+          * Allow "combo" boxes in widget UI (Gergely Szasz).
+          * Allow Home and End keys to work in widget UI (Gergely Szasz).
+          * Fix poke finder passing the wrong page to the debugger (Marek
+            Januszewski).
+          * Ensure joystick code always activates fire buttons correctly
+            (thanks, anonymous user)
+          * Don't fire joystick fire button events unless they've actually
+            changed (Fredrick Meunier; thanks, Phil Reynolds).
+          * Make svgalib UI use event interface rather than polling (thanks,
+            anonymous user).
+          * Ensure empty XML elements can't cause a segfault (thanks,
+            anonymous user).
+          * Tweak sector padding to fix Opus ATC+Technician Ted.dsk (Gergely
+            Szasz; thanks, Simon Owen).
+          * Z80 NMI should take some time (Fredrick Meunier).
+          * Ensure netbooks always recognise the enter key (Fredrick Meunier;
+            thanks, Marce).
+          * Add a --without-png option to configure for Gentoo (José Manuel
+            Ferrer Ortiz)
+
+        * Many other things I forgot. If you contributed something and would
+          like to be mentioned here, please mail me.
 
 2008-12-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
