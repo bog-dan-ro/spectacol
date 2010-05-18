@@ -3287,3 +3287,6 @@
 20100516 ui/ui.h: include widget.h if we are going to refer to widget_finish()
          (Fred)
 20100516 ui/widget/menu.c: supply a format to avoid warnings (Fred)
+20100516 debugger/commandl.l: have a second go at eliminating warnings when
+         calling debugger_command_input() on platforms where yy_size_t isn't an
+         int in a way that works for platforms where it is (Fred)

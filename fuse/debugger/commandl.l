@@ -37,7 +37,9 @@
 
 #define YY_INPUT(buf,result,max_size) \
 { \
-  if( !debugger_command_input( buf, &result, max_size ) ) result = YY_NULL; \
+  int retval; \
+  if( !debugger_command_input( buf, &retval, max_size ) ) retval = YY_NULL; \
+  result = (yy_size_t)retval; \
 }
 
 #define YY_NO_INPUT
