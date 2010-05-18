@@ -3284,3 +3284,5 @@
 20100506 debugger/{command.c,debugger_internals.h},ula.c: fix gcc 4.4 warnings.
 20100515 disk/upd_fdc.c: fix valgrind warning.
 20100515 ChangeLog: update.
+20100516 ui/ui.h: include widget.h if we are going to refer to widget_finish()
+         (Fred)

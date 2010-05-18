@@ -266,6 +266,7 @@ char *ui_get_save_filename( const char *title );
 int ui_query( const char *message );
 
 #ifdef USE_WIDGET
+#include "ui/widget/widget.h"
 #define ui_widget_finish() widget_finish()
 #else				/* #ifdef USE_WIDGET */
 #define ui_widget_finish()
