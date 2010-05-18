@@ -234,7 +234,7 @@ print_items( void )
     int colour;
     if( !menu[i+1].text[0] ) { height += 4; continue; }
 
-    snprintf( buffer, sizeof (buffer), menu[i+1].text );
+    snprintf( buffer, sizeof (buffer), "%s", menu[i+1].text );
     colour = menu[i+1].inactive ?
 	     WIDGET_COLOUR_DISABLED :
 	     WIDGET_COLOUR_FOREGROUND;
@@ -578,8 +578,8 @@ menu_machine_select( int action )
 
   for( i = 0; i < machine_count; i++ ) {
     options[i] = &buffer[ i * 40 ];
-    snprintf( options[i], 40,
-	      libspectrum_machine_name( machine_types[i]->machine ) );
+    snprintf( options[i], 40, "%s",
+              libspectrum_machine_name( machine_types[i]->machine ) );
     if( machine_current->machine == machine_types[i]->machine )
       info.current = i;
   }

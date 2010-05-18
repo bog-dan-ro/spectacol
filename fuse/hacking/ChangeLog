@@ -3286,3 +3286,4 @@
 20100515 ChangeLog: update.
 20100516 ui/ui.h: include widget.h if we are going to refer to widget_finish()
          (Fred)
+20100516 ui/widget/menu.c: supply a format to avoid warnings (Fred)
