@@ -148,8 +148,8 @@ specplus3_765_init( void )
     d->disk.flag = DISK_FLAG_PLUS3_CPC;
   }
 					/* builtin drive 1 head 42 track */
-  fdd_init( &specplus3_drives[ 0 ].fdd, FDD_SHUGART, 1, 42, 0 );
-  fdd_init( &specplus3_drives[ 1 ].fdd, FDD_SHUGART, 0, 0, 0 );	/* drive geometry 'autodetect' */
+  fdd_init( &specplus3_drives[ 0 ].fdd, FDD_SHUGART, &fdd_params[ 1 ], 0 );
+  fdd_init( &specplus3_drives[ 1 ].fdd, FDD_SHUGART, NULL, 0 );	/* drive geometry 'autodetect' */
   specplus3_fdc->set_intrq = NULL;
   specplus3_fdc->reset_intrq = NULL;
   specplus3_fdc->set_datarq = NULL;
@@ -165,12 +165,10 @@ specplus3_765_reset( void )
 
   upd_fdc_master_reset( specplus3_fdc );
   dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3a_type() + 1 ];	/* +1 => there is no `Disabled' */
-  fdd_init( &specplus3_drives[ 0 ].fdd, FDD_SHUGART,
-	    dt->heads, dt->cylinders, 1 );
+  fdd_init( &specplus3_drives[ 0 ].fdd, FDD_SHUGART, dt, 1 );
 
   dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3b_type() ];
-  fdd_init( &specplus3_drives[ 1 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
-	    dt->heads, dt->cylinders, 1 );
+  fdd_init( &specplus3_drives[ 1 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE, dt, 1 );
 }
 
 static int

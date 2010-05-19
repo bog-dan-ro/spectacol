@@ -120,7 +120,7 @@ int fdd_init_events( void );
 
 const char *fdd_strerror( int error );
 /* initialize the fdd_t struct, and set fdd_heads and cylinders (e.g. 2/83 ) */
-int fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls, int reinit );
+int fdd_init( fdd_t *d, fdd_type_t type, const fdd_params_t *dt, int reinit );
 /* load the given disk into the fdd. if upsidedown = 1, floppy upsidedown in drive :) */
 int fdd_load( fdd_t *d, disk_t *disk, int upsidedown );
 /* unload the disk from fdd */

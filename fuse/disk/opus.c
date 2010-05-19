@@ -126,7 +126,7 @@ opus_init( void )
 
   for( i = 0; i < OPUS_NUM_DRIVES; i++ ) {
     d = &opus_drives[ i ];
-    fdd_init( &d->fdd, FDD_SHUGART, 0, 0, 0 );	/* drive geometry 'autodetect' */
+    fdd_init( &d->fdd, FDD_SHUGART, NULL, 0 );	/* drive geometry 'autodetect' */
     d->disk.flag = DISK_FLAG_NONE;
   }
 
@@ -200,8 +200,7 @@ opus_reset( int hard_reset )
 
   /* We can eject disks only if they are currently present */
   dt = &fdd_params[ option_enumerate_diskoptions_drive_opus1_type() + 1 ];	/* +1 => there is no `Disabled' */
-  fdd_init( &opus_drives[ OPUS_DRIVE_1 ].fdd, FDD_SHUGART,
-	    dt->heads, dt->cylinders, 1 );
+  fdd_init( &opus_drives[ OPUS_DRIVE_1 ].fdd, FDD_SHUGART, dt, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_OPUS_1, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_OPUS_1_EJECT,
 		    opus_drives[ OPUS_DRIVE_1 ].fdd.loaded );
@@ -212,8 +211,7 @@ opus_reset( int hard_reset )
 
 
   dt = &fdd_params[ option_enumerate_diskoptions_drive_opus2_type() ];
-  fdd_init( &opus_drives[ OPUS_DRIVE_2 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
-	    dt->heads, dt->cylinders, 1 );
+  fdd_init( &opus_drives[ OPUS_DRIVE_2 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE, dt, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_OPUS_2, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_OPUS_2_EJECT,
 		    opus_drives[ OPUS_DRIVE_2 ].fdd.loaded );

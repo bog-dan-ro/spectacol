@@ -3290,3 +3290,8 @@
 20100516 debugger/commandl.l: have a second go at eliminating warnings when
          calling debugger_command_input() on platforms where yy_size_t isn't an
          int in a way that works for platforms where it is (Fred)
+20100519 disk/{beta.c,fdd.[ch],opus.c,plusd.c},machines/specplus3.c,
+         settings.dat: extend 80 track drives to accept disks up to 84 tracks
+         and 40 track drives to accept disks up to 42 tracks. Also add options
+         to allow these limits to be overridden (fixes bug #3002653) (Gergely
+         Szasz).

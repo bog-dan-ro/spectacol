@@ -222,6 +222,8 @@ drive_plusd1_type, string, NULL
 drive_plusd2_type, string, NULL
 drive_opus1_type, string, NULL
 drive_opus2_type, string, NULL
+drive_40_max_track, numeric, 42
+drive_80_max_track, numeric, 84
 
 disk_try_merge, string, NULL
 disk_ask_merge, boolean, 1

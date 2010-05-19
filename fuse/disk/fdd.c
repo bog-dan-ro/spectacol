@@ -35,10 +35,13 @@
 #include "fdd.h"
 #include "machine.h"
 #include "spectrum.h"
+#include "settings.h"
 
 #define FDD_LOAD_FACT 2
-#define FDD_HEAD_FACT 16			/* load head */
+#define FDD_HEAD_FACT 16		/* load head */
 #define FDD_STEP_FACT 34
+#define FDD_MAX_TRACK 99		/* absolute maximum number of track*/
+#define FDD_TRACK_TRESHOLD 10		/* unreadable disk*/
 
 static const char *fdd_error[] = {
   "OK",
@@ -51,10 +54,10 @@ static const char *fdd_error[] = {
 
 const fdd_params_t fdd_params[] = {
   { 0, 0, 0 },		/* Disabled */
-  { 1, 1, 42 },		/* Single-sided 40 track */
-  { 1, 2, 42 },		/* Double-sided 80 track */
-  { 1, 1, 83 },		/* Single-sided 40 track */
-  { 1, 2, 83 }		/* Double-sided 80 track */
+  { 1, 1, 40 },		/* Single-sided 40 track */
+  { 1, 2, 40 },		/* Double-sided 80 track */
+  { 1, 1, 80 },		/* Single-sided 40 track */
+  { 1, 2, 80 }		/* Double-sided 80 track */
 };
 
 static void
@@ -129,12 +132,13 @@ fdd_set_data( fdd_t *d, int fact )
 
 /* initialise fdd */
 int
-fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls, int reinit )
+fdd_init( fdd_t *d, fdd_type_t type, const fdd_params_t *dt, int reinit )
 {
   int upsidedown = d->upsidedown;
   int selected = d->selected;
   int do_read_weak = d->do_read_weak;
   disk_t *disk = d->disk;
+  if( dt == NULL ) dt = &fdd_params[0];
 
   d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = 0;
   d->upsidedown = d->unreadable = d->loaded = d->auto_geom = d->selected = 0;
@@ -145,13 +149,13 @@ fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls, int reinit )
     d->index = d->tr00 = d->wrprot = 1;
   d->type = type;
 
-  if( heads < 0 || heads > 2 || cyls < 0 || cyls > 83 )
+  if( dt->heads < 0 || dt->heads > 2 || dt->cylinders < 0 || dt->cylinders > FDD_MAX_TRACK )
     return d->status = FDD_GEOM;
 
-  if( heads == 0 || cyls == 0 )
+  if( dt->heads == 0 )
     d->auto_geom = 1;
-  d->fdd_heads = heads;
-  d->fdd_cylinders = cyls;
+  d->fdd_heads = dt->heads;
+  d->fdd_cylinders = dt->cylinders == 80 ? settings_current.drive_80_max_track : settings_current.drive_40_max_track;
   if( reinit ) {
     d->selected = selected;
     d->do_read_weak = do_read_weak;
@@ -233,15 +237,16 @@ fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
     return d->status = FDD_NONE;
 
   if( disk->sides < 0 || disk->sides > 2 ||
-      disk->cylinders < 0 || disk->cylinders > 83 )
+      disk->cylinders < 0 || disk->cylinders > FDD_MAX_TRACK )
     return d->status = FDD_GEOM;
 
   if( d->auto_geom )
     d->fdd_heads = disk->sides;		/* 1 or 2 */
   if( d->auto_geom )
-    d->fdd_cylinders = disk->cylinders > 42 ? 83 : 42;
+    d->fdd_cylinders = disk->cylinders > settings_current.drive_40_max_track ?
+				settings_current.drive_80_max_track : settings_current.drive_40_max_track;
 
-  if( disk->cylinders > d->fdd_cylinders )
+  if( disk->cylinders > d->fdd_cylinders + FDD_TRACK_TRESHOLD )
     d->unreadable = 1;
 
   d->disk = disk;

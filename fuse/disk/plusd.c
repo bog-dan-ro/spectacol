@@ -138,7 +138,7 @@ plusd_init( void )
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     d = &plusd_drives[ i ];
-    fdd_init( &d->fdd, FDD_SHUGART, 0, 0, 0 );	/* drive geometry 'autodetect' */
+    fdd_init( &d->fdd, FDD_SHUGART, NULL, 0 );
     d->disk.flag = DISK_FLAG_NONE;
   }
 
@@ -205,9 +205,8 @@ plusd_reset( int hard_reset )
   }
 
   /* We can eject disks only if they are currently present */
-  dt = &fdd_params[ option_enumerate_diskoptions_drive_plusd1_type() + 1 ];	/* +1 => there is no `Disabled' */
-  fdd_init( &plusd_drives[ PLUSD_DRIVE_1 ].fdd, FDD_SHUGART,
-	    dt->heads, dt->cylinders, 1 );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_plusd1_type() + 1 ];
+  fdd_init( &plusd_drives[ PLUSD_DRIVE_1 ].fdd, FDD_SHUGART, dt, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
 		    plusd_drives[ PLUSD_DRIVE_1 ].fdd.loaded );
@@ -218,8 +217,7 @@ plusd_reset( int hard_reset )
 
 
   dt = &fdd_params[ option_enumerate_diskoptions_drive_plusd2_type() ];
-  fdd_init( &plusd_drives[ PLUSD_DRIVE_2 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
-	    dt->heads, dt->cylinders, 1 );
+  fdd_init( &plusd_drives[ PLUSD_DRIVE_2 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE, dt, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
 		    plusd_drives[ PLUSD_DRIVE_2 ].fdd.loaded );
