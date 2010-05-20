@@ -3296,5 +3296,4 @@
          to allow these limits to be overridden (fixes bug #3002653) (Gergely
          Szasz).
 20100520 ChangeLog,README,configure.in,man/fuse.1: merge Release_0_10_0-branch
-         changes from 10.0.2 onto trunk (Fred).
-
+         changes from 0.10.0.2 onto trunk (Fred).
