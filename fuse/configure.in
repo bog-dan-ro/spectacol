@@ -24,7 +24,7 @@ AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_SYSTEM
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.10.0.1)
+AM_INIT_AUTOMAKE(fuse, 0.10.0.2)
 
 dnl Checks for programs.
 AC_PROG_CC

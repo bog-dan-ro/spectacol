@@ -74,6 +74,26 @@
         * Many other things I forgot. If you contributed something and would
           like to be mentioned here, please mail me.
 
+2009-01-14  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+	* Fuse 0.10.0.2 released
+
+	* Make loader acceleration work on all compilers (Philip Kendall;
+	  thanks, Carlos Almeida, Alberto Garcia and Alexander Yurchenko).
+
+	* Make the "Don't Save" option in the widget UI do the right thing
+	  (Frederick Meunier).
+
+	* Allow both +3 disk drives to be used at once (Gergely Szasz).
+
+	* Allow both +D disk drives to be used at once (Gergely Szasz).
+
+	* Make .dsk code handle missing newline on "Track-Info" header
+	  (Gergely Szasz; thanks, Simon Owen).
+
+	* Remove unnecessary 'use' directive when building widget options
+	  header file; fixes some build issues (Frederick Meunier)    
+
 2008-12-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 0.10.0.1 released

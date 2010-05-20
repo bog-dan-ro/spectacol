@@ -3295,3 +3295,6 @@
          and 40 track drives to accept disks up to 42 tracks. Also add options
          to allow these limits to be overridden (fixes bug #3002653) (Gergely
          Szasz).
+20100520 ChangeLog,README,configure.in,man/fuse.1: merge Release_0_10_0-branch
+         changes from 10.0.2 onto trunk (Fred).
+
