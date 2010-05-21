@@ -3068,7 +3068,7 @@
          wrong page for the possible found location to the debugger (Marek).
 20090309 ui/widget/text.c: fix display of widget text entry boxes (Fred).
 20090309 ui/widget/options.pl: fixes for widget options when multiple options
-         are changes in one session (fixes bug #2673198) (Gergely Szasz).
+         are changed in one session (fixes bug #2673198) (Gergely Szasz).
 20090315 ui/widget/{menu.c,widget_internals.h,select.c,widget.c,options.pl},
          ui/gtk/{options-header.pl,options.pl},
          ui/win32/{options-resource.pl,options-header.pl}: add a new "Combo"
@@ -3297,3 +3297,4 @@
          Szasz).
 20100520 ChangeLog,README,configure.in,man/fuse.1: merge Release_0_10_0-branch
          changes from 0.10.0.2 onto trunk (Fred).
+20100521 ChangeLog: remove duplicate entry (Fred).

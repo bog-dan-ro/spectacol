@@ -31,8 +31,6 @@
           Szasz).
         * Allow GTK+ scalers to set window size in GTK+ UI (rkd77, Fredrick
           Meunier).
-        * Allow Beta interfaces to be used in 48K and 128K machines (thanks,
-          Omikron)
         * Allow selection of "TV speaker" or "beeper"-style sound output
           (Fredrick Meunier)
         * Allow hot-key switching between full-screen and windowed mode in
