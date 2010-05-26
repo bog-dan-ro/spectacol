@@ -765,3 +765,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          #2533274) (Simon Owen).
 20100222 make-perl.c: VC6 has __int64 instead of long long (Fred; thanks, Simon
          Owen).
+20100526 tape_block.c: declare libspectrum_bits_set_n_bits static as it isn't
+         used outside it's file to silence a warning on LLVM 4.2 (Fred).

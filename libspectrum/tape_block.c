@@ -447,7 +447,7 @@ static int bits_set[ BITS_SET_ARRAY_SIZE ];
 
 static const int LIBSPECTRUM_BITS_IN_BYTE = 8;
 
-int
+static int
 libspectrum_bits_set_n_bits( libspectrum_byte byte, libspectrum_byte bits )
 {
   int i;
