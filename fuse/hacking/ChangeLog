@@ -3299,3 +3299,5 @@
          changes from 0.10.0.2 onto trunk (Fred).
 20100521 ChangeLog: remove duplicate entry (Fred).
 20100522 sound.c: allow a little more treble in the TV Speaker mode (Fred).
+20100527 sound/coreaudiosound.c: add some casts in output statements to avoid
+         annoying warnings about format mismatches (Fred).
