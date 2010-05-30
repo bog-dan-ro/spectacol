@@ -3301,3 +3301,4 @@
 20100522 sound.c: allow a little more treble in the TV Speaker mode (Fred).
 20100527 sound/coreaudiosound.c: add some casts in output statements to avoid
          annoying warnings about format mismatches (Fred).
+20100530 ChangeLog: remove another duplicate entry (Fred).

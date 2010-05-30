@@ -47,8 +47,6 @@
             notebooks (thanks, Andrew Owen) (Fredrick Meunier).
           * Fixes for speed estimation (Gergely Szasz).
           * Fix border colour in Timex HiRes screenshots (Fredrick Meunier).
-          * Fix accelerated loaders when compiling with gcc 3.x (Carlos
-            Almeida, Alberto Garcia and Philip Kendall).
           * Allow "combo" boxes in widget UI (Gergely Szasz).
           * Allow Home and End keys to work in widget UI (Gergely Szasz).
           * Fix poke finder passing the wrong page to the debugger (Marek
