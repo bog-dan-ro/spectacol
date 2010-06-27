@@ -96,7 +96,7 @@ static int gtkdisplay_current_size=1;
 
 static int init_colours( void );
 static void gtkdisplay_area(int x, int y, int width, int height);
-static void register_scalers( void );
+static void register_scalers( int force_scaler );
 
 /* Callbacks */
 
@@ -161,7 +161,7 @@ uidisplay_init( int width, int height )
   image_width = width; image_height = height;
   image_scale = width / DISPLAY_ASPECT_WIDTH;
 
-  register_scalers();
+  register_scalers( 0 );
 
   display_refresh_all();
 
@@ -174,7 +174,7 @@ uidisplay_init( int width, int height )
 }
 
 static int
-drawing_area_resize( int width, int height )
+drawing_area_resize( int width, int height, int force_scaler )
 {
   int size;
 
@@ -187,7 +187,7 @@ drawing_area_resize( int width, int height )
 
   gtkdisplay_current_size = size;
 
-  register_scalers();
+  register_scalers( force_scaler );
 
   memset( scaled_image, 0, sizeof( scaled_image ) );
   display_refresh_all();
@@ -196,8 +196,10 @@ drawing_area_resize( int width, int height )
 }
 
 static void
-register_scalers( void )
+register_scalers( int force_scaler )
 {
+  scaler_type scaler;
+
   scaler_register_clear();
 
   if( machine_current->timex ) {
@@ -224,11 +226,18 @@ register_scalers( void )
   scaler_register( SCALER_NORMAL );
   scaler_register( SCALER_PALTV );
 
-  if( scaler_is_supported( current_scaler ) ) {
-    scaler_select_scaler( current_scaler );
-  } else {
-    scaler_select_scaler( SCALER_NORMAL );
+  scaler =
+    scaler_is_supported( current_scaler ) ? current_scaler : SCALER_NORMAL;
+
+  if( force_scaler ) {
+    switch( gtkdisplay_current_size ) {
+    case 1: scaler = SCALER_NORMAL; break;
+    case 2: scaler = SCALER_DOUBLESIZE; break;
+    case 3: scaler = SCALER_TRIPLESIZE; break;
+    }
   }
+
+  scaler_select_scaler( scaler );
 }
 
 void
@@ -331,7 +340,7 @@ uidisplay_hotswap_gfx_mode( void )
   gtk_drawing_area_size( GTK_DRAWING_AREA( gtkui_drawing_area ),
                          scale * image_width, scale * image_height );
 
-  drawing_area_resize( scale * image_width, scale * image_height );
+  drawing_area_resize( scale * image_width, scale * image_height, 0 );
  
   gtk_window_resize( GTK_WINDOW( gtkui_window ), scale * image_width,
                      scale * image_height );
@@ -453,6 +462,6 @@ static gint
 drawing_area_resize_callback( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
                               gpointer data GCC_UNUSED )
 {
-  drawing_area_resize( event->configure.width, event->configure.height );
+  drawing_area_resize( event->configure.width, event->configure.height, 1 );
   return TRUE;
 }

@@ -3302,3 +3302,5 @@
 20100527 sound/coreaudiosound.c: add some casts in output statements to avoid
          annoying warnings about format mismatches (Fred).
 20100530 ChangeLog: remove another duplicate entry (Fred).
+20100627 ui/gtk/gtkdisplay.c: ensure an appropriate scaler is selected when
+         the Fuse window is resized by the user.
