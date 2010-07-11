@@ -1229,7 +1229,7 @@ Free the memory used by an input recording object as allocated by
 void
 libspectrum_rzx_start_input( libspectrum_rzx *rzx, libspectrum_dword tstates )
 
-Start an input recording block int the object.
+Start an input recording block in the object.
 
 libspectrum_error libspectrum_rzx_stop_input( libspectrum_rzx *rzx )
 
