@@ -102,6 +102,8 @@ typedef struct buffer_t {		/* to store buffer data */
   size_t index;
 } buffer_t;
 
+void disk_update_tlens( disk_t *d );
+
 const char *
 disk_strerror( int error )
 {
@@ -742,6 +744,7 @@ disk_new( disk_t *d, int sides, int cylinders,
 
   d->wrprot = 0;
   d->dirty = 0;
+  disk_update_tlens( d );
   return d->status = DISK_OK;
 }
 
