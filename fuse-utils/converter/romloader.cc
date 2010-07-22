@@ -182,7 +182,7 @@ romloader::end_block( double end_marker, double end_tstates )
   bool isHeader = data.size() == 19 && data[0] == 0x00;
   std::cout << "Type: " << (isHeader ? "Header" : "Data") << "\n";
   if( isHeader ) {
-    switch( data[0]) {
+    switch( data[1]) {
     case 0:
       std::cout << "Program: ";
       break;
@@ -199,7 +199,7 @@ romloader::end_block( double end_marker, double end_tstates )
       std::cout << "Unknown: ";
       break;
     }
-    for( int i = 1; i < 11; i++) {
+    for( int i = 2; i < 12; i++) {
       std::cout << data[i];
     }
     std::cout << "\n";
