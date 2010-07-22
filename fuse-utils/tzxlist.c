@@ -117,6 +117,64 @@ hardware_desc( int type, int id )
   }
 }
 
+static void
+check_checksum(unsigned long length, libspectrum_byte * data)
+{
+  int retval = 0;
+  libspectrum_byte checksum = 0;
+  if( length ) {
+    size_t i;
+    for( i = 0; i < length-1; i++ ) {
+      checksum ^= data[i];
+    }
+    retval = checksum == data[length-1];
+  }
+
+  printf("  Checksum: %s\n", (retval ? "pass" : "fail"));
+}
+
+static void
+print_block_name( libspectrum_byte * data )
+{
+  int i;
+  for( i = 2; i < 12; i++) {
+    printf("%c", data[i]);
+  }
+}
+
+static void
+decode_header( libspectrum_tape_block *block )
+{
+  unsigned long length = libspectrum_tape_block_data_length( block );
+  libspectrum_byte * data = libspectrum_tape_block_data( block );
+  int is_header = length == 19 && data[0] == 0x00;
+  if(is_header) {
+    switch( data[1] ) {
+    case 0:
+      printf("  Program: ");
+      print_block_name( data );
+      break;
+    case 1:
+      printf("  Number Array: ");
+      print_block_name( data );
+      break;
+    case 2:
+      printf("  Character Array: ");
+      print_block_name( data );
+      break;
+    case 3:
+      printf("  CODE: ");
+      print_block_name( data );
+      break;
+    default:
+      printf("  Unknown");
+      break;
+    }
+    printf("\n");
+  }
+  check_checksum(length, data);
+}
+
 static int
 process_tape( char *filename )
 {
@@ -163,10 +221,13 @@ process_tape( char *filename )
     switch( libspectrum_tape_block_type( block ) ) {
 
     case LIBSPECTRUM_TAPE_BLOCK_ROM:
-      printf("  Data length: %ld bytes\n",
-	     (unsigned long)libspectrum_tape_block_data_length( block ) );
-      printf("  Pause length: %d ms\n",
-	     libspectrum_tape_block_pause( block ) );
+      {
+        printf("  Data length: %ld bytes\n",
+               (unsigned long)libspectrum_tape_block_data_length( block ) );
+        decode_header( block );
+        printf("  Pause length: %d ms\n",
+               libspectrum_tape_block_pause( block ) );
+      }
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_TURBO:
