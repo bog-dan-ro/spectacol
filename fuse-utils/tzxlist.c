@@ -27,6 +27,12 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#endif /* #ifdef HAVE_ICONV */
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif /* #ifdef HAVE_LOCALE_H */
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -39,6 +45,10 @@
 #define DESCRIPTION_LENGTH 80
 
 const char *progname;
+
+#ifdef HAVE_ICONV
+static iconv_t conversion_descriptor;
+#endif /* #ifdef HAVE_ICONV */
 
 static void
 dump_symbol_table( libspectrum_tape_generalised_data_symbol_table *table )
@@ -115,6 +125,55 @@ hardware_desc( int type, int id )
     }
   default: return "Unknown type";
   }
+}
+
+/* A simple routine to convert the input text to another character encoding.
+   We really are only thinking about simple conversions of accented characters,
+   the pound and Euro signs so just reserve 3x the input buffer size to give
+   "plenty" of space for the most common encondings and let any failure in
+   conversion fall back to just returning the source string unmodified */
+static char *
+convert_charset( char *input )
+{
+#ifdef HAVE_ICONV
+  const int expansion_factor = 3;
+  static char *output = NULL;
+  static size_t output_size = 0;
+  char* output_ptr = output;
+  size_t output_left = output_size;
+  ICONV_CONST char* input_ptr = input;
+  size_t input_left = strlen( input ) + 1;
+  size_t min_output_size = input_left * expansion_factor;
+ 
+  if( conversion_descriptor == (iconv_t)(-1) ) return input;
+
+  if( output_size == 0 || output_size < min_output_size ) {
+    output = realloc( output, min_output_size );
+    if( output == NULL ) {
+      output_size = 0;
+      return input;
+    }
+    output_ptr = output;
+    output_size = input_left * expansion_factor;
+    output_left = output_size;
+    *output = '\0';
+  } 
+
+  if( (size_t)(-1) == iconv( conversion_descriptor, &input_ptr, &input_left,
+                             &output_ptr, &output_left ) ) {
+    return input;
+  }
+
+  /* Write the byte sequence to get into the initial state if required. */
+  if( (size_t)(-1) == iconv( conversion_descriptor, NULL, NULL, &output_ptr,
+                             &output_left ) ) {
+    return input;
+  }
+
+  return output;
+#else  /* #ifdef HAVE_ICONV */
+  return input;
+#endif /* #ifdef HAVE_ICONV */
 }
 
 static void
@@ -288,7 +347,8 @@ process_tape( char *filename )
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
-      printf("  Name: %s\n", libspectrum_tape_block_text( block ) );
+      printf("  Name: %s\n", 
+                    convert_charset( libspectrum_tape_block_text( block ) ) );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
@@ -310,7 +370,7 @@ process_tape( char *filename )
       for( i = 0; i < libspectrum_tape_block_count( block ); i++ ) {
 	printf("  Choice %2ld: Offset %d: %s\n", (unsigned long)i,
 	       libspectrum_tape_block_offsets( block, i ),
-	       libspectrum_tape_block_texts( block, i )            );
+               convert_charset( libspectrum_tape_block_texts( block, i ) ) );
       }
       break;
 
@@ -321,7 +381,8 @@ process_tape( char *filename )
       /* Fall through */
 
     case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
-      printf("  Comment: %s\n", libspectrum_tape_block_text( block ) );
+      printf("  Comment: %s\n", 
+               convert_charset( libspectrum_tape_block_text( block ) ) );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
@@ -340,7 +401,8 @@ process_tape( char *filename )
 	case 255: printf("   Comment:"); break;
 	 default: printf("(Unknown string): "); break;
 	}
-	printf(" %s\n", libspectrum_tape_block_texts( block, i ) );
+	printf(" %s\n", 
+               convert_charset( libspectrum_tape_block_texts( block, i ) ));
       }
       break;
 
@@ -362,7 +424,8 @@ process_tape( char *filename )
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
-      printf( "  Description: %s\n", libspectrum_tape_block_text( block ) );
+      printf( "  Description: %s\n", 
+                    convert_charset( libspectrum_tape_block_text( block ) ) );
       printf( "       Length: %ld bytes\n",
 	      (unsigned long)libspectrum_tape_block_data_length( block ) );
       break;
@@ -401,8 +464,27 @@ main( int argc, char **argv )
 
   error = init_libspectrum(); if( error ) return error;
 
+#ifdef HAVE_ICONV
+  /* Looks like GNU libc iconv needs to have the character type locale set
+     to do the current locale target thing (but oddly GNU libiconv doesn't) */
+#ifdef HAVE_SETLOCALE
+  setlocale(LC_CTYPE, "");
+#endif /* #ifdef HAVE_SETLOCALE */
+  /* Convert from Windows code page 1252 to our current locale.
+     CP1252 is a valid name of the Windows-1252 charset used by WoS, Tapir and
+     ZX-Blockeditor on at least Linux, MacOS X and Solaris 9. If we need to use
+     another string on another OS we will need to do a little more */
+  conversion_descriptor = iconv_open("", "CP1252");
+#endif /* #ifdef HAVE_ICONV */
+
   while( ++arg < argc )
     ret |= process_tape( argv[arg] );
+
+#ifdef HAVE_ICONV
+  if( conversion_descriptor != (iconv_t)(-1) ) {
+    error = iconv_close( conversion_descriptor ); if( error ) return error;
+  }
+#endif /* #ifdef HAVE_ICONV */
 
   return ret;
 }

@@ -302,3 +302,6 @@
          (Fred).
 20100722 converter/romloader.cc: fix header printing (Fred).
 20100722 tzxlist.c: add ROM block header printing (Fred).
+20100806 Makefile.am,acinclude.m4,config.rpath,configure.in,man/tzxlist.1,
+         tzxlist.c: support the de-facto standard Windows-1252 charset in TZX
+         text (Fred).

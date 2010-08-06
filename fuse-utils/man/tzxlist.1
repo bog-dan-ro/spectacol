@@ -43,6 +43,11 @@ tzxlist \- Sinclair ZX Spectrum "real" tape file lister
 .SH DESCRIPTION
 tzxlist outputs a description of the contents of TZX, TAP and Warajevo
 TAP tape files.
+.P
+On supported systems it attempts to handle conversions of the 
+de-facto standard TZX Windows-1252 character encoding to the charset 
+used on the current system. If a problem with conversion is 
+encountered any applicable strings will be output as-is.
 .\"
 .\"------------------------------------------------------------------
 .\"

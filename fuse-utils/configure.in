@@ -57,19 +57,6 @@ AC_CHECK_LIB(gcrypt,gcry_check_version,
 AC_SUBST(GCRYPT_LIBS)
 AM_CONDITIONAL(BUILD_RZXCHECK, test "$gcrypt" = yes)
 
-dnl Check that libspectrum is available
-AC_ARG_WITH(libspectrum-prefix,
-[  --with-libspectrum-prefix=PFX where libspectrum is installed (optional)],
-LIBSPEC_CFLAGS=-I$withval/include; LIBSPEC_LIBS=-L$withval/lib,
-LIBSPEC_CFLAGS=""; LIBSPEC_LIBS="")
-ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CFLAGS $LIBSPEC_CFLAGS $GLIB_CFLAGS"
-AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS="$LIBSPEC_LIBS -lspectrum",
-	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
-CPPFLAGS="$ac_save_CPPFLAGS"
-AC_SUBST(LIBSPEC_CFLAGS)
-AC_SUBST(LIBSPEC_LIBS)
-
 dnl Do we want lots of warning messages?
 AC_MSG_CHECKING(whether lots of warnings requested)
 AC_ARG_ENABLE(warnings,
@@ -105,17 +92,30 @@ if test "$glib" = yes; then
     2.0.0,
     glib2=yes
     AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-    LIBS="$LIBS `pkg-config --libs glib-2.0`",
+    GLIBS="`pkg-config --libs glib-2.0`",
   )
   if test "$glib2" = no; then
     AM_PATH_GLIB(
       1.2.0,
       AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-      LIBS="$LIBS `glib-config --libs`",
+      GLIBS="`glib-config --libs`",
       AC_MSG_WARN(glib not found - using libspectrum's replacement)
     )
   fi
 fi
+
+dnl Check that libspectrum is available
+AC_ARG_WITH(libspectrum-prefix,
+[  --with-libspectrum-prefix=PFX where libspectrum is installed (optional)],
+LIBSPEC_CFLAGS=-I$withval/include; LIBSPEC_LIBS=-L$withval/lib,
+LIBSPEC_CFLAGS=""; LIBSPEC_LIBS="")
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CFLAGS $LIBSPEC_CFLAGS $GLIB_CFLAGS"
+AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS="$LIBSPEC_LIBS -lspectrum $GLIBS",
+	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
+CPPFLAGS="$ac_save_CPPFLAGS"
+AC_SUBST(LIBSPEC_CFLAGS)
+AC_SUBST(LIBSPEC_LIBS)
 
 # Look for audiofile (default=yes)
 AC_MSG_CHECKING(whether to use audiofile)
@@ -132,6 +132,20 @@ if test "$audiofile" = yes; then
   )
 fi
 AM_CONDITIONAL(BUILD_AUDIOTOOLS, test "$audiofile" = yes)
+
+# Look for iconv (default=yes)
+AC_MSG_CHECKING(whether to use iconv)
+AC_ARG_WITH(iconv,
+[  --without-iconv         don't use iconv],
+if test "$withval" = no; then iconv=no; else iconv=yes; fi,
+iconv=yes)
+AC_MSG_RESULT($iconv)
+if test "$iconv" = yes; then
+  AC_CHECK_HEADERS(locale.h)
+  AC_CHECK_FUNCS(setlocale)
+  AM_ICONV()
+fi
+AC_SUBST(LTLIBICONV)
 
 dnl Work out which compatibility routines to use
 AC_MSG_CHECKING(which compatibility routines to use)

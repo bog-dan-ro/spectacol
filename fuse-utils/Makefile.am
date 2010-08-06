@@ -49,7 +49,7 @@ endif
 
 EXTRA_PROGRAMS = rzxcheck audio2tape tape2wav
 
-INCLUDES = @LIBSPEC_CFLAGS@ @AUDIOFILE_CFLAGS@ `pkg-config --cflags glib-2.0`
+INCLUDES = @LIBSPEC_CFLAGS@ @AUDIOFILE_CFLAGS@ @GLIB_CFLAGS@
 
 createhdf_SOURCES = ide.c createhdf.c
 
@@ -82,7 +82,7 @@ tapeconv_SOURCES = tapeconv.c utils.c
 tapeconv_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 tzxlist_SOURCES = tzxlist.c utils.c
-tzxlist_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+tzxlist_LDADD = @LIBSPEC_LIBS@ @LTLIBICONV@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 audio2tape_SOURCES = audio2tape.cc importer/soundfile.cc importer/trigger.cc \
                      converter/findpilot.cc converter/findsync1.cc \
