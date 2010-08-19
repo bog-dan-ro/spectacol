@@ -65,6 +65,8 @@ int beta_available = 0;
 int beta_active = 0;
 int beta_builtin = 0;
 
+static libspectrum_byte beta_system_register; /* FDC system register */
+
 libspectrum_word beta_pc_mask;
 libspectrum_word beta_pc_value;
 
@@ -365,6 +367,8 @@ beta_sp_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   fdd_set_head( &beta_fdc->current_drive->fdd, ( ( b & 0x10 ) ? 0 : 1 ) );
   /* 0x20 = density, reset = FM, set = MFM */
   beta_fdc->dden = b & 0x20 ? 1 : 0;
+
+  beta_system_register = b;
 }
 
 libspectrum_byte
@@ -725,7 +729,6 @@ beta_from_snapshot( libspectrum_snap *snap )
 void
 beta_to_snapshot( libspectrum_snap *snap )
 {
-  int attached;
   wd_fdc *f = beta_fdc;
   libspectrum_byte *buffer;
   int drive_count = 0;
@@ -759,9 +762,9 @@ beta_to_snapshot( libspectrum_snap *snap )
 
   libspectrum_snap_set_beta_paged ( snap, beta_active );
   libspectrum_snap_set_beta_direction( snap, beta_fdc->direction );
-  libspectrum_snap_set_beta_status( snap, beta_sr_read( 0x001f, &attached ) );
+  libspectrum_snap_set_beta_status( snap, f->status_register );
   libspectrum_snap_set_beta_track ( snap, f->track_register );
   libspectrum_snap_set_beta_sector( snap, f->sector_register );
   libspectrum_snap_set_beta_data  ( snap, f->data_register );
-  libspectrum_snap_set_beta_system( snap, beta_sp_read( 0x00ff, &attached ) );
+  libspectrum_snap_set_beta_system( snap, beta_system_register );
 }

@@ -3306,3 +3306,5 @@
          the Fuse window is resized by the user.
 20100719 disk/disk.c: set track lengths when inserting a new disk (fixes bug
          #3031299) (Gergely Szasz).
+20100819 disk/beta.c: correct writing of status and system regeisters to
+         snapshots (Patrik Rak).
