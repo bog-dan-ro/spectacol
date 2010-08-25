@@ -768,3 +768,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20100526 tape_block.c: declare libspectrum_bits_set_n_bits static as it isn't
          used outside it's file to silence a warning on LLVM 4.2 (Fred).
 20100711 doc/libspectrum.txt: fix a typo in libspectrum_rzx_start_input (Fred).
+20100825 libspectrum.c,libspectrum.h.in,sna.c,szx.c,timings.c,z80.c:
+         reintegrate NTSC Spectrum branch.

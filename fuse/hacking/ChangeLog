@@ -3308,3 +3308,5 @@
          #3031299) (Gergely Szasz).
 20100819 disk/beta.c: correct writing of status and system regeisters to
          snapshots (Patrik Rak).
+20100825 machine.c,machines/{Makefile.am,machines.h},tape.c: reintegrate
+         NTSC Spectrum branch.
