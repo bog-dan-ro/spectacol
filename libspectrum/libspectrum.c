@@ -223,6 +223,7 @@ libspectrum_machine_name( libspectrum_machine type )
   switch( type ) {
   case LIBSPECTRUM_MACHINE_16:       return "Spectrum 16K";
   case LIBSPECTRUM_MACHINE_48:       return "Spectrum 48K";
+  case LIBSPECTRUM_MACHINE_48_NTSC:  return "Spectrum 48K (NTSC)";
   case LIBSPECTRUM_MACHINE_TC2048:   return "Timex TC2048";
   case LIBSPECTRUM_MACHINE_TC2068:   return "Timex TC2068";
   case LIBSPECTRUM_MACHINE_TS2068:   return "Timex TS2068";
@@ -409,6 +410,7 @@ libspectrum_machine_capabilities( libspectrum_machine type )
 
   /* NTSC display */
   switch( type ) {
+  case LIBSPECTRUM_MACHINE_48_NTSC:
   case LIBSPECTRUM_MACHINE_TS2068:
     capabilities |= LIBSPECTRUM_MACHINE_CAPABILITY_NTSC; break;
   default:

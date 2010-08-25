@@ -333,6 +333,7 @@ libspectrum_sna_write( libspectrum_byte **buffer, size_t *length,
 
   switch( libspectrum_snap_machine( snap ) ) {
 
+  case LIBSPECTRUM_MACHINE_48_NTSC:
   case LIBSPECTRUM_MACHINE_TC2048:
   case LIBSPECTRUM_MACHINE_TC2068:
   case LIBSPECTRUM_MACHINE_TS2068:

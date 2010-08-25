@@ -564,6 +564,7 @@ trap_check_rom( void )
   switch( machine_current->machine ) {
   case LIBSPECTRUM_MACHINE_16:
   case LIBSPECTRUM_MACHINE_48:
+  case LIBSPECTRUM_MACHINE_48_NTSC:
   case LIBSPECTRUM_MACHINE_TC2048:
     return 1;		/* Always OK here */
 

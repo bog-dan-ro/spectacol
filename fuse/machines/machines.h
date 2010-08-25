@@ -36,6 +36,7 @@ int pentagon512_init( fuse_machine_info *machine );
 int pentagon1024_init( fuse_machine_info *machine );
 
 int spec16_init( fuse_machine_info *machine );
+int spec48_ntsc_init( fuse_machine_info *machine );
 int spec_se_init( fuse_machine_info *machine );
 int specplus2_init( fuse_machine_info *machine );
 int specplus2a_init( fuse_machine_info *machine );

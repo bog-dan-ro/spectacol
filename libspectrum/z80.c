@@ -1283,6 +1283,9 @@ write_extended_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
   libspectrum_write_word( ptr, libspectrum_snap_pc( snap ) );
 
   switch( libspectrum_snap_machine( snap ) ) {
+  case LIBSPECTRUM_MACHINE_48_NTSC:
+    *flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+    /* fall through */
   case LIBSPECTRUM_MACHINE_16:
   case LIBSPECTRUM_MACHINE_48:
     if( libspectrum_snap_plusd_active( snap ) ) {

@@ -48,6 +48,7 @@ typedef enum szx_machine_type {
   SZX_MACHINE_TS2068,
   SZX_MACHINE_PENTAGON512,
   SZX_MACHINE_PENTAGON1024,
+  SZX_MACHINE_48_NTSC,
 
 } szx_machine_type;
 
@@ -2179,6 +2180,7 @@ write_file_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   case LIBSPECTRUM_MACHINE_16:     **ptr = SZX_MACHINE_16; break;
   case LIBSPECTRUM_MACHINE_48:     **ptr = SZX_MACHINE_48; break;
+  case LIBSPECTRUM_MACHINE_48_NTSC: **ptr = SZX_MACHINE_48_NTSC; break;
   case LIBSPECTRUM_MACHINE_128:    **ptr = SZX_MACHINE_128; break;
   case LIBSPECTRUM_MACHINE_PLUS2:  **ptr = SZX_MACHINE_PLUS2; break;
   case LIBSPECTRUM_MACHINE_PLUS2A: **ptr = SZX_MACHINE_PLUS2A; break;
@@ -2454,6 +2456,7 @@ write_rom_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr, size_t *leng
 
   case LIBSPECTRUM_MACHINE_16:
   case LIBSPECTRUM_MACHINE_48:
+  case LIBSPECTRUM_MACHINE_48_NTSC:
   case LIBSPECTRUM_MACHINE_TC2048:
     /* 1 ROM = 16k */
     if( ( libspectrum_snap_custom_rom_pages( snap ) != 1 ||

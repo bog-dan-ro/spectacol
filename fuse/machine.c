@@ -69,6 +69,8 @@ int machine_init_machines( void )
   if (error ) return error;
   error = machine_add_machine( spec48_init    );
   if (error ) return error;
+  error = machine_add_machine( spec48_ntsc_init );
+  if (error ) return error;
   error = machine_add_machine( spec128_init   );
   if (error ) return error;
   error = machine_add_machine( specplus2_init );
