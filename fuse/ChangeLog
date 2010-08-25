@@ -8,6 +8,8 @@
         * Many improvements to Win32 UI, including an installer (Marek
           Januszewski).
         * Support weak data in +3 disk images (Gergely Szasz).
+        * NTSC Spectrum support (Philip Kendall, with thanks to Claudio
+          Bernet).
         * Add support for flipping disk images in single sided drives (Gergely
           Szasz).
         * Add support for automatically merging both both disk images where

@@ -44,6 +44,8 @@
 
 	* Tweak timings for TS2068 (Fredrick Meunier; thanks Philip Kendall).
 
+        * NTSC Spectrum support (Philip Kendall; thanks, Claudio Bernet).
+
 2008-01-05  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
 	* libspectrum 0.4.0 released.
