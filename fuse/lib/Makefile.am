@@ -33,6 +33,7 @@ FILES = cassette.bmp \
 	@AUTOLOAD_SNAPS@/tape_2048.szx \
 	@AUTOLOAD_SNAPS@/tape_2068.szx \
 	@AUTOLOAD_SNAPS@/tape_48.szx \
+	@AUTOLOAD_SNAPS@/tape_48_ntsc.szx \
 	@AUTOLOAD_SNAPS@/tape_plus2.szx \
 	@AUTOLOAD_SNAPS@/tape_plus2a.szx \
 	@AUTOLOAD_SNAPS@/tape_plus3.szx \
@@ -51,6 +52,7 @@ EXTRA_DIST = $(FILES) \
 	compressed/tape_2048.szx \
 	compressed/tape_2068.szx \
 	compressed/tape_48.szx \
+	compressed/tape_48_ntsc.szx \
 	compressed/tape_plus2.szx \
 	compressed/tape_plus2a.szx \
 	compressed/tape_plus3.szx \
@@ -65,6 +67,7 @@ EXTRA_DIST = $(FILES) \
 	uncompressed/tape_2048.szx \
 	uncompressed/tape_2068.szx \
 	uncompressed/tape_48.szx \
+	uncompressed/tape_48_ntsc.szx \
 	uncompressed/tape_plus2.szx \
 	uncompressed/tape_plus2a.szx \
 	uncompressed/tape_plus3.szx \

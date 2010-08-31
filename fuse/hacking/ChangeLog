@@ -3319,3 +3319,5 @@
          (thanks, Gergely Szasz) (Fred).
 20100831 machines/spec48_ntsc.c: add some more peripherals and add display
          setup code (Fred).
+20100901 lib/{[un]compressed/tape_48_ntsc.szx,Makefile.am}: add autoload
+         snapshot for NTSC Spectrum (Fred).
