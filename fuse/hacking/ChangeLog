@@ -3310,3 +3310,10 @@
          snapshots (Patrik Rak).
 20100825 machine.c,machines/{Makefile.am,machines.h},tape.c: reintegrate
          NTSC Spectrum branch.
+20100831 lib/[un]compressed/{disk_plus3.szx,tape_128.szx,tape_16.szx,
+         tape_2048.szx,tape_2068.szx,tape_48.szx,tape_pentagon.szx,
+         tape_plus2.szx,tape_plus2a.szx,tape_plus3.szx,tape_plus3e.szx,
+         tape_scorpion.szx,tape_se.szx,tape_ts2068.szx}: swap A and F and A'
+         and F' registers in autoload snapshots which were written when
+         libspectrum still suffered from bug #2857419 (fixes bug #3040262)
+         (thanks, Gergely Szasz) (Fred).
