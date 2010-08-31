@@ -3317,3 +3317,5 @@
          and F' registers in autoload snapshots which were written when
          libspectrum still suffered from bug #2857419 (fixes bug #3040262)
          (thanks, Gergely Szasz) (Fred).
+20100831 machines/spec48_ntsc.c: add some more peripherals and add display
+         setup code (Fred).
