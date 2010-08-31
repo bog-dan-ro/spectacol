@@ -1941,6 +1941,10 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
     libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_48 );
     break;
 
+  case SZX_MACHINE_48_NTSC:
+    libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_48_NTSC );
+    break;
+
   case SZX_MACHINE_128:
     libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_128 );
     break;

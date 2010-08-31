@@ -770,3 +770,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20100711 doc/libspectrum.txt: fix a typo in libspectrum_rzx_start_input (Fred).
 20100825 libspectrum.c,libspectrum.h.in,sna.c,szx.c,timings.c,z80.c:
          reintegrate NTSC Spectrum branch.
+20100831 szx.c: add SZX read support for NTSC Spectrum machine ID (Fred).
