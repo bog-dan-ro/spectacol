@@ -198,7 +198,7 @@ tape_autoload( libspectrum_machine hardware )
   if( error ) { utils_close_file( &snap ); return error; }
 
   if( utils_close_file( &snap ) ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
+    ui_error( UI_ERROR_ERROR, "Couldn't close '%s': %s", filename,
 	      strerror( errno ) );
     return 1;
   }

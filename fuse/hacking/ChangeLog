@@ -3321,3 +3321,4 @@
          setup code (Fred).
 20100901 lib/{[un]compressed/tape_48_ntsc.szx,Makefile.am}: add autoload
          snapshot for NTSC Spectrum (Fred).
+20100905 tape.c: remove obsolete reference to munmap (Fred).
