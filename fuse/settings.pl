@@ -166,14 +166,14 @@ int settings_defaults( settings_info *settings )
 static int
 read_config_file( settings_info *settings )
 {
-  const char *home; char path[256];
+  const char *home; char path[ PATH_MAX ];
   struct stat stat_info;
 
   xmlDocPtr doc;
 
   home = compat_get_home_path(); if( !home ) return 1;
 
-  snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
+  snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
 
   /* See if the file exists; if doesn't, it's not a problem */
   if( stat( path, &stat_info ) ) {
@@ -275,13 +275,13 @@ print hashline( __LINE__ ), << 'CODE';
 int
 settings_write_config( settings_info *settings )
 {
-  const char *home; char path[256], buffer[80]; 
+  const char *home; char path[ PATH_MAX ], buffer[80]; 
 
   xmlDocPtr doc; xmlNodePtr root;
 
   home = compat_get_home_path(); if( !home ) return 1;
 
-  snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
+  snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
 
   /* Create the XML document */
   doc = xmlNewDoc( (const xmlChar*)"1.0" );
@@ -329,7 +329,7 @@ CODE
 static int
 read_config_file( settings_info *settings )
 {
-  const char *home; char path[256];
+  const char *home; char path[ PATH_MAX ];
   struct stat stat_info;
   int error;
 
@@ -337,7 +337,7 @@ read_config_file( settings_info *settings )
 
   home = compat_get_home_path(); if( !home ) return 1;
 
-  snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
+  snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
 
   /* See if the file exists; if doesn't, it's not a problem */
   if( stat( path, &stat_info ) ) {
@@ -363,139 +363,158 @@ read_config_file( settings_info *settings )
   return 0;
 }
 
-/* special_trim() trims that are characters less then equal than space (32).
-   This will eliminate extra tabs, \r (if line ends with \r\n, or \n\r),
-   and spaces (if someone edits the config with external editor),
-   both leading and trailing.
- */
-static void
-special_trim( char string[80] ) {
+static int
+settings_var( settings_info *settings, unsigned char *name, unsigned char *last,
+              int **val_int, char ***val_char, unsigned char **next  )
+{
+  unsigned char* cpos;
+  size_t n;
 
-  size_t trim_pos;
+  *val_int = NULL;
+  *val_char = NULL;
 
-  /* Trim leading chars */
-  trim_pos = 0;
-  while( string[ trim_pos ] && ( string[ trim_pos ] <= 32 ) )
-    trim_pos++;
-  if( trim_pos > 0 )
-    strcpy( string, &string[ trim_pos ] );
-       
-  /* Trim trailing chars */
-  trim_pos = strlen( string );
-  while( ( --trim_pos > 0 ) && ( string[ trim_pos ] <= 32 ) ) {
-    string[ trim_pos ] = '\0';
+  *next = name;
+  while( name < last && ( *name == ' ' || *name == '\t' || *name == '\r' ||
+                          *name == '\n' ) ) {
+    *next = ++name;					/* seek to first char */
   }
+  cpos = name;
+
+  while( cpos < last && ( *cpos != '=' && *cpos != ' ' && *cpos != '\t' &&
+                          *cpos != '\r' && *cpos != '\n' ) ) cpos++;
+  *next = cpos;
+  n = cpos - name;		/* length of name */
+
+  while( *next < last && **next != '=' ) {		/* search for '=' */
+    if( **next != ' ' && **next != '\t' && **next != '\r' && **next != '\n' )
+      return 1;	/* error in value */
+    (*next)++;
+  }
+  if( *next < last) (*next)++;		/* set after '=' */
+/*  ui_error( UI_ERROR_WARNING, "Config: (%5s): ", name ); */
+
+CODE
+my %type = ('null' => 0, 'boolean' => 1, 'numeric' => 1, 'string' => 2 );
+foreach my $name ( sort keys %options ) {
+    my $len = length $options{$name}->{configfile};
+
+    print << "CODE";
+  if( n == $len && !strncmp( (const char *)name, "$options{$name}->{configfile}", n ) ) {
+CODE
+    print "    *val_int = \&settings->$name;\n" if( $options{$name}->{type} eq 'boolean' or $options{$name}->{type} eq 'numeric' );
+    print "    *val_char = \&settings->$name;\n" if( $options{$name}->{type} eq 'string' );
+    print "/*    *val_null = \&settings->$name; */\n" if( $options{$name}->{type} eq 'null' );
+    print << "CODE";
+    return 0;
+  }
+CODE
+}
+    print << "CODE";
+  return 1;
 }
 
 static int
 parse_ini( utils_file *file, settings_info *settings )
 {
-  unsigned char* current_pos;
-  char setting_name[80], setting_value[80];
-  size_t chars_copied;
-  
-  current_pos = file->buffer;
+  unsigned char *cpos, *cpos_new;
+  int *val_int;
+  char **val_char;
+
+  cpos = file->buffer;
 
   /* Read until the end of file */
-  while( current_pos < file->buffer + file->length ) {
-
-    /* Safely copy the text to setting_name, delimted by "=", until \n or eof */
-    chars_copied = 0;
-    while( ( current_pos < file->buffer + file->length )
-        && ( *current_pos != '\n' ) && ( *current_pos != '=' )
-        && ( chars_copied < 79 ) ) { /* leave one char for \0 */
-      setting_name[ chars_copied ] = *current_pos;
-      current_pos++;
-      chars_copied++;
+  while( cpos < file->buffer + file->length ) {
+    if( settings_var( settings, cpos, file->buffer + file->length, &val_int,
+                      &val_char, &cpos_new ) ) {
+      /* error in name or something else ... */
+      cpos = cpos_new + 1;
+      ui_error( UI_ERROR_WARNING,
+                "Unknown and/or invalid setting '%s' in config file", cpos );
+      continue;
     }
-    setting_name[ chars_copied ] = '\0';
-    
-    if( *current_pos != '=' ) {
-      /* line misses the "=" delimiter, skip to next line */
-      current_pos++;
-      continue; 
+    cpos = cpos_new;
+    if( val_int ) {
+	*val_int = atoi( (char *)cpos );
+	while( cpos < file->buffer + file->length && 
+		( *cpos != '\\0' && *cpos != '\\r' && *cpos != '\\n' ) ) cpos++;
+    } else if( val_char ) {
+	char *value = (char *)cpos;
+	size_t n = 0;
+	while( cpos < file->buffer + file->length && 
+		( *cpos != '\\0' && *cpos != '\\r' && *cpos != '\\n' ) ) cpos++;
+	n = (char *)cpos - value;
+	if( n > 0 ) {
+	  if( *val_char != NULL ) {
+	    free( *val_char );
+	    *val_char = NULL;
+	  }
+	  *val_char = malloc( n + 1 );
+	  if( ! *val_char ) {
+	    ui_error( UI_ERROR_WARNING, "Out of memory!" );
+	    return 1;
+	  }
+	  (*val_char)[n] = '\\0';
+	  memcpy( *val_char, value, n );
+	}
     }
-    
-    /* Safely copy the text to setting_value, until \n or eof */
-    current_pos++;
-    chars_copied = 0;
-    while( ( current_pos < file->buffer + file->length )
-        && ( *current_pos != '\n' )
-        && ( chars_copied < 79 ) ) { /* leave one char for \0 */
-      setting_value[ chars_copied ] = *current_pos;
-      current_pos++;
-      chars_copied++;
-    }
-    setting_value[ chars_copied ] = '\0';
-
-    current_pos++;
-    
-    special_trim( setting_name );
-    special_trim( setting_value );
+    /* skip 'new line' like chars */
+    while( ( cpos < ( file->buffer + file->length ) ) &&
+           ( *cpos == '\\r' || *cpos == '\\n' ) ) cpos++;
 
 CODE
-
-foreach my $name ( sort keys %options ) {
-
-    my $type = $options{$name}->{type};
-
-    if( $type eq 'boolean' or $type eq 'numeric' ) {
-
-	print << "CODE";
-    if( !strcmp( setting_name, "$options{$name}->{configfile}" ) ) {
-      settings->$name = atoi( setting_value );
-    } else
-CODE
-
-    } elsif( $type eq 'string' ) {
-
-	    print << "CODE";
-    if( !strcmp( setting_name, "$options{$name}->{configfile}" ) ) {
-      free( settings->$name );
-      settings->$name = strdup( setting_value );
-    } else
-CODE
-
-    } elsif( $type eq 'null' ) {
-
-	    print << "CODE";
-    if( !strcmp( setting_name, "$options{$name}->{configfile}" ) ) {
-      /* Do nothing */
-    } else
-CODE
-
-    } else {
-	die "Unknown setting type `$type'";
-    }
-}
-
 print hashline( __LINE__ ), << 'CODE';
-    if( !strcmp( setting_name, "text" ) ) {
-      /* Do nothing */
-    } else {
-      ui_error( UI_ERROR_WARNING, "Unknown setting '%s' in config file",
-		setting_name );
-    }
   }
 
   return 0;
 }
 
+static int
+settings_file_write( compat_fd fd, const char *buffer, size_t length )
+{
+  return compat_file_write( fd, (const unsigned char *)buffer, length );
+}
+
+static int
+settings_string_write( compat_fd doc, const char* name, const char* config )
+{
+  if( config != NULL &&
+      ( settings_file_write( doc, name, strlen( name ) ) ||
+        settings_file_write( doc, "=", 1 ) ||
+        settings_file_write( doc, config, strlen( config ) ) ||
+        settings_file_write( doc, "\n", 1 ) ) )
+    return 1;
+  return 0;
+}
+
+static int
+settings_boolean_write( compat_fd doc, const char* name, int config )
+{
+  return settings_string_write( doc, name, config ? "1" : "0" );
+}
+
+static int
+settings_numeric_write( compat_fd doc, const char* name, int config )
+{
+  char buffer[80]; 
+  snprintf( buffer, sizeof( buffer ), "%d", config );
+  return settings_string_write( doc, name, buffer );
+}
+
 int
 settings_write_config( settings_info *settings )
 {
-  const char *home; char path[256], buffer[80]; 
+  const char *home; char path[ PATH_MAX ];
 
   compat_fd doc;
 
   home = compat_get_home_path(); if( !home ) return 1;
 
-  snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
+  snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
 
   doc = compat_file_open( path, 1 );
   if( doc == COMPAT_FILE_OPEN_FAILED ) {
     ui_error( UI_ERROR_ERROR, "couldn't open `%s' for writing: %s\n",
-    	      path, strerror( errno ) );
+	      path, strerror( errno ) );
     return 1;
   }
 
@@ -504,38 +523,28 @@ CODE
 foreach my $name ( sort keys %options ) {
 
     my $type = $options{$name}->{type};
+    my $len = length "$options{$name}->{configfile}";
 
     if( $type eq 'boolean' ) {
 
 	print << "CODE";
-	snprintf( buffer, 80, "%s=%s\\n", "$options{$name}->{configfile}", settings->$name ? "1" : "0" );
-  if( compat_file_write( doc, ( const unsigned char * ) buffer,
-                         strlen( buffer ) > 80 ? 80 : strlen( buffer ) ) ) {
-    compat_file_close( doc );
-    return 1;
-  }
+  if( settings_boolean_write( doc, "$options{$name}->{configfile}",
+                              settings->$name ) )
+    goto error;
 CODE
 
     } elsif( $type eq 'string' ) {
 	print << "CODE";
-  if( settings->$name ) {
-	  snprintf( buffer, 80, "%s=%s\\n", "$options{$name}->{configfile}", settings->$name );
-  if( compat_file_write( doc, ( const unsigned char * ) buffer,
-                         strlen( buffer ) > 80 ? 80 : strlen( buffer ) ) ) {
-      compat_file_close( doc );
-      return 1;
-    }
-  }
+  if( settings_string_write( doc, "$options{$name}->{configfile}",
+                             settings->$name ) )
+    goto error;
 CODE
 
     } elsif( $type eq 'numeric' ) {
 	print << "CODE";
-  snprintf( buffer, 80, "%s=%d\\n", "$options{$name}->{configfile}", settings->$name );
-  if( compat_file_write( doc, ( const unsigned char * ) buffer,
-                         strlen( buffer ) > 80 ? 80 : strlen( buffer ) ) ) {
-    compat_file_close( doc );
-    return 1;
-  }
+  if( settings_numeric_write( doc, "$options{$name}->{configfile}",
+                              settings->$name ) )
+    goto error;
 CODE
 
     } elsif( $type eq 'null' ) {
@@ -550,6 +559,10 @@ CODE
   compat_file_close( doc );
 
   return 0;
+error:
+  compat_file_close( doc );
+
+  return 1;
 }
 
 #endif				/* #ifdef HAVE_LIB_XML2 */

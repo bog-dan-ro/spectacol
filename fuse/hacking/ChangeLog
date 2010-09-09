@@ -3322,3 +3322,6 @@
 20100901 lib/{[un]compressed/tape_48_ntsc.szx,Makefile.am}: add autoload
          snapshot for NTSC Spectrum (Fred).
 20100905 tape.c: remove obsolete reference to munmap (Fred).
+20100909 settings.pl: remove the 80 character limit in ini file settings
+         names+values and change 256 char path lengths to MAX_PATH (patch
+         #3013768) (Gergely Szasz).
