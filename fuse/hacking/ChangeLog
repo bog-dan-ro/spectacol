@@ -3328,3 +3328,5 @@
 20100912 menu.c,rzx.[ch]: query for an initial snapshot when opening a rzx file
          which doesn't have one as is common in competition mode rzx files
          (patch #3054536) (Sergio Baldovi).
+20100912 configure.in,windres.rc: enhancements to Windows version encoding
+         (patch #3061430) (Sergio Baldovi).

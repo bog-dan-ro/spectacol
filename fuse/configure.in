@@ -23,8 +23,10 @@ AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_SYSTEM
 
+define(FUSE_VERSION, [0.10.0.2])
+
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.10.0.2)
+AM_INIT_AUTOMAKE(fuse, FUSE_VERSION)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -40,8 +42,10 @@ AC_CHECK_TOOL(WINDRES, windres, no)
 AC_SUBST(WINDRES)
 if test "$WINDRES" != no; then
   WINDRES_OBJ="windres.o"
+  AC_DEFINE([VERSION_WIN32], [translit(FUSE_VERSION, [.], [,])], [Define version information for win32 executable])
 fi
 AC_SUBST(WINDRES_OBJ)
+AM_SUBST_NOTMAKE(WINDRES_OBJ)
 
 dnl Generate commandy.h
 YFLAGS="$YFLAGS -d"

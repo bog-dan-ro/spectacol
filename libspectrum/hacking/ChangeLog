@@ -774,3 +774,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20100912 rzx.c: don't log error message when encountering an external snapshot
          (common in competition mode rzx files made by Spectaculator) (patch
          #3054536) (Sergio Baldovi).
+20100912 Makefile.am,configure.in,windres.rc: add Windows version encoding
+         similar to Fuse (patch #3061430) (Sergio Baldovi).

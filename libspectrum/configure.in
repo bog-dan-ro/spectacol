@@ -24,8 +24,10 @@ dnl E-mail: philip-fuse@shadowmagic.org.uk
 AC_INIT(libspectrum.c)
 AM_CONFIG_HEADER(config.h)
 
+define(LIBSPECTRUM_VERSION, [0.5.0])
+
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(libspectrum, 0.5.0)
+AM_INIT_AUTOMAKE(libspectrum, LIBSPECTRUM_VERSION)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -50,6 +52,19 @@ AC_CHECK_HEADERS(stdint.h strings.h unistd.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
+
+dnl Check for Win32 resource tool
+AC_CHECK_TOOL(WINDRES, windres, no)
+AC_SUBST(WINDRES)
+if test "$WINDRES" != no; then
+  WINDRES_OBJ="windres.o"
+  WINDRES_LDFLAGS="-Xlinker windres.o"
+  AC_DEFINE([VERSION_WIN32], [translit(LIBSPECTRUM_VERSION, [.], [,])[,0]], [Define version information for win32 dll library])
+fi
+AC_SUBST(WINDRES_OBJ)
+AM_SUBST_NOTMAKE(WINDRES_OBJ)
+AC_SUBST(WINDRES_LDFLAGS)
+AM_SUBST_NOTMAKE(WINDRES_LDFLAGS)
 
 dnl Check for big endianness
 AC_C_BIGENDIAN
