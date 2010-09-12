@@ -128,6 +128,7 @@ MENU_CALLBACK( menu_file_recording_rollbackto )
 MENU_CALLBACK( menu_file_recording_play )
 {
   char *recording;
+  int error;
 
   if( rzx_playback || rzx_recording ) return;
 
@@ -136,13 +137,23 @@ MENU_CALLBACK( menu_file_recording_play )
   recording = ui_get_open_filename( "Fuse - Start Replay" );
   if( !recording ) { fuse_emulation_unpause(); return; }
 
-  rzx_start_playback( recording );
+  error = rzx_start_playback( recording );
 
   free( recording );
 
+  if( !error && !rzx_embedded_snapshot ) {
+    error = menu_open_snap();
+
+    if( error ) {
+      rzx_abort_delayed_playback();
+    } else {
+      rzx_resume_delayed_playback();
+    }
+  }
+
   display_refresh_all();
 
-  ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
+  if( rzx_playback  ) ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
 
   fuse_emulation_unpause();
 }

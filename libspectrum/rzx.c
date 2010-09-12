@@ -860,8 +860,9 @@ rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
   /* We don't handle 'links' to external snapshots. I really think these
      are just more trouble than they're worth */
   if( flags & 0x01 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
-			     "rzx_read_snapshot: skipping external snapshot" );
+    /* TODO log error if this isn't the first block as that can't be easily
+       covered by prompting the user for a snapshot file (but should be
+       unlikely to encounter in reality?) */
     (*ptr) += blocklength - 9;
     return LIBSPECTRUM_ERROR_NONE;
   }

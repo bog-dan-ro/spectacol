@@ -3325,3 +3325,6 @@
 20100909 settings.pl: remove the 80 character limit in ini file settings
          names+values and change 256 char path lengths to MAX_PATH (patch
          #3013768) (Gergely Szasz).
+20100912 menu.c,rzx.[ch]: query for an initial snapshot when opening a rzx file
+         which doesn't have one as is common in competition mode rzx files
+         (patch #3054536) (Sergio Baldovi).

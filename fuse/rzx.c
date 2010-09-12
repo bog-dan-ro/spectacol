@@ -82,6 +82,9 @@ int rzx_playback;
 /* The number of instructions in the current .rzx playback frame */
 size_t rzx_instruction_count;
 
+/* Has the .rzx file an initial snapshot to play from? */
+int rzx_embedded_snapshot;
+
 /* The current RZX data */
 libspectrum_rzx *rzx;
 
@@ -234,10 +237,45 @@ int rzx_stop_recording( void )
   return 0;
 }
 
+libspectrum_snap*
+rzx_get_initial_snapshot( void )
+{
+  libspectrum_rzx_iterator it;
+
+  for( it = libspectrum_rzx_iterator_begin( rzx );
+       it;
+       it = libspectrum_rzx_iterator_next( it ) ) {
+
+    libspectrum_rzx_block_id id = libspectrum_rzx_iterator_get_type( it );
+
+    switch( id ) {
+
+    case LIBSPECTRUM_RZX_INPUT_BLOCK:
+      /* If we get this then there can't have been an initial snap to start
+         from */
+      return NULL;
+      break;
+      
+    case LIBSPECTRUM_RZX_SNAPSHOT_BLOCK:
+      /* Got initial snap */
+      return libspectrum_rzx_iterator_get_snap( it );
+      break;
+      
+    default:
+      continue;
+
+    }
+
+  }
+
+  return NULL;
+}
+
 int rzx_start_playback( const char *filename )
 {
   utils_file file;
   libspectrum_error libspec_error; int error;
+  libspectrum_snap* snap;
 
   if( rzx_recording ) return 1;
 
@@ -257,6 +295,15 @@ int rzx_start_playback( const char *filename )
     return 1;
   }
 
+  snap = rzx_get_initial_snapshot();
+  if( !snap ) {
+    /* We need to load an external snapshot */
+    rzx_embedded_snapshot = 0;
+    return 0;
+  } else {
+    rzx_embedded_snapshot = 1;
+  }
+
   error = start_playback( rzx );
   if( error ) {
     libspectrum_rzx_free( rzx );
@@ -264,6 +311,24 @@ int rzx_start_playback( const char *filename )
   }
 
   return 0;
+}
+
+int rzx_resume_delayed_playback( void )
+{
+  int error;
+
+  error = start_playback( rzx );
+  if( error ) {
+    libspectrum_rzx_free( rzx );
+    return error;
+  }
+
+  return 0;
+}
+
+int rzx_abort_delayed_playback( void )
+{
+  return libspectrum_rzx_free( rzx );
 }
 
 int

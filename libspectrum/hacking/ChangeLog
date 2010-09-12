@@ -766,8 +766,11 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20100222 make-perl.c: VC6 has __int64 instead of long long (Fred; thanks, Simon
          Owen).
 20100526 tape_block.c: declare libspectrum_bits_set_n_bits static as it isn't
-         used outside it's file to silence a warning on LLVM 4.2 (Fred).
+         used outside its file to silence a warning on LLVM 4.2 (Fred).
 20100711 doc/libspectrum.txt: fix a typo in libspectrum_rzx_start_input (Fred).
 20100825 libspectrum.c,libspectrum.h.in,sna.c,szx.c,timings.c,z80.c:
          reintegrate NTSC Spectrum branch.
 20100831 szx.c: add SZX read support for NTSC Spectrum machine ID (Fred).
+20100912 rzx.c: don't log error message when encountering an external snapshot
+         (common in competition mode rzx files made by Spectaculator) (patch
+         #3054536) (Sergio Baldovi).
