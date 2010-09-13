@@ -638,7 +638,7 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
 static int
 do_start_files( start_files_t *start_files )
 {
-  int autoload, error, i;
+  int autoload, error, i, check_snapshot;
 
   /* Can't do both input recording and playback */
   if( start_files->playback && start_files->recording ) {
@@ -783,7 +783,8 @@ do_start_files( start_files_t *start_files )
   /* Input recordings */
 
   if( start_files->playback ) {
-    error = utils_open_file( start_files->playback, autoload, NULL );
+    check_snapshot = start_files->snapshot ? 0 : 1;
+    error = rzx_start_playback( start_files->playback, check_snapshot );
     if( error ) return error;
   }
 

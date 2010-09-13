@@ -56,9 +56,6 @@ extern int rzx_competition_mode;
 /* The number of instructions in the current .rzx playback frame */
 extern size_t rzx_instruction_count;
 
-/* Has the .rzx file an initial snapshot to play from? */
-extern int rzx_embedded_snapshot;
-
 /* The actual RZX data */
 extern libspectrum_rzx *rzx;
 
@@ -67,9 +64,7 @@ int rzx_init( void );
 int rzx_start_recording( const char *filename, int embed_snapshot );
 int rzx_stop_recording( void );
 
-int rzx_start_playback( const char *filename );
-int rzx_resume_delayed_playback( void );
-int rzx_abort_delayed_playback( void );
+int rzx_start_playback( const char *filename, int check_snapshot );
 int
 rzx_start_playback_from_buffer( const unsigned char *buffer, size_t length );
 

@@ -37,7 +37,6 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
-#include "menu.h"
 #include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
@@ -81,9 +80,6 @@ int rzx_playback;
 
 /* The number of instructions in the current .rzx playback frame */
 size_t rzx_instruction_count;
-
-/* Has the .rzx file an initial snapshot to play from? */
-int rzx_embedded_snapshot;
 
 /* The current RZX data */
 libspectrum_rzx *rzx;
@@ -271,7 +267,7 @@ rzx_get_initial_snapshot( void )
   return NULL;
 }
 
-int rzx_start_playback( const char *filename )
+int rzx_start_playback( const char *filename, int check_snapshot )
 {
   utils_file file;
   libspectrum_error libspec_error; int error;
@@ -296,12 +292,11 @@ int rzx_start_playback( const char *filename )
   }
 
   snap = rzx_get_initial_snapshot();
-  if( !snap ) {
-    /* We need to load an external snapshot */
-    rzx_embedded_snapshot = 0;
-    return 0;
-  } else {
-    rzx_embedded_snapshot = 1;
+  if( !snap && check_snapshot ) {
+    /* We need to load an external snapshot. Could be skipped if the snapshot
+       is preloaded from command line */
+    error = utils_open_snap();
+    if( error ) return error;
   }
 
   error = start_playback( rzx );
@@ -311,30 +306,13 @@ int rzx_start_playback( const char *filename )
   }
 
   return 0;
-}
-
-int rzx_resume_delayed_playback( void )
-{
-  int error;
-
-  error = start_playback( rzx );
-  if( error ) {
-    libspectrum_rzx_free( rzx );
-    return error;
-  }
-
-  return 0;
-}
-
-int rzx_abort_delayed_playback( void )
-{
-  return libspectrum_rzx_free( rzx );
 }
 
 int
 rzx_start_playback_from_buffer( const unsigned char *buffer, size_t length )
 {
   int error;
+  libspectrum_snap* snap;
 
   if( rzx_recording ) return 0;
 
@@ -342,6 +320,15 @@ rzx_start_playback_from_buffer( const unsigned char *buffer, size_t length )
 
   error = libspectrum_rzx_read( rzx, buffer, length );
   if( error ) return error;
+
+  snap = rzx_get_initial_snapshot();
+  if( !snap ) {
+    error = utils_open_snap();
+    if( error ) {
+      libspectrum_rzx_free( rzx );
+      return error;
+    }
+  }
 
   error = start_playback( rzx );
   if( error ) {

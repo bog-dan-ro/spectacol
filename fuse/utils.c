@@ -76,6 +76,11 @@ utils_open_file( const char *filename, int autoload,
   libspectrum_class_t class;
   int error;
 
+  error = 0;
+  if( rzx_recording ) error = rzx_stop_recording();
+  if( rzx_playback  ) error = rzx_stop_playback( 1 );
+  if( error ) return error;
+
   /* Read the file into a buffer */
   if( utils_read_file( filename, &file ) ) return 1;
 
@@ -85,8 +90,6 @@ utils_open_file( const char *filename, int autoload,
     utils_close_file( &file );
     return 1;
   }
-
-  error = 0;
 
   switch( class ) {
     
@@ -206,6 +209,21 @@ utils_open_file( const char *filename, int autoload,
   if( type_ptr ) *type_ptr = type;
 
   return 0;
+}
+
+/* Request a snapshot file from the user and it */
+int
+utils_open_snap( void )
+{
+  char *filename;
+  int error;
+
+  filename = ui_get_open_filename( "Fuse - Load Snapshot" );
+  if( !filename ) return -1;
+
+  error = snapshot_read( filename );
+  free( filename );
+  return error;
 }
 
 /* Find the auxiliary file called `filename'; returns a fd for the

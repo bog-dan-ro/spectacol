@@ -128,7 +128,6 @@ MENU_CALLBACK( menu_file_recording_rollbackto )
 MENU_CALLBACK( menu_file_recording_play )
 {
   char *recording;
-  int error;
 
   if( rzx_playback || rzx_recording ) return;
 
@@ -137,23 +136,13 @@ MENU_CALLBACK( menu_file_recording_play )
   recording = ui_get_open_filename( "Fuse - Start Replay" );
   if( !recording ) { fuse_emulation_unpause(); return; }
 
-  error = rzx_start_playback( recording );
+  rzx_start_playback( recording, 1 );
 
   free( recording );
 
-  if( !error && !rzx_embedded_snapshot ) {
-    error = menu_open_snap();
-
-    if( error ) {
-      rzx_abort_delayed_playback();
-    } else {
-      rzx_resume_delayed_playback();
-    }
-  }
-
   display_refresh_all();
 
-  if( rzx_playback  ) ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
+  if( rzx_playback ) ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
 
   fuse_emulation_unpause();
 }
@@ -847,20 +836,6 @@ MENU_CALLBACK( menu_file_aylogging_record )
   ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 1 );
 
   fuse_emulation_unpause();
-}
-
-int
-menu_open_snap( void )
-{
-  char *filename;
-  int error;
-
-  filename = ui_get_open_filename( "Fuse - Load Snapshot" );
-  if( !filename ) return -1;
-
-  error = snapshot_read( filename );
-  free( filename );
-  return error;
 }
 
 int

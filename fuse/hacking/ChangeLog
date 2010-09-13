@@ -3330,3 +3330,7 @@
          (patch #3054536) (Sergio Baldovi).
 20100912 configure.in,windres.rc: enhancements to Windows version encoding
          (patch #3061430) (Sergio Baldovi).
+20100913 fuse.c,menu.[ch],rzx.[ch],utils.[ch]: extend RZX playback handling of
+         files without initial embedded snapshots to cover File->Open, the
+         command line and some miscellaneous RZX playback initialisation bugs
+         (more from patch #3054536) (Sergio Baldovi).

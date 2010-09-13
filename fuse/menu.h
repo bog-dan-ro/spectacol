@@ -105,8 +105,6 @@ MENU_CALLBACK( menu_media_ide_zxatasp_writeprotect );
 MENU_CALLBACK( menu_media_ide_zxcf_upload );
 MENU_CALLBACK( menu_media_ide_divide_writeprotect );
 
-int menu_open_snap( void );
-
 /*
  * Things to be defined elsewhere
  */
