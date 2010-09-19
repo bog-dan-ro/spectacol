@@ -3334,3 +3334,8 @@
          files without initial embedded snapshots to cover File->Open, the
          command line and some miscellaneous RZX playback initialisation bugs
          (more from patch #3054536) (Sergio Baldovi).
+20100919 ui/win32/installer/fuse.nsi: windows installer improvements; correct
+         uninstall registry key, parameterise installation directory path, add
+         version information fields, optionally register file types, make start
+         menu shortcuts optional and add desktop shortcut (patch #3069264)
+         (Sergio Baldovi).

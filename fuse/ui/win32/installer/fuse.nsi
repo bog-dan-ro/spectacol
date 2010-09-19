@@ -21,20 +21,23 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-!define FUSE_VERSION "0.10.0.1"
+!define FUSE_VERSION "0.10.0.2"
 !define DISPLAY_NAME "Free Unix Spectrum Emulator (Fuse) ${FUSE_VERSION}"
+!define SETUP_FILENAME "fuse-${FUSE_VERSION}-setup"
+!define SETUP_FILE "${SETUP_FILENAME}.exe"
 
 ;Include Modern UI
 !include "MUI2.nsh"
+!include "Util.nsh"
 
 ;--------------------------------
 ;General
 
 Name "${DISPLAY_NAME}"
-outFile "fuse-${FUSE_VERSION}-setup.exe"
+outFile "${SETUP_FILE}"
 Caption "${DISPLAY_NAME}"
  
-installDir "C:\Program Files\Fuse"
+installDir "$PROGRAMFILES\Fuse"
 
 ; [Additional Installer Settings ]
 XPStyle on
@@ -50,7 +53,8 @@ SetCompressor lzma
 ;Pages
 
   !insertmacro MUI_PAGE_LICENSE "COPYING"
-  ;!insertmacro MUI_PAGE_COMPONENTS
+  !define MUI_COMPONENTSPAGE_SMALLDESC
+  !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
   !define MUI_FINISHPAGE_RUN "$INSTDIR\fuse.exe"
@@ -66,9 +70,106 @@ SetCompressor lzma
   !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
+;Version Information
 
+  VIProductVersion ${FUSE_VERSION}
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" ""
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "${SETUP_FILENAME}"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright (c) 1999-2009 Philip Kendall and others; see the file 'AUTHORS' for more details."
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Fuse"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${FUSE_VERSION}"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "${SETUP_FILE}"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "Fuse - the Free Unix Spectrum Emulator"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${FUSE_VERSION}"
+
+;--------------------------------
+;File association functions
+
+!macro RegisterExtensionCall _EXECUTABLE _EXTENSION _DESCRIPTION
+  Push `${_DESCRIPTION}`
+  Push `${_EXTENSION}`
+  Push `${_EXECUTABLE}`
+  ${CallArtificialFunction} RegisterExtension_
+!macroend
+
+!macro UnRegisterExtensionCall _EXTENSION _DESCRIPTION
+  Push `${_EXTENSION}`
+  Push `${_DESCRIPTION}`
+  ${CallArtificialFunction} UnRegisterExtension_
+!macroend
+
+!macro RegisterExtension_
+  Exch $R2 ;exe
+  Exch
+  Exch $R1 ;ext
+  Exch
+  Exch 2
+  Exch $R0 ;desc
+  Exch 2
+  Push $0
+  Push $1
+
+  ReadRegStr $1 HKCR $R1 ""  ; read current file association
+  StrCmp "$1" "" NoBackup  ; is it empty
+  StrCmp "$1" "$R0" NoBackup  ; is it our own
+    WriteRegStr HKCR $R1 "backup_val" "$1"  ; backup current value
+NoBackup:
+  WriteRegStr HKCR $R1 "" "$R0"  ; set our file association
+
+  ReadRegStr $0 HKCR $R0 ""
+  StrCmp $0 "" 0 Skip
+    WriteRegStr HKCR "$R0" "" "$R0"
+    WriteRegStr HKCR "$R0\shell" "" "open"
+    WriteRegStr HKCR "$R0\DefaultIcon" "" "$R2,0"
+Skip:
+  WriteRegStr HKCR "$R0\shell\open\command" "" '"$R2" "%1"'
+  WriteRegStr HKCR "$R0\shell\edit" "" "Edit $R0"
+  WriteRegStr HKCR "$R0\shell\edit\command" "" '"$R2" "%1"'
+ 
+  Pop $1
+  Pop $0
+  Pop $R2
+  Pop $R1
+  Pop $R0
+!macroend
+
+!macro UnRegisterExtension_
+  Exch $R1 ;desc
+  Exch
+  Exch $R0 ;ext
+  Exch
+  Push $0
+  Push $1
+
+  ReadRegStr $1 HKCR $R0 ""
+  StrCmp $1 $R1 0 NoOwn ; only do this if we own it
+  ReadRegStr $1 HKCR $R0 "backup_val"
+  StrCmp $1 "" 0 Restore ; if backup="" then delete the whole key
+  DeleteRegKey HKCR $R0
+  Goto NoOwn
+
+Restore:
+  WriteRegStr HKCR $R0 "" $1
+  DeleteRegValue HKCR $R0 "backup_val"
+  DeleteRegKey HKCR $R1 ;Delete key with association name settings
+
+NoOwn: 
+  Pop $1
+  Pop $0
+  Pop $R1
+  Pop $R0
+!macroend
+
+!define RegisterExtension `!insertmacro RegisterExtensionCall`
+!define UnRegisterExtension `!insertmacro UnRegisterExtensionCall`
+
+;--------------------------------
 ; start default section
-section
+
+section "!Fuse Core Files (required)" SecCore
+
+    SectionIn RO
+    DetailPrint "Installing Fuse Core Files..."
  
     ; set the installation directory as the destination for the following actions
     setOutPath "$INSTDIR"
@@ -86,33 +187,71 @@ section
     ; create the uninstaller
     writeUninstaller "$INSTDIR\uninstall.exe"
 
-    ; create shortcuts
-    CreateDirectory "$SMPROGRAMS\Fuse"
-    createShortCut "$SMPROGRAMS\Fuse\Fuse.lnk" "$INSTDIR\fuse.exe"
-    createShortCut "$SMPROGRAMS\Fuse\Manual.lnk" "$INSTDIR\fuse.html"
-    createShortCut "$SMPROGRAMS\Fuse\Uninstall.lnk" "$INSTDIR\uninstall.exe"
-
     ; Write the uninstall keys for Windows
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "DisplayName" "${DISPLAY_NAME}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "DisplayVersion" "${FUSE_VERSION}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "HelpLink" "http://fuse-emulator.sourceforge.net"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "UninstallString" '"$INSTDIR\uninstall.exe"'
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "NoModify" 1
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "NoRepair" 1
 
 sectionEnd
- 
+
+;--------------------------------
+; Create shortcuts
+
+section "Start Menu and Desktop links" SecShortcuts
+
+    DetailPrint "Creating Shortcuts..."
+    CreateDirectory "$SMPROGRAMS\Fuse"
+    CreateShortCut "$SMPROGRAMS\Fuse\Fuse.lnk" "$INSTDIR\fuse.exe"
+    CreateShortCut "$SMPROGRAMS\Fuse\Manual.lnk" "$INSTDIR\fuse.html"
+    CreateShortCut "$SMPROGRAMS\Fuse\Uninstall.lnk" "$INSTDIR\uninstall.exe"
+    CreateShortCut "$DESKTOP\Fuse.lnk" "$INSTDIR\fuse.exe"
+
+sectionEnd
+
+;--------------------------------
+; Register common file extesions
+
+section "Register File Extensions"  SecFileExt
+
+    DetailPrint "Registering File Extensions..."
+    ${registerExtension} "$INSTDIR\fuse.exe" ".rzx" "Fuse RZX File"
+    ${registerExtension} "$INSTDIR\fuse.exe" ".sna" "Fuse SNA File"
+    ${registerExtension} "$INSTDIR\fuse.exe" ".szx" "Fuse SZX File"
+    ${registerExtension} "$INSTDIR\fuse.exe" ".tap" "Fuse TAP File"
+    ${registerExtension} "$INSTDIR\fuse.exe" ".tzx" "Fuse TZX File"
+    ${registerExtension} "$INSTDIR\fuse.exe" ".z80" "Fuse Z80 File"
+    System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v (0x08000000, 0, 0, 0)'
+
+sectionEnd
+
+;--------------------------------
 ; uninstaller section start
+
 section "uninstall"
- 
-    ; delete the uninstaller
-    Delete "$INSTDIR\uninstall.exe"
- 
-    ; delete the links
+
+    ; Unregister file extensions association
+    DetailPrint "Deleting Registry Keys..."
+    ${unregisterExtension} ".rzx" "Fuse RZX File"
+    ${unregisterExtension} ".sna" "Fuse SNA File"
+    ${unregisterExtension} ".szx" "Fuse SZX File"
+    ${unregisterExtension} ".tap" "Fuse TAP File"
+    ${unregisterExtension} ".tzx" "Fuse TZX File"
+    ${unregisterExtension} ".z80" "Fuse Z80 File"
+    System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v (0x08000000, 0, 0, 0)'
+	
+    ; Delete the links
+    DetailPrint "Deleting Shortcuts..."
     Delete "$SMPROGRAMS\Fuse\Fuse.lnk"
     Delete "$SMPROGRAMS\Fuse\Manual.lnk"
     Delete "$SMPROGRAMS\Fuse\Uninstall.lnk"
     RMDir  "$SMPROGRAMS\Fuse"
- 
+    Delete "$DESKTOP\Fuse.lnk"
+
     ; Installation files
+    DetailPrint "Deleting Files..."
     Delete "$INSTDIR\lib\*"
     RMDir  "$INSTDIR\lib"
     Delete "$INSTDIR\roms\*"
@@ -120,8 +259,18 @@ section "uninstall"
     Delete "$INSTDIR\*"
     RMDir "$INSTDIR"
 
-    ; Remove the uninstall keys for Windows
-    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Dev-C++"
- 
-; uninstaller section end
+    ; Delete the uninstaller and remove the uninstall keys for Windows
+    DetailPrint "Deleting Uninstaller..."
+    Delete "$INSTDIR\uninstall.exe"
+    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse"
+
 sectionEnd
+
+;--------------------------------
+;Descriptions
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecCore} "The core files required to use Fuse (program, libraries, ROMs, etc.)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcuts} "Adds icons to your start menu and your desktop for easy access"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecFileExt} "Register common file extensions with Fuse: rzx, sna, szx, tap, tzx and z80"
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
