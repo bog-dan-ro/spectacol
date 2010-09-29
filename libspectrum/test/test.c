@@ -625,6 +625,66 @@ test_25( void )
   return r;
 }
 
+/* Tests for bug #3078262: last out to 0x1ffd is not serialised into .z80
+   files */
+static test_return_t
+test_26( void )
+{
+  const char *filename = STATIC_TEST_PATH( "plus3.z80" );
+  libspectrum_byte *buffer = NULL;
+  size_t filesize = 0, length = 0;
+  libspectrum_snap *snap;
+  int flags;
+  test_return_t r = TEST_INCOMPLETE;
+
+  if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
+
+  snap = libspectrum_snap_alloc();
+
+  if( libspectrum_snap_read( snap, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
+			     filename ) != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf( stderr, "%s: reading `%s' failed\n", progname, filename );
+    libspectrum_snap_free( snap );
+    libspectrum_free( buffer );
+    return TEST_INCOMPLETE;
+  }
+
+  libspectrum_free( buffer );
+  buffer = NULL;
+
+  if( libspectrum_snap_write( &buffer, &length, &flags, snap,
+                              LIBSPECTRUM_ID_SNAPSHOT_Z80, NULL, 0 ) != 
+      LIBSPECTRUM_ERROR_NONE ) {
+    fprintf( stderr, "%s: serialising to Z80 failed\n", progname );
+    libspectrum_snap_free( snap );
+    return TEST_INCOMPLETE;
+  }
+
+  libspectrum_snap_free( snap );
+  snap = libspectrum_snap_alloc();
+
+  if( libspectrum_snap_read( snap, buffer, length, LIBSPECTRUM_ID_SNAPSHOT_Z80,
+                             NULL ) != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf( stderr, "%s: restoring from Z80 failed\n", progname );
+    libspectrum_snap_free( snap );
+    libspectrum_free( buffer );
+    return TEST_INCOMPLETE;
+  }
+
+  if( libspectrum_snap_out_plus3_memoryport( snap ) == 0xaa ) {
+    r = TEST_PASS;
+  } else {
+    fprintf( stderr,
+             "%s: Last out to 0x1ffd is 0x%02x, not the expected 0xaa\n",
+             progname, libspectrum_snap_out_plus3_memoryport( snap ) );
+    r = TEST_FAIL;
+  }
+
+  libspectrum_snap_free( snap );
+
+  return r;
+}
+
 struct test_description {
 
   test_fn test;
@@ -659,6 +719,7 @@ static struct test_description tests[] = {
   { test_23, "MDR write protection 2", 0 },
   { test_24, "Complete TZX timings", 0 },
   { test_25, "Writing SNA file", 0 },
+  { test_26, "Writing +3 .Z80 file", 0 },
 };
 
 static size_t test_count = sizeof( tests ) / sizeof( tests[0] );

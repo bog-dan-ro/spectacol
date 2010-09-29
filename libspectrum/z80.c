@@ -1269,18 +1269,14 @@ write_extended_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
 {
   int i, bottom_16kb_ram;
   libspectrum_byte hardware_flag = 0;      /* No special emulation features */
+  int second_memory_port = 0; /* By default, don't write the extra bytes */
+  libspectrum_byte machine_byte;
+  size_t header_length;
 
   libspectrum_dword quarter_states;
 
   int capabilities =
     libspectrum_machine_capabilities( libspectrum_snap_machine( snap ) );
-
-  /* +2 here to deal with the two length bytes */
-  libspectrum_make_room( buffer, LIBSPECTRUM_Z80_V3_LENGTH + 2, ptr, length );
-
-  libspectrum_write_word( ptr, LIBSPECTRUM_Z80_V3_LENGTH );
-  
-  libspectrum_write_word( ptr, libspectrum_snap_pc( snap ) );
 
   switch( libspectrum_snap_machine( snap ) ) {
   case LIBSPECTRUM_MACHINE_48_NTSC:
@@ -1289,11 +1285,11 @@ write_extended_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
   case LIBSPECTRUM_MACHINE_16:
   case LIBSPECTRUM_MACHINE_48:
     if( libspectrum_snap_plusd_active( snap ) ) {
-      *(*ptr)++ = Z80_MACHINE_48_MGT;
+      machine_byte = Z80_MACHINE_48_MGT;
     } else if( libspectrum_snap_interface1_active( snap ) ) {
-      *(*ptr)++ = Z80_MACHINE_48_IF1;
+      machine_byte = Z80_MACHINE_48_IF1;
     } else {
-      *(*ptr)++ = Z80_MACHINE_48;
+      machine_byte = Z80_MACHINE_48;
     }
     break;
   case LIBSPECTRUM_MACHINE_SE:
@@ -1301,40 +1297,48 @@ write_extended_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
     /* fall through */
   case LIBSPECTRUM_MACHINE_128:
     if( libspectrum_snap_plusd_active( snap ) ) {
-      *(*ptr)++ = Z80_MACHINE_128_MGT;
+      machine_byte = Z80_MACHINE_128_MGT;
     } else if( libspectrum_snap_interface1_active( snap ) ) {
-      *(*ptr)++ = Z80_MACHINE_128_IF1;
+      machine_byte = Z80_MACHINE_128_IF1;
     } else {
-      *(*ptr)++ = Z80_MACHINE_128;
+      machine_byte = Z80_MACHINE_128;
     }
     break;
   case LIBSPECTRUM_MACHINE_PLUS3E:
     *flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS;
     /* fall through */
   case LIBSPECTRUM_MACHINE_PLUS3:
-    *(*ptr)++ = Z80_MACHINE_PLUS3; break;
+    second_memory_port = 1;
+    machine_byte = Z80_MACHINE_PLUS3;
+    break;
   case LIBSPECTRUM_MACHINE_PENT:
   case LIBSPECTRUM_MACHINE_PENT512:
   case LIBSPECTRUM_MACHINE_PENT1024:
-    *(*ptr)++ = Z80_MACHINE_PENTAGON; break;
+    second_memory_port = 1;
+    machine_byte = Z80_MACHINE_PENTAGON;
+    break;
   case LIBSPECTRUM_MACHINE_SCORP:
-    *(*ptr)++ = Z80_MACHINE_SCORPION; break;
+    second_memory_port = 1;
+    machine_byte = Z80_MACHINE_SCORPION;
+    break;
   case LIBSPECTRUM_MACHINE_PLUS2:
     if( libspectrum_snap_interface1_active( snap ) ) {
       *flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS;
     }
-    *(*ptr)++ = Z80_MACHINE_PLUS2; break;
+    machine_byte = Z80_MACHINE_PLUS2; break;
   case LIBSPECTRUM_MACHINE_PLUS2A:
-    *(*ptr)++ = Z80_MACHINE_PLUS2A; break;
+    second_memory_port = 1;
+    machine_byte = Z80_MACHINE_PLUS2A;
+    break;
   case LIBSPECTRUM_MACHINE_TC2048:
     if( libspectrum_snap_interface1_active( snap ) ) {
       *flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS;
     }
-    *(*ptr)++ = Z80_MACHINE_TC2048; break;
+    machine_byte = Z80_MACHINE_TC2048; break;
   case LIBSPECTRUM_MACHINE_TC2068:
-    *(*ptr)++ = Z80_MACHINE_TC2068; break;
+    machine_byte = Z80_MACHINE_TC2068; break;
   case LIBSPECTRUM_MACHINE_TS2068:
-    *(*ptr)++ = Z80_MACHINE_TS2068; break;
+    machine_byte = Z80_MACHINE_TS2068; break;
 
   case LIBSPECTRUM_MACHINE_UNKNOWN:
     libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
@@ -1342,6 +1346,17 @@ write_extended_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
 			     __FILE__ );
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
+
+  header_length = second_memory_port ? LIBSPECTRUM_Z80_V3X_LENGTH
+                                     : LIBSPECTRUM_Z80_V3_LENGTH;
+
+  /* +2 here to deal with the two length bytes */
+  libspectrum_make_room( buffer, header_length + 2, ptr, length );
+
+  libspectrum_write_word( ptr, header_length );
+
+  libspectrum_write_word( ptr, libspectrum_snap_pc( snap ) );
+  *(*ptr)++ = machine_byte;
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY ) {
     *(*ptr)++ = libspectrum_snap_out_128_memoryport( snap );
@@ -1463,8 +1478,9 @@ write_extended_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
     for( i=52; i<55; i++ ) *(*ptr)++ = '\0';
   }
 
-  /* etc */
-  for( i=55; i<=LIBSPECTRUM_Z80_V3_LENGTH; i++ ) *(*ptr)++ = '\0';
+  if( second_memory_port ) {
+    *(*ptr)++ = libspectrum_snap_out_plus3_memoryport( snap );
+  }
 
   return LIBSPECTRUM_ERROR_NONE;
 }
