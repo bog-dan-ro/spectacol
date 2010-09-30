@@ -776,3 +776,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          #3054536) (Sergio Baldovi).
 20100912 Makefile.am,configure.in,windres.rc: add Windows version encoding
          similar to Fuse (patch #3061430) (Sergio Baldovi).
+20100929 test/test.c,z80.c: ensure last OUT to 0x1ffd is serialised into .z80
+         files (fixes bug #3078262; thanks, Nick Corey).
+20100930 test/plus3.z80: remember to add test file.
