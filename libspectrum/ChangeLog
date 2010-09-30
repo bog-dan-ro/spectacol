@@ -1,4 +1,41 @@
-2008-11-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2010-10-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * libspectrum 1.0.0 released.
+
+        * New end of tape flag (Fredrick Meunier).
+
+        * AF and AF' were swapped when reading and writing SZX files
+          (Fredrick Meunier; thanks, velesoft).
+
+        * Support for Fuller Box and Melodik (and similar AY interfaces) in
+          snapshots (Fredrick Meunier).
+
+        * Support for Opus Discovery in snapshots (Fredrick Meunier, Gergely
+          Szasz).
+
+        * Support for the NTSC 48K Spectrum (Philip Kendall).
+
+        * Support for stereo sound files (Fredrick Meunier; thanks, Gilberto
+          Almeida).
+
+        * Add proper support for +2A/+3, Pentagon and Scorpion in .z80 files
+          (Philip Kendall; thanks, Nick Corey)
+
+        * Various fixes for compiling with Visual Studio 6 (Simon Owen).
+
+        * Various minor bug fixes/improvements:
+          * Looser signature checks for .dsk files (Gergely Szasz; thanks,
+            zx81 and Simon Owen).
+          * --without-(bzip2|zlib) options to configure for Gentoo and similar
+            distributions (José Manuel Ferrer Ortiz).
+          * Handle querying the block length for turbo and pure data blocks
+            with 0 length (Fredrick Meunier).
+          * Fix loading of Warajevo TAPs with raw samples (Fredrick Meunier).
+          * Fail sensibly if file decompression fails (Fredrick Meunier).
+          * Remove various unused variables, initialisations etc (Fredrick
+            Meunier).
+
+2008-11-30  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * libspectrum 0.5.0 released.
 

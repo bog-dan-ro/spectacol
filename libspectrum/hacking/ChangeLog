@@ -779,3 +779,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20100929 test/test.c,z80.c: ensure last OUT to 0x1ffd is serialised into .z80
          files (fixes bug #3078262; thanks, Nick Corey).
 20100930 test/plus3.z80: remember to add test file.
+20100930 ChangeLog,README: first updates for a "1.0" release.
