@@ -685,6 +685,45 @@ test_26( void )
   return r;
 }
 
+/* Tests for bug #2857419: SZX files were written with A and F reversed */
+static test_return_t
+test_27( void )
+{
+  const char *filename = STATIC_TEST_PATH( "empty.szx" );
+  libspectrum_byte *buffer = NULL;
+  size_t filesize = 0;
+  libspectrum_snap *snap;
+  test_return_t r = TEST_INCOMPLETE;
+
+  if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
+
+  snap = libspectrum_snap_alloc();
+
+  if( libspectrum_snap_read( snap, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
+			     filename ) != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf( stderr, "%s: reading `%s' failed\n", progname, filename );
+    libspectrum_snap_free( snap );
+    libspectrum_free( buffer );
+    return TEST_INCOMPLETE;
+  }
+
+  libspectrum_free( buffer );
+
+  if( libspectrum_snap_a( snap ) != 0x12 ) {
+    fprintf( stderr, "%s: A is 0x%02x, not the expected 0x12\n", progname,
+             libspectrum_snap_a( snap ) );
+    r = TEST_FAIL;
+  } else if( libspectrum_snap_f( snap ) != 0x34 ) {
+    fprintf( stderr, "%s: F is 0x%04x, not the expected 0x34\n", progname,
+             libspectrum_snap_f( snap ) );
+    r = TEST_FAIL;
+  } else {
+    r = TEST_PASS;
+  }
+
+  return r;
+}
+
 struct test_description {
 
   test_fn test;
@@ -720,6 +759,7 @@ static struct test_description tests[] = {
   { test_24, "Complete TZX timings", 0 },
   { test_25, "Writing SNA file", 0 },
   { test_26, "Writing +3 .Z80 file", 0 },
+  { test_27, "Reading old SZX file", 0 },
 };
 
 static size_t test_count = sizeof( tests ) / sizeof( tests[0] );

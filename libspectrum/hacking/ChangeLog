@@ -780,3 +780,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          files (fixes bug #3078262; thanks, Nick Corey).
 20100930 test/plus3.z80: remember to add test file.
 20100930 ChangeLog,README: first updates for a "1.0" release.
+20101002 configure.in,szx.c,test/{empty.szx,test.c}: check for SZX files
+         written with A and F swapped and read them in appropriately. Bump
+         libspectrum version number so we know that new files are written
+         without the bug.
