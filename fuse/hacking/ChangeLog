@@ -3340,3 +3340,5 @@
          menu shortcuts optional and add desktop shortcut (patch #3069264)
          (Sergio Baldovi).
 20100930 ChangeLog,fuse.c,man/fuse.1,README: first updates for a "1.0" release.
+20101002 lib/{compressed,uncompressed}/*.szx: update libspectrum signature in
+         each file so we know they don't have the A-F swap bug.
