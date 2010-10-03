@@ -61,8 +61,15 @@ specifies that the A and F and A' and F' registers should be swapped.
 Version 0.5.0 and older of 
 .IR libspectrum "(3)"
 had a bug that resulted in these registers being swapped in SZX 
-snapshots only, and this flag can be used to correct any such 
-snapshots.
+snapshots only. Version 0.5.1 and newer of
+.IR libspectrum "(3)"
+automatically recognise these snapshots and correct the problem, but
+this flag is necessary to fix some snapshots created by
+.I development versions only
+of
+.IR libspectrum "(3)"
+which had the bug fixed, but cannot be distinguished from snapshots
+containing the bug.
 .TP
 .I infile
 specifies the snapshot to be converted. This file can be in any of the

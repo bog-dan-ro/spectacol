@@ -308,3 +308,5 @@
 20101003 snapconv.c,man/snapconv.1: add -f flag to write snapshots with A and F
          and A' and F' transposed to fix SZX snaps written with old versions of
          libspectrum (Fred).
+20101003 man/snapconv.1: libspectrum now automatically fixes the problem of
+         A and F being transposed.
