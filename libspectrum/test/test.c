@@ -723,7 +723,7 @@ test_27( void )
     r = TEST_FAIL;
   } else if( libspectrum_snap_f_( snap ) != 0x78 ) {
     fprintf( stderr, "%s: F' is 0x%02x, not the expected 0x78\n", progname,
-             libspectrum_snap_f( snap ) );
+             libspectrum_snap_f_( snap ) );
     r = TEST_FAIL;
   } else {
     r = TEST_PASS;
