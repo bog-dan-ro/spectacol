@@ -305,3 +305,6 @@
 20100806 Makefile.am,acinclude.m4,config.rpath,configure.in,man/tzxlist.1,
          tzxlist.c: support the de-facto standard Windows-1252 charset in TZX
          text (Fred).
+20101003 snapconv.c,man/snapconv.1: add -f flag to write snapshots with A and F
+         and A' and F' transposed to fix SZX snaps written with old versions of
+         libspectrum (Fred).

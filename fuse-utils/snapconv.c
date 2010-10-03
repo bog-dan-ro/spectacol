@@ -38,6 +38,19 @@
 
 char *progname;
 
+static void
+fix_snapshot( libspectrum_snap *snap )
+{
+  libspectrum_byte a = libspectrum_snap_a( snap );
+  libspectrum_byte f = libspectrum_snap_f( snap );
+  libspectrum_snap_set_a( snap, f );
+  libspectrum_snap_set_f( snap, a );
+  a = libspectrum_snap_a_( snap );
+  f = libspectrum_snap_f_( snap );
+  libspectrum_snap_set_a_( snap, f );
+  libspectrum_snap_set_f_( snap, a );
+}
+
 int
 main( int argc, char **argv )
 {
@@ -47,6 +60,7 @@ main( int argc, char **argv )
   libspectrum_creator *creator;
   int flags;
   int compress = 0;
+  int fix = 0;
   FILE *f;
 
   int error;
@@ -54,7 +68,7 @@ main( int argc, char **argv )
 
   progname = argv[0];
 
-  while( ( c = getopt( argc, argv, "cn" ) ) != -1 ) {
+  while( ( c = getopt( argc, argv, "cnf" ) ) != -1 ) {
 
     switch( c ) {
 
@@ -64,13 +78,16 @@ main( int argc, char **argv )
     case 'n': compress = LIBSPECTRUM_FLAG_SNAPSHOT_NO_COMPRESSION;
       break;
 
+    case 'f': fix = 1;
+      break;
+
     }
   }
   argc -= optind;
   argv += optind;
 
   if( argc < 2 ) {
-    fprintf( stderr, "%s: usage: %s [-c] [-n] <infile> <outfile>\n", progname,
+    fprintf( stderr, "%s: usage: %s [-c] [-n] [-f] <infile> <outfile>\n", progname,
 	     progname );
     return 1;
   }
@@ -92,6 +109,8 @@ main( int argc, char **argv )
   }
 
   free( buffer );
+
+  if( fix ) fix_snapshot( snap );
 
   error = libspectrum_identify_file_with_class( &type, &class, argv[1], NULL,
                                                 0 );

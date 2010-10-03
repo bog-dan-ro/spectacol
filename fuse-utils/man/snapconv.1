@@ -56,6 +56,14 @@ programs that can only read entirely compressed .z80 files.
 .I \-n
 specifies that the output snapshot should be uncompressed.
 .TP
+.I \-f
+specifies that the A and F and A' and F' registers should be swapped.
+Version 0.5.0 and older of 
+.IR libspectrum "(3)"
+had a bug that resulted in these registers being swapped in SZX 
+snapshots only, and this flag can be used to correct any such 
+snapshots.
+.TP
 .I infile
 specifies the snapshot to be converted. This file can be in any of the
 snapshot formats supported by
