@@ -1294,8 +1294,14 @@ read_z80r_chunk( libspectrum_snap *snap, libspectrum_word version,
   libspectrum_snap_set_de  ( snap, libspectrum_read_word( buffer ) );
   libspectrum_snap_set_hl  ( snap, libspectrum_read_word( buffer ) );
 
-  libspectrum_snap_set_f_  ( snap, **buffer ); (*buffer)++;
-  libspectrum_snap_set_a_  ( snap, **buffer ); (*buffer)++;
+  if( ctx->swap_af ) {
+    libspectrum_snap_set_a_( snap, **buffer ); (*buffer)++;
+    libspectrum_snap_set_f_( snap, **buffer ); (*buffer)++;
+  } else {
+    libspectrum_snap_set_f_( snap, **buffer ); (*buffer)++;
+    libspectrum_snap_set_a_( snap, **buffer ); (*buffer)++;
+  }
+
   libspectrum_snap_set_bc_ ( snap, libspectrum_read_word( buffer ) );
   libspectrum_snap_set_de_ ( snap, libspectrum_read_word( buffer ) );
   libspectrum_snap_set_hl_ ( snap, libspectrum_read_word( buffer ) );

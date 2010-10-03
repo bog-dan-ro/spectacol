@@ -714,7 +714,15 @@ test_27( void )
              libspectrum_snap_a( snap ) );
     r = TEST_FAIL;
   } else if( libspectrum_snap_f( snap ) != 0x34 ) {
-    fprintf( stderr, "%s: F is 0x%04x, not the expected 0x34\n", progname,
+    fprintf( stderr, "%s: F is 0x%02x, not the expected 0x34\n", progname,
+             libspectrum_snap_f( snap ) );
+    r = TEST_FAIL;
+  } else if( libspectrum_snap_a_( snap ) != 0x56 ) {
+    fprintf( stderr, "%s: A' is 0x%02x, not the expected 0x56\n", progname,
+             libspectrum_snap_a_( snap ) );
+    r = TEST_FAIL;
+  } else if( libspectrum_snap_f_( snap ) != 0x78 ) {
+    fprintf( stderr, "%s: F' is 0x%02x, not the expected 0x78\n", progname,
              libspectrum_snap_f( snap ) );
     r = TEST_FAIL;
   } else {

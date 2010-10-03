@@ -784,3 +784,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          written with A and F swapped and read them in appropriately. Bump
          libspectrum version number so we know that new files are written
          without the bug.
+20101003 szx.c,test/{empty.szx,test.c}: we also need to swap A' and F'.
