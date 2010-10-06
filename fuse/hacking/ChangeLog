@@ -3343,3 +3343,5 @@
 20101002 lib/{compressed,uncompressed}/*.szx: update libspectrum signature in
          each file so we know they don't have the A-F swap bug.
 20101003 README: small update to mention WoS forums.
+20101006 configure.in: update header check for XShm.h (patch #3081497) (Gergely
+         Szasz).

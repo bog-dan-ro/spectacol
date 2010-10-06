@@ -251,7 +251,11 @@ if test -z "$UI"; then
   fi
 
   dnl Check for the MIT-SHM extension
-  AC_CHECK_HEADERS( X11/extensions/XShm.h )
+  AC_CHECK_HEADERS( X11/extensions/XShm.h,,,[[
+	#include <sys/ipc.h>
+	#include <sys/shm.h>
+	#include <X11/Xlib.h>
+	]])
   AC_CHECK_LIB( Xext, XShmAttach, LIBS="$LIBS -lXext" )
 
   AC_DEFINE([UI_X], 1, [Defined if Xlib UI in use])
