@@ -144,6 +144,7 @@ ui_init( int *argc, char ***argv )
 {
   GtkWidget *box, *menu_bar;
   GtkAccelGroup *accel_group;
+  GtkSettings *settings;
 
   gtk_init(argc,argv);
 
@@ -154,6 +155,8 @@ ui_init( int *argc, char ***argv )
 
   gtkui_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
+  settings = gtk_widget_get_settings( GTK_WIDGET( gtkui_window ) );
+  g_object_set( settings, "gtk-menu-bar-accel", "F1", NULL );
   gtk_window_set_title( GTK_WINDOW(gtkui_window), "Fuse" );
   gtk_window_set_wmclass( GTK_WINDOW(gtkui_window), fuse_progname, "Fuse" );
 

@@ -180,5 +180,8 @@ gtkstock_dialog_new( const gchar *title, GtkSignalFunc destroy )
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
 		      destroy ? destroy : DEFAULT_DESTROY, NULL );
   if( destroy == NULL ) gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
+  gtk_window_set_transient_for( GTK_WINDOW( dialog ),
+                                GTK_WINDOW( gtkui_window ) );
+
   return dialog;
 }

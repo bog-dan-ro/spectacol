@@ -82,7 +82,7 @@ gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
 {
   input_event_t fuse_event;
 
-  if( event->key.keyval == GDK_F10 && event->key.state == 0 )
+  if( event->key.keyval == GDK_F1 && event->key.state == 0 )
     ui_mouse_suspend();
 
   fuse_event.type = INPUT_EVENT_KEYPRESS;

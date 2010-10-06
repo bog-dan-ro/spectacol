@@ -97,6 +97,7 @@ gtkstatusbar_create( GtkBox *parent )
 					   NULL, gtkpixmap_mouse_active );
 
   speed_status = gtk_label_new( "100%" );
+  gtk_label_set_width_chars( GTK_LABEL( speed_status ), 8 );
   gtk_box_pack_end( GTK_BOX( status_bar ), speed_status, FALSE, FALSE, 0 );
 
   separator = gtk_vseparator_new();
