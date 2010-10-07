@@ -201,7 +201,7 @@ main( int argc, char **argv )
   FILE *raw, *hdf;
   int error;
   size_t byte_count;
-  enum hdf_version_t version;
+  enum hdf_version_t version = HDF_VERSION_11;
 
   progname = argv[0];
 
