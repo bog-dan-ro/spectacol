@@ -3349,3 +3349,5 @@
          open menus, set window dialogs as transient for the main window and set a
          fixed width for the emulation speed display (patch #3081729) (Sergio
          Baldovi).
+20101007 ui.c: don't close a disk or mdr if a write fails (patch #3058156) (thanks,
+         Crisis) (Gergely Szasz).

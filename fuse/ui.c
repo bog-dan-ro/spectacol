@@ -643,6 +643,7 @@ ui_tape_write( void )
 int
 ui_plus3_disk_write( specplus3_drive_number which )
 {
+  int err;
   char drive, *filename, title[80];
 
   switch( which ) {
@@ -658,18 +659,19 @@ ui_plus3_disk_write( specplus3_drive_number which )
   filename = ui_get_save_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
-  specplus3_disk_write( which, filename );
+  err = specplus3_disk_write( which, filename );
 
   free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 int
 ui_beta_disk_write( beta_drive_number which )
 {
+  int err;
   char drive, *filename, title[80];
 
   switch( which ) {
@@ -687,18 +689,19 @@ ui_beta_disk_write( beta_drive_number which )
   filename = ui_get_save_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
-  beta_disk_write( which, filename );
+  err = beta_disk_write( which, filename );
 
   free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 int
 ui_opus_disk_write( opus_drive_number which )
 {
+  int err;
   char drive, *filename, title[80];
 
   switch( which ) {
@@ -714,18 +717,19 @@ ui_opus_disk_write( opus_drive_number which )
   filename = ui_get_save_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
-  opus_disk_write( which, filename );
+  err = opus_disk_write( which, filename );
 
   free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 int
 ui_plusd_disk_write( plusd_drive_number which )
 {
+  int err;
   char drive, *filename, title[80];
 
   switch( which ) {
@@ -741,18 +745,19 @@ ui_plusd_disk_write( plusd_drive_number which )
   filename = ui_get_save_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
-  plusd_disk_write( which, filename );
+  err = plusd_disk_write( which, filename );
 
   free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 int
 ui_mdr_write( int which )
 {
+  int err;
   char *filename, title[80];
 
   fuse_emulation_pause();
@@ -762,13 +767,13 @@ ui_mdr_write( int which )
   filename = ui_get_save_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
-  if1_mdr_write( which, filename );
+  err = if1_mdr_write( which, filename );
 
   free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 #ifdef USE_WIDGET
