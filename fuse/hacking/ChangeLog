@@ -3345,9 +3345,11 @@
 20101003 README: small update to mention WoS forums.
 20101006 configure.in: update header check for XShm.h (patch #3081497) (Gergely
          Szasz).
-20101006 ui/gtk/{gtkkeyboard.c,gtkui.c,statusbar.c,stock.c}: use F1 as shortcut to
-         open menus, set window dialogs as transient for the main window and set a
-         fixed width for the emulation speed display (patch #3081729) (Sergio
-         Baldovi).
-20101007 ui.c: don't close a disk or mdr if a write fails (patch #3058156) (thanks,
-         Crisis) (Gergely Szasz).
+20101006 ui/gtk/{gtkkeyboard.c,gtkui.c,statusbar.c,stock.c}: use F1 as shortcut
+         to open menus, set window dialogs as transient for the main window and
+         set a fixed width for the emulation speed display (patch #3081729)
+         (Sergio Baldovi).
+20101007 ui.c: don't close a disk or mdr if a write fails (patch #3058156)
+         (thanks, Crisis) (Gergely Szasz).
+20101007 ui/widget/query.c: fix colour of dialog Cancel entry and correct action
+         returned when cancel is selected (patch #3083619) (Gergely Szasz).

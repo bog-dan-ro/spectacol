@@ -62,7 +62,7 @@ static void widget_query_line_draw( int left_edge, int width,
 static widget_query_entry query_save[] = {
   { "\012S\001ave", 0, INPUT_KEY_s, widget_save_click },
   { "\012D\001on't save", 1, INPUT_KEY_d, widget_dont_save_click },
-  { "\010C\001ancel", 2, INPUT_KEY_c, widget_cancel_click },
+  { "\012C\001ancel", 2, INPUT_KEY_c, widget_cancel_click },
   { NULL }
 };
 
@@ -87,7 +87,7 @@ widget_dont_save_click( void )
 static void
 widget_cancel_click( void )
 {
-  widget_query.save = UI_CONFIRM_SAVE_DONTSAVE;
+  widget_query.save = UI_CONFIRM_SAVE_CANCEL;
 }
 
 static void
