@@ -2327,8 +2327,7 @@ Virtual Microdrive images are accessible only when the Interface I is
 active from the
 .I "Options, Peripherals"
 menu. Note that any changes to the Microdrive image will not be
-written to the file on disk until the appropriate `eject and write'
-option is used.
+written to the file on disk until the appropriate save option is used.
 .RE
 .PP
 .I "Media, Interface I, Microdrive 1, Insert New"
@@ -2349,10 +2348,15 @@ Eject the Microdrive image in Microdrive 1. If the image has been
 modified, you will be asked as to whether you want any changes saved.
 .RE
 .PP
-.I "Media, Interface I, Microdrive 1, Eject and write..."
+.I "Media, Interface I, Microdrive 1, Save"
 .RS
-Write the Microdrive image in Microdrive 1 to a file, and then eject
-the image.  You will be prompted for a filename.
+Save the Microdrive image in Microdrive 1.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 1, Save as..."
+.RS
+Write the Microdrive image in Microdrive 1 to a file. You will be 
+prompted for a filename.
 .RE
 .PP
 .I "Media, Interface I, Microdrive 1, Write protect, Enable"
@@ -2415,21 +2419,26 @@ Fuse.
 .PP
 .I "Media, Disk, +3, Drive A:, Insert..."
 .RS
-Select a disk-image file to read/write in the +3's emulated drive
+Insert a disk-image file to read/write in the +3's emulated drive
 A:.
 .RE
 .PP
 .I "Media, Disk, +3, Drive A:, Eject"
 .RS
-Deselect the disk image currently in the +3's emulated drive A: \- or
+Eject the disk image currently in the +3's emulated drive A: \- or
 from the emulated machine's perspective, eject it. Note that any
 changes made to the image will not be saved.
 .RE
 .PP
-.I "Media, Disk, +3, Drive A:, Eject and write..."
+.I "Media, Disk, +3, Drive A:, Save"
 .RS
-Deselect the disk image currently in the +3's drive A: and write the
-current state of the disk to a file. You will be prompted for a filename.
+Save the disk image currently in the +3's drive A:.
+.RE
+.PP
+.I "Media, Disk, +3, Drive A:, Save as..."
+.RS
+Save the current state of the disk image currently in the +3's 
+drive A: to a file. You will be prompted for a filename.
 .RE
 .PP
 .I "Media, Disk, +3, Drive B:, Insert..."
@@ -2443,7 +2452,12 @@ second 3" drive.
 As above, but for drive B:.
 .RE
 .PP
-.I "Media, Disk, +3, Drive B:, Eject and write"
+.I "Media, Disk, +3, Drive B:, Save"
+.RS
+As above, but for drive B:.
+.RE
+.PP
+.I "Media, Disk, +3, Drive B:, Save as..."
 .RS
 As above, but for drive B:.
 .RE
@@ -2457,7 +2471,9 @@ Insert a new (unformatted) disk into the emulated Beta drive A:.
 .br
 .I "Media, Disk, Beta, Drive A:, Eject"
 .br
-.I "Media, Disk, Beta, Drive A:, Eject and write..."
+.I "Media, Disk, Beta, Drive A:, Save"
+.br
+.I "Media, Disk, Beta, Drive A:, Save as..."
 .RS
 As above, but for the emulated Beta disk drive A:.
 .RE
@@ -2487,7 +2503,9 @@ As above, but for the remaining emulated Beta disk interface drives.
 .br
 .I "Media, Disk, Opus, Drive 1, Eject"
 .br
-.I "Media, Disk, Opus, Drive 1, Eject and write..."
+.I "Media, Disk, Opus, Drive 1, Save"
+.br
+.I "Media, Disk, Opus, Drive 1, Save as..."
 .br
 .I "Media, Disk, Opus, Drive 1, Write protect, Enable"
 .br
@@ -2504,7 +2522,9 @@ As above, but for the emulated Opus Discovery drives.
 .br
 .I "Media, Disk, +D, Drive 1, Eject"
 .br
-.I "Media, Disk, +D, Drive 1, Eject and write..."
+.I "Media, Disk, +D, Drive 1, Save"
+.br
+.I "Media, Disk, +D, Drive 1, Save as..."
 .br
 .I "Media, Disk, +D, Drive 1, Write protect, Enable"
 .br

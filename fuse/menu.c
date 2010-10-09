@@ -435,32 +435,39 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
   fuse_emulation_unpause();
 }
 
+/*
+1. menu_media_eject
+2. xxx_disk_eject
+2.a. ui_xxx_disk_write( save )
+2.b. ui_xxx_disk_write( saveas )
+[2.c. ui_xxx_disk_eject( save )]
+*/
 MENU_CALLBACK_WITH_ACTION( menu_media_eject )
 {
-  int which, write, type;
+  int which, saveas, type;
 
   ui_widget_finish();
 
   action--;
   which = action & 0x00f;
   type = ( action & 0x0f0 ) >> 4;
-  write = !!( action & 0x100 );
+  saveas = ( action & 0xf00 ) >> 8;    /* 0 -> eject, 1 -> save as, 2 -> save */
 
   switch( type ) {
   case 0:
-    specplus3_disk_eject( which, write );
+    specplus3_disk_eject( which, saveas );
     break;
   case 1:
-    beta_disk_eject( which, write );
+    beta_disk_eject( which, saveas );
     break;
   case 2:
-    plusd_disk_eject( which, write );
+    plusd_disk_eject( which, saveas );
     break;
   case 3:
-    if1_mdr_eject( which, write );
+    if1_mdr_eject( which, saveas );
     break;
   case 4:
-    opus_disk_eject( which, write );
+    opus_disk_eject( which, saveas );
     break;
   }
 }

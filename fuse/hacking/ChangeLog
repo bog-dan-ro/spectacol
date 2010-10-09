@@ -3353,3 +3353,6 @@
          (thanks, Crisis) (Gergely Szasz).
 20101007 ui/widget/query.c: fix colour of dialog Cancel entry and correct action
          returned when cancel is selected (patch #3083619) (Gergely Szasz).
+20101009 disk/{beta.c,disk.[ch],opus.c,plusd.c},if1.c,machines/specplus3.c,
+         man/fuse.1,menu.c,menu_data.dat,ui.c,ui/ui.h: change "Eject and write"
+         menu items to "Save" and "Save as" (patch #3083639) (Gergely Szasz).

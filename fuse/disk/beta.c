@@ -564,25 +564,28 @@ beta_disk_writeprotect( beta_drive_number which, int wrprot )
 }
 
 int
-beta_disk_eject( beta_drive_number which, int write )
+beta_disk_eject( beta_drive_number which, int saveas )
 {
   wd_fdc_drive *d;
   char drive;
-  
+
   if( which >= BETA_NUM_DRIVES )
     return 1;
-    
+
   d = &beta_drives[ which ];
-  
+
   if( !d->fdd.loaded )
     return 0;
-    
-  if( write ) {
-  
-    if( ui_beta_disk_write( which ) ) return 1;
+
+  if( saveas ) {	/* 1 -> save as.., 2 -> save */
+
+    if( d->disk.filename == NULL ) saveas = 1;
+    if( ui_beta_disk_write( which, 2 - saveas ) ) return 1;
+    d->disk.dirty = 0;
+    return 0;
 
   } else {
-  
+
     if( d->disk.dirty ) {
       ui_confirm_save_t confirm;
 
@@ -603,7 +606,7 @@ beta_disk_eject( beta_drive_number which, int write )
       switch( confirm ) {
 
       case UI_CONFIRM_SAVE_SAVE:
-	if( ui_beta_disk_write( which ) ) return 1;
+	if( beta_disk_eject( which, 2 ) ) return 1;	/* first save */
 	break;
 
       case UI_CONFIRM_SAVE_DONTSAVE: break;
@@ -641,6 +644,7 @@ beta_disk_write( beta_drive_number which, const char *filename )
   int error;
 
   d->disk.type = DISK_TYPE_NONE;
+  if( filename == NULL ) filename = d->disk.filename;	/* write over original file */
   error = disk_write( &d->disk, filename );
 
   if( error != DISK_OK ) {
@@ -649,6 +653,10 @@ beta_disk_write( beta_drive_number which, const char *filename )
     return 1;
   }
 
+  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
+    free( d->disk.filename );
+    d->disk.filename = strdup( filename );
+  }
   return 0;
 }
 

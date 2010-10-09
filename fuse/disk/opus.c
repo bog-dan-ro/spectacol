@@ -410,7 +410,7 @@ opus_disk_insert( opus_drive_number which, const char *filename,
 }
 
 int
-opus_disk_eject( opus_drive_number which, int write )
+opus_disk_eject( opus_drive_number which, int saveas )
 {
   wd_fdc_drive *d;
 
@@ -422,9 +422,12 @@ opus_disk_eject( opus_drive_number which, int write )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( write ) {
+  if( saveas ) {	/* 1 -> save as.., 2 -> save */
 
-    if( ui_opus_disk_write( which ) ) return 1;
+    if( d->disk.filename == NULL ) saveas = 1;
+    if( ui_opus_disk_write( which, 2 - saveas ) ) return 1;
+    d->disk.dirty = 0;
+    return 0;
 
   } else {
 
@@ -439,7 +442,7 @@ opus_disk_eject( opus_drive_number which, int write )
       switch( confirm ) {
 
       case UI_CONFIRM_SAVE_SAVE:
-	if( ui_opus_disk_write( which ) ) return 1;
+	if( opus_disk_eject( which, 2 ) ) return 1;	/* first save */
 	break;
 
       case UI_CONFIRM_SAVE_DONTSAVE: break;
@@ -529,6 +532,7 @@ opus_disk_write( opus_drive_number which, const char *filename )
   int error;
   
   d->disk.type = DISK_TYPE_NONE;
+  if( filename == NULL ) filename = d->disk.filename;	/* write over original file */
   error = disk_write( &d->disk, filename );
 
   if( error != DISK_OK ) {
@@ -537,6 +541,10 @@ opus_disk_write( opus_drive_number which, const char *filename )
     return 1;
   }
 
+  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
+    free( d->disk.filename );
+    d->disk.filename = strdup( filename );
+  }
   return 0;
 }
 

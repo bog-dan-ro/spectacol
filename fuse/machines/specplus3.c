@@ -452,7 +452,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
       break;
     }
     error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );
-    disk_preformat( &d->disk );						/* pre-format disk for +3 */
+    disk_preformat( &d->disk );			/* pre-format disk for +3 */
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",
 				disk_strerror( error ) );
@@ -488,7 +488,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
 }
 
 int
-specplus3_disk_eject( specplus3_drive_number which, int write )
+specplus3_disk_eject( specplus3_drive_number which, int saveas )
 {
   upd_fdc_drive *d;
 
@@ -500,9 +500,12 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( write ) {
+  if( saveas ) {	/* 1 -> save as.., 2 -> save */
 
-    if( ui_plus3_disk_write( which ) ) return 1;
+    if( d->disk.filename == NULL ) saveas = 1;
+    if( ui_plus3_disk_write( which, 2 - saveas ) ) return 1;	/* save as... */
+    d->disk.dirty = 0;
+    return 0;
 
   } else {
 
@@ -517,7 +520,7 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
       switch( confirm ) {
 
       case UI_CONFIRM_SAVE_SAVE:
-	if( ui_plus3_disk_write( which ) ) return 1;
+	if( specplus3_disk_eject( which, 2 ) ) return 1;   /* first save it...*/
 	break;
 
       case UI_CONFIRM_SAVE_DONTSAVE: break;
@@ -605,8 +608,9 @@ specplus3_disk_write( specplus3_drive_number which, const char *filename )
 {
   upd_fdc_drive *d = &specplus3_drives[ which ];
   int error;
-  
+
   d->disk.type = DISK_TYPE_NONE;
+  if( filename == NULL ) filename = d->disk.filename; /* write over original file */
   error = disk_write( &d->disk, filename );
 
   if( error != DISK_OK ) {
@@ -615,6 +619,10 @@ specplus3_disk_write( specplus3_drive_number which, const char *filename )
     return 1;
   }
 
+  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
+    free( d->disk.filename );
+    d->disk.filename = strdup( filename );
+  }
   return 0;
 }
 

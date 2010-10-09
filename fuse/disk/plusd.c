@@ -457,7 +457,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 }
 
 int
-plusd_disk_eject( plusd_drive_number which, int write )
+plusd_disk_eject( plusd_drive_number which, int saveas )
 {
   wd_fdc_drive *d;
 
@@ -469,9 +469,12 @@ plusd_disk_eject( plusd_drive_number which, int write )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( write ) {
+  if( saveas ) {	/* 1 -> save as.., 2 -> save */
 
-    if( ui_plusd_disk_write( which ) ) return 1;
+    if( d->disk.filename == NULL ) saveas = 1;
+    if( ui_plusd_disk_write( which, 2 - saveas ) ) return 1;
+    d->disk.dirty = 0;
+    return 0;
 
   } else {
 
@@ -486,7 +489,7 @@ plusd_disk_eject( plusd_drive_number which, int write )
       switch( confirm ) {
 
       case UI_CONFIRM_SAVE_SAVE:
-	if( ui_plusd_disk_write( which ) ) return 1;
+	if( plusd_disk_eject( which, 2 ) ) return 1;	/* first save */
 	break;
 
       case UI_CONFIRM_SAVE_DONTSAVE: break;
@@ -569,19 +572,25 @@ plusd_disk_writeprotect( plusd_drive_number which, int wrprot )
   return 0;
 }
 
+/***TODO most part of the next routine could be move to a common place... */
 int
 plusd_disk_write( plusd_drive_number which, const char *filename )
 {
   wd_fdc_drive *d = &plusd_drives[ which ];
   int error;
-  
+
   d->disk.type = DISK_TYPE_NONE;
+  if( filename == NULL ) filename = d->disk.filename;	/* write over original file */
   error = disk_write( &d->disk, filename );
 
   if( error != DISK_OK ) {
     ui_error( UI_ERROR_ERROR, "couldn't write '%s' file: %s", filename,
 	      disk_strerror( error ) );
     return 1;
+  }
+  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
+    free( d->disk.filename );
+    d->disk.filename = strdup( filename );
   }
 
   return 0;

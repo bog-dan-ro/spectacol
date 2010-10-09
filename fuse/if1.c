@@ -64,6 +64,7 @@ enum {
  
 typedef struct microdrive_t {
   utils_file file;
+  char *filename;		/* old filename */
   int inserted;
   int modified;
   int motor_on;
@@ -1052,6 +1053,7 @@ if1_mdr_new( microdrive_t *mdr )
   libspectrum_byte len;
   long int i;
 
+  mdr->filename = NULL;
   if( settings_current.mdr_random_len ) {	/* Random length */
     len = 171 + ( ( rand() >> 2 ) + ( rand() >> 2 ) +
                   ( rand() >> 2 ) + ( rand() >> 2 ) )
@@ -1135,6 +1137,7 @@ if1_mdr_insert( int which, const char *filename )
 
   mdr->inserted = 1;
   mdr->modified = 0;
+  mdr->filename = strdup( filename );
   /* we assume formatted cartridges */
   for( i = libspectrum_microdrive_cartridge_len( mdr->cartridge );
 	i > 0; i-- )
@@ -1146,7 +1149,7 @@ if1_mdr_insert( int which, const char *filename )
 }
 
 int
-if1_mdr_eject( int which, int write )
+if1_mdr_eject( int which, int saveas )
 {
   microdrive_t *mdr;
 
@@ -1158,9 +1161,12 @@ if1_mdr_eject( int which, int write )
   if( !mdr->inserted )
     return 0;
 
-  if( write ) {
+  if( saveas ) {	/* 1 -> save as.., 2 -> save */
 
-    if( ui_mdr_write( which ) ) return 1;
+    if( mdr->filename == NULL ) saveas = 1;
+    if( ui_mdr_write( which, 2 - saveas ) ) return 1;
+    mdr->modified = 0;
+    return 0;
 
   } else {
 
@@ -1175,7 +1181,7 @@ if1_mdr_eject( int which, int write )
       switch( confirm ) {
 
       case UI_CONFIRM_SAVE_SAVE:
-	if( ui_mdr_write( which ) ) return 1;
+	if( if1_mdr_eject( which, 2 ) ) return 1;	/* first save */
 	break;
 
       case UI_CONFIRM_SAVE_DONTSAVE: break;
@@ -1186,7 +1192,11 @@ if1_mdr_eject( int which, int write )
   }
 
   mdr->inserted = 0;
-  
+  if( mdr->filename != NULL ) {
+    free( mdr->filename );
+    mdr->filename = NULL;
+  }
+
   update_menu( UMENU_MDRV1 + which );
   return 0;
 }
@@ -1198,10 +1208,16 @@ if1_mdr_write( int which, const char *filename )
   
   libspectrum_microdrive_mdr_write( mdr->cartridge, &mdr->file.buffer,
 			            &mdr->file.length );
-    
+
+  if( filename == NULL ) filename = mdr->filename;	/* Write over the original file */
+
   if( utils_write_file( filename, mdr->file.buffer, mdr->file.length ) )
     return 1;
 
+  if( mdr->filename && strcmp( filename, mdr->filename ) ) {
+    free( mdr->filename );
+    mdr->filename = strdup( filename );
+  }
   return 0;
 }
 

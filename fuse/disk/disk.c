@@ -675,6 +675,10 @@ disk_close( disk_t *d )
     free( d->data );
     d->data = NULL;
   }
+  if( d->filename != NULL ) {
+    free( d->filename );
+    d->filename = NULL;
+  }
   d->type = DISK_TYPE_NONE;
 }
 
@@ -728,6 +732,7 @@ int
 disk_new( disk_t *d, int sides, int cylinders,
 	     disk_dens_t density, disk_type_t type )
 {
+  d->filename = NULL;
   if( density < DISK_DENS_AUTO || density > DISK_HD ||	/* unknown density */
       type <= DISK_TYPE_NONE || type >= DISK_TYPE_LAST || /* unknown type */
       sides < 1 || sides > 2 ||				/* 1 or 2 side */
@@ -1903,6 +1908,7 @@ disk_open2( disk_t *d, const char *filename, int preindex )
   d->dirty = 0;
   disk_update_tlens( d );
   update_tracks_mode( d );
+  d->filename = strdup( filename );
   return d->status = DISK_OK;
 }
 
@@ -1972,6 +1978,7 @@ disk_open( disk_t *d, const char *filename, int preindex, int merge_disks )
   int l, g = 0, pos = 0;
   disk_t d1, d2;
 
+  d->filename = NULL;
   if( filename == NULL || *filename == '\0' )
     return d->status = DISK_OPEN;
 

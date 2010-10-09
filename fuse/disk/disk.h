@@ -87,6 +87,7 @@ typedef enum disk_dens_t {
 } disk_dens_t;
 
 typedef struct disk_t {
+  char *filename;	/* original filename */
   int sides;		/* 1 or 2 */
   int cylinders;	/* tracks per side  */
   int bpt;		/* bytes per track */
