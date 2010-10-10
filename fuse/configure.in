@@ -42,7 +42,11 @@ AC_CHECK_TOOL(WINDRES, windres, no)
 AC_SUBST(WINDRES)
 if test "$WINDRES" != no; then
   WINDRES_OBJ="windres.o"
-  AC_DEFINE([VERSION_WIN32], [translit(FUSE_VERSION, [.], [,])], [Define version information for win32 executable])
+  define(FUSE_FULL_VERSION,
+         [ifelse(translit(FUSE_VERSION, [0-9]), [.], [FUSE_VERSION[.0.0]],
+                 translit(FUSE_VERSION, [0-9]), [..], [FUSE_VERSION[.0]],
+                 [FUSE_VERSION])])dnl
+  AC_DEFINE([VERSION_WIN32], [translit(FUSE_FULL_VERSION, [.], [,])], [Define version information for win32 executable])
 fi
 AC_SUBST(WINDRES_OBJ)
 AM_SUBST_NOTMAKE(WINDRES_OBJ)

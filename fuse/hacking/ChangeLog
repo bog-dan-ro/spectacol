@@ -3356,3 +3356,5 @@
 20101009 disk/{beta.c,disk.[ch],opus.c,plusd.c},if1.c,machines/specplus3.c,
          man/fuse.1,menu.c,menu_data.dat,ui.c,ui/ui.h: change "Eject and write"
          menu items to "Save" and "Save as" (patch #3083639) (Gergely Szasz).
+20101010 configure.in: pad version number for Win32 if needed (patch #3084574)
+         (Sergio Baldovi).

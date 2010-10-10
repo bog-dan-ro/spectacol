@@ -59,7 +59,11 @@ AC_SUBST(WINDRES)
 if test "$WINDRES" != no; then
   WINDRES_OBJ="windres.o"
   WINDRES_LDFLAGS="-Xlinker windres.o"
-  AC_DEFINE([VERSION_WIN32], [translit(LIBSPECTRUM_VERSION, [.], [,])[,0]], [Define version information for win32 dll library])
+  define(LIBSPECTRUM_FULL_VERSION,
+         [ifelse(translit(LIBSPECTRUM_VERSION, [0-9]), [.], [LIBSPECTRUM_VERSION[.0.0]],
+                 translit(LIBSPECTRUM_VERSION, [0-9]), [..], [LIBSPECTRUM_VERSION[.0]],
+                 [LIBSPECTRUM_VERSION])])dnl
+  AC_DEFINE([VERSION_WIN32], [translit(LIBSPECTRUM_FULL_VERSION, [.], [,])], [Define version information for win32 dll library])
 fi
 AC_SUBST(WINDRES_OBJ)
 AM_SUBST_NOTMAKE(WINDRES_OBJ)

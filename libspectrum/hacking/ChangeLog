@@ -785,3 +785,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          libspectrum version number so we know that new files are written
          without the bug.
 20101003 szx.c,test/{empty.szx,test.c}: we also need to swap A' and F'.
+20101010 configure.in: pad version number for Win32 if needed (patch #3084574)
+         (Sergio Baldovi).
