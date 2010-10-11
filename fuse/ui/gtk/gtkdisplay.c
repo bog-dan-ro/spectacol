@@ -97,6 +97,7 @@ static int gtkdisplay_current_size=1;
 static int init_colours( void );
 static void gtkdisplay_area(int x, int y, int width, int height);
 static void register_scalers( int force_scaler );
+static void gtkdisplay_load_gfx_mode( void );
 
 /* Callbacks */
 
@@ -168,6 +169,8 @@ uidisplay_init( int width, int height )
   if ( scaler_select_scaler( current_scaler ) )
         scaler_select_scaler( SCALER_NORMAL );
 
+  gtkdisplay_load_gfx_mode();
+
   display_ui_initialised = 1;
 
   return 0;
@@ -231,9 +234,13 @@ register_scalers( int force_scaler )
 
   if( force_scaler ) {
     switch( gtkdisplay_current_size ) {
-    case 1: scaler = SCALER_NORMAL; break;
-    case 2: scaler = SCALER_DOUBLESIZE; break;
-    case 3: scaler = SCALER_TRIPLESIZE; break;
+    case 1: scaler = machine_current->timex ? SCALER_HALF : SCALER_NORMAL;
+      break;
+    case 2: scaler = machine_current->timex ? SCALER_NORMAL : SCALER_DOUBLESIZE;
+      break;
+    case 3: scaler = machine_current->timex ? SCALER_TIMEX1_5X :
+                                              SCALER_TRIPLESIZE;
+      break;
     }
   }
 
@@ -299,54 +306,10 @@ static void gtkdisplay_area(int x, int y, int width, int height)
 int
 uidisplay_hotswap_gfx_mode( void )
 {
-  GdkGeometry geometry;
-  GdkWindowHints hints;
-  float scale;
-
   fuse_emulation_pause();
 
-  scale = scaler_get_scaling_factor( current_scaler );
-
-  hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
-          GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;
-
-  geometry.min_width = DISPLAY_ASPECT_WIDTH;
-  geometry.min_height = DISPLAY_SCREEN_HEIGHT;
-  geometry.max_width = 3 * DISPLAY_ASPECT_WIDTH;
-  geometry.max_height = 3 * DISPLAY_SCREEN_HEIGHT;
-  geometry.base_width = scale * image_width;
-  geometry.base_height = scale * image_height;
-  geometry.width_inc = DISPLAY_ASPECT_WIDTH;
-  geometry.height_inc = DISPLAY_SCREEN_HEIGHT;
-
-  if( settings_current.aspect_hint ) {
-    hints |= GDK_HINT_ASPECT;
-    if( settings_current.strict_aspect_hint ) {
-      geometry.min_aspect = geometry.max_aspect =
-        (float)DISPLAY_ASPECT_WIDTH / DISPLAY_SCREEN_HEIGHT;
-    } else {
-      geometry.min_aspect = 1.2;
-      geometry.max_aspect = 1.5;
-    }
-  }
-
-  gtk_window_set_geometry_hints( GTK_WINDOW( gtkui_window ),
-                                 GTK_WIDGET( gtkui_drawing_area ),
-                                 &geometry, hints );
-
-  gtk_window_set_default_size( GTK_WINDOW( gtkui_window ),
-                               scale * image_width, scale * image_height );
-
-  gtk_drawing_area_size( GTK_DRAWING_AREA( gtkui_drawing_area ),
-                         scale * image_width, scale * image_height );
-
-  drawing_area_resize( scale * image_width, scale * image_height, 0 );
- 
-  gtk_window_resize( GTK_WINDOW( gtkui_window ), scale * image_width,
-                     scale * image_height );
-
-  /* Redraw the entire screen... */
-  display_refresh_all();
+  /* Setup the new GFX mode */
+  gtkdisplay_load_gfx_mode();
 
   fuse_emulation_unpause();
 
@@ -464,4 +427,55 @@ drawing_area_resize_callback( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
 {
   drawing_area_resize( event->configure.width, event->configure.height, 1 );
   return TRUE;
+}
+
+static void
+gtkdisplay_load_gfx_mode( void )
+{
+  GdkGeometry geometry;
+  GdkWindowHints hints;
+  float scale;
+
+  scale = scaler_get_scaling_factor( current_scaler );
+
+  hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
+          GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;
+
+  geometry.min_width = DISPLAY_ASPECT_WIDTH;
+  geometry.min_height = DISPLAY_SCREEN_HEIGHT;
+  geometry.max_width = 3 * DISPLAY_ASPECT_WIDTH;
+  geometry.max_height = 3 * DISPLAY_SCREEN_HEIGHT;
+  geometry.base_width = scale * image_width;
+  geometry.base_height = scale * image_height;
+  geometry.width_inc = DISPLAY_ASPECT_WIDTH;
+  geometry.height_inc = DISPLAY_SCREEN_HEIGHT;
+
+  if( settings_current.aspect_hint ) {
+    hints |= GDK_HINT_ASPECT;
+    if( settings_current.strict_aspect_hint ) {
+      geometry.min_aspect = geometry.max_aspect =
+        (float)DISPLAY_ASPECT_WIDTH / DISPLAY_SCREEN_HEIGHT;
+    } else {
+      geometry.min_aspect = 1.2;
+      geometry.max_aspect = 1.5;
+    }
+  }
+
+  gtk_window_set_geometry_hints( GTK_WINDOW( gtkui_window ),
+                                 GTK_WIDGET( gtkui_drawing_area ),
+                                 &geometry, hints );
+
+  gtk_window_set_default_size( GTK_WINDOW( gtkui_window ),
+                               scale * image_width, scale * image_height );
+
+  gtk_drawing_area_size( GTK_DRAWING_AREA( gtkui_drawing_area ),
+                         scale * image_width, scale * image_height );
+
+  drawing_area_resize( scale * image_width, scale * image_height, 0 );
+ 
+  gtk_window_resize( GTK_WINDOW( gtkui_window ), scale * image_width,
+                     scale * image_height );
+
+  /* Redraw the entire screen... */
+  display_refresh_all();
 }
