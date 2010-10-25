@@ -3361,3 +3361,5 @@
 20101011 ui/gtk/gtkdisplay.c: resize window when machine selection switches
          between Timex and non-Timex modes (fixes bug #3084862) (thanks, Phil)
          (Fred).
+20101025 memory.c: writable_roms preference shouldn't affect the 16K machine
+         "empty" page (thanks, Andrew Owen) (Fred).

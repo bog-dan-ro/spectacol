@@ -276,7 +276,9 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
 
   if( opus_active && address >= 0x2800 && address < 0x3800 ) {
     opus_write( address, b );
-  } else if( mapping->writable || settings_current.writable_roms ) {
+  } else if( mapping->writable ||
+             (mapping->bank != MEMORY_BANK_NONE &&
+              settings_current.writable_roms) ) {
     libspectrum_word offset = address & 0x1fff;
     libspectrum_byte *memory = mapping->page;
 
