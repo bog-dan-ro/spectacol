@@ -54,10 +54,12 @@ The emulator can load any of the formats supported by
 virtual-tape files. Saving to SZX, Z80 and SNA snapshots and TZX and
 TAP tape files is supported. The SLT extension to the Z80 format is
 partly supported (enough for multi-load games); however, loading of
-the old DAT-file variant is not. DSK disk images are supported when
-emulating a +3, TRD and SCL disk images are supported when emulating
-a Pentagon or Scorpion and DCK cartridge images are supported when
-emulating a Timex 2068 variant. Interface II ROM cartridges are also
+the old DAT-file variant is not. DSK, UDI, FDI, TR0, SDF, MGT, IMG, 
+SAD, TRD, SCL and OPD disk images are supported when a disk interface
+is being emulated, including the integrated disk drives on +3, 
+Pentagon or Scorpion machines as well as the +D, Opus Discovery and 
+Beta 128 interfaces. DCK cartridge images are supported when 
+emulating a Timex 2068 variant. Interface II ROM cartridges are also 
 supported.
 .PP
 Finally, there is also support for reading and writing the RZX input recording
@@ -435,6 +437,7 @@ Specify machine type to emulate initially. The default is
 a 48K Spectrum. The available options are
 .IR 16 ,
 .IR 48 ,
+.IR 48_ntsc,
 .IR 128 ,
 .IR plus2 ,
 .IR plus2a ,
@@ -445,8 +448,9 @@ a 48K Spectrum. The available options are
 .IR pentagon ,
 .IR pentagon512 ,
 .IR pentagon1024 ,
+.IR scorpion
 and
-.IR scorpion .
+.IR se .
 .RE
 .PP
 .I "\-\-melodik"
@@ -1669,9 +1673,9 @@ limits bass and treble response.
 .RE
 .PP
 .I "AY volume"
-.RE
-Sets the relative volume of the AY-3-8912 chip from a range of 0-100%.
 .RS
+Sets the relative volume of the AY-3-8912 chip from a range of 0-100%.
+.RE
 .PP
 .I "Beeper volume"
 .RS
@@ -2102,6 +2106,12 @@ and
 .RS
 The original machines as released by Sinclair in 1982 with 16 or 48K
 of RAM respectively.
+.RE
+.PP
+.I "Spectrum 48K (NTSC)"
+.RS
+The NTSC 48K machine released in limited numbers in parts of South 
+America.
 .RE
 .PP
 .I "Spectrum 128K"
@@ -3494,13 +3504,16 @@ Fuse supports both the `CPCEMU' and `EXTENDED' formats.
 .\"
 .SH BETA 128 EMULATION
 .PP
-Fuse supports .SCL and .TRD images in its Pentagon and Scorpion
+Fuse supports Betadisk emulation in its Pentagon and Scorpion
 emulation, and also under 48K, TC2048, 128K and +2 (but not +2A)
 emulation if the
 .I Beta 128 interface
 option from the
 .I "Options, Peripherals..."
 dialog is enabled.
+See the
+.B "DISK FILE FORMATS"
+section for mode details on supported disk file formats.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -3508,7 +3521,9 @@ dialog is enabled.
 .PP
 By default, Fuse emulates the Opus Discovery interface with the optional 2k RAM
 expansion and a second 40 track single sided disk drive.
-Fuse supports .OPD and .OPU images in its Opus Discovery emulation. The Opus
+See the
+.B "DISK FILE FORMATS"
+section for mode details on supported disk file formats. The Opus
 Discovery's printer port is also emulated for output only. (See the
 .B "PRINTER EMULATION"                                             
 section for more details.) The Opus Discovery may only be
@@ -3519,7 +3534,9 @@ use the same syntax as Interface I and Microdrives.
 .\"
 .SH +D EMULATION
 .PP
-Fuse supports .MGT and .IMG images in its +D emulation. The +D's
+Fuse supports emulating the +D disk and printer interface. See the
+.B "DISK FILE FORMATS"
+section for mode details on supported disk file formats. The +D's
 printer port is emulated. (See the
 .B "PRINTER EMULATION"                                             
 section for more details.) The +D may only be

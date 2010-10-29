@@ -3363,3 +3363,4 @@
          (Fred).
 20101025 memory.c: writable_roms preference shouldn't affect the 16K machine
          "empty" page (thanks, Andrew Owen) (Fred).
+20101029 man/fuse.1: some updates to bring things a bit more up to date (Fred).
