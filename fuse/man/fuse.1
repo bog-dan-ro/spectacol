@@ -3691,13 +3691,6 @@ disk images.
 Selecting a startup filter doesn't work properly with user interfaces
 other than SDL and GTK+.
 .PP
-Attempting to replay an RZX file without an embedded snapshot from the
-command-line doesn't work if you do `./fuse
-.IR "rzxfile snapshot" '.
-`./fuse
-.IR "snapshot rzxfile" '
-does work though, so use that instead.
-.PP
 Changing virtual consoles when using SVGAlib for joystick support
 causes Fuse to exit. If this is a problem, compile Fuse with the
 .RI ` \-\-disable\-ui\-joystick '
