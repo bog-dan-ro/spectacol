@@ -396,8 +396,10 @@ uidisplay_area( int x, int start, int width, int height)
 int
 uidisplay_end( void )
 {
-  fbdisplay_end();
-  display_ui_initialised = 0;
+  if (display_ui_initialised) {
+    fbdisplay_end();
+    display_ui_initialised = 0;
+  }
   return 0;
 }
 

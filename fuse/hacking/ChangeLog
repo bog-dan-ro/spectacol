@@ -3366,3 +3366,5 @@
 20101029 man/fuse.1: some updates to bring things a bit more up to date (Fred).
 20101102 man/fuse.1: remove reference to fixed issue in RZX playback command
          line ordering (patch #3100707) (Sergio Baldovi).
+20101129 ui/fb/fbdisplay.c: only call fbdisplay_end() when display is
+         initialised (fixes bug #3119382) (rkd77).
