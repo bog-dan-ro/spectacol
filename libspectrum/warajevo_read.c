@@ -150,17 +150,17 @@ decompress_block( libspectrum_byte *dest, const libspectrum_byte *src,
 static libspectrum_dword
 lsb2dword( const libspectrum_byte *mem )
 {
-  return  mem[0]             +
-          mem[1] *     0x100 +
-          mem[2] *   0x10000 +
-          mem[3] * 0x1000000 ;
+  return ( mem[0] <<  0 ) |
+         ( mem[1] <<  8 ) |
+         ( mem[2] << 16 ) |
+         ( mem[3] << 24 );
 } 
   
 static libspectrum_word
 lsb2word( const libspectrum_byte *mem ) 
 {
-  return  mem[0]             +
-          mem[1] *     0x100 ;
+  return ( mem[0] << 0 ) |
+         ( mem[1] << 8 );
 }
 
 /* The main load function */
