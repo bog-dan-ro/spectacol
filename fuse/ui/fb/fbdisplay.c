@@ -27,6 +27,7 @@
 #include <config.h>
 
 #include <errno.h>
+#include <math.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -66,7 +67,7 @@ int image_width, image_height;
 /* Are we in a Timex display mode? */
 static int hires;
 
-static int register_scalers( void );
+static void register_scalers( void );
 
 /* probably 0rrrrrgggggbbbbb */
 static short rgbs[16], greys[16];
@@ -77,6 +78,7 @@ static libspectrum_word *gm = 0;
 static struct fb_fix_screeninfo fixed;
 static struct fb_var_screeninfo orig_display, display;
 static int got_orig_display = 0;
+static int changed_palette = 0;
 
 unsigned long fb_resolution; /* == xres << 16 | yres */
 #define FB_RES(X,Y) ((X) << 16 | (Y))
@@ -127,20 +129,20 @@ static const fuse_fb_mode_t fb_modes_doublescan_alt[] = {
   { 320, 240, 80000,  40, 28,  9,  2,  20,  3, 0, 1 }, ** 320x240-60  60.310 M tall
   { 320, 240, 55555,  52, 16, 12,  0,  28,  2, 0, 1 }, ** 320x240-85  85.177 M
  */
+
+static unsigned short red16[256], green16[256], blue16[256], transp16[256];
+static struct fb_cmap orig_cmap = {0, 256, red16, green16, blue16, transp16};
+
 static int fb_set_mode( void );
 
 int uidisplay_init( int width, int height )
 {
-  int error;
-
   hires = ( width == 640 ? 1 : 0 );
 
-  scaler_register_clear();
-  
   image_width = width; image_height = height;
   image_scale = width / DISPLAY_ASPECT_WIDTH;
 
-  error = register_scalers(); if( error ) return error;
+  register_scalers();
 
   display_ui_initialised = 1;
 
@@ -149,10 +151,30 @@ int uidisplay_init( int width, int height )
   return 0;
 }
 
-static int
+static void
 register_scalers( void )
 {
-  return 0;
+  scaler_register_clear();
+  scaler_select_bitformat( 565 );		/* 16bit always */
+  scaler_register( SCALER_NORMAL );
+}
+
+static void
+linear_palette(struct fb_cmap *p_cmap)
+{
+  int i;
+  int rcols = 1 << display.red.length;
+  int gcols = 1 << display.green.length;
+  int bcols = 1 << display.blue.length;
+
+  for (i = 0; i < rcols; i++)
+    p_cmap->red[i] = (65535 / (rcols - 1)) * i;
+
+  for (i = 0; i < gcols; i++)
+    p_cmap->green[i] = (65535 / (gcols - 1)) * i;
+
+  for (i = 0; i < bcols; i++)
+    p_cmap->blue[i] = (65535 / (bcols - 1)) * i;
 }
 
 int fbdisplay_init(void)
@@ -160,9 +182,9 @@ int fbdisplay_init(void)
   int i;
   const char *dev;
 
-  static libspectrum_word paldata[20] = { 0, 0xbbbb, 0xffff };
-  static const struct fb_cmap fb_cmap = {
-    0, 20, paldata, paldata, paldata, NULL
+  static libspectrum_word r16[256], g16[256], b16[256];
+  static struct fb_cmap fb_cmap = {
+    0, 256, r16, g16, b16, NULL
   };
 
   dev = getenv( DEVICE_VARIABLE );
@@ -187,32 +209,41 @@ int fbdisplay_init(void)
   fputs( "\x1B[H\x1B[J", stdout );	/* clear tty */
   memset( gm, 0, display.xres_virtual * display.yres_virtual * 2 );
 
-  for( i = 0; i < 16; i++ ) {
-    int v = ( i & 8 ) ? 2 : 1;
-     rgbs[i] = ( ( i & 1 ) ? v << display.blue.offset  : 0 )
-           | ( ( i & 2 ) ? v << display.red.offset   : 0 )
-           | ( ( i & 4 ) ? v << display.green.offset : 0 );
-
-     v = ( i & 8 ) ? 15 : 11;
-     paldata[i+4] = (   ( (i & 1) ? v *  7471 : 0)  /* 0.114 */
-		      + ( (i & 2) ? v * 19595 : 0)  /* 0.299 */
-		      + ( (i & 4) ? v * 38469 : 0)  /* 0.587 */
-		    ) / 15;
-     greys[i] = (i + 4) << display.blue.offset
-              | (i + 4) << display.red.offset
-              | (i + 4) << display.green.offset;
-  }
 
   display.activate = FB_ACTIVATE_NOW;
-  if( ioctl( fb_fd, FBIOPUT_VSCREENINFO, &display ) ||
-      ioctl( fb_fd, FBIOPUTCMAP, &fb_cmap )            ) {
+  if( ioctl( fb_fd, FBIOPUT_VSCREENINFO, &display ) ) {
     fprintf( stderr, "%s: couldn't set mode for framebuffer device '%s'\n",
 	     fuse_progname, dev );
     return 1;
   }
-  ioctl( fb_fd, FBIOGET_VSCREENINFO, &display );
 
+  ioctl( fb_fd, FBIOGET_VSCREENINFO, &display);
+  for( i = 0; i < 16; i++ ) {
+    int v = ( i & 8 ) ? 0xff : 0xbf;
+    int c;
+     rgbs[i] = ( ( i & 1 ) ? (v >> (8 - display.blue.length)) << display.blue.offset  : 0 )
+           | ( ( i & 2 ) ? (v >> (8 - display.red.length)) << display.red.offset   : 0 )
+           | ( ( i & 4 ) ? (v >> (8 - display.green.length)) << display.green.offset : 0 );
+
+     c = (( i & 1 ) ? (v * 0.114) : 0.0) +
+     (( i & 2) ? (v * 0.299) : 0.0) +
+     (( i & 4) ? (v * 0.587) : 0.0) + 0.5;
+     greys[i] = (c >> (8 - display.red.length) << display.red.offset)
+     | (c >> (8 - display.green.length) << display.green.offset)
+     | (c >> (8 - display.blue.length) << display.blue.offset);
+  }
+  linear_palette(&fb_cmap);
+
+  if (orig_display.bits_per_pixel == 8 || fixed.visual == FB_VISUAL_DIRECTCOLOR) {
+    ioctl( fb_fd, FBIOGETCMAP, &orig_cmap);
+    changed_palette = 1;
+  }
+  ioctl( fb_fd, FBIOGET_FSCREENINFO, &fixed);
+  if ( fixed.visual == FB_VISUAL_DIRECTCOLOR) {
+    ioctl( fb_fd, FBIOPUTCMAP, &fb_cmap );
+  }
   sleep( 1 ); /* give the monitor time to sync before we start emulating */
+
   fputs( "\x1B[?25l", stdout );		/* hide cursor */
   fflush( stdout );
 
@@ -396,10 +427,6 @@ uidisplay_area( int x, int start, int width, int height)
 int
 uidisplay_end( void )
 {
-  if (display_ui_initialised) {
-    fbdisplay_end();
-    display_ui_initialised = 0;
-  }
   return 0;
 }
 
@@ -407,7 +434,13 @@ int
 fbdisplay_end( void )
 {
   if( fb_fd != -1 ) {
-    if( got_orig_display ) ioctl( fb_fd, FBIOPUT_VSCREENINFO, &orig_display );
+    if( got_orig_display ) {
+      ioctl( fb_fd, FBIOPUT_VSCREENINFO, &orig_display );
+      if (changed_palette) {
+        ioctl( fb_fd, FBIOPUTCMAP, &orig_cmap);
+	changed_palette = 0;
+      }
+    }
     close( fb_fd );
     fb_fd = -1;
     fputs( "\x1B[H\x1B[J\x1B[?25h", stdout );	/* clear screen, show cursor */
