@@ -312,3 +312,5 @@
          A and F being transposed.
 20101007 raw2hdf.c: add missing default for version (fixes bug #3082566; thanks,
          UB880D) (Fred).
+20101206 Makefile.am: remember to put all compat directories in the dist tarball
+         (thanks, kizmiaz).

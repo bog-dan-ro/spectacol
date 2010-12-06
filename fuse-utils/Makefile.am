@@ -27,6 +27,11 @@ SUBDIRS = @COMPAT_SUBDIR@ \
           hacking \
           man
 
+DIST_SUBDIRS = compat/amiga \
+               compat/unix \
+               hacking \
+               man
+
 bin_PROGRAMS = createhdf \
 	       listbasic \
 	       profile2map \
