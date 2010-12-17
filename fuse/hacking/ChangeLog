@@ -3368,5 +3368,7 @@
          line ordering (patch #3100707) (Sergio Baldovi).
 20101129 ui/fb/fbdisplay.c: only call fbdisplay_end() when display is
          initialised (fixes bug #3119382) (rkd77).
+20101129 ChangeLog,README,man/fuse.1: more 1.0 updates.
 20101203 ui/fb/fbdisplay.c: improve fb colour handling and initialise scaler
          system (fixes bugs #3124787 and #3124788) (rkd77).
+20101216 ChangeLog,README,configure.in,man/fuse.1: update for 1.0.0 release.

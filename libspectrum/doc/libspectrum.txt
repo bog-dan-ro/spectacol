@@ -1,4 +1,4 @@
-libspectrum 0.5.0
+libspectrum 1.0.0
 =================
 
 libspectrum is a fairly simple library designed to make the handling
@@ -166,6 +166,7 @@ values:
 
 LIBSPECTRUM_MACHINE_16		16K Spectrum
 LIBSPECTRUM_MACHINE_48		48K Spectrum
+LIBSPECTRUM_MACHINE_48_NTSC     NTSC version of 48K Spectrum
 LIBSPECTRUM_MACHINE_128		(Original) 128K Spectrum
 LIBSPECTRUM_MACHINE_PLUS2	Spectrum +2 (the grey one)
 LIBSPECTRUM_MACHINE_PLUS2A	Spectrum +2A (the black one)

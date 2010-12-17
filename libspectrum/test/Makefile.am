@@ -44,6 +44,7 @@ EXTRA_DIST += \
 	test/complete-tzx.pl \
 	test/empty-drb.tzx \
 	test/empty.csw \
+        test/empty.szx \
 	test/empty.z80 \
 	test/invalid-archiveinfo.tzx \
 	test/invalid-custominfo.tzx \
@@ -57,6 +58,7 @@ EXTRA_DIST += \
 	test/loop.tzx \
 	test/loop2.tzx \
 	test/loopend.tzx \
+        test/plus3.z80 \
 	test/sp-2000.sna.gz \
 	test/sp-ffff.sna.gz \
 	test/turbo-zeropilot.tzx \

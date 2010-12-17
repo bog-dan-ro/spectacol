@@ -67,6 +67,6 @@ Wii. At the time of writing, those haven't been ported yet.
 Then, type "make" and if everything went well, "make install".
 
 Philip Kendall <philip-fuse@shadowmagic.org.uk>
-FIXME September 2010
+16 December 2010
 
 $Id$

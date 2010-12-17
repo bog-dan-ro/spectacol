@@ -787,4 +787,10 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20101003 szx.c,test/{empty.szx,test.c}: we also need to swap A' and F'.
 20101010 configure.in: pad version number for Win32 if needed (patch #3084574)
          (Sergio Baldovi).
+20101129 ChangeLog,README,doc/libspectrum.{3,txt}: more 1.0 updates.
 20101130 warajevo_read.c: remove potential signedness problem.
+20101130 Makefile.am,configure.in: bump version numbers for 1.0 release.
+20101216 README,configure.in,doc/libspectrum.3: bump version numbers and dates
+         for 1.0.0 release.
+20101216 ChangeLog: update date here as well.
+20101216 test/Makefile.am: ensure all test files are distributed.

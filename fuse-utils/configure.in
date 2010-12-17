@@ -23,7 +23,7 @@ AC_INIT(tzxlist.c)
 AM_CONFIG_HEADER(config.h)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse-utils, 0.10.0.1)
+AM_INIT_AUTOMAKE(fuse-utils, [1.0.0])
 
 dnl Checks for programs.
 AC_PROG_CC

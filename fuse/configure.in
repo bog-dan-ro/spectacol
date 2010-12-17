@@ -23,7 +23,7 @@ AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_SYSTEM
 
-define(FUSE_VERSION, [0.10.0.2])
+define(FUSE_VERSION, [1.0.0])
 
 dnl Use automake to produce `Makefile.in'
 AM_INIT_AUTOMAKE(fuse, FUSE_VERSION)

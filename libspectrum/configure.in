@@ -24,7 +24,7 @@ dnl E-mail: philip-fuse@shadowmagic.org.uk
 AC_INIT(libspectrum.c)
 AM_CONFIG_HEADER(config.h)
 
-define(LIBSPECTRUM_VERSION, [0.5.1])
+define(LIBSPECTRUM_VERSION, [1.0.0])
 
 dnl Use automake to produce `Makefile.in'
 AM_INIT_AUTOMAKE(libspectrum, LIBSPECTRUM_VERSION)

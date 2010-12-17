@@ -1,3 +1,23 @@
+2010-12-16  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Version 1.0.0 released
+
+        * audio2tape
+          * work with stereo sound files (Fredrick Meunier; thanks,
+            Gilberto Almeida).
+          * don't crash on an empty ROM block (Fredrick Meunier).
+
+        * tzxlist
+          * print data from ROM header blocks (Fredrick Meunier).
+          * Assume non-ASCII characters are in Windows-1252 (Fredrick
+            Meunier).
+
+        * snapconv: add -f flag to fix .szx files written with old
+          versions of libspectrum (Fredrick Meunier).
+
+        * raw2hdf: ensure version data is always written (Fredrick
+          Meunier; thanks, UB880D).
+
 2008-12-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
 	* Version 0.10.0.1 released
