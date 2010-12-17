@@ -794,3 +794,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          for 1.0.0 release.
 20101216 ChangeLog: update date here as well.
 20101216 test/Makefile.am: ensure all test files are distributed.
+20101217 Makefile.am: mark windres.rc as a source file so it is distributed
+         (thanks, Guesser).
