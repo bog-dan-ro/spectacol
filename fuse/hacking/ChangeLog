@@ -3372,3 +3372,4 @@
 20101203 ui/fb/fbdisplay.c: improve fb colour handling and initialise scaler
          system (fixes bugs #3124787 and #3124788) (rkd77).
 20101216 ChangeLog,README,configure.in,man/fuse.1: update for 1.0.0 release.
+20101217 keysyms.pl: fix SVGAlib compilation (rkd77).

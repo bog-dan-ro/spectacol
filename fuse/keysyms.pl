@@ -203,6 +203,7 @@ my %ui_data = (
 		  Down       => 'CURSORBLOCKDOWN',
 		  Up         => 'CURSORBLOCKUP',
 		  Right      => 'CURSORBLOCKRIGHT',
+		  KP_Enter   => 'KEYPADENTER',
 	      },
 	      function => \&svga_keysym,
 	    },
