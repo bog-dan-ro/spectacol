@@ -1,7 +1,7 @@
 <?php
 
 /* fuse.php: the main Fuse homepage
-   Copyright (c) 1999-2008 Darren Salt, Philip Kendall
+   Copyright (c) 1999-2010 Darren Salt, Philip Kendall
 
    $Id$
 
@@ -35,7 +35,7 @@ fuse_menu_heading ("Fuse");
 $img = mk_image('screens/f-awm.png', 330, 292);
 fuse_section (NULL, "What is it?", <<<END_SECTION
   $img
-  <p>Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat unsurprisingly, a ZX Spectrum emulator for Unix. However, it has now also been ported to Mac OS X, which may or may not count as a Unix variant depending on your advocacy position. It has also been ported to Windows, AmigaOS and MorphOS, which are definitely not Unix variants.</p>
+  <p>Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat unsurprisingly, a ZX Spectrum emulator for Unix. However, it has now also been ported to Mac OS X, which may or may not count as a Unix variant depending on your advocacy position. It has also been ported to Windows, the Wii, AmigaOS and MorphOS, which are definitely not Unix variants.</p>
 
 END_SECTION
 );
@@ -46,7 +46,7 @@ $img = mk_image('screens/f-large.png', 650, 532, 4);
 fuse_section ("Features", "What features does it have?", <<<END_SECTION
   $img
   <ul>
-   <li>Accurate 16K, 48K, 128K, +2, +2A and +3 emulation.</li>
+   <li>Accurate 16K, 48K (including the NTSC variant), 128K, +2, +2A and +3 emulation.</li>
    <li>Working +3e, SE, TC2048, TC2068, TS2068, Pentagon 128, Pentagon "512" (Pentagon 128 modified for extra memory), Pentagon 1024 and Scorpion ZS 256 emulation.</li>
    <li>Runs at true Speccy speed on any computer you're likely to try it on.</li>
    <li>Support for loading from .tzx files, including accelerated loading.</li>
@@ -54,7 +54,7 @@ fuse_section ("Features", "What features does it have?", <<<END_SECTION
    <li>Kempston joystick emulation.</li>
    <li>Emulation of the various printers you could attach to the Spectrum.</li>
    <li>Support for the RZX input recording file format, including 'competition mode'.</li>
-   <li>Emulation of the DivIDE, Interface I, +D, Beta 128, Kempston mouse, Spectrum +3e, ZXATASP and ZXCF interfaces.</li>
+   <li>Emulation of the DivIDE, Interface I, +D, Beta 128, Opus Discovery, Kempston mouse, Fuller audio box, Spectrum +3e, ZXATASP and ZXCF interfaces.</li>
   </ul>
 
 END_SECTION
@@ -79,20 +79,19 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Unix</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
-   <li>Unofficial packages of 0.10.0.2 for <a href="http://www.debian.org/">Debian</a> (or <a href="http://www.ubuntu.com/">Ubuntu</a>) by Alberto Garcia are available from <a href="http://people.igalia.com/berto/">his personal webpage</a> (i386 binaries and source).</li>
-   <li><a href="http://fedoraproject.org/index.html">Fedora</a> has <a href="https://admin.fedoraproject.org/pkgdb/packages/name/fuse-emulator">packages</a> of 0.10.0.1 available.</li>
-   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 0.10.0.1 available as <a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/fuse/">emulators/fuse</a>.</li>
-   <li>Nokia's <a href="http://maemo.org/">Maemo</a> platform has a port of <a href="http://maemo.org/downloads/product/OS2008/fuse-emulator/">0.10.0.2</a> available by Alberto Garcia.</li>
-   <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 0.10.0.2 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse/">emulators/fuse</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-utils/">emulators/fuse-utils</a>.</li>
-   <li><a href="http://www.openbsd.org/">OpenBSD</a> users have version 0.10.0.1 available from ports as <a href="http://www.openbsd.org/cgi-bin/cvsweb/ports/emulators/fuse/">ports/emulators/fuse</a>, and <a href="http://www.openbsd.org/cgi-bin/cvsweb/ports/emulators/fuse-utils/">ports/emulators/fuse-utils/</a>, with thanks to Alexander Yurchenko.</li>
+   <li><a href="http://fedoraproject.org/index.html">Fedora</a> has <a href="https://admin.fedoraproject.org/pkgdb/acls/name/fuse-emulator">packages</a> of 1.0.0 available.</li>
+   <li>The <a href="http://en.docs.pld-linux.org/">Polish Linux Distribution</a> has packages of Fuse 1.0.0 and the utilities.</li>
   </ul>
   <p>Packages of older versions of Fuse are also available for some other distributions:</p>
   <ul>
-   <li><a href="http://www.gentoo.org/">Gentoo</a> users have an <a href="http://packages.gentoo.org/package/app-emulation/fuse?full_cat">ebuild</a> of 0.9.0 available.</li>
-   <li><a href="http://www.mandriva.com/">Mandriva</a> packages of 0.9.0 are available from the <a href="http://plf.zarb.org/">PLF</a>, or Miguel Barrio Orsikowsky has some <a href="http://www.speccy.org/sinclairmania/arch/emu/mandrake/">older versions</a> available.</li>
-   <li>Zoran Jekic has produced <a href="http://www.suse.com">SuSE</a> 11.3 packages of <a href="fuse-0.9.0-1.zj.i586.rpm">0.9.0</a> and the <a href="fuse-utils-0.9.0-1.zj.i586.rpm">utilities</a>.</li>
-   <li>The <a href="http://en.docs.pld-linux.org/">Polish Linux Distribution</a> has packages of Fuse 0.6.2.1 and the utilities.</li>
-   <li><a href="mailto:spec(at)webtech(dot)pl">Marek Januszewski</a> has produced a <a href="http://www.slackware.com/">Slackware</a> 9.1 packages of <a href="fuse-0.6.1.1-i386-1spec.tgz">0.6.1.1</a> (<a href="fuse-0.6.1.1-i386-1spec.tgz.md5">md5 sum</a>) and <a href="fuse-utils-0.6.1-i386-1spec.tgz">the utilities</a> (<a href="fuse-utils-0.6.1-i386-1spec.tgz.md5">md5 sum</a>).</li>
+   <li>Unofficial packages of 0.10.0.2 for <a href="http://www.debian.org/">Debian</a> (or <a href="http://www.ubuntu.com/">Ubuntu</a>) by Alberto Garcia are available from <a href="http://people.igalia.com/berto/">his personal webpage</a>.</li>
+   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 0.10.0.2 available as <a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/fuse/">emulators/fuse</a>.</li>
+   <li><a href="http://www.gentoo.org/">Gentoo</a> users have an <a href="http://packages.gentoo.org/package/app-emulation/fuse?full_cat">ebuild</a> of 0.10.0.2 available.</li>
+   <li>Nokia's <a href="http://maemo.org/">Maemo</a> platform has a port of <a href="http://maemo.org/downloads/product/OS2008/fuse-emulator/">0.10.0.2</a> available by Alberto Garcia.</li>
+   <li><a href="http://www.mandriva.com/">Mandriva</a> packages of 0.10.0.2 are available from the <a href="http://plf.zarb.org/">Penguin Liberation Front</a>.
+   <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 0.10.0.2 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse/">emulators/fuse</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-utils/">emulators/fuse-utils</a>.</li>
+   <li><a href="http://www.openbsd.org/">OpenBSD</a> users have version 0.10.0.2 available from ports as <a href="http://www.openbsd.org/cgi-bin/cvsweb/ports/emulators/fuse/">ports/emulators/fuse</a>, and <a href="http://www.openbsd.org/cgi-bin/cvsweb/ports/emulators/fuse-utils/">ports/emulators/fuse-utils/</a>, with thanks to Alexander Yurchenko.</li>
+   <li><a href="http://www.suse.com/">SuSE</a> users have version 0.10.0.2 as the <a href="https://build.opensuse.org/package/show?package=Fuse&project=Emulators">Fuse</a> package.</li>
   </ul>
 
   <h3>Mac OS X</h3>
@@ -140,12 +139,12 @@ fuse_section ("Source", "Source", <<<END_SECTION
   <ul>
    <li>First, check the requirements below and ensure all the libraries you want/need are installed.</li>
    <li>Secondly, install <a href="libspectrum.php">libspectrum</a>.</li>
-   <li>Get the <a href="http://prdownloads.sourceforge.net/fuse-emulator/fuse-0.10.0.2.tar.gz?download">source code</a> (<a href="http://prdownloads.sourceforge.net/fuse-emulator/fuse-0.10.0.2.tar.gz.sig?download">PGP signature</a>).</li>
-   <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://prdownloads.sourceforge.net/fuse-emulator/fuse-utils-0.10.0.1.tar.gz?download">own package</a> (<a href="http://prdownloads.sourceforge.net/fuse-emulator/fuse-utils-0.10.0.1.tar.gz.sig?download">PGP signature</a>). Note that
+   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0/fuse-1.0.0.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0/fuse-1.0.0.tar.gz.sig/download">PGP signature</a>).</li>
+   <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.0.0/fuse-utils-1.0.0.tar.gz/download">own package</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.0.0/fuse-utils-1.0.0.tar.gz.sig/download">PGP signature</a>). Note that
 you'll still need <a href="libspectrum.php">libspectrum</a> installed to run these.</li>
    <li>The above are also mirrored at <a href="http://www.worldofspectrum.org/">World of Spectrum</a>: <a
-href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-0.10.0.2.tar.gz">Fuse source</a> (<a
-href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-0.10.0.2.tar.gz.sig">signature</a>), <a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-0.10.0.1.tar.gz">utils source</a> (<a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-0.10.0.1.tar.gz.sig">signature</a>).</li>
+href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.tar.gz">Fuse source</a> (<a
+href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.tar.gz.sig">signature</a>), <a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.0.0.tar.gz">utils source</a> (<a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.0.0.tar.gz.sig">signature</a>).</li>
    <li>The source code releases above are signed with the <a href="http://wwwkeys.pgp.net:11371/pks/lookup?op=get&amp;search=0xD0767AB9">Fuse Release Key, ID <tt>D0767AB9</tt></a>, which has fingerprint <tt>064E 0BA9 688F 2699 3267 B1E5 1043 EEEB D076 7AB9</tt>. This is different from the key used to sign the 0.6.0(.1) releases as I forgot the passphrase for that key <tt>:-(</tt>.</li>
   </ul>
 
