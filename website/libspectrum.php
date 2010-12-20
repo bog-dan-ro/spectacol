@@ -89,8 +89,8 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Binaries</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
+   <li>Unofficial packages of 1.0.0 for <a href="http://www.debian.org/">Debian</a> (or <a href="http://www.ubuntu.com/">Ubuntu</a>) by Alberto Garcia are available from <a href="http://people.igalia.com/berto/">his personal webpage</a>.</li>
    <li><a href="https://admin.fedoraproject.org/pkgdb/acls/name/libspectrum">Fedora</a> (1.0.0)</li>
-   <li>Unofficial packages of 0.5.0.1 for <a href="http://www.debian.org/">Debian</a> (or <a href="http://www.ubuntu.com/">Ubuntu</a>) by Alberto Garcia are available from <a href="http://people.igalia.com/berto/">his personal webpage</a>.</li>
    <li><a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/libspectrum/">FreeBSD</a> (0.5.0)</li>
    <li><a href="http://packages.gentoo.org/package/app-emulation/libspectrum?full_cat">Gentoo</a> (0.5.0.1)</li>
    <li><a href="http://www.mandriva.com/">Mandriva</a> packages of 0.5.0.1 are available from the <a href="http://plf.zarb.org/">PLF</a>, or some <a href="http://www.speccy.org/sinclairmania/arch/emu/mandrake/">older packages</a> from Miguel Barrio Orsikowsky.</li>

@@ -79,12 +79,12 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Unix</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
+   <li>Unofficial packages of 1.0.0 for <a href="http://www.debian.org/">Debian</a> (or <a href="http://www.ubuntu.com/">Ubuntu</a>) by Alberto Garcia are available from <a href="http://people.igalia.com/berto/">his personal webpage</a>.</li>
    <li><a href="http://fedoraproject.org/index.html">Fedora</a> has <a href="https://admin.fedoraproject.org/pkgdb/acls/name/fuse-emulator">packages</a> of 1.0.0 available.</li>
    <li>The <a href="http://en.docs.pld-linux.org/">Polish Linux Distribution</a> has packages of Fuse 1.0.0 and the utilities.</li>
   </ul>
   <p>Packages of older versions of Fuse are also available for some other distributions:</p>
   <ul>
-   <li>Unofficial packages of 0.10.0.2 for <a href="http://www.debian.org/">Debian</a> (or <a href="http://www.ubuntu.com/">Ubuntu</a>) by Alberto Garcia are available from <a href="http://people.igalia.com/berto/">his personal webpage</a>.</li>
    <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 0.10.0.2 available as <a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/fuse/">emulators/fuse</a>.</li>
    <li><a href="http://www.gentoo.org/">Gentoo</a> users have an <a href="http://packages.gentoo.org/package/app-emulation/fuse?full_cat">ebuild</a> of 0.10.0.2 available.</li>
    <li>Nokia's <a href="http://maemo.org/">Maemo</a> platform has a port of <a href="http://maemo.org/downloads/product/OS2008/fuse-emulator/">0.10.0.2</a> available by Alberto Garcia.</li>
@@ -180,25 +180,14 @@ END_SECTION
 #<!-- ======================================================= -->
 
 fuse_section (NULL, "What's new?", <<<END_SECTION
-  <h3>0.10.0.2</h3>
+  <h3>1.0.0</h3>
   <ul>
-    <li>Make loading acceleration work with all compilers</li>
-    <li>A number of minor bug fixes</li>
-  </ul>
-
-  <h3>0.10.0.1</h3>
-  <ul>
-    <li>Stop corruption when overwriting an existing file</li>
-    <li>Ensure all header files are distributed</li>
-  </ul>
-
-  <h3>0.10.0</h3>
-  <ul>
-    <li>Improved upd765 FDC emulation</li>
-    <li>Loading acceleration</li>
-    <li>Automatic saves while RZX recording</li>
-    <li>Improved Win32 UI</li>
-    <li>Improved widget UI</li>
+    <li>Opus Discovery interface support</li>
+    <li>Wii support</li>
+    <li>Many improvements to Win32 UI</li>
+    <li>NTSC Spectrum support</li>
+    <li>Improved sound output, including when not running at 100% speed</li>
+    <li>Fuller Audio Box support</li>
   </ul>
 
 END_SECTION
