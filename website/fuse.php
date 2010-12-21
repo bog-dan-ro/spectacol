@@ -168,8 +168,7 @@ href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.tar.g
      <li><a href="http://www.gzip.org/zlib/">zlib</a>: support for compressed RZX files.</li>
      <li><a href="http://www.bzip.org/">libbzip2</a>: support for certain compressed files.</li>
      <li><a href="http://www.68k.org/~michael/audiofile/">libaudiofile</a>: support for loading from .wav files.</li>
-     <li><a href="http://www.mega-nerd.com/SRC/">libsamplerate</a>: higher quality sound.</li>
-     <li>Versions previous to 0.10.0 used John Elliott's <a href="http://www.seasip.demon.co.uk/Unix/LibDsk/">lib765 and libdsk</a> for the +3 support. 0.10.0 includes this support natively, so these libraries are no longer necessary (or used).</li>
+     <li>Versions previous to 0.10.0 used John Elliott's <a href="http://www.seasip.demon.co.uk/Unix/LibDsk/">lib765 and libdsk</a> for the +3 support. 0.10.0 and newer include this support natively, so these libraries are no longer necessary (or used).</li>
     </ul>
    </dd>
   </dl>
