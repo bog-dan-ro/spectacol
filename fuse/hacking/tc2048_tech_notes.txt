@@ -1,9 +1,9 @@
-The lower 8 bits of Timex ports are fully decoded
+The lower 8 bits of Timex SCLD ports are fully decoded
 Timings appear close to 48K spectrum despite the higher clock speed
 Keyboard reads (port FE) are different to other spectrum models,  bits 5 & 7 are
 always reset
 Reading unattached ports gives 255. There are no floating ULA values.
-Joystick ports are all over the shop!
+Joystick is returned for ports with bit 5 == 0
 Machine is silent during loading (eerie!)
 Colours are always bright in hires mode
 Border always matches hires colour in hires mode
@@ -44,6 +44,6 @@ Running a contention test (based on contention from fusetest) shows that the
 contention pattern starts at 14320 with 6, then 5, 4, 3, 2, 1, 0, 0 in the same
 way as the Sinclair ULA.
 
-It seems that the display of the top left pixel is slightly out of sync with this
-and the first pixel is displayed at 14321 based on the output of other contention
-testing programs.
+It seems that the display of the top left pixel is slightly out of sync with
+this and the first pixel is displayed at 14321 based on the output of other
+contention testing programs.

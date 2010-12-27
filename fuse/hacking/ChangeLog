@@ -3376,3 +3376,4 @@
 20101227 man/fuse.1: fix typo (Fred).
 20101227 man/fuse.1,sound.c,ui/options.dat: new speaker type for unfiltered
          sound output (Alberto Garcia).
+20101227 hacking/tc2048_tech_notes.txt: a couple of minor corrections (Fred).
