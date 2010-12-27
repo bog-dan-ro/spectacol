@@ -100,7 +100,7 @@ struct speaker_type_tag
 };
 
 static struct speaker_type_tag speaker_type[] =
-  { { 200, -37.0 }, { 1000, -67.0 } };
+  { { 200, -37.0 }, { 1000, -67.0 }, { 0, 0.0 } };
 
 static double
 sound_get_volume( int volume )
