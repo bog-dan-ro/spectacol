@@ -3379,3 +3379,5 @@
 20101227 hacking/tc2048_tech_notes.txt: a couple of minor corrections (Fred).
 20101229 disk/{beta.c,opus.c,plusd.c},if1.c,if2.c: handle missing peripheral ROM files
          (patch #3147415) (Alberto Garcia).
+20101229 debugger/breakpoint.c: don't free temporary breakpoint until after we have run
+         it (fixes bug #3084862) (thanks, Chris Cowley) (Fred).
