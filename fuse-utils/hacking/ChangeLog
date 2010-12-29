@@ -317,3 +317,5 @@
          (thanks, kizmiaz).
 20101216 README,configure.in,man/*.1: updates for 1.0.0 release.
 20101216 ChangeLog: update date here as well.
+20101229 tzxlist.c: fix typo in archive block printing (patch #3147102) (Alberto
+         Garcia).

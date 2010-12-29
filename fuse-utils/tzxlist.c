@@ -393,7 +393,7 @@ process_tape( char *filename )
 	case   1: printf(" Publisher:"); break;
 	case   2: printf("    Author:"); break;
 	case   3: printf("      Year:"); break;
-	case   4: printf(" Langugage:"); break;
+	case   4: printf("  Language:"); break;
 	case   5: printf("  Category:"); break;
 	case   6: printf("     Price:"); break;
 	case   7: printf("    Loader:"); break;
