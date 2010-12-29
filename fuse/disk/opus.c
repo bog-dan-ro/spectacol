@@ -162,9 +162,13 @@ opus_reset( int hard_reset )
   if( !periph_opus_active )
     return;
 
-  machine_load_rom_bank( opus_memory_map_romcs, 0, 0,
-			 settings_current.rom_opus,
-			 settings_default.rom_opus, 0x2000 );
+  if( machine_load_rom_bank( opus_memory_map_romcs, 0, 0,
+                             settings_current.rom_opus,
+                             settings_default.rom_opus, 0x2000 ) ) {
+    settings_current.opus = 0;
+    periph_opus_active = 0;
+    return;
+  }
 
   opus_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 

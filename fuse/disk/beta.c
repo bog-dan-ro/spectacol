@@ -205,9 +205,15 @@ beta_reset( int hard_reset GCC_UNUSED )
   }
 
   if( !beta_builtin ) {
-    machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
-			   settings_current.rom_beta128,
-			   settings_default.rom_beta128, 0x4000 );
+    if( machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
+			       settings_current.rom_beta128,
+			       settings_default.rom_beta128, 0x4000 ) ) {
+      beta_active = 0;
+      beta_available = 0;
+      periph_beta128_active = 0;
+      settings_current.beta128 = 0;
+      return;
+    }
 
     beta_memory_map_romcs[ 0 ].writable = 0;
     beta_memory_map_romcs[ 1 ].writable = 0;

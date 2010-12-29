@@ -174,9 +174,13 @@ plusd_reset( int hard_reset )
   if( !periph_plusd_active )
     return;
 
-  machine_load_rom_bank( plusd_memory_map_romcs, 0, 0,
-			 settings_current.rom_plusd,
-			 settings_default.rom_plusd, 0x2000 );
+  if( machine_load_rom_bank( plusd_memory_map_romcs, 0, 0,
+			     settings_current.rom_plusd,
+			     settings_default.rom_plusd, 0x2000 ) ) {
+    settings_current.plusd = 0;
+    periph_plusd_active = 0;
+    return;
+  }
 
   plusd_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 

@@ -364,10 +364,14 @@ if1_reset( int hard_reset GCC_UNUSED )
 
   if( !periph_interface1_active ) return;
 
-  machine_load_rom_bank( if1_memory_map_romcs, 0, 0,
-			 settings_current.rom_interface_i,
-			 settings_default.rom_interface_i,
-			 MEMORY_PAGE_SIZE );
+  if( machine_load_rom_bank( if1_memory_map_romcs, 0, 0,
+			     settings_current.rom_interface_i,
+			     settings_default.rom_interface_i,
+			     MEMORY_PAGE_SIZE ) ) {
+    settings_current.interface1 = 0;
+    periph_interface1_active = 0;
+    return;
+  }
 
   if1_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 

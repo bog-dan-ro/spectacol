@@ -3377,3 +3377,5 @@
 20101227 man/fuse.1,sound.c,ui/options.dat: new speaker type for unfiltered
          sound output (Alberto Garcia).
 20101227 hacking/tc2048_tech_notes.txt: a couple of minor corrections (Fred).
+20101229 disk/{beta.c,opus.c,plusd.c},if1.c,if2.c: handle missing peripheral ROM files
+         (patch #3147415) (Alberto Garcia).

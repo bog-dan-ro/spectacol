@@ -121,10 +121,11 @@ if2_reset( int hard_reset GCC_UNUSED )
 
   if ( !periph_interface2_active ) return;
 
-  machine_load_rom_bank( if2_memory_map_romcs, 0, 0,
-			 settings_current.if2_file,
-			 NULL,
-			 2 * MEMORY_PAGE_SIZE );
+  if ( machine_load_rom_bank( if2_memory_map_romcs, 0, 0,
+			      settings_current.if2_file,
+			      NULL,
+			      2 * MEMORY_PAGE_SIZE ) )
+    return;
 
   if2_memory_map_romcs[0].source =
     if2_memory_map_romcs[1].source = MEMORY_SOURCE_CARTRIDGE;
