@@ -3381,3 +3381,6 @@
          (patch #3147415) (Alberto Garcia).
 20101229 debugger/breakpoint.c: don't free temporary breakpoint until after we have run
          it (fixes bug #3084862) (thanks, Chris Cowley) (Fred).
+20101230 debugger/breakpoint.c: stop evaluating breakpoints when we have hit a
+         temporary breakpoint (really fixes bug #3084862) (patch #3142840) (Sergio
+         Baldovi).

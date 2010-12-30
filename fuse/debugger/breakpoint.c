@@ -248,12 +248,13 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
       bp = ptr->data;
 
       if( breakpoint_check( bp, type, value ) ) {
-	debugger_mode = DEBUGGER_MODE_HALTED;
-	debugger_command_evaluate( bp->commands );
+        debugger_mode = DEBUGGER_MODE_HALTED;
+        debugger_command_evaluate( bp->commands );
 
         if( bp->life == DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) {
           debugger_breakpoints = g_slist_remove( debugger_breakpoints, bp );
           free( bp );
+          break;
         }
       }
 
