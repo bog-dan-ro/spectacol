@@ -40,6 +40,7 @@
 #include "joystick.h"
 #include "kempmouse.h"
 #include "melodik.h"
+#include "speccyboot.h"
 #include "periph.h"
 #include "rzx.h"
 #include "settings.h"
@@ -343,6 +344,12 @@ periph_present melodik_present;
 /* Is the Melodik currently active */
 int periph_melodik_active;
 
+/* What sort of SpeccyBoot does the current machine have */
+periph_present speccyboot_present;
+
+/* Is the SpeccyBoot active */
+int periph_speccyboot_active;
+
 int
 periph_setup( const periph_t *peripherals_list, size_t n )
 {
@@ -362,6 +369,8 @@ periph_setup( const periph_t *peripherals_list, size_t n )
 
   periph_register_n( kempmouse_peripherals, kempmouse_peripherals_count );
 
+  periph_register_n( speccyboot_peripherals, speccyboot_peripherals_count );
+
   error = periph_register_n( peripherals_list, n ); if( error ) return error;
 
   kempston_present = PERIPH_PRESENT_NEVER;
@@ -372,6 +381,7 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   opus_present = PERIPH_PRESENT_NEVER;
   fuller_present = PERIPH_PRESENT_NEVER;
   melodik_present = PERIPH_PRESENT_NEVER;
+  speccyboot_present = PERIPH_PRESENT_NEVER;
 
   return 0;
 }
@@ -419,6 +429,11 @@ periph_setup_fuller( periph_present present ) {
 void
 periph_setup_melodik( periph_present present ) {
   melodik_present = present;
+}
+
+void
+periph_setup_speccyboot( periph_present present ) {
+  speccyboot_present = present;
 }
 
 static void
@@ -541,6 +556,13 @@ periph_update( void )
 
   if( periph_melodik_active ) {
     periph_register_n( melodik_peripherals, melodik_peripherals_count );
+  }
+
+  switch (speccyboot_present ) {
+  case PERIPH_PRESENT_NEVER: periph_speccyboot_active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    periph_speccyboot_active = settings_current.speccyboot; break;
+  case PERIPH_PRESENT_ALWAYS: periph_speccyboot_active = 1; break;
   }
 
   update_cartridge_menu();

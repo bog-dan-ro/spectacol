@@ -107,6 +107,9 @@ extern int periph_fuller_active;
 /* Is the Melodik active */
 extern int periph_melodik_active;
 
+/* Is the SpeccyBoot active */
+extern int periph_speccyboot_active;
+
 int periph_setup( const periph_t *peripherals_list, size_t n );
 void periph_setup_kempston( periph_present present );
 void periph_setup_interface1( periph_present present );
@@ -116,6 +119,7 @@ void periph_setup_beta128( periph_present present );
 void periph_setup_opus( periph_present present );
 void periph_setup_fuller( periph_present present );
 void periph_setup_melodik( periph_present present );
+void periph_setup_speccyboot( periph_present present );
 void periph_update( void );
 
 void periph_register_beta128( void );

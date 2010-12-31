@@ -71,6 +71,7 @@ late_timings, boolean, 0
 unittests, boolean, 0
 fuller, boolean, 0
 melodik, boolean, 0
+speccyboot, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1
@@ -166,6 +167,8 @@ doublescan_mode, numeric, 1, 'D', doublescan-mode
 
 start_scaler_mode, string, "normal", 'g', graphics-filter
 
+speccyboot_tap, string, "tap0",
+
 rom_16, string, "48.rom",
 rom_48, string, "48.rom",
 rom_128_0, string, "128-0.rom",
@@ -206,6 +209,7 @@ rom_scorpion_2, string, "256s-2.rom",
 rom_scorpion_3, string, "256s-3.rom",
 rom_spec_se_0, string, "se-0.rom",
 rom_spec_se_1, string, "se-1.rom",
+rom_speccyboot, string, "speccyboot-1.4.rom",
 rom_interface_i, string, "if1-2.rom",
 rom_opus, string, "opus.rom",
 rom_plusd, string, "plusd.rom",

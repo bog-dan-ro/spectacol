@@ -33,6 +33,7 @@ SUBDIRS = @COMPAT_SUBDIR@ \
 	  lib \
 	  machines \
 	  man \
+          nic \
 	  perl \
 	  pokefinder \
 	  roms \
@@ -89,6 +90,7 @@ fuse_SOURCES = ay.c \
 	slt.c \
 	snapshot.c \
 	sound.c \
+	speccyboot.c \
 	spectrum.c \
 	tape.c \
 	ui.c \
@@ -117,6 +119,7 @@ debugger/libdebugger.a \
 disk/libdisk.a \
 ide/libide.a \
 machines/libmachines.a \
+nic/libnic.a \
 pokefinder/libpokefinder.a \
 sound/libsound.a \
 timer/libtimer.a \
@@ -139,6 +142,7 @@ debugger/libdebugger.a \
 disk/libdisk.a \
 ide/libide.a \
 machines/libmachines.a \
+nic/libnic.a \
 pokefinder/libpokefinder.a \
 sound/libsound.a \
 timer/libtimer.a \
@@ -199,6 +203,7 @@ noinst_HEADERS = ay.h \
 	slt.h \
 	snapshot.h \
 	sound.h \
+	speccyboot.h \
 	spectrum.h \
 	tape.h \
 	utils.h \

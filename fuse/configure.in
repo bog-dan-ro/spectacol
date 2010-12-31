@@ -584,6 +584,24 @@ else
 fi
 AC_SUBST(TIMER_LIBADD)
 
+dnl See if Linux TAP devices are supported
+AC_MSG_CHECKING(whether Linux TAP devices are supported)
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+AC_TRY_COMPILE([
+    #include <linux/if_tun.h>
+    #include <net/if.h>
+    #include <sys/ioctl.h>
+  ],[
+    int test1 = IFF_TAP | IFF_NO_PI;
+    int test2 = TUNSETIFF;
+  ],
+  AC_DEFINE([LINUX_TAP], 1, [Define to 1 if Linux TAP devices are supported.])
+  AC_MSG_RESULT(yes),
+  AC_MSG_RESULT(no))
+
+CPPFLAGS="$ac_save_CPPFLAGS"
+
 dnl Work out which standard routines we're missing
 AC_MSG_CHECKING(which standard routines we're missing)
 missing_routines=''
@@ -685,6 +703,7 @@ ide/Makefile \
 lib/Makefile \
 machines/Makefile \
 man/Makefile \
+nic/Makefile \
 perl/Makefile \
 perl/Fuse/Makefile \
 pokefinder/Makefile \

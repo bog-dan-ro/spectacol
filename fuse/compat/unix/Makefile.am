@@ -31,6 +31,7 @@ libcompatos_a_SOURCES = dir.c \
 			file.c \
 			osname.c \
 			paths.c \
-			timer.c
+			timer.c \
+                        tuntap.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@

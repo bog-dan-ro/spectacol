@@ -48,6 +48,7 @@ Checkbox, DivIDE w(r)ite protect, divide_wp, INPUT_KEY_r
 Checkbox, +D i(n)terface, plusd, INPUT_KEY_n
 Checkbox, (B)eta 128 interface, beta128, INPUT_KEY_b
 Checkbox, Opus Discovery in(t)erface, opus, INPUT_KEY_t
+Checkbox, S(p)eccyBoot interface, speccyboot, INPUT_KEY_p
 Posthook, periph_update
 
 rzx

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2007-2008 Philip Kendall
+## Copyright (c) 2010 Philip Kendall
 
 ## $Id$
 
@@ -23,15 +23,12 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-AM_CPPFLAGS = -I$(srcdir)/../..
+AM_CPPFLAGS = -I$(srcdir)/..
 
-noinst_LIBRARIES = libcompatos.a
+noinst_LIBRARIES = libnic.a
 
-libcompatos_a_SOURCES = ../unix/dir.c \
-			../unix/file.c \
-			osname.c \
-			../amiga/paths.c \
-			../unix/timer.c \
-                        ../unix/tuntap.c
+INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
+libnic_a_SOURCES = enc28j60.c
+
+noinst_HEADERS = enc28j60.h

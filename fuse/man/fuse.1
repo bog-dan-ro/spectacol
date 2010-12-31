@@ -636,6 +636,8 @@ Specify an RZX file to begin recording to.
 .I "\-\-rom\-plusd file"
 .br
 .I "\-\-rom\-beta128 file"
+.br
+.I "\-\-rom\-speccyboot file"
 .RS
 Specify the file to be used for ROM(s) used for each machine. The
 options respectively refer to the 16K Spectrum
@@ -668,8 +670,10 @@ the Opus Discovery ROM
 .RI ( opus.rom ),
 the +D ROM
 .RI ( plusd.rom ),
-and the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
-.RI ( trdos.rom ).
+the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
+.RI ( trdos.rom ),
+and the SpeccyBoot ROM
+.RI ( speccyboot-1.4.rom ).
 The names in brackets denote the defaults.
 .RE
 .PP
@@ -775,6 +779,19 @@ Select the output speaker emulation, type can be TV speaker, Beeper
 or Unfiltered. Same as the Sound Options dialog's
 .I "Speaker type"
 option.
+.RE
+.PP
+.I "\-\-speccyboot"
+.RS
+Emulate a SpeccyBoot Ethernet interface. Same as the Peripherals Options dialog's
+.I "SpeccyBoot"
+option. See the SpeccyBoot web page at http://speccyboot.sourceforge.net/ for
+full details on the SpeccyBoot.
+.RE
+.PP
+.I "\-\-speccyboot-tap device"
+.RS
+Specify the TAP device to use for SpeccyBoot emulation.
 .RE
 .PP
 .I "\-\-volume\-ay volume"
@@ -3791,3 +3808,5 @@ improvements to the widget code.
 .PP
 Michael D Wynne wrote the original Opus disk interface emulation
 (for EightyOne).
+.PP
+Patrik Persson wrote the SpeccyBoot emulation.

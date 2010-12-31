@@ -115,4 +115,8 @@ int compat_closedir( compat_dir directory );
 double compat_timer_get_time( void );
 void compat_timer_sleep( int ms );
 
+/* TUN/TAP handling */
+
+int compat_get_tap( const char *interface_name );
+
 #endif				/* #ifndef FUSE_COMPAT_H */

@@ -31,6 +31,7 @@ libcompatos_a_SOURCES = ../unix/dir.c \
 			../unix/file.c \
 			osname.c \
 			paths.c \
-			timer.c
+			timer.c \
+                        ../unix/tuntap.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@

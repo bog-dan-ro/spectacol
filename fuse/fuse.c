@@ -78,6 +78,7 @@
 #include "slt.h"
 #include "snapshot.h"
 #include "sound.h"
+#include "speccyboot.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "timer/timer.h"
@@ -296,6 +297,7 @@ static int fuse_init(int argc, char **argv)
   if( kempmouse_init() ) return 1;
   if( fuller_init() ) return 1;
   if( melodik_init() ) return 1;
+  if( speccyboot_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 
