@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2001 Philip Kendall
+## Copyright (c) 1999-2011 Philip Kendall
 
 ## $Id$
 
@@ -35,7 +35,8 @@ ROMS =  128-0.rom 128-1.rom \
 	256s-0.rom 256s-1.rom 256s-2.rom 256s-3.rom \
 	se-0.rom se-1.rom \
 	if1-1.rom if1-2.rom \
-	plusd.rom
+	plusd.rom \
+        speccyboot-1.4.rom
 
 pkgdata_DATA = $(ROMS)
 

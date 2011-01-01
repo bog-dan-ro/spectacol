@@ -3392,3 +3392,4 @@
 20110101 debugger/breakpoint.c: evaluate all breakpoints again, but store the
          next breakpoint before deleteing the current one from the list 
          (really really fixes bug #3084862) (thanks, Phil) (Fred).
+20110101 roms/Makefile.am: ensure SpeccyBoot ROM is installed.
