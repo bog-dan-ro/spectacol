@@ -3377,15 +3377,18 @@
 20101227 man/fuse.1,sound.c,ui/options.dat: new speaker type for unfiltered
          sound output (Alberto Garcia).
 20101227 hacking/tc2048_tech_notes.txt: a couple of minor corrections (Fred).
-20101229 disk/{beta.c,opus.c,plusd.c},if1.c,if2.c: handle missing peripheral ROM files
-         (patch #3147415) (Alberto Garcia).
-20101229 debugger/breakpoint.c: don't free temporary breakpoint until after we have run
-         it (fixes bug #3084862) (thanks, Chris Cowley) (Fred).
+20101229 disk/{beta.c,opus.c,plusd.c},if1.c,if2.c: handle missing peripheral
+         ROM files (patch #3147415) (Alberto Garcia).
+20101229 debugger/breakpoint.c: don't free temporary breakpoint until after we
+         have run it (fixes bug #3084862) (thanks, Chris Cowley) (Fred).
 20101230 debugger/breakpoint.c: stop evaluating breakpoints when we have hit a
-         temporary breakpoint (really fixes bug #3084862) (patch #3142840) (Sergio
-         Baldovi).
+         temporary breakpoint (really fixes bug #3084862) (patch #3142840)
+         (Sergio Baldovi).
 20101231 AUTHORS,Makefile.am,compat.h,compat/{amiga,morphos,unix,wii,
          win32}/Makefile.am,compat/unix/tuntap.c,configure.in,fuse.c,menu.c,
          man/fuse.1,menu_data.dat,nic/{Makefile.am,enc28j60.[ch]},periph.[ch],
          settings.{dat,pl},speccyboot.[ch],roms/speccyboot-1.4.rom,ui/options.dat:
          SpeccyBoot emulation (patch #2906047) (Patrik Persson).
+20110101 debugger/breakpoint.c: evaluate all breakpoints again, but store the
+         next breakpoint before deleteing the current one from the list 
+         (really really fixes bug #3084862) (thanks, Phil) (Fred).
