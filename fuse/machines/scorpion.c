@@ -124,6 +124,7 @@ scorpion_reset(void)
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_setup_beta128( PERIPH_PRESENT_ALWAYS );
+  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   beta_builtin = 1;

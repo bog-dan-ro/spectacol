@@ -195,6 +195,7 @@ specplus3_reset( void )
   error = periph_setup( specplus3_peripherals, specplus3_peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
   periph_update();
   specplus3_765_reset();
   specplus3_menu_items();

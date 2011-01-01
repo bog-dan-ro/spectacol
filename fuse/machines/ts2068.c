@@ -93,6 +93,7 @@ ts2068_reset( void )
 
   error = periph_setup( tc2068_peripherals, tc2068_peripherals_count );
   if( error ) return error;
+  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   for( i = 0; i < 8; i++ ) {

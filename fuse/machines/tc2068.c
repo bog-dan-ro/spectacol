@@ -150,6 +150,7 @@ tc2068_reset( void )
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   for( i = 0; i < 8; i++ ) {

@@ -107,7 +107,7 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
    * error messages are only displayed if SpeccyBoot emulation is
    * actually requested.
    */
-  if ( settings_current.speccyboot && !tap_opened ) {
+  if( periph_speccyboot_active && !tap_opened ) {
     nic_enc28j60_init( nic );
     tap_opened = 1;
   }
@@ -116,7 +116,7 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
 static libspectrum_byte
 speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !settings_current.speccyboot ) return 0xff;
+  if( !periph_speccyboot_active ) return 0xff;
 
   *attached = 1;
   return in_register_state;
@@ -125,7 +125,7 @@ speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached )
 static void
 speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 {
-  if ( !settings_current.speccyboot ) return;
+  if ( !periph_speccyboot_active ) return;
 
   nic_enc28j60_poll( nic );
 

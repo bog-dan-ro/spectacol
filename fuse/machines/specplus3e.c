@@ -83,6 +83,7 @@ specplus3e_reset( void )
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
   periph_update();
   specplus3_765_reset();
   specplus3_menu_items();

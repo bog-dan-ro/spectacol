@@ -100,6 +100,7 @@ specplus2a_reset( void )
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   spec48_common_display_setup();
