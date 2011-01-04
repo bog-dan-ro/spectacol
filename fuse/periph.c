@@ -369,6 +369,9 @@ periph_setup( const periph_t *peripherals_list, size_t n )
 
   periph_register_n( kempmouse_peripherals, kempmouse_peripherals_count );
 
+  periph_register_n( fuller_peripherals, fuller_peripherals_count );
+  periph_register_n( melodik_peripherals, melodik_peripherals_count );
+
   periph_register_n( speccyboot_peripherals, speccyboot_peripherals_count );
 
   error = periph_register_n( peripherals_list, n ); if( error ) return error;
@@ -543,19 +546,11 @@ periph_update( void )
   case PERIPH_PRESENT_ALWAYS: periph_fuller_active = 1; break;
   }
 
-  if( periph_fuller_active ) {
-    periph_register_n( fuller_peripherals, fuller_peripherals_count );
-  }
-
   switch( melodik_present ) {
   case PERIPH_PRESENT_NEVER: periph_melodik_active = 0; break;
   case PERIPH_PRESENT_OPTIONAL:
     periph_melodik_active = settings_current.melodik; break;
   case PERIPH_PRESENT_ALWAYS: periph_melodik_active = 1; break;
-  }
-
-  if( periph_melodik_active ) {
-    periph_register_n( melodik_peripherals, melodik_peripherals_count );
   }
 
   switch (speccyboot_present ) {

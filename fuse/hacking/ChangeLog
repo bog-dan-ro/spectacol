@@ -3397,3 +3397,5 @@
          spec128.c,spec16.c,spec48.c,spec48_ntsc.c,specplus2a.c,specplus2.c,
          specplus3.c,specplus3e.c,spec_se.c,tc2068.c,ts2068.c},speccyboot.c:
          make SpeccyBoot honour PERIPH_PRESENT_NEVER etc.
+20110104 periph.c: make Fuller box and Melodik register the same way as
+         everything else (fixes bug #3084862) (thanks, Phil) (Fred).
