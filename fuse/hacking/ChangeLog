@@ -3399,3 +3399,4 @@
          make SpeccyBoot honour PERIPH_PRESENT_NEVER etc.
 20110104 periph.c: make Fuller box and Melodik register the same way as
          everything else (fixes bug #3084862) (thanks, Phil) (Fred).
+20110104 nic: add .deps and Makefile to the ignore property (Fred).
