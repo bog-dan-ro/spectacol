@@ -64,6 +64,9 @@ struct Library *ExecBase;
 
 
 int err = 0;
+
+char *amiga_asl( char *title, BOOL is_saving );
+
 #endif /* ifdef AMIGA */
 
 struct widget_dirent **widget_filenames; /* Filenames in the current
@@ -145,13 +148,21 @@ widget_get_filename( const char *title, int saving )
 char *
 ui_get_open_filename( const char *title )
 {
+#if !defined AMIGA && !defined __MORPHOS__
   return widget_get_filename( title, 0 );
+#else
+  return amiga_asl( title, FALSE );
+#endif
 }
 
 char *
 ui_get_save_filename( const char *title )
 {
+#if !defined AMIGA && !defined __MORPHOS__
   return widget_get_filename( title, 1 );
+#else
+  return amiga_asl( title, TRUE );
+#endif
 }
 
 static int widget_add_filename( int *allocated, int *number,
@@ -207,8 +218,8 @@ static int widget_add_filename( int *allocated, int *number,
 }
 
 #if defined AMIGA || defined __MORPHOS__
-static char *
-amiga_asl( char *title ) {
+char *
+amiga_asl( char *title, BOOL is_saving ) {
   char *filename;
   struct FileRequester *filereq;
 
@@ -499,8 +510,7 @@ widget_filesel_draw( void *data )
   /* Show all the filenames */
   widget_print_all_filenames( widget_filenames, widget_numfiles,
 			      top_left_file, current_file, directory );
-#else  /* ifndef AMIGA */
-  amiga_asl(title);
+
 #endif /* ifndef AMIGA */
 
   return 0;
