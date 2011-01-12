@@ -139,12 +139,12 @@ fuse_section ("Source", "Source", <<<END_SECTION
   <ul>
    <li>First, check the requirements below and ensure all the libraries you want/need are installed.</li>
    <li>Secondly, install <a href="libspectrum.php">libspectrum</a>.</li>
-   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0/fuse-1.0.0.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0/fuse-1.0.0.tar.gz.sig/download">PGP signature</a>).</li>
+   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0.1/fuse-1.0.0.1.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0.1/fuse-1.0.0.1.tar.gz.sig/download">PGP signature</a>).</li>
    <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.0.0/fuse-utils-1.0.0.tar.gz/download">own package</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.0.0/fuse-utils-1.0.0.tar.gz.sig/download">PGP signature</a>). Note that
 you'll still need <a href="libspectrum.php">libspectrum</a> installed to run these.</li>
    <li>The above are also mirrored at <a href="http://www.worldofspectrum.org/">World of Spectrum</a>: <a
-href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.tar.gz">Fuse source</a> (<a
-href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.tar.gz.sig">signature</a>), <a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.0.0.tar.gz">utils source</a> (<a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.0.0.tar.gz.sig">signature</a>).</li>
+href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.1.tar.gz">Fuse source</a> (<a
+href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.1.tar.gz.sig">signature</a>), <a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.0.0.tar.gz">utils source</a> (<a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.0.0.tar.gz.sig">signature</a>).</li>
    <li>The source code releases above are signed with the <a href="http://wwwkeys.pgp.net:11371/pks/lookup?op=get&amp;search=0xD0767AB9">Fuse Release Key, ID <tt>D0767AB9</tt></a>, which has fingerprint <tt>064E 0BA9 688F 2699 3267 B1E5 1043 EEEB D076 7AB9</tt>. This is different from the key used to sign the 0.6.0(.1) releases as I forgot the passphrase for that key <tt>:-(</tt>.</li>
   </ul>
 
@@ -179,6 +179,13 @@ END_SECTION
 #<!-- ======================================================= -->
 
 fuse_section (NULL, "What's new?", <<<END_SECTION
+  <h3>1.0.0.1</h3>
+  <ul>
+    <li>Fix temporary breakpoints when using replacement Glib routines</li>
+    <li>Ensure Amiga port can load files</li>
+    <li>Fix SVGAlib compilation</li>
+  </ul>
+
   <h3>1.0.0</h3>
   <ul>
     <li>Opus Discovery interface support</li>
