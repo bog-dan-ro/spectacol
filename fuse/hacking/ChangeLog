@@ -3401,3 +3401,7 @@
          everything else (fixes bug #3084862) (thanks, Phil) (Fred).
 20110104 nic: add .deps and Makefile to the ignore property (Fred).
 20110109 ui/widget/filesel.c: make Amiga work again (Chris Young).
+20110113 ui/win32/installer/fuse.nsi: windows installer improvements; optionally
+         delete configuration file (fuse.cfg) on uninstall, silently uninstall
+         previous version if reinstalling to the same folder, include AUTHORS
+         file (patch #3152511) (Sergio Baldovi).

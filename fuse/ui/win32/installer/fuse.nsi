@@ -21,10 +21,12 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-!define FUSE_VERSION "0.10.0.2"
+!define FUSE_VERSION "1.0.0.1" ; can contain letters like -RC1
+!define FUSE_FULL_VERSION "1.0.0.1" ; must contain four numeric tokens
 !define DISPLAY_NAME "Free Unix Spectrum Emulator (Fuse) ${FUSE_VERSION}"
 !define SETUP_FILENAME "fuse-${FUSE_VERSION}-setup"
 !define SETUP_FILE "${SETUP_FILENAME}.exe"
+!define HKLM_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse"
 
 ;Include Modern UI
 !include "MUI2.nsh"
@@ -63,7 +65,12 @@ SetCompressor lzma
   
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
-  
+  !define MUI_FINISHPAGE_SHOWREADME_CHECKED
+  !define MUI_FINISHPAGE_SHOWREADME ""
+  !define MUI_FINISHPAGE_SHOWREADME_TEXT "Delete configuration file"
+  !define MUI_FINISHPAGE_SHOWREADME_FUNCTION un.DeleteConfigFile
+  !insertmacro MUI_UNPAGE_FINISH
+
 ;--------------------------------
 ;Languages
  
@@ -72,10 +79,10 @@ SetCompressor lzma
 ;--------------------------------
 ;Version Information
 
-  VIProductVersion ${FUSE_VERSION}
+  VIProductVersion ${FUSE_FULL_VERSION}
   VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" ""
   VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "${SETUP_FILENAME}"
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright (c) 1999-2009 Philip Kendall and others; see the file 'AUTHORS' for more details."
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright (c) 1999-2011 Philip Kendall and others; see the file 'AUTHORS' for more details."
   VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Fuse"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${FUSE_VERSION}"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "${SETUP_FILE}"
@@ -164,6 +171,26 @@ NoOwn:
 !define UnRegisterExtension `!insertmacro UnRegisterExtensionCall`
 
 ;--------------------------------
+; Uninstall previous version
+
+ Section "" SecUninstallPrevious
+
+    Push $R0
+    ReadRegStr $R0 HKLM "${HKLM_REG_KEY}" "UninstallString"
+
+    ; Check if we are upgrading a previous installation
+    ${If} $R0 == '"$INSTDIR\uninstall.exe"'
+        DetailPrint "Removing previous installation..."
+
+        ; Run the uninstaller silently
+        ExecWait '"$INSTDIR\uninstall.exe" /S _?=$INSTDIR'
+    ${EndIf}
+
+    Pop $R0
+
+SectionEnd
+
+;--------------------------------
 ; start default section
 
 section "!Fuse Core Files (required)" SecCore
@@ -173,10 +200,11 @@ section "!Fuse Core Files (required)" SecCore
  
     ; set the installation directory as the destination for the following actions
     setOutPath "$INSTDIR"
-    
+
     ; Installation files
-    File "fuse.exe"
+    File "AUTHORS"
     File "COPYING"
+    File "fuse.exe"
     File "fuse.html"
     File "*.dll"
     SetOutPath $INSTDIR\lib
@@ -188,12 +216,12 @@ section "!Fuse Core Files (required)" SecCore
     writeUninstaller "$INSTDIR\uninstall.exe"
 
     ; Write the uninstall keys for Windows
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "DisplayName" "${DISPLAY_NAME}"
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "DisplayVersion" "${FUSE_VERSION}"
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "HelpLink" "http://fuse-emulator.sourceforge.net"
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "UninstallString" '"$INSTDIR\uninstall.exe"'
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "NoModify" 1
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse" "NoRepair" 1
+    WriteRegStr HKLM "${HKLM_REG_KEY}" "DisplayName" "${DISPLAY_NAME}"
+    WriteRegStr HKLM "${HKLM_REG_KEY}" "DisplayVersion" "${FUSE_VERSION}"
+    WriteRegStr HKLM "${HKLM_REG_KEY}" "HelpLink" "http://fuse-emulator.sourceforge.net"
+    WriteRegStr HKLM "${HKLM_REG_KEY}" "UninstallString" '"$INSTDIR\uninstall.exe"'
+    WriteRegDWORD HKLM "${HKLM_REG_KEY}" "NoModify" 1
+    WriteRegDWORD HKLM "${HKLM_REG_KEY}" "NoRepair" 1
 
 sectionEnd
 
@@ -256,7 +284,11 @@ section "uninstall"
     RMDir  "$INSTDIR\lib"
     Delete "$INSTDIR\roms\*"
     RMDir  "$INSTDIR\roms"
-    Delete "$INSTDIR\*"
+    Delete "$INSTDIR\AUTHORS"
+    Delete "$INSTDIR\COPYING"
+    Delete "$INSTDIR\fuse.exe"
+    Delete "$INSTDIR\fuse.html"
+    Delete "$INSTDIR\*.dll"
     RMDir "$INSTDIR"
 
     ; Delete the uninstaller and remove the uninstall keys for Windows
@@ -265,6 +297,10 @@ section "uninstall"
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse"
 
 sectionEnd
+
+Function un.DeleteConfigFile
+    Delete "$PROFILE\fuse.cfg"
+FunctionEnd
 
 ;--------------------------------
 ;Descriptions
