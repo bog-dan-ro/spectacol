@@ -37,7 +37,13 @@
 #include "menu.h"
 #include "settings.h"
 
+#if !defined USE_JOYSTICK || defined HAVE_JSW_H
+/* Fake joystick, or override UI-specific handling */
 #include "../uijoystick.c"
+
+#else			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
+
+#include "../sdl/sdljoystick.c"
 
 struct button_info {
   int *setting;
@@ -354,3 +360,5 @@ joystick_done( GtkButton *button GCC_UNUSED, gpointer user_data )
   }
 
 }
+
+#endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */

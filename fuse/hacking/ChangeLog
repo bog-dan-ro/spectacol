@@ -3409,3 +3409,6 @@
          widget/widget.c,win32/picture.c},utils.[ch]: extract the read_screen()
          function to utils.c and add utils_read_auxiliary_file() to simplify
          auxiliary file reading code (patch #3148363) (Gergely Szasz).
+20110113 configure.in,fuse.c,ui/{gtk/gtkjoystick.c,sdl/sdljoystick.c,
+         xlib/xjoystick.c}: allow the use of the SDL joystick code in the GTK+
+         and Xlib UIs (patch #3156508) (Sergio Baldovi).
