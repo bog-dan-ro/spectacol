@@ -43,7 +43,6 @@ static int specplus2a_reset( void );
 
 static const periph_t peripherals[] = {
   { 0x0001, 0x0000, ula_read, ula_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, ay_registerport_read, ay_dataport_write },
   { 0xc002, 0x4000, NULL, spec128_memoryport_write },
@@ -99,8 +98,13 @@ specplus2a_reset( void )
 
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   spec48_common_display_setup();

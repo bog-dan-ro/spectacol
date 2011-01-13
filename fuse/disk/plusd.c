@@ -107,7 +107,7 @@ plusd_memory_map( void )
   memory_map_read[ 1 ] = memory_map_write[ 1 ] = plusd_memory_map_romcs[ 1 ];
 }
 
-const periph_t plusd_peripherals[] = {
+static const periph_t plusd_peripherals[] = {
   /* ---- ---- 1110 0011 */
   { 0x00ff, 0x00e3, plusd_sr_read, plusd_cr_write },
   /* ---- ---- 1110 1011 */
@@ -123,10 +123,9 @@ const periph_t plusd_peripherals[] = {
   { 0x00ff, 0x00e7, plusd_mem_read, plusd_mem_write },
   /* 0000 0000 1111 0111 */
   { 0x00ff, 0x00f7, plusd_printer_read, plusd_printer_write },
-};
 
-const size_t plusd_peripherals_count =
-  sizeof( plusd_peripherals ) / sizeof( periph_t );
+  { 0, 0, NULL, NULL }
+};
 
 int
 plusd_init( void )
@@ -156,6 +155,9 @@ plusd_init( void )
   module_register( &plusd_module_info );
   for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_PLUSD, &settings_current.plusd,
+                        plusd_peripherals );
+
   return 0;
 }
 
@@ -171,14 +173,14 @@ plusd_reset( int hard_reset )
 
   event_remove_type( index_event );
 
-  if( !periph_plusd_active )
+  if( !periph_is_active( PERIPH_TYPE_PLUSD ) )
     return;
 
   if( machine_load_rom_bank( plusd_memory_map_romcs, 0, 0,
 			     settings_current.rom_plusd,
 			     settings_default.rom_plusd, 0x2000 ) ) {
     settings_current.plusd = 0;
-    periph_plusd_active = 0;
+    periph_activate_type( PERIPH_TYPE_PLUSD, 0 );
     return;
   }
 
@@ -695,7 +697,7 @@ plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   libspectrum_byte *buffer;
   int drive_count = 0;
 
-  if( !periph_plusd_active ) return;
+  if( !periph_is_active( PERIPH_TYPE_PLUSD ) ) return;
 
   libspectrum_snap_set_plusd_active( snap, 1 );
 

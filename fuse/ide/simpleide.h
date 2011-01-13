@@ -25,10 +25,6 @@
 #define FUSE_SIMPLEIDE_H
 
 #include <libspectrum.h>
-#include "periph.h"
-
-extern const periph_t simpleide_peripherals[];
-extern const size_t simpleide_peripherals_count;
 
 int simpleide_init( void );
 int simpleide_end( void );

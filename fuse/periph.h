@@ -1,5 +1,5 @@
 /* periph.h: code for handling peripherals
-   Copyright (c) 2004-2009 Philip Kendall
+   Copyright (c) 2004-2011 Philip Kendall
 
    $Id$
 
@@ -28,16 +28,48 @@
 
 #include <libspectrum.h>
 
+/* The types of peripheral Fuse knows about */
+typedef enum periph_type {
+  PERIPH_TYPE_UNKNOWN,
+
+  PERIPH_TYPE_BETA128,        /* Beta128 disk interface */
+  PERIPH_TYPE_DIVIDE,         /* DivIDE interface */
+  PERIPH_TYPE_PLUSD,          /* +D disk interface */
+  PERIPH_TYPE_FULLER,         /* Fuller box */
+  PERIPH_TYPE_INTERFACE1,     /* Interface 1 */
+  PERIPH_TYPE_INTERFACE2,     /* Interface 2 */
+
+  /* A Kempston joystick which requires b5, b6 and b7 reset to be read */
+  PERIPH_TYPE_KEMPSTON,
+  /* A Kempston joystick which requires b5 only reset to be read */
+  PERIPH_TYPE_KEMPSTON_LOOSE,
+
+  PERIPH_TYPE_KEMPSTON_MOUSE, /* Kempston mouse */
+  PERIPH_TYPE_MELODIK,        /* Melodik interface */
+  PERIPH_TYPE_OPUS,           /* Opus disk interface */
+  PERIPH_TYPE_SIMPLEIDE,      /* Simple 8-bit IDE interface */
+  PERIPH_TYPE_SPECCYBOOT,     /* SpeccyBoot interface */
+  PERIPH_TYPE_ZXATASP,        /* ZXATASP IDE interface */
+  PERIPH_TYPE_ZXCF,           /* ZXCF IDE interface */
+} periph_type;
+
 /*
  * General peripheral list handling routines
  */
+
+/* For indicating the (optional) presence or absence of a peripheral */
+typedef enum periph_present {
+  PERIPH_PRESENT_NEVER,		/* Never present */
+  PERIPH_PRESENT_OPTIONAL,	/* Optionally present */
+  PERIPH_PRESENT_ALWAYS,	/* Always present */
+} periph_present;
 
 typedef libspectrum_byte (*periph_port_read_function)( libspectrum_word port,
 						       int *attached );
 typedef void (*periph_port_write_function)( libspectrum_word port,
 					    libspectrum_byte data );
 
-/* Information about a peripheral */
+/* Information about a specific port response */
 typedef struct periph_t {
 
   /* This peripheral responds to all port values where
@@ -50,14 +82,20 @@ typedef struct periph_t {
 
 } periph_t;
 
-int periph_register( const periph_t *peripheral );
-int periph_register_n( const periph_t *peripherals_list, size_t n );
-int periph_set_active( int id, int active );
-void periph_clear( void );
+/* Register a peripheral with the system */
+void periph_register_type( periph_type type, int *option, const periph_t *peripherals );
 
-/* Register debugger page/unpage events for a peripheral */
-int periph_register_paging_events( const char *type_string, int *page_event,
-				   int *unpage_event );
+/* Set whether a peripheral can be present on this machine or not */
+void periph_set_present( periph_type type, periph_present present );
+
+/* Mark a specific peripheral as (in)active */
+void periph_activate_type( periph_type type, int active );
+
+/* Is a specific peripheral active at the moment? */
+int periph_is_active( periph_type type );
+
+/* Empty out the list of peripherals */
+void periph_clear( void );
 
 /*
  * The actual routines to read and write a port
@@ -73,55 +111,11 @@ void writeport_internal( libspectrum_word port, libspectrum_byte b );
  * The more Fuse-specific peripheral handling routines
  */
 
-/* For indicating the (optional) presence or absence of a peripheral */
-
-typedef enum periph_present {
-
-  PERIPH_PRESENT_NEVER,		/* Never present */
-  PERIPH_PRESENT_OPTIONAL,	/* Optionally present */
-  PERIPH_PRESENT_ALWAYS,	/* Always present */
-
-} periph_present;
-
-/* Is the Kempston interface active */
-extern int periph_kempston_active;
-
-/* Is the Interface I active */
-extern int periph_interface1_active;
-
-/* Is the Interface II active */
-extern int periph_interface2_active;
-
-/* Is the +D active */
-extern int periph_plusd_active;
-
-/* Is the Beta 128 active */
-extern int periph_beta128_active;
-
-/* Is the Opus active */
-extern int periph_opus_active;
-
-/* Is the Fuller Box active */
-extern int periph_fuller_active;
-
-/* Is the Melodik active */
-extern int periph_melodik_active;
-
-/* Is the SpeccyBoot active */
-extern int periph_speccyboot_active;
-
 int periph_setup( const periph_t *peripherals_list, size_t n );
-void periph_setup_kempston( periph_present present );
-void periph_setup_interface1( periph_present present );
-void periph_setup_interface2( periph_present present );
-void periph_setup_plusd( periph_present present );
-void periph_setup_beta128( periph_present present );
-void periph_setup_opus( periph_present present );
-void periph_setup_fuller( periph_present present );
-void periph_setup_melodik( periph_present present );
-void periph_setup_speccyboot( periph_present present );
 void periph_update( void );
 
-void periph_register_beta128( void );
+/* Register debugger page/unpage events for a peripheral */
+int periph_register_paging_events( const char *type_string, int *page_event,
+				   int *unpage_event );
 
 #endif				/* #ifndef FUSE_PERIPH_H */

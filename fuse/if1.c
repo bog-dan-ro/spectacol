@@ -1,5 +1,5 @@
 /* if1.c: Interface I handling routines
-   Copyright (c) 2004-2008 Gergely Szasz, Philip Kendall
+   Copyright (c) 2004-2011 Gergely Szasz, Philip Kendall
 
    $Id$
 
@@ -210,14 +210,12 @@ static module_info_t if1_module_info = {
 
 };
 
-const periph_t if1_peripherals[] = {
+static const periph_t if1_peripherals[] = {
   { 0x0018, 0x0010, if1_port_in, if1_port_out },
   { 0x0018, 0x0008, if1_port_in, if1_port_out },
   { 0x0018, 0x0000, if1_port_in, if1_port_out },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t if1_peripherals_count =
-  sizeof( if1_peripherals ) / sizeof( periph_t );
 
 /* Debugger events */
 static const char *event_type_string = "if1";
@@ -329,6 +327,9 @@ if1_init( void )
   module_register( &if1_module_info );
   for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_INTERFACE1, &settings_current.interface1,
+                        if1_peripherals );
+
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;
@@ -362,14 +363,14 @@ if1_reset( int hard_reset GCC_UNUSED )
   if1_active = 0;
   if1_available = 0;
 
-  if( !periph_interface1_active ) return;
+  if( !periph_is_active( PERIPH_TYPE_INTERFACE1 ) ) return;
 
   if( machine_load_rom_bank( if1_memory_map_romcs, 0, 0,
 			     settings_current.rom_interface_i,
 			     settings_default.rom_interface_i,
 			     MEMORY_PAGE_SIZE ) ) {
     settings_current.interface1 = 0;
-    periph_interface1_active = 0;
+    periph_activate_type( PERIPH_TYPE_INTERFACE1, 0 );
     return;
   }
 
@@ -455,7 +456,7 @@ if1_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
 
-  if( !periph_interface1_active ) return;
+  if( !periph_is_active( PERIPH_TYPE_INTERFACE1 ) ) return;
 
   libspectrum_snap_set_interface1_active( snap, 1 );
   libspectrum_snap_set_interface1_paged ( snap, if1_active );

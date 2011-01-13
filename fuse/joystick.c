@@ -1,6 +1,5 @@
 /* joystick.c: Joystick emulation support
-   Copyright (c) 2001-2004 Russell Marks, Philip Kendall
-   Copyright (c) 2003 Darren Salt
+   Copyright (c) 2001-2011 Russell Marks, Darren Salt, Philip Kendall
 
    $Id$
 
@@ -98,6 +97,16 @@ static module_info_t joystick_module_info = {
 
 };
 
+static periph_t kempston_strict_decoding[] = {
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
+  { 0, 0, NULL, NULL }
+};
+
+static periph_t kempston_loose_decoding[] = {
+  { 0x0020, 0x0000, joystick_kempston_read, NULL },
+  { 0, 0, NULL, NULL }
+};
+
 /* Init/shutdown functions. Errors aren't important here */
 
 void
@@ -108,6 +117,8 @@ fuse_joystick_init (void)
   fuller_value = 0xff;
 
   module_register( &joystick_module_info );
+  periph_register_type( PERIPH_TYPE_KEMPSTON, &settings_current.joy_kempston, kempston_strict_decoding );
+  periph_register_type( PERIPH_TYPE_KEMPSTON_LOOSE, &settings_current.joy_kempston, kempston_loose_decoding );
 }
 
 void
@@ -203,10 +214,7 @@ joystick_press( int which, joystick_button button, int press )
 libspectrum_byte
 joystick_kempston_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !periph_kempston_active ) return 0xff;
-
   *attached = 1;
-
   return kempston_value;
 }
 
@@ -219,10 +227,7 @@ joystick_timex_read( libspectrum_word port GCC_UNUSED, libspectrum_byte which )
 libspectrum_byte
 joystick_fuller_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !periph_fuller_active ) return 0xff;
-
   *attached = 1;
-
   return fuller_value;
 }
 

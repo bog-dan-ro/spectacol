@@ -43,12 +43,10 @@ static void simpleide_write( libspectrum_word port, libspectrum_byte data );
 
 /* Data */
 
-const periph_t simpleide_peripherals[] = {
+static const periph_t simpleide_peripherals[] = {
   { 0x0010, 0x0000, simpleide_read, simpleide_write },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t simpleide_peripherals_count =
-  sizeof( simpleide_peripherals ) / sizeof( periph_t );
 
 static libspectrum_ide_channel *simpleide_idechn;
 
@@ -92,6 +90,9 @@ simpleide_init( void )
   }
 
   module_register( &simpleide_module_info );
+  periph_register_type( PERIPH_TYPE_SIMPLEIDE,
+                        &settings_current.simpleide_active,
+                        simpleide_peripherals );
 
   return 0;
 }

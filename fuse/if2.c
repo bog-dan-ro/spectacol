@@ -1,6 +1,5 @@
 /* if2.c: Interface II cartridge handling routines
-   Copyright (c) 2003 Darren Salt, Fredrick Meunier, Philip Kendall
-   Copyright (c) 2004 Fredrick Meunier
+   Copyright (c) 2003-2011 Darren Salt, Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -68,6 +67,8 @@ if2_init( void )
   module_register( &if2_module_info );
   for( i = 0; i < 2; i++ ) if2_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_INTERFACE2, &settings_current.interface2, NULL );
+
   return 0;
 }
 
@@ -76,7 +77,7 @@ if2_insert( const char *filename )
 {
   int error;
 
-  if ( !periph_interface2_active ) {
+  if ( !periph_is_active( PERIPH_TYPE_INTERFACE2 ) ) {
     ui_error( UI_ERROR_ERROR,
 	      "This machine does not support the Interface II" );
     return 1;
@@ -93,7 +94,7 @@ if2_insert( const char *filename )
 void
 if2_eject( void )
 {
-  if ( !periph_interface2_active ) {
+  if ( !periph_is_active( PERIPH_TYPE_INTERFACE2 ) ) {
     ui_error( UI_ERROR_ERROR,
 	      "This machine does not support the Interface II" );
     return;
@@ -119,7 +120,7 @@ if2_reset( int hard_reset GCC_UNUSED )
     return;
   }
 
-  if ( !periph_interface2_active ) return;
+  if ( !periph_is_active( PERIPH_TYPE_INTERFACE2 ) ) return;
 
   if ( machine_load_rom_bank( if2_memory_map_romcs, 0, 0,
 			      settings_current.if2_file,

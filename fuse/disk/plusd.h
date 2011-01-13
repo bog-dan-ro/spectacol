@@ -37,14 +37,10 @@ typedef enum plusd_drive_number {
 
 #include <libspectrum.h>
 
-#include "periph.h"
 #include "disk/fdd.h"
 
 extern int plusd_available;  /* Is the +D available for use? */
 extern int plusd_active;     /* +D enabled? */
-
-extern const periph_t plusd_peripherals[];
-extern const size_t plusd_peripherals_count;
 
 int plusd_init( void );
 void plusd_end( void );

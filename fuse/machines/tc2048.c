@@ -1,6 +1,5 @@
 /* tc2048.c: Timex TC2048 specific routines
-   Copyright (c) 1999-2005 Philip Kendall
-   Copyright (c) 2002-2009 Fredrick Meunier
+   Copyright (c) 1999-2011 Philip Kendall, Fredrick Meunier
 
    $Id$
 
@@ -47,7 +46,6 @@
 static int tc2048_reset( void );
 
 static const periph_t peripherals[] = {
-  { 0x0020, 0x0000, joystick_kempston_read, NULL },
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
   /* TS2040/Alphacom printer */
@@ -111,17 +109,21 @@ tc2048_reset( void )
 
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_ALWAYS );
-  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_opus( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_melodik( PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_FULLER, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_INTERFACE1, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_KEMPSTON_LOOSE, PERIPH_PRESENT_ALWAYS );
+  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_MELODIK, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_OPUS, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_PLUSD, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
-  periph_register_beta128();
   beta_builtin = 0;
 
   for( i = 0; i < 8; i++ ) {

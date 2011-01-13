@@ -1,5 +1,5 @@
 /* if1.h: Interface I handling routines
-   Copyright (c) 2004-2005 Gergely Szasz, Philip Kendall
+   Copyright (c) 2004-2011 Gergely Szasz, Philip Kendall
 
    $Id$
 
@@ -28,14 +28,9 @@
 
 #include <libspectrum.h>
 
-#include "periph.h"
-
 /* IF1 */
 extern int if1_active;
 extern int if1_available;
-
-extern const periph_t if1_peripherals[];
-extern const size_t if1_peripherals_count;
 
 int if1_init( void );
 libspectrum_error if1_end( void );

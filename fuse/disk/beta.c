@@ -1,5 +1,5 @@
 /* beta.c: Routines for handling the Beta disk interface
-   Copyright (c) 2004-2008 Stuart Brady
+   Copyright (c) 2004-2011 Stuart Brady, Philip Kendall
 
    $Id$
 
@@ -19,8 +19,7 @@
 
    Author contact information:
 
-   Philip: pak21-fuse@srcf.ucam.org
-   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+   Philip: philip-fuse@shadowmagic.org.uk
 
    Stuart: sdbrady@ntlworld.com
 
@@ -79,16 +78,14 @@ static int index_event;
 static wd_fdc *beta_fdc;
 static wd_fdc_drive beta_drives[ BETA_NUM_DRIVES ];
 
-const periph_t beta_peripherals[] = {
+static const periph_t beta_peripherals[] = {
   { 0x00ff, 0x001f, beta_sr_read, beta_cr_write },
   { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
   { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
   { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t beta_peripherals_count =
-  sizeof( beta_peripherals ) / sizeof( periph_t );
 
 static void beta_reset( int hard_reset );
 static void beta_memory_map( void );
@@ -172,6 +169,9 @@ beta_init( void )
   module_register( &beta_module_info );
   for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_BETA128, &settings_current.beta128,
+                        beta_peripherals );
+
   return 0;
 }
 
@@ -184,7 +184,7 @@ beta_reset( int hard_reset GCC_UNUSED )
 
   event_remove_type( index_event );
 
-  if( !periph_beta128_active ) {
+  if( !periph_is_active( PERIPH_TYPE_BETA128 ) ) {
     beta_active = 0;
     beta_available = 0;
     return;
@@ -210,7 +210,7 @@ beta_reset( int hard_reset GCC_UNUSED )
 			       settings_default.rom_beta128, 0x4000 ) ) {
       beta_active = 0;
       beta_available = 0;
-      periph_beta128_active = 0;
+      periph_activate_type( PERIPH_TYPE_BETA128, 0 );
       settings_current.beta128 = 0;
       return;
     }
@@ -747,7 +747,7 @@ beta_to_snapshot( libspectrum_snap *snap )
   libspectrum_byte *buffer;
   int drive_count = 0;
 
-  if( !periph_beta128_active ) return;
+  if( !periph_is_active( PERIPH_TYPE_BETA128 ) ) return;
 
   libspectrum_snap_set_beta_active( snap, 1 );
 

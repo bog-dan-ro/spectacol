@@ -29,9 +29,6 @@
 #include <libspectrum.h>
 #include "periph.h"
 
-extern const periph_t divide_peripherals[];
-extern const size_t divide_peripherals_count;
-
 /* Whether DivIDE is currently paged in */
 extern int divide_active;
 

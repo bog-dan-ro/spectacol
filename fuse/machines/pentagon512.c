@@ -4,7 +4,7 @@
                   exchange snapshots with emulators that do not support this
                   model but do support the older style Pentagon (SPIN,
                   Spectaculator, xzx-pro etc. etc.)..
-   Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2011 Philip Kendall and Fredrick Meunier
 
    $Id$
 
@@ -98,9 +98,13 @@ pentagon_reset(void)
 
   error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_ALWAYS );
-  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_ALWAYS );
+  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   beta_builtin = 1;

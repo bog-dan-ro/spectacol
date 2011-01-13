@@ -59,13 +59,11 @@ static void zxcf_ide_write( libspectrum_word port, libspectrum_byte data );
 
 /* Data */
 
-const periph_t zxcf_peripherals[] = {
+static const periph_t zxcf_peripherals[] = {
   { 0x10f4, 0x10b4, zxcf_memctl_read, zxcf_memctl_write },
   { 0x10f4, 0x00b4, zxcf_ide_read, zxcf_ide_write },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t zxcf_peripherals_count =
-  sizeof( zxcf_peripherals ) / sizeof( periph_t );
 
 static int zxcf_writeenable;
 
@@ -119,6 +117,8 @@ zxcf_init( void )
   module_register( &zxcf_module_info );
   for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_ZXCF, &settings_current.zxcf_active,
+                        zxcf_peripherals );
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;

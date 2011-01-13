@@ -3413,3 +3413,12 @@
          xlib/xjoystick.c}: allow the use of the SDL joystick code in the GTK+
          and Xlib UIs (patch #3156508) (Sergio Baldovi).
 20110113 tape.c: remove unused variable.
+20110113 ui/gtk/gtkjoystick.c: unbreak GTK+ compilation.
+20110113 disk/{beta.[ch],opus.c,plusd.[ch]},fuller.[ch],fuse.c,ide/{divide.[ch],
+         simpleide.[ch],zxatasp.[ch],/zxcf.[ch]},if1.[ch],joystick.c,
+         kempmouse.c,machines/{pentagon1024.c,pentagon512.c,pentagon.c,
+         scorpion.c,spec128.c,spec16.c,spec48.c,spec48_ntsc.c,specplus2a.c,
+         specplus2.c,specplus3.c,specplus3e.c,spec_se.c,tc2048.c,tc2068.c,
+         ts2068.c},melodik.[ch],periph.[ch],sound.c,speccyboot.[ch],tape.c,
+         utils.c: rework peripheral handling to reduce explicit coupling
+         (extended version of patch #3151461).

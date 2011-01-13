@@ -1,5 +1,5 @@
 /* sound.c: Sound support
-   Copyright (c) 2000-2009 Russell Marks, Matan Ziv-Av, Philip Kendall,
+   Copyright (c) 2000-2011 Russell Marks, Matan Ziv-Av, Philip Kendall,
                            Fredrick Meunier
 
    $Id$
@@ -377,7 +377,8 @@ sound_ay_overlay( void )
   unsigned int tone_count, noise_count;
 
   /* If no AY chip, don't produce any AY sound (!) */
-  if( !( periph_fuller_active || periph_melodik_active ||
+  if( !( periph_is_active( PERIPH_TYPE_FULLER) ||
+         periph_is_active( PERIPH_TYPE_MELODIK ) ||
          machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) )
     return;
 

@@ -1,5 +1,5 @@
 /* fuller.c: Routines for handling the Fuller Box
-   Copyright (c) 2007-2009 Stuart Brady, Fredrick Meunier
+   Copyright (c) 2007-2011 Stuart Brady, Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -19,9 +19,7 @@
 
    Author contact information:
 
-   Philip: philip-fuse@shadowmagic.org.uk
-
-   Stuart: sdbrady@ntlworld.com
+   E-mail: philip-fuse@shadowmagic.org.uk
 
 */
 
@@ -51,14 +49,12 @@ static module_info_t fuller_module_info = {
 
 };
 
-const periph_t fuller_peripherals[] = {
+static const periph_t fuller_peripherals[] = {
   { 0x00ff, 0x003f, ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x005f, NULL, ay_dataport_write },
   { 0x00ff, 0x007f, joystick_fuller_read, NULL },
+  { 0, 0, NULL, NULL },
 };
-
-const size_t fuller_peripherals_count =
-  sizeof( fuller_peripherals ) / sizeof( periph_t );
 
 static void
 fuller_enabled_snapshot( libspectrum_snap *snap )
@@ -70,21 +66,23 @@ fuller_enabled_snapshot( libspectrum_snap *snap )
 static void
 fuller_from_snapshot( libspectrum_snap *snap )
 {
-  if( periph_fuller_active ) {
+  if( periph_is_active( PERIPH_TYPE_FULLER ) )
     ay_state_from_snapshot( snap );
-  }
 }
 
 static void
 fuller_to_snapshot( libspectrum_snap *snap )
 {
-  libspectrum_snap_set_fuller_box_active( snap, periph_fuller_active );
+  int active = periph_is_active( PERIPH_TYPE_FULLER );
+  libspectrum_snap_set_fuller_box_active( snap, active );
 }
 
 int
 fuller_init( void )
 {
   module_register( &fuller_module_info );
+  periph_register_type( PERIPH_TYPE_FULLER, &settings_current.fuller,
+                        fuller_peripherals );
 
   return 0;
 }

@@ -55,7 +55,6 @@ static struct {
   static libspectrum_byte \
   read_##name( libspectrum_word port GCC_UNUSED, int *attached ) \
   { \
-    if( !settings_current.kempston_mouse ) return 0xff; \
     *attached = 1; \
     return kempmouse.item; \
   }
@@ -78,6 +77,7 @@ int
 kempmouse_init( void )
 {
   module_register( &kempmouse_module_info );
+  periph_register_type( PERIPH_TYPE_KEMPSTON_MOUSE, &settings_current.kempston_mouse, kempmouse_peripherals );
 
   return 0;
 }

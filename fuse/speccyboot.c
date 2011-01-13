@@ -32,6 +32,7 @@
 #include "memory.h"
 #include "nic/enc28j60.h"
 #include "module.h"
+#include "periph.h"
 #include "settings.h"
 
 #include "speccyboot.h"
@@ -62,12 +63,10 @@ speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached );
 static void
 speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val );
 
-const periph_t speccyboot_peripherals[] = {
-  { 0x00e0, 0x0080, speccyboot_register_read, speccyboot_register_write }
+static const periph_t speccyboot_peripherals[] = {
+  { 0x00e0, 0x0080, speccyboot_register_read, speccyboot_register_write },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t speccyboot_peripherals_count =
-  sizeof ( speccyboot_peripherals ) / sizeof( periph_t );
 
 /* ---------------------------------------------------------------------------
  * ROM paging state
@@ -98,7 +97,9 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
   speccyboot_memory_map_romcs.writable = 0;
 
   out_register_state = 0xff;  /* force transitions to low */
-  speccyboot_register_write( 0 /* unused argument */, 0 );
+
+  if( periph_is_active( PERIPH_TYPE_SPECCYBOOT ) )
+    speccyboot_register_write( 0, 0 );
 
   /*
    * Open TAP. If this fails, SpeccyBoot emulation won't work.
@@ -107,7 +108,7 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
    * error messages are only displayed if SpeccyBoot emulation is
    * actually requested.
    */
-  if( periph_speccyboot_active && !tap_opened ) {
+  if( periph_is_active( PERIPH_TYPE_SPECCYBOOT ) && !tap_opened ) {
     nic_enc28j60_init( nic );
     tap_opened = 1;
   }
@@ -116,8 +117,6 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
 static libspectrum_byte
 speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !periph_speccyboot_active ) return 0xff;
-
   *attached = 1;
   return in_register_state;
 }
@@ -125,8 +124,6 @@ speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached )
 static void
 speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 {
-  if ( !periph_speccyboot_active ) return;
-
   nic_enc28j60_poll( nic );
 
   if ( GONE_LO( out_register_state, val, OUT_BIT_ETH_RST ) )
@@ -187,6 +184,8 @@ speccyboot_init( void )
   module_register( &speccyboot_module_info );
 
   speccyboot_memory_map_romcs.bank = MEMORY_BANK_ROMCS;
+
+  periph_register_type( PERIPH_TYPE_SPECCYBOOT, &settings_current.speccyboot, speccyboot_peripherals );
 
   return 0;
 }

@@ -1,5 +1,5 @@
 /* utils.c: some useful helper functions
-   Copyright (c) 1999-2008 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -136,7 +136,7 @@ utils_open_file( const char *filename, int autoload,
 
     if( !( machine_current->capabilities &
 	   LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) &&
-        !periph_beta128_active ) {
+        !periph_is_active( PERIPH_TYPE_BETA128 ) ) {
       error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
     }
 
@@ -153,9 +153,9 @@ utils_open_file( const char *filename, int autoload,
           machine_current->machine == LIBSPECTRUM_MACHINE_SCORP )
       error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
     else
-      if( periph_beta128_active )
+      if( periph_is_active( PERIPH_TYPE_BETA128 ) )
         error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
-      else if( periph_plusd_active )
+      else if( periph_is_active( PERIPH_TYPE_PLUSD ) )
         error = plusd_disk_insert( PLUSD_DRIVE_1, filename, autoload );
     break;
 

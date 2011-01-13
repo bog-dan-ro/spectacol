@@ -1,5 +1,5 @@
-/* melodik.h: Routines for handling the Fuller Box
-   Copyright (c) 2009 Fredrick Meunier
+/* melodik.h: Routines for handling the Melodik interface
+   Copyright (c) 2009-2011 Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -26,13 +26,6 @@
 #ifndef FUSE_MELODIK_H
 #define FUSE_MELODIK_H
 
-#include <libspectrum.h>
-
-#include "periph.h"
-
-extern const periph_t melodik_peripherals[];
-extern const size_t melodik_peripherals_count;
-
 int melodik_init( void );
 
-#endif				/* #ifndef FUSE_FULLER_H */
+#endif				/* #ifndef FUSE_MELODIK_H */

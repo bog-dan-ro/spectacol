@@ -28,10 +28,6 @@
 #define FUSE_ZXCF_H
 
 #include <libspectrum.h>
-#include "periph.h"
-
-extern const periph_t zxcf_peripherals[];
-extern const size_t zxcf_peripherals_count;
 
 int zxcf_init( void );
 int zxcf_end( void );

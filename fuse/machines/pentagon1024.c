@@ -1,6 +1,6 @@
 /* pentagon1024.c: Pentagon 1024 specific routines This machine is expected to
                   be a post-1996 Pentagon (a 1024k v2.2 1024SL?).
-   Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2011 Philip Kendall and Fredrick Meunier
 
    $Id$
 
@@ -116,7 +116,7 @@ pentagon1024_reset(void)
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
 
-  /* Mark the least 896K as present/writeable */
+  /* Mark the last 896K as present/writeable */
   for( i = 16; i < 128; i++ )
     memory_map_ram[i].writable = 1;
 
@@ -125,9 +125,13 @@ pentagon1024_reset(void)
 
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_ALWAYS );
-  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_ALWAYS );
+  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   spec48_common_display_setup();

@@ -28,10 +28,6 @@
 #define FUSE_ZXATASP_H
 
 #include <libspectrum.h>
-#include "periph.h"
-
-extern const periph_t zxatasp_peripherals[];
-extern const size_t zxatasp_peripherals_count;
 
 int zxatasp_init( void );
 int zxatasp_end( void );

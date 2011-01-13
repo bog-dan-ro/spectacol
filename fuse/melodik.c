@@ -1,5 +1,5 @@
-/* melodik.c: Routines for handling the Fuller Box
-   Copyright (c) 2009 Fredrick Meunier
+/* melodik.c: Routines for handling the Melodik interface
+   Copyright (c) 2009-2011 Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -48,13 +48,11 @@ static module_info_t melodik_module_info = {
 
 };
 
-const periph_t melodik_peripherals[] = {
+static const periph_t melodik_peripherals[] = {
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t melodik_peripherals_count =
-  sizeof( melodik_peripherals ) / sizeof( periph_t );
 
 static void
 melodik_enabled_snapshot( libspectrum_snap *snap )
@@ -66,21 +64,24 @@ melodik_enabled_snapshot( libspectrum_snap *snap )
 static void
 melodik_from_snapshot( libspectrum_snap *snap )
 {
-  if( periph_melodik_active ) {
+  if( periph_is_active( PERIPH_TYPE_MELODIK ) )
     ay_state_from_snapshot( snap );
-  }
 }
 
 static void
 melodik_to_snapshot( libspectrum_snap *snap )
 {
-  libspectrum_snap_set_melodik_active( snap, periph_melodik_active );
+  int active = periph_is_active( PERIPH_TYPE_MELODIK );
+  libspectrum_snap_set_melodik_active( snap, active );
 }
 
 int
 melodik_init( void )
 {
   module_register( &melodik_module_info );
+
+  periph_register_type( PERIPH_TYPE_MELODIK, &settings_current.melodik,
+                        melodik_peripherals );
 
   return 0;
 }

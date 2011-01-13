@@ -1,7 +1,7 @@
 /* pentagon.c: Pentagon 128K specific routines, this is intended to be a 1991
                era Pentagon machine with Beta 128 and AY as described in the
                Russian Speccy FAQ and emulated on most Spectrum emulators.
-   Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2011 Philip Kendall and Fredrick Meunier
 
    $Id$
 
@@ -66,7 +66,7 @@ pentagon_select_1f_read( libspectrum_word port, int *attached )
   int tmpattached = 0;
 
   data = beta_sr_read( port, &tmpattached );
-  if( !tmpattached )
+  if( !tmpattached && settings_current.joy_kempston )
     data = joystick_kempston_read( port, &tmpattached );
 
   if( tmpattached ) {
@@ -144,9 +144,13 @@ pentagon_reset(void)
 
   error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_ALWAYS );
-  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_ALWAYS );
+  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   beta_builtin = 1;

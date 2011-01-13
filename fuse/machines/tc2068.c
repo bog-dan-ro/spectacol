@@ -1,8 +1,5 @@
 /* tc2068.c: Timex TC2068 specific routines
-   Copyright (c) 1999-2004 Philip Kendall
-   Copyright (c) 2002-2004 Fredrick Meunier
-   Copyright (c) 2003 Witold Filipczyk
-   Copyright (c) 2003 Darren Salt
+   Copyright (c) 1999-2011 Philip Kendall, Fredrick Meunier, Witold Filipczyk, Darren Salt
 
    $Id$
 
@@ -148,9 +145,14 @@ tc2068_reset( void )
 
   error = periph_setup( tc2068_peripherals, tc2068_peripherals_count );
   if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_speccyboot( PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   for( i = 0; i < 8; i++ ) {

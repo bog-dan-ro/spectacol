@@ -1,5 +1,5 @@
 /* fuller.h: Routines for handling the Fuller Box
-   Copyright (c) 2007-2009 Stuart Brady, Fredrick Meunier
+   Copyright (c) 2007-2011 Stuart Brady, Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -27,13 +27,6 @@
 
 #ifndef FUSE_FULLER_H
 #define FUSE_FULLER_H
-
-#include <libspectrum.h>
-
-#include "periph.h"
-
-extern const periph_t fuller_peripherals[];
-extern const size_t fuller_peripherals_count;
 
 int fuller_init( void );
 

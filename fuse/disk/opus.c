@@ -159,14 +159,14 @@ opus_reset( int hard_reset )
 
   event_remove_type( index_event );
 
-  if( !periph_opus_active )
+  if( !periph_is_active( PERIPH_TYPE_OPUS ) )
     return;
 
   if( machine_load_rom_bank( opus_memory_map_romcs, 0, 0,
                              settings_current.rom_opus,
                              settings_default.rom_opus, 0x2000 ) ) {
     settings_current.opus = 0;
-    periph_opus_active = 0;
+    periph_activate_type( PERIPH_TYPE_OPUS, 0 );
     return;
   }
 
@@ -706,7 +706,7 @@ opus_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   libspectrum_byte *buffer;
   int drive_count = 0;
 
-  if( !periph_opus_active ) return;
+  if( !periph_is_active( PERIPH_TYPE_OPUS ) ) return;
 
   libspectrum_snap_set_opus_active( snap, 1 );
 

@@ -1,5 +1,5 @@
 /* beta.h: Routines for handling the Beta disk interface
-   Copyright (c) 2003-2004 Fredrick Meunier, Philip Kendall
+   Copyright (c) 2003-2011 Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -31,7 +31,6 @@
 #include <libspectrum.h>
 
 #include "memory.h"
-#include "periph.h"
 #include "disk/fdd.h"
 
 extern int beta_available;  /* Is the Beta disk interface available for use? */
@@ -43,9 +42,6 @@ extern memory_page beta_memory_map_romcs[2];
 
 extern libspectrum_word beta_pc_mask; /* Bits to mask in PC for enable check */
 extern libspectrum_word beta_pc_value; /* Value to compare masked PC against */
-
-extern const periph_t beta_peripherals[];
-extern const size_t beta_peripherals_count;
 
 int beta_init( void );
 

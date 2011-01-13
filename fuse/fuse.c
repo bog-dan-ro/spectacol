@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2010 Philip Kendall and others
+   Copyright (c) 1999-2011 Philip Kendall and others
 
    $Id$
 
@@ -598,11 +598,11 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
           machine_current->machine == LIBSPECTRUM_MACHINE_SCORP )
         start_files->disk_beta = filename; 
       else {
-        if( periph_beta128_active )
+        if( periph_is_active( PERIPH_TYPE_BETA128 ) )
           start_files->disk_beta = filename; 
-        else if( periph_plusd_active )
+        else if( periph_is_active( PERIPH_TYPE_PLUSD ) )
           start_files->disk_plusd = filename;
-        else if( periph_opus_active )
+        else if( periph_is_active( PERIPH_TYPE_OPUS ) )
           start_files->disk_opus = filename;
       }
       break;

@@ -11,7 +11,7 @@
    SpeccyBoot:
      http://speccyboot.sourceforge.net/
   
-   Copyright (c) 2009-2010 Patrik Persson, Philip Kendall
+   Copyright (c) 2009-2011 Patrik Persson, Philip Kendall
 
    $Id$
 
@@ -37,11 +37,6 @@
 
 #ifndef FUSE_SPECCYBOOT_H
 #define FUSE_SPECCYBOOT_H
-
-#include "periph.h"
-
-extern const periph_t speccyboot_peripherals[];
-extern const size_t speccyboot_peripherals_count;
 
 int speccyboot_init( void );
 
