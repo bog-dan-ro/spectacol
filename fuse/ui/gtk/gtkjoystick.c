@@ -45,6 +45,8 @@
 
 #include "../sdl/sdljoystick.c"
 
+#endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
+
 struct button_info {
   int *setting;
   char name[80];
@@ -360,5 +362,3 @@ joystick_done( GtkButton *button GCC_UNUSED, gpointer user_data )
   }
 
 }
-
-#endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
