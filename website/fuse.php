@@ -74,6 +74,7 @@ END_SECTION
 
 $img = mk_image('screens/f-rzx.png', 330, 266);
 fuse_section ("Download", "Downloads", <<<END_SECTION
+  $img
   <p>Fuse is licensed under the <a href="COPYING">GNU General Public License</a>, version 2 or later. Please read this before downloading Fuse if you're not already familiar with it.</p>
 
   <h3>Unix</h3>
@@ -149,7 +150,6 @@ href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.1.tar
   </ul>
 
   <h3>Requirements</h3>
-  $img
   <dl>
    <dt>Required:</dt>
    <dd>
