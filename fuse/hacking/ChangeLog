@@ -3412,3 +3412,4 @@
 20110113 configure.in,fuse.c,ui/{gtk/gtkjoystick.c,sdl/sdljoystick.c,
          xlib/xjoystick.c}: allow the use of the SDL joystick code in the GTK+
          and Xlib UIs (patch #3156508) (Sergio Baldovi).
+20110113 tape.c: remove unused variable.

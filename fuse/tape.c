@@ -163,7 +163,7 @@ tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
 static int
 tape_autoload( libspectrum_machine hardware )
 {
-  int error; const char *id; compat_fd fd;
+  int error; const char *id;
   char filename[80];
   utils_file snap;
   libspectrum_id_t type;
