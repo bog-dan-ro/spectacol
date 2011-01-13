@@ -48,6 +48,7 @@
 #include "machines/specplus3.h"
 #include "memory.h"
 #include "rzx.h"
+#include "screenshot.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
@@ -228,7 +229,7 @@ utils_open_snap( void )
 
 /* Find the auxiliary file called `filename'; returns a fd for the
    file on success, -1 if it couldn't find the file */
-compat_fd
+static compat_fd
 utils_find_auxiliary_file( const char *filename, utils_aux_type type )
 {
   compat_fd fd;
@@ -488,6 +489,47 @@ utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
 
   error = utils_close_file( &file );
   if( error ) { close( *fd ); unlink( tempfilename ); return error; }
+
+  return 0;
+}
+
+int
+utils_read_auxiliary_file( const char *filename, utils_file *file,
+                           utils_aux_type type )
+{
+  int error;
+  compat_fd fd;
+
+  fd = utils_find_auxiliary_file( filename, type );
+  if( fd == COMPAT_FILE_OPEN_FAILED ) return -1;
+
+  error = utils_read_fd( fd, filename, file );
+  if( error ) return error;
+
+  return 0;
+
+}
+
+int
+utils_read_screen( const char *filename, utils_file *screen )
+{
+  int error;
+
+  error = utils_read_auxiliary_file( filename, screen, UTILS_AUXILIARY_LIB );
+  if( error == -1 ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find screen picture ('%s')",
+	      filename );
+    return 1;
+  }
+
+  if( error ) return error;
+
+  if( screen->length != STANDARD_SCR_SIZE ) {
+    utils_close_file( screen );
+    ui_error( UI_ERROR_ERROR, "screen picture ('%s') is not %d bytes long",
+	      filename, STANDARD_SCR_SIZE );
+    return 1;
+  }
 
   return 0;
 }

@@ -628,36 +628,22 @@ menu_media_tape_browse( int action )
 void
 menu_help_keyboard( int action )
 {
-  int error;
-  compat_fd fd;
-  utils_file file;
+  utils_file screen;
   widget_picture_data info;
 
   static const char *filename = "keyboard.scr";
 
-  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
-  if( fd == COMPAT_FILE_OPEN_FAILED ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
-	      filename );
-    return;
-  }
-  
-  error = utils_read_fd( fd, filename, &file ); if( error ) return;
-
-  if( file.length != 6912 ) {
-    ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
-	      filename );
-    utils_close_file( &file );
+  if( utils_read_screen( filename, &screen ) ) {
     return;
   }
 
   info.filename = filename;
-  info.screen = file.buffer;
+  info.screen = screen.buffer;
   info.border = 0;
 
   widget_do( WIDGET_TYPE_PICTURE, &info );
 
-  if( utils_close_file( &file ) ) return;
+  if( utils_close_file( &screen ) ) return;
 }
 
 void

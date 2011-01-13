@@ -40,7 +40,6 @@
 #include "ui/ui.h"
 #include "utils.h"
 
-#define STANDARD_SCR_SIZE 6912
 #define MONO_BITMAP_SIZE 6144
 #define HICOLOUR_SCR_SIZE (2 * MONO_BITMAP_SIZE)
 #define HIRES_ATTR HICOLOUR_SCR_SIZE

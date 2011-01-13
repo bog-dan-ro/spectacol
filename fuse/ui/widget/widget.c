@@ -95,18 +95,15 @@ settings_info widget_options_settings;
 
 static int widget_read_font( const char *filename )
 {
-  compat_fd fd;
   utils_file file;
   int error;
   int i;
 
-  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_WIDGET );
-  if( fd == COMPAT_FILE_OPEN_FAILED ) {
+  error = utils_read_auxiliary_file( filename, &file, UTILS_AUXILIARY_WIDGET );
+  if( error == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't find font file '%s'", filename );
     return 1;
   }
-
-  error = utils_read_fd( fd, filename, &file );
   if( error ) return error;
 
   i = 0;

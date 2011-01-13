@@ -3405,3 +3405,7 @@
          delete configuration file (fuse.cfg) on uninstall, silently uninstall
          previous version if reinstalling to the same folder, include AUTHORS
          file (patch #3152511) (Sergio Baldovi).
+20110113 machine.c,screenshot.[ch],tape.c,ui/{gtk/picture.c,widget/menu.c,
+         widget/widget.c,win32/picture.c},utils.[ch]: extract the read_screen()
+         function to utils.c and add utils_read_auxiliary_file() to simplify
+         auxiliary file reading code (patch #3148363) (Gergely Szasz).

@@ -49,8 +49,9 @@ typedef enum utils_aux_type {
 int utils_open_file( const char *filename, int autoload,
 		     libspectrum_id_t *type );
 int utils_open_snap( void );
-compat_fd utils_find_auxiliary_file( const char *filename,
-                                     utils_aux_type type );
+int utils_read_auxiliary_file( const char *filename, utils_file *file,
+                               utils_aux_type type );
+
 int utils_read_file( const char *filename, utils_file *file );
 int utils_read_fd( compat_fd fd, const char *filename, utils_file *file );
 int utils_close_file( utils_file *file );
@@ -62,5 +63,7 @@ int utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
 
 int utils_find_file_path( const char *filename, char *path,
                           utils_aux_type type );
+
+int utils_read_screen( const char *filename, utils_file *screen );
 
 #endif			/* #ifndef FUSE_UTILS_H */

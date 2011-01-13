@@ -41,7 +41,6 @@ static HWND hDialogPicture = NULL;
 static utils_file screen;
 static HBITMAP picture_BMP;
 
-static int read_screen( const char *filename, utils_file *screen );
 static void draw_screen( libspectrum_byte *screen, int border );
 
 static LRESULT WINAPI picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
@@ -80,7 +79,7 @@ win32ui_picture( const char *filename, int border )
     picture_BMP = CreateDIBSection( dc, &picture_BMI, DIB_RGB_COLORS, &picture,
                                     NULL, 0 );
 
-    if( read_screen( filename, &screen ) ) {
+    if( utils_read_screen( filename, &screen ) ) {
       return 1;
     }
 
@@ -136,33 +135,6 @@ picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     }
   }
   return FALSE;
-}
-
-
-static int
-read_screen( const char *filename, utils_file *screen )
-{
-  int error;
-  compat_fd fd;
-
-  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
-  if( fd == COMPAT_FILE_OPEN_FAILED ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
-              filename );
-    return 1;
-  }
-
-  error = utils_read_fd( fd, filename, screen );
-  if( error ) return error;
-
-  if( screen->length != 6912 ) {
-    utils_close_file( screen );
-    ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
-              filename );
-    return 1;
-  }
-
-  return 0;
 }
 
 static void
