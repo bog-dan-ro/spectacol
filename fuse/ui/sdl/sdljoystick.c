@@ -138,7 +138,7 @@ button_action( SDL_JoyButtonEvent *buttonevent, input_event_type type )
   input_event_t event;
   
   button = buttonevent->button;
-  if( button > 10 ) return;	/* We support 'only' 10 fire buttons */
+  if( button > 9 ) return;	/* We support 'only' 10 fire buttons */
 
   event.type = type;
   event.types.joystick.which = buttonevent->which;

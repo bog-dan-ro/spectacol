@@ -3422,3 +3422,6 @@
          ts2068.c},melodik.[ch],periph.[ch],sound.c,speccyboot.[ch],tape.c,
          utils.c: rework peripheral handling to reduce explicit coupling
          (extended version of patch #3151461).
+20110114 ui/sdl/sdljoystick.c: this one goes to 11; don't overrun joystick
+         button array when button 11 or more is pressed (thanks, pmrtvcom)
+         (Fred).
