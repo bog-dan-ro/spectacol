@@ -257,7 +257,6 @@ libspectrum_byte
 divide_ide_read( libspectrum_word port, int *attached )
 {
   int ide_register;
-  if( !settings_current.divide_enabled ) return 0xff;
 
   *attached = 1;
   ide_register = port_to_ide_register( port );
@@ -269,7 +268,6 @@ static void
 divide_ide_write( libspectrum_word port, libspectrum_byte data )
 {
   int ide_register;
-  if( !settings_current.divide_enabled ) return;
   
   ide_register = port_to_ide_register( port );
   
@@ -281,8 +279,6 @@ divide_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   int old_mapram;
 
-  if( !settings_current.divide_enabled ) return;
-  
   /* MAPRAM bit cannot be reset, only set */
   old_mapram = divide_control & DIVIDE_CONTROL_MAPRAM;
   divide_control_write_internal( data | old_mapram );

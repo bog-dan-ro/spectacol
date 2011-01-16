@@ -761,8 +761,6 @@ if1_port_in( libspectrum_word port GCC_UNUSED, int *attached )
 {
   libspectrum_byte ret = 0xff;
 
-  if( !if1_active ) return ret;
-
   *attached = 1;
 
   switch( decode_port( port ) )
@@ -996,8 +994,6 @@ port_net_out( libspectrum_byte val )
 void
 if1_port_out( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 {
-  if( !if1_active ) return;
-
 #ifdef IF1_DEBUG_NET_1
   fprintf( stderr, "In if1_port_out( %%%d%d%d%d%d%d%d%d => 0x%04x ).\n", 
 	!!(val & 128), !!(val & 64), !!(val & 32), !!(val & 16),

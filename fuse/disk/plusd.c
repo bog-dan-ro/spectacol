@@ -250,8 +250,6 @@ plusd_end( void )
 libspectrum_byte
 plusd_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
   return wd_fdc_sr_read( plusd_fdc );
 }
@@ -259,16 +257,12 @@ plusd_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   wd_fdc_cr_write( plusd_fdc, b );
 }
 
 libspectrum_byte
 plusd_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
   return wd_fdc_tr_read( plusd_fdc );
 }
@@ -276,16 +270,12 @@ plusd_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   wd_fdc_tr_write( plusd_fdc, b );
 }
 
 libspectrum_byte
 plusd_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
   return wd_fdc_sec_read( plusd_fdc );
 }
@@ -293,16 +283,12 @@ plusd_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   wd_fdc_sec_write( plusd_fdc, b );
 }
 
 libspectrum_byte
 plusd_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
   return wd_fdc_dr_read( plusd_fdc );
 }
@@ -310,8 +296,6 @@ plusd_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   wd_fdc_dr_write( plusd_fdc, b );
 }
 
@@ -320,8 +304,6 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   int drive, side;
   int i;
-
-  if( !plusd_available ) return;
 
   plusd_control_register = b;
 
@@ -349,8 +331,6 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 libspectrum_byte
 plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
 {
-  if( !plusd_available ) return 0xff;
-
   /* should we set *attached = 1? */
 
   plusd_page();
@@ -360,16 +340,12 @@ plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
 void
 plusd_mem_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
 {
-  if( !plusd_available ) return;
-
   plusd_unpage();
 }
 
 libspectrum_byte
 plusd_printer_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
 
   /* bit 7 = busy. other bits high? */
@@ -383,8 +359,6 @@ plusd_printer_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_printer_write( libspectrum_word port, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   printer_parallel_write( port, b );
 }
 

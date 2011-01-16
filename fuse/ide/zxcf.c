@@ -209,8 +209,6 @@ set_zxcf_bank( int bank )
 static libspectrum_byte
 zxcf_memctl_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !settings_current.zxcf_active ) return 0xff;
-
   *attached = 1;
 
   return 0xff;
@@ -220,8 +218,6 @@ static void
 zxcf_memctl_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   int was_paged = machine_current->ram.romcs;
-
-  if( !settings_current.zxcf_active ) return;
 
   last_memctl = data;
 
@@ -251,8 +247,6 @@ zxcf_ide_read( libspectrum_word port, int *attached )
 {
   libspectrum_ide_register idereg = ( port >> 8 ) & 0x07;
   
-  if( !settings_current.zxcf_active ) return 0xff;
-
   *attached = 1;
 
   return libspectrum_ide_read( zxcf_idechn, idereg ); 
@@ -263,8 +257,6 @@ zxcf_ide_write( libspectrum_word port, libspectrum_byte data )
 {
   libspectrum_ide_register idereg;
   
-  if( !settings_current.zxcf_active ) return;
-
   idereg = ( port >> 8 ) & 0x07;
   libspectrum_ide_write( zxcf_idechn, idereg, data ); 
 }

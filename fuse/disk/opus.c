@@ -144,6 +144,8 @@ opus_init( void )
   module_register( &opus_module_info );
   for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_OPUS, &settings_current.opus, NULL );
+
   return 0;
 }
 

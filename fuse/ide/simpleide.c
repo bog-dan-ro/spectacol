@@ -174,8 +174,6 @@ simpleide_read( libspectrum_word port, int *attached )
 {
   libspectrum_ide_register idereg;
   
-  if( !settings_current.simpleide_active ) return 0xff;
-  
   *attached = 1;
   
   idereg = ( ( port >> 8 ) & 0x01 ) | ( ( port >> 11 ) & 0x06 );
@@ -188,8 +186,6 @@ simpleide_write( libspectrum_word port, libspectrum_byte data )
 {
   libspectrum_ide_register idereg;
   
-  if( !settings_current.simpleide_active ) return;
-   
   idereg = ( ( port >> 8 ) & 0x01 ) | ( ( port >> 11 ) & 0x06 );
   
   libspectrum_ide_write( simpleide_idechn, idereg, data ); 
