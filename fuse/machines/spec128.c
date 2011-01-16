@@ -94,6 +94,7 @@ spec128_reset( void )
   error = spec128_common_reset( 1 );
   if( error ) return error;
 
+  spec128_common_peripherals();
   periph_update();
 
   beta_builtin = 0;

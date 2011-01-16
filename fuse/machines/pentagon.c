@@ -146,6 +146,7 @@ pentagon_reset(void)
   error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
 
+  pentagon_common_peripherals();
   periph_update();
 
   beta_builtin = 1;

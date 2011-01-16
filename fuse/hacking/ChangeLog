@@ -3429,3 +3429,5 @@
          spec128.[ch],spec16.c,spec48.[ch],spec48_ntsc.c,specplus2a.c,
          specplus2.c,specplus3.[ch],specplus3e.c,spec_se.c,tc2048.c,
          tc2068.[ch],ts2068.c}: factor out common peripheral sets.
+20110116 machines/{spec128.c,pentagon.c}: remember to give the 128K and Pentagon
+         some peripherals.
