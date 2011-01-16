@@ -122,13 +122,8 @@ scorpion_reset(void)
 
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
-  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_ALWAYS );
-  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
+
+  pentagon_common_peripherals();
   periph_update();
 
   beta_builtin = 1;

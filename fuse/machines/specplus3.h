@@ -42,6 +42,7 @@ void specplus3_765_update_fdd( void );
 void specplus3_765_init( void );
 void specplus3_765_reset( void );
 
+void specplus3_common_peripherals( void );
 int specplus3_plus2a_common_reset( void );
 void specplus3_fdc_reset( void );
 void specplus3_menu_items( void );

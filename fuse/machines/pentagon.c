@@ -40,6 +40,7 @@
 #include "settings.h"
 #include "spec48.h"
 #include "spec128.h"
+#include "specplus3.h"
 #include "ula.h"
 
 static int pentagon_reset( void );
@@ -144,13 +145,7 @@ pentagon_reset(void)
 
   error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
-  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_ALWAYS );
-  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
+
   periph_update();
 
   beta_builtin = 1;
@@ -163,3 +158,15 @@ pentagon_reset(void)
 
   return 0;
 }
+
+void
+pentagon_common_peripherals( void )
+{
+  specplus3_common_peripherals();
+
+  /* Built-in Betadisk 128 interface, which also handles Kempston joystick
+     as they share a port */
+  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_ALWAYS );
+  periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_NEVER );
+}
+

@@ -109,19 +109,17 @@ tc2048_reset( void )
 
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
-  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_FULLER, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_INTERFACE1, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );
+
+  spec48_common_peripherals();
+
+  /* TC2048 has a built-in Kempston joystick, which uses the "loose"
+     decoding */
+  periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_KEMPSTON_LOOSE, PERIPH_PRESENT_ALWAYS );
-  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_MELODIK, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_OPUS, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_PLUSD, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
+
+  /* SpeccyBoot doesn't seem to work on the TC2048 */
+  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_NEVER );
+
   periph_update();
 
   beta_builtin = 0;
