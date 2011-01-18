@@ -180,7 +180,8 @@ set_activity( gpointer key, gpointer value, gpointer user_data )
 
   switch ( type_data->present ) {
   case PERIPH_PRESENT_NEVER: active = 0; break;
-  case PERIPH_PRESENT_OPTIONAL: active = *(type_data->option); break;
+  case PERIPH_PRESENT_OPTIONAL:
+    active = type_data->option ? *(type_data->option) : 0; break;
   case PERIPH_PRESENT_ALWAYS: active = 1; break;
   }
 

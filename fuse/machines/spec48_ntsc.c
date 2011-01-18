@@ -43,7 +43,6 @@
 static int spec48_ntsc_reset( void );
 
 static const periph_t peripherals[] = {
-  { 0x0001, 0x0000, ula_read, ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
 };
 

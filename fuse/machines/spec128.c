@@ -46,7 +46,6 @@
 static int spec128_reset( void );
 
 const periph_t spec128_peripherals[] = {
-  { 0x0001, 0x0000, ula_read, ula_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0x8002, 0x0000, NULL, spec128_memoryport_write },

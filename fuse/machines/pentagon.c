@@ -50,7 +50,6 @@ const periph_t pentagon_peripherals[] = {
   { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
   { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
-  { 0x00ff, 0x00fe, ula_read, ula_write },
   { 0x00ff, 0x00ff, pentagon_select_ff_read, beta_sp_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
@@ -164,6 +163,10 @@ void
 pentagon_common_peripherals( void )
 {
   specplus3_common_peripherals();
+
+  /* ULA uses full decoding */
+  periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
+  periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
 
   /* Built-in Betadisk 128 interface, which also handles Kempston joystick
      as they share a port */

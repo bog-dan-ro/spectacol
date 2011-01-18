@@ -49,6 +49,8 @@ typedef enum periph_type {
   PERIPH_TYPE_OPUS,           /* Opus disk interface */
   PERIPH_TYPE_SIMPLEIDE,      /* Simple 8-bit IDE interface */
   PERIPH_TYPE_SPECCYBOOT,     /* SpeccyBoot interface */
+  PERIPH_TYPE_ULA,            /* Standard ULA */
+  PERIPH_TYPE_ULA_FULL_DECODE,/* Standard ULA responding only to 0xfe */
   PERIPH_TYPE_ZXATASP,        /* ZXATASP IDE interface */
   PERIPH_TYPE_ZXCF,           /* ZXCF IDE interface */
 } periph_type;

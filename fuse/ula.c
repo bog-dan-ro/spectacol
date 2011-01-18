@@ -1,5 +1,5 @@
 /* ula.c: ULA routines
-   Copyright (c) 1999-2008 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -32,6 +32,7 @@
 #include "loader.h"
 #include "machine.h"
 #include "module.h"
+#include "periph.h"
 #include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
@@ -50,6 +51,8 @@ libspectrum_byte ula_default_value;
 
 static void ula_from_snapshot( libspectrum_snap *snap );
 static void ula_to_snapshot( libspectrum_snap *snap );
+static libspectrum_byte ula_read( libspectrum_word port, int *attached );
+static void ula_write( libspectrum_word port, libspectrum_byte b );
 
 static module_info_t ula_module_info = {
 
@@ -61,17 +64,31 @@ static module_info_t ula_module_info = {
 
 };
 
+static periph_t ula_peripherals[] = {
+  { 0x0001, 0x0000, ula_read, ula_write },
+  { 0, 0, NULL, NULL }
+};
+
+static periph_t ula_peripherals_full_decode[] = {
+  { 0x00ff, 0x00fe, ula_read, ula_write },
+  { 0, 0, NULL, NULL }
+};
+
 int
 ula_init( void )
 {
   module_register( &ula_module_info );
+
+  periph_register_type( PERIPH_TYPE_ULA, NULL, ula_peripherals );
+  periph_register_type( PERIPH_TYPE_ULA_FULL_DECODE, NULL,
+                        ula_peripherals_full_decode );
 
   ula_default_value = 0xff;
 
   return 0;
 }
 
-libspectrum_byte
+static libspectrum_byte
 ula_read( libspectrum_word port, int *attached )
 {
   libspectrum_byte r = ula_default_value;
@@ -87,7 +104,7 @@ ula_read( libspectrum_word port, int *attached )
 }
 
 /* What happens when we write to the ULA? */
-void
+static void
 ula_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   last_byte = b;

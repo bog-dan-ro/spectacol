@@ -47,7 +47,6 @@ static libspectrum_byte empty_chunk[ MEMORY_PAGE_SIZE ];
 static memory_page empty_mapping;
 
 static const periph_t peripherals[] = {
-  { 0x0001, 0x0000, ula_read, ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
 };
 

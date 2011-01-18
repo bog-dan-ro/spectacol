@@ -51,9 +51,6 @@ static const periph_t peripherals[] = {
   /* TS2040/Alphacom printer */
   { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
 
-  /* Lower 8 bits of Timex ports are fully decoded */
-  { 0x00ff, 0x00fe, ula_read, ula_write },
-
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
 };
 
@@ -111,6 +108,10 @@ tc2048_reset( void )
   if( error ) return error;
 
   spec48_common_peripherals();
+
+  /* ULA uses full decoding */
+  periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
+  periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
 
   /* TC2048 has a built-in Kempston joystick, which uses the "loose"
      decoding */

@@ -42,7 +42,6 @@
 static int specplus2a_reset( void );
 
 static const periph_t peripherals[] = {
-  { 0x0001, 0x0000, ula_read, ula_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, ay_registerport_read, ay_dataport_write },
   { 0xc002, 0x4000, NULL, spec128_memoryport_write },

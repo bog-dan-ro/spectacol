@@ -50,9 +50,6 @@ const periph_t tc2068_peripherals[] = {
   /* TS2040/Alphacom printer */
   { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
 
-  /* Lower 8 bits of Timex ports are fully decoded */
-  { 0x00ff, 0x00fe, ula_read, ula_write },
-
   { 0x00ff, 0x00f5, tc2068_ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },
 
@@ -176,6 +173,11 @@ void
 tc2068_common_peripherals()
 {
   specplus3_common_peripherals();
+
+  /* ULA uses full decoding */
+  periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
+  periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
+
   periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );
 }
 

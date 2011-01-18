@@ -36,9 +36,6 @@ extern libspectrum_byte ula_contention_no_mreq[ ULA_CONTENTION_SIZE ];
 
 int ula_init( void );
 
-libspectrum_byte ula_read( libspectrum_word port, int *attached );
-void ula_write( libspectrum_word port, libspectrum_byte b );
-
 libspectrum_byte ula_last_byte( void );
 
 libspectrum_byte ula_tape_level( void );

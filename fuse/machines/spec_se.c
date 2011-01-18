@@ -71,9 +71,6 @@ static const periph_t peripherals[] = {
 
   { 0xffff, 0x7ffd, NULL, spec_se_memoryport_write },
 
-  /* Lower 8 bits of Timex ports are fully decoded */
-  { 0x00ff, 0x00fe, ula_read, ula_write },
-
   /* FIXME: The SE has an 8k SRAM attached to its AY dataport */
   { 0x00ff, 0x00f5, ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x00f6, NULL, ay_dataport_write },
@@ -146,6 +143,11 @@ spec_se_reset( void )
   if( error ) return error;
 
   spec128_common_peripherals();
+
+  /* ULA uses full decoding */
+  periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
+  periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
+
   periph_update();
 
   /* Mark as present/writeable */
