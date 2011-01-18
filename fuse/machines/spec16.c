@@ -46,13 +46,6 @@ static int spec16_reset( void );
 static libspectrum_byte empty_chunk[ MEMORY_PAGE_SIZE ];
 static memory_page empty_mapping;
 
-static const periph_t peripherals[] = {
-  { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
-
 int spec16_init( fuse_machine_info *machine )
 {
   machine->machine = LIBSPECTRUM_MACHINE_16;
@@ -92,7 +85,7 @@ spec16_reset( void )
                             settings_default.rom_16, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
+  error = periph_setup( NULL, 0 );
   if( error ) return error;
 
   spec48_common_peripherals();

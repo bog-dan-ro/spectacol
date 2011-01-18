@@ -3435,3 +3435,7 @@
          specplus3.c,pentagon1024.c,tc2048.c,spec128.c,tc2068.c,scorpion.c,
          spec48_ntsc.c},periph.[ch],ula.[ch]: use new peripheral framework to
          handle the ULA.
+20110118 ay.c,machines/{pentagon1024.c,pentagon.c,scorpion.c,spec128.c,spec16.c,
+         spec48.c,spec48_ntsc.c,specplus2a.c,specplus3.c,spec_se.c,tc2048.c,
+         tc2068.c},periph.h,printer.[ch]: use new peripheral framework for the
+         ZX Printer and 128K AY chip.

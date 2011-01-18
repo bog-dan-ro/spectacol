@@ -28,8 +28,6 @@
 
 #include <libspectrum.h>
 
-libspectrum_byte printer_zxp_read( libspectrum_word port, int *attached );
-void printer_zxp_write( libspectrum_word port, libspectrum_byte b );
 void printer_frame( void );
 void printer_serial_write( libspectrum_byte b );
 void printer_parallel_strobe_write( int on );

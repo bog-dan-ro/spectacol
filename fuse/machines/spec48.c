@@ -44,13 +44,6 @@
 
 static int spec48_reset( void );
 
-static const periph_t peripherals[] = {
-  { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
-
 int
 spec48_port_from_ula( libspectrum_word port )
 {
@@ -88,7 +81,7 @@ spec48_reset( void )
                             settings_default.rom_48, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
+  error = periph_setup( NULL, 0 );
   if( error ) return error;
 
   spec48_common_peripherals();
@@ -109,9 +102,13 @@ spec48_common_peripherals( void )
 {
   spec128_common_peripherals();
 
+  /* No AY chip on the 48K */
+  periph_set_present( PERIPH_TYPE_AY, PERIPH_PRESENT_NEVER );
+
   /* These peripherals valid for the 48K and very similar machines only */
   periph_set_present( PERIPH_TYPE_FULLER, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_MELODIK, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_OPTIONAL );
 }
 
 void

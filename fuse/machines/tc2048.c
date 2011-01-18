@@ -47,10 +47,6 @@ static int tc2048_reset( void );
 
 static const periph_t peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
-
-  /* TS2040/Alphacom printer */
-  { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
-
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
 };
 
@@ -112,6 +108,10 @@ tc2048_reset( void )
   /* ULA uses full decoding */
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
+
+  /* As does the ZX Printer */
+  periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_NEVER );
+  periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_OPTIONAL );
 
   /* TC2048 has a built-in Kempston joystick, which uses the "loose"
      decoding */

@@ -42,13 +42,6 @@
 
 static int spec48_ntsc_reset( void );
 
-static const periph_t peripherals[] = {
-  { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
-
 int spec48_ntsc_init( fuse_machine_info *machine )
 {
   machine->machine = LIBSPECTRUM_MACHINE_48_NTSC;
@@ -80,7 +73,7 @@ spec48_ntsc_reset( void )
                             settings_default.rom_48, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
+  error = periph_setup( NULL, 0 );
   if( error ) return error;
 
   spec48_common_peripherals();

@@ -62,13 +62,6 @@ static void spec_se_memoryport_write( libspectrum_word port,
 static const periph_t peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
-  /* TS2040/Alphacom printer */
-  { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
-
-  /* FIXME: The SE has an 8k SRAM attached to its AY dataport */
-  { 0xffff, 0xfffd, ay_registerport_read, ay_registerport_write },
-  { 0xffff, 0xbffd, NULL, ay_dataport_write },
-
   { 0xffff, 0x7ffd, NULL, spec_se_memoryport_write },
 
   /* FIXME: The SE has an 8k SRAM attached to its AY dataport */
@@ -147,6 +140,13 @@ spec_se_reset( void )
   /* ULA uses full decoding */
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
+
+  /* As does the AY chip */
+  periph_set_present( PERIPH_TYPE_AY, PERIPH_PRESENT_NEVER );
+  periph_set_present( PERIPH_TYPE_AY_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
+
+  /* ZX Printer available */
+  periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
 
   periph_update();
 

@@ -32,6 +32,8 @@
 typedef enum periph_type {
   PERIPH_TYPE_UNKNOWN,
 
+  PERIPH_TYPE_AY,             /* 128K-style AY chip */
+  PERIPH_TYPE_AY_FULL_DECODE, /* 128K-style AY chip responding only to 0xfffd */
   PERIPH_TYPE_BETA128,        /* Beta128 disk interface */
   PERIPH_TYPE_DIVIDE,         /* DivIDE interface */
   PERIPH_TYPE_PLUSD,          /* +D disk interface */
@@ -53,6 +55,8 @@ typedef enum periph_type {
   PERIPH_TYPE_ULA_FULL_DECODE,/* Standard ULA responding only to 0xfe */
   PERIPH_TYPE_ZXATASP,        /* ZXATASP IDE interface */
   PERIPH_TYPE_ZXCF,           /* ZXCF IDE interface */
+  PERIPH_TYPE_ZXPRINTER,      /* ZX Printer */
+  PERIPH_TYPE_ZXPRINTER_FULL_DECODE, /* ZX Printer responding only to 0xfb */
 } periph_type;
 
 /*

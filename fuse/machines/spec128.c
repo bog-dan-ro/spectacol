@@ -46,8 +46,6 @@
 static int spec128_reset( void );
 
 const periph_t spec128_peripherals[] = {
-  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0x8002, 0x0000, NULL, spec128_memoryport_write },
 };
 
@@ -109,6 +107,7 @@ spec128_common_peripherals( void )
   specplus3_common_peripherals();
 
   /* Peripherals available on the 48K and 128K */
+  periph_set_present( PERIPH_TYPE_AY, PERIPH_PRESENT_ALWAYS );
   periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_INTERFACE1, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );

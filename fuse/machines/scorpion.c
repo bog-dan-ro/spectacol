@@ -56,8 +56,6 @@ static const periph_t peripherals[] = {
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
   { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
   { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
-  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0xc002, 0x4000, NULL, spec128_memoryport_write },
   { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
 };

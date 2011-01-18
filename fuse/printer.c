@@ -68,6 +68,8 @@ static unsigned char parallel_data=0;
 #define PARALLEL_STROBE_MAX_CYCLES	10000
 
 static void printer_zxp_reset(int hard_reset);
+static libspectrum_byte printer_zxp_read( libspectrum_word port, int *attached );
+static void printer_zxp_write( libspectrum_word port, libspectrum_byte b );
 
 static module_info_t printer_zxp_module_info = {
   printer_zxp_reset,
@@ -77,11 +79,26 @@ static module_info_t printer_zxp_module_info = {
   NULL
 };
 
+static periph_t printer_zxp_peripherals[] = {
+  { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
+  { 0, 0, NULL, NULL }
+};
+
+static periph_t printer_zxp_peripherals_full_decode[] = {
+  { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
+  { 0, 0, NULL, NULL }
+};
+
 static void printer_zxp_init(void)
 {
 zxpstylus=zxpspeed=zxpheight=zxpnewspeed=zxplineofchar=0;
 zxppixel=-1;
 module_register(&printer_zxp_module_info);
+periph_register_type(PERIPH_TYPE_ZXPRINTER,&settings_current.printer,
+                     printer_zxp_peripherals);
+periph_register_type(PERIPH_TYPE_ZXPRINTER_FULL_DECODE,
+                     &settings_current.printer,
+                     printer_zxp_peripherals_full_decode);
 }
 
 
@@ -385,11 +402,9 @@ frames++;
  * very little brain. :-) Or at least, I don't grok it that well.
  * It works wonderfully though.
  */
-libspectrum_byte printer_zxp_read(libspectrum_word port GCC_UNUSED,
-				  int *attached)
+static libspectrum_byte printer_zxp_read(libspectrum_word port GCC_UNUSED,
+				         int *attached)
 {
-if(!settings_current.printer)
-  return(0xff);
 if(!printer_graphics_enabled)
   return(0xff);
 if(plusd_available)
@@ -436,10 +451,8 @@ else
 }
 
 
-void printer_zxp_write(libspectrum_word port GCC_UNUSED,libspectrum_byte b)
+static void printer_zxp_write(libspectrum_word port GCC_UNUSED,libspectrum_byte b)
 {
-if(!settings_current.printer)
-  return;
 if(plusd_available)
   return;
 if(!zxpspeed)

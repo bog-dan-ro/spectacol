@@ -30,6 +30,7 @@
 #include "compat.h"
 #include "machine.h"
 #include "module.h"
+#include "periph.h"
 #include "printer.h"
 #include "psg.h"
 #include "sound.h"
@@ -57,10 +58,25 @@ static module_info_t ay_module_info = {
 
 };
 
+static periph_t ay_peripherals[] = {
+  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
+  { 0xc002, 0x8000, NULL, ay_dataport_write },
+  { 0, 0, NULL, NULL }
+};
+
+static periph_t ay_peripherals_full_decode[] = {
+  { 0xffff, 0xfffd, ay_registerport_read, ay_registerport_write },
+  { 0xffff, 0xbffd, NULL, ay_dataport_write },
+  { 0, 0, NULL, NULL }
+};
+
 int
 ay_init( void )
 {
   module_register( &ay_module_info );
+  periph_register_type( PERIPH_TYPE_AY, NULL, ay_peripherals );
+  periph_register_type( PERIPH_TYPE_AY_FULL_DECODE, NULL,
+                        ay_peripherals_full_decode );
 
   return 0;
 }

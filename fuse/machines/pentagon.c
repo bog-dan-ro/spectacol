@@ -51,8 +51,6 @@ const periph_t pentagon_peripherals[] = {
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
   { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
   { 0x00ff, 0x00ff, pentagon_select_ff_read, beta_sp_write },
-  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0x8002, 0x0000, NULL, spec128_memoryport_write },
 };
 

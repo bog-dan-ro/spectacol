@@ -47,9 +47,6 @@ static int tc2068_reset( void );
 const periph_t tc2068_peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
-  /* TS2040/Alphacom printer */
-  { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
-
   { 0x00ff, 0x00f5, tc2068_ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },
 
@@ -178,7 +175,9 @@ tc2068_common_peripherals()
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
 
+  /* ZX Printer and Interface 2 available */
   periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE, PERIPH_PRESENT_OPTIONAL );
 }
 
 int

@@ -74,8 +74,6 @@ static void specplus3_fdc_write( libspectrum_word port,
 static int specplus3_reset( void );
 
 const periph_t specplus3_peripherals[] = {
-  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, ay_registerport_read, ay_dataport_write },
   { 0xc002, 0x4000, NULL, spec128_memoryport_write },
   { 0xf002, 0x3000, specplus3_fdc_read, specplus3_fdc_write },
   { 0xf002, 0x2000, specplus3_fdc_status, NULL },
