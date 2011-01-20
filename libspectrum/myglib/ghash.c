@@ -8,7 +8,7 @@
    files for a list of changes.  These files are distributed with GLib
    at ftp://ftp.gtk.org/pub/gtk/.
 
-   Modified by Philip Kendall 2004-2008.
+   Modified by Philip Kendall 2004-2011.
 
    $Id$
 
@@ -61,6 +61,12 @@ struct _GHashTable
 
 static GHashNode *node_free_list = NULL;
 
+guint
+g_direct_hash (gconstpointer v)
+{
+  return GPOINTER_TO_UINT (v);
+}
+
 GHashTable*
 g_hash_table_new (GHashFunc	hash_func,
 		  GCompareFunc	key_equal_func)
@@ -71,7 +77,7 @@ g_hash_table_new (GHashFunc	hash_func,
   hash_table = libspectrum_malloc (sizeof (GHashTable));
 
   hash_table->nnodes = 0;
-  hash_table->hash_func = hash_func;
+  hash_table->hash_func = hash_func? hash_func : g_direct_hash;
   hash_table->key_equal_func = key_equal_func;
   hash_table->nodes = libspectrum_malloc (HASH_TABLE_SIZE * sizeof (GHashNode*));
 
@@ -116,10 +122,17 @@ g_hash_table_lookup_node (GHashTable    *hash_table,
   
   node = &hash_table->nodes
     [(* hash_table->hash_func) (key) % HASH_TABLE_SIZE];
-  
-  while (*node && !(*hash_table->key_equal_func) ((*node)->key, key))
+
+  while( *node ) {
+    if( hash_table->key_equal_func ) {
+        if( hash_table->key_equal_func( (*node)->key, key ) ) break;
+    } else if( (*node)->key == key ) {
+      break;
+    }
+
     node = &(*node)->next;
-  
+  }
+
   return node;
 }
 
@@ -228,6 +241,19 @@ g_hash_table_foreach_remove (GHashTable *hash_table,
     }
   
   return deleted;
+}
+
+void
+g_hash_table_foreach (GHashTable *hash_table,
+                      GHFunc      func,
+                      gpointer    user_data)
+{
+  GHashNode *node;
+  gint i;
+
+  for (i = 0; i < HASH_TABLE_SIZE; i++)
+    for (node = hash_table->nodes[i]; node; node = node->next)
+      (* func) (node->key, node->value, user_data);
 }
 
 guint

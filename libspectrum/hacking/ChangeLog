@@ -796,3 +796,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20101216 test/Makefile.am: ensure all test files are distributed.
 20101217 Makefile.am: mark windres.rc as a source file so it is distributed
          (thanks, Guesser).
+20110120 make-perl.c,myglib/ghash.c: add the g_hash_table_foreach() function and
+         update g_hash_table_new() function to support the
+         g_hash_table_new( NULL, NULL ) syntax (patch #3160211) (Sergio
+         Baldovi).

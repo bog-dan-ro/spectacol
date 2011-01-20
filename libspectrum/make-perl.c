@@ -133,6 +133,7 @@ int main(void)
 "typedef long glong;\n"
 "typedef gint gboolean;\n"
 "typedef unsigned int guint;\n"
+"typedef unsigned long gulong;\n"
 "typedef const void * gconstpointer;\n"
 "typedef void * gpointer;\n"
 "\n"
@@ -196,6 +197,10 @@ int main(void)
 "\n"
 "typedef guint		(*GHashFunc)		(gconstpointer	key);\n"
 "\n"
+"typedef void	(*GHFunc)		(gpointer	key,\n"
+"						 gpointer	value,\n"
+"						 gpointer	user_data);\n"
+"\n"
 "typedef gboolean	(*GHRFunc)		(gpointer	key,\n"
 "						 gpointer	value,\n"
 "						 gpointer	user_data);\n"
@@ -219,6 +224,10 @@ int main(void)
 "\n"
 "WIN32_DLL gpointer g_hash_table_lookup	(GHashTable	*hash_table,\n"
 "					 gconstpointer	 key);\n"
+"\n"
+"WIN32_DLL void	g_hash_table_foreach (GHashTable	*hash_table,\n"
+"						 GHFunc    func,\n"
+"						 gpointer  user_data);\n"
 "\n"
 "WIN32_DLL guint	g_hash_table_foreach_remove	(GHashTable	*hash_table,\n"
 "						 GHRFunc	 func,\n"
@@ -248,9 +257,11 @@ int main(void)
   if( sizeof( void* ) == sizeof( int ) ) {
     printf( "#define GINT_TO_POINTER(i)      ((gpointer)  (i))\n" );
     printf( "#define GPOINTER_TO_INT(p)      ((gint)   (p))\n" );
+    printf( "#define GPOINTER_TO_UINT(p)     ((guint)  (p))\n" );
   } else if( sizeof( void* ) == sizeof( long ) ) {
     printf( "#define GINT_TO_POINTER(i)      ((gpointer)  (glong)(i))\n" );
     printf( "#define GPOINTER_TO_INT(p)      ((gint)   (glong)(p))\n" );
+    printf( "#define GPOINTER_TO_UINT(p)     ((guint)  (gulong)(p))\n" );
   } else {
     fprintf( stderr, "No plausible int to pointer cast found\n" );
     return 1;
