@@ -51,7 +51,6 @@ const periph_t pentagon_peripherals[] = {
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
   { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
   { 0x00ff, 0x00ff, pentagon_select_ff_read, beta_sp_write },
-  { 0x8002, 0x0000, NULL, spec128_memoryport_write },
 };
 
 const size_t pentagon_peripherals_count =
@@ -161,6 +160,9 @@ void
 pentagon_common_peripherals( void )
 {
   specplus3_common_peripherals();
+
+  /* 128K-style memory paging available */
+  periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_ALWAYS );
 
   /* ULA uses full decoding */
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );

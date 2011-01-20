@@ -74,10 +74,8 @@ static void specplus3_fdc_write( libspectrum_word port,
 static int specplus3_reset( void );
 
 const periph_t specplus3_peripherals[] = {
-  { 0xc002, 0x4000, NULL, spec128_memoryport_write },
   { 0xf002, 0x3000, specplus3_fdc_read, specplus3_fdc_write },
   { 0xf002, 0x2000, specplus3_fdc_status, NULL },
-  { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
 };
 
@@ -205,6 +203,8 @@ specplus3_reset( void )
 void
 specplus3_common_peripherals( void )
 {
+  periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_ALWAYS );
+
   /* Peripherals generally available on all machines; the Timex machines and
      Russian clones remove some items from this list */
   periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );

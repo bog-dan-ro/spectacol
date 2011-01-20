@@ -76,7 +76,7 @@ specplus2_reset( void )
   error = spec128_common_reset( 1 );
   if( error ) return error;
 
-  error = periph_setup( spec128_peripherals, spec128_peripherals_count );
+  error = periph_setup( NULL, 0 );
   if( error ) return error;
 
   spec128_common_peripherals();

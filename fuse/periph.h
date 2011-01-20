@@ -32,6 +32,7 @@
 typedef enum periph_type {
   PERIPH_TYPE_UNKNOWN,
 
+  PERIPH_TYPE_128_MEMORY,     /* 128K-style memory paging */
   PERIPH_TYPE_AY,             /* 128K-style AY chip */
   PERIPH_TYPE_AY_FULL_DECODE, /* 128K-style AY chip responding only to 0xfffd */
   PERIPH_TYPE_BETA128,        /* Beta128 disk interface */
@@ -49,6 +50,7 @@ typedef enum periph_type {
   PERIPH_TYPE_KEMPSTON_MOUSE, /* Kempston mouse */
   PERIPH_TYPE_MELODIK,        /* Melodik interface */
   PERIPH_TYPE_OPUS,           /* Opus disk interface */
+  PERIPH_TYPE_PLUS3_MEMORY,   /* +2A/+3-style memory paging */
   PERIPH_TYPE_SCLD,           /* Timex SCLD */
   PERIPH_TYPE_SIMPLEIDE,      /* Simple 8-bit IDE interface */
   PERIPH_TYPE_SPECCYBOOT,     /* SpeccyBoot interface */

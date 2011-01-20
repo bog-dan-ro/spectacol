@@ -42,8 +42,6 @@
 static int specplus2a_reset( void );
 
 static const periph_t peripherals[] = {
-  { 0xc002, 0x4000, NULL, spec128_memoryport_write },
-  { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
 };
 

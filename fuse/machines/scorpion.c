@@ -56,8 +56,6 @@ static const periph_t peripherals[] = {
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
   { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
   { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
-  { 0xc002, 0x4000, NULL, spec128_memoryport_write },
-  { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
 };
 
 static const size_t peripherals_count =
@@ -121,6 +119,9 @@ scorpion_reset(void)
   if( error ) return error;
 
   pentagon_common_peripherals();
+
+  periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_ALWAYS );
+
   periph_update();
 
   beta_builtin = 1;

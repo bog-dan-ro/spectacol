@@ -102,7 +102,8 @@ spec48_common_peripherals( void )
 {
   spec128_common_peripherals();
 
-  /* No AY chip on the 48K */
+  /* No memory paging or AY chip on the 48K */
+  periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_AY, PERIPH_PRESENT_NEVER );
 
   /* These peripherals valid for the 48K and very similar machines only */
