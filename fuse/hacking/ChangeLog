@@ -3441,3 +3441,4 @@
          ZX Printer and 128K AY chip.
 20110120 machines/{spec_se.c,tc2048.c,tc2068.c},periph.h,scld.[ch]: use new
          peripheral framework for SCLD.
+20110120 event.c: event_reset() returns void (thanks, zx81).

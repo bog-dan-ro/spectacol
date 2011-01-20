@@ -268,5 +268,5 @@ event_name( int type )
 void
 event_end( void )
 {
-  return event_reset();
+  event_reset();
 }
