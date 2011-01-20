@@ -44,20 +44,16 @@
 
 static int tc2068_reset( void );
 
-const periph_t tc2068_peripherals[] = {
-  { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
+libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
+memory_page fake_mapping;
 
+const periph_t tc2068_peripherals[] = {
   { 0x00ff, 0x00f5, tc2068_ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },
-
-  { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
 };
 
 const size_t tc2068_peripherals_count =
   sizeof( tc2068_peripherals ) / sizeof( periph_t );
-
-libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
-memory_page fake_mapping;
 
 libspectrum_byte
 tc2068_ay_registerport_read( libspectrum_word port, int *attached )
@@ -174,6 +170,9 @@ tc2068_common_peripherals()
   /* ULA uses full decoding */
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
+
+  /* SCLD always present */
+  periph_set_present( PERIPH_TYPE_SCLD, PERIPH_PRESENT_ALWAYS );
 
   /* ZX Printer and Interface 2 available */
   periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );

@@ -45,14 +45,6 @@
 
 static int tc2048_reset( void );
 
-static const periph_t peripherals[] = {
-  { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
-  { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
-
 int
 tc2048_port_from_ula( libspectrum_word port )
 {
@@ -100,7 +92,7 @@ tc2048_reset( void )
                             settings_default.rom_tc2048, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
+  error = periph_setup( NULL, 0 );
   if( error ) return error;
 
   spec48_common_peripherals();
@@ -111,7 +103,10 @@ tc2048_reset( void )
 
   /* As does the ZX Printer */
   periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_NEVER );
-  periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE, PERIPH_PRESENT_OPTIONAL );
+
+  /* SCLD always present */
+  periph_set_present( PERIPH_TYPE_SCLD, PERIPH_PRESENT_ALWAYS );
 
   /* TC2048 has a built-in Kempston joystick, which uses the "loose"
      decoding */

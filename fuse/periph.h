@@ -49,6 +49,7 @@ typedef enum periph_type {
   PERIPH_TYPE_KEMPSTON_MOUSE, /* Kempston mouse */
   PERIPH_TYPE_MELODIK,        /* Melodik interface */
   PERIPH_TYPE_OPUS,           /* Opus disk interface */
+  PERIPH_TYPE_SCLD,           /* Timex SCLD */
   PERIPH_TYPE_SIMPLEIDE,      /* Simple 8-bit IDE interface */
   PERIPH_TYPE_SPECCYBOOT,     /* SpeccyBoot interface */
   PERIPH_TYPE_ULA,            /* Standard ULA */

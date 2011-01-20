@@ -60,15 +60,11 @@ static void spec_se_memoryport_write( libspectrum_word port,
                                       libspectrum_byte b );
 
 static const periph_t peripherals[] = {
-  { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
-
   { 0xffff, 0x7ffd, NULL, spec_se_memoryport_write },
 
   /* FIXME: The SE has an 8k SRAM attached to its AY dataport */
   { 0x00ff, 0x00f5, ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x00f6, NULL, ay_dataport_write },
-
-  { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
 };
 
 static const size_t peripherals_count =
@@ -145,8 +141,11 @@ spec_se_reset( void )
   periph_set_present( PERIPH_TYPE_AY, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_AY_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
 
+  /* SCLD always present */
+  periph_set_present( PERIPH_TYPE_SCLD, PERIPH_PRESENT_ALWAYS );
+
   /* ZX Printer available */
-  periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
+  periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE, PERIPH_PRESENT_OPTIONAL );
 
   periph_update();
 

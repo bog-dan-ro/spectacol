@@ -123,10 +123,7 @@ extern memory_page timex_dock[8];
 int scld_init( void );
 
 void scld_dec_write( libspectrum_word port, libspectrum_byte b );
-libspectrum_byte scld_dec_read( libspectrum_word port, int *attached );
-
 void scld_hsr_write( libspectrum_word port, libspectrum_byte b );
-libspectrum_byte scld_hsr_read( libspectrum_word port, int *attached );
 
 void scld_memory_map( void );
 
