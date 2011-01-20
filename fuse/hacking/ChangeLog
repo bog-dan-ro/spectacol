@@ -3446,3 +3446,4 @@
          spec48.c,specplus2a.c,specplus2.c,specplus3.c},periph.h: use new
          peripheral framework for 128K and +3 memory paging.
 20110120 machines/{pentagon.c,scorpion.c}: fix Russian clone memory paging.
+20110120 machines/machines_periph.[ch]: remember to add new files.
