@@ -163,6 +163,7 @@ pentagon_common_peripherals( void )
 
   /* 128K-style memory paging available */
   periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_ALWAYS );
+  periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_NEVER );
 
   /* ULA uses full decoding */
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );

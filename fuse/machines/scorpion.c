@@ -120,6 +120,8 @@ scorpion_reset(void)
 
   pentagon_common_peripherals();
 
+  /* +3-style memory paging */
+  periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_ALWAYS );
 
   periph_update();

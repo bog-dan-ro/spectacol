@@ -3445,3 +3445,4 @@
 20110120 fuse.c,machines/{Makefile.am,pentagon.c,scorpion.c,spec128.c,spec128.h,
          spec48.c,specplus2a.c,specplus2.c,specplus3.c},periph.h: use new
          peripheral framework for 128K and +3 memory paging.
+20110120 machines/{pentagon.c,scorpion.c}: fix Russian clone memory paging.
