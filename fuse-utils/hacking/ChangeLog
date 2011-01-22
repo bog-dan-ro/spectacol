@@ -319,3 +319,5 @@
 20101216 ChangeLog: update date here as well.
 20101229 tzxlist.c: fix typo in archive block printing (patch #3147102) (Alberto
          Garcia).
+20110122 compat/win32/{Makefile.am,osname.c},configure.in: add compatibility
+         function support for Windows (patch #3163680) (Sergio Baldovi).
