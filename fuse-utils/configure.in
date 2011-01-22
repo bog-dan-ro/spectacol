@@ -49,12 +49,16 @@ if test "$prefix" != "NONE"; then
   LDFLAGS="$LDFLAGS -L$prefix/lib"
 fi)
 
-dnl Check that libgcrypt is available
-AC_CHECK_LIB(gcrypt,gcry_check_version,
-  AC_DEFINE([HAVE_LIBGCRYPT], 1, [Defined if we've got libgcrypt])
-  GCRYPT_LIBS="$LIBS -lgcrypt"
-  gcrypt=yes
-)
+dnl Check whether to use libgcrypt
+AC_MSG_CHECKING(whether to use libgcrypt)
+AC_ARG_WITH(libgcrypt,
+[  --without-libgcrypt     don't use libgcrypt],
+if test "$withval" = no; then libgcrypt=no; else libgcrypt=yes; fi,
+libgcrypt=yes)
+AC_MSG_RESULT($libgcrypt)
+if test "$libgcrypt" = yes; then
+  AC_CHECK_HEADERS(gcrypt.h,LIBS="$LIBS -lgcrypt")
+fi
 AC_SUBST(GCRYPT_LIBS)
 AM_CONDITIONAL(BUILD_RZXCHECK, test "$gcrypt" = yes)
 

@@ -26,6 +26,8 @@
 #ifndef AUDIO2TAPE_H
 #define AUDIO2TAPE_H
 
+#include <string.h>
+
 class audio2tape_exception : public std::exception
 {
   public:

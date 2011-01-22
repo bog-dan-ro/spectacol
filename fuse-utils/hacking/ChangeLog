@@ -321,3 +321,5 @@
          Garcia).
 20110122 compat/win32/{Makefile.am,osname.c},configure.in: add compatibility
          function support for Windows (patch #3163680) (Sergio Baldovi).
+20110122 audio2tape.h,configure.in: add support for --without-gcrypt flag like
+         libspectrum (patch #3163845) (Ooblick).
