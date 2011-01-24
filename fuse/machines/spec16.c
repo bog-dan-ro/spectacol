@@ -33,6 +33,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
 #include "printer.h"
@@ -88,7 +89,7 @@ spec16_reset( void )
   error = periph_setup( NULL, 0 );
   if( error ) return error;
 
-  spec48_common_peripherals();
+  machines_periph_48();
   periph_update();
 
   /* ROM 0, RAM 5, nothing, nothing */

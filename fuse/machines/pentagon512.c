@@ -37,6 +37,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "pentagon.h"
 #include "periph.h"
@@ -99,7 +100,7 @@ pentagon_reset(void)
   error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
 
-  pentagon_common_peripherals();
+  machines_periph_pentagon();
   periph_update();
 
   beta_builtin = 1;

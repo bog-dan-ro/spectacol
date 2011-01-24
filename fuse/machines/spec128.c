@@ -34,6 +34,7 @@
 #include "disk/beta.h"
 #include "joystick.h"
 #include "machine.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
 #include "settings.h"
@@ -84,7 +85,7 @@ spec128_reset( void )
   error = spec128_common_reset( 1 );
   if( error ) return error;
 
-  spec128_common_peripherals();
+  machines_periph_128();
   periph_update();
 
   beta_builtin = 0;
@@ -92,25 +93,6 @@ spec128_reset( void )
   spec48_common_display_setup();
 
   return 0;
-}
-
-void
-spec128_common_peripherals( void )
-{
-  specplus3_common_peripherals();
-
-  periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_NEVER );
-
-  /* Peripherals present only on the 128K */
-  periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_ALWAYS );
-  periph_set_present( PERIPH_TYPE_AY, PERIPH_PRESENT_ALWAYS );
-
-  /* Peripherals available on the 48K and 128K */
-  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_INTERFACE1, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_OPUS, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_PLUSD, PERIPH_PRESENT_OPTIONAL );
 }
 
 int

@@ -31,7 +31,6 @@
 #include "machine.h"
 
 int tc2068_init( fuse_machine_info *machine );
-void tc2068_common_peripherals();
 void tc2068_tc2048_common_display_setup( void );
 int tc2068_tc2048_common_reset( void );
 

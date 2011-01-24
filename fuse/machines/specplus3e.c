@@ -27,6 +27,7 @@
 
 #include "disk/upd_fdc.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "periph.h"
 #include "settings.h"
 #include "spec48.h"
@@ -82,7 +83,7 @@ specplus3e_reset( void )
   error = periph_setup( specplus3_peripherals, specplus3_peripherals_count );
   if( error ) return error;
 
-  specplus3_common_peripherals();
+  machines_periph_plus3();
   periph_update();
 
   specplus3_765_reset();

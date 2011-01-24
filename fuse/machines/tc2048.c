@@ -33,6 +33,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
 #include "printer.h"
@@ -95,7 +96,7 @@ tc2048_reset( void )
   error = periph_setup( NULL, 0 );
   if( error ) return error;
 
-  spec48_common_peripherals();
+  machines_periph_48();
 
   /* ULA uses full decoding */
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );

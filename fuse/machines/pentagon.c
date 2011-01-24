@@ -34,13 +34,13 @@
 #include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "pentagon.h"
 #include "periph.h"
 #include "settings.h"
 #include "spec48.h"
 #include "spec128.h"
-#include "specplus3.h"
 #include "ula.h"
 
 static int pentagon_reset( void );
@@ -142,7 +142,7 @@ pentagon_reset(void)
   error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
 
-  pentagon_common_peripherals();
+  machines_periph_pentagon();
   periph_update();
 
   beta_builtin = 1;
@@ -155,23 +155,3 @@ pentagon_reset(void)
 
   return 0;
 }
-
-void
-pentagon_common_peripherals( void )
-{
-  specplus3_common_peripherals();
-
-  /* 128K-style memory paging available */
-  periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_ALWAYS );
-  periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_NEVER );
-
-  /* ULA uses full decoding */
-  periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
-  periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
-
-  /* Built-in Betadisk 128 interface, which also handles Kempston joystick
-     as they share a port */
-  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_ALWAYS );
-  periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_NEVER );
-}
-

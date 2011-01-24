@@ -36,6 +36,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "pentagon.h"
 #include "printer.h"
@@ -118,7 +119,7 @@ scorpion_reset(void)
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
 
-  pentagon_common_peripherals();
+  machines_periph_pentagon();
 
   /* +3-style memory paging */
   periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_NEVER );

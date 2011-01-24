@@ -40,6 +40,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "printer.h"
 #include "snapshot.h"
@@ -131,7 +132,7 @@ spec_se_reset( void )
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
 
-  spec128_common_peripherals();
+  machines_periph_128();
 
   /* ULA uses full decoding */
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );

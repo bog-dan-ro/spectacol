@@ -32,6 +32,7 @@
 #include "disk/beta.h"
 #include "joystick.h"
 #include "machine.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
 #include "printer.h"
@@ -84,7 +85,7 @@ spec48_reset( void )
   error = periph_setup( NULL, 0 );
   if( error ) return error;
 
-  spec48_common_peripherals();
+  machines_periph_48();
   periph_update();
 
   beta_builtin = 0;
@@ -95,21 +96,6 @@ spec48_reset( void )
   spec48_common_display_setup();
 
   return spec48_common_reset();
-}
-
-void
-spec48_common_peripherals( void )
-{
-  spec128_common_peripherals();
-
-  /* No memory paging or AY chip on the 48K */
-  periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_NEVER );
-  periph_set_present( PERIPH_TYPE_AY, PERIPH_PRESENT_NEVER );
-
-  /* These peripherals valid for the 48K and very similar machines only */
-  periph_set_present( PERIPH_TYPE_FULLER, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_MELODIK, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_OPTIONAL );
 }
 
 void

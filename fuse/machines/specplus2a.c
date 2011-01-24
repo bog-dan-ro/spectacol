@@ -30,6 +30,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "periph.h"
 #include "printer.h"
 #include "settings.h"
@@ -94,7 +95,7 @@ specplus2a_reset( void )
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
 
-  specplus3_common_peripherals();
+  machines_periph_plus3();
   periph_update();
 
   spec48_common_display_setup();

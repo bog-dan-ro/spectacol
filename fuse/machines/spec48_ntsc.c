@@ -31,6 +31,7 @@
 
 #include "joystick.h"
 #include "machine.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
 #include "printer.h"
@@ -76,7 +77,7 @@ spec48_ntsc_reset( void )
   error = periph_setup( NULL, 0 );
   if( error ) return error;
 
-  spec48_common_peripherals();
+  machines_periph_48();
   periph_update();
 
   memory_current_screen = 5;

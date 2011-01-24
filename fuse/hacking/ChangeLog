@@ -3447,3 +3447,8 @@
          peripheral framework for 128K and +3 memory paging.
 20110120 machines/{pentagon.c,scorpion.c}: fix Russian clone memory paging.
 20110120 machines/machines_periph.[ch]: remember to add new files.
+20110124 machines/{machines_periph.[ch],pentagon1024.c,pentagon512.c,
+         pentagon.[ch],scorpion.c,spec128.[ch],spec16.c,spec48.[ch],
+         spec48_ntsc.c,specplus2a.c,specplus2.c,specplus3.[ch],specplus3e.c,
+         spec_se.c,tc2048.c,tc2068.[ch],ts2068.c}: further refactoring of
+         common peripherals code.

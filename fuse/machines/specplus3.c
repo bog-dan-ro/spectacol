@@ -40,6 +40,7 @@
 #include "fuse.h"
 #include "joystick.h"
 #include "machine.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
 #include "printer.h"
@@ -189,7 +190,7 @@ specplus3_reset( void )
   error = periph_setup( specplus3_peripherals, specplus3_peripherals_count );
   if( error ) return error;
 
-  specplus3_common_peripherals();
+  machines_periph_plus3();
   periph_update();
 
   specplus3_765_reset();
@@ -198,23 +199,6 @@ specplus3_reset( void )
   spec48_common_display_setup();
 
   return 0;
-}
-
-void
-specplus3_common_peripherals( void )
-{
-  periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_ALWAYS );
-
-  /* Peripherals generally available on all machines; the Timex machines and
-     Russian clones remove some items from this list */
-  periph_set_present( PERIPH_TYPE_DIVIDE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_KEMPSTON_MOUSE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_SIMPLEIDE, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_ALWAYS );
-  periph_set_present( PERIPH_TYPE_ZXATASP, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ZXCF, PERIPH_PRESENT_OPTIONAL );
 }
 
 int

@@ -33,6 +33,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "periph.h"
 #include "printer.h"
 #include "scld.h"
@@ -136,7 +137,7 @@ tc2068_reset( void )
   error = periph_setup( tc2068_peripherals, tc2068_peripherals_count );
   if( error ) return error;
 
-  tc2068_common_peripherals();
+  machines_periph_timex();
   periph_update();
 
   for( i = 0; i < 8; i++ ) {
@@ -159,24 +160,6 @@ tc2068_reset( void )
   }
 
   return tc2068_tc2048_common_reset();
-}
-
-/* The peripherals common to the T[CS]2068 */
-void
-tc2068_common_peripherals()
-{
-  specplus3_common_peripherals();
-
-  /* ULA uses full decoding */
-  periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
-  periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
-
-  /* SCLD always present */
-  periph_set_present( PERIPH_TYPE_SCLD, PERIPH_PRESENT_ALWAYS );
-
-  /* ZX Printer and Interface 2 available */
-  periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE, PERIPH_PRESENT_OPTIONAL );
 }
 
 int

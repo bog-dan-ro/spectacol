@@ -33,6 +33,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "periph.h"
 #include "printer.h"
 #include "scld.h"
@@ -91,7 +92,7 @@ ts2068_reset( void )
   error = periph_setup( tc2068_peripherals, tc2068_peripherals_count );
   if( error ) return error;
 
-  tc2068_common_peripherals();
+  machines_periph_timex();
   /* TS2068 has its own joysticks */
   periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_NEVER );
   periph_update();

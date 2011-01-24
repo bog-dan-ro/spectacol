@@ -34,8 +34,6 @@
 extern const periph_t pentagon_peripherals[];
 extern const size_t pentagon_peripherals_count;
 
-void pentagon_common_peripherals( void );
-
 libspectrum_byte pentagon_select_1f_read( libspectrum_word port,
 					  int *attached );
 libspectrum_byte pentagon_select_ff_read( libspectrum_word port,

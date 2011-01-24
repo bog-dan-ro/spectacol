@@ -31,6 +31,7 @@
 
 #include "disk/beta.h"
 #include "machine.h"
+#include "machines_periph.h"
 #include "machines.h"
 #include "settings.h"
 #include "spec128.h"
@@ -79,7 +80,7 @@ specplus2_reset( void )
   error = periph_setup( NULL, 0 );
   if( error ) return error;
 
-  spec128_common_peripherals();
+  machines_periph_128();
   periph_update();
 
   beta_builtin = 0;
