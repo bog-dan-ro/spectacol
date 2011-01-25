@@ -42,13 +42,6 @@
 
 static int specplus2a_reset( void );
 
-static const periph_t peripherals[] = {
-  { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
-
 int
 specplus2a_init( fuse_machine_info *machine )
 {
@@ -92,7 +85,7 @@ specplus2a_reset( void )
   error = specplus3_plus2a_common_reset();
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
+  error = periph_setup( NULL, 0 );
   if( error ) return error;
 
   machines_periph_plus3();

@@ -25,27 +25,51 @@
 
 #include <config.h>
 
+#include "fuse.h"
 #include "periph.h"
 #include "spec128.h"
 #include "specplus3.h"
 
-static const periph_t spec128_peripherals[] = {
+void
+spec_se_memoryport_write( libspectrum_word port GCC_UNUSED,
+			  libspectrum_byte b )
+{
+  machine_current->ram.last_byte = b;
+  machine_current->memory_map();
+}
+
+static const periph_t spec128_memory_peripherals[] = {
   { 0x8002, 0x0000, NULL, spec128_memoryport_write },
   { 0, 0, NULL, NULL }
 };
 
-static const periph_t specplus3_memory_peripherals[] = {
+static const periph_t plus3_memory_peripherals[] = {
   { 0xc002, 0x4000, NULL, spec128_memoryport_write },
   { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
+  { 0, 0, NULL, NULL }
+};
+
+static const periph_t upd765_peripherals[] = {
+  { 0xf002, 0x3000, specplus3_fdc_read, specplus3_fdc_write },
+  { 0xf002, 0x2000, specplus3_fdc_status, NULL },
+  { 0, 0, NULL, NULL }
+};
+
+static const periph_t se_memory_peripherals[] = {
+  { 0xffff, 0x7ffd, NULL, spec_se_memoryport_write },
   { 0, 0, NULL, NULL }
 };
 
 void
 machines_periph_init( void )
 {
-  periph_register_type( PERIPH_TYPE_128_MEMORY, NULL, spec128_peripherals );
+  periph_register_type( PERIPH_TYPE_128_MEMORY, NULL,
+                        spec128_memory_peripherals );
   periph_register_type( PERIPH_TYPE_PLUS3_MEMORY, NULL,
-                        specplus3_memory_peripherals );
+                        plus3_memory_peripherals );
+  periph_register_type( PERIPH_TYPE_UPD765, NULL, upd765_peripherals );
+  periph_register_type( PERIPH_TYPE_SE_MEMORY, NULL,
+                        se_memory_peripherals );
 }
 
 /* Peripherals generally available on all machines; the Timex machines and
@@ -100,6 +124,7 @@ machines_periph_plus3( void )
 {
   base_peripherals();
   periph_set_present( PERIPH_TYPE_AY, PERIPH_PRESENT_ALWAYS );
+  periph_set_present( PERIPH_TYPE_PARALLEL_PRINTER, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_ALWAYS );
 }
 

@@ -57,19 +57,6 @@
 static int dock_exrom_reset( void );
 static int spec_se_reset( void );
 static int spec_se_memory_map( void );
-static void spec_se_memoryport_write( libspectrum_word port,
-                                      libspectrum_byte b );
-
-static const periph_t peripherals[] = {
-  { 0xffff, 0x7ffd, NULL, spec_se_memoryport_write },
-
-  /* FIXME: The SE has an 8k SRAM attached to its AY dataport */
-  { 0x00ff, 0x00f5, ay_registerport_read, ay_registerport_write },
-  { 0x00ff, 0x00f6, NULL, ay_dataport_write },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
 
 int
 spec_se_init( fuse_machine_info *machine )
@@ -129,10 +116,13 @@ spec_se_reset( void )
                             settings_default.rom_spec_se_1, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
+  error = periph_setup( NULL, 0 );
   if( error ) return error;
 
   machines_periph_128();
+  
+  /* SE style memory paging present */
+  periph_set_present( PERIPH_TYPE_SE_MEMORY, PERIPH_PRESENT_ALWAYS );
 
   /* ULA uses full decoding */
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
@@ -141,6 +131,9 @@ spec_se_reset( void )
   /* As does the AY chip */
   periph_set_present( PERIPH_TYPE_AY, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_AY_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
+
+  /* Timex-style AY also present */
+  periph_set_present( PERIPH_TYPE_AY_TIMEX, PERIPH_PRESENT_ALWAYS );
 
   /* SCLD always present */
   periph_set_present( PERIPH_TYPE_SCLD, PERIPH_PRESENT_ALWAYS );
@@ -233,13 +226,4 @@ spec_se_memory_map( void )
   memory_romcs_map();
 
   return 0;
-}
-
-void
-spec_se_memoryport_write( libspectrum_word port GCC_UNUSED,
-			  libspectrum_byte b )
-{
-  machine_current->ram.last_byte = b;
-
-  machine_current->memory_map();
 }

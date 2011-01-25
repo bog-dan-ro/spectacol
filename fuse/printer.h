@@ -31,7 +31,6 @@
 void printer_frame( void );
 void printer_serial_write( libspectrum_byte b );
 void printer_parallel_strobe_write( int on );
-libspectrum_byte printer_parallel_read( libspectrum_word port, int *attached );
 void printer_parallel_write( libspectrum_word port, libspectrum_byte b );
 int printer_init( void );
 void printer_end( void );

@@ -35,6 +35,7 @@ typedef enum periph_type {
   PERIPH_TYPE_128_MEMORY,     /* 128K-style memory paging */
   PERIPH_TYPE_AY,             /* 128K-style AY chip */
   PERIPH_TYPE_AY_FULL_DECODE, /* 128K-style AY chip responding only to 0xfffd */
+  PERIPH_TYPE_AY_TIMEX,       /* Timex-style AY chip */
   PERIPH_TYPE_BETA128,        /* Beta128 disk interface */
   PERIPH_TYPE_DIVIDE,         /* DivIDE interface */
   PERIPH_TYPE_PLUSD,          /* +D disk interface */
@@ -50,12 +51,15 @@ typedef enum periph_type {
   PERIPH_TYPE_KEMPSTON_MOUSE, /* Kempston mouse */
   PERIPH_TYPE_MELODIK,        /* Melodik interface */
   PERIPH_TYPE_OPUS,           /* Opus disk interface */
+  PERIPH_TYPE_PARALLEL_PRINTER, /* +2A/+3 parallel printer */
   PERIPH_TYPE_PLUS3_MEMORY,   /* +2A/+3-style memory paging */
   PERIPH_TYPE_SCLD,           /* Timex SCLD */
+  PERIPH_TYPE_SE_MEMORY,      /* Spectrum SE-style memory paging */
   PERIPH_TYPE_SIMPLEIDE,      /* Simple 8-bit IDE interface */
   PERIPH_TYPE_SPECCYBOOT,     /* SpeccyBoot interface */
   PERIPH_TYPE_ULA,            /* Standard ULA */
   PERIPH_TYPE_ULA_FULL_DECODE,/* Standard ULA responding only to 0xfe */
+  PERIPH_TYPE_UPD765,         /* +3 uPD765 FDC */
   PERIPH_TYPE_ZXATASP,        /* ZXATASP IDE interface */
   PERIPH_TYPE_ZXCF,           /* ZXCF IDE interface */
   PERIPH_TYPE_ZXPRINTER,      /* ZX Printer */

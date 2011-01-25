@@ -3452,3 +3452,6 @@
          spec48_ntsc.c,specplus2a.c,specplus2.c,specplus3.[ch],specplus3e.c,
          spec_se.c,tc2048.c,tc2068.[ch],ts2068.c}: further refactoring of
          common peripherals code.
+20110125 ay.c,machines/{machines_periph.c,specplus2a.c,specplus3.c,specplus3e.c,
+         specplus3.h,spec_se.c},periph.h,printer.[ch]: move a few more bits into
+         the new peripherals framework.

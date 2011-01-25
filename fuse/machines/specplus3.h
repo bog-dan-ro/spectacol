@@ -32,9 +32,6 @@
 #include "periph.h"
 #include "disk/fdd.h"
 
-extern const periph_t specplus3_peripherals[];
-extern const size_t specplus3_peripherals_count;
-
 int specplus3_port_from_ula( libspectrum_word port );
 
 int specplus3_init( fuse_machine_info *machine );
@@ -49,6 +46,10 @@ int specplus3_shutdown( void );
 
 void specplus3_memoryport_write( libspectrum_word port, libspectrum_byte b );
 void specplus3_memoryport2_write( libspectrum_word port, libspectrum_byte b );
+
+libspectrum_byte specplus3_fdc_status( libspectrum_word port, int *attached );
+libspectrum_byte specplus3_fdc_read( libspectrum_word port, int *attached );
+void specplus3_fdc_write( libspectrum_word port, libspectrum_byte data );
 
 int specplus3_memory_map( void );
 

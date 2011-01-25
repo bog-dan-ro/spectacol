@@ -70,6 +70,8 @@ static unsigned char parallel_data=0;
 static void printer_zxp_reset(int hard_reset);
 static libspectrum_byte printer_zxp_read( libspectrum_word port, int *attached );
 static void printer_zxp_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED,
+				              int *attached);
 
 static module_info_t printer_zxp_module_info = {
   printer_zxp_reset,
@@ -89,6 +91,11 @@ static periph_t printer_zxp_peripherals_full_decode[] = {
   { 0, 0, NULL, NULL }
 };
 
+static periph_t printer_parallel_peripherals[] = {
+  { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
+  { 0, 0, NULL, NULL }
+};
+
 static void printer_zxp_init(void)
 {
 zxpstylus=zxpspeed=zxpheight=zxpnewspeed=zxplineofchar=0;
@@ -99,6 +106,8 @@ periph_register_type(PERIPH_TYPE_ZXPRINTER,&settings_current.printer,
 periph_register_type(PERIPH_TYPE_ZXPRINTER_FULL_DECODE,
                      &settings_current.printer,
                      printer_zxp_peripherals_full_decode);
+periph_register_type(PERIPH_TYPE_PARALLEL_PRINTER,&settings_current.printer,
+                     printer_parallel_peripherals);
 }
 
 
@@ -648,8 +657,8 @@ old_on=on;
 }
 
 
-libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED,
-				       int *attached)
+static libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED,
+				              int *attached)
 {
 if(!settings_current.printer)
   return(0xff);

@@ -65,23 +65,7 @@ static int normal_memory_map( int rom, int page );
 static int special_memory_map( int which );
 static int select_special_map( int page1, int page2, int page3, int page4 );
 
-static libspectrum_byte specplus3_fdc_status( libspectrum_word port,
-					      int *attached );
-static libspectrum_byte specplus3_fdc_read( libspectrum_word port,
-					    int *attached );
-static void specplus3_fdc_write( libspectrum_word port,
-				 libspectrum_byte data );
-
 static int specplus3_reset( void );
-
-const periph_t specplus3_peripherals[] = {
-  { 0xf002, 0x3000, specplus3_fdc_read, specplus3_fdc_write },
-  { 0xf002, 0x2000, specplus3_fdc_status, NULL },
-  { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
-};
-
-const size_t specplus3_peripherals_count =
-  sizeof( specplus3_peripherals ) / sizeof( periph_t );
 
 #define SPECPLUS3_NUM_DRIVES 2
 upd_fdc *specplus3_fdc;
@@ -187,10 +171,11 @@ specplus3_reset( void )
   error = specplus3_plus2a_common_reset();
   if( error ) return error;
 
-  error = periph_setup( specplus3_peripherals, specplus3_peripherals_count );
+  error = periph_setup( NULL, 0 );
   if( error ) return error;
 
   machines_periph_plus3();
+  periph_set_present( PERIPH_TYPE_UPD765, PERIPH_PRESENT_ALWAYS );
   periph_update();
 
   specplus3_765_reset();
@@ -387,21 +372,21 @@ specplus3_menu_items( void )
 		    !specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.wrprot );
 }
 
-static libspectrum_byte
+libspectrum_byte
 specplus3_fdc_status( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return upd_fdc_read_status( specplus3_fdc );
 }
 
-static libspectrum_byte
+libspectrum_byte
 specplus3_fdc_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return upd_fdc_read_data( specplus3_fdc );
 }
 
-static void
+void
 specplus3_fdc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   upd_fdc_write_data( specplus3_fdc, data );
