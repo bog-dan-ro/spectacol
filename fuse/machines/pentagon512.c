@@ -97,10 +97,12 @@ pentagon_reset(void)
   error = spec128_common_reset( 0 );
   if( error ) return error;
 
-  error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
-  if( error ) return error;
-
+  periph_clear();
   machines_periph_pentagon();
+
+  /* Earlier style Betadisk 128 interface */
+  periph_set_present( PERIPH_TYPE_BETA128_PENTAGON, PERIPH_PRESENT_ALWAYS );
+
   periph_update();
 
   beta_builtin = 1;

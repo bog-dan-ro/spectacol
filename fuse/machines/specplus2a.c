@@ -85,9 +85,7 @@ specplus2a_reset( void )
   error = specplus3_plus2a_common_reset();
   if( error ) return error;
 
-  error = periph_setup( NULL, 0 );
-  if( error ) return error;
-
+  periph_clear();
   machines_periph_plus3();
   periph_update();
 

@@ -82,9 +82,7 @@ spec48_reset( void )
                             settings_default.rom_48, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( NULL, 0 );
-  if( error ) return error;
-
+  periph_clear();
   machines_periph_48();
   periph_update();
 

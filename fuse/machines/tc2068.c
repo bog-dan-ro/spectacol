@@ -48,14 +48,6 @@ static int tc2068_reset( void );
 libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
 memory_page fake_mapping;
 
-const periph_t tc2068_peripherals[] = {
-  { 0x00ff, 0x00f5, tc2068_ay_registerport_read, ay_registerport_write },
-  { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },
-};
-
-const size_t tc2068_peripherals_count =
-  sizeof( tc2068_peripherals ) / sizeof( periph_t );
-
 libspectrum_byte
 tc2068_ay_registerport_read( libspectrum_word port, int *attached )
 {
@@ -134,9 +126,7 @@ tc2068_reset( void )
                             settings_default.rom_tc2068_1, 0x2000 );
   if( error ) return error;
 
-  error = periph_setup( tc2068_peripherals, tc2068_peripherals_count );
-  if( error ) return error;
-
+  periph_clear();
   machines_periph_timex();
   periph_update();
 

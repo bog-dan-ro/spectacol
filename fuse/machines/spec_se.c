@@ -116,9 +116,7 @@ spec_se_reset( void )
                             settings_default.rom_spec_se_1, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( NULL, 0 );
-  if( error ) return error;
-
+  periph_clear();
   machines_periph_128();
   
   /* SE style memory paging present */

@@ -116,14 +116,6 @@ periph_register_type( periph_type type, int *option, const periph_t *peripherals
   g_hash_table_insert( peripherals_by_type, GINT_TO_POINTER( type ), type_data );
 }
 
-/* FIXME: remove this function */
-static void
-periph_register_n( const periph_t *peripherals_list, size_t n )
-{
-  const periph_t *ptr;
-  for( ptr = peripherals_list; n--; ptr++ ) periph_register( PERIPH_TYPE_UNKNOWN, ptr );
-}
-
 /* Get the data about one peripheral */
 static gint
 find_by_type( gconstpointer data, gconstpointer user_data )
@@ -364,14 +356,6 @@ writeport_internal( libspectrum_word port, libspectrum_byte b )
 /*
  * The more Fuse-specific peripheral handling routines
  */
-
-int
-periph_setup( const periph_t *peripherals_list, size_t n )
-{
-  periph_clear();
-  periph_register_n( peripherals_list, n );
-  return 0;
-}
 
 static void
 update_cartridge_menu( void )

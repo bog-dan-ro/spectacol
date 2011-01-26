@@ -79,12 +79,10 @@ spec128_reset( void )
                             settings_default.rom_128_1, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( NULL, 0 );
-  if( error ) return error;
-
   error = spec128_common_reset( 1 );
   if( error ) return error;
 
+  periph_clear();
   machines_periph_128();
   periph_update();
 

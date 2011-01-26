@@ -43,24 +43,7 @@
 #include "ula.h"
 
 static int pentagon1024_reset( void );
-static void pentagon1024_memoryport_write( libspectrum_word port GCC_UNUSED,
-					   libspectrum_byte b);
-static void pentagon1024_v22_memoryport_write( libspectrum_word port GCC_UNUSED,
-					      libspectrum_byte b);
 static int pentagon1024_memory_map( void );
-
-static const periph_t peripherals[] = {
-  { 0x00ff, 0x001f, pentagon_select_1f_read, beta_cr_write },
-  { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
-  { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
-  { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
-  { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
-  { 0xc002, 0x4000, NULL, pentagon1024_memoryport_write  },
-  { 0xf008, 0xe000, NULL, pentagon1024_v22_memoryport_write }, /* v2.2 */
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
 
 int
 pentagon1024_init( fuse_machine_info *machine )
@@ -121,10 +104,15 @@ pentagon1024_reset(void)
   beta_builtin = 1;
   beta_active = 1;
 
-  error = periph_setup( peripherals, peripherals_count );
-  if( error ) return error;
-
+  periph_clear();
   machines_periph_pentagon();
+
+  /* Pentagon 1024 memory paging */
+  periph_set_present( PERIPH_TYPE_PENTAGON1024_MEMORY, PERIPH_PRESENT_ALWAYS );
+
+  /* Later style Betadisk 128 interface */
+  periph_set_present( PERIPH_TYPE_BETA128_PENTAGON_LATE, PERIPH_PRESENT_ALWAYS );
+
   periph_update();
 
   spec48_common_display_setup();
@@ -132,7 +120,7 @@ pentagon1024_reset(void)
   return 0;
 }
 
-static void
+void
 pentagon1024_memoryport_write( libspectrum_word port GCC_UNUSED,
 			       libspectrum_byte b )
 {
@@ -145,7 +133,7 @@ pentagon1024_memoryport_write( libspectrum_word port GCC_UNUSED,
     machine_current->ram.locked = b & 0x20;
 }
 
-static void
+void
 pentagon1024_v22_memoryport_write( libspectrum_word port GCC_UNUSED,
 				   libspectrum_byte b)
 {

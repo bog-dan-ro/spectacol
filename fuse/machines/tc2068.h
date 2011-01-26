@@ -44,7 +44,4 @@ int tc2068_memory_map( void );
 extern libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
 extern memory_page fake_mapping;
 
-extern const periph_t tc2068_peripherals[];
-extern const size_t tc2068_peripherals_count;
-
 #endif			/* #ifndef FUSE_TS2068_H */

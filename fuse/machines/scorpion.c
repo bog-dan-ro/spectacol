@@ -51,17 +51,6 @@
 static int scorpion_reset( void );
 static int scorpion_memory_map( void );
 
-static const periph_t peripherals[] = {
-  { 0x00ff, 0x001f, pentagon_select_1f_read, beta_cr_write },
-  { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
-  { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
-  { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
-  { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
-
 int
 scorpion_init( fuse_machine_info *machine )
 {
@@ -116,14 +105,15 @@ scorpion_reset(void)
   for( i = 16; i < 32; i++ )
     memory_map_ram[i].writable = 1;
 
-  error = periph_setup( peripherals, peripherals_count );
-  if( error ) return error;
-
+  periph_clear();
   machines_periph_pentagon();
 
   /* +3-style memory paging */
   periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_PLUS3_MEMORY, PERIPH_PRESENT_ALWAYS );
+
+  /* Later style Betadisk 128 interface */
+  periph_set_present( PERIPH_TYPE_BETA128_PENTAGON_LATE, PERIPH_PRESENT_ALWAYS );
 
   periph_update();
 

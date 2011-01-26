@@ -25,10 +25,13 @@
 
 #include <config.h>
 
+#include "disk/beta.h"
 #include "fuse.h"
+#include "pentagon.h"
 #include "periph.h"
 #include "spec128.h"
 #include "specplus3.h"
+#include "tc2068.h"
 
 void
 spec_se_memoryport_write( libspectrum_word port GCC_UNUSED,
@@ -60,6 +63,36 @@ static const periph_t se_memory_peripherals[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t tc2068_ay_peripherals[] = {
+  { 0x00ff, 0x00f5, tc2068_ay_registerport_read, ay_registerport_write },
+  { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },
+  { 0, 0, NULL, NULL }
+};
+
+static const periph_t beta128_pentagon_peripherals[] = {
+  { 0x00ff, 0x001f, pentagon_select_1f_read, beta_cr_write },
+  { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
+  { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
+  { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
+  { 0x00ff, 0x00ff, pentagon_select_ff_read, beta_sp_write },
+  { 0, 0, NULL, NULL }
+};
+
+static const periph_t beta128_pentagon_late_peripherals[] = {
+  { 0x00ff, 0x001f, pentagon_select_1f_read, beta_cr_write },
+  { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
+  { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
+  { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
+  { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
+  { 0, 0, NULL, NULL }
+};
+
+static const periph_t pentagon1024_memory_peripherals[] = {
+  { 0xc002, 0x4000, NULL, pentagon1024_memoryport_write  },
+  { 0xf008, 0xe000, NULL, pentagon1024_v22_memoryport_write }, /* v2.2 */
+  { 0, 0, NULL, NULL }
+};
+
 void
 machines_periph_init( void )
 {
@@ -70,6 +103,14 @@ machines_periph_init( void )
   periph_register_type( PERIPH_TYPE_UPD765, NULL, upd765_peripherals );
   periph_register_type( PERIPH_TYPE_SE_MEMORY, NULL,
                         se_memory_peripherals );
+  periph_register_type( PERIPH_TYPE_AY_TIMEX_WITH_JOYSTICK, NULL,
+                        tc2068_ay_peripherals );
+  periph_register_type( PERIPH_TYPE_BETA128_PENTAGON, NULL,
+                        beta128_pentagon_peripherals );
+  periph_register_type( PERIPH_TYPE_BETA128_PENTAGON_LATE, NULL,
+                        beta128_pentagon_late_peripherals );
+  periph_register_type( PERIPH_TYPE_PENTAGON1024_MEMORY, NULL,
+                        pentagon1024_memory_peripherals );
 }
 
 /* Peripherals generally available on all machines; the Timex machines and
@@ -141,6 +182,9 @@ machines_periph_timex( void )
   /* SCLD always present */
   periph_set_present( PERIPH_TYPE_SCLD, PERIPH_PRESENT_ALWAYS );
 
+  /* AY chip with joystick always present */
+  periph_set_present( PERIPH_TYPE_AY_TIMEX_WITH_JOYSTICK, PERIPH_PRESENT_ALWAYS );
+
   /* ZX Printer and Interface 2 available */
   periph_set_present( PERIPH_TYPE_INTERFACE2, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE, PERIPH_PRESENT_OPTIONAL );
@@ -162,8 +206,9 @@ machines_periph_pentagon( void )
   periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
 
-  /* Built-in Betadisk 128 interface, which also handles Kempston joystick
-     as they share a port */
-  periph_set_present( PERIPH_TYPE_BETA128, PERIPH_PRESENT_ALWAYS );
+  /* All machines have a built-in Betadisk 128 interface, which also
+     handles Kempston joystick as they share a port; we don't add the
+     actual Betadisk interface here as it differs slightly between the
+     (original) Pentagon and the Scorpion/Pentagon 1024 */
   periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_NEVER );
 }

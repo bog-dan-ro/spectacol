@@ -77,9 +77,7 @@ specplus2_reset( void )
   error = spec128_common_reset( 1 );
   if( error ) return error;
 
-  error = periph_setup( NULL, 0 );
-  if( error ) return error;
-
+  periph_clear();
   machines_periph_128();
   periph_update();
 

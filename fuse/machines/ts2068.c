@@ -89,12 +89,12 @@ ts2068_reset( void )
                             settings_default.rom_ts2068_1, 0x2000 );
   if( error ) return error;
 
-  error = periph_setup( tc2068_peripherals, tc2068_peripherals_count );
-  if( error ) return error;
-
+  periph_clear();
   machines_periph_timex();
+
   /* TS2068 has its own joysticks */
   periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_NEVER );
+
   periph_update();
 
   for( i = 0; i < 8; i++ ) {

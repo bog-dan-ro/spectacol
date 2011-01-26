@@ -36,7 +36,10 @@ typedef enum periph_type {
   PERIPH_TYPE_AY,             /* 128K-style AY chip */
   PERIPH_TYPE_AY_FULL_DECODE, /* 128K-style AY chip responding only to 0xfffd */
   PERIPH_TYPE_AY_TIMEX,       /* Timex-style AY chip */
+  PERIPH_TYPE_AY_TIMEX_WITH_JOYSTICK, /* Timex-style AY chip with joystick */
   PERIPH_TYPE_BETA128,        /* Beta128 disk interface */
+  PERIPH_TYPE_BETA128_PENTAGON, /* Beta128 disk interface as found on the original Pentagon */
+  PERIPH_TYPE_BETA128_PENTAGON_LATE, /* Beta128 disk interface as found on later Pentagons */
   PERIPH_TYPE_DIVIDE,         /* DivIDE interface */
   PERIPH_TYPE_PLUSD,          /* +D disk interface */
   PERIPH_TYPE_FULLER,         /* Fuller box */
@@ -52,6 +55,7 @@ typedef enum periph_type {
   PERIPH_TYPE_MELODIK,        /* Melodik interface */
   PERIPH_TYPE_OPUS,           /* Opus disk interface */
   PERIPH_TYPE_PARALLEL_PRINTER, /* +2A/+3 parallel printer */
+  PERIPH_TYPE_PENTAGON1024_MEMORY, /* Pentagon 1024-style memory paging */
   PERIPH_TYPE_PLUS3_MEMORY,   /* +2A/+3-style memory paging */
   PERIPH_TYPE_SCLD,           /* Timex SCLD */
   PERIPH_TYPE_SE_MEMORY,      /* Spectrum SE-style memory paging */
@@ -124,7 +128,6 @@ void writeport_internal( libspectrum_word port, libspectrum_byte b );
  * The more Fuse-specific peripheral handling routines
  */
 
-int periph_setup( const periph_t *peripherals_list, size_t n );
 void periph_update( void );
 
 /* Register debugger page/unpage events for a peripheral */
