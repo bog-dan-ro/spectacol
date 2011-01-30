@@ -3462,3 +3462,6 @@
          framework. This allows us to kill periph_setup().
 20110130 ULA book says that MIC only isn't enough to drive the speaker as output
          voltage is below the 1.4v threshold (Fred).
+20110130 fuse.c,machine.h,machines/machines_periph.c,Makefile.am,periph.h,
+         settings.dat,sound.c,sound.h,specdrum.[ch],ui/options.dat: SpecDrum
+         support (patch #3164313, very slightly reworked) (Jon Mitchell).

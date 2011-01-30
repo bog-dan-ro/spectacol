@@ -72,6 +72,7 @@ unittests, boolean, 0
 fuller, boolean, 0
 melodik, boolean, 0
 speccyboot, boolean, 0
+specdrum, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1
@@ -82,6 +83,7 @@ sound_freq, numeric, 32000, 'f'
 speaker_type, string, NULL
 volume_ay, numeric, 100
 volume_beeper, numeric, 100
+volume_specdrum, numeric, 100
 
 joystick_1, string, NULL, 'j'
 joystick_1_output, numeric, 0

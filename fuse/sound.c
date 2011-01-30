@@ -93,6 +93,8 @@ Blip_Synth *left_beeper_synth = NULL, *right_beeper_synth = NULL;
 Blip_Synth *ay_a_synth = NULL, *ay_b_synth = NULL, *ay_c_synth = NULL;
 Blip_Synth *ay_a_synth_r = NULL, *ay_b_synth_r = NULL, *ay_c_synth_r = NULL;
 
+Blip_Synth *specdrum_synth = NULL;
+
 struct speaker_type_tag
 {
   int bass;
@@ -216,6 +218,11 @@ sound_init( const char *device )
   blip_synth_set_output( ay_c_synth, left_buf );
   blip_synth_set_treble_eq( ay_c_synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
 
+  specdrum_synth = new_Blip_Synth();
+  blip_synth_set_volume( specdrum_synth, sound_get_volume( settings_current.volume_specdrum) );
+  blip_synth_set_output( specdrum_synth, left_buf );
+  blip_synth_set_treble_eq( specdrum_synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+  
   /* important to override these settings if not using stereo
    * (it would probably be confusing to mess with the stereo
    * settings in settings_current though, which is why we make copies
@@ -304,6 +311,8 @@ sound_end( void )
     delete_Blip_Synth( &ay_a_synth_r );
     delete_Blip_Synth( &ay_b_synth_r );
     delete_Blip_Synth( &ay_c_synth_r );
+
+    delete_Blip_Synth( &specdrum_synth );
 
     sound_lowlevel_end();
     free( samples );
@@ -590,6 +599,19 @@ sound_ay_reset( void )
   for( f = 0; f < 3; f++ )
     ay_tone_high[f] = 0;
   ay_tone_cycles = ay_env_cycles = 0;
+}
+
+/*
+ * sound_specdrum_write - very simple routine
+ * as the output is already a digitized waveform
+ */
+void
+sound_specdrum_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
+{
+  if( periph_is_active( PERIPH_TYPE_SPECDRUM ) ) {
+    blip_synth_update( specdrum_synth, tstates, ( val - 128) * 128);
+    machine_current->specdrum.specdrum_dac = val - 128;
+  }
 }
 
 void

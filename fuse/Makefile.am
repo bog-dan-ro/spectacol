@@ -91,6 +91,7 @@ fuse_SOURCES = ay.c \
 	snapshot.c \
 	sound.c \
 	speccyboot.c \
+        specdrum.c \
 	spectrum.c \
 	tape.c \
 	ui.c \

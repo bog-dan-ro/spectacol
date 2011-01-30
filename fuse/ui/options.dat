@@ -43,12 +43,13 @@ Checkbox, ZXATASP (u)pload, zxatasp_upload, INPUT_KEY_u
 Checkbox, ZXATASP (w)rite protect, zxatasp_wp, INPUT_KEY_w
 Checkbox, ZX(C)F interface, zxcf_active, INPUT_KEY_c
 Checkbox, ZXCF up(l)oad, zxcf_upload, INPUT_KEY_l
-Checkbox, (D)ivIDE interface, divide_enabled, INPUT_KEY_d
+Checkbox, Di(v)IDE interface, divide_enabled, INPUT_KEY_v
 Checkbox, DivIDE w(r)ite protect, divide_wp, INPUT_KEY_r
 Checkbox, +D i(n)terface, plusd, INPUT_KEY_n
 Checkbox, (B)eta 128 interface, beta128, INPUT_KEY_b
 Checkbox, Opus Discovery in(t)erface, opus, INPUT_KEY_t
 Checkbox, S(p)eccyBoot interface, speccyboot, INPUT_KEY_p
+Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
 Posthook, periph_update
 
 rzx
@@ -68,6 +69,7 @@ Checkbox, (F)orce 8-bit, sound_force_8bit, INPUT_KEY_f
 Combo, Speaker (t)ype, speaker_type, INPUT_KEY_t, *TV speaker|Beeper|Unfiltered
 Entry, A(Y) volume, volume_ay, INPUT_KEY_y, 3, %
 Entry, B(e)eper volume, volume_beeper, INPUT_KEY_e, 3, %
+Entry, SpecDrum volume, volume_specdrum, , 3, %
 
 diskoptions
 Drives Setup

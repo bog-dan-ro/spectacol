@@ -303,6 +303,7 @@ static int fuse_init(int argc, char **argv)
   if( fuller_init() ) return 1;
   if( melodik_init() ) return 1;
   if( speccyboot_init() ) return 1;
+  if( specdrum_init() ) return 1;
   machines_periph_init();
 
   error = pokefinder_clear(); if( error ) return error;

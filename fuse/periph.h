@@ -61,6 +61,7 @@ typedef enum periph_type {
   PERIPH_TYPE_SE_MEMORY,      /* Spectrum SE-style memory paging */
   PERIPH_TYPE_SIMPLEIDE,      /* Simple 8-bit IDE interface */
   PERIPH_TYPE_SPECCYBOOT,     /* SpeccyBoot interface */
+  PERIPH_TYPE_SPECDRUM,       /* SpecDrum interface */
   PERIPH_TYPE_ULA,            /* Standard ULA */
   PERIPH_TYPE_ULA_FULL_DECODE,/* Standard ULA responding only to 0xfe */
   PERIPH_TYPE_UPD765,         /* +3 uPD765 FDC */

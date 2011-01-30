@@ -33,6 +33,7 @@
 #include "ay.h"
 #include "display.h"
 #include "memory.h"
+#include "specdrum.h"
 #include "spectrum.h"
 
 typedef libspectrum_byte (*spectrum_unattached_port_fn)( void );
@@ -78,6 +79,8 @@ typedef struct fuse_machine_info {
 						  attached to anything */
 
   ayinfo ay;		/* The AY-8-3912 chip */
+
+  specdrum_info specdrum; /* SpecDrum settings */
 
   int (*shutdown)( void );
 
