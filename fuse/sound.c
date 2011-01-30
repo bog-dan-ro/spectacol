@@ -51,7 +51,7 @@ int sound_stereo_ay = 0;	/* local copy of settings_current.stereo_ay */
  * (Now scaled up for 16-bit.)
  */
 #define AMPL_BEEPER		( 50 * 256)
-#define AMPL_TAPE		( 5 * 256 )
+#define AMPL_TAPE		( 2 * 256 )
 #define AMPL_AY_TONE		( 24 * 256 )	/* three of these */
 
 /* max. number of sub-frame AY port writes allowed;
@@ -625,25 +625,23 @@ sound_frame( void )
 void
 sound_beeper( int on )
 {
-  static int beeper_ampl[] = { 0, AMPL_TAPE, AMPL_BEEPER, AMPL_BEEPER+AMPL_TAPE };
-
+  static int beeper_ampl[] = { 0, AMPL_TAPE, AMPL_BEEPER,
+                               AMPL_BEEPER+AMPL_TAPE };
   int val;
-  int ampl;
 
-  if( !sound_enabled )
-    return;
+  if( !sound_enabled ) return;
 
-  /* Timex machines have no loading noise */
-  if( tape_is_playing() &&
-      ( !settings_current.sound_load || machine_current->timex ) )
-    on = on & 0x02;
+  if( tape_is_playing() ) {
+    /* Timex machines have no loading noise */
+    if( !settings_current.sound_load || machine_current->timex ) on = on & 0x02;
+  } else {
+    /* ULA book says that MIC only isn't enough to drive the speaker as output
+       voltage is below the 1.4v threshold */
+    if( on == 1 ) on = 0;
+  }
 
-  ampl = beeper_ampl[on];
-
-  val = -beeper_ampl[3] + ampl*2;
+  val = -beeper_ampl[3] + beeper_ampl[on]*2;
 
   blip_synth_update( left_beeper_synth, tstates, val );
-  if( sound_stereo ) {
-    blip_synth_update( right_beeper_synth, tstates, val );
-  }
+  if( sound_stereo ) blip_synth_update( right_beeper_synth, tstates, val );
 }

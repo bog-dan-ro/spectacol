@@ -3460,3 +3460,5 @@
          specplus2.c,specplus3.c,specplus3e.c,spec_se.c,tc2048.c,tc2068.c,
          tc2068.h,ts2068.c},periph.[ch]: move final peripherals into new
          framework. This allows us to kill periph_setup().
+20110130 ULA book says that MIC only isn't enough to drive the speaker as output
+         voltage is below the 1.4v threshold (Fred).
