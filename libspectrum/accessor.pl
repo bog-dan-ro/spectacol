@@ -211,6 +211,10 @@ struct libspectrum_snap {
 
   /* Melodik status */
   int melodik_active;
+
+  /* Cheetah SpecDrum status */
+  int specdrum_active;
+  libspectrum_signed_byte specdrum_dac;
 };
 
 /* Initialise a libspectrum_snap structure */

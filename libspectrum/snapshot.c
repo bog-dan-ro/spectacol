@@ -192,6 +192,9 @@ libspectrum_snap_alloc( void )
 
   libspectrum_snap_set_simpleide_active( snap, 0 );
 
+  libspectrum_snap_set_specdrum_active( snap, 0 );
+  libspectrum_snap_set_specdrum_dac( snap, 0 );
+
   libspectrum_snap_set_divide_active( snap, 0 );
   libspectrum_snap_set_divide_eprom_writeprotect( snap, 0 );
   libspectrum_snap_set_divide_paged( snap, 0 );

@@ -800,3 +800,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          update g_hash_table_new() function to support the
          g_hash_table_new( NULL, NULL ) syntax (patch #3160211) (Sergio
          Baldovi).
+20110130 accessor.pl,doc/libspectrum.txt,snap_accessors.txt,snapshot.c,szx.c:
+         add support for SpecDrum in SZX snapshots (patch #3164313) (Jon
+         Mitchell).

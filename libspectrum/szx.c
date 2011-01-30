@@ -274,6 +274,9 @@ write_cfrp_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 static libspectrum_error
 write_side_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap );
+static libspectrum_error
+write_drum_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, libspectrum_snap *snap );
 
 #ifdef HAVE_ZLIB_H
 
@@ -976,6 +979,27 @@ read_side_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 
   return LIBSPECTRUM_ERROR_NONE;
 }
+
+static libspectrum_error
+read_drum_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
+		 const libspectrum_byte **buffer,
+		 const libspectrum_byte *end GCC_UNUSED, size_t data_length,
+                 szx_context *ctx GCC_UNUSED )
+{
+  if( data_length != 1 ) {
+    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			     "%s:read_drum_chunk: unknown length %lu",
+			     __FILE__, (unsigned long)data_length );
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+  }
+
+  libspectrum_snap_set_specdrum_dac( snap, *(*buffer)++ );
+
+  libspectrum_snap_set_specdrum_active( snap, 1 );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 
 static void
 add_joystick( libspectrum_snap *snap, libspectrum_joystick type, int inputs )
@@ -1916,7 +1940,7 @@ static struct read_chunk_t read_chunks[] = {
   { ZXSTBID_RAMPAGE,	    read_ramp_chunk },
   { ZXSTBID_ROM,	    read_rom_chunk  },
   { ZXSTBID_SIMPLEIDE,	    read_side_chunk },
-  { ZXSTBID_SPECDRUM,	    skip_chunk      },
+  { ZXSTBID_SPECDRUM,	    read_drum_chunk },
   { ZXSTBID_SPECREGS,	    read_spcr_chunk },
   { ZXSTBID_TIMEXREGS,	    read_scld_chunk },
   { ZXSTBID_USPEECH,	    skip_chunk      },
@@ -2251,6 +2275,11 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
 
   if( libspectrum_snap_simpleide_active( snap ) ) {
     error = write_side_chunk( buffer, &ptr, length, snap );
+    if( error ) return error;
+  }
+
+  if( libspectrum_snap_specdrum_active( snap ) ) {
+    error = write_drum_chunk( buffer, &ptr, length, snap );
     if( error ) return error;
   }
 
@@ -3329,6 +3358,17 @@ write_side_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap )
 {
   write_chunk_header( buffer, ptr, length, ZXSTBID_SIMPLEIDE, 0 );
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+write_drum_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, libspectrum_snap *snap )
+{
+  write_chunk_header( buffer, ptr, length, ZXSTBID_SPECDRUM, 1 );
+
+  *(*ptr)++ = libspectrum_snap_specdrum_dac( snap );
+
   return LIBSPECTRUM_ERROR_NONE;
 }
 

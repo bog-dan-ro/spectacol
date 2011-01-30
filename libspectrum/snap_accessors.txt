@@ -168,3 +168,6 @@ libspectrum_byte* divide_ram 1
 int fuller_box_active
 
 int melodik_active
+
+int specdrum_active
+libspectrum_signed_byte specdrum_dac
