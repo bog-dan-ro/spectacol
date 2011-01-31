@@ -3467,3 +3467,4 @@
          support (patch #3164313, very slightly reworked) (Jon Mitchell).
 20110131 ui/options.dat: fix compilation of widget UI by adding a shortcut for
          SpecDrum volume (Fred).
+20110131 machine/machines_periph.c: SpecDrum available on 128K as well.
