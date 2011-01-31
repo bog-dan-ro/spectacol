@@ -803,3 +803,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20110130 accessor.pl,doc/libspectrum.txt,snap_accessors.txt,snapshot.c,szx.c:
          add support for SpecDrum in SZX snapshots (patch #3164313) (Jon
          Mitchell).
+20110131 sna.c,z80.c: note info loss of SpecDrum info when writing sna or z80
+         format snapshots (Fred).
