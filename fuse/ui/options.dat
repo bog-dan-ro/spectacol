@@ -69,7 +69,7 @@ Checkbox, (F)orce 8-bit, sound_force_8bit, INPUT_KEY_f
 Combo, Speaker (t)ype, speaker_type, INPUT_KEY_t, *TV speaker|Beeper|Unfiltered
 Entry, A(Y) volume, volume_ay, INPUT_KEY_y, 3, %
 Entry, B(e)eper volume, volume_beeper, INPUT_KEY_e, 3, %
-Entry, SpecDrum volume, volume_specdrum, , 3, %
+Entry, Spec(D)rum volume, volume_specdrum, INPUT_KEY_d, 3, %
 
 diskoptions
 Drives Setup

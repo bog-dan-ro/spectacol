@@ -3465,3 +3465,5 @@
 20110130 fuse.c,machine.h,machines/machines_periph.c,Makefile.am,periph.h,
          settings.dat,sound.c,sound.h,specdrum.[ch],ui/options.dat: SpecDrum
          support (patch #3164313, very slightly reworked) (Jon Mitchell).
+20110131 ui/options.dat: fix compilation of widget UI by adding a shortcut for
+         SpecDrum volume (Fred).
