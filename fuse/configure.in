@@ -217,9 +217,9 @@ if test -z "$UI"; then
   gtk=yes)
   AC_MSG_RESULT($gtk)
   if test "$gtk" = yes; then
-    AM_PATH_GTK_2_0(2.0.0,
+    AM_PATH_GTK_2_0(2.18.0,
 		AC_DEFINE([UI_GTK], 1,
-		          [Defined if GTK+ UI (either 1.2 or 2.x) is in use])
+		          [Defined if GTK+ UI 2.x is in use])
 		AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
 	        UI=gtk; UI_LIBS="ui/gtk/libuigtk.la",
 		AC_MSG_WARN([GTK+ not found. Reverting to Xlib]))
@@ -283,21 +283,12 @@ if test "$UI" != gtk; then
   glib=yes)
   AC_MSG_RESULT($glib)
   if test "$glib" = yes; then
-    glib2=no
     AM_PATH_GLIB_2_0(
-      2.0.0,
-      glib2=yes
+      2.20.0,
       AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
       LIBS="$LIBS `pkg-config --libs glib-2.0`",
+      AC_MSG_WARN(glib not found - using libspectrum's replacement)
     )
-    if test "$glib2" = no; then
-      AM_PATH_GLIB(
-        1.2.0,
-        AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-        LIBS="$LIBS `glib-config --libs`",
-        AC_MSG_WARN(glib not found - using libspectrum's replacement)
-      )
-    fi
   fi
 fi
 

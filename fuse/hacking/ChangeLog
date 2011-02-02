@@ -3468,3 +3468,5 @@
 20110131 ui/options.dat: fix compilation of widget UI by adding a shortcut for
          SpecDrum volume (Fred).
 20110131 machine/machines_periph.c: SpecDrum available on 128K as well.
+20110202 configure.in: update glib and GTK+ required versions to new minimums
+         (more from patch #3160211) (Sergio Baldovi).
