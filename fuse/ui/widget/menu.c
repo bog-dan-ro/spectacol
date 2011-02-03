@@ -29,16 +29,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "dck.h"
 #include "debugger/debugger.h"
-#include "disk/beta.h"
 #include "event.h"
 #include "fuse.h"
-#include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "machines/specplus3.h"
 #include "menu.h"
+#include "peripherals/dck.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/joystick.h"
 #include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"

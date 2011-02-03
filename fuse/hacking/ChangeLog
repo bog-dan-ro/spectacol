@@ -3471,3 +3471,5 @@
 20110202 configure.in: update glib and GTK+ required versions to new minimums
          (more from patch #3160211) (Sergio Baldovi).
 20110203 (all peripheral files): move to new peripherals/ subdirectory.
+20110203 ui/{sdl/sdldisplay.c,widget/{debugger.c,menu.c,widget.c}},
+         z80/coretest.c: fix up SDL for new peripherals structure.

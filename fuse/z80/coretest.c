@@ -360,7 +360,7 @@ ui_error( ui_error_level severity GCC_UNUSED, const char *format, ... )
 
 #include "debugger/debugger.h"
 #include "machine.h"
-#include "scld.h"
+#include "peripherals/scld.h"
 #include "settings.h"
 
 libspectrum_byte *slt[256];

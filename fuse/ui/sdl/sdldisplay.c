@@ -35,7 +35,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "machine.h"
-#include "scld.h"
+#include "peripherals/scld.h"
 #include "screenshot.h"
 #include "settings.h"
 #include "ui/ui.h"
