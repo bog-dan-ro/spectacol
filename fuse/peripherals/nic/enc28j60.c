@@ -36,11 +36,10 @@
 #include <unistd.h>
 
 #include "compat.h"
+#include "enc28j60.h"
 #include "fuse.h"
 #include "settings.h"
 #include "ui/ui.h"
-
-#include "nic/enc28j60.h"
 
 /* ---------------------------------------------------------------------------
  * ENC28J60 emulation

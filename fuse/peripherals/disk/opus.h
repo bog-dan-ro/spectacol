@@ -38,7 +38,7 @@ typedef enum opus_drive_number {
 #include <libspectrum.h>
 
 #include "periph.h"
-#include "disk/fdd.h"
+#include "fdd.h"
 
 extern int opus_available;  /* Is the Opus available for use? */
 extern int opus_active;     /* Opus enabled? */

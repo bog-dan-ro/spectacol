@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2008 Fredrick Meunier
+## Copyright (c) 2007 Stuart Brady
 
 ## $Id$
 
@@ -23,20 +23,26 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-AM_CPPFLAGS = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/../..
 
-noinst_LIBRARIES = libide.a
+noinst_LIBRARIES = libdisk.a
 
-INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
+INCLUDES = @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@
 
-libide_a_SOURCES = divide.c \
-		   ide.c \
-		   simpleide.c \
-		   zxatasp.c \
-		   zxcf.c
+libdisk_a_SOURCES = beta.c \
+		    crc.c \
+		    disk.c \
+		    fdd.c \
+		    opus.c \
+		    plusd.c \
+		    upd_fdc.c \
+		    wd_fdc.c
 
-noinst_HEADERS = divide.h \
-		 ide.h \
-		 simpleide.h \
-		 zxatasp.h \
-		 zxcf.h
+noinst_HEADERS = beta.h \
+		 crc.h \
+		 disk.h \
+		 fdd.h \
+		 opus.h \
+		 plusd.h \
+		 upd_fdc.h \
+		 wd_fdc.h

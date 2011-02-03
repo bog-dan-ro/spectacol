@@ -30,18 +30,12 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
-#include "ide/divide.h"
-#include "ide/simpleide.h"
-#include "ide/zxatasp.h"
-#include "ide/zxcf.h"
-#include "if1.h"
-#include "if2.h"
-#include "joystick.h"
 #include "periph.h"
+#include "peripherals/if1.h"
+#include "peripherals/ula.h"
 #include "rzx.h"
 #include "settings.h"
 #include "ui/ui.h"
-#include "ula.h"
 
 /*
  * General peripheral list handling routines

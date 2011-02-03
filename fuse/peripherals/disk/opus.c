@@ -36,7 +36,7 @@
 #include "machine.h"
 #include "module.h"
 #include "opus.h"
-#include "printer.h"
+#include "peripherals/printer.h"
 #include "settings.h"
 #include "ui/ui.h"
 #include "wd_fdc.h"

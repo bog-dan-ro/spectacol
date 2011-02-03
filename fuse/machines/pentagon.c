@@ -30,18 +30,17 @@
 #include <libspectrum.h>
 
 #include "compat.h"
-#include "disk/beta.h"
-#include "joystick.h"
 #include "machine.h"
 #include "machines.h"
 #include "machines_periph.h"
 #include "memory.h"
 #include "pentagon.h"
 #include "periph.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/joystick.h"
 #include "settings.h"
 #include "spec48.h"
 #include "spec128.h"
-#include "ula.h"
 
 static int pentagon_reset( void );
 

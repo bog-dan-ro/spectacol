@@ -30,11 +30,10 @@
 
 #include <libspectrum.h>
 
-#include "ay.h"
 #include "display.h"
 #include "memory.h"
-#include "specdrum.h"
-#include "spectrum.h"
+#include "peripherals/ay.h"
+#include "peripherals/specdrum.h"
 
 typedef libspectrum_byte (*spectrum_unattached_port_fn)( void );
 

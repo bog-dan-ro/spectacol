@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2010 Philip Kendall
+## Copyright (c) 2011 Philip Kendall
 
 ## $Id$
 
@@ -25,10 +25,41 @@ AUTOMAKE_OPTIONS = foreign
 
 AM_CPPFLAGS = -I$(srcdir)/..
 
-noinst_LIBRARIES = libnic.a
+SUBDIRS = \
+  disk \
+  ide \
+  nic
+
+noinst_LIBRARIES = libperipherals.a
 
 INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
-libnic_a_SOURCES = enc28j60.c
+libperipherals_a_SOURCES = \
+  ay.c \
+  dck.c \
+  fuller.c \
+  if1.c \
+  if2.c \
+  joystick.c \
+  kempmouse.c \
+  melodik.c \
+  printer.c \
+  scld.c \
+  speccyboot.c \
+  specdrum.c \
+  ula.c
 
-noinst_HEADERS = enc28j60.h
+noinst_HEADERS = \
+  ay.h \
+  dck.h \
+  fuller.h \
+  if1.h \
+  if2.h \
+  joystick.h \
+  kempmouse.h \
+  melodik.h \
+  printer.h \
+  scld.h \
+  speccyboot.h \
+  specdrum.h \
+  ula.h

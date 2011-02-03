@@ -25,10 +25,10 @@
 
 #include <config.h>
 
-#include "disk/beta.h"
 #include "fuse.h"
 #include "pentagon.h"
 #include "periph.h"
+#include "peripherals/disk/beta.h"
 #include "spec128.h"
 #include "specplus3.h"
 #include "tc2068.h"

@@ -37,7 +37,7 @@ typedef enum plusd_drive_number {
 
 #include <libspectrum.h>
 
-#include "disk/fdd.h"
+#include "fdd.h"
 
 extern int plusd_available;  /* Is the +D available for use? */
 extern int plusd_active;     /* +D enabled? */

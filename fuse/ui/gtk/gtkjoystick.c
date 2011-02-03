@@ -32,8 +32,8 @@
 #include "compat.h"
 #include "fuse.h"
 #include "gtkinternals.h"
-#include "joystick.h"
 #include "keyboard.h"
+#include "peripherals/joystick.h"
 #include "menu.h"
 #include "settings.h"
 

@@ -25,10 +25,10 @@
 
 #include <config.h>
 
-#include "disk/upd_fdc.h"
 #include "machines.h"
 #include "machines_periph.h"
 #include "periph.h"
+#include "peripherals/disk/upd_fdc.h"
 #include "settings.h"
 #include "spec48.h"
 #include "specplus3.h"

@@ -34,25 +34,21 @@
 
 #include <libspectrum.h>
 
-#include "dck.h"
 #include "fuse.h"
-#include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "machines.h"
 #include "machines_periph.h"
 #include "memory.h"
-#include "printer.h"
+#include "peripherals/dck.h"
+#include "peripherals/scld.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "spec128.h"
 #include "settings.h"
 #include "spectrum.h"
-#include "scld.h"
 #include "tc2068.h"
 #include "ui/ui.h"
-#include "ula.h"
-#include "if1.h"
 
 static int dock_exrom_reset( void );
 static int spec_se_reset( void );

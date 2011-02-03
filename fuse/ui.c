@@ -33,8 +33,8 @@
 #include <libspectrum.h>
 
 #include "fuse.h"
-#include "if1.h"
-#include "kempmouse.h"
+#include "peripherals/if1.h"
+#include "peripherals/kempmouse.h"
 #include "settings.h"
 #include "tape.h"
 #include "ui/ui.h"

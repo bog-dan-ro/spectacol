@@ -35,13 +35,13 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "peripherals/scld.h"
 #include "rectangle.h"
 #include "screenshot.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
-#include "scld.h"
 
 /* Set once we have initialised the UI */
 int display_ui_initialised = 0;

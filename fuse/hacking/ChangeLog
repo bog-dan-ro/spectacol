@@ -3470,3 +3470,4 @@
 20110131 machine/machines_periph.c: SpecDrum available on 128K as well.
 20110202 configure.in: update glib and GTK+ required versions to new minimums
          (more from patch #3160211) (Sergio Baldovi).
+20110203 (all peripheral files): move to new peripherals/ subdirectory.

@@ -29,20 +29,16 @@
 
 #include <libspectrum.h>
 
-#include "ay.h"
 #include "compat.h"
-#include "disk/beta.h"
-#include "joystick.h"
 #include "machine.h"
 #include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
+#include "peripherals/disk/beta.h"
 #include "settings.h"
 #include "spec128.h"
 #include "spec48.h"
 #include "specplus3.h"
-#include "ula.h"
-#include "if1.h"
 
 static int spec128_reset( void );
 

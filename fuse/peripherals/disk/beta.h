@@ -31,7 +31,7 @@
 #include <libspectrum.h>
 
 #include "memory.h"
-#include "disk/fdd.h"
+#include "fdd.h"
 
 extern int beta_available;  /* Is the Beta disk interface available for use? */
 extern int beta_active;     /* Is the Beta disk interface enabled? */

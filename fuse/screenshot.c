@@ -33,8 +33,8 @@
 
 #include "display.h"
 #include "machine.h"
+#include "peripherals/scld.h"
 #include "screenshot.h"
-#include "scld.h"
 #include "settings.h"
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"

@@ -35,15 +35,15 @@
 
 #include <libspectrum.h>
 
-#include "ay.h"
 #include "compat.h"
 #include "fuse.h"
-#include "joystick.h"
 #include "machine.h"
 #include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
-#include "printer.h"
+#include "peripherals/disk/fdd.h"
+#include "peripherals/disk/upd_fdc.h"
+#include "peripherals/printer.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "spec128.h"
@@ -51,11 +51,7 @@
 #include "specplus3.h"
 #include "spectrum.h"
 #include "ui/ui.h"
-#include "ula.h"
-#include "if1.h"
 #include "utils.h"
-#include "disk/fdd.h"
-#include "disk/upd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \

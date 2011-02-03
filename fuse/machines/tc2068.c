@@ -29,19 +29,17 @@
 
 #include <libspectrum.h>
 
-#include "dck.h"
-#include "joystick.h"
 #include "machine.h"
 #include "machines.h"
 #include "machines_periph.h"
 #include "periph.h"
-#include "printer.h"
-#include "scld.h"
+#include "peripherals/dck.h"
+#include "peripherals/joystick.h"
+#include "peripherals/scld.h"
 #include "spec48.h"
 #include "settings.h"
 #include "tc2068.h"
 #include "ui/ui.h"
-#include "ula.h"
 
 static int tc2068_reset( void );
 

@@ -30,17 +30,13 @@
 
 #include <libspectrum.h>
 
-#include "joystick.h"
 #include "machine.h"
 #include "machines.h"
 #include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
-#include "printer.h"
 #include "settings.h"
 #include "spec48.h"
-#include "ula.h"
-#include "if1.h"
 
 static int spec16_reset( void );
 

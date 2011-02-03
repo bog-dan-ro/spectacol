@@ -35,7 +35,7 @@
 #include "loader.h"
 #include "machine.h"
 #include "memory.h"
-#include "printer.h"
+#include "peripherals/printer.h"
 #include "psg.h"
 #include "profile.h"
 #include "rzx.h"

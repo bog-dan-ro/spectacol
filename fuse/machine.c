@@ -39,6 +39,7 @@
 #include "machines/tc2068.h"
 #include "memory.h"
 #include "module.h"
+#include "peripherals/ula.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
@@ -46,7 +47,6 @@
 #include "timer/timer.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
-#include "ula.h"
 #include "utils.h"
 
 fuse_machine_info **machine_types = NULL; /* Array of available machines */

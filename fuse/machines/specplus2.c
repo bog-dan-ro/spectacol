@@ -29,10 +29,10 @@
 
 #include <libspectrum.h>
 
-#include "disk/beta.h"
 #include "machine.h"
 #include "machines_periph.h"
 #include "machines.h"
+#include "peripherals/disk/beta.h"
 #include "settings.h"
 #include "spec128.h"
 #include "spec48.h"

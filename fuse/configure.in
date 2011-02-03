@@ -707,13 +707,14 @@ compat/unix/Makefile \
 compat/wii/Makefile \
 compat/win32/Makefile \
 debugger/Makefile \
-disk/Makefile \
 hacking/Makefile \
-ide/Makefile \
 lib/Makefile \
 machines/Makefile \
 man/Makefile \
-nic/Makefile \
+peripherals/Makefile \
+peripherals/disk/Makefile \
+peripherals/ide/Makefile \
+peripherals/nic/Makefile \
 perl/Makefile \
 perl/Fuse/Makefile \
 pokefinder/Makefile \

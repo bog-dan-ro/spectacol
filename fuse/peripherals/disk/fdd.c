@@ -29,13 +29,13 @@
 
 #include "bitmap.h"
 #include "compat.h"
-#include "disk/upd_fdc.h"
-#include "disk/wd_fdc.h"
 #include "event.h"
 #include "fdd.h"
 #include "machine.h"
 #include "spectrum.h"
 #include "settings.h"
+#include "upd_fdc.h"
+#include "wd_fdc.h"
 
 #define FDD_LOAD_FACT 2
 #define FDD_HEAD_FACT 16		/* load head */

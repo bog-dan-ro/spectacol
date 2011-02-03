@@ -30,7 +30,7 @@
 
 #include "machine.h"
 #include "periph.h"
-#include "disk/fdd.h"
+#include "peripherals/disk/fdd.h"
 
 int specplus3_port_from_ula( libspectrum_word port );
 

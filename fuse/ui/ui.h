@@ -35,10 +35,10 @@
 #include <libspectrum.h>
 
 #include "compat.h"
-#include "disk/beta.h"
-#include "disk/opus.h"
-#include "disk/plusd.h"
 #include "machines/specplus3.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/disk/opus.h"
+#include "peripherals/disk/plusd.h"
 #include "ui/scaler/scaler.h"
 
 /* The various severities of error level, increasing downwards */

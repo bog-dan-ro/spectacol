@@ -31,15 +31,15 @@
 
 #include "debugger/debugger.h"
 #include "display.h"
-#include "disk/opus.h"
 #include "fuse.h"
 #include "machines/spec128.h"
 #include "memory.h"
 #include "module.h"
+#include "peripherals/disk/opus.h"
+#include "peripherals/ula.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
-#include "ula.h"
 
 /* Each 8Kb RAM chunk accessible by the Z80 */
 memory_page memory_map_read[8];

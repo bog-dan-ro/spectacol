@@ -27,8 +27,8 @@
 
 #include "fuse.h"
 #include "input.h"
-#include "joystick.h"
 #include "keyboard.h"
+#include "peripherals/joystick.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"

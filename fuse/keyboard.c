@@ -33,7 +33,6 @@
 
 #include "ui/ui.h"
 #include "keyboard.h"
-#include "scld.h"
 
 /* Bit masks for each of the eight keyboard half-rows; `AND' the selected
    ones of these to get the value to return

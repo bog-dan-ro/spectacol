@@ -30,8 +30,8 @@
 #include "fuse.h"
 #include "machine.h"
 #include "mempool.h"
+#include "peripherals/ula.h"
 #include "settings.h"
-#include "ula.h"
 
 static int
 contention_test( void )

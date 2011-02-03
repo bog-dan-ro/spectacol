@@ -29,20 +29,16 @@
 
 #include <libspectrum.h>
 
-#include "disk/beta.h"
-#include "joystick.h"
 #include "machine.h"
 #include "machines.h"
 #include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
-#include "printer.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/scld.h"
 #include "settings.h"
-#include "scld.h"
 #include "spec48.h"
 #include "tc2068.h"
-#include "ula.h"
-#include "if1.h"
 
 static int tc2048_reset( void );
 

@@ -38,7 +38,6 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "ui/scaler/scaler.h"
-#include "scld.h"
 #include "settings.h"
 
 /* The size of a 1x1 image in units of
