@@ -3476,3 +3476,4 @@
 20110204 peripherals/disk/disk.c: fix transposed arguments in memset calls
          (Sergio Baldovi).
 20110204 peripherals/specdrum.h: tweak whitespace (Fred).
+20110204 peripherals: add .deps and Makefile to the ignore property (Fred).
