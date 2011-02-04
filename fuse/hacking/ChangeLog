@@ -3475,3 +3475,4 @@
          z80/coretest.c: fix up SDL for new peripherals structure.
 20110204 peripherals/disk/disk.c: fix transposed arguments in memset calls
          (Sergio Baldovi).
+20110204 peripherals/specdrum.h: tweak whitespace (Fred).

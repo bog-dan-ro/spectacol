@@ -33,11 +33,11 @@
 #include "periph.h"
 
 typedef struct specdrum_info {
-    int specdrum_present;  /* SpecDrum present */
-    libspectrum_signed_byte specdrum_dac; /* Current byte in the SpecDrum 8bit DAC */
+  int specdrum_present;  /* SpecDrum present */
+  libspectrum_signed_byte specdrum_dac; /* Current byte in the SpecDrum 8bit DAC */
 } specdrum_info;
 
 int specdrum_init( void );
-void specdrum_write ( libspectrum_word port, libspectrum_byte val );
+void specdrum_write( libspectrum_word port, libspectrum_byte val );
 
 #endif                          /* #ifndef FUSE_SPECRUM_H */
