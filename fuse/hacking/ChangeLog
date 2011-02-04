@@ -3473,3 +3473,5 @@
 20110203 (all peripheral files): move to new peripherals/ subdirectory.
 20110203 ui/{sdl/sdldisplay.c,widget/{debugger.c,menu.c,widget.c}},
          z80/coretest.c: fix up SDL for new peripherals structure.
+20110204 peripherals/disk/disk.c: fix transposed arguments in memset calls
+         (Sergio Baldovi).

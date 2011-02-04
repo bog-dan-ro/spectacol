@@ -1949,7 +1949,7 @@ disk_merge_sides( disk_t *d, disk_t *d1, disk_t *d2, int autofill )
       d->track[1] = ( d->bpt >> 8 ) & 0xff;
       d->track[2] = 0x00;
       memset( d->track + 3, d->bpt, autofill & 0xff );		/* fill data */
-      memset( d->track + 3 + d->bpt, 3 * clen, 0x00 );		/* no clock and other marks */
+      memset( d->track + 3 + d->bpt, 0x00, 3 * clen );		/* no clock and other marks */
     }
     d->track += d->tlen;
     d1->track += d1->tlen;
@@ -1960,7 +1960,7 @@ disk_merge_sides( disk_t *d, disk_t *d1, disk_t *d2, int autofill )
       d->track[1] = ( d->bpt >> 8 ) & 0xff;
       d->track[2] = 0x00;
       memset( d->track + 1, d->bpt, autofill & 0xff );		/* fill data */
-      memset( d->track + 1 + d->bpt, 3 * clen, 0x00 );		/* no clock and other marks */
+      memset( d->track + 1 + d->bpt, 0x00, 3 * clen );		/* no clock and other marks */
     }
     d->track += d->tlen;
     d2->track += d2->tlen;
