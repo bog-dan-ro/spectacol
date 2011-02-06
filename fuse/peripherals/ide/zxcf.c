@@ -71,7 +71,7 @@ static libspectrum_ide_channel *zxcf_idechn;
 
 #define ZXCF_PAGES 64
 #define ZXCF_PAGE_LENGTH 0x4000
-static libspectrum_byte ZXCFMEM[ ZXCF_PAGES ][ ZXCF_PAGE_LENGTH ];
+static libspectrum_byte *ZXCFMEM[ ZXCF_PAGES ];
 
 static libspectrum_byte last_memctl;
 
@@ -265,6 +265,14 @@ static void
 zxcf_memory_map( void )
 {
   if( !settings_current.zxcf_active ) return;
+
+  if( !ZXCFMEM[0] ) {
+    int i;
+    libspectrum_byte *memory =
+      memory_pool_allocate_persistent( ZXCF_PAGES * ZXCF_PAGE_LENGTH, 1 );
+    for( i = 0; i < ZXCF_PAGES; i++ )
+      ZXCFMEM[i] = memory + i * ZXCF_PAGE_LENGTH;
+  }
 
   if( !settings_current.zxcf_upload ) {
     memory_map_read[0] = zxcf_memory_map_romcs[0];

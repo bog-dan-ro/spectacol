@@ -59,6 +59,12 @@ memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
 /* Standard mappings for the ROMs */
 memory_page memory_map_rom[ 2 * SPECTRUM_ROM_PAGES ];
 
+/* Some allocated memory */
+typedef struct memory_pool_entry_t {
+  int persistent;
+  libspectrum_byte *memory;
+} memory_pool_entry_t;
+
 /* All the memory we've allocated for this machine */
 static GSList *pool;
 
@@ -137,31 +143,55 @@ memory_init( void )
 libspectrum_byte*
 memory_pool_allocate( size_t length )
 {
-  libspectrum_byte *ptr;
+  return memory_pool_allocate_persistent( length, 0 );
+}
 
-  ptr = malloc( length * sizeof( libspectrum_byte ) );
-  if( !ptr ) {
+libspectrum_byte*
+memory_pool_allocate_persistent( size_t length, int persistent )
+{
+  memory_pool_entry_t *entry;
+  libspectrum_byte *memory;
+
+  memory = malloc( length * sizeof( *memory ) );
+  if( !memory ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return NULL;
+    fuse_abort();
   }
 
-  pool = g_slist_prepend( pool, ptr );
+  entry = malloc( sizeof( *entry ) );
+  if( !entry ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+    free( memory );
+    fuse_abort();
+  }
 
-  return ptr;
+  entry->persistent = persistent;
+  entry->memory = memory;
+
+  pool = g_slist_prepend( pool, entry );
+
+  return memory;
 }
 
-static void
-free_memory( gpointer data, gpointer user_data GCC_UNUSED )
+static gint
+find_non_persistent( gconstpointer data, gconstpointer user_data GCC_UNUSED )
 {
-  free( data );
+  const memory_pool_entry_t *entry = data;
+  return entry->persistent;
 }
 
+/* Free all non-persistent memory in the pool */
 void
 memory_pool_free( void )
 {
-  g_slist_foreach( pool, free_memory, NULL );
-  g_slist_free( pool );
-  pool = NULL;
+  GSList *ptr;
+
+  while( ( ptr = g_slist_find_custom( pool, NULL, find_non_persistent ) ) != NULL )
+  {
+    memory_pool_entry_t *entry = ptr->data;
+    free( entry->memory );
+    pool = g_slist_remove( pool, entry );
+  }
 }
 
 const char*

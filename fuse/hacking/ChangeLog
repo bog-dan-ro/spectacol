@@ -3477,3 +3477,5 @@
          (Sergio Baldovi).
 20110204 peripherals/specdrum.h: tweak whitespace (Fred).
 20110204 peripherals: add .deps and Makefile to the ignore property (Fred).
+20110206 memory.[ch],peripherals/ide/{divide.c,zxatasp.c,zxcf.c}: use memory
+         pool to allocate the DivIDE/ZXATASP/ZXCF memory.

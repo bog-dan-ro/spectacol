@@ -76,8 +76,8 @@ static libspectrum_ide_channel *divide_idechn1;
 
 #define DIVIDE_PAGES 4
 #define DIVIDE_PAGE_LENGTH 0x2000
-static libspectrum_byte divide_ram[ DIVIDE_PAGES ][ DIVIDE_PAGE_LENGTH ];
-static libspectrum_byte divide_eprom[ DIVIDE_PAGE_LENGTH ];
+static libspectrum_byte *divide_ram[ DIVIDE_PAGES ];
+static libspectrum_byte *divide_eprom;
 
 static void divide_reset( int hard_reset );
 static void divide_memory_map( void );
@@ -158,7 +158,7 @@ divide_reset( int hard_reset )
   divide_active = 0;
 
   if( !settings_current.divide_enabled ) return;
-  
+
   if( hard_reset ) {
     divide_control = 0;
   } else {
@@ -344,6 +344,15 @@ divide_memory_map( void )
 
   if( !divide_active ) return;
 
+  if( !divide_eprom ) {
+    int i;
+    libspectrum_byte *memory =
+      memory_pool_allocate_persistent( DIVIDE_PAGES * DIVIDE_PAGE_LENGTH, 1 );
+    for( i = 0; i < DIVIDE_PAGES; i++ )
+      divide_ram[i] = memory + i * DIVIDE_PAGE_LENGTH;
+    divide_eprom = memory_pool_allocate_persistent( DIVIDE_PAGE_LENGTH, 1 );
+  }
+  
   /* low bits of divide_control register give page number to use in upper
      bank; only lowest two bits on original 32K model */
   upper_ram_page = divide_control & (DIVIDE_PAGES - 1);

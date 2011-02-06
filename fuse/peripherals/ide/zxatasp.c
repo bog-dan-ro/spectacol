@@ -100,7 +100,7 @@ static libspectrum_ide_channel *zxatasp_idechn1;
 
 #define ZXATASP_PAGES 32
 #define ZXATASP_PAGE_LENGTH 0x4000
-static libspectrum_byte ZXATASPMEM[ ZXATASP_PAGES ][ ZXATASP_PAGE_LENGTH ];
+static libspectrum_byte *ZXATASPMEM[ ZXATASP_PAGES ];
 
 static const size_t ZXATASP_NOT_PAGED = 0xff;
 
@@ -485,6 +485,14 @@ zxatasp_memory_map( void )
   int writable;
 
   if( !settings_current.zxatasp_active ) return;
+
+  if( !ZXATASPMEM[0] ) {
+    int i;
+    libspectrum_byte *memory =
+      memory_pool_allocate_persistent( ZXATASP_PAGES * ZXATASP_PAGE_LENGTH, 1 );
+    for( i = 0; i < ZXATASP_PAGES; i++ )
+      ZXATASPMEM[i] = memory + i * ZXATASP_PAGE_LENGTH;
+  }
 
   if( settings_current.zxatasp_wp &&
       ( zxatasp_memory_map_romcs[0].page_num & 1 ) ) {

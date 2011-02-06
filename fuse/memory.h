@@ -87,6 +87,7 @@ extern libspectrum_word memory_screen_mask;
 
 int memory_init( void );
 libspectrum_byte *memory_pool_allocate( size_t length );
+libspectrum_byte* memory_pool_allocate_persistent( size_t length, int persistent );
 void memory_pool_free( void );
 
 const char *memory_bank_name( memory_page *page );
