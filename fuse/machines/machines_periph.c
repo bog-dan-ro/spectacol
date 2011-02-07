@@ -139,6 +139,7 @@ base_peripherals_48_128( void )
   periph_set_present( PERIPH_TYPE_MELODIK, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_OPUS, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_PLUSD, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_SPECDRUM, PERIPH_PRESENT_OPTIONAL );
 }
 
 /* The set of peripherals available on the 48K and similar machines */
@@ -147,7 +148,6 @@ machines_periph_48( void )
 {
   base_peripherals_48_128();
   periph_set_present( PERIPH_TYPE_FULLER, PERIPH_PRESENT_OPTIONAL );
-  periph_set_present( PERIPH_TYPE_SPECDRUM, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_OPTIONAL );
 }
 
