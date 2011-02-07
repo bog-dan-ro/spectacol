@@ -3481,3 +3481,4 @@
          pool to allocate the DivIDE/ZXATASP/ZXCF memory.
 20110207 peripherals/disk/disk.c: fix more transposed arguments in memset calls
          (thanks, Stuart Brady) (Fred).
+20110207 peripherals/nic/enc28j60.c: add missing #include <string.h> (Fred).
