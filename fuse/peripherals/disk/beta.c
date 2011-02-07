@@ -78,7 +78,7 @@ static int index_event;
 static wd_fdc *beta_fdc;
 static wd_fdc_drive beta_drives[ BETA_NUM_DRIVES ];
 
-static const periph_t beta_peripherals[] = {
+static const periph_port_t beta_ports[] = {
   { 0x00ff, 0x001f, beta_sr_read, beta_cr_write },
   { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
@@ -170,7 +170,7 @@ beta_init( void )
   for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   periph_register_type( PERIPH_TYPE_BETA128, &settings_current.beta128,
-                        beta_peripherals );
+                        beta_ports );
 
   return 0;
 }

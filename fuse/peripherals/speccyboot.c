@@ -63,7 +63,7 @@ speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached );
 static void
 speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val );
 
-static const periph_t speccyboot_peripherals[] = {
+static const periph_port_t speccyboot_ports[] = {
   { 0x00e0, 0x0080, speccyboot_register_read, speccyboot_register_write },
   { 0, 0, NULL, NULL }
 };
@@ -185,7 +185,8 @@ speccyboot_init( void )
 
   speccyboot_memory_map_romcs.bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_SPECCYBOOT, &settings_current.speccyboot, speccyboot_peripherals );
+  periph_register_type( PERIPH_TYPE_SPECCYBOOT, &settings_current.speccyboot,
+                        speccyboot_ports );
 
   return 0;
 }

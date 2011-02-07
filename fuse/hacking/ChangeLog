@@ -3484,3 +3484,8 @@
 20110207 peripherals/nic/enc28j60.c: add missing #include <string.h> (Fred).
 20110207 machines/machines_periph.c: enable SpecDrum for TC2048 as is has
          a Spectrum compatible edge connector and ROM (Fred).
+20110207 machines/machines_periph.c,periph.[ch],peripherals/{ay.c,disk/{beta.c,
+         plusd.c},fuller.c,ide/{divide.c,simpleide.c,zxatasp.c,zxcf.c},if1.c,
+         joystick.c,kempmouse.[ch],melodik.c,printer.c,scld.c,speccyboot.c,
+         specdrum.c,ula.c},periph.h: periph_t does not represent a peripheral,
+         but just one port from a peripheral, so rename appropriately.

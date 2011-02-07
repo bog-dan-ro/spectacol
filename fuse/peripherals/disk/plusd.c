@@ -107,7 +107,7 @@ plusd_memory_map( void )
   memory_map_read[ 1 ] = memory_map_write[ 1 ] = plusd_memory_map_romcs[ 1 ];
 }
 
-static const periph_t plusd_peripherals[] = {
+static const periph_port_t plusd_ports[] = {
   /* ---- ---- 1110 0011 */
   { 0x00ff, 0x00e3, plusd_sr_read, plusd_cr_write },
   /* ---- ---- 1110 1011 */
@@ -156,7 +156,7 @@ plusd_init( void )
   for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   periph_register_type( PERIPH_TYPE_PLUSD, &settings_current.plusd,
-                        plusd_peripherals );
+                        plusd_ports );
 
   return 0;
 }

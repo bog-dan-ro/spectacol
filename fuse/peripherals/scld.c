@@ -67,7 +67,7 @@ static module_info_t scld_module_info = {
 static libspectrum_byte scld_dec_read( libspectrum_word port, int *attached );
 static libspectrum_byte scld_hsr_read( libspectrum_word port, int *attached );
 
-static const periph_t scld_peripherals[] = {
+static const periph_port_t scld_ports[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
   { 0, 0, NULL, NULL }
@@ -77,7 +77,7 @@ int
 scld_init( void )
 {
   module_register( &scld_module_info );
-  periph_register_type( PERIPH_TYPE_SCLD, NULL, scld_peripherals );
+  periph_register_type( PERIPH_TYPE_SCLD, NULL, scld_ports );
 
   return 0;
 }

@@ -63,21 +63,19 @@ READ( buttons, buttons );
 READ( x_pos, pos.x );
 READ( y_pos, pos.y );
 
-const periph_t kempmouse_peripherals[] = {
+static const periph_port_t kempmouse_ports[] = {
   /* _we_ require b0 set */
   { 0x0121, 0x0001, read_buttons, NULL },
   { 0x0521, 0x0101, read_x_pos, NULL },
   { 0x0521, 0x0501, read_y_pos, NULL },
 };
 
-const size_t kempmouse_peripherals_count =
-  sizeof( kempmouse_peripherals ) / sizeof( periph_t );
-
 int
 kempmouse_init( void )
 {
   module_register( &kempmouse_module_info );
-  periph_register_type( PERIPH_TYPE_KEMPSTON_MOUSE, &settings_current.kempston_mouse, kempmouse_peripherals );
+  periph_register_type( PERIPH_TYPE_KEMPSTON_MOUSE,
+                        &settings_current.kempston_mouse, kempmouse_ports );
 
   return 0;
 }

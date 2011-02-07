@@ -50,7 +50,7 @@ static libspectrum_ide_register port_to_ide_register( libspectrum_byte port );
 
 /* Data */
 
-static const periph_t divide_peripherals[] = {
+static const periph_port_t divide_ports[] = {
   { 0x00e3, 0x00a3, divide_ide_read, divide_ide_write },
   { 0x00ff, 0x00e3, NULL, divide_control_write },
   { 0, 0, NULL, NULL }
@@ -130,7 +130,7 @@ divide_init( void )
   for( i = 0; i < 2; i++ ) divide_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   periph_register_type( PERIPH_TYPE_DIVIDE, &settings_current.divide_enabled,
-                        divide_peripherals );
+                        divide_ports );
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;

@@ -48,7 +48,7 @@ static module_info_t melodik_module_info = {
 
 };
 
-static const periph_t melodik_peripherals[] = {
+static const periph_port_t melodik_ports[] = {
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0, 0, NULL, NULL }
@@ -81,7 +81,7 @@ melodik_init( void )
   module_register( &melodik_module_info );
 
   periph_register_type( PERIPH_TYPE_MELODIK, &settings_current.melodik,
-                        melodik_peripherals );
+                        melodik_ports );
 
   return 0;
 }

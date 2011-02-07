@@ -50,7 +50,7 @@ typedef struct periph_type_t {
   /* The preferences option which controls this peripheral */
   int *option;
   /* The list of ports this peripheral responds to */
-  const periph_t *peripherals;
+  const periph_port_t *ports;
 } periph_type_t;
 
 /* All the peripherals we know about */
@@ -61,7 +61,7 @@ typedef struct periph_private_t {
   /* The peripheral this came from */
   periph_type type;
   /* The port response */
-  periph_t peripheral;
+  periph_port_t port;
 } periph_private_t;
 
 /* The list of currently active peripherals */
@@ -73,7 +73,7 @@ static const char *page_event_string = "page",
 
 /* Place one port response in the list of currently active ones */
 static void
-periph_register( periph_type type, const periph_t *peripheral )
+port_register( periph_type type, const periph_port_t *port )
 {
   periph_private_t *private;
 
@@ -84,14 +84,14 @@ periph_register( periph_type type, const periph_t *peripheral )
   }
 
   private->type = type;
-  private->peripheral = *peripheral;
+  private->port = *port;
 
   peripherals = g_slist_append( peripherals, private );
 }
 
 /* Register a peripheral with the system */
 void
-periph_register_type( periph_type type, int *option, const periph_t *peripherals )
+periph_register_type( periph_type type, int *option, const periph_port_t *ports )
 {
   if( !peripherals_by_type )
     peripherals_by_type = g_hash_table_new( NULL, NULL );
@@ -105,7 +105,7 @@ periph_register_type( periph_type type, int *option, const periph_t *peripherals
   type_data->present = PERIPH_PRESENT_NEVER;
   type_data->active = 0;
   type_data->option = option;
-  type_data->peripherals = peripherals;
+  type_data->ports = ports;
 
   g_hash_table_insert( peripherals_by_type, GINT_TO_POINTER( type ), type_data );
 }
@@ -137,9 +137,9 @@ periph_activate_type( periph_type type, int active )
   type_data->active = active;
 
   if( active ) {
-    const periph_t *ptr;
-    for( ptr = type_data->peripherals; ptr && ptr->mask != 0; ptr++ )
-      periph_register( type, ptr );
+    const periph_port_t *ptr;
+    for( ptr = type_data->ports; ptr && ptr->mask != 0; ptr++ )
+      port_register( type, ptr );
   } else {
     GSList *found;
     while( ( found = g_slist_find_custom( peripherals, GINT_TO_POINTER( type ), find_by_type ) ) != NULL )
@@ -250,14 +250,12 @@ read_peripheral( gpointer data, gpointer user_data )
   periph_private_t *private = data;
   struct peripheral_data_t *callback_info = user_data;
 
-  periph_t *peripheral;
+  periph_port_t *port = &( private->port );
 
-  peripheral = &( private->peripheral );
-
-  if( peripheral->read &&
-      ( ( callback_info->port & peripheral->mask ) == peripheral->value ) ) {
-    callback_info->value &= peripheral->read( callback_info->port,
-					      &( callback_info->attached ) );
+  if( port->read &&
+      ( ( callback_info->port & port->mask ) == port->value ) ) {
+    callback_info->value &= port->read( callback_info->port,
+					&( callback_info->attached ) );
   }
 }
 
@@ -322,13 +320,11 @@ write_peripheral( gpointer data, gpointer user_data )
   periph_private_t *private = data;
   struct peripheral_data_t *callback_info = user_data;
 
-  periph_t *peripheral;
-
-  peripheral = &( private->peripheral );
+  periph_port_t *port = &( private->port );
   
-  if( peripheral->write &&
-      ( ( callback_info->port & peripheral->mask ) == peripheral->value ) )
-    peripheral->write( callback_info->port, callback_info->value );
+  if( port->write &&
+      ( ( callback_info->port & port->mask ) == port->value ) )
+    port->write( callback_info->port, callback_info->value );
 }
 
 /* Write a byte to a port, taking no time */

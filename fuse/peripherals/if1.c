@@ -210,7 +210,7 @@ static module_info_t if1_module_info = {
 
 };
 
-static const periph_t if1_peripherals[] = {
+static const periph_port_t if1_ports[] = {
   { 0x0018, 0x0010, if1_port_in, if1_port_out },
   { 0x0018, 0x0008, if1_port_in, if1_port_out },
   { 0x0018, 0x0000, if1_port_in, if1_port_out },
@@ -328,7 +328,7 @@ if1_init( void )
   for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   periph_register_type( PERIPH_TYPE_INTERFACE1, &settings_current.interface1,
-                        if1_peripherals );
+                        if1_ports );
 
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )

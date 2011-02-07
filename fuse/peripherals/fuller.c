@@ -49,7 +49,7 @@ static module_info_t fuller_module_info = {
 
 };
 
-static const periph_t fuller_peripherals[] = {
+static const periph_port_t fuller_ports[] = {
   { 0x00ff, 0x003f, ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x005f, NULL, ay_dataport_write },
   { 0x00ff, 0x007f, joystick_fuller_read, NULL },
@@ -82,7 +82,7 @@ fuller_init( void )
 {
   module_register( &fuller_module_info );
   periph_register_type( PERIPH_TYPE_FULLER, &settings_current.fuller,
-                        fuller_peripherals );
+                        fuller_ports );
 
   return 0;
 }

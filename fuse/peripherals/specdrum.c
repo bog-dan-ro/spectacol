@@ -51,7 +51,7 @@ static module_info_t specdrum_module_info = {
     specdrum_to_snapshot
 } ;
 
-static const periph_t specdrum_peripherals[] = {
+static const periph_port_t specdrum_ports[] = {
   { 0x00ff, 0x00df, NULL, sound_specdrum_write },
   { 0, 0, NULL, NULL }
 };
@@ -61,7 +61,7 @@ specdrum_init( void )
 {
   module_register( &specdrum_module_info );
   periph_register_type( PERIPH_TYPE_SPECDRUM, &settings_current.specdrum,
-                        specdrum_peripherals );
+                        specdrum_ports );
 
   return 0;
 }

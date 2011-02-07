@@ -81,17 +81,17 @@ static module_info_t printer_zxp_module_info = {
   NULL
 };
 
-static periph_t printer_zxp_peripherals[] = {
+static const periph_port_t printer_zxp_ports[] = {
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
   { 0, 0, NULL, NULL }
 };
 
-static periph_t printer_zxp_peripherals_full_decode[] = {
+static const periph_port_t printer_zxp_ports_full_decode[] = {
   { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
   { 0, 0, NULL, NULL }
 };
 
-static periph_t printer_parallel_peripherals[] = {
+static const periph_port_t printer_parallel_ports[] = {
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
   { 0, 0, NULL, NULL }
 };
@@ -102,12 +102,11 @@ zxpstylus=zxpspeed=zxpheight=zxpnewspeed=zxplineofchar=0;
 zxppixel=-1;
 module_register(&printer_zxp_module_info);
 periph_register_type(PERIPH_TYPE_ZXPRINTER,&settings_current.printer,
-                     printer_zxp_peripherals);
+                     printer_zxp_ports);
 periph_register_type(PERIPH_TYPE_ZXPRINTER_FULL_DECODE,
-                     &settings_current.printer,
-                     printer_zxp_peripherals_full_decode);
+                     &settings_current.printer,printer_zxp_ports_full_decode);
 periph_register_type(PERIPH_TYPE_PARALLEL_PRINTER,&settings_current.printer,
-                     printer_parallel_peripherals);
+                     printer_parallel_ports);
 }
 
 

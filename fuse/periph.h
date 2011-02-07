@@ -88,7 +88,7 @@ typedef void (*periph_port_write_function)( libspectrum_word port,
 					    libspectrum_byte data );
 
 /* Information about a specific port response */
-typedef struct periph_t {
+typedef struct periph_port_t {
 
   /* This peripheral responds to all port values where
      <port> & mask == value */
@@ -98,10 +98,10 @@ typedef struct periph_t {
   periph_port_read_function read;
   periph_port_write_function write;
 
-} periph_t;
+} periph_port_t;
 
 /* Register a peripheral with the system */
-void periph_register_type( periph_type type, int *option, const periph_t *peripherals );
+void periph_register_type( periph_type type, int *option, const periph_port_t *ports );
 
 /* Set whether a peripheral can be present on this machine or not */
 void periph_set_present( periph_type type, periph_present present );

@@ -64,12 +64,12 @@ static module_info_t ula_module_info = {
 
 };
 
-static periph_t ula_peripherals[] = {
+static const periph_port_t ula_ports[] = {
   { 0x0001, 0x0000, ula_read, ula_write },
   { 0, 0, NULL, NULL }
 };
 
-static periph_t ula_peripherals_full_decode[] = {
+static const periph_port_t ula_ports_full_decode[] = {
   { 0x00ff, 0x00fe, ula_read, ula_write },
   { 0, 0, NULL, NULL }
 };
@@ -79,9 +79,9 @@ ula_init( void )
 {
   module_register( &ula_module_info );
 
-  periph_register_type( PERIPH_TYPE_ULA, NULL, ula_peripherals );
+  periph_register_type( PERIPH_TYPE_ULA, NULL, ula_ports );
   periph_register_type( PERIPH_TYPE_ULA_FULL_DECODE, NULL,
-                        ula_peripherals_full_decode );
+                        ula_ports_full_decode );
 
   ula_default_value = 0xff;
 

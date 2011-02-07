@@ -29,9 +29,6 @@
 #include <libspectrum.h>
 #include "periph.h"
 
-extern const periph_t kempmouse_peripherals[];
-extern const size_t kempmouse_peripherals_count;
-
 int kempmouse_init( void );
 void kempmouse_update( int dx, int dy, int button, int down );
 

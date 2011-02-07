@@ -97,12 +97,12 @@ static module_info_t joystick_module_info = {
 
 };
 
-static periph_t kempston_strict_decoding[] = {
+static const periph_port_t kempston_strict_decoding[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0, 0, NULL, NULL }
 };
 
-static periph_t kempston_loose_decoding[] = {
+static const periph_port_t kempston_loose_decoding[] = {
   { 0x0020, 0x0000, joystick_kempston_read, NULL },
   { 0, 0, NULL, NULL }
 };
