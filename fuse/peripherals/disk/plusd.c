@@ -60,7 +60,7 @@ static int index_event;
 static wd_fdc *plusd_fdc;
 static wd_fdc_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 
-static libspectrum_byte plusd_ram[ 0x2000 ];
+static libspectrum_byte *plusd_ram;
 
 static void plusd_reset( int hard_reset );
 static void plusd_memory_map( void );
@@ -185,6 +185,10 @@ plusd_reset( int hard_reset )
   }
 
   plusd_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
+
+  if( !plusd_ram ) {
+    plusd_ram = memory_pool_allocate_persistent( 0x2000, 1 );
+  }
 
   plusd_memory_map_romcs[1].page = plusd_ram;
   plusd_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;

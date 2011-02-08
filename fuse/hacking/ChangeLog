@@ -3489,3 +3489,5 @@
          joystick.c,kempmouse.[ch],melodik.c,printer.c,scld.c,speccyboot.c,
          specdrum.c,ula.c},periph.h: periph_t does not represent a peripheral,
          but just one port from a peripheral, so rename appropriately.
+20110208 machines/spec16.c,memory.h,peripherals/disk/plusd.c: use memory pool to
+         allocate the Spectrum 16K uninstalled memory and +D memory (Fred).
