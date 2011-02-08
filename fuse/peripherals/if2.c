@@ -59,6 +59,11 @@ static module_info_t if2_module_info = {
 
 };
 
+static const periph_t if2_periph = {
+  &settings_current.interface2,
+  NULL
+};
+
 int
 if2_init( void )
 {
@@ -67,7 +72,7 @@ if2_init( void )
   module_register( &if2_module_info );
   for( i = 0; i < 2; i++ ) if2_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_INTERFACE2, &settings_current.interface2, NULL );
+  periph_register( PERIPH_TYPE_INTERFACE2, &if2_periph );
 
   return 0;
 }

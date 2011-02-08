@@ -73,12 +73,16 @@ static const periph_port_t scld_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t scld_periph = {
+  NULL,
+  scld_ports
+};
+
 int
 scld_init( void )
 {
   module_register( &scld_module_info );
-  periph_register_type( PERIPH_TYPE_SCLD, NULL, scld_ports );
-
+  periph_register( PERIPH_TYPE_SCLD, &scld_periph );
   return 0;
 }
 

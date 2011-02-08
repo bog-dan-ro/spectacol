@@ -1,7 +1,7 @@
 /* specdrum.c: Routines for handling the Specdrum Drum Kit
    Copyright (c) 2011 Jon Mitchell
 
-   $Id:$
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -56,13 +56,16 @@ static const periph_port_t specdrum_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t specdrum_periph = {
+  &settings_current.specdrum,
+  specdrum_ports
+};
+
 int
 specdrum_init( void )
 {
   module_register( &specdrum_module_info );
-  periph_register_type( PERIPH_TYPE_SPECDRUM, &settings_current.specdrum,
-                        specdrum_ports );
-
+  periph_register( PERIPH_TYPE_SPECDRUM, &specdrum_periph );
   return 0;
 }
 

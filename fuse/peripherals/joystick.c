@@ -102,9 +102,19 @@ static const periph_port_t kempston_strict_decoding[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t kempston_strict_periph = {
+  &settings_current.joy_kempston,
+  kempston_strict_decoding
+};
+
 static const periph_port_t kempston_loose_decoding[] = {
   { 0x0020, 0x0000, joystick_kempston_read, NULL },
   { 0, 0, NULL, NULL }
+};
+
+static const periph_t kempston_loose_periph = {
+  &settings_current.joy_kempston,
+  kempston_loose_decoding
 };
 
 /* Init/shutdown functions. Errors aren't important here */
@@ -117,8 +127,8 @@ fuse_joystick_init (void)
   fuller_value = 0xff;
 
   module_register( &joystick_module_info );
-  periph_register_type( PERIPH_TYPE_KEMPSTON, &settings_current.joy_kempston, kempston_strict_decoding );
-  periph_register_type( PERIPH_TYPE_KEMPSTON_LOOSE, &settings_current.joy_kempston, kempston_loose_decoding );
+  periph_register( PERIPH_TYPE_KEMPSTON, &kempston_strict_periph );
+  periph_register( PERIPH_TYPE_KEMPSTON_LOOSE, &kempston_loose_periph );
 }
 
 void

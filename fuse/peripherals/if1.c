@@ -217,6 +217,11 @@ static const periph_port_t if1_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t if1_periph = {
+  &settings_current.interface1,
+  if1_ports
+};
+
 /* Debugger events */
 static const char *event_type_string = "if1";
 static int page_event, unpage_event;
@@ -327,9 +332,7 @@ if1_init( void )
   module_register( &if1_module_info );
   for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_INTERFACE1, &settings_current.interface1,
-                        if1_ports );
-
+  periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;

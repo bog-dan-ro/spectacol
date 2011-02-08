@@ -54,6 +54,11 @@ static const periph_port_t melodik_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t melodik_periph = {
+  &settings_current.melodik,
+  melodik_ports
+};
+
 static void
 melodik_enabled_snapshot( libspectrum_snap *snap )
 {
@@ -79,9 +84,6 @@ int
 melodik_init( void )
 {
   module_register( &melodik_module_info );
-
-  periph_register_type( PERIPH_TYPE_MELODIK, &settings_current.melodik,
-                        melodik_ports );
-
+  periph_register( PERIPH_TYPE_MELODIK, &melodik_periph );
   return 0;
 }

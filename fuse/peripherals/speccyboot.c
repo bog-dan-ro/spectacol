@@ -68,6 +68,11 @@ static const periph_port_t speccyboot_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t speccyboot_periph = {
+  &settings_current.speccyboot,
+  speccyboot_ports
+};
+
 /* ---------------------------------------------------------------------------
  * ROM paging state
  * ------------------------------------------------------------------------ */
@@ -185,8 +190,7 @@ speccyboot_init( void )
 
   speccyboot_memory_map_romcs.bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_SPECCYBOOT, &settings_current.speccyboot,
-                        speccyboot_ports );
+  periph_register( PERIPH_TYPE_SPECCYBOOT, &speccyboot_periph );
 
   return 0;
 }

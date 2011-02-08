@@ -127,6 +127,11 @@ static const periph_port_t plusd_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t plusd_periph = {
+  &settings_current.plusd,
+  plusd_ports
+};
+
 int
 plusd_init( void )
 {
@@ -155,8 +160,7 @@ plusd_init( void )
   module_register( &plusd_module_info );
   for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_PLUSD, &settings_current.plusd,
-                        plusd_ports );
+  periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
 
   return 0;
 }

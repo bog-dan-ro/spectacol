@@ -89,6 +89,11 @@ static const periph_port_t zxatasp_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t zxatasp_periph = {
+  &settings_current.zxatasp_active,
+  zxatasp_ports
+};
+
 static libspectrum_byte zxatasp_control;
 static libspectrum_byte zxatasp_portA;
 static libspectrum_byte zxatasp_portB;
@@ -182,8 +187,7 @@ zxatasp_init( void )
   module_register( &zxatasp_module_info );
   for( i = 0; i < 2; i++ ) zxatasp_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_ZXATASP, &settings_current.zxatasp_active,
-                        zxatasp_ports );
+  periph_register( PERIPH_TYPE_ZXATASP, &zxatasp_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;

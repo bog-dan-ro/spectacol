@@ -56,6 +56,11 @@ static const periph_port_t fuller_ports[] = {
   { 0, 0, NULL, NULL },
 };
 
+static const periph_t fuller_periph = {
+  &settings_current.fuller,
+  fuller_ports
+};
+
 static void
 fuller_enabled_snapshot( libspectrum_snap *snap )
 {
@@ -81,8 +86,7 @@ int
 fuller_init( void )
 {
   module_register( &fuller_module_info );
-  periph_register_type( PERIPH_TYPE_FULLER, &settings_current.fuller,
-                        fuller_ports );
+  periph_register( PERIPH_TYPE_FULLER, &fuller_periph );
 
   return 0;
 }

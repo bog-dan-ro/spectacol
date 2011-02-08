@@ -87,6 +87,11 @@ static const periph_port_t beta_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t beta_peripheral = {
+  &settings_current.beta128,  
+  beta_ports
+};
+
 static void beta_reset( int hard_reset );
 static void beta_memory_map( void );
 static void beta_enabled_snapshot( libspectrum_snap *snap );
@@ -169,8 +174,7 @@ beta_init( void )
   module_register( &beta_module_info );
   for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_BETA128, &settings_current.beta128,
-                        beta_ports );
+  periph_register( PERIPH_TYPE_BETA128, &beta_peripheral );
 
   return 0;
 }

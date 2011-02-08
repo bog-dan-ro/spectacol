@@ -70,13 +70,16 @@ static const periph_port_t kempmouse_ports[] = {
   { 0x0521, 0x0501, read_y_pos, NULL },
 };
 
+static const periph_t kempmouse_periph = {
+  &settings_current.kempston_mouse,
+  kempmouse_ports
+};
+
 int
 kempmouse_init( void )
 {
   module_register( &kempmouse_module_info );
-  periph_register_type( PERIPH_TYPE_KEMPSTON_MOUSE,
-                        &settings_current.kempston_mouse, kempmouse_ports );
-
+  periph_register( PERIPH_TYPE_KEMPSTON_MOUSE, &kempmouse_periph );
   return 0;
 }
 

@@ -41,31 +41,28 @@
  * General peripheral list handling routines
  */
 
-/* One peripheral and all the ports it responds to */
-typedef struct periph_type_t {
+typedef struct periph_private_t {
   /* Can this peripheral ever be present on the currently emulated machine? */
   periph_present present;
   /* Is this peripheral currently active? */
   int active; 
-  /* The preferences option which controls this peripheral */
-  int *option;
-  /* The list of ports this peripheral responds to */
-  const periph_port_t *ports;
-} periph_type_t;
+  /* The actual peripheral data */
+  const periph_t *periph;
+} periph_private_t;
 
 /* All the peripherals we know about */
-static GHashTable *peripherals_by_type = NULL;
+static GHashTable *peripherals = NULL;
 
 /* Wrapper to pair up a port response with the peripheral it came from */
-typedef struct periph_private_t {
+typedef struct periph_port_private_t {
   /* The peripheral this came from */
   periph_type type;
   /* The port response */
   periph_port_t port;
-} periph_private_t;
+} periph_port_private_t;
 
-/* The list of currently active peripherals */
-static GSList *peripherals = NULL;
+/* The list of currently active ports */
+static GSList *ports = NULL;
 
 /* The strings used for debugger events */
 static const char *page_event_string = "page",
@@ -75,7 +72,7 @@ static const char *page_event_string = "page",
 static void
 port_register( periph_type type, const periph_port_t *port )
 {
-  periph_private_t *private;
+  periph_port_private_t *private;
 
   private = malloc( sizeof( *private ) );
   if( !private ) {
@@ -86,35 +83,34 @@ port_register( periph_type type, const periph_port_t *port )
   private->type = type;
   private->port = *port;
 
-  peripherals = g_slist_append( peripherals, private );
+  ports = g_slist_append( ports, private );
 }
 
 /* Register a peripheral with the system */
 void
-periph_register_type( periph_type type, int *option, const periph_port_t *ports )
+periph_register( periph_type type, const periph_t *periph )
 {
-  if( !peripherals_by_type )
-    peripherals_by_type = g_hash_table_new( NULL, NULL );
+  if( !peripherals )
+    peripherals = g_hash_table_new( NULL, NULL );
 
-  periph_type_t *type_data = malloc( sizeof( *type_data ) );
-  if( !type_data ) {
+  periph_private_t *private = malloc( sizeof( *private ) );
+  if( !private ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
     fuse_abort();
   }
 
-  type_data->present = PERIPH_PRESENT_NEVER;
-  type_data->active = 0;
-  type_data->option = option;
-  type_data->ports = ports;
+  private->present = PERIPH_PRESENT_NEVER;
+  private->active = 0;
+  private->periph = periph;
 
-  g_hash_table_insert( peripherals_by_type, GINT_TO_POINTER( type ), type_data );
+  g_hash_table_insert( peripherals, GINT_TO_POINTER( type ), private );
 }
 
 /* Get the data about one peripheral */
 static gint
 find_by_type( gconstpointer data, gconstpointer user_data )
 {
-  const periph_private_t *periph = data;
+  const periph_port_private_t *periph = data;
   periph_type type = GPOINTER_TO_INT( user_data );
   return periph->type - type;
 }
@@ -123,7 +119,7 @@ find_by_type( gconstpointer data, gconstpointer user_data )
 void
 periph_set_present( periph_type type, periph_present present )
 {
-  periph_type_t *type_data = g_hash_table_lookup( peripherals_by_type, GINT_TO_POINTER( type ) );
+  periph_private_t *type_data = g_hash_table_lookup( peripherals, GINT_TO_POINTER( type ) );
   if( type_data ) type_data->present = present;
 }
 
@@ -131,19 +127,19 @@ periph_set_present( periph_type type, periph_present present )
 void
 periph_activate_type( periph_type type, int active )
 {
-  periph_type_t *type_data = g_hash_table_lookup( peripherals_by_type, GINT_TO_POINTER( type ) );
-  if( !type_data || type_data->active == active ) return;
+  periph_private_t *private = g_hash_table_lookup( peripherals, GINT_TO_POINTER( type ) );
+  if( !private || private->active == active ) return;
 
-  type_data->active = active;
+  private->active = active;
 
   if( active ) {
     const periph_port_t *ptr;
-    for( ptr = type_data->ports; ptr && ptr->mask != 0; ptr++ )
+    for( ptr = private->periph->ports; ptr && ptr->mask != 0; ptr++ )
       port_register( type, ptr );
   } else {
     GSList *found;
-    while( ( found = g_slist_find_custom( peripherals, GINT_TO_POINTER( type ), find_by_type ) ) != NULL )
-      peripherals = g_slist_remove( peripherals, found->data );
+    while( ( found = g_slist_find_custom( ports, GINT_TO_POINTER( type ), find_by_type ) ) != NULL )
+      ports = g_slist_remove( ports, found->data );
   }
 }
 
@@ -151,7 +147,7 @@ periph_activate_type( periph_type type, int active )
 int
 periph_is_active( periph_type type )
 {
-  periph_type_t *type_data = g_hash_table_lookup( peripherals_by_type, GINT_TO_POINTER( type ) );
+  periph_private_t *type_data = g_hash_table_lookup( peripherals, GINT_TO_POINTER( type ) );
   return type_data ? type_data->active : 0;
 }
 
@@ -161,13 +157,13 @@ static void
 set_activity( gpointer key, gpointer value, gpointer user_data )
 {
   periph_type type = GPOINTER_TO_INT( key );
-  periph_type_t *type_data = value;
+  periph_private_t *private = value;
   int active;
 
-  switch ( type_data->present ) {
+  switch ( private->present ) {
   case PERIPH_PRESENT_NEVER: active = 0; break;
   case PERIPH_PRESENT_OPTIONAL:
-    active = type_data->option ? *(type_data->option) : 0; break;
+    active = private->periph->option ? *(private->periph->option) : 0; break;
   case PERIPH_PRESENT_ALWAYS: active = 1; break;
   }
 
@@ -178,7 +174,7 @@ set_activity( gpointer key, gpointer value, gpointer user_data )
 static void
 free_peripheral( gpointer data, gpointer user_data GCC_UNUSED )
 {
-  periph_private_t *private = data;
+  periph_port_private_t *private = data;
   free( private );
 }
 
@@ -186,7 +182,7 @@ free_peripheral( gpointer data, gpointer user_data GCC_UNUSED )
 static void
 set_type_inactive( gpointer key, gpointer value, gpointer user_data )
 {
-  periph_type_t *type_data = value;
+  periph_private_t *type_data = value;
   type_data->present = PERIPH_PRESENT_NEVER;
   type_data->active = 0;
 }
@@ -195,16 +191,16 @@ set_type_inactive( gpointer key, gpointer value, gpointer user_data )
 static void
 set_types_inactive( void )
 {
-  g_hash_table_foreach( peripherals_by_type, set_type_inactive, NULL );
+  g_hash_table_foreach( peripherals, set_type_inactive, NULL );
 }
 
 /* Empty out the list of peripherals */
 void
 periph_clear( void )
 {
-  g_slist_foreach( peripherals, free_peripheral, NULL );
-  g_slist_free( peripherals );
-  peripherals = NULL;
+  g_slist_foreach( ports, free_peripheral, NULL );
+  g_slist_free( ports );
+  ports = NULL;
   set_types_inactive();
 }
 
@@ -247,7 +243,7 @@ readport( libspectrum_word port )
 static void
 read_peripheral( gpointer data, gpointer user_data )
 {
-  periph_private_t *private = data;
+  periph_port_private_t *private = data;
   struct peripheral_data_t *callback_info = user_data;
 
   periph_port_t *port = &( private->port );
@@ -293,7 +289,7 @@ readport_internal( libspectrum_word port )
   callback_info.attached = 0;
   callback_info.value = 0xff;
 
-  g_slist_foreach( peripherals, read_peripheral, &callback_info );
+  g_slist_foreach( ports, read_peripheral, &callback_info );
 
   if( !callback_info.attached )
     callback_info.value = machine_current->unattached_port();
@@ -317,7 +313,7 @@ writeport( libspectrum_word port, libspectrum_byte b )
 static void
 write_peripheral( gpointer data, gpointer user_data )
 {
-  periph_private_t *private = data;
+  periph_port_private_t *private = data;
   struct peripheral_data_t *callback_info = user_data;
 
   periph_port_t *port = &( private->port );
@@ -340,7 +336,7 @@ writeport_internal( libspectrum_word port, libspectrum_byte b )
   callback_info.port = port;
   callback_info.value = b;
   
-  g_slist_foreach( peripherals, write_peripheral, &callback_info );
+  g_slist_foreach( ports, write_peripheral, &callback_info );
 }
 
 /*
@@ -393,7 +389,7 @@ periph_update( void )
     }
   }
 
-  g_hash_table_foreach( peripherals_by_type, set_activity, NULL );
+  g_hash_table_foreach( peripherals, set_activity, NULL );
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1,
 		    periph_is_active( PERIPH_TYPE_INTERFACE1 ) );

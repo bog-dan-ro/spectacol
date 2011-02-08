@@ -46,10 +46,20 @@ static const periph_port_t spec128_memory_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t spec128_memory = {
+  NULL,
+  spec128_memory_ports
+};
+
 static const periph_port_t plus3_memory_ports[] = {
   { 0xc002, 0x4000, NULL, spec128_memoryport_write },
   { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
   { 0, 0, NULL, NULL }
+};
+
+static const periph_t plus3_memory = {
+  NULL,
+  plus3_memory_ports
 };
 
 static const periph_port_t upd765_ports[] = {
@@ -58,15 +68,30 @@ static const periph_port_t upd765_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t upd765 = {
+  NULL,
+  upd765_ports
+};
+
 static const periph_port_t se_memory_ports[] = {
   { 0xffff, 0x7ffd, NULL, spec_se_memoryport_write },
   { 0, 0, NULL, NULL }
+};
+
+static const periph_t se_memory = {
+  NULL,
+  se_memory_ports
 };
 
 static const periph_port_t tc2068_ay_ports[] = {
   { 0x00ff, 0x00f5, tc2068_ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },
   { 0, 0, NULL, NULL }
+};
+
+static const periph_t tc2068_ay = {
+  NULL,
+  tc2068_ay_ports
 };
 
 static const periph_port_t beta128_pentagon_ports[] = {
@@ -78,6 +103,11 @@ static const periph_port_t beta128_pentagon_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t beta128_pentagon = {
+  NULL,
+  beta128_pentagon_ports
+};
+
 static const periph_port_t beta128_pentagon_late_ports[] = {
   { 0x00ff, 0x001f, pentagon_select_1f_read, beta_cr_write },
   { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
@@ -87,27 +117,33 @@ static const periph_port_t beta128_pentagon_late_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t beta128_pentagon_late = {
+  NULL,
+  beta128_pentagon_late_ports
+};
+
 static const periph_port_t pentagon1024_memory_ports[] = {
   { 0xc002, 0x4000, NULL, pentagon1024_memoryport_write  },
   { 0xf008, 0xe000, NULL, pentagon1024_v22_memoryport_write }, /* v2.2 */
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t pentagon1024_memory = {
+  NULL,
+  pentagon1024_memory_ports
+};
+
 void
 machines_periph_init( void )
 {
-  periph_register_type( PERIPH_TYPE_128_MEMORY, NULL, spec128_memory_ports );
-  periph_register_type( PERIPH_TYPE_PLUS3_MEMORY, NULL, plus3_memory_ports );
-  periph_register_type( PERIPH_TYPE_UPD765, NULL, upd765_ports );
-  periph_register_type( PERIPH_TYPE_SE_MEMORY, NULL, se_memory_ports );
-  periph_register_type( PERIPH_TYPE_AY_TIMEX_WITH_JOYSTICK, NULL,
-                        tc2068_ay_ports );
-  periph_register_type( PERIPH_TYPE_BETA128_PENTAGON, NULL,
-                        beta128_pentagon_ports );
-  periph_register_type( PERIPH_TYPE_BETA128_PENTAGON_LATE, NULL,
-                        beta128_pentagon_late_ports );
-  periph_register_type( PERIPH_TYPE_PENTAGON1024_MEMORY, NULL,
-                        pentagon1024_memory_ports );
+  periph_register( PERIPH_TYPE_128_MEMORY, &spec128_memory );
+  periph_register( PERIPH_TYPE_PLUS3_MEMORY, &plus3_memory );
+  periph_register( PERIPH_TYPE_UPD765, &upd765 );
+  periph_register( PERIPH_TYPE_SE_MEMORY, &se_memory );
+  periph_register( PERIPH_TYPE_AY_TIMEX_WITH_JOYSTICK, &tc2068_ay );
+  periph_register( PERIPH_TYPE_BETA128_PENTAGON, &beta128_pentagon );
+  periph_register( PERIPH_TYPE_BETA128_PENTAGON_LATE, &beta128_pentagon_late );
+  periph_register( PERIPH_TYPE_PENTAGON1024_MEMORY, &pentagon1024_memory );
 }
 
 /* Peripherals generally available on all machines; the Timex machines and

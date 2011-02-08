@@ -85,6 +85,11 @@ static module_info_t opus_module_info = {
 
 };
 
+static const periph_t opus_periph = {
+  &settings_current.opus,
+  NULL
+};
+
 void
 opus_page( void )
 {
@@ -144,7 +149,7 @@ opus_init( void )
   module_register( &opus_module_info );
   for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_OPUS, &settings_current.opus, NULL );
+  periph_register( PERIPH_TYPE_OPUS, &opus_periph );
 
   return 0;
 }

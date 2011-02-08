@@ -100,8 +100,16 @@ typedef struct periph_port_t {
 
 } periph_port_t;
 
+/* Information about a peripheral */
+typedef struct periph_t {
+  /* The preferences option which controls this peripheral */
+  int *option;
+  /* The list of ports this peripheral responds to */
+  const periph_port_t *ports;
+} periph_t;
+
 /* Register a peripheral with the system */
-void periph_register_type( periph_type type, int *option, const periph_port_t *ports );
+void periph_register( periph_type type, const periph_t *periph );
 
 /* Set whether a peripheral can be present on this machine or not */
 void periph_set_present( periph_type type, periph_present present );

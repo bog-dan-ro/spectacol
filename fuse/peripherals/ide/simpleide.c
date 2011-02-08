@@ -48,6 +48,11 @@ static const periph_port_t simpleide_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t simpleide_periph = {
+  &settings_current.simpleide_active,
+  simpleide_ports
+};
+
 static libspectrum_ide_channel *simpleide_idechn;
 
 static void simpleide_from_snapshot( libspectrum_snap *snap );
@@ -90,8 +95,7 @@ simpleide_init( void )
   }
 
   module_register( &simpleide_module_info );
-  periph_register_type( PERIPH_TYPE_SIMPLEIDE,
-                        &settings_current.simpleide_active, simpleide_ports );
+  periph_register( PERIPH_TYPE_SIMPLEIDE, &simpleide_periph );
 
   return 0;
 }

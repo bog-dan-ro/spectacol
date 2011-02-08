@@ -65,6 +65,11 @@ static const periph_port_t zxcf_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t zxcf_periph = {
+  &settings_current.zxcf_active,
+  zxcf_ports
+};
+
 static int zxcf_writeenable;
 
 static libspectrum_ide_channel *zxcf_idechn;
@@ -117,8 +122,7 @@ zxcf_init( void )
   module_register( &zxcf_module_info );
   for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_ZXCF, &settings_current.zxcf_active,
-                        zxcf_ports );
+  periph_register( PERIPH_TYPE_ZXCF, &zxcf_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;

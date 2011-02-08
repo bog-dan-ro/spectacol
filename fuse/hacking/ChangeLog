@@ -3491,3 +3491,8 @@
          but just one port from a peripheral, so rename appropriately.
 20110208 machines/spec16.c,memory.h,peripherals/disk/plusd.c: use memory pool to
          allocate the Spectrum 16K uninstalled memory and +D memory (Fred).
+20110208 machines/machines_periph.c,periph.[ch],peripherals/{ay.c,disk/{beta.c,
+         opus.c,plusd.c},fuller.c,ide/{divide.c,simpleide.c,zxatasp.c,zxcf.c},
+         if1.c,if2.c,joystick.c,kempmouse.c,melodik.c,printer.c,scld.c,
+         speccyboot.c,specdrum.c,ula.c}: wrap peripheral data up into a type
+         and further renames to better match what types represent.

@@ -56,6 +56,11 @@ static const periph_port_t divide_ports[] = {
   { 0, 0, NULL, NULL }
 };
 
+static const periph_t divide_periph = {
+  &settings_current.divide_enabled,
+  divide_ports
+};
+
 static const libspectrum_byte DIVIDE_CONTROL_CONMEM = 0x80;
 static const libspectrum_byte DIVIDE_CONTROL_MAPRAM = 0x40;
 
@@ -129,8 +134,7 @@ divide_init( void )
   module_register( &divide_module_info );
   for( i = 0; i < 2; i++ ) divide_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
-  periph_register_type( PERIPH_TYPE_DIVIDE, &settings_current.divide_enabled,
-                        divide_ports );
+  periph_register( PERIPH_TYPE_DIVIDE, &divide_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;
