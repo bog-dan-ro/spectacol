@@ -100,12 +100,16 @@ typedef struct periph_port_t {
 
 } periph_port_t;
 
+typedef void (*periph_activate_function)( void );
+
 /* Information about a peripheral */
 typedef struct periph_t {
   /* The preferences option which controls this peripheral */
   int *option;
   /* The list of ports this peripheral responds to */
   const periph_port_t *ports;
+  /* Function to be called when the peripheral is activated */
+  periph_activate_function activate;
 } periph_t;
 
 /* Register a peripheral with the system */

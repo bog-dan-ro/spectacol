@@ -78,6 +78,7 @@ static void zxatasp_readide( libspectrum_ide_channel *chn,
 			     libspectrum_ide_register idereg );
 static void zxatasp_writeide( libspectrum_ide_channel *chn,
 			      libspectrum_ide_register idereg );
+static void zxatasp_activate( void );
 
 /* Data */
 
@@ -91,7 +92,8 @@ static const periph_port_t zxatasp_ports[] = {
 
 static const periph_t zxatasp_periph = {
   &settings_current.zxatasp_active,
-  zxatasp_ports
+  zxatasp_ports,
+  zxatasp_activate
 };
 
 static libspectrum_byte zxatasp_control;
@@ -106,6 +108,7 @@ static libspectrum_ide_channel *zxatasp_idechn1;
 #define ZXATASP_PAGES 32
 #define ZXATASP_PAGE_LENGTH 0x4000
 static libspectrum_byte *ZXATASPMEM[ ZXATASP_PAGES ];
+static int memory_allocated = 0;
 
 static const size_t ZXATASP_NOT_PAGED = 0xff;
 
@@ -490,14 +493,6 @@ zxatasp_memory_map( void )
 
   if( !settings_current.zxatasp_active ) return;
 
-  if( !ZXATASPMEM[0] ) {
-    int i;
-    libspectrum_byte *memory =
-      memory_pool_allocate_persistent( ZXATASP_PAGES * ZXATASP_PAGE_LENGTH, 1 );
-    for( i = 0; i < ZXATASP_PAGES; i++ )
-      ZXATASPMEM[i] = memory + i * ZXATASP_PAGE_LENGTH;
-  }
-
   if( settings_current.zxatasp_wp &&
       ( zxatasp_memory_map_romcs[0].page_num & 1 ) ) {
     writable = 0;
@@ -579,5 +574,18 @@ zxatasp_to_snapshot( libspectrum_snap *snap )
 
     memcpy( buffer, ZXATASPMEM[ i ], ZXATASP_PAGE_LENGTH );
     libspectrum_snap_set_zxatasp_ram( snap, i, buffer );
+  }
+}
+
+static void
+zxatasp_activate( void )
+{
+  if( !memory_allocated ) {
+    int i;
+    libspectrum_byte *memory =
+      memory_pool_allocate_persistent( ZXATASP_PAGES * ZXATASP_PAGE_LENGTH, 1 );
+    for( i = 0; i < ZXATASP_PAGES; i++ )
+      ZXATASPMEM[i] = memory + i * ZXATASP_PAGE_LENGTH;
+    memory_allocated = 1;
   }
 }

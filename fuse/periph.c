@@ -134,6 +134,8 @@ periph_activate_type( periph_type type, int active )
 
   if( active ) {
     const periph_port_t *ptr;
+    if( private->periph->activate )
+      private->periph->activate();
     for( ptr = private->periph->ports; ptr && ptr->mask != 0; ptr++ )
       port_register( type, ptr );
   } else {

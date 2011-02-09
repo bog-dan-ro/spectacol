@@ -61,6 +61,7 @@ static wd_fdc *plusd_fdc;
 static wd_fdc_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 
 static libspectrum_byte *plusd_ram;
+static int memory_allocated = 0;
 
 static void plusd_reset( int hard_reset );
 static void plusd_memory_map( void );
@@ -69,6 +70,7 @@ static void plusd_from_snapshot( libspectrum_snap *snap );
 static void plusd_to_snapshot( libspectrum_snap *snap );
 static void plusd_event_index( libspectrum_dword last_tstates, int type,
 			       void *user_data );
+static void plusd_activate( void );
 
 static module_info_t plusd_module_info = {
 
@@ -129,7 +131,8 @@ static const periph_port_t plusd_ports[] = {
 
 static const periph_t plusd_periph = {
   &settings_current.plusd,
-  plusd_ports
+  plusd_ports,
+  plusd_activate
 };
 
 int
@@ -189,10 +192,6 @@ plusd_reset( int hard_reset )
   }
 
   plusd_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-
-  if( !plusd_ram ) {
-    plusd_ram = memory_pool_allocate_persistent( 0x2000, 1 );
-  }
 
   plusd_memory_map_romcs[1].page = plusd_ram;
   plusd_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
@@ -705,3 +704,13 @@ plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   libspectrum_snap_set_plusd_data  ( snap, plusd_fdc->data_register );
   libspectrum_snap_set_plusd_control( snap, plusd_control_register );
 }
+
+static void
+plusd_activate( void )
+{
+  if( !memory_allocated ) {
+    plusd_ram = memory_pool_allocate_persistent( 0x2000, 1 );
+    memory_allocated = 1;
+  }
+}
+

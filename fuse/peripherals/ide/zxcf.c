@@ -56,6 +56,7 @@ static libspectrum_byte zxcf_memctl_read( libspectrum_word port,
 static void zxcf_memctl_write( libspectrum_word port, libspectrum_byte data );
 static libspectrum_byte zxcf_ide_read( libspectrum_word port, int *attached );
 static void zxcf_ide_write( libspectrum_word port, libspectrum_byte data );
+static void zxcf_activate( void );
 
 /* Data */
 
@@ -67,7 +68,8 @@ static const periph_port_t zxcf_ports[] = {
 
 static const periph_t zxcf_periph = {
   &settings_current.zxcf_active,
-  zxcf_ports
+  zxcf_ports,
+  zxcf_activate
 };
 
 static int zxcf_writeenable;
@@ -77,6 +79,7 @@ static libspectrum_ide_channel *zxcf_idechn;
 #define ZXCF_PAGES 64
 #define ZXCF_PAGE_LENGTH 0x4000
 static libspectrum_byte *ZXCFMEM[ ZXCF_PAGES ];
+static int memory_allocated = 0;
 
 static libspectrum_byte last_memctl;
 
@@ -270,14 +273,6 @@ zxcf_memory_map( void )
 {
   if( !settings_current.zxcf_active ) return;
 
-  if( !ZXCFMEM[0] ) {
-    int i;
-    libspectrum_byte *memory =
-      memory_pool_allocate_persistent( ZXCF_PAGES * ZXCF_PAGE_LENGTH, 1 );
-    for( i = 0; i < ZXCF_PAGES; i++ )
-      ZXCFMEM[i] = memory + i * ZXCF_PAGE_LENGTH;
-  }
-
   if( !settings_current.zxcf_upload ) {
     memory_map_read[0] = zxcf_memory_map_romcs[0];
     memory_map_read[1] = zxcf_memory_map_romcs[1];
@@ -330,3 +325,17 @@ zxcf_to_snapshot( libspectrum_snap *snap )
     libspectrum_snap_set_zxcf_ram( snap, i, buffer );
   }
 }
+
+static void
+zxcf_activate( void )
+{
+  if( !memory_allocated ) {
+    int i;
+    libspectrum_byte *memory =
+      memory_pool_allocate_persistent( ZXCF_PAGES * ZXCF_PAGE_LENGTH, 1 );
+    for( i = 0; i < ZXCF_PAGES; i++ )
+      ZXCFMEM[i] = memory + i * ZXCF_PAGE_LENGTH;
+    memory_allocated = 1;
+  }
+}
+

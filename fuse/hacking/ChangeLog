@@ -3496,3 +3496,5 @@
          if1.c,if2.c,joystick.c,kempmouse.c,melodik.c,printer.c,scld.c,
          speccyboot.c,specdrum.c,ula.c}: wrap peripheral data up into a type
          and further renames to better match what types represent.
+20110209 periph.[ch],peripherals/{disk/plusd.c,ide/{divide.c,zxatasp.c,zxcf.c}}:
+         add new "peripheral activated" function and use it to allocate memory.

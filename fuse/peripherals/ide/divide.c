@@ -47,6 +47,7 @@ static void divide_control_write_internal( libspectrum_byte data );
 static void divide_page( void );
 static void divide_unpage( void );
 static libspectrum_ide_register port_to_ide_register( libspectrum_byte port );
+static void divide_activate( void );
 
 /* Data */
 
@@ -58,7 +59,8 @@ static const periph_port_t divide_ports[] = {
 
 static const periph_t divide_periph = {
   &settings_current.divide_enabled,
-  divide_ports
+  divide_ports,
+  divide_activate
 };
 
 static const libspectrum_byte DIVIDE_CONTROL_CONMEM = 0x80;
@@ -83,6 +85,7 @@ static libspectrum_ide_channel *divide_idechn1;
 #define DIVIDE_PAGE_LENGTH 0x2000
 static libspectrum_byte *divide_ram[ DIVIDE_PAGES ];
 static libspectrum_byte *divide_eprom;
+static int memory_allocated = 0;
 
 static void divide_reset( int hard_reset );
 static void divide_memory_map( void );
@@ -348,15 +351,6 @@ divide_memory_map( void )
 
   if( !divide_active ) return;
 
-  if( !divide_eprom ) {
-    int i;
-    libspectrum_byte *memory =
-      memory_pool_allocate_persistent( DIVIDE_PAGES * DIVIDE_PAGE_LENGTH, 1 );
-    for( i = 0; i < DIVIDE_PAGES; i++ )
-      divide_ram[i] = memory + i * DIVIDE_PAGE_LENGTH;
-    divide_eprom = memory_pool_allocate_persistent( DIVIDE_PAGE_LENGTH, 1 );
-  }
-  
   /* low bits of divide_control register give page number to use in upper
      bank; only lowest two bits on original 32K model */
   upper_ram_page = divide_control & (DIVIDE_PAGES - 1);
@@ -454,5 +448,19 @@ divide_to_snapshot( libspectrum_snap *snap )
 
     memcpy( buffer, divide_ram[ i ], DIVIDE_PAGE_LENGTH );
     libspectrum_snap_set_divide_ram( snap, i, buffer );
+  }
+}
+
+static void
+divide_activate( void )
+{
+  if( !memory_allocated ) {
+    int i;
+    libspectrum_byte *memory =
+      memory_pool_allocate_persistent( DIVIDE_PAGES * DIVIDE_PAGE_LENGTH, 1 );
+    for( i = 0; i < DIVIDE_PAGES; i++ )
+      divide_ram[i] = memory + i * DIVIDE_PAGE_LENGTH;
+    divide_eprom = memory_pool_allocate_persistent( DIVIDE_PAGE_LENGTH, 1 );
+    memory_allocated = 1;
   }
 }
