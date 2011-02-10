@@ -31,10 +31,10 @@
 #include <windows.h>
 
 #include "fuse.h"
-#include "joystick.h"
 #include "input.h"
 #include "keyboard.h"
 #include "menu.h"
+#include "peripherals/joystick.h"
 #include "settings.h"
 #include "win32internals.h"
 

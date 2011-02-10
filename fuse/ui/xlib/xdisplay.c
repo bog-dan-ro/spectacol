@@ -54,6 +54,7 @@
 #include "fuse.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "peripherals/scld.h"
 #include "screenshot.h"
 #include "settings.h"
 #include "xdisplay.h"
@@ -61,7 +62,6 @@
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
-#include "scld.h"
 
 typedef enum {
   MSB_RED = 0,			/* 0RGB */

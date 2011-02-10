@@ -3500,3 +3500,5 @@
          add new "peripheral activated" function and use it to allocate memory.
 20110209 ui/{fb/fbjoystick.c,svga/svgajoystick.c}: fix compilation (fixes bug
          #3175619) (rkd77).
+20110210 ui/{win32/{debugger.c,win32joystick.c,win32ui.c},xlib/xdisplay.c}:
+         more compilation fixes (fixes bug #3176005) (Sergio Baldovi).
