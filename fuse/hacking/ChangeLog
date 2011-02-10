@@ -3498,3 +3498,5 @@
          and further renames to better match what types represent.
 20110209 periph.[ch],peripherals/{disk/plusd.c,ide/{divide.c,zxatasp.c,zxcf.c}}:
          add new "peripheral activated" function and use it to allocate memory.
+20110209 ui/{fb/fbjoystick.c,svga/svgajoystick.c}: fix compilation (fixes bug
+         #3175619) (rkd77).

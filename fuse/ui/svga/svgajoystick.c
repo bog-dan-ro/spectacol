@@ -26,6 +26,7 @@
 */
 
 #include <config.h>
+#include "peripherals/joystick.h"
 
 #if !defined USE_JOYSTICK || defined HAVE_JSW_H
 
@@ -43,7 +44,6 @@
 #include <vgajoystick.h>
 
 #include "fuse.h"
-#include "joystick.h"
 #include "keyboard.h"
 #include "settings.h"
 #include "spectrum.h"
