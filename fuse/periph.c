@@ -160,7 +160,7 @@ set_activity( gpointer key, gpointer value, gpointer user_data )
 {
   periph_type type = GPOINTER_TO_INT( key );
   periph_private_t *private = value;
-  int active;
+  int active = 0;
 
   switch ( private->present ) {
   case PERIPH_PRESENT_NEVER: active = 0; break;

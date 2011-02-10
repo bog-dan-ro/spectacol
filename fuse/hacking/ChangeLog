@@ -3502,3 +3502,4 @@
          #3175619) (rkd77).
 20110210 ui/{win32/{debugger.c,win32joystick.c,win32ui.c},xlib/xdisplay.c}:
          more compilation fixes (fixes bug #3176005) (Sergio Baldovi).
+20110210 periph.ch: remove warning about accessing uninitialised value (Fred).
