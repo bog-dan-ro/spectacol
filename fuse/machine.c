@@ -361,6 +361,8 @@ machine_reset( int hard_reset )
 
   machine_set_variable_timings( machine_current );
 
+  memory_reset();
+
   /* Do the machine-specific bits, including loading the ROMs */
   error = machine_current->reset(); if( error ) return error;
 

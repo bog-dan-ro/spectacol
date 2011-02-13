@@ -404,6 +404,18 @@ memory_custom_rom( void )
   return 0;
 }
 
+/* Reset all ROM entries to MEMORY_SOURCE_SYSTEM in case any were marked as
+   MEMORY_SOURCE_CUSTOMROM last reset */
+void
+memory_reset( void )
+{
+  size_t i;
+
+  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
+    memory_map_rom[ i ].source = MEMORY_SOURCE_SYSTEM;
+  }
+}
+
 static void
 memory_rom_to_snapshot( libspectrum_snap *snap )
 {

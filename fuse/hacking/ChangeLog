@@ -3503,3 +3503,7 @@
 20110210 ui/{win32/{debugger.c,win32joystick.c,win32ui.c},xlib/xdisplay.c}:
          more compilation fixes (fixes bug #3176005) (Sergio Baldovi).
 20110210 periph.ch: remove warning about accessing uninitialised value (Fred).
+20110213 machine.c,memory.[ch]: reset ROM source to SYSTEM on machine reset
+         so tape traps work on machines with fewer ROMs than a machine with a
+         custom ROM that is used first (fixes bug #3179123) (thanks, Phil
+         Reynolds) (Fred).

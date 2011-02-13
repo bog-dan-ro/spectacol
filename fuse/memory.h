@@ -99,6 +99,10 @@ void memory_romcs_map( void );
 /* Have we loaded any custom ROMs? */
 int memory_custom_rom( void );
 
+/* Reset any memory configuration that may have changed in the machine
+   configuration */
+void memory_reset( void );
+
 libspectrum_byte readbyte( libspectrum_word address );
 
 /* Use a macro for performance in the main core, but a function for
