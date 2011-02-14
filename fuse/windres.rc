@@ -79,3 +79,8 @@ BEGIN
   END
 END
 
+/* Reference a manifest for visual styles. It must happen at the end.
+   Visual Studio generates the manifest automatically */
+#ifdef __GNUC__
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "ui/win32/fuse.manifest"
+#endif

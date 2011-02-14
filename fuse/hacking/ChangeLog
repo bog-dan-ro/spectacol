@@ -3507,3 +3507,5 @@
          so tape traps work on machines with fewer ROMs than a machine with a
          custom ROM that is used first (fixes bug #3179123) (thanks, Phil
          Reynolds) (Fred).
+20110214 configure.in,ui/win32/fuse.manifest.in,windres.rc: enable win32 themes
+         (patch #3179878) (Sergio Baldovi).

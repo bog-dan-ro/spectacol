@@ -47,6 +47,9 @@ if test "$WINDRES" != no; then
                  translit(FUSE_VERSION, [0-9]), [..], [FUSE_VERSION[.0]],
                  [FUSE_VERSION])])dnl
   AC_DEFINE([VERSION_WIN32], [translit(FUSE_FULL_VERSION, [.], [,])], [Define version information for win32 executable])
+  FUSE_FULL[]_VERSION=FUSE_FULL_VERSION
+  AC_SUBST(FUSE_FULL[]_VERSION)
+  AM_SUBST_NOTMAKE(FUSE_FULL[]_VERSION)
 fi
 AC_SUBST(WINDRES_OBJ)
 AM_SUBST_NOTMAKE(WINDRES_OBJ)
@@ -729,6 +732,7 @@ ui/svga/Makefile \
 ui/sdl/Makefile \
 ui/scaler/Makefile \
 ui/widget/Makefile \
+ui/win32/fuse.manifest \
 ui/win32/Makefile \
 ui/win32/icons/Makefile \
 ui/win32/installer/Makefile \
