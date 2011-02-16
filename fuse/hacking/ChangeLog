@@ -3512,3 +3512,4 @@
 20110216 machines/{tc2048.c,tc2068.[ch],ts2068.c}: use memory pool for Timex
          fake memory bank, leave memory marked as no bank so that it doesn't
          get marked as writable by the writeable ROM option (Fred).
+20110216 ignore fuse.dSYM file (Fred).
