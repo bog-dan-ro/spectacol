@@ -63,13 +63,6 @@ int tc2048_init( fuse_machine_info *machine )
   machine->ram.contend_delay	     = spectrum_contend_delay_65432100;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
 
-  memset( fake_bank, 0xff, MEMORY_PAGE_SIZE );
-
-  fake_mapping.page = fake_bank;
-  fake_mapping.writable = 0;
-  fake_mapping.contended = 0;
-  fake_mapping.offset = 0x0000;
-
   machine->unattached_port = spectrum_unattached_port_none;
 
   machine->shutdown = NULL;
@@ -118,15 +111,11 @@ tc2048_reset( void )
   for( i = 0; i < 8; i++ ) {
 
     timex_dock[i] = fake_mapping;
-    timex_dock[i].bank= MEMORY_BANK_DOCK;
     timex_dock[i].page_num = i;
-    timex_dock[i].source= MEMORY_SOURCE_SYSTEM;
     memory_map_dock[i] = &timex_dock[i];
 
     timex_exrom[i] = fake_mapping;
-    timex_exrom[i].bank = MEMORY_BANK_EXROM;
     timex_exrom[i].page_num = i;
-    timex_exrom[i].source= MEMORY_SOURCE_SYSTEM;
     memory_map_exrom[i] = &timex_exrom[i];
 
   }
