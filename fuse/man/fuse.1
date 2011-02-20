@@ -143,9 +143,9 @@ Specify a Betadisk image to load.
 .I \-\-bw\-tv
 .RS
 Specify whether the display should simulate a colour or black and
-white television. This option is effective under the GTK+, Xlib and SDL
-user interfaces: the others will always simulate a colour TV. The same
-as the General Options dialog's
+white television. This option is effective under the GTK+, Win32, Xlib
+and SDL user interfaces: the others will always simulate a colour TV.
+The same as the General Options dialog's
 .I "Black and white TV"
 option.
 .RE
@@ -182,7 +182,7 @@ Specify whether `dangerous' actions (those which could cause data
 loss, for example resetting the Spectrum) require confirmation before
 occurring. (Enabled by default, but you can use
 .RI ` \-\-no\-confirm\-actions '
-to disable). This option is effective under the GTK+ UI, and is the
+to disable). This option is effective under the GTK+ and Win32 UIs, and is the
 same as the General Options dialog's
 .I "Confirm actions"
 option.
@@ -1083,7 +1083,7 @@ option.
 .PP
 .I "\-\-statusbar"
 .RS
-For the GTK+ UI, enables the statusbar beneath the display. For the
+For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
 SDL UI, enables the status icons showing whether the disk and tape are
 being accessed. Same as the General Options dialog's
 .I "Show statusbar"
@@ -1268,10 +1268,10 @@ section for details.
 .\"
 .SH "THE VARIOUS FRONT-ENDS"
 Fuse supports various front-ends, or UIs (user interfaces). The usual
-one is GTK+-based, but there are also SDL, Xlib, SVGAlib and
+one is GTK+-based, but there are also SDL, Win32, Xlib, SVGAlib and
 framebuffer ones.
 .PP
-The important difference to note is that the GTK+ version uses
+The important difference to note is that GTK+ and Win32 versions uses
 `native' dialog boxes etc. (behaving like a fairly normal GUI-based
 program) while the others use an alternative, Fuse-specific `widget
 UI'. This latter front-end is easily spotted by the way it uses the
@@ -1286,8 +1286,8 @@ Spectrum's keyboard, the primary way of controlling Fuse itself
 (rather than the emulated machine) is via the menus. There are also
 function key shortcuts for some menu options.
 .PP
-In the GTK+ version, the menu bar is always visible at the top of the
-Fuse window. You can click on a menu name to pop it up. Alternatively,
+In the GTK+ and Win32 version, the menu bar is always visible at the top
+of the Fuse window. You can click on a menu name to pop it up. Alternatively,
 you can press
 .I F1
 to display a pop-up version of the menu bar, which you can then
@@ -1597,7 +1597,7 @@ options.
 .I "Black and white TV"
 .RS
 This option allows you to choose whether to simulate a colour or black
-and white television. This is effective only under the GTK+, Xlib and
+and white television. This is effective only under the GTK+, Win32, Xlib and
 SDL user interfaces: the others will always simulate a colour TV.
 .RE
 .PP
@@ -1617,7 +1617,7 @@ occurring.
 .PP
 .I "Show statusbar"
 .RS
-For the GTK+ UI, enables the statusbar beneath the display. For the
+For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
 SDL UI, enables the status icons showing whether the disk and tape are
 being accessed. This option has no effect for the other user
 interfaces.
@@ -2087,7 +2087,7 @@ by hand if you really want to.
 .I "Machine, Pause"
 .RS
 Pause or unpause emulation. This option is available only under the
-GTK+ UI; to pause the other user interfaces, simply press F1 to bring
+GTK+ and Win32 UIs; to pause the other user interfaces, simply press F1 to bring
 up the main menu.
 .RE
 .PP
@@ -2096,14 +2096,14 @@ up the main menu.
 .I "Machine, Reset"
 .RS
 Reset the emulated Spectrum. Again, you get a chance to cancel this if
-you're using the GTK+ UI.
+you're using the GTK+ or Win32 UIs.
 .RE
 .PP
 .I "Machine, Hard reset"
 .RS
 Reset the emulated Spectrum. A hard reset is equivalent to turning the
 Spectrum's power off, and then turning it back on. Again, you get a
-chance to cancel this if you're using the GTK+ UI.
+chance to cancel this if you're using the GTK+ or Win32 UIs.
 .RE
 .PP
 .I F9
@@ -2669,7 +2669,7 @@ entries above, but for the two channels of the DivIDE interface.
 .RS
 Display a diagram showing the Spectrum keyboard, and the various
 keywords that can be generated with each key from (48K) BASIC. Under
-the GTK+ UI, this will appear in a separate window and emulation
+the GTK+ and Win32 UIs, this will appear in a separate window and emulation
 continues. With the other UIs, the picture remains onscreen (and the
 emulator paused) until you press
 .I Esc
@@ -2737,7 +2737,7 @@ section below.
 .\"
 .SH "DISPLAY SIZE"
 Some of Fuse's UIs allow resizing of the emulated Spectrum's display.
-For the window-based ones (GTK+ and Xlib), you can resize the window
+For the window-based ones (GTK+, Win32 and Xlib), you can resize the window
 by, well, resizing it. :\-) Exactly how this works depends on your
 window manager; you may have to make the window over twice the width
 and height of the original size before it actually scales up. Fuse
@@ -2760,7 +2760,7 @@ emulating machine's monitor. These filters can be used to do various
 forms of smoothing, emulation of TV scanlines and various other
 possibilities. Support for graphics filters varies between the
 different user interfaces, but there are two general classes: the GTK+,
-Xlib, SVGAlib and SDL user interfaces (and the saving of .png
+Win32, Xlib, SVGAlib and SDL user interfaces (and the saving of .png
 screenshots) support `interpolating' filters which use a palette larger
 than the Spectrum's 16 colours, while the framebuffer user interface
 currently does not support filters at all.
@@ -2771,8 +2771,8 @@ resolution. To deal with this, Fuse treats these machines as having a
 `normal' display size which is twice the size of a normal Spectrum's
 screen, leading to a different set of filters being available for
 these machines. Note that any of the double or triple-sizing filters
-are available for Timex machines only when using the SDL or GTK+ user
-interfaces.
+are available for Timex machines only when using the SDL, Win32 or GTK+
+user interfaces.
 .PP
 The available filters, along with their short name used to select them
 from the command line, are:
@@ -2804,7 +2804,7 @@ Scale the displayed screen up to double size.
 .IR "Triple size " ( 3x )
 .RS
 Scale the displayed screen up to triple size. Available only with the
-GTK+, Xlib and SDL user interfaces or when saving screenshots of
+GTK+, Win32, Xlib and SDL user interfaces or when saving screenshots of
 non-Timex machines.
 .RE
 .PP
@@ -2829,7 +2829,7 @@ diagonal lines.
 Very similar to
 .IR AdvMAME2x ,
 except that it triples the size of the displayed screen. Available
-only with the GTK+, Xlib and SDL user interfaces or when saving
+only with the GTK+, Win32, Xlib and SDL user interfaces or when saving
 screenshots of non-Timex machines.
 .RE
 .PP
@@ -2868,8 +2868,8 @@ display.
 .RS
 An interpolating Timex-specific filter which scales the Timex screen
 up to 1.5x its usual size (which is therefore 3x the size of a
-`normal' Spectrum screen). Available only for the GTK+ and SDL user
-interfaces or when saving screenshots.
+`normal' Spectrum screen). Available only for the GTK+, Win32 and SDL
+user interfaces or when saving screenshots.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -3707,7 +3707,7 @@ disk images.
 .\"
 .SH BUGS
 Selecting a startup filter doesn't work properly with user interfaces
-other than SDL and GTK+.
+other than SDL, Win32 and GTK+.
 .PP
 Changing virtual consoles when using SVGAlib for joystick support
 causes Fuse to exit. If this is a problem, compile Fuse with the

@@ -339,8 +339,9 @@ ui_init( int *argc, char ***argv )
   GetClientRect( fuse_hStatusWindow, &statr );
 
   w_ofs = ( wr.right - wr.left ) - ( cr.right - cr.left );
-  h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top )
-          + ( statr.bottom - statr.top );
+  h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
+  if( settings_current.statusbar ) h_ofs += ( statr.bottom - statr.top );
+
   MoveWindow( fuse_hWnd, wr.left, wr.top,
               DISPLAY_ASPECT_WIDTH + w_ofs,
               DISPLAY_SCREEN_HEIGHT + h_ofs,
@@ -356,8 +357,6 @@ ui_init( int *argc, char ***argv )
   /* window will accept dragging and dropping */
   DragAcceptFiles( fuse_hWnd, TRUE );
 
-  win32statusbar_set_visibility( settings_current.statusbar );
-  
   ui_mouse_present = 1;
 
   return 0;
@@ -464,9 +463,6 @@ menu_file_exit( int action )
 scaler_type
 menu_get_scaler( scaler_available_fn selector )
 {
-	/* FIXME if fuse hasn't been resized prior to opening, Filters... dialog
-	         shows all scalers independently of current window size */
-
   scaler_type selected_scaler = SCALER_NUM;
   win32ui_select_info items;
   int count, i, selection;
@@ -831,7 +827,6 @@ selector_dialog( win32ui_select_info *items )
      The function returns an int corresponding to the selected radiobutton */
   
   /* FIXME: fix accelerators for this window */
-  /* FIXME: switching machines changes filter (typically to 1x) */
 
   return DialogBoxParam( fuse_hInstance, MAKEINTRESOURCE( IDD_SELECT_DIALOG ),
                          fuse_hWnd, selector_dialog_proc, ( LPARAM )items );
@@ -871,17 +866,16 @@ win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
       fuse_emulation_pause();
     }
   } else {
-    win32display_drawing_area_resize( LOWORD( lParam ), HIWORD( lParam ) );
+    win32display_drawing_area_resize( LOWORD( lParam ), HIWORD( lParam ), 1 );
 
-    /* FIXME: statusbar needs to be accounted for in size */
+    /* Resize statusbar and inner parts */
     SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
+    win32statusbar_resize( hWnd, wParam, lParam );
 
     if( size_paused ) {
       size_paused = 0;
       fuse_emulation_unpause();
     }
-
-    win32statusbar_resize( hWnd, wParam, lParam );
   }
 
   return 0;
@@ -892,8 +886,8 @@ win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
 static BOOL
 win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
-  RECT *selr, wr, cr , statr;
-  int width, height, size, w_ofs, h_ofs;
+  RECT *selr, wr, cr, statr, or;
+  int width, height, w_ofs, h_ofs, w_max, h_max;
 
   selr = (RECT *)lParam;
   GetWindowRect( fuse_hWnd, &wr );
@@ -901,9 +895,23 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
   GetClientRect( fuse_hStatusWindow, &statr );
 
   w_ofs = ( wr.right - wr.left ) - ( cr.right - cr.left );
-  h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top )
-          + ( statr.bottom - statr.top );
+  h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
+  if( settings_current.statusbar ) h_ofs += ( statr.bottom - statr.top );
 
+  /* max scaler size in desktop workarea */
+  SystemParametersInfo( SPI_GETWORKAREA, 0, &or, 0 );
+  w_max = ( or.right - or.left ) - w_ofs + DISPLAY_ASPECT_WIDTH / 2;
+  w_max /= DISPLAY_ASPECT_WIDTH;
+  h_max = ( or.bottom - or.top ) - h_ofs + DISPLAY_SCREEN_HEIGHT / 2;
+  h_max /= DISPLAY_SCREEN_HEIGHT;
+
+  if( w_max < h_max ) {
+    h_max = w_max;
+  } else {
+    w_max = h_max;
+  }
+
+  /* current scaler */
   width = selr->right - selr->left + DISPLAY_ASPECT_WIDTH / 2;
   height = selr->bottom - selr->top + DISPLAY_SCREEN_HEIGHT / 2;
 
@@ -914,15 +922,18 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
     height = width;
   } else if( wParam == WMSZ_TOP || wParam == WMSZ_BOTTOM ) {
     width = height;
-  } else if( width < 1 || height < 1 ) {
+  }
+
+  if( width < 1 || height < 1 ) {
     width = 1; height = 1;
   }
 
-  if( width > 3 ) {
-    width = 3;
+  if( width > w_max || height > h_max ) {
+    width = w_max; height = h_max;
   }
-  if( height > 3 ) {
-    height = 3;
+
+  if( width > 3 || height > 3 ) {
+    width = 3; height = 3;
   }
 
   if( width < height ) {
@@ -930,11 +941,11 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
   } else {
     width = height;
   }
-  size = width;
 
   width *= DISPLAY_ASPECT_WIDTH; height *= DISPLAY_SCREEN_HEIGHT;
   width += w_ofs; height += h_ofs;
 
+  /* Set window size */
   if( wParam == WMSZ_TOP ||
       wParam == WMSZ_TOPLEFT ||
       wParam == WMSZ_TOPRIGHT ) {
@@ -951,6 +962,36 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
   }
 
   return TRUE;
+}
+
+/* The function is an equivalent of GTK's gtk_window_resize,
+   take care of resizing main window into visible screen */
+void
+win32ui_fuse_resize( int width, int height )
+{
+  RECT wr, cr, statr, or;
+  int w_ofs, h_ofs;
+
+  /* Calculate decorations before resizing */
+  GetWindowRect( fuse_hWnd, &wr );
+  GetClientRect( fuse_hWnd, &cr );
+  GetClientRect( fuse_hStatusWindow, &statr );
+
+  w_ofs = ( wr.right - wr.left ) - ( cr.right - cr.left );
+  h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
+  if( settings_current.statusbar ) h_ofs += ( statr.bottom - statr.top );
+
+  /* Set position inside workarea */
+  SystemParametersInfo( SPI_GETWORKAREA, 0, &or, 0 );
+  if( wr.left + width + w_ofs > or.right ) wr.left = or.right - width - w_ofs;
+  if( wr.top + height + h_ofs > or.bottom ) wr.top = or.bottom - height - h_ofs;
+  if( wr.left < or.left ) wr.left = or.left;
+  if( wr.top < or.top ) wr.top = or.top;
+
+  MoveWindow( fuse_hWnd, wr.left, wr.top,
+              width + w_ofs,
+              height + h_ofs,
+              TRUE );
 }
 
 /* win32ui_process_messages() is an equivalent of gtk's gtk_main(),

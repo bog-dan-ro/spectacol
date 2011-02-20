@@ -63,12 +63,15 @@ extern libspectrum_dword win32display_colours[16];
 
 int win32display_init( void );
 int win32display_end( void );
+int win32display_scaled_height( void );
+int win32display_scaled_width( void );
+
 
 /* Below variables and functions are shared
    between win32display.c and win32ui.c */
 
 void win32display_area(int x, int y, int width, int height);
-int win32display_drawing_area_resize( int width, int height );
+int win32display_drawing_area_resize( int width, int height, int force_scaler );
 
 void blit( void );
 
@@ -89,6 +92,8 @@ void win32mouse_button( int button, int down );
 /*
  * General user interface routines (win32ui.c)
  */
+
+void win32ui_fuse_resize( int width, int height );
 
 int win32ui_confirm( const char *string );
 
