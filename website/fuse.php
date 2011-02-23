@@ -80,17 +80,17 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Unix</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
-   <li>Unofficial packages of 1.0.0 for <a href="http://www.debian.org/">Debian</a> (or <a href="http://www.ubuntu.com/">Ubuntu</a>) by Alberto Garcia are available from <a href="http://people.igalia.com/berto/">his personal webpage</a>.</li>
+   <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.0.0 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available. As of February 2011, these are only in the unstable distribution, but should move into the testing distribution soon and from there into the next stable distribution. The packages should also work on <a href="http://www.ubuntu.com/">Ubuntu</a>.</li>
    <li><a href="http://fedoraproject.org/index.html">Fedora</a> has <a href="https://admin.fedoraproject.org/pkgdb/acls/name/fuse-emulator">packages</a> of 1.0.0 available.</li>
+   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.0.0.1 available as <a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/fuse/">emulators/fuse</a>.</li>
    <li>Nokia's <a href="http://maemo.org/">Maemo</a> platform has a port of <a href="http://maemo.org/downloads/product/OS2008/fuse-emulator/">1.0.0</a> available by Alberto Garcia.</li>
+   <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 1.0.0.1 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse/">emulators/fuse</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-utils/">emulators/fuse-utils</a>.</li>
    <li>The <a href="http://en.docs.pld-linux.org/">Polish Linux Distribution</a> has packages of Fuse 1.0.0 and the utilities.</li>
   </ul>
   <p>Packages of older versions of Fuse are also available for some other distributions:</p>
   <ul>
-   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 0.10.0.2 available as <a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/fuse/">emulators/fuse</a>.</li>
    <li><a href="http://www.gentoo.org/">Gentoo</a> users have an <a href="http://packages.gentoo.org/package/app-emulation/fuse?full_cat">ebuild</a> of 0.10.0.2 available.</li>
    <li><a href="http://www.mandriva.com/">Mandriva</a> packages of 0.10.0.2 are available from the <a href="http://plf.zarb.org/">Penguin Liberation Front</a>.</li>
-   <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 0.10.0.2 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse/">emulators/fuse</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-utils/">emulators/fuse-utils</a>.</li>
    <li><a href="http://www.openbsd.org/">OpenBSD</a> users have version 0.10.0.2 available from ports as <a href="http://www.openbsd.org/cgi-bin/cvsweb/ports/emulators/fuse/">ports/emulators/fuse</a>, and <a href="http://www.openbsd.org/cgi-bin/cvsweb/ports/emulators/fuse-utils/">ports/emulators/fuse-utils/</a>, with thanks to Alexander Yurchenko.</li>
    <li><a href="http://www.suse.com/">SuSE</a> users have version 0.10.0.2 as the <a href="https://build.opensuse.org/package/show?package=Fuse&amp;project=Emulators">Fuse</a> package.</li>
   </ul>
@@ -99,7 +99,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <p>A native port to OS X by <a href="mailto:fredm@spamcop.net">Fredrick Meunier</a> is available on its own SourceForge project <a href="http://fuse-for-macosx.sourceforge.net//">here</a>, as well as a Spotlight importer for Mac OS X 10.4 Tiger users. Alternatively, the original version of Fuse will compile on OS X 10.3 (Panther) or later.</p>
 
   <h3>Windows</h3>
-  <p>A port to Windows of 0.10.0.2 by Marek Januszewski and Stuart Brady is available <a href="http://prdownloads.sourceforge.net/fuse-emulator/fuse-0.10.0.2-setup.exe?download">here</a> (<a href="http://prdownloads.sourceforge.net/fuse-emulator/fuse-0.10.0.2-setup.exe.sha1?download">SHA1 hash</a>). This is also mirrored at <a href="http://www.worldofspectrum.org/">World of Spectrum</a>: <a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/pc/windows/fuse-0.10.0.2-setup.exe">Fuse</a> (<a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/pc/windows/fuse-0.10.0.2-setup.exe.sha1">SHA1 hash</a>).</p>
+  <p>A port to Windows of 1.0.0.1 by Sergio Baldovi is available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0.1/fuse-1.0.0.1-win32.zip/download">here</a>, and the utilities are available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.0.0/fuse-utils-1.0.0-win32.zip/download">here</a>.</p>
 
   <h3>AmigaOS 4</h3>
   <p>Chris Young has ported Fuse 0.10.0 to AmigaOS 4, with binaries available from Aminet as <a href="http://aminet.net/package/misc/emu/fuse.lha">misc/emu/fuse.lha</a>.</p>
