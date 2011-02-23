@@ -3513,3 +3513,15 @@
          fake memory bank, leave memory marked as no bank so that it doesn't
          get marked as writable by the writeable ROM option (Fred).
 20110216 ignore fuse.dSYM file (Fred).
+20110220 man/fuse.1,ui/win32/{win32ui.c,win32internals.h,win32display.c,
+         statusbar.c}: updated Win32 UI code to resemble GTK+ UI;
+           - Allow scalers to set window size from menu
+           - Restore scaler after restart
+           - Resize window when machine selection switches between Timex and
+             non-Timex modes
+           - Status bar can be hidden completely from menu and command line
+           - Status bar icons appear in the same order as GTK+ UI
+           - Fix status bar flickering on +2A, +3 and +3e machines due to high
+             refresh rate of disk status
+           - Properly sized status bar icons part on startup
+         (patch #3169039) (Sergio Baldovi).
