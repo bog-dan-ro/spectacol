@@ -90,6 +90,7 @@ static int
 selector_dialog( win32ui_select_info *items );
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
+#define DIM(X) sizeof((X)) / sizeof((X)[0])
 
 static void
 handle_drop( HDROP hDrop )
@@ -620,14 +621,6 @@ menu_help_keyboard( int action )
   win32ui_picture( "keyboard.scr", 0 );
 }
 
-void
-menu_help_about( int action )
-{
-  /* TODO: create a help about window that's more similar to GTK,
-           with a clickable link to the website. */
-  ui_error( UI_ERROR_INFO, "Free Unix Spectrum Emulator (Fuse) %s (c) 1999-2008 Philip Kendall and others. See http://fuse-emulator.sf.net/ for details.", VERSION );
-}
-
 /* Functions to activate and deactivate certain menu items */
 static int
 set_active( HMENU menu, const char *path, int active )
@@ -768,8 +761,8 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
                     hwndDlg, (HMENU) IDCANCEL, fuse_hInstance, 0 );
       SendDlgItemMessage( hwndDlg, IDCANCEL, WM_SETFONT,
                           (WPARAM) h_ms_font, FALSE );
-      
-      pos_y += 54;
+
+      pos_y += 32 + 23 + 5;
       /* the following will only change the size of the window */
       SetWindowPos( hwndDlg, NULL, 0, 0, 177, pos_y,
                     SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
@@ -1008,12 +1001,19 @@ void
 win32ui_process_messages( int process_queue_once )
 {
   MSG msg;
+  int i, processMsg;
+  HWND hModelessDlgs[] = { fuse_hPFWnd, fuse_hDBGWnd, fuse_hABOWnd };
 
   while( 1 ) {
     while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
       /* FIXME: rethink this loop, IsDialogMessage in particular */
-      if( !IsDialogMessage( fuse_hPFWnd, &msg  ) &&
-          !IsDialogMessage( fuse_hDBGWnd, &msg ) ) {
+      processMsg = TRUE;
+
+      for( i = 0; processMsg && i < DIM( hModelessDlgs ); i++) {
+        if( IsDialogMessage( hModelessDlgs[i], &msg ) ) processMsg = FALSE;
+      }
+
+      if( processMsg ) {
         if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
           if( ( LOWORD( msg.message ) == WM_QUIT ) ||
               ( LOWORD( msg.message ) == WM_USER_EXIT_PROCESS_MESSAGES ) )

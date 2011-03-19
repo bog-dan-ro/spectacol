@@ -54,6 +54,9 @@ HWND fuse_hPFWnd;
 /* debugger window handle */
 HWND fuse_hDBGWnd;
 
+/* about window handle */
+HWND fuse_hABOWnd;
+
 /*
  * Display routines (win32display.c)
  */

@@ -31,6 +31,7 @@ win32_icon ICON "winfuse.ico"
 
 #ifdef UI_WIN32
 
+#include "ui/win32/about.rc"            /* reserved ids: 1800 - 1899 */
 #include "ui/win32/binary.rc"           /* reserved ids: 1300 - 1399 */
 #include "ui/win32/browse.rc"           /* reserved ids: 1400 - 1499 */
 #include "ui/win32/debugger.rc"         /* reserved ids: 2000 - 2099 */

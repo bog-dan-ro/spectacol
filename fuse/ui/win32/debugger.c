@@ -112,7 +112,8 @@ static libspectrum_word disassembly_top;
 /* helper constants for disassembly listview's scrollbar */
 static const int disassembly_min = 0x0000;
 static const int disassembly_max = 0xffff;
-static const int disassembly_page = 20;
+static const float disassembly_step = 0.5;
+static int disassembly_page = 20; /* Visual styles could change visible rows */
 
 /* Have we created the above yet? */
 static int dialog_created = 0;
@@ -414,7 +415,11 @@ create_disassembly( HFONT font )
   }
   
   win32ui_set_font( fuse_hDBGWnd, IDC_DBG_LV_PC, font );
-  
+
+  /* Recalculate visible rows, Visual Styles could change rows height */
+  disassembly_page = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC,
+                                         LVM_GETCOUNTPERPAGE, 0, 0 );
+
   /* The disassembly scrollbar */
   SCROLLINFO si;
   si.cbSize = sizeof(si); 
@@ -606,7 +611,6 @@ ui_debugger_update( void )
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_R,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
 
-  /* FIXME: doesnt' look like T-states fits in with monospaced font? */
   _sntprintf( buffer, 80, TEXT( "T-states %5d" ), tstates );
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_T_STATES,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
@@ -847,7 +851,7 @@ update_disassembly()
   LV_ITEM lvi;
   lvi.mask = LVIF_TEXT;
 
-  for( i = 0, address = disassembly_top; i < 20; i++ ) {
+  for( i = 0, address = disassembly_top; i < disassembly_page; i++ ) {
     int l;
     _sntprintf( disassembly_text[0], 40, format_16_bit(), address );
     debugger_disassemble( disassembly_text[1], 40, &length, address );
@@ -949,7 +953,7 @@ move_disassembly( WPARAM scroll_command )
   si.fMask = SIF_POS; 
   GetScrollInfo( GetDlgItem( fuse_hDBGWnd, IDC_DBG_SB_PC ), SB_CTL, &si );
 
-  int value = si.nPos;
+  float value = si.nPos;
   
   /* in Windows we have to read the command and scroll the scrollbar manually */
   switch( LOWORD( scroll_command ) ) {
@@ -960,10 +964,10 @@ move_disassembly( WPARAM scroll_command )
       value = disassembly_min;
       break;
     case SB_LINEDOWN:
-      value++;
+      value += disassembly_step;
       break;
     case SB_LINEUP:
-      value--;
+      value -= disassembly_step;
       break;
     case SB_PAGEUP:
       value -= disassembly_page;
@@ -1094,6 +1098,7 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
         case IDCLOSE:
+        case IDCANCEL:
           win32ui_debugger_done_close();
           return 0;
         case IDC_DBG_BTN_CONT:

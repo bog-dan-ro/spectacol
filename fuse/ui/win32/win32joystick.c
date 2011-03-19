@@ -95,7 +95,11 @@ win32joystick_buttonevent( int which_joystick, int button_down,
 {
   input_event_t event;
   int button = 0;
-  
+
+ /* FIXME: buttons higher than 4 are not catched through window messages.
+    We should use DirectInput. Polling with JoyGetPosEx would take
+    up to 8 milliseconds in analog joysticks (digital joysticks just
+    a few clock cycles) */
   if( wParam & JOY_BUTTON1 ) button = INPUT_JOYSTICK_FIRE_1;
   else if( wParam & JOY_BUTTON2 ) button = INPUT_JOYSTICK_FIRE_2;
   else if( wParam & JOY_BUTTON3 ) button = INPUT_JOYSTICK_FIRE_3;

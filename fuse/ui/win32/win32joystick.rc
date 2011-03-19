@@ -33,7 +33,7 @@ EXSTYLE WS_EX_APPWINDOW
 CAPTION "Fuse - Configure Joystick"
 FONT 8,"Ms Shell Dlg 2",400,0,1
 BEGIN
-    GROUPBOX        "Joystick type",IDC_JOYSTICKS_GROUP_JOYTYPE,0,0,60,85
+    GROUPBOX        "Joystick type",IDC_JOYSTICKS_GROUP_JOYTYPE,0,0,60,125
 
 /* those radio buttons will be created at runtime,
    with the sizes and distances like below
@@ -45,6 +45,7 @@ BEGIN
     RADIOBUTTON     "Sinclair 2",IDC_JOYSTICKS_RADIO_SINCLAIR2,5,50,45,10
     RADIOBUTTON     "Timex 1",IDC_JOYSTICKS_RADIO_TIMEX1,5,60,45,10
     RADIOBUTTON     "Timex 2",IDC_JOYSTICKS_RADIO_TIMEX2,5,70,45,10
+    RADIOBUTTON     "Fuller",IDC_JOYSTICKS_RADIO_FULLER,5,80,45,10
 */
     GROUPBOX        "Button 1",IDC_JOYSTICKS_GROUP_BUTTON1,65,0,115,25
     LTEXT           "Joystick Fire",IDC_JOYSTICKS_STATIC_BUTTON1,70,10,40,12,SS_CENTERIMAGE

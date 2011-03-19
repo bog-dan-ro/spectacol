@@ -46,27 +46,30 @@ foreach( @dialogs ) {
     my $buffer = ""; # needed because we find out the height at the end at the end
     my $optname = uc( "OPT_$_->{name}" );
     my $y = 5;
+    my $y_label = $y;
 
     foreach my $widget ( @{ $_->{widgets} } ) {
 
 	my $text = $widget->{text}; $text =~ s/\((.)\)/&$1/;
 	if( $widget->{type} eq "Checkbox" ) {
-	    $buffer .= sprintf "  AUTOCHECKBOX \"%s\",IDC_%s_%s,5,$y,160,12\n",
+	    $buffer .= sprintf "  AUTOCHECKBOX \"%s\",IDC_%s_%s,5,$y,160,11\n",
 		$text, $optname, uc( $widget->{value}, );
 	    $y += 12;
 	} elsif( $widget->{type} eq "Entry" ) {
-	    $buffer .= sprintf "  LTEXT \"%s\",IDC_%s_LABEL_%s,5,$y,90,12\n",
+	    $y_label = $y + 2;
+	    $buffer .= sprintf "  LTEXT \"%s\",IDC_%s_LABEL_%s,5,$y_label,90,9\n",
 		$text, $optname, uc( $widget->{value} );
-	    $buffer .= sprintf "  EDITTEXT IDC_%s_%s,100,$y,85,10\n",
+	    $buffer .= sprintf "  EDITTEXT IDC_%s_%s,100,$y,85,13\n",
 		$optname, uc( $widget->{value} );
-	    $y += 12;
+	    $y += 14;
 	} elsif( $widget->{type} eq "Combo" ) {
-	    $buffer .= sprintf "  LTEXT \"%s\",IDC_%s_LABEL_%s,5,$y,90,12\n",
+	    $y_label = $y + 2;
+	    $buffer .= sprintf "  LTEXT \"%s\",IDC_%s_LABEL_%s,5,$y_label,90,9\n",
 		$text, $optname, uc( $widget->{value} );
 	    $buffer .= sprintf "  COMBOBOX IDC_%s_%s,100,$y,85,90,"
 	        . "CBS_DROPDOWNLIST | CBS_HASSTRINGS\n",
 		$optname, uc( $widget->{value} );
-	    $y += 12;
+	    $y += 14;
 	} else {
 	    die "Unknown type '$widget->{type}'";
 	}
@@ -75,10 +78,10 @@ foreach( @dialogs ) {
 
     $y += 5;
 
-    $buffer .= sprintf "  DEFPUSHBUTTON \"OK\",IDOK,55,$y,40,13\n", $optname;
-    $buffer .= sprintf "  PUSHBUTTON \"Cancel\",IDCANCEL,100,$y,40,13\n", $optname;
+    $buffer .= sprintf "  DEFPUSHBUTTON \"OK\",IDOK,45,$y,50,14\n", $optname;
+    $buffer .= sprintf "  PUSHBUTTON \"Cancel\",IDCANCEL,100,$y,50,14\n", $optname;
 
-    $y += 13 + 5; #height of the buttons + 5 margin
+    $y += 14 + 5; #height of the buttons + 5 margin
    
     print << "CODE";
 
