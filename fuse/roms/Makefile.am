@@ -36,4 +36,4 @@ ROMS =  128-0.rom 128-1.rom \
 
 pkgdata_DATA = $(ROMS)
 
-EXTRA_DIST = $(ROMS)
+EXTRA_DIST = $(ROMS) README.copyright

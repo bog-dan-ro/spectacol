@@ -3551,3 +3551,4 @@
          README.copyright,gluck.rom,if1-[12].rom,opus.rom,trdos.rom,
          Makefile.am}: remove ROMs that there is no formal permission to
          distribute.
+20110327 roms/Makefile.am: distribute README.copyright.
