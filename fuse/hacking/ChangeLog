@@ -3547,5 +3547,3 @@
             mismatch next OP if the top OP was 2 bytes.
           - Enabled ESC key to close the dialog.
          (patch #3201532) (Sergio Baldovi).
-20110327 configure.in: move windres detection into the Win32 UI block (works
-         around bug #3248008; thanks, Cygnus).

@@ -37,6 +37,23 @@ AM_PROG_LEX
 AC_PROG_YACC
 AC_PROG_LIBTOOL
 
+dnl Check for Win32 resource tool
+AC_CHECK_TOOL(WINDRES, windres, no)
+AC_SUBST(WINDRES)
+if test "$WINDRES" != no; then
+  WINDRES_OBJ="windres.o"
+  define(FUSE_FULL_VERSION,
+         [ifelse(translit(FUSE_VERSION, [0-9]), [.], [FUSE_VERSION[.0.0]],
+                 translit(FUSE_VERSION, [0-9]), [..], [FUSE_VERSION[.0]],
+                 [FUSE_VERSION])])dnl
+  AC_DEFINE([VERSION_WIN32], [translit(FUSE_FULL_VERSION, [.], [,])], [Define version information for win32 executable])
+  FUSE_FULL[]_VERSION=FUSE_FULL_VERSION
+  AC_SUBST(FUSE_FULL[]_VERSION)
+  AM_SUBST_NOTMAKE(FUSE_FULL[]_VERSION)
+fi
+AC_SUBST(WINDRES_OBJ)
+AM_SUBST_NOTMAKE(WINDRES_OBJ)
+
 dnl Generate commandy.h
 YFLAGS="$YFLAGS -d"
 AC_SUBST(YFLAGS)
@@ -85,19 +102,6 @@ if test "$withval" = no; then win32=no; else win32=yes; fi,
 win32=no)
 AC_MSG_RESULT($win32)
 if test "$win32" = yes; then
-  AC_CHECK_TOOL(WINDRES, windres, no)
-  AC_SUBST(WINDRES)
-  if test "$WINDRES" != no; then
-    WINDRES_OBJ="windres.o"
-    define(FUSE_FULL_VERSION,
-           [ifelse(translit(FUSE_VERSION, [0-9]), [.], [FUSE_VERSION[.0.0]],
-                   translit(FUSE_VERSION, [0-9]), [..], [FUSE_VERSION[.0]],
-                   [FUSE_VERSION])])dnl
-    AC_DEFINE([VERSION_WIN32], [translit(FUSE_FULL_VERSION, [.], [,])], [Define version information for win32 executable])
-    FUSE_FULL[]_VERSION=FUSE_FULL_VERSION
-    AC_SUBST(FUSE_FULL[]_VERSION)
-    AM_SUBST_NOTMAKE(FUSE_FULL[]_VERSION)
-  fi
   AC_CHECK_HEADER(windows.h,
                   LIBS="$LIBS -mwindows -lcomctl32 -lwinmm";
                   AC_DEFINE([UI_WIN32], 1, [Defined if Win32 UI in use])
@@ -106,8 +110,6 @@ if test "$win32" = yes; then
                   UI=win32; UI_LIBS="ui/win32/libuiwin32.a",
                   AC_MSG_ERROR([Win32 UI not found]))
 fi
-AC_SUBST(WINDRES_OBJ)
-AM_SUBST_NOTMAKE(WINDRES_OBJ)
 
 dnl Look for svgalib (default=no)
 AC_MSG_CHECKING(whether svgalib UI requested)
