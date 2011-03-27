@@ -53,17 +53,25 @@ AC_CHECK_HEADERS(stdint.h strings.h unistd.h)
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
-dnl Check for Win32 resource tool
-AC_CHECK_TOOL(WINDRES, windres, no)
-AC_SUBST(WINDRES)
-if test "$WINDRES" != no; then
-  WINDRES_OBJ="windres.o"
-  WINDRES_LDFLAGS="-Xlinker windres.o"
-  define(LIBSPECTRUM_FULL_VERSION,
-         [ifelse(translit(LIBSPECTRUM_VERSION, [0-9]), [.], [LIBSPECTRUM_VERSION[.0.0]],
-                 translit(LIBSPECTRUM_VERSION, [0-9]), [..], [LIBSPECTRUM_VERSION[.0]],
-                 [LIBSPECTRUM_VERSION])])dnl
-  AC_DEFINE([VERSION_WIN32], [translit(LIBSPECTRUM_FULL_VERSION, [.], [,])], [Define version information for win32 dll library])
+dnl Check whether to use Windows resource file utility
+AC_MSG_CHECKING(whether to use windres)
+AC_ARG_WITH(windres,
+[  --without-windres       don't use windres],
+if test "$withval" = no; then windres=no; else windres=yes; fi,
+windres=yes)
+AC_MSG_RESULT($windres)
+if test "$windres" = yes; then
+  AC_CHECK_TOOL(WINDRES, windres, no)
+  AC_SUBST(WINDRES)
+  if test "$WINDRES" != no; then
+    WINDRES_OBJ="windres.o"
+    WINDRES_LDFLAGS="-Xlinker windres.o"
+    define(LIBSPECTRUM_FULL_VERSION,
+           [ifelse(translit(LIBSPECTRUM_VERSION, [0-9]), [.], [LIBSPECTRUM_VERSION[.0.0]],
+                   translit(LIBSPECTRUM_VERSION, [0-9]), [..], [LIBSPECTRUM_VERSION[.0]],
+                   [LIBSPECTRUM_VERSION])])dnl
+    AC_DEFINE([VERSION_WIN32], [translit(LIBSPECTRUM_FULL_VERSION, [.], [,])], [Define version information for win32 dll library])
+  fi
 fi
 AC_SUBST(WINDRES_OBJ)
 AM_SUBST_NOTMAKE(WINDRES_OBJ)

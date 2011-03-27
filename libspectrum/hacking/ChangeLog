@@ -805,3 +805,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          Mitchell).
 20110131 sna.c,z80.c: note info loss of SpecDrum info when writing sna or z80
          format snapshots (Fred).
+20110327 configure.in: allow the user to say they do not want to use windres
+         (works around bug #3248008; thanks, Cygnus).
