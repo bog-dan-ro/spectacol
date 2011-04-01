@@ -3556,3 +3556,5 @@
          (works around bug #3248008; thanks, Cygnus).
 20110401 peripherals/disk/{opus,plusd}.c: remove incorrect use of GCC_UNUSED
          (Stuart).
+20110401 fuse.c,ui/{gtk/gtkui.c,widget/menu.c},windres.rc: update copyright
+         dates (Stuart).
