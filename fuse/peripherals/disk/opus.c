@@ -708,7 +708,7 @@ opus_from_snapshot( libspectrum_snap *snap )
 }
 
 static void
-opus_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
+opus_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
   int drive_count = 0;

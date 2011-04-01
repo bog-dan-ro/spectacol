@@ -673,7 +673,7 @@ plusd_from_snapshot( libspectrum_snap *snap )
 }
 
 static void
-plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
+plusd_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
   int drive_count = 0;
