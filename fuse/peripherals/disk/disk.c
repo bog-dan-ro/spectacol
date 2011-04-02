@@ -1830,7 +1830,7 @@ disk_update_tlens( disk_t *d )
 /* open a disk image file, read and convert to our format
  * if preindex != 0 we generate preindex gap if needed
  */
-int
+static int
 disk_open2( disk_t *d, const char *filename, int preindex )
 {
   buffer_t buffer;

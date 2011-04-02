@@ -3563,3 +3563,5 @@
          unittests/unittests.c: add missing #includes (Stuart).
 20110402 peripherals/if1.c,ui/{gtk,widget,win32}/{options,options-header}.pl:
          add missing 'void' in K&R-style parameter lists (Stuart).
+20110402 peripherals/{machines_periph.c,disk/disk.c},sound/blipbuffer.c:
+         add 'static' to function definitions where appropriate (Stuart).

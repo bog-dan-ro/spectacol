@@ -405,7 +405,7 @@ gen_sinc( float *out, int count, double oversample, double treble,
   }
 }
 
-void
+static void
 blip_eq_generate( blip_eq_t * eq, float *out, int count )
 {
   /* lower cutoff freq for narrow kernels with their wider transition band

@@ -34,7 +34,7 @@
 #include "specplus3.h"
 #include "tc2068.h"
 
-void
+static void
 spec_se_memoryport_write( libspectrum_word port GCC_UNUSED,
 			  libspectrum_byte b )
 {
@@ -163,7 +163,7 @@ base_peripherals( void )
 }
 
 /* Peripherals available on the 48K and 128K */
-void
+static void
 base_peripherals_48_128( void )
 {
   base_peripherals();
