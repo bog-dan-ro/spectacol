@@ -304,7 +304,8 @@ init_path_context( path_context *ctx, utils_aux_type type )
 static int
 get_next_path( path_context *ctx )
 {
-  char buffer[ PATH_MAX ], *path_segment, *path2;
+  char buffer[ PATH_MAX ];
+  const char *path_segment, *path2;
 
   switch( (ctx->state)++ ) {
 

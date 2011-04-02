@@ -62,7 +62,8 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "settings.h"
 
 static int
-option_enumerate_combo( char **options, char *value, guint count, int def ) {
+option_enumerate_combo( const char **options, char *value, guint count,
+			int def ) {
   int i;
   if( value != NULL ) {
     for( i = 0; i < count; i++) {
@@ -100,7 +101,7 @@ foreach( @dialogs ) {
 
 		    print << "CODE";
 
-static char * $_->{name}_$widget->{value}_combo[] = {
+static const char *$_->{name}_$widget->{value}_combo[] = {
 CODE
 		    foreach( split( /\|/, $widget->{data1} ) ) {
 			print << "CODE";

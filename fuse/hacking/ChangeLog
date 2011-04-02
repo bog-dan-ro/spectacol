@@ -3565,3 +3565,4 @@
          add missing 'void' in K&R-style parameter lists (Stuart).
 20110402 peripherals/{machines_periph.c,disk/disk.c},sound/blipbuffer.c:
          add 'static' to function definitions where appropriate (Stuart).
+20110402 ui/{gtk,win32}/options.pl,utils.c: add const qualifiers (Stuart).
