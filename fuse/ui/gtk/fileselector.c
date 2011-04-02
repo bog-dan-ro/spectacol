@@ -28,6 +28,7 @@
 #include <gtk/gtk.h>
 
 #include "gtkinternals.h"
+#include "ui/ui.h"
 
 static gchar *current_folder;
 

@@ -32,6 +32,7 @@
 #include "mempool.h"
 #include "peripherals/ula.h"
 #include "settings.h"
+#include "unittests.h"
 
 static int
 contention_test( void )

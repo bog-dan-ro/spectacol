@@ -30,6 +30,7 @@
 #include <libspectrum.h>
 
 #include "machine.h"
+#include "machines.h"
 #include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"

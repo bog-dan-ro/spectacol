@@ -3558,3 +3558,6 @@
          (Stuart).
 20110401 fuse.c,ui/{gtk/gtkui.c,widget/menu.c},windres.rc: update copyright
          dates (Stuart).
+20110402 machines/{machines_periph.c,spec48_ntsc.c},peripherals/disk/crc.c,
+         ui/gtk/fileselector.c,ui/{gtk,widget,win32}/options.pl,
+         unittests/unittests.c: add missing #includes (Stuart).

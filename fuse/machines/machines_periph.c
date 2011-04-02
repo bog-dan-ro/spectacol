@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include "fuse.h"
+#include "machines_periph.h"
 #include "pentagon.h"
 #include "periph.h"
 #include "peripherals/disk/beta.h"
