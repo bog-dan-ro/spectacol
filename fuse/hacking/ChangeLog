@@ -3561,3 +3561,5 @@
 20110402 machines/{machines_periph.c,spec48_ntsc.c},peripherals/disk/crc.c,
          ui/gtk/fileselector.c,ui/{gtk,widget,win32}/options.pl,
          unittests/unittests.c: add missing #includes (Stuart).
+20110402 peripherals/if1.c,ui/{gtk,widget,win32}/{options,options-header}.pl:
+         add missing 'void' in K&R-style parameter lists (Stuart).

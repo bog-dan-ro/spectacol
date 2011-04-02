@@ -638,7 +638,7 @@ port_ctr_in( void )
 */
 
 static int
-read_rs232()
+read_rs232( void )
 {
   if( if1_ula.rs232_buffer <= 0xff ) {	/* we read from the buffer */
     if1_ula.data_in = if1_ula.rs232_buffer;

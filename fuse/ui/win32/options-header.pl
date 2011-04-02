@@ -97,7 +97,7 @@ if( $internal ) {
 	foreach my $widget ( @{ $_->{widgets} } ) {
 	    if( $widget->{type} eq "Combo" ) {
 		print <<"CODE";
-int option_enumerate_$_->{name}_$widget->{value}();
+int option_enumerate_$_->{name}_$widget->{value}( void );
 
 CODE
 	    }

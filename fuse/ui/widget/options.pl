@@ -150,7 +150,7 @@ CODE
 	    }
 		print << "CODE";
 int
-option_enumerate_$_->{name}_$widget->{value}() {
+option_enumerate_$_->{name}_$widget->{value}( void ) {
   return option_enumerate_combo( widget_$widget->{value}_combo,
 				 settings_current.$widget->{value},
 				 $combo_default{$widget->{value}} );

@@ -123,7 +123,7 @@ CODE
 		}
 		print << "CODE";
 int
-option_enumerate_$_->{name}_$widget->{value}() {
+option_enumerate_$_->{name}_$widget->{value}( void ) {
   return option_enumerate_combo( $_->{name}_$widget->{value}_combo,
 				 settings_current.$widget->{value},
 				 $_->{name}_$widget->{value}_combo_count,
