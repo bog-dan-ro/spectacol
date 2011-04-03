@@ -3566,3 +3566,6 @@
 20110402 peripherals/{machines_periph.c,disk/disk.c},sound/blipbuffer.c:
          add 'static' to function definitions where appropriate (Stuart).
 20110402 ui/{gtk,win32}/options.pl,utils.c: add const qualifiers (Stuart).
+20110403 ui/win32/win32ui.c: implement Snap Joystick Prompt. Enable default
+         button, ESC key and the ability to use arrow up/down to cycle (patch
+         #3258533) (Sergio Baldovi).

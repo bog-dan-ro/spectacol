@@ -24,6 +24,7 @@
 */
 
 #include <config.h>
+#include <tchar.h>
 
 #include "debugger/debugger.h"
 #include "display.h"
@@ -89,7 +90,6 @@ static BOOL win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam );
 static int
 selector_dialog( win32ui_select_info *items );
 
-#define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 #define DIM(X) sizeof((X)) / sizeof((X)[0])
 
 static void
@@ -674,8 +674,44 @@ ui_menu_item_set_active( const char *path, int active )
 ui_confirm_joystick_t
 ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
-  STUB;
-  return UI_CONFIRM_JOYSTICK_NONE;
+  win32ui_select_info items;
+  char title[ 80 ];
+  int i;
+  int selected_joystick;
+
+  if( !settings_current.joy_prompt ) return UI_CONFIRM_JOYSTICK_NONE;
+
+  /* Some space to store the radio options in */
+  items.labels = malloc( JOYSTICK_CONN_COUNT * sizeof( char * ) );
+  if( !items.labels ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return UI_CONFIRM_JOYSTICK_NONE;
+  }
+
+  /* Stop emulation */
+  fuse_emulation_pause();
+
+  /* Populate win32ui_select_info */
+  _sntprintf( title, sizeof( title ), "Fuse - Configure %s Joystick",
+	    libspectrum_joystick_name( libspectrum_type ) );
+  items.dialog_title = title;
+  items.length = JOYSTICK_CONN_COUNT; 
+
+  for( i=0; i<JOYSTICK_CONN_COUNT; i++ ) {
+    items.labels[i] = joystick_connection[ i ];
+  }
+
+  items.selected = UI_CONFIRM_JOYSTICK_NONE;
+
+  /* start the joystick select dialog box */
+  selected_joystick = selector_dialog( &items );
+
+  free( items.labels );
+
+  /* And then carry on with emulation again */
+  fuse_emulation_unpause();
+
+  return selected_joystick;
 }
 
 /*
@@ -713,6 +749,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
   int i, pos_y;
   win32ui_select_info *items;
   HWND next_item = NULL;
+  DWORD dwStyle;
 
   switch( uMsg )
   {
@@ -727,9 +764,12 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       pos_y = 8;
       for( i=0; i< items->length; i++ ) {
 
+        dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTORADIOBUTTON;
+        /* Need for WS_GROUP to allow using arrow up/down to cycle thru this group */
+        if( i == 0 ) dwStyle = dwStyle | WS_GROUP;
+
         CreateWindow( TEXT( "BUTTON" ), items->labels[i],
-                      /* no need for WS_GROUP since they're all in the same group */  
-                      WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTORADIOBUTTON,
+                      dwStyle,
                       8, pos_y, 155, 16,
                       hwndDlg, (HMENU) ( IDC_SELECT_OFFSET + i ), fuse_hInstance, 0 );
         SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), WM_SETFONT,
@@ -749,7 +789,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       /* create OK and Cancel buttons */
       pos_y += 6;
       CreateWindow( TEXT( "BUTTON" ), TEXT( "&OK" ),
-                    WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_DEFPUSHBUTTON,
+                    WS_VISIBLE | WS_CHILD | WS_TABSTOP | WS_GROUP | BS_DEFPUSHBUTTON,
                     6, pos_y, 75, 23,
                     hwndDlg, (HMENU) IDOK, fuse_hInstance, 0 );
       SendDlgItemMessage( hwndDlg, IDOK, WM_SETFONT,
@@ -767,11 +807,11 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       SetWindowPos( hwndDlg, NULL, 0, 0, 177, pos_y,
                     SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
       
-      return FALSE;
+      return TRUE;
 
     case WM_SETFONT:
       h_ms_font = (HFONT) wParam;
-      return 0; /* "This message does not return a value." */
+      return TRUE; /* "This message does not return a value." */
 
     case WM_COMMAND:
       if ( HIWORD( wParam ) != BN_CLICKED ) break;
@@ -788,7 +828,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
             if( SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), 
                                     BM_GETCHECK, 0, 0 ) == BST_CHECKED ) {
               EndDialog( hwndDlg, i );
-              return 0;
+              return TRUE;
             }
             i++;
           }
@@ -796,7 +836,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
         }
         case IDCANCEL:
           EndDialog( hwndDlg, GetWindowLong( hwndDlg, GWL_USERDATA ) );
-          return 0;
+          return TRUE;
       }
       /* service clicking radiobuttons */
       /* FIXME should also be checking if wParam < offset + radio count */
@@ -806,7 +846,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
     case WM_DESTROY:
       EndDialog( hwndDlg, GetWindowLong( hwndDlg, GWL_USERDATA ) );
-      return 0;
+      return TRUE;
   }
   return FALSE;
 }
