@@ -3569,3 +3569,5 @@
 20110403 ui/win32/win32ui.c: implement Snap Joystick Prompt. Enable default
          button, ESC key and the ability to use arrow up/down to cycle (patch
          #3258533) (Sergio Baldovi).
+20110403 peripherals/disk/upd_fdc.c: fix compilation warnings (patch #3259355)
+         (Sergio Baldovi and Gergely Szasz).

@@ -759,7 +759,7 @@ start_write_id( upd_fdc *f )
   int i;
   upd_fdc_drive *d = f->current_drive;
 
-  d->fdd.data = d->fdd.data = f->mf ? 0x4e : 0xff;
+  d->fdd.data = f->mf ? 0x4e : 0xff;
   for( i = 40; i > 0; i-- )	/* write 40 GAP byte */
     fdd_read_write_data( &d->fdd, FDD_WRITE );
   if( f->mf )					/* MFM */
@@ -778,7 +778,7 @@ start_write_id( upd_fdc *f )
   d->fdd.data = 0x00fc | ( f->mf ? 0x0000 : 0xff00 );	/* write index mark */
   fdd_read_write_data( &d->fdd, FDD_WRITE );
 
-  d->fdd.data = d->fdd.data = f->mf ? 0x4e : 0xff;	/* postindex GAP */
+  d->fdd.data = f->mf ? 0x4e : 0xff;	/* postindex GAP */
   for( i = 26; i > 0; i-- )	/* write 26 GAP byte */
     fdd_read_write_data( &d->fdd, FDD_WRITE );
   if( f->mf )					/* MFM */
@@ -1040,7 +1040,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
         d->fdd.data = f->crc & 0xff;
         fdd_read_write_data( &d->fdd, FDD_WRITE );	/* write crc2 */
 
-        d->fdd.data = d->fdd.data = f->mf ? 0x4e : 0xff;
+        d->fdd.data = f->mf ? 0x4e : 0xff;
 	for( i = f->data_register[3]; i > 0; i-- ) {	/* GAP */
           fdd_read_write_data( &d->fdd, FDD_WRITE );
 	}
@@ -1049,7 +1049,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       }
       if( f->data_register[2] == 0 ) {	/* finish all sector */
 
-        d->fdd.data = d->fdd.data = f->mf ? 0x4e : 0xff;	/* GAP3 as Intel call this GAP */
+        d->fdd.data = f->mf ? 0x4e : 0xff;	/* GAP3 as Intel call this GAP */
         while( !d->fdd.index )
           fdd_read_write_data( &d->fdd, FDD_WRITE );
 
