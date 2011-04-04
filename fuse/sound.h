@@ -40,14 +40,8 @@ void sound_beeper( int on );
 libspectrum_dword sound_get_effective_processor_speed( void );
 
 extern int sound_enabled;
-extern int sound_enabled_ever;
-extern int sound_freq;
 extern int sound_framesiz;
 extern int sound_stereo;
-extern int sound_stereo_beeper;
-extern int sound_stereo_ay;
-extern int sound_stereo_ay_abc;
-extern int sound_stereo_ay_narrow;
 
 /* The low-level sound interface */
 

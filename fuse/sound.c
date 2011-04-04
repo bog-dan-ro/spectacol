@@ -41,10 +41,11 @@
 
 /* configuration */
 int sound_enabled = 0;		/* Are we currently using the sound card */
-int sound_enabled_ever = 0;	/* if it's *ever* been in use; see
-				   sound_ay_write() and sound_ay_reset() */
 int sound_stereo = 0;		/* true for stereo *output sample* (only) */
-int sound_stereo_ay = 0;	/* local copy of settings_current.stereo_ay */
+
+static int sound_enabled_ever = 0; /* whether sound has *ever* been in use; see
+				      sound_ay_write() and sound_ay_reset() */
+static int sound_stereo_ay = 0;	/* local copy of settings_current.stereo_ay */
 
 /* assume all three tone channels together match the beeper volume (ish).
  * Must be <=127 for all channels; 50+2+(24*3) = 124.
@@ -60,7 +61,6 @@ int sound_stereo_ay = 0;	/* local copy of settings_current.stereo_ay */
  */
 #define AY_CHANGE_MAX		8000
 
-int sound_freq;
 int sound_framesiz;
 
 static int sound_channels;

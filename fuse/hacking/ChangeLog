@@ -3576,3 +3576,5 @@
 20110404 ui/win32/about.rc: fix spelling (Stuart).
 20110404 bitmap.h,peripherals/{disk/{beta.c,opus.[ch],plusd.[ch],upd_fdc.h,
          wd_fdc.[ch]},fuller.h}: update my email address (Stuart).
+20110404 sound.[ch]: make certain variables be private to sound.h and remove
+         unused variables (Stuart).
