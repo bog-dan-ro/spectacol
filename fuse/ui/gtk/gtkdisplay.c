@@ -144,6 +144,7 @@ uidisplay_init( int width, int height )
 {
   int x, y, error;
   libspectrum_dword black;
+  char *machine_name;
 
   gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "expose_event",
                       GTK_SIGNAL_FUNC(gtkdisplay_expose ), NULL );
@@ -169,6 +170,9 @@ uidisplay_init( int width, int height )
         scaler_select_scaler( SCALER_NORMAL );
 
   gtkdisplay_load_gfx_mode();
+
+  machine_name = libspectrum_machine_name( machine_current->machine );
+  gtkstatusbar_update_machine( machine_name );
 
   display_ui_initialised = 1;
 
