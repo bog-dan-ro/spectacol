@@ -21,7 +21,7 @@
 
    Philip: philip-fuse@shadowmagic.org.uk
 
-   Stuart: sdbrady@ntlworld.com
+   Stuart: stuart.brady@gmail.com
 
 */
 
