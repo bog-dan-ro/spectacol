@@ -3573,3 +3573,4 @@
          (Sergio Baldovi and Gergely Szasz).
 20110403 ui/gtk/{gtkdisplay.c,gtkinternals.h,statusbar.c}: add current machine
          name to GTK+ statusbar (patch #3208815) (Sergio Baldovi).
+20110404 ui/win32/about.rc: fix spelling (Stuart).

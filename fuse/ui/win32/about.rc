@@ -36,7 +36,7 @@ FONT 8,"Ms Shell Dlg 2",400,0,1
 {
     CTEXT           "fuse " VERSION, IDC_ABOUT_STATIC_VERSION, 12, 5, 155, 16, SS_CENTER
     CTEXT           "The Free Unix Spectrum Emulator", IDC_ABOUT_STATIC_NAME, 12, 24, 155, 8, SS_CENTER
-    CTEXT           "(c) 1999-2011 Phillip Kendall and others.", IDC_ABOUT_STATIC_COPYRIGHT, 12, 40, 155, 8, SS_CENTER
+    CTEXT           "(c) 1999-2011 Philip Kendall and others.", IDC_ABOUT_STATIC_COPYRIGHT, 12, 40, 155, 8, SS_CENTER
     CTEXT           "http://sourceforge.net/fuse-emulator/", IDC_ABOUT_STATIC_WEBSITE, 12, 56, 155, 8, SS_CENTER|SS_NOTIFY
     DEFPUSHBUTTON   "Close", IDCLOSE, 68, 77, 50, 14
 }
