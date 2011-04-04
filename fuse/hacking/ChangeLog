@@ -3578,3 +3578,4 @@
          wd_fdc.[ch]},fuller.h}: update my email address (Stuart).
 20110404 sound.[ch]: make certain variables be private to sound.h and remove
          unused variables (Stuart).
+20110404 sound.c: add missing 'static' to function definition (Stuart).

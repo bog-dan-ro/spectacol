@@ -121,7 +121,7 @@ sound_get_effective_processor_speed( void )
            settings_current.emulation_speed;
 }
 
-int
+static int
 sound_init_blip( Blip_Buffer **buf, Blip_Synth **synth )
 {
   *buf = new_Blip_Buffer();
