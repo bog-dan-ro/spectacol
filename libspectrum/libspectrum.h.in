@@ -772,7 +772,7 @@ typedef enum libspectrum_rzx_block_id {
 
 } libspectrum_rzx_block_id;
 
-void
+WIN32_DLL void
 libspectrum_rzx_insert_snap( libspectrum_rzx *rzx, libspectrum_snap *snap,
 			     int where );
 
