@@ -64,7 +64,7 @@ sound
 Sound Options
 Checkbox, (S)ound enabled, sound, INPUT_KEY_s
 Checkbox, (L)oading sound, sound_load, INPUT_KEY_l
-Checkbox, (A)Y stereo separation, stereo_ay, INPUT_KEY_a
+Combo, (A)Y stereo separation, stereo_ay, INPUT_KEY_a, *None|ACB|ABC
 Checkbox, (F)orce 8-bit, sound_force_8bit, INPUT_KEY_f
 Combo, Speaker (t)ype, speaker_type, INPUT_KEY_t, *TV speaker|Beeper|Unfiltered
 Entry, A(Y) volume, volume_ay, INPUT_KEY_y, 3, %

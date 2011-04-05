@@ -3583,3 +3583,5 @@
          output is enabled (Stuart).
 20110405 sound.c: avoid calling option_enumerate_sound_speaker_type()
          repeatedly (Stuart).
+20110405 settings.dat,sound.c,ui/options.dat: add support for ABC AY stereo
+         (Stuart).

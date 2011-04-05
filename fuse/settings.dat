@@ -77,7 +77,7 @@ specdrum, boolean, 0
 sound_device, string, NULL, 'd'
 sound, boolean, 1
 sound_load, boolean, 1,, loading-sound
-stereo_ay, boolean, 0,, separation
+stereo_ay, string, NULL,, separation, stereo_ay
 sound_force_8bit, boolean, 0
 sound_freq, numeric, 32000, 'f'
 speaker_type, string, NULL

@@ -61,6 +61,18 @@ static int sound_stereo_ay = 0;	/* local copy of settings_current.stereo_ay */
  */
 #define AY_CHANGE_MAX		8000
 
+/* Stereo separation types:
+ *  * ACB is used in the Melodik interface.
+ *  * ABC stereo is used in the Pentagon/Scorpion.
+ *  * BAC stereo does seem to exist but is quite rare:
+ *      Z80Stealth emulates BAC stereo but that's about all.
+ *  * CAB, BCA and CBA don't get many search results.
+ */
+
+#define SOUND_STEREO_AY_NONE	0
+#define SOUND_STEREO_AY_ACB	1
+#define SOUND_STEREO_AY_ABC	2
+
 int sound_framesiz;
 
 static int sound_channels;
@@ -181,6 +193,10 @@ sound_init( const char *device )
   int ret;
   float hz;
   double treble;
+  Blip_Synth **ay_left_synth;
+  Blip_Synth **ay_mid_synth;
+  Blip_Synth **ay_mid_synth_r;
+  Blip_Synth **ay_right_synth;
 
   /* Allow sound as long as emulation speed is greater than 2%
      (less than that and a single Speccy frame generates more
@@ -190,10 +206,10 @@ sound_init( const char *device )
          settings_current.emulation_speed > 1 ) )
     return;
 
-  sound_stereo_ay = settings_current.stereo_ay;
+  sound_stereo_ay = option_enumerate_sound_stereo_ay();
 
   /* only try for stereo if we need it */
-  if( sound_stereo_ay )
+  if( sound_stereo_ay != SOUND_STEREO_AY_NONE )
     sound_stereo = 1;
 
   ret =
@@ -209,7 +225,6 @@ sound_init( const char *device )
 
   ay_a_synth = new_Blip_Synth();
   blip_synth_set_volume( ay_a_synth, sound_get_volume( settings_current.volume_ay) );
-  blip_synth_set_output( ay_a_synth, left_buf );
   blip_synth_set_treble_eq( ay_a_synth, treble );
 
   ay_b_synth = new_Blip_Synth();
@@ -218,7 +233,6 @@ sound_init( const char *device )
 
   ay_c_synth = new_Blip_Synth();
   blip_synth_set_volume( ay_c_synth, sound_get_volume( settings_current.volume_ay) );
-  blip_synth_set_output( ay_c_synth, left_buf );
   blip_synth_set_treble_eq( ay_c_synth, treble );
 
   specdrum_synth = new_Blip_Synth();
@@ -232,7 +246,7 @@ sound_init( const char *device )
    * rather than using the real ones).
    */
   if( !sound_stereo ) {
-    sound_stereo_ay = 0;
+    sound_stereo_ay = SOUND_STEREO_AY_NONE;
   }
 
   ay_a_synth_r = NULL;
@@ -240,29 +254,58 @@ sound_init( const char *device )
   ay_c_synth_r = NULL;
 
   if( sound_stereo ) {
-    ay_c_synth_r = new_Blip_Synth();
-    blip_synth_set_volume( ay_c_synth_r, sound_get_volume( settings_current.volume_ay ) );
-    blip_synth_set_output( ay_c_synth_r, right_buf );
-    blip_synth_set_treble_eq( ay_c_synth_r, treble );
+    if( sound_stereo_ay == SOUND_STEREO_AY_NONE ) {
+      /* Attach the Blip_Synth's we've already created to the left buffer,
+       * and create an addition Blip_Synth for each channel's right buffer. */
+      blip_synth_set_output( ay_a_synth, left_buf );
+      blip_synth_set_output( ay_b_synth, left_buf );
+      blip_synth_set_output( ay_c_synth, left_buf );
 
-    if( sound_stereo_ay ) {
-      /* stereo with ACB stereo. */
-      blip_synth_set_output( ay_b_synth, right_buf );
-    } else {
       ay_a_synth_r = new_Blip_Synth();
       blip_synth_set_volume( ay_a_synth_r, sound_get_volume( settings_current.volume_ay ) );
       blip_synth_set_output( ay_a_synth_r, right_buf );
       blip_synth_set_treble_eq( ay_a_synth_r, treble );
 
-      blip_synth_set_output( ay_b_synth, left_buf );
-
       ay_b_synth_r = new_Blip_Synth();
       blip_synth_set_volume( ay_b_synth_r, sound_get_volume( settings_current.volume_ay ) );
       blip_synth_set_output( ay_b_synth_r, right_buf );
       blip_synth_set_treble_eq( ay_b_synth_r, treble );
+
+      ay_c_synth_r = new_Blip_Synth();
+      blip_synth_set_volume( ay_c_synth_r, sound_get_volume( settings_current.volume_ay ) );
+      blip_synth_set_output( ay_c_synth_r, right_buf );
+      blip_synth_set_treble_eq( ay_c_synth_r, treble );
+    } else {
+      /* Attach the Blip_Synth's we've already created as appropriate, and
+       * create one more Blip_Synth for the middle channel's right buffer. */
+      if( sound_stereo_ay == SOUND_STEREO_AY_ACB ) {
+        ay_left_synth = &ay_a_synth;
+        ay_mid_synth = &ay_c_synth;
+        ay_mid_synth_r = &ay_c_synth_r;
+        ay_right_synth = &ay_b_synth;
+      } else if ( sound_stereo_ay == SOUND_STEREO_AY_ABC ) {
+        ay_left_synth = &ay_a_synth;
+        ay_mid_synth = &ay_b_synth;
+        ay_mid_synth_r = &ay_b_synth_r;
+        ay_right_synth = &ay_c_synth;
+      } else {
+        ui_error( UI_ERROR_ERROR, "unknown AY stereo separation type: %d", sound_stereo_ay );
+        fuse_abort();
+      }
+
+      blip_synth_set_output( *ay_left_synth, left_buf );
+      blip_synth_set_output( *ay_mid_synth, left_buf );
+      blip_synth_set_output( *ay_right_synth, right_buf );
+
+      *ay_mid_synth_r = new_Blip_Synth();
+      blip_synth_set_volume( *ay_mid_synth_r, sound_get_volume( settings_current.volume_ay ) );
+      blip_synth_set_output( *ay_mid_synth_r, right_buf );
+      blip_synth_set_treble_eq( *ay_mid_synth_r, treble );
     }
   } else {
+    blip_synth_set_output( ay_a_synth, left_buf );
     blip_synth_set_output( ay_b_synth, left_buf );
+    blip_synth_set_output( ay_c_synth, left_buf );
   }
 
   sound_enabled = sound_enabled_ever = 1;
