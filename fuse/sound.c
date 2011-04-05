@@ -180,6 +180,7 @@ sound_init( const char *device )
 {
   int ret;
   float hz;
+  double treble;
 
   /* Allow sound as long as emulation speed is greater than 2%
      (less than that and a single Speccy frame generates more
@@ -204,24 +205,26 @@ sound_init( const char *device )
   if( !sound_init_blip(&left_buf, &left_beeper_synth) ) return;
   if( sound_stereo && !sound_init_blip(&right_buf, &right_beeper_synth) ) return;
 
+  treble = speaker_type[ option_enumerate_sound_speaker_type() ].treble;
+
   ay_a_synth = new_Blip_Synth();
   blip_synth_set_volume( ay_a_synth, sound_get_volume( settings_current.volume_ay) );
   blip_synth_set_output( ay_a_synth, left_buf );
-  blip_synth_set_treble_eq( ay_a_synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+  blip_synth_set_treble_eq( ay_a_synth, treble );
 
   ay_b_synth = new_Blip_Synth();
   blip_synth_set_volume( ay_b_synth, sound_get_volume( settings_current.volume_ay) );
-  blip_synth_set_treble_eq( ay_b_synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+  blip_synth_set_treble_eq( ay_b_synth, treble );
 
   ay_c_synth = new_Blip_Synth();
   blip_synth_set_volume( ay_c_synth, sound_get_volume( settings_current.volume_ay) );
   blip_synth_set_output( ay_c_synth, left_buf );
-  blip_synth_set_treble_eq( ay_c_synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+  blip_synth_set_treble_eq( ay_c_synth, treble );
 
   specdrum_synth = new_Blip_Synth();
   blip_synth_set_volume( specdrum_synth, sound_get_volume( settings_current.volume_specdrum) );
   blip_synth_set_output( specdrum_synth, left_buf );
-  blip_synth_set_treble_eq( specdrum_synth, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+  blip_synth_set_treble_eq( specdrum_synth, treble );
   
   /* important to override these settings if not using stereo
    * (it would probably be confusing to mess with the stereo
@@ -240,7 +243,7 @@ sound_init( const char *device )
     ay_c_synth_r = new_Blip_Synth();
     blip_synth_set_volume( ay_c_synth_r, sound_get_volume( settings_current.volume_ay ) );
     blip_synth_set_output( ay_c_synth_r, right_buf );
-    blip_synth_set_treble_eq( ay_c_synth_r, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+    blip_synth_set_treble_eq( ay_c_synth_r, treble );
 
     if( sound_stereo_ay ) {
       /* stereo with ACB stereo. */
@@ -249,14 +252,14 @@ sound_init( const char *device )
       ay_a_synth_r = new_Blip_Synth();
       blip_synth_set_volume( ay_a_synth_r, sound_get_volume( settings_current.volume_ay ) );
       blip_synth_set_output( ay_a_synth_r, right_buf );
-      blip_synth_set_treble_eq( ay_a_synth_r, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+      blip_synth_set_treble_eq( ay_a_synth_r, treble );
 
       blip_synth_set_output( ay_b_synth, left_buf );
 
       ay_b_synth_r = new_Blip_Synth();
       blip_synth_set_volume( ay_b_synth_r, sound_get_volume( settings_current.volume_ay ) );
       blip_synth_set_output( ay_b_synth_r, right_buf );
-      blip_synth_set_treble_eq( ay_b_synth_r, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
+      blip_synth_set_treble_eq( ay_b_synth_r, treble );
     }
   } else {
     blip_synth_set_output( ay_b_synth, left_buf );

@@ -3581,3 +3581,5 @@
 20110404 sound.c: add missing 'static' to function definition (Stuart).
 20110405 sound.c: set treble on 'right' buffer for AY channel C when stereo
          output is enabled (Stuart).
+20110405 sound.c: avoid calling option_enumerate_sound_speaker_type()
+         repeatedly (Stuart).
