@@ -61,8 +61,14 @@ static libspectrum_byte WorkBuffer[65535];
 
 static int verbose = 0;
 
+static void print_error( const char *format, ... )
+     GCC_PRINTF( 1, 2 );
+
+static void print_verbose( const char *format, ... )
+     GCC_PRINTF( 1, 2 );
+
 static void
-print_error( char *format, ... )
+print_error( const char *format, ... )
 {
   va_list ap;
 
@@ -76,7 +82,7 @@ print_error( char *format, ... )
 }
 
 static void
-print_verbose( char *format, ... )
+print_verbose( const char *format, ... )
 {
   va_list ap;
 

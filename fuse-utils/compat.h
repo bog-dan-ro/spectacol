@@ -26,6 +26,13 @@
 #ifndef FUSE_UTILS_COMPAT_H
 #define FUSE_UTILS_COMPAT_H
 
+/* Remove the gcc-specific incantations if we're not using gcc */
+#ifdef __GNUC__
+#define GCC_PRINTF( fmtstring, args ) __attribute__ ((format( printf, fmtstring, args )))
+#else				/* #ifdef __GNUC__ */
+#define GCC_PRINTF( fmtstring, args )
+#endif				/* #ifdef __GNUC__ */
+
 /* Certain brain damaged operating systems (DOS/Windows) treat text
    and binary files different in open(2) and need to be given the
    O_BINARY flag to tell them it's a binary file */

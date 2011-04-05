@@ -323,3 +323,5 @@
          function support for Windows (patch #3163680) (Sergio Baldovi).
 20110122 audio2tape.h,configure.in: add support for --without-gcrypt flag like
          libspectrum (patch #3163845) (Ooblick).
+20110405 compat.h,snap2tzx.c: add and use Fuse's GCC_PRINTF macro and add
+         missing 'const' to format string parameter (Stuart).
