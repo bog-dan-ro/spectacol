@@ -3579,3 +3579,5 @@
 20110404 sound.[ch]: make certain variables be private to sound.h and remove
          unused variables (Stuart).
 20110404 sound.c: add missing 'static' to function definition (Stuart).
+20110405 sound.c: set treble on 'right' buffer for AY channel C when stereo
+         output is enabled (Stuart).

@@ -240,6 +240,7 @@ sound_init( const char *device )
     ay_c_synth_r = new_Blip_Synth();
     blip_synth_set_volume( ay_c_synth_r, sound_get_volume( settings_current.volume_ay ) );
     blip_synth_set_output( ay_c_synth_r, right_buf );
+    blip_synth_set_treble_eq( ay_c_synth_r, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
 
     if( sound_stereo_ay ) {
       /* stereo with ACB stereo. */
