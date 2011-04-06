@@ -44,7 +44,8 @@ libspectrum_byte if1_port_in( libspectrum_word port, int *attached );
 
 int if1_mdr_insert( int drive, const char *filename );
 int if1_mdr_write( int drive, const char *filename );
-int if1_mdr_eject( int drive, int write );
+int if1_mdr_eject( int drive );
+int if1_mdr_save( int drive, int saveas );
 void if1_mdr_writeprotect( int drive, int wrprot );
 void if1_plug( const char *filename, int what );
 void if1_unplug( int what );

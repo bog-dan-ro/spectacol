@@ -75,7 +75,8 @@ typedef enum beta_drive_number {
 
 int beta_disk_insert( beta_drive_number which, const char *filename,
                        int autoload );
-int beta_disk_eject( beta_drive_number which, int write );
+int beta_disk_eject( beta_drive_number which );
+int beta_disk_save( beta_drive_number which, int saveas );
 int beta_disk_flip( beta_drive_number which, int flip );
 int beta_disk_writeprotect( beta_drive_number which, int wrprot );
 int beta_disk_write( beta_drive_number which, const char *filename );

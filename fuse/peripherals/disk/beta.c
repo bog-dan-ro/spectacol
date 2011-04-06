@@ -422,7 +422,7 @@ beta_disk_insert( beta_drive_number which, const char *filename,
   /* Eject any disk already in the drive */
   if( d->fdd.loaded ) {
     /* Abort the insert if we want to keep the current disk */
-    if( beta_disk_eject( which, 0 ) ) return 0;
+    if( beta_disk_eject( which ) ) return 0;
   }
 
   if( filename ) {
@@ -574,7 +574,7 @@ beta_disk_writeprotect( beta_drive_number which, int wrprot )
 }
 
 int
-beta_disk_eject( beta_drive_number which, int saveas )
+beta_disk_eject( beta_drive_number which )
 {
   wd_fdc_drive *d;
   char drive;
@@ -587,42 +587,32 @@ beta_disk_eject( beta_drive_number which, int saveas )
   if( !d->fdd.loaded )
     return 0;
 
-  if( saveas ) {	/* 1 -> save as.., 2 -> save */
+  if( d->disk.dirty ) {
+    ui_confirm_save_t confirm;
 
-    if( d->disk.filename == NULL ) saveas = 1;
-    if( ui_beta_disk_write( which, 2 - saveas ) ) return 1;
-    d->disk.dirty = 0;
-    return 0;
+    switch( which ) {
+      case BETA_DRIVE_A: drive = 'A'; break;
+      case BETA_DRIVE_B: drive = 'B'; break;
+      case BETA_DRIVE_C: drive = 'C'; break;
+      case BETA_DRIVE_D: drive = 'D'; break;
+      default: drive = '?'; break;
+    }
 
-  } else {
+    confirm = ui_confirm_save(
+      "Disk in Beta drive %c: has been modified.\n"
+      "Do you want to save it?",
+      drive
+    );
 
-    if( d->disk.dirty ) {
-      ui_confirm_save_t confirm;
+    switch( confirm ) {
 
-      switch( which ) {
-	case BETA_DRIVE_A: drive = 'A'; break;
-	case BETA_DRIVE_B: drive = 'B'; break;
-	case BETA_DRIVE_C: drive = 'C'; break;
-	case BETA_DRIVE_D: drive = 'D'; break;
-	default: drive = '?'; break;
-      }
+    case UI_CONFIRM_SAVE_SAVE:
+      if( beta_disk_save( which, 0 ) ) return 1;	/* first save */
+      break;
 
-      confirm = ui_confirm_save(
-	"Disk in Beta drive %c: has been modified.\n"
-	"Do you want to save it?",
-	drive
-      );
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
 
-      switch( confirm ) {
-
-      case UI_CONFIRM_SAVE_SAVE:
-	if( beta_disk_eject( which, 2 ) ) return 1;	/* first save */
-	break;
-
-      case UI_CONFIRM_SAVE_DONTSAVE: break;
-      case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-      }
     }
   }
 
@@ -644,6 +634,25 @@ beta_disk_eject( beta_drive_number which, int saveas )
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT, 0 );
     break;
   }
+  return 0;
+}
+
+int
+beta_disk_save( beta_drive_number which, int saveas )
+{
+  wd_fdc_drive *d;
+
+  if( which >= BETA_NUM_DRIVES )
+    return 1;
+
+  d = &beta_drives[ which ];
+
+  if( !d->fdd.loaded )
+    return 0;
+
+  if( d->disk.filename == NULL ) saveas = 1;
+  if( ui_beta_disk_write( which, saveas ) ) return 1;
+  d->disk.dirty = 0;
   return 0;
 }
 

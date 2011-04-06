@@ -409,7 +409,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
   /* Eject any disk already in the drive */
   if( d->fdd.loaded ) {
     /* Abort the insert if we want to keep the current disk */
-    if( specplus3_disk_eject( which, 0 ) ) return 0;
+    if( specplus3_disk_eject( which ) ) return 0;
   }
 
   if( filename ) {
@@ -466,7 +466,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
 }
 
 int
-specplus3_disk_eject( specplus3_drive_number which, int saveas )
+specplus3_disk_eject( specplus3_drive_number which )
 {
   upd_fdc_drive *d;
 
@@ -478,33 +478,23 @@ specplus3_disk_eject( specplus3_drive_number which, int saveas )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( saveas ) {	/* 1 -> save as.., 2 -> save */
+  if( d->disk.dirty ) {
 
-    if( d->disk.filename == NULL ) saveas = 1;
-    if( ui_plus3_disk_write( which, 2 - saveas ) ) return 1;	/* save as... */
-    d->disk.dirty = 0;
-    return 0;
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "Disk in drive %c has been modified.\n"
+      "Do you want to save it?",
+      which == SPECPLUS3_DRIVE_A ? 'A' : 'B'
+    );
 
-  } else {
+    switch( confirm ) {
 
-    if( d->disk.dirty ) {
+    case UI_CONFIRM_SAVE_SAVE:
+      if( specplus3_disk_save( which, 0 ) ) return 1;   /* first save it...*/
+      break;
 
-      ui_confirm_save_t confirm = ui_confirm_save(
-	"Disk in drive %c has been modified.\n"
-	"Do you want to save it?",
-	which == SPECPLUS3_DRIVE_A ? 'A' : 'B'
-      );
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
 
-      switch( confirm ) {
-
-      case UI_CONFIRM_SAVE_SAVE:
-	if( specplus3_disk_eject( which, 2 ) ) return 1;   /* first save it...*/
-	break;
-
-      case UI_CONFIRM_SAVE_DONTSAVE: break;
-      case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-      }
     }
   }
 
@@ -520,6 +510,25 @@ specplus3_disk_eject( specplus3_drive_number which, int saveas )
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT, 0 );
     break;
   }
+  return 0;
+}
+
+int
+specplus3_disk_save( specplus3_drive_number which, int saveas )
+{
+  upd_fdc_drive *d;
+
+  if( which >= SPECPLUS3_NUM_DRIVES )
+    return 1;
+
+  d = &specplus3_drives[ which ];
+
+  if( d->disk.type == DISK_TYPE_NONE )
+    return 0;
+
+  if( d->disk.filename == NULL ) saveas = 1;
+  if( ui_plus3_disk_write( which, saveas ) ) return 1;
+  d->disk.dirty = 0;
   return 0;
 }
 

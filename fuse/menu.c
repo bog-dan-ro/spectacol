@@ -436,14 +436,36 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
   fuse_emulation_unpause();
 }
 
-/*
-1. menu_media_eject
-2. xxx_disk_eject
-2.a. ui_xxx_disk_write( save )
-2.b. ui_xxx_disk_write( saveas )
-[2.c. ui_xxx_disk_eject( save )]
-*/
 MENU_CALLBACK_WITH_ACTION( menu_media_eject )
+{
+  int which, type;
+
+  ui_widget_finish();
+
+  action--;
+  which = action & 0x00f;
+  type = ( action & 0x0f0 ) >> 4;
+
+  switch( type ) {
+  case 0:
+    specplus3_disk_eject( which );
+    break;
+  case 1:
+    beta_disk_eject( which );
+    break;
+  case 2:
+    plusd_disk_eject( which );
+    break;
+  case 3:
+    if1_mdr_eject( which );
+    break;
+  case 4:
+    opus_disk_eject( which );
+    break;
+  }
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_save )
 {
   int which, saveas, type;
 
@@ -452,23 +474,23 @@ MENU_CALLBACK_WITH_ACTION( menu_media_eject )
   action--;
   which = action & 0x00f;
   type = ( action & 0x0f0 ) >> 4;
-  saveas = ( action & 0xf00 ) >> 8;    /* 0 -> eject, 1 -> save as, 2 -> save */
+  saveas = ( action & 0xf00 ) >> 8;
 
   switch( type ) {
   case 0:
-    specplus3_disk_eject( which, saveas );
+    specplus3_disk_save( which, saveas );
     break;
   case 1:
-    beta_disk_eject( which, saveas );
+    beta_disk_save( which, saveas );
     break;
   case 2:
-    plusd_disk_eject( which, saveas );
+    plusd_disk_save( which, saveas );
     break;
   case 3:
-    if1_mdr_eject( which, saveas );
+    if1_mdr_save( which, saveas );
     break;
   case 4:
-    opus_disk_eject( which, saveas );
+    opus_disk_save( which, saveas );
     break;
   }
 }
@@ -853,38 +875,38 @@ menu_check_media_changed( void )
 
   confirm = tape_close(); if( confirm ) return 1;
 
-  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_A, 0 );
+  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_A );
   if( confirm ) return 1;
 
-  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_B, 0 );
+  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_B );
   if( confirm ) return 1;
 
-  confirm = beta_disk_eject( BETA_DRIVE_A, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_A );
   if( confirm ) return 1;
 
-  confirm = beta_disk_eject( BETA_DRIVE_B, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_B );
   if( confirm ) return 1;
 
-  confirm = beta_disk_eject( BETA_DRIVE_C, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_C );
   if( confirm ) return 1;
 
-  confirm = beta_disk_eject( BETA_DRIVE_D, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_D );
   if( confirm ) return 1;
 
-  confirm = opus_disk_eject( OPUS_DRIVE_1, 0 );
+  confirm = opus_disk_eject( OPUS_DRIVE_1 );
   if( confirm ) return 1;
 
-  confirm = opus_disk_eject( OPUS_DRIVE_2, 0 );
+  confirm = opus_disk_eject( OPUS_DRIVE_2 );
   if( confirm ) return 1;
 
-  confirm = plusd_disk_eject( PLUSD_DRIVE_1, 0 );
+  confirm = plusd_disk_eject( PLUSD_DRIVE_1 );
   if( confirm ) return 1;
 
-  confirm = plusd_disk_eject( PLUSD_DRIVE_2, 0 );
+  confirm = plusd_disk_eject( PLUSD_DRIVE_2 );
   if( confirm ) return 1;
 
   for( i = 0; i < 8; i++ ) {
-    confirm = if1_mdr_eject( i, 0 );
+    confirm = if1_mdr_eject( i );
     if( confirm ) return 1;
   }
 

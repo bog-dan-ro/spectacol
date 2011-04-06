@@ -3585,3 +3585,6 @@
          repeatedly (Stuart).
 20110405 settings.dat,sound.c,ui/options.dat: add support for ABC AY stereo
          (Stuart).
+20110406 machines/specplus3.[ch],menu.[ch],menu_data.dat,
+         peripherals/{disk/{beta,opus,plusd},if1}.[ch]: split saving out of
+         menu_media_eject() and the device-specific eject functions (Stuart).

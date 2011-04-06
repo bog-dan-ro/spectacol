@@ -60,7 +60,8 @@ typedef enum specplus3_drive_number {
 
 int specplus3_disk_insert( specplus3_drive_number which, const char *filename,
                            int autoload );
-int specplus3_disk_eject( specplus3_drive_number which, int save );
+int specplus3_disk_eject( specplus3_drive_number which );
+int specplus3_disk_save( specplus3_drive_number which, int saveas );
 int specplus3_disk_write( specplus3_drive_number which, const char *filename );
 int specplus3_disk_flip( specplus3_drive_number which, int flip );
 int specplus3_disk_writeprotect( specplus3_drive_number which, int wp );

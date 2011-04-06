@@ -86,6 +86,7 @@ MENU_DETAIL( menu_tape_detail );
 MENU_CALLBACK_WITH_ACTION( menu_media_insert_new );
 MENU_CALLBACK_WITH_ACTION( menu_media_insert );
 MENU_CALLBACK_WITH_ACTION( menu_media_eject );
+MENU_CALLBACK_WITH_ACTION( menu_media_save );
 MENU_CALLBACK_WITH_ACTION( menu_media_flip );
 MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect );
 
