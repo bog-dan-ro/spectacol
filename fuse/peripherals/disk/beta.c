@@ -188,7 +188,9 @@ beta_reset( int hard_reset GCC_UNUSED )
 
   event_remove_type( index_event );
 
-  if( !periph_is_active( PERIPH_TYPE_BETA128 ) ) {
+  if( !(periph_is_active( PERIPH_TYPE_BETA128 ) ||
+        periph_is_active( PERIPH_TYPE_BETA128_PENTAGON ) ||
+        periph_is_active( PERIPH_TYPE_BETA128_PENTAGON_LATE )) ) {
     beta_active = 0;
     beta_available = 0;
     return;

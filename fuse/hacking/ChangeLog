@@ -3588,3 +3588,6 @@
 20110406 machines/specplus3.[ch],menu.[ch],menu_data.dat,
          peripherals/{disk/{beta,opus,plusd},if1}.[ch]: split saving out of
          menu_media_eject() and the device-specific eject functions (Stuart).
+20110406 peripherals/disk/beta.c: enable Beta 128 interface for
+         PERIPH_TYPE_BETA128_PENTAGON and PERIPH_TYPE_BETA128_PENTAGON_LATE too
+         (ketmar).
