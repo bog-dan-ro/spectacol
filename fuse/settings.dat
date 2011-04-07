@@ -67,6 +67,7 @@ opus, boolean, 0
 pal_tv2x, boolean, 0
 plusd, boolean, 0
 beta128, boolean, 0
+beta128_48boot, boolean, 1
 late_timings, boolean, 0
 unittests, boolean, 0
 fuller, boolean, 0

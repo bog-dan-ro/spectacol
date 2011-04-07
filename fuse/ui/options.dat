@@ -47,6 +47,7 @@ Checkbox, Di(v)IDE interface, divide_enabled, INPUT_KEY_v
 Checkbox, DivIDE w(r)ite protect, divide_wp, INPUT_KEY_r
 Checkbox, +D i(n)terface, plusd, INPUT_KEY_n
 Checkbox, (B)eta 128 interface, beta128, INPUT_KEY_b
+Checkbox, Beta 128 (a)uto-boot in 48K machines, beta128_48boot, INPUT_KEY_a
 Checkbox, Opus Discovery in(t)erface, opus, INPUT_KEY_t
 Checkbox, S(p)eccyBoot interface, speccyboot, INPUT_KEY_p
 Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d

@@ -236,8 +236,11 @@ beta_reset( int hard_reset GCC_UNUSED )
 
       /* For 48K type machines, the Beta 128 is supposed to be configured
          to start with the Beta ROM paged in (System switch in centre position)
+         but we also allow the settion where the Beta does not auto-boot (System
+         switch is in the off position 3)
          */
-      beta_page();
+      if ( settings_current.beta128_48boot )
+        beta_page();
     }
   }
 

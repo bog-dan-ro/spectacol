@@ -3591,3 +3591,6 @@
 20110406 peripherals/disk/beta.c: enable Beta 128 interface for
          PERIPH_TYPE_BETA128_PENTAGON and PERIPH_TYPE_BETA128_PENTAGON_LATE too
          (ketmar).
+20110407 peripherals/disk/beta.c,settings.dat,ui/options.dat: support the Beta
+         interface setting to not auto-boot the interface on 48K machines 
+         (ketmar).
