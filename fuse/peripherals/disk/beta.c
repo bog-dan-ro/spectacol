@@ -727,6 +727,11 @@ beta_from_snapshot( libspectrum_snap *snap )
 {
   if( !libspectrum_snap_beta_active( snap ) ) return;
 
+  if( !( machine_current->capabilities &
+         LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY ) ) {
+    settings_current.beta128_48boot = libspectrum_snap_beta_autoboot( snap );
+  }
+
   beta_active = libspectrum_snap_beta_paged( snap );
 
   if( beta_active ) {
@@ -793,6 +798,10 @@ beta_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_beta_drive_count( snap, drive_count );
 
   libspectrum_snap_set_beta_paged ( snap, beta_active );
+  if( !( machine_current->capabilities &
+         LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY ) ) {
+    libspectrum_snap_set_beta_autoboot( snap, settings_current.beta128_48boot );
+  }
   libspectrum_snap_set_beta_direction( snap, beta_fdc->direction );
   libspectrum_snap_set_beta_status( snap, f->status_register );
   libspectrum_snap_set_beta_track ( snap, f->track_register );

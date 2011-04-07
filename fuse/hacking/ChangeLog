@@ -3594,3 +3594,5 @@
 20110407 peripherals/disk/beta.c,settings.dat,ui/options.dat: support the Beta
          interface setting to not auto-boot the interface on 48K machines 
          (ketmar).
+20110407 peripherals/disk/beta.c: store Beta 128 autoboot setting in snapshots
+         (Fred).
