@@ -109,6 +109,7 @@ libspectrum_snap_alloc( void )
 
   libspectrum_snap_set_beta_active( snap, 0 );
   libspectrum_snap_set_beta_paged( snap, 0 );
+  libspectrum_snap_set_beta_autoboot( snap, 0 );
   libspectrum_snap_set_beta_drive_count( snap, 0 );
   libspectrum_snap_set_beta_custom_rom( snap, 0 );
   libspectrum_snap_set_beta_direction( snap, 0 );

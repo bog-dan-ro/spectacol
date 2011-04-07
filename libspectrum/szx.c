@@ -139,6 +139,7 @@ static const libspectrum_word ZXSTIF1F_PAGED = 4;
 static const libspectrum_dword ZXSTBETAF_CONNECTED = 1;
 static const libspectrum_dword ZXSTBETAF_CUSTOMROM = 2;
 static const libspectrum_dword ZXSTBETAF_PAGED = 4;
+static const libspectrum_dword ZXSTBETAF_AUTOBOOT = 8;
 static const libspectrum_dword ZXSTBETAF_SEEKLOWER = 16;
 static const libspectrum_dword ZXSTBETAF_COMPRESSED = 32;
 
@@ -444,6 +445,7 @@ read_b128_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   flags = libspectrum_read_dword( buffer );
   libspectrum_snap_set_beta_active( snap, 1 );
   libspectrum_snap_set_beta_paged( snap, flags & ZXSTBETAF_PAGED );
+  libspectrum_snap_set_beta_autoboot( snap, flags & ZXSTBETAF_AUTOBOOT );
   libspectrum_snap_set_beta_direction( snap,
 				       !( flags & ZXSTBETAF_SEEKLOWER ) );
 
@@ -2927,6 +2929,7 @@ write_b128_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   flags = ZXSTBETAF_CONNECTED;	/* Betadisk interface connected */
   if( libspectrum_snap_beta_paged( snap ) ) flags |= ZXSTBETAF_PAGED;
+  if( libspectrum_snap_beta_autoboot( snap ) ) flags |= ZXSTBETAF_AUTOBOOT;
   if( !libspectrum_snap_beta_direction( snap ) ) flags |= ZXSTBETAF_SEEKLOWER;
   if( libspectrum_snap_beta_custom_rom( snap ) ) flags |= ZXSTBETAF_CUSTOMROM;
   if( use_compression ) flags |= ZXSTBETAF_COMPRESSED;

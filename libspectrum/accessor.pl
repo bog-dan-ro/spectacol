@@ -119,6 +119,7 @@ struct libspectrum_snap {
   /* Betadisk status */
   int beta_active;
   int beta_paged;
+  int beta_autoboot;
   int beta_drive_count;
   int beta_custom_rom;
   int beta_direction;	/* FDC seek direction:

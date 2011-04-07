@@ -808,3 +808,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20110327 configure.in: allow the user to say they do not want to use windres
          (works around bug #3248008; thanks, Cygnus).
 20110405 libspectrum.h.in: add missing WIN32_DLL (Stuart).
+20110407 accessor.pl,snap_accessors.txt,snapshot.c,szx.c: add support for Beta
+         128 interface autoboot setting in SZX snapshots (Fred).
