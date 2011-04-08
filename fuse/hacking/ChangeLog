@@ -3596,3 +3596,4 @@
          (ketmar).
 20110407 peripherals/disk/beta.c: store Beta 128 autoboot setting in snapshots
          (Fred).
+20110408 settings.dat: fix name of separation option in config file (Stuart).
