@@ -589,8 +589,9 @@ menu_machine_select( int action )
 
   /* start the machine select dialog box */
   selected_machine = selector_dialog( &items );
-  
-  if( machine_types[ selected_machine ] != machine_current ) {
+
+  if( selected_machine >= 0 &&
+      machine_types[ selected_machine ] != machine_current ) {
     machine_select( machine_types[ selected_machine ]->machine );
   }
 
@@ -676,7 +677,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
   win32ui_select_info items;
   char title[ 80 ];
-  int i;
+  int i, selection;
   int selected_joystick;
 
   if( !settings_current.joy_prompt ) return UI_CONFIRM_JOYSTICK_NONE;
@@ -704,7 +705,9 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
   items.selected = UI_CONFIRM_JOYSTICK_NONE;
 
   /* start the joystick select dialog box */
-  selected_joystick = selector_dialog( &items );
+  selection = selector_dialog( &items );
+
+  selected_joystick = ( selection >= 0 )? selection : UI_CONFIRM_JOYSTICK_NONE;
 
   free( items.labels );
 
@@ -779,8 +782,6 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
         if( i == items->selected ) {
           SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), BM_SETCHECK,
                               BST_CHECKED, 0 );
-          /* remember the default item, and return it in case of cancelling */
-          SetWindowLong( hwndDlg, GWL_USERDATA, i );
         }
 
         pos_y += 16;
@@ -835,7 +836,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
           break; /* program should never reach here */
         }
         case IDCANCEL:
-          EndDialog( hwndDlg, GetWindowLong( hwndDlg, GWL_USERDATA ) );
+          EndDialog( hwndDlg, -1 );
           return TRUE;
       }
       /* service clicking radiobuttons */
@@ -845,7 +846,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       break;
 
     case WM_DESTROY:
-      EndDialog( hwndDlg, GetWindowLong( hwndDlg, GWL_USERDATA ) );
+      EndDialog( hwndDlg, -1 );
       return TRUE;
   }
   return FALSE;
