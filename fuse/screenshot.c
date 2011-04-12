@@ -48,6 +48,9 @@
 #ifdef USE_LIBPNG
 
 #include <png.h>
+#ifdef HAVE_ZLIB_H
+#include <zlib.h>
+#endif				/* #ifdef HAVE_ZLIB_H */
 
 static int get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
 			   size_t height, size_t width );

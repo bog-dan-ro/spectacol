@@ -3597,3 +3597,6 @@
 20110407 peripherals/disk/beta.c: store Beta 128 autoboot setting in snapshots
          (Fred).
 20110408 settings.dat: fix name of separation option in config file (Stuart).
+20110412 configure.in,screenshot.c: libpng 1.5.X no longer internally includes
+         the zlib.h header file, so applications that refer to Z_ constants need
+         to include it explicitly (patch #3283820) (Sergio Baldovi).
