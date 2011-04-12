@@ -325,3 +325,4 @@
          libspectrum (patch #3163845) (Ooblick).
 20110405 compat.h,snap2tzx.c: add and use Fuse's GCC_PRINTF macro and add
          missing 'const' to format string parameter (Stuart).
+20110413 man/tape2wav.1,tape2wav.c: allow writing WAV file to stdout (Fred).
