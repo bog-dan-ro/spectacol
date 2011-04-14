@@ -33,6 +33,7 @@
 #include "memory.h"
 #include "periph.h"
 #include "peripherals/disk/beta.h"
+#include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
 #include "peripherals/ide/divide.h"
@@ -179,6 +180,14 @@ z80_do_opcodes( void )
 
     if( PC == 0x0008 || PC == 0x003a || PC == 0x0066 || PC == 0x028e ) {
       plusd_page();
+    }
+
+    END_CHECK
+
+    CHECK( disciple, disciple_available )
+
+    if( PC == 0x0001 || PC == 0x0008 || PC == 0x0066 || PC == 0x028e ) {
+      disciple_page();
     }
 
     END_CHECK

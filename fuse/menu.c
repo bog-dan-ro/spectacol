@@ -33,6 +33,7 @@
 #include "machines/specplus3.h"
 #include "peripherals/dck.h"
 #include "peripherals/disk/beta.h"
+#include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
 #include "peripherals/ide/divide.h"
@@ -376,6 +377,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert_new )
   case 4:
     opus_disk_insert( which, NULL, 0 );
     break;
+  case 5:
+    disciple_disk_insert( which, NULL, 0 );
+    break;
   }
 }
 
@@ -407,6 +411,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
   case 4:
     snprintf( title, 80, "Fuse - Insert Opus Disk %i", which + 1 );
     break;
+  case 5:
+    snprintf( title, 80, "Fuse - Insert DISCiPLE Disk %i", which + 1 );
+    break;
   default:
     return;
   }
@@ -428,6 +435,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
     break;
   case 4:
     opus_disk_insert( which, filename, 0 );
+    break;
+  case 5:
+    disciple_disk_insert( which, filename, 0 );
     break;
   }
 
@@ -462,6 +472,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_eject )
   case 4:
     opus_disk_eject( which );
     break;
+  case 5:
+    disciple_disk_eject( which );
+    break;
   }
 }
 
@@ -492,6 +505,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_save )
   case 4:
     opus_disk_save( which, saveas );
     break;
+  case 5:
+    disciple_disk_save( which, saveas );
+    break;
   }
 }
 
@@ -516,8 +532,12 @@ MENU_CALLBACK_WITH_ACTION( menu_media_flip )
   case 2:
     plusd_disk_flip( which, flip );
     break;
+  /* No flip option for IF1 */
   case 4:
     opus_disk_flip( which, flip );
+    break;
+  case 5:
+    disciple_disk_flip( which, flip );
     break;
   }
 }
@@ -548,6 +568,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect )
     break;
   case 4:
     opus_disk_writeprotect( which, wrprot );
+    break;
+  case 5:
+    disciple_disk_writeprotect( which, wrprot );
     break;
   }
 
@@ -905,6 +928,12 @@ menu_check_media_changed( void )
   confirm = plusd_disk_eject( PLUSD_DRIVE_2 );
   if( confirm ) return 1;
 
+  confirm = disciple_disk_eject( DISCIPLE_DRIVE_1 );
+  if( confirm ) return 1;
+
+  confirm = disciple_disk_eject( DISCIPLE_DRIVE_2 );
+  if( confirm ) return 1;
+
   for( i = 0; i < 8; i++ ) {
     confirm = if1_mdr_eject( i );
     if( confirm ) return 1;
@@ -1088,6 +1117,22 @@ const char*
 menu_plusd2_detail( void )
 {
   fdd_t *f = plusd_get_fdd( PLUSD_DRIVE_2 );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_disciple1_detail( void )
+{
+  fdd_t *f = disciple_get_fdd( DISCIPLE_DRIVE_1 );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_disciple2_detail( void )
+{
+  fdd_t *f = disciple_get_fdd( DISCIPLE_DRIVE_2 );
 
   return menu_disk_detail( f );
 }

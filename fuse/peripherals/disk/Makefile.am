@@ -31,6 +31,7 @@ INCLUDES = @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@
 
 libdisk_a_SOURCES = beta.c \
 		    crc.c \
+		    disciple.c \
 		    disk.c \
 		    fdd.c \
 		    opus.c \
@@ -40,6 +41,7 @@ libdisk_a_SOURCES = beta.c \
 
 noinst_HEADERS = beta.h \
 		 crc.h \
+		 disciple.h \
 		 disk.h \
 		 fdd.h \
 		 opus.h \

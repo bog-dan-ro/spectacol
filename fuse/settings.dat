@@ -66,6 +66,7 @@ snapsasz80, null, 0
 opus, boolean, 0
 pal_tv2x, boolean, 0
 plusd, boolean, 0
+disciple, boolean, 0
 beta128, boolean, 0
 beta128_48boot, boolean, 1
 late_timings, boolean, 0
@@ -131,6 +132,7 @@ opusdisk_file, string, NULL,, opusdisk
 playback_file, string, NULL, 'p', playback, playbackfile
 plus3disk_file, string, NULL,, plus3disk
 plusddisk_file, string, NULL,, plusddisk
+discipledisk_file, string, NULL,, discipledisk
 betadisk_file, string, NULL,, betadisk
 dck_file, string, NULL,, dock
 if2_file, string, NULL,, if2cart
@@ -216,6 +218,7 @@ rom_speccyboot, string, "speccyboot-1.4.rom",
 rom_interface_i, string, "if1-2.rom",
 rom_opus, string, "opus.rom",
 rom_plusd, string, "plusd.rom",
+rom_disciple, string, "disciple.rom",
 rom_beta128, string, "trdos.rom",
 
 drive_plus3a_type, string, NULL
@@ -227,6 +230,8 @@ drive_beta128c_type, string, NULL
 drive_beta128d_type, string, NULL
 drive_plusd1_type, string, NULL
 drive_plusd2_type, string, NULL
+drive_disciple1_type, string, NULL
+drive_disciple2_type, string, NULL
 drive_opus1_type, string, NULL
 drive_opus2_type, string, NULL
 drive_40_max_track, numeric, 42

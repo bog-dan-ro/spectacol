@@ -3603,3 +3603,7 @@
 20110412 ui/win32/win32ui.c: improve Win32 UI behaviour when cancelling
          selection dialogs (patch #3283822) (Sergio Baldovi).
 20110413 menu_data.dat: remove leading zeroes in eject action values (Stuart).
+20110414 fuse.c,machines/machines_periph.c,man/fuse.1,menu.[ch],menu_data.dat,
+         periph.h,peripherals/disk/{Makefile.am,disciple.[ch]},settings.dat,
+         tape.c,ui.c,ui/{options.dat,ui.h},z80/{coretest.c,z80_checks.h,
+         z80_ops.c}: DISCiPLE emulation (Stuart).

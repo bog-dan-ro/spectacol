@@ -42,6 +42,7 @@ typedef enum periph_type {
   PERIPH_TYPE_BETA128_PENTAGON_LATE, /* Beta128 disk interface as found on later Pentagons */
   PERIPH_TYPE_DIVIDE,         /* DivIDE interface */
   PERIPH_TYPE_PLUSD,          /* +D disk interface */
+  PERIPH_TYPE_DISCIPLE,       /* DISCiPLE disk interface */
   PERIPH_TYPE_FULLER,         /* Fuller box */
   PERIPH_TYPE_INTERFACE1,     /* Interface 1 */
   PERIPH_TYPE_INTERFACE2,     /* Interface 2 */

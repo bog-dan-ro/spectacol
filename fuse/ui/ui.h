@@ -37,6 +37,7 @@
 #include "compat.h"
 #include "machines/specplus3.h"
 #include "peripherals/disk/beta.h"
+#include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
 #include "ui/scaler/scaler.h"
@@ -119,6 +120,7 @@ int ui_plus3_disk_write( specplus3_drive_number which, int saveas );
 int ui_beta_disk_write( beta_drive_number which, int saveas );
 int ui_opus_disk_write( opus_drive_number which, int saveas );
 int ui_plusd_disk_write( plusd_drive_number which, int saveas );
+int ui_disciple_disk_write( disciple_drive_number which, int saveas );
 int ui_mdr_write( int which, int saveas );
 
 /* Get a rollback point from the given list */
@@ -190,6 +192,15 @@ typedef enum ui_menu_item {
   UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
   UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_FLIP_SET,
   UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
+  UI_MENU_ITEM_MEDIA_DISK_DISCIPLE,
+  UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1,
+  UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_FLIP_SET,
+  UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_WP_SET,
+  UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2,
+  UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_FLIP_SET,
+  UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_WP_SET,
   UI_MENU_ITEM_MEDIA_DISK_OPUS,
   UI_MENU_ITEM_MEDIA_DISK_OPUS_1,
   UI_MENU_ITEM_MEDIA_DISK_OPUS_1_EJECT,

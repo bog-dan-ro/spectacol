@@ -336,6 +336,32 @@ Media/Disk/+D/Drive 2/Write _protect, Branch
 Media/Disk/+D/Drive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x122
 Media/Disk/+D/Drive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x022
 
+Media/Disk/DISC_iPLE, Branch
+Media/Disk/DISCiPLE/Drive _1, Branch,,,menu_disciple1_detail
+Media/Disk/DISCiPLE/Drive 1/Insert _New, Item,, menu_media_insert_new,, 0x51
+Media/Disk/DISCiPLE/Drive 1/_Insert..., Item,, menu_media_insert,, 0x51
+Media/Disk/DISCiPLE/Drive 1/_Eject, Item,, menu_media_eject,, 0x51
+Media/Disk/DISCiPLE/Drive 1/_Save, Item,, menu_media_save,, 0x051
+Media/Disk/DISCiPLE/Drive 1/Save _As..., Item,, menu_media_save,, 0x151
+Media/Disk/DISCiPLE/Drive 1/_Flip disk, Branch
+Media/Disk/DISCiPLE/Drive 1/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x151
+Media/Disk/DISCiPLE/Drive 1/Flip disk/Turn _back, Item,, menu_media_flip,, 0x051
+Media/Disk/DISCiPLE/Drive 1/Write _protect, Branch
+Media/Disk/DISCiPLE/Drive 1/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x151
+Media/Disk/DISCiPLE/Drive 1/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x051
+Media/Disk/DISCiPLE/Drive _2, Branch,,,menu_disciple2_detail
+Media/Disk/DISCiPLE/Drive 2/Insert _New, Item,, menu_media_insert_new,, 0x52
+Media/Disk/DISCiPLE/Drive 2/_Insert..., Item,, menu_media_insert,, 0x52
+Media/Disk/DISCiPLE/Drive 2/_Eject, Item,, menu_media_eject,, 0x52
+Media/Disk/DISCiPLE/Drive 2/_Save, Item,, menu_media_save,, 0x052
+Media/Disk/DISCiPLE/Drive 2/Save _As..., Item,, menu_media_save,, 0x152
+Media/Disk/DISCiPLE/Drive 2/_Flip disk, Branch
+Media/Disk/DISCiPLE/Drive 2/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x152
+Media/Disk/DISCiPLE/Drive 2/Flip disk/Turn _back, Item,, menu_media_flip,, 0x052
+Media/Disk/DISCiPLE/Drive 2/Write _protect, Branch
+Media/Disk/DISCiPLE/Drive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x152
+Media/Disk/DISCiPLE/Drive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x052
+
 Media/Disk/_Opus, Branch
 Media/Disk/Opus/Drive _1, Branch,,,menu_opus1_detail
 Media/Disk/Opus/Drive 1/Insert _New, Item,, menu_media_insert_new,, 0x41

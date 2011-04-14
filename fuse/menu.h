@@ -142,6 +142,8 @@ MENU_DETAIL( menu_opus1_detail );
 MENU_DETAIL( menu_opus2_detail );
 MENU_DETAIL( menu_plusd1_detail );
 MENU_DETAIL( menu_plusd2_detail );
+MENU_DETAIL( menu_disciple1_detail );
+MENU_DETAIL( menu_disciple2_detail );
 MENU_CALLBACK_WITH_ACTION( menu_options_joysticks_select );
 MENU_DETAIL( menu_keyboard_joystick_detail );
 MENU_DETAIL( menu_joystick_1_detail );

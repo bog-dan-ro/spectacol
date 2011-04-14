@@ -551,6 +551,9 @@ trap_check_rom( void )
   if( plusd_available && plusd_active )
     return 0;		/* +D must not be active */
 
+  if( disciple_available && disciple_active )
+    return 0;		/* DISCiPLE must not be active */
+
   if( opus_available && opus_active )
     return 0;		/* Opus must not be active */
 

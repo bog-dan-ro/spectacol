@@ -287,6 +287,7 @@ static int fuse_init(int argc, char **argv)
   if( beta_init() ) return 1;
   if( opus_init() ) return 1;
   if( plusd_init() ) return 1;
+  if( disciple_init() ) return 1;
   if( fdd_init_events() ) return 1;
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;
@@ -827,6 +828,7 @@ static int fuse_end(void)
   divide_end();
   opus_end();
   plusd_end();
+  disciple_end();
 
   machine_end();
 

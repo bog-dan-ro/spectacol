@@ -46,6 +46,7 @@ Checkbox, ZXCF up(l)oad, zxcf_upload, INPUT_KEY_l
 Checkbox, Di(v)IDE interface, divide_enabled, INPUT_KEY_v
 Checkbox, DivIDE w(r)ite protect, divide_wp, INPUT_KEY_r
 Checkbox, +D i(n)terface, plusd, INPUT_KEY_n
+Checkbox, DISCiPLE interf(a)ce, disciple, INPUT_KEY_a
 Checkbox, (B)eta 128 interface, beta128, INPUT_KEY_b
 Checkbox, Beta 128 (a)uto-boot in 48K machines, beta128_48boot, INPUT_KEY_a
 Checkbox, Opus Discovery in(t)erface, opus, INPUT_KEY_t
@@ -83,6 +84,8 @@ Combo, Beta 128 Drive (C), drive_beta128c_type, INPUT_KEY_c, Disabled|Single-sid
 Combo, Beta 128 Drive (D), drive_beta128d_type, INPUT_KEY_d, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, +D Drive (1), drive_plusd1_type, INPUT_KEY_1, Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, +D Drive (2), drive_plusd2_type, INPUT_KEY_2, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
+Combo, DISCiPLE Drive (1), drive_disciple1_type, INPUT_KEY_1, Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
+Combo, DISCiPLE Drive (2), drive_disciple2_type, INPUT_KEY_2, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, (O)pus Drive 1, drive_opus1_type, INPUT_KEY_o, *Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
 Combo, O(p)us Drive 2, drive_opus2_type, INPUT_KEY_p, Disabled|*Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
 Combo, (T)ry merge 'B' side of disks, disk_try_merge, INPUT_KEY_t, Never|*With single-sided drives|Always

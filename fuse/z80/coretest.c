@@ -471,6 +471,15 @@ plusd_page( void )
   abort();
 }
 
+int disciple_available = 0;
+int disciple_active = 0;
+
+void
+disciple_page( void )
+{
+  abort();
+}
+
 void
 if1_page( void )
 {

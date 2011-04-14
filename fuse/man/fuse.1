@@ -57,10 +57,10 @@ partly supported (enough for multi-load games); however, loading of
 the old DAT-file variant is not. DSK, UDI, FDI, TR0, SDF, MGT, IMG, 
 SAD, TRD, SCL and OPD disk images are supported when a disk interface
 is being emulated, including the integrated disk drives on +3, 
-Pentagon or Scorpion machines as well as the +D, Opus Discovery and 
-Beta 128 interfaces. DCK cartridge images are supported when 
-emulating a Timex 2068 variant. Interface II ROM cartridges are also 
-supported.
+Pentagon or Scorpion machines as well as the +D, DISCiPLE,
+Opus Discovery and Beta 128 interfaces. DCK cartridge images are
+supported when emulating a Timex 2068 variant. Interface II ROM
+cartridges are also supported.
 .PP
 Finally, there is also support for reading and writing the RZX input recording
 format.
@@ -205,6 +205,13 @@ automatically. (Enabled by default, but you can use
 .RI ` \-\-no\-detect\-loader '
 to disable). Same as the General Options dialog's
 .I "Detect loaders"
+option.
+.RE
+.PP
+.I \-\-disciple
+.RS
+Emulate a DISCiPLE interface. Same as the Peripherals Options dialog's
+.I "DISCiPLE interface"
 option.
 .RE
 .PP
@@ -635,6 +642,8 @@ Specify an RZX file to begin recording to.
 .br
 .I "\-\-rom\-plusd file"
 .br
+.I "\-\-rom\-disciple file"
+.br
 .I "\-\-rom\-beta128 file"
 .br
 .I "\-\-rom\-speccyboot file"
@@ -668,6 +677,8 @@ the Interface I ROM
 .RI ( if1\-2.rom ),
 the Opus Discovery ROM
 .RI ( opus.rom ),
+the DISCiPLE ROM
+.RI ( disciple.rom ),
 the +D ROM
 .RI ( plusd.rom ),
 the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
@@ -1868,6 +1879,13 @@ If this option is selected, Fuse will emulate the +D interface.  See the
 section for more details.
 .RE
 .PP
+.I "DISCiPLE interface"
+.RS
+If this option is selected, Fuse will emulate the DISCiPLE interface.  See the
+.B "DISCiPLE EMULATION"
+section for more details.
+.RE
+.PP
 .I "Beta 128 interface"
 .RS
 If this option is selected, Fuse will emulate the Beta 128 interface.
@@ -2241,10 +2259,15 @@ you close the window.
 .RS
 Sends a non-maskable interrupt to the emulated Spectrum. Due to a typo
 in the standard 48K ROM, this will cause a reset, but modified ROMs are 
-available which make use of this feature. When the +D is emulated, this
-is used to access the +D's screenshot and snapshot features (see the
+available which make use of this feature. When the +D (or DISCiPLE) is
+emulated, this is used to access the +D (or DISCiPLE)'s screenshot and
+snapshot features (see the
 .B "+D EMULATION"
-section below).
+and
+.B "DISCiPLE EMULATION"
+sections below).  Note that GDOS on the DISCiPLE contains a bug which
+causes corruption of saved snapshots, and a failure to return from the
+NMI menu correctly.  This bug is not present in G+DOS on the +D.
 .RE
 .PP
 .I F7
@@ -2431,14 +2454,15 @@ as the RS-232 TxD or RxD wire.
 .I "Media, Disk"
 .RS
 Virtual floppy disk images are accessible when emulating a +3, +3e,
-Pentagon or Scorpion, or when the Beta 128, Opus Discovery or +D interface
-options are enabled and a machine compatible with the chosen interface is
-selected. (See
+Pentagon or Scorpion, or when the Beta 128, Opus Discovery, +D or
+DISCiPLE interface options are enabled and a machine compatible with
+the chosen interface is selected. (See
 .BR "THE .DSK FORMAT" ,
 .B "BETA 128 EMULATION"
 .B "OPUS DISCOVERY EMULATION"
-and
 .B "+D EMULATION"
+and
+.B "DISCiPLE EMULATION"
 sections below for notes on the file formats supported).
 .PP
 Once again, any changes made to a disk image will not affect the file
@@ -2563,6 +2587,25 @@ As above, but for the emulated Opus Discovery drives.
 .I "Media, Disk, +D, Drive 2, ..."
 .RS
 As above, but for the emulated +D drives.
+.RE
+.PP
+.I "Media, Disk, DISCiPLE, Drive 1, Insert New"
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Insert..."
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Eject"
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Save"
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Save as..."
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Write protect, Enable"
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Write protect, Disable"
+.br
+.I "Media, Disk, DISCiPLE, Drive 2, ..."
+.RS
+As above, but for the emulated DISCiPLE drives.
 .RE
 .PP
 .I "Media, Cartridge, Timex Dock, Insert..."
@@ -2906,9 +2949,9 @@ Serial printer (text-only)
 .IR +2A ", " +3
 Parallel printer (text-only)
 .PP
-If Opus Discovery or +D emulation is in use and printer emulation is enabled,
-text-only emulation of the disk interface's parallel printer interface is
-provided.
+If Opus Discovery, +D or DISCiPLE emulation is in use and printer
+emulation is enabled, text-only emulation of the disk interface's
+parallel printer interface is provided.
 .PP
 Any printout is appended to one (or both) of two files, depending on
 the printer \- these default to
@@ -3582,9 +3625,43 @@ if printer emulation is enabled.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH DISCiPLE EMULATION
+.PP
+Fuse supports emulating the DISCiPLE disk and printer interface, although
+it does not currently support emulation of the Sinclair Network, or
+support emulation of a DISCiPLE attached to a 128K machine. See the
+.B "DISK FILE FORMATS"
+section for mode details on supported disk file formats, which are the
+same as for +D emulation as described above. The DISCiPLE's
+printer port is emulated. (See the
+.B "PRINTER EMULATION"                                             
+section for more details.) The DISCiPLE may only be
+used with 48K emulation at present.  To access disks, you will first
+need to load GDOS, by inserting a disk containing the DOS file (SYS) and
+entering "RUN".  Once DOS is loaded, you can load to/from DISCiPLE disks
+by prefixing filenames with
+.RI `d n '
+where
+.RI ` n '
+is the number of the drive in use.  For example,
+.RI ` "LOAD d1\(dqmyfile\(dq" '
+would load the file named `myfile' from the emulated drive 1.
+Microdrive syntax may also be used.
+.PP
+Snapshots can be saved in the same manner as with the +D as described
+above, but note that GDOS on the DISCiPLE contains a bug which causes
+corruption in any saved snapshots, and incorrect restoration of saved
+snapshots, even if saved on a +D.  This bug is not present in G+DOS
+on the +D.  (Note: this was caused by saving/restoring the AF register
+twice in the NMI handler, where both AF and the AF\(aq shadow register
+should have been saved/restored.)
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH DISK FILE FORMATS
 .PP
-Fuse supports several disk image formats in its +D and Beta 128 emulation.
+Fuse supports several disk image formats in its +D, DISCiPLE and
+Beta 128 emulation.
 .PP
 For reading:
 .PP
@@ -3702,8 +3779,8 @@ recording files can be read from files compressed with
 or
 .IR gzip (3)
 just as if they were uncompressed.
-There is currently no support for reading compressed +3, +D or Beta
-disk images.
+There is currently no support for reading compressed +3, DISCiPLE/+D
+or Beta disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -3797,8 +3874,8 @@ Matthew Westcott wrote the AY logging code and the DivIDE emulation.
 Marek Januszewski wrote various bits of code to make Fuse work under
 Win32, including the DirectDraw user interface.
 .PP
-Stuart Brady wrote the +D emulation, Scorpion emulation and the HP-UX
-sound code.
+Stuart Brady wrote the DISCiPLE and +D emulation, Scorpion emulation
+and the HP-UX sound code.
 .PP
 Garry Lancaster wrote the 8-bit IDE, ZXATASP and ZXCF interface
 emulations.
