@@ -3607,3 +3607,4 @@
          periph.h,peripherals/disk/{Makefile.am,disciple.[ch]},settings.dat,
          tape.c,ui.c,ui/{options.dat,ui.h},z80/{coretest.c,z80_checks.h,
          z80_ops.c}: DISCiPLE emulation (Stuart).
+20110414 disciple.c: avoid C++/C99 comments (Stuart).
