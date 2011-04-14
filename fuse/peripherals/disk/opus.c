@@ -2,7 +2,7 @@
    Copyright (c) 1999-2009 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Dmitry Sanarin, Darren Salt, Michael D Wynne, Gergely Szasz
 
-   $Id: opus.c 4012 2009-04-16 12:42:14Z fredm $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
