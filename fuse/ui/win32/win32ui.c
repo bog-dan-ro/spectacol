@@ -635,7 +635,7 @@ set_active( HMENU menu, const char *path, int active )
   menu_count = GetMenuItemCount( menu );
   for( i = 0; i < menu_count; i++ ) {
 
-    if( GetMenuString( menu, i, menu_text, 255, MF_BYPOSITION ) == 0 ) return 1;
+    if( GetMenuString( menu, i, menu_text, 255, MF_BYPOSITION ) == 0 ) continue;
 
     const char *p = menu_text, *q = path;
 
