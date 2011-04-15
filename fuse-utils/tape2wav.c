@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -186,6 +187,11 @@ write_tape( char *filename, libspectrum_tape *tape )
       afFreeFileSetup( setup );
       return 1;
     }
+
+#ifdef WIN32
+    setmode( fd, O_BINARY );
+#endif				/* #ifdef WIN32 */
+
     file = afOpenFD( fd, "w", setup );
   } else {
     file = afOpenFile( filename, "w", setup );
