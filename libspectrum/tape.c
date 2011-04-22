@@ -372,7 +372,8 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
     case LIBSPECTRUM_TAPE_BLOCK_JUMP:
       error = jump_blocks( tape, block->types.jump.offset );
       if( error ) return error;
-      *tstates = 0; end_of_block = 1; no_advance = 1;
+      *tstates = 0; *flags |= LIBSPECTRUM_TAPE_FLAGS_NO_EDGE; end_of_block = 1;
+      no_advance = 1;
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:
@@ -380,7 +381,7 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
         it->loop_block = it->current_block->next;
         it->loop_count = block->types.loop_start.count;
       }
-      *tstates = 0; end_of_block = 1;
+      *tstates = 0; *flags |= LIBSPECTRUM_TAPE_FLAGS_NO_EDGE; end_of_block = 1;
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
@@ -392,7 +393,7 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
           it->loop_block = NULL;
         }
       }
-      *tstates = 0; end_of_block = 1;
+      *tstates = 0; *flags |= LIBSPECTRUM_TAPE_FLAGS_NO_EDGE; end_of_block = 1;
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_STOP48:
@@ -409,7 +410,7 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
     case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
-      *tstates = 0; end_of_block = 1;
+      *tstates = 0; *flags |= LIBSPECTRUM_TAPE_FLAGS_NO_EDGE; end_of_block = 1;
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:

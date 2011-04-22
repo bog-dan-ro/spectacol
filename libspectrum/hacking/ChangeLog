@@ -812,3 +812,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          128 interface autoboot setting in SZX snapshots (Fred).
 20110422 tape_block.c: ROM block duration didn't take into account pilot and
          sync pulses (Fred).
+20110422 tape.c: don't expect an edge for a jump, group start/end, loop
+         start/end or other non-audio blocks (Fred).
