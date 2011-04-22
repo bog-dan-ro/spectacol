@@ -498,6 +498,13 @@ rom_block_length( libspectrum_tape_rom_block *rom )
   libspectrum_dword length = convert_ms_to_tstates( rom->pause );
   size_t i;
 
+  size_t edge_count = rom->length && rom->data[0] & 0x80 ?
+                      LIBSPECTRUM_TAPE_PILOTS_DATA           :
+                      LIBSPECTRUM_TAPE_PILOTS_HEADER;
+  length += LIBSPECTRUM_TAPE_TIMING_PILOT * edge_count;
+  length += LIBSPECTRUM_TAPE_TIMING_SYNC1;
+  length += LIBSPECTRUM_TAPE_TIMING_SYNC2;
+
   for( i = 0; i < rom->length; i++ ) {
     libspectrum_byte data = rom->data[ i ];
     length += convert_pulses_to_tstates( LIBSPECTRUM_TAPE_TIMING_DATA1,

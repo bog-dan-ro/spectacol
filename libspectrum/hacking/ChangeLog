@@ -810,3 +810,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20110405 libspectrum.h.in: add missing WIN32_DLL (Stuart).
 20110407 accessor.pl,snap_accessors.txt,snapshot.c,szx.c: add support for Beta
          128 interface autoboot setting in SZX snapshots (Fred).
+20110422 tape_block.c: ROM block duration didn't take into account pilot and
+         sync pulses (Fred).
