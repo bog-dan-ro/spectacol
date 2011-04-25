@@ -3610,3 +3610,4 @@
 20110414 disciple.c: avoid C++/C99 comments (Stuart).
 20110415 ui/win32/win32ui.c: fix the disabling of menu entries below a separator,
          e.g., /File/Movie/Stop Movie Recording (patch #3286195) (Sergio Baldovi).
+20110425 ui/gtk/{gtkdisplay.c,gtkinternals.h,statusbar.c}: fix warnings.

@@ -152,7 +152,7 @@ extern char *gtkpixmap_mouse_active[];
 
 int gtkstatusbar_create( GtkBox *parent );
 int gtkstatusbar_set_visibility( int visible );
-void gtkstatusbar_update_machine( char *name );
+void gtkstatusbar_update_machine( const char *name );
 
 /*
  * Scrolling for GtkCList widgets

@@ -142,7 +142,7 @@ gtkstatusbar_set_visibility( int visible )
 }
 
 void
-gtkstatusbar_update_machine( char *name )
+gtkstatusbar_update_machine( const char *name )
 {
   gtk_label_set( GTK_LABEL( machine_name ), name );
 }
