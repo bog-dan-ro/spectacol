@@ -828,3 +828,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          conversions (Fred).
 20110427 z80.c: initialise machine_type to avoid a warning (Fred).
 20110427 test/test.c: test needed updating for ROM block duration fix (Fred).
+20110427 tzx_read.c: message time in the TZX is in seconds not ms (Fred).

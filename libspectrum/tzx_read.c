@@ -865,8 +865,8 @@ tzx_read_message( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_MESSAGE );
 
-  /* Get the time */
-  libspectrum_set_pause_ms( block, **ptr ); (*ptr)++;
+  /* Get the time in seconds */
+  libspectrum_set_pause_ms( block, (**ptr) * 1000 ); (*ptr)++;
 
   /* Get the message itself */
   error = tzx_read_string( ptr, end, &text );
