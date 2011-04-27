@@ -1121,7 +1121,16 @@ int offset				JUMP
 
 int offsets[]				SELECT
 
-libspectrum_dword pause			MESSAGE
+libspectrum_dword pause			GENERALISED_DATA
+					MESSAGE
+					PAUSE
+					PURE_DATA
+					RAW_DATA
+					ROM
+					TURBO
+
+libspectrum_dword pause_tstates		GENERALISED_DATA
+					MESSAGE
 					PAUSE
 					PURE_DATA
 					RAW_DATA

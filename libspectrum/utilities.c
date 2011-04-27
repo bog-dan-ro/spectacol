@@ -48,12 +48,15 @@ libspectrum_set_pause_ms( libspectrum_tape_block *block,
                           libspectrum_dword pause_ms )
 {
   libspectrum_tape_block_set_pause( block, pause_ms );
+  libspectrum_tape_block_set_pause_tstates( block,
+                                        libspectrum_ms_to_tstates( pause_ms ) );
 }
 
 void
 libspectrum_set_pause_tstates( libspectrum_tape_block *block,
                                libspectrum_dword pause_tstates )
 {
+  libspectrum_tape_block_set_pause_tstates( block, pause_tstates );
   libspectrum_tape_block_set_pause( block,
                                   libspectrum_tstates_to_ms( pause_tstates ) );
 }

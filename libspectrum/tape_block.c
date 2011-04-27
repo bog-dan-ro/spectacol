@@ -486,7 +486,7 @@ convert_pulses_to_tstates( libspectrum_dword set_bit_length,
 static libspectrum_dword
 rom_block_length( libspectrum_tape_rom_block *rom )
 {
-  libspectrum_dword length = libspectrum_ms_to_tstates( rom->pause );
+  libspectrum_dword length = rom->pause_tstates;
   size_t i;
 
   size_t edge_count = rom->length && rom->data[0] & 0x80 ?
@@ -513,7 +513,7 @@ turbo_block_length( libspectrum_tape_turbo_block *turbo )
   libspectrum_dword length =
     turbo->pilot_pulses * turbo->pilot_length +
     turbo->sync1_length + turbo->sync2_length +
-    libspectrum_ms_to_tstates( turbo->pause );
+    turbo->pause_tstates;
   size_t i;
   if( turbo->length ) {
     int bits_set_in_last_byte =
@@ -552,7 +552,7 @@ pulses_block_length( libspectrum_tape_pulses_block *pulses )
 static libspectrum_dword
 pure_data_block_length( libspectrum_tape_pure_data_block *pure_data )
 {
-  libspectrum_dword length = libspectrum_ms_to_tstates( pure_data->pause );
+  libspectrum_dword length = pure_data->pause_tstates;
   size_t i;
   if( pure_data->length ) {
     int bits_set_in_last_byte =
@@ -580,7 +580,7 @@ pure_data_block_length( libspectrum_tape_pure_data_block *pure_data )
 static libspectrum_dword
 raw_data_block_length( libspectrum_tape_raw_data_block *raw_data )
 {
-  libspectrum_dword length = libspectrum_ms_to_tstates( raw_data->pause );
+  libspectrum_dword length = raw_data->pause_tstates;
 
   length += ( LIBSPECTRUM_BITS_IN_BYTE * raw_data->length -
               ( LIBSPECTRUM_BITS_IN_BYTE - raw_data->bits_in_last_byte ) ) *
@@ -647,7 +647,7 @@ libspectrum_tape_block_length( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
     return pure_data_block_length( &block->types.pure_data );
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
-    return libspectrum_ms_to_tstates( block->types.pause.length );
+    return block->types.pause.length_tstates;
   case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
     return raw_data_block_length( &block->types.raw_data );
   case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:

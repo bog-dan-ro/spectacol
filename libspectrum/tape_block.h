@@ -40,6 +40,7 @@ typedef struct libspectrum_tape_rom_block {
   size_t length;		/* How long is this block */
   libspectrum_byte *data;	/* The actual data */
   libspectrum_dword pause;	/* Pause after block (milliseconds) */
+  libspectrum_dword pause_tstates; /* Pause after block (tstates) */
 
 } libspectrum_tape_rom_block;
 
@@ -67,6 +68,7 @@ typedef struct libspectrum_tape_turbo_block {
   size_t bits_in_last_byte;	/* How many bits are in the last byte? */
   libspectrum_byte *data;	/* The actual data */
   libspectrum_dword pause;	/* Pause after data (in ms) */
+  libspectrum_dword pause_tstates; /* Pause after block (tstates) */
 
   libspectrum_dword pilot_length; /* Length of pilot pulse (in tstates) */
   size_t pilot_pulses;		/* Number of pilot pulses */
@@ -132,6 +134,7 @@ typedef struct libspectrum_tape_pure_data_block {
   size_t bits_in_last_byte;	/* How many bits are in the last byte? */
   libspectrum_byte *data;	/* The actual data */
   libspectrum_dword pause;	/* Pause after data (in ms) */
+  libspectrum_dword pause_tstates; /* Pause after block (tstates) */
 
   libspectrum_dword bit0_length, bit1_length; /* Length of (re)set bits */
 
@@ -159,6 +162,7 @@ typedef struct libspectrum_tape_raw_data_block {
   size_t bits_in_last_byte;	/* How many bits are in the last byte? */
   libspectrum_byte *data;	/* The actual data */
   libspectrum_dword pause;	/* Pause after data (in ms) */
+  libspectrum_dword pause_tstates; /* Pause after block (tstates) */
 
   libspectrum_dword bit_length; /* Bit length. *Not* pulse length! */
 
@@ -198,6 +202,7 @@ struct libspectrum_tape_generalised_data_symbol_table {
 typedef struct libspectrum_tape_generalised_data_block {
 
   libspectrum_dword pause;	/* Pause after data (in ms) */
+  libspectrum_dword pause_tstates; /* Pause after block (tstates) */
 
   libspectrum_tape_generalised_data_symbol_table pilot_table, data_table;
 
@@ -228,10 +233,13 @@ typedef struct libspectrum_tape_generalised_data_block_state {
 
 } libspectrum_tape_generalised_data_block_state;
 
-/* A pause block */
+/* A pause block - some formats use pause in ms, some use tstates. Fuse uses
+   tstates but wants to be able to write back the original value to a file
+   if re-saved so store both */
 typedef struct libspectrum_tape_pause_block {
 
   libspectrum_dword length;
+  libspectrum_dword length_tstates;
 
 } libspectrum_tape_pause_block;
 
@@ -285,6 +293,7 @@ typedef struct libspectrum_tape_comment_block {
 typedef struct libspectrum_tape_message_block {
 
   int time;
+  int time_tstates;
   char *text;
 
 } libspectrum_tape_message_block;

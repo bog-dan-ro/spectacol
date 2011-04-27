@@ -829,3 +829,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20110427 z80.c: initialise machine_type to avoid a warning (Fred).
 20110427 test/test.c: test needed updating for ROM block duration fix (Fred).
 20110427 tzx_read.c: message time in the TZX is in seconds not ms (Fred).
+20110427 doc/libspectrum.txt,tape.c,tape_accessors.txt,tape_block.[ch],
+         utilities.c: directly store pause tstates values in blocks to allow
+         access to either original values or native tstates values (Fred).

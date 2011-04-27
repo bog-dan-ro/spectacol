@@ -117,6 +117,15 @@ libspectrum_dword	pause			0	-1
 	rom
 	turbo
 
+libspectrum_dword	pause_tstates		0	-1
+	generalised_data
+	message         time_tstates
+	pause           length_tstates
+	pure_data
+	raw_data
+	rom
+	turbo
+
 libspectrum_dword	pilot_length		0	-1
 	turbo
 
