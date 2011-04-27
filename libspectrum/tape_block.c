@@ -25,6 +25,8 @@
 
 #include <config.h>
 
+#include <math.h>
+
 #include "tape_block.h"
 
 /* The number of pilot pulses for the standard ROM loader NB: These
@@ -54,6 +56,9 @@ raw_data_init( libspectrum_tape_raw_data_block *block,
 static libspectrum_error
 generalised_data_init( libspectrum_tape_generalised_data_block *block,
                        libspectrum_tape_generalised_data_block_state *state );
+static libspectrum_error
+data_block_init( libspectrum_tape_data_block *block,
+                 libspectrum_tape_data_block_state *state );
 
 libspectrum_tape_block*
 libspectrum_tape_block_alloc( libspectrum_tape_type type )
@@ -158,10 +163,21 @@ libspectrum_tape_block_free( libspectrum_tape_block *block )
     libspectrum_free( block->types.custom.data );
     break;
 
-    /* Block types not present in .tzx follow here */
+  /* Block types not present in .tzx follow here */
 
   case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:
     libspectrum_free( block->types.rle_pulse.data );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
+    libspectrum_free( block->types.pulse_sequence.lengths );
+    libspectrum_free( block->types.pulse_sequence.pulse_repeats );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
+    libspectrum_free( block->types.data_block.data );
+    libspectrum_free( block->types.data_block.bit0_pulses );
+    libspectrum_free( block->types.data_block.bit1_pulses );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_CONCAT: /* This should never occur */
@@ -222,6 +238,14 @@ libspectrum_tape_block_init( libspectrum_tape_block *block,
   case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:
     state->block_state.rle_pulse.index = 0;
     return LIBSPECTRUM_ERROR_NONE;
+  case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
+    state->block_state.pulse_sequence.index = 0;
+    state->block_state.pulse_sequence.pulse_count = 0;
+    state->block_state.pulse_sequence.level = 1;
+    return LIBSPECTRUM_ERROR_NONE;
+  case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
+    return data_block_init( &(block->types.data_block),
+                            &(state->block_state.data_block) );
 
   /* These blocks need no initialisation */
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
@@ -329,6 +353,41 @@ generalised_data_init( libspectrum_tape_generalised_data_block *block,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+data_block_init( libspectrum_tape_data_block *block,
+                 libspectrum_tape_data_block_state *state )
+{
+  libspectrum_error error;
+
+  state->bit0_flags = 0;
+  state->bit1_flags = 0;
+
+  /* If both bit0 and bit1 are two matching pulses, then assign them to be
+     flagged as short/long pulses respectively */
+  if( block->bit0_pulse_count == 2 && block->bit1_pulse_count == 2 &&
+      block->bit0_pulses[ 0 ] == block->bit0_pulses[ 1 ] &&
+      block->bit1_pulses[ 0 ] == block->bit1_pulses[ 1 ] &&
+      block->bit0_pulses[ 0 ] > 0  && block->bit1_pulses[ 0 ] > 0 ) {
+    if( block->bit0_pulses[ 0 ] < block->bit1_pulses[ 0 ] ) {
+      state->bit0_flags = LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT;
+      state->bit1_flags = LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG;
+    } else if( block->bit0_pulses[ 0 ] > block->bit1_pulses[ 0 ] ) {
+      state->bit0_flags = LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG;
+      state->bit1_flags = LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT;
+    }
+  }
+
+  state->level = block->initial_level;
+
+  /* We're just before the start of the data */
+  state->bytes_through_block = -1; state->bits_through_byte = 7;
+  /* Set up the next bit */
+  error = libspectrum_tape_data_block_next_bit( block, state );
+  if( error ) return error;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 /* Does this block consist solely of metadata? */
 int
 libspectrum_tape_block_metadata( libspectrum_tape_block *block )
@@ -347,6 +406,8 @@ libspectrum_tape_block_metadata( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_SELECT:
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
   case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:
+  case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
+  case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
     return 0;
 
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
@@ -629,6 +690,61 @@ generalised_data_block_length(
   return length;
 }
 
+static libspectrum_dword
+pulse_sequence_block_length(
+                    libspectrum_tape_pulse_sequence_block *pulses )
+{
+  libspectrum_dword length = 0;
+  size_t i;
+
+  for( i = 0; i < pulses->count; i++ )
+    length += pulses->lengths[ i ] * pulses->pulse_repeats[ i ];
+
+  return length;
+}
+
+static libspectrum_dword
+data_block_length( libspectrum_tape_data_block *data_block )
+{
+  libspectrum_dword length = 0;
+  size_t i;
+  if( data_block->count ) {
+    int bits_set_in_last_byte =
+      libspectrum_bits_set_n_bits( data_block->data[ data_block->length-1 ],
+                                   data_block->bits_in_last_byte );
+    size_t bit0_length = 0;
+    size_t bit1_length = 0;
+
+    for( i = 0; i < data_block->bit0_pulse_count; i++ ) {
+      bit0_length += data_block->bit0_pulses[ i ];
+    }
+    bit0_length /=
+      data_block->bit0_pulse_count ? data_block->bit0_pulse_count : 1;
+
+    for( i = 0; i < data_block->bit1_pulse_count; i++ ) {
+      bit1_length += data_block->bit1_pulses[ i ];
+    }
+    bit1_length /=
+      data_block->bit1_pulse_count ? data_block->bit1_pulse_count : 1;
+
+    for( i = 0; i < data_block->length-1; i++ ) {
+      libspectrum_byte data = data_block->data[ i ];
+      length += convert_pulses_to_tstates( bit1_length,
+                                           bit0_length,
+                                           bits_set[ data ],
+                                           LIBSPECTRUM_BITS_IN_BYTE );
+    }
+      
+    /* handle bits in last byte correctly */
+    length += convert_pulses_to_tstates( bit1_length,
+                                         bit0_length,
+                                         bits_set_in_last_byte,
+                                         data_block->bits_in_last_byte );
+  }
+
+  return length;
+}
+
 libspectrum_dword
 libspectrum_tape_block_length( libspectrum_tape_block *block )
 {
@@ -654,6 +770,10 @@ libspectrum_tape_block_length( libspectrum_tape_block *block )
     return rle_pulse_block_length( &block->types.rle_pulse );
   case LIBSPECTRUM_TAPE_BLOCK_GENERALISED_DATA:
     return generalised_data_block_length( &block->types.generalised_data );
+  case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
+    return pulse_sequence_block_length( &block->types.pulse_sequence );
+  case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
+    return data_block_length( &block->types.data_block );
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_JUMP:

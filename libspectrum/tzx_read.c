@@ -639,6 +639,7 @@ tzx_read_pause( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   /* Get the pause length */
   libspectrum_set_pause_ms( block, (*ptr)[0] + (*ptr)[1] * 0x100 );
+  libspectrum_tape_block_set_level( block, -1 ); /* No specific level */
   (*ptr) += 2;
 
   libspectrum_tape_append_block( tape, block );

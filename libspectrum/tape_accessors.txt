@@ -63,6 +63,7 @@ libspectrum_dword	bit1_length		0	-1
 	turbo
 
 size_t			bits_in_last_byte	0	-1
+	data_block
 	pure_data
 	raw_data
 	turbo
@@ -77,9 +78,12 @@ size_t			count			0	-1
 	select
 	archive_info
 	hardware
+	pulse_sequence
+	data_block
 
 libspectrum_byte*	data			0	NULL
 	custom
+	data_block
 	generalised_data
 	pure_data
 	raw_data
@@ -89,6 +93,7 @@ libspectrum_byte*	data			0	NULL
 
 size_t			data_length		0	-1
        custom		length
+       data_block	length
        pure_data	length
        raw_data		length
        rle_pulse	length
@@ -149,12 +154,19 @@ libspectrum_dword	scale			0	-1
 
 libspectrum_dword	pulse_lengths		1	-1
 	pulses		lengths
+	pulse_sequence	lengths
+
+size_t			pulse_repeats		1	-1
+	pulse_sequence
 
 libspectrum_dword	sync1_length		0	-1
 	turbo
 
 libspectrum_dword	sync2_length		0	-1
 	turbo
+
+libspectrum_dword	tail_length		0	-1
+ 	data_block
 
 char*	text			0	NULL
 	group_start	name
@@ -171,3 +183,19 @@ int			types			1	-1
 
 int			values			1	-1
 	hardware
+
+int			level			0	-1
+	pause
+	data_block      initial_level
+
+libspectrum_byte	bit0_pulse_count	0	-1
+	data_block
+
+libspectrum_byte	bit1_pulse_count	0	-1
+	data_block
+
+libspectrum_word	bit0_pulses		1	-1
+	data_block
+
+libspectrum_word	bit1_pulses		1	-1
+	data_block

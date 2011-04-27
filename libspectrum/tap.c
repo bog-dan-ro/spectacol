@@ -177,6 +177,8 @@ internal_tap_write( libspectrum_byte **buffer, size_t *length,
     case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:     /* Could do better? */
     case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
     case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:
+    case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
+    case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
       error = skip_block( block, "conversion almost certainly won't work" );
       if( error != LIBSPECTRUM_ERROR_NONE ) { libspectrum_free( *buffer ); return 1; }
       done = 1;

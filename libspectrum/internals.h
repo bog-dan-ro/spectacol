@@ -166,6 +166,7 @@ extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC1;
 extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC2;
 extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA0;
 extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA1;
+extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_TAIL;
 
 /* Tape routines */
 
@@ -217,6 +218,10 @@ libspectrum_csw_write( libspectrum_byte **buffer, size_t *length,
 
 libspectrum_error
 libspectrum_wav_read( libspectrum_tape *tape, const char *filename );
+
+libspectrum_error
+internal_pzx_read( libspectrum_tape *tape, const libspectrum_byte *buffer,
+                   const size_t length );
 
 libspectrum_tape_block*
 libspectrum_tape_block_internal_init(

@@ -210,6 +210,8 @@ typedef enum libspectrum_id_t {
 
   LIBSPECTRUM_ID_DISK_OPD,		/* .opu/.opd Opus Discovery disk image */
 
+  LIBSPECTRUM_ID_TAPE_PZX,		/* PZX tape image */
+
 } libspectrum_id_t;
 
 /* And 'classes' of file */
@@ -513,6 +515,10 @@ typedef enum libspectrum_tape_type {
 
   LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE = 0x100,
 
+  /* PZX format blocks */
+  LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE,
+  LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK,
+
 } libspectrum_tape_type;
 
 typedef struct libspectrum_tape_block libspectrum_tape_block;
@@ -540,12 +546,13 @@ typedef enum libspectrum_tape_state_type {
 
   LIBSPECTRUM_TAPE_STATE_INVALID = 0,
 
-  LIBSPECTRUM_TAPE_STATE_PILOT,	/* Pilot pulses */
-  LIBSPECTRUM_TAPE_STATE_SYNC1,	/* First sync pulse */
-  LIBSPECTRUM_TAPE_STATE_SYNC2,	/* Second sync pulse */
-  LIBSPECTRUM_TAPE_STATE_DATA1,	/* First edge of a data bit */
-  LIBSPECTRUM_TAPE_STATE_DATA2,	/* Second edge of a data bit */
-  LIBSPECTRUM_TAPE_STATE_PAUSE,	/* The pause at the end of a block */
+  LIBSPECTRUM_TAPE_STATE_PILOT, /* Pilot pulses */
+  LIBSPECTRUM_TAPE_STATE_SYNC1, /* First sync pulse */
+  LIBSPECTRUM_TAPE_STATE_SYNC2, /* Second sync pulse */
+  LIBSPECTRUM_TAPE_STATE_DATA1, /* First edge of a data bit */
+  LIBSPECTRUM_TAPE_STATE_DATA2, /* Second edge of a data bit */
+  LIBSPECTRUM_TAPE_STATE_PAUSE, /* The pause at the end of a block */
+  LIBSPECTRUM_TAPE_STATE_TAIL,  /* The pulse at the end of a block */
 
 } libspectrum_tape_state_type;
 

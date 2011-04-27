@@ -240,6 +240,7 @@ typedef struct libspectrum_tape_pause_block {
 
   libspectrum_dword length;
   libspectrum_dword length_tstates;
+  int level; /* 0/1 for low and high, anything else for not specified */
 
 } libspectrum_tape_pause_block;
 
@@ -356,6 +357,66 @@ typedef struct libspectrum_tape_rle_pulse_block_state {
 
 } libspectrum_tape_rle_pulse_block_state;
 
+/* A PZX pulse sequence block */
+typedef struct libspectrum_tape_pulse_sequence_block {
+
+  size_t count;
+  libspectrum_dword *lengths; /* Length of pulse (in tstates) */
+  size_t *pulse_repeats;      /* Number of pulses */
+
+} libspectrum_tape_pulse_sequence_block;
+
+typedef struct libspectrum_tape_pulse_sequence_block_state {
+
+  /* Private data */
+
+  size_t index;
+  size_t pulse_count;		/* Number of pulses to go */
+  int level;			/* Mic level 0/1 */
+
+} libspectrum_tape_pulse_sequence_block_state;
+
+/* A PZX data block */
+typedef struct libspectrum_tape_data_block {
+
+  size_t count;			   /* Length of data in bits */
+  int initial_level;		   /* Mic level 0/1 */
+  libspectrum_byte *data;	   /* The actual data */
+  libspectrum_dword tail_length;   /* Length of tail pulse (in tstates) */
+
+  size_t bit0_pulse_count, bit1_pulse_count; /* Pulse count in (re)set bits */
+  libspectrum_word *bit0_pulses;   /* Reset bits pulses */
+  libspectrum_word *bit1_pulses;   /* Set bits pulses */
+
+  size_t length;		/* Length of data in bytes */
+  size_t bits_in_last_byte;	/* How many bits are in the last byte? */
+
+} libspectrum_tape_data_block;
+
+typedef struct libspectrum_tape_data_block_state {
+
+  /* Private data */
+
+  libspectrum_tape_state_type state;
+
+  int bit0_flags;		 /* Any flags to be set when bit0 is returned */
+  int bit1_flags;		 /* Any flags to be set when bit1 is returned */
+
+  size_t bytes_through_block;
+  size_t bits_through_byte;	/* How far through the data are we? */
+
+  libspectrum_byte current_byte; /* The current data byte; gets shifted out
+				    as we read bits from it */
+  size_t pulse_count;		 /* Pulse count in current bit */
+  libspectrum_word *bit_pulses;  /* Current bit pulses */
+  int bit_flags;		 /* Any flags to be set when this bit is
+				    returned */
+  int level;			 /* Mic level 0/1 */
+
+  size_t index;			 /* Location in active pulse sequence */
+
+} libspectrum_tape_data_block_state;
+
 /*
  * The generic tape block
  */
@@ -393,6 +454,10 @@ struct libspectrum_tape_block {
     libspectrum_tape_custom_block custom;
 
     libspectrum_tape_rle_pulse_block rle_pulse;
+
+    libspectrum_tape_pulse_sequence_block pulse_sequence;
+    libspectrum_tape_data_block data_block;
+
   } types;
 
 };
@@ -416,6 +481,8 @@ struct libspectrum_tape_block_state {
     libspectrum_tape_raw_data_block_state raw_data;
     libspectrum_tape_generalised_data_block_state generalised_data;
     libspectrum_tape_rle_pulse_block_state rle_pulse;
+    libspectrum_tape_pulse_sequence_block_state pulse_sequence;
+    libspectrum_tape_data_block_state data_block;
 
   } block_state;
 
@@ -433,7 +500,9 @@ generalised_data_edge( libspectrum_tape_generalised_data_block *block,
                        libspectrum_tape_generalised_data_block_state *state,
 		       libspectrum_dword *tstates, int *end_of_block,
 		       int *flags );
+libspectrum_error
+libspectrum_tape_data_block_next_bit( libspectrum_tape_data_block *block,
+                                    libspectrum_tape_data_block_state *state );
 
 
 #endif				/* #ifndef LIBSPECTRUM_TAPE_BLOCK_H */
-

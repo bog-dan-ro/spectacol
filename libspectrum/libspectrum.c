@@ -524,6 +524,7 @@ libspectrum_identify_file_raw( libspectrum_id_t *type, const char *filename,
       { LIBSPECTRUM_ID_TAPE_LTP,      "ltp", 3, "\x11\0\0",	    0, 3, 1 },
       { LIBSPECTRUM_ID_TAPE_TZX,      "tzx", 3, "ZXTape!",	    0, 7, 4 },
       { LIBSPECTRUM_ID_TAPE_WARAJEVO, "tap", 2, "\xff\xff\xff\xff", 8, 4, 2 },
+      { LIBSPECTRUM_ID_TAPE_PZX,      "pzx", 3, "PZXT",		    0, 4, 4 },
 
       { LIBSPECTRUM_ID_DISK_SCL,      "scl", 3, "SINCLAIR",         0, 8, 4 },
       { LIBSPECTRUM_ID_DISK_TRD,      "trd", 3, NULL,		    0, 0, 0 },
@@ -708,6 +709,7 @@ libspectrum_identify_class( libspectrum_class_t *libspectrum_class,
   case LIBSPECTRUM_ID_TAPE_Z80EM:
   case LIBSPECTRUM_ID_TAPE_CSW:
   case LIBSPECTRUM_ID_TAPE_WAV:
+  case LIBSPECTRUM_ID_TAPE_PZX:
     *libspectrum_class = LIBSPECTRUM_CLASS_TAPE; return 0;
 
   case LIBSPECTRUM_ID_CARTRIDGE_IF2:
