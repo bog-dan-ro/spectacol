@@ -326,5 +326,6 @@
 20110405 compat.h,snap2tzx.c: add and use Fuse's GCC_PRINTF macro and add
          missing 'const' to format string parameter (Stuart).
 20110413 man/tape2wav.1,tape2wav.c: allow writing WAV file to stdout (Fred).
-20110414 tape2wav.c: allow writing WAV file to stdout on Windows (patch #3286205)
-         (Sergio Baldovi).
+20110414 tape2wav.c: allow writing WAV file to stdout on Windows (patch
+         #3286205) (Sergio Baldovi).
+20110427 tzxlist.c,man/tzxlist.1: add support for reading PZX files (Fred).

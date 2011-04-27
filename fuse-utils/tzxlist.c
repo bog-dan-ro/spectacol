@@ -1,5 +1,5 @@
 /* tzxlist.c: Produce a listing of the blocks in a .tzx file
-   Copyright (c) 2001-2008 Philip Kendall, Darren Salt
+   Copyright (c) 2001-2011 Philip Kendall, Darren Salt, Fredrick Meunier
 
    $Id$
 
@@ -304,7 +304,9 @@ process_tape( char *filename )
 	     libspectrum_tape_block_bit1_length( block ) );
       printf("  Data length: %ld bytes (%ld bits in last byte used)\n",
 	     (unsigned long)libspectrum_tape_block_data_length( block ),
-	     (unsigned long)libspectrum_tape_block_bits_in_last_byte(block) );
+	     libspectrum_tape_block_bits_in_last_byte(block) ? 
+               (unsigned long)libspectrum_tape_block_bits_in_last_byte(block) :
+               8 );
       printf("  Pause length: %d ms\n",
 	     libspectrum_tape_block_pause( block ) );
       break;
@@ -343,6 +345,13 @@ process_tape( char *filename )
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
+      printf( "  Initial polarity: " );
+      if( libspectrum_tape_block_level( block ) < 0 ) {
+        printf( "none specified\n" );
+      } else {
+        printf( "%s\n",
+                libspectrum_tape_block_level( block ) ? "high" : "low" );
+      }
       printf("  Length: %d ms\n", libspectrum_tape_block_pause( block ) );
       break;
 
@@ -399,7 +408,7 @@ process_tape( char *filename )
 	case   7: printf("    Loader:"); break;
 	case   8: printf("    Origin:"); break;
 	case 255: printf("   Comment:"); break;
-	 default: printf("(Unknown string): "); break;
+        default: printf("(Unknown string): "); break;
 	}
 	printf(" %s\n", 
                convert_charset( libspectrum_tape_block_texts( block, i ) ));
@@ -428,6 +437,42 @@ process_tape( char *filename )
                     convert_charset( libspectrum_tape_block_text( block ) ) );
       printf( "       Length: %ld bytes\n",
 	      (unsigned long)libspectrum_tape_block_data_length( block ) );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
+      printf( "  Initial polarity: low\n" );
+      for( i=0; i < libspectrum_tape_block_count( block ); i++ )
+        printf("  Pulse %3ld: length %4d tstates, repeated %4ld times\n",
+             (unsigned long)i,
+             libspectrum_tape_block_pulse_lengths( block, i ),
+             (unsigned long)libspectrum_tape_block_pulse_repeats( block, i ) );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
+      printf( "  Initial polarity: " );
+      if( libspectrum_tape_block_level( block ) < 0 ) {
+        printf( "none specified\n" );
+      } else {
+        printf( "%s\n",
+                libspectrum_tape_block_level( block ) ? "high" : "low" );
+      }
+      printf("  Reset data bits are\n");
+      for( i=0; i < libspectrum_tape_block_bit0_pulse_count( block ); i++ )
+	printf("    Pulse %3ld: length %4d tstates\n",
+             (unsigned long)i,
+             libspectrum_tape_block_bit0_pulses( block, i ) );
+      printf("  Set data bits are\n");
+      for( i=0; i < libspectrum_tape_block_bit1_pulse_count( block ); i++ )
+	printf("    Pulse %3ld: length %4d tstates\n",
+             (unsigned long)i,
+             libspectrum_tape_block_bit1_pulses( block, i ) );
+      printf("  Data length: %ld bytes (%ld bits in last byte used)\n",
+	     (unsigned long)libspectrum_tape_block_data_length( block ),
+	     libspectrum_tape_block_bits_in_last_byte(block) ? 
+               (unsigned long)libspectrum_tape_block_bits_in_last_byte(block) :
+               8 );
+      printf("  Tail length: %d tstates\n",
+	     libspectrum_tape_block_tail_length( block ) );
       break;
 
     default:
