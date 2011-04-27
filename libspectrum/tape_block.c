@@ -37,8 +37,6 @@
 static const size_t LIBSPECTRUM_TAPE_PILOTS_HEADER = 0x1f7f;
 static const size_t LIBSPECTRUM_TAPE_PILOTS_DATA   = 0x0c97;
 
-#define TZX_HZ 3500000
-
 /* Functions to initialise block types */
 
 static libspectrum_error
@@ -445,7 +443,7 @@ libspectrum_tape_block_zero( libspectrum_tape_block *block )
 #define BITS_SET_ARRAY_SIZE 256
 static int bits_set[ BITS_SET_ARRAY_SIZE ];
 
-static const int LIBSPECTRUM_BITS_IN_BYTE = 8;
+const int LIBSPECTRUM_BITS_IN_BYTE = 8;
 
 static int
 libspectrum_bits_set_n_bits( libspectrum_byte byte, libspectrum_byte bits )
@@ -486,16 +484,9 @@ convert_pulses_to_tstates( libspectrum_dword set_bit_length,
 }
 
 static libspectrum_dword
-convert_ms_to_tstates( libspectrum_dword ms )
-{
-  static const libspectrum_dword tstates_per_ms = TZX_HZ / 1000;
-  return ms * tstates_per_ms;
-}
-
-static libspectrum_dword
 rom_block_length( libspectrum_tape_rom_block *rom )
 {
-  libspectrum_dword length = convert_ms_to_tstates( rom->pause );
+  libspectrum_dword length = libspectrum_ms_to_tstates( rom->pause );
   size_t i;
 
   size_t edge_count = rom->length && rom->data[0] & 0x80 ?
@@ -522,7 +513,7 @@ turbo_block_length( libspectrum_tape_turbo_block *turbo )
   libspectrum_dword length =
     turbo->pilot_pulses * turbo->pilot_length +
     turbo->sync1_length + turbo->sync2_length +
-    convert_ms_to_tstates( turbo->pause );
+    libspectrum_ms_to_tstates( turbo->pause );
   size_t i;
   if( turbo->length ) {
     int bits_set_in_last_byte =
@@ -561,7 +552,7 @@ pulses_block_length( libspectrum_tape_pulses_block *pulses )
 static libspectrum_dword
 pure_data_block_length( libspectrum_tape_pure_data_block *pure_data )
 {
-  libspectrum_dword length = convert_ms_to_tstates( pure_data->pause );
+  libspectrum_dword length = libspectrum_ms_to_tstates( pure_data->pause );
   size_t i;
   if( pure_data->length ) {
     int bits_set_in_last_byte =
@@ -589,7 +580,7 @@ pure_data_block_length( libspectrum_tape_pure_data_block *pure_data )
 static libspectrum_dword
 raw_data_block_length( libspectrum_tape_raw_data_block *raw_data )
 {
-  libspectrum_dword length = convert_ms_to_tstates( raw_data->pause );
+  libspectrum_dword length = libspectrum_ms_to_tstates( raw_data->pause );
 
   length += ( LIBSPECTRUM_BITS_IN_BYTE * raw_data->length -
               ( LIBSPECTRUM_BITS_IN_BYTE - raw_data->bits_in_last_byte ) ) *
@@ -656,7 +647,7 @@ libspectrum_tape_block_length( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
     return pure_data_block_length( &block->types.pure_data );
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
-    return convert_ms_to_tstates( block->types.pause.length );
+    return libspectrum_ms_to_tstates( block->types.pause.length );
   case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
     return raw_data_block_length( &block->types.raw_data );
   case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:

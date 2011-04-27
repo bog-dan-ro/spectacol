@@ -126,7 +126,7 @@ internal_tap_read( libspectrum_tape *tape, const libspectrum_byte *buffer,
     ptr += buf_length;
 
     /* Give a 1s pause after each block */
-    libspectrum_tape_block_set_pause( block, 1000 );
+    libspectrum_set_pause_ms( block, 1000 );
 
     libspectrum_tape_append_block( tape, block );
   }

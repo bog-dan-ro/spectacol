@@ -270,7 +270,7 @@ tzx_read_rom_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
   block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_ROM );
 
   /* Get the pause length */
-  libspectrum_tape_block_set_pause( block, (*ptr)[0] + (*ptr)[1] * 0x100 );
+  libspectrum_set_pause_ms( block, (*ptr)[0] + (*ptr)[1] * 0x100 );
   (*ptr) += 2;
 
   /* And the data */
@@ -323,7 +323,7 @@ tzx_read_turbo_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 					   (*ptr)[0] + (*ptr)[1] * 0x100 );
   (*ptr) += 2;
   libspectrum_tape_block_set_bits_in_last_byte( block, **ptr ); (*ptr)++;
-  libspectrum_tape_block_set_pause       ( block,
+  libspectrum_set_pause_ms               ( block,
 					   (*ptr)[0] + (*ptr)[1] * 0x100 );
   (*ptr) += 2;
 

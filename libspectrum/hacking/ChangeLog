@@ -814,3 +814,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          sync pulses (Fred).
 20110422 tape.c: don't expect an edge for a jump, group start/end, loop
          start/end or other non-audio blocks (Fred).
+20110427 Makefile.am,internals.h,tap.c,tape_block.c,tzx_read.c,utilities.c,
+         warajevo_read.c: centralise ms/tstate conversions and tape block pause
+         setting functions (Fred).
