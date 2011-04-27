@@ -1274,7 +1274,7 @@ write_extended_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
   int i, bottom_16kb_ram;
   libspectrum_byte hardware_flag = 0;      /* No special emulation features */
   int second_memory_port = 0; /* By default, don't write the extra bytes */
-  libspectrum_byte machine_byte;
+  libspectrum_byte machine_byte = Z80_MACHINE_48;
   size_t header_length;
 
   libspectrum_dword quarter_states;

@@ -826,3 +826,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (Fred).
 20110427 tape.c,test/test15.c: use more centralised methods for ms/tstate
          conversions (Fred).
+20110427 z80.c: initialise machine_type to avoid a warning (Fred).
