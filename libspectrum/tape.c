@@ -366,7 +366,8 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
-      *tstates = ( block->types.pause.length * 69888 ) / 20; end_of_block = 1;
+      *tstates = libspectrum_ms_to_tstates( block->types.pause.length );
+      end_of_block = 1;
       /* 0 ms pause => stop tape */
       if( *tstates == 0 ) { *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP; }
       break;

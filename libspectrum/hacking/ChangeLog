@@ -824,3 +824,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG (Fred).
 20110427 tape.c,test/test15.c: use centralised methods for ms/tstate conversions
          (Fred).
+20110427 tape.c,test/test15.c: use more centralised methods for ms/tstate
+         conversions (Fred).

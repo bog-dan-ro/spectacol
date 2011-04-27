@@ -58,7 +58,7 @@ complete_edges_list[] =
   { 1939000, 1, 0 },	/* Pause */
 
   /* Pause block */
-  { 2159539, 1, 0 },
+  { 2163000, 1, 0 },
 
   /* Group start block */
   {    0,    1, 0 },
