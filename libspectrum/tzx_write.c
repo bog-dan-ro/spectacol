@@ -738,7 +738,7 @@ tzx_write_rle( libspectrum_tape_block *block, libspectrum_byte **buffer,
     libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_RAW_DATA );
 
   libspectrum_tape_block_set_bit_length( raw_block, scale );
-  libspectrum_tape_block_set_pause     ( raw_block, 0 );
+  libspectrum_set_pause_ms( raw_block, 0 );
 
   rle_state.bits_used = 0;
   rle_state.level = 0;

@@ -127,7 +127,7 @@ libspectrum_wav_read( libspectrum_tape *tape, const char *filename )
   /* 44100 Hz 79 t-states 22050 Hz 158 t-states */
   libspectrum_tape_block_set_bit_length( block,
                                          3500000/afGetRate( handle, track ) );
-  libspectrum_tape_block_set_pause     ( block, 0 );
+  libspectrum_set_pause_ms( block, 0 );
   libspectrum_tape_block_set_bits_in_last_byte( block, length%8 ? length%8 : 8 );
   libspectrum_tape_block_set_data_length( block, tape_length/8 );
 

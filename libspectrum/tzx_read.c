@@ -439,7 +439,7 @@ tzx_read_pure_data( libspectrum_tape *tape, const libspectrum_byte **ptr,
 					  (*ptr)[0] + (*ptr)[1] * 0x100 );
   (*ptr) += 2;
   libspectrum_tape_block_set_bits_in_last_byte( block, **ptr ); (*ptr)++;
-  libspectrum_tape_block_set_pause( block, (*ptr)[0] + (*ptr)[1] * 0x100 );
+  libspectrum_set_pause_ms( block, (*ptr)[0] + (*ptr)[1] * 0x100 );
   (*ptr) += 2;
 
   /* And the actual data */
@@ -473,8 +473,7 @@ tzx_read_raw_data (libspectrum_tape *tape, const libspectrum_byte **ptr,
   /* Get the metadata */
   libspectrum_tape_block_set_bit_length( block,
 					 (*ptr)[0] + (*ptr)[1] * 0x100 );
-  libspectrum_tape_block_set_pause     ( block,
-					 (*ptr)[2] + (*ptr)[3] * 0x100 );
+  libspectrum_set_pause_ms( block, (*ptr)[2] + (*ptr)[3] * 0x100 );
   libspectrum_tape_block_set_bits_in_last_byte( block, (*ptr)[4] );
   (*ptr) += 5;
 
@@ -536,7 +535,7 @@ tzx_read_generalised_data( libspectrum_tape *tape,
 
   libspectrum_tape_block_zero( block );
 
-  libspectrum_tape_block_set_pause( block, (*ptr)[0] + (*ptr)[1] * 0x100 );
+  libspectrum_set_pause_ms( block, (*ptr)[0] + (*ptr)[1] * 0x100 );
   (*ptr) += 2;
 
   error = libspectrum_tape_block_read_symbol_table_parameters( block, 1, ptr );
@@ -639,7 +638,7 @@ tzx_read_pause( libspectrum_tape *tape, const libspectrum_byte **ptr,
   block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PAUSE );
 
   /* Get the pause length */
-  libspectrum_tape_block_set_pause( block, (*ptr)[0] + (*ptr)[1] * 0x100 );
+  libspectrum_set_pause_ms( block, (*ptr)[0] + (*ptr)[1] * 0x100 );
   (*ptr) += 2;
 
   libspectrum_tape_append_block( tape, block );
@@ -867,7 +866,7 @@ tzx_read_message( libspectrum_tape *tape, const libspectrum_byte **ptr,
   block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_MESSAGE );
 
   /* Get the time */
-  libspectrum_tape_block_set_pause( block, **ptr ); (*ptr)++;
+  libspectrum_set_pause_ms( block, **ptr ); (*ptr)++;
 
   /* Get the message itself */
   error = tzx_read_string( ptr, end, &text );

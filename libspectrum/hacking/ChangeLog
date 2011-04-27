@@ -817,3 +817,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20110427 Makefile.am,internals.h,tap.c,tape_block.c,tzx_read.c,utilities.c,
          warajevo_read.c: centralise ms/tstate conversions and tape block pause
          setting functions (Fred).
+20110427 tzx_read.c,tzx_write.c,warajevo_read.c,wav.c: complete centralisation
+         of tape block pause setting functions (Fred).

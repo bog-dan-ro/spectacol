@@ -567,7 +567,7 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
   }
   libspectrum_tape_block_set_bit_length( block, bit_length );
 
-  libspectrum_tape_block_set_pause( block, 0 );
+  libspectrum_set_pause_tstates( block, 0 );
   libspectrum_tape_block_set_bits_in_last_byte( block,
 						status.bits.bits_used + 1 );
 
