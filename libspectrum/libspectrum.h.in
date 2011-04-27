@@ -529,8 +529,10 @@ extern WIN32_DLL const int LIBSPECTRUM_TAPE_FLAGS_STOP48; /* Stop tape if in 48K
 extern WIN32_DLL const int LIBSPECTRUM_TAPE_FLAGS_NO_EDGE; /* Edge isn't really an edge */
 extern WIN32_DLL const int LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW; /* Set level low */
 extern WIN32_DLL const int LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH; /* Set level high */
-extern WIN32_DLL const int LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT;
-extern WIN32_DLL const int LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG;
+extern WIN32_DLL const int LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT;/* Short edge;
+                                                used for loader acceleration */
+extern WIN32_DLL const int LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG; /* Long edge;
+                                                used for loader acceleration */
 extern WIN32_DLL const int LIBSPECTRUM_TAPE_FLAGS_TAPE;	/* Tape has finished */
 
 /* The states which a block can be in */

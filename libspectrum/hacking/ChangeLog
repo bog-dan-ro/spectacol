@@ -819,3 +819,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          setting functions (Fred).
 20110427 tzx_read.c,tzx_write.c,warajevo_read.c,wav.c: complete centralisation
          of tape block pause setting functions (Fred).
+20110427 libspectrum.h.in,tape.c: add comments for
+         LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT and
+         LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG (Fred).

@@ -298,8 +298,10 @@ const int LIBSPECTRUM_TAPE_FLAGS_STOP48     = 1 << 2; /* Stop tape if in
 const int LIBSPECTRUM_TAPE_FLAGS_NO_EDGE    = 1 << 3; /* Not an edge really */
 const int LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW  = 1 << 4; /* Set level low */
 const int LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH = 1 << 5; /* Set level high */
-const int LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT = 1 << 6;
-const int LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG = 1 << 7;
+const int LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT = 1 << 6;/* Short edge; used for
+                                                          loader acceleration */
+const int LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG = 1 << 7; /* Long edge; used for
+                                                          loader acceleration */
 const int LIBSPECTRUM_TAPE_FLAGS_TAPE       = 1 << 8; /* End of tape */
 
 libspectrum_error
