@@ -17,7 +17,7 @@ complete_edges_list[] =
   { 1710,    2, 0 },	/* Bit 7 */
   {  855,    2, 0 },	/* Bit 8 */
 
-  { 8194368, 1, 0 },	/* Pause */
+  { 8207500, 1, 0 },	/* Pause */
 
   /* Turbo speed data block */
   { 1000,    5, 0 },	/* Pilot */
@@ -41,7 +41,7 @@ complete_edges_list[] =
   {  400,    2, 0 },	/* Byte 4, bit 3 */
   {  789,    2, 0 },	/* Byte 4, bit 4 */
 
-  { 3448972, 1, 0 },	/* Pause */
+  { 3454500, 1, 0 },	/* Pause */
 
   /* Pure tone block */
   {  535,  666, 0 },
@@ -55,7 +55,7 @@ complete_edges_list[] =
   { 1639,   16, 0 },	/* Byte 1, bits 1-8 */
   {  552,   16, 0 },	/* Byte 2, bits 1-8 */
   { 1639,   12, 0 },	/* Byte 3, bits 1-6 */
-  { 1935897, 1, 0 },	/* Pause */
+  { 1939000, 1, 0 },	/* Pause */
 
   /* Pause block */
   { 2159539, 1, 0 },

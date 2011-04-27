@@ -822,3 +822,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20110427 libspectrum.h.in,tape.c: add comments for
          LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT and
          LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG (Fred).
+20110427 tape.c,test/test15.c: use centralised methods for ms/tstate conversions
+         (Fred).
