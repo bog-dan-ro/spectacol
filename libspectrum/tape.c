@@ -98,7 +98,8 @@ pure_data_edge( libspectrum_tape_pure_data_block *block,
 static libspectrum_error
 raw_data_edge( libspectrum_tape_raw_data_block *block,
                libspectrum_tape_raw_data_block_state *state,
-	       libspectrum_dword *tstates, int *end_of_block );
+	       libspectrum_dword *tstates, int *end_of_block,
+               int *flags );
 
 static libspectrum_error
 jump_blocks( libspectrum_tape *tape, int offset );
@@ -373,7 +374,7 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
       break;
     case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
       error = raw_data_edge( &(block->types.raw_data), &(it->block_state.raw_data),
-                             tstates, &end_of_block );
+                             tstates, &end_of_block, flags );
       if( error ) return error;
       break;
 
@@ -386,11 +387,8 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
 
     case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
       *tstates = block->types.pause.length_tstates; end_of_block = 1;
-      if( block->types.pause.level == 0 ) {
-        *flags |= LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW;
-      } else if( block->types.pause.level == 1 ) {
-        *flags |= LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH;
-      }
+      *flags |= block->types.pause.level ? LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH :
+                                           LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW;
       /* 0 ms pause => stop tape */
       if( *tstates == 0 ) { *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP; }
       break;
@@ -827,12 +825,17 @@ libspectrum_tape_pure_data_next_bit( libspectrum_tape_pure_data_block *block,
 static libspectrum_error
 raw_data_edge( libspectrum_tape_raw_data_block *block,
                libspectrum_tape_raw_data_block_state *state,
-	       libspectrum_dword *tstates, int *end_of_block )
+	       libspectrum_dword *tstates, int *end_of_block,
+               int *flags )
 {
   switch (state->state) {
   case LIBSPECTRUM_TAPE_STATE_DATA1:
     *tstates = state->bit_tstates;
     libspectrum_tape_raw_data_next_bit( block, state );
+    /* Backwards as last bit is the state of the next bit as it has already been
+       updated*/
+    *flags |= state->last_bit ? LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW :
+                                LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH;
     break;
 
   case LIBSPECTRUM_TAPE_STATE_PAUSE:
