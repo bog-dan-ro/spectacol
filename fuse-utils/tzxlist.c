@@ -244,10 +244,40 @@ process_tape( char *filename )
   libspectrum_tape_iterator iterator;
   libspectrum_tape_block *block;
   libspectrum_dword total_length = 0;
+  libspectrum_id_t type;
 
   size_t i;
 
   error = read_file( filename, &buffer, &length ); if( error ) return error;
+
+  error = libspectrum_identify_file( &type, filename, buffer, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    free( buffer );
+    return error;
+  }
+
+#ifdef HAVE_ICONV
+  /* Looks like GNU libc iconv needs to have the character type locale set
+     to do the current locale target thing (but oddly GNU libiconv doesn't) */
+#ifdef HAVE_SETLOCALE
+  setlocale(LC_CTYPE, "");
+#endif /* #ifdef HAVE_SETLOCALE */
+  switch( type ) {
+  case LIBSPECTRUM_ID_TAPE_TZX:
+    /* Convert from Windows code page 1252 to our current locale.
+       CP1252 is a valid name of the Windows-1252 charset used by WoS, Tapir and
+       ZX-Blockeditor on at least Linux, MacOS X and Solaris 9. If we need to
+       use another string on another OS we will need to do a little more work */
+    conversion_descriptor = iconv_open("", "CP1252");
+    break;
+  case LIBSPECTRUM_ID_TAPE_PZX:
+    conversion_descriptor = iconv_open("", "UTF-8");
+    break;
+  default:
+    conversion_descriptor = (iconv_t)(-1);
+    break;
+  }
+#endif /* #ifdef HAVE_ICONV */
 
   tape = libspectrum_tape_alloc();
 
@@ -490,6 +520,12 @@ process_tape( char *filename )
   error = libspectrum_tape_free( tape );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
+#ifdef HAVE_ICONV
+  if( conversion_descriptor != (iconv_t)(-1) ) {
+    error = iconv_close( conversion_descriptor ); if( error ) return error;
+  }
+#endif /* #ifdef HAVE_ICONV */
+
   return 0;
 }
 
@@ -509,27 +545,9 @@ main( int argc, char **argv )
 
   error = init_libspectrum(); if( error ) return error;
 
-#ifdef HAVE_ICONV
-  /* Looks like GNU libc iconv needs to have the character type locale set
-     to do the current locale target thing (but oddly GNU libiconv doesn't) */
-#ifdef HAVE_SETLOCALE
-  setlocale(LC_CTYPE, "");
-#endif /* #ifdef HAVE_SETLOCALE */
-  /* Convert from Windows code page 1252 to our current locale.
-     CP1252 is a valid name of the Windows-1252 charset used by WoS, Tapir and
-     ZX-Blockeditor on at least Linux, MacOS X and Solaris 9. If we need to use
-     another string on another OS we will need to do a little more */
-  conversion_descriptor = iconv_open("", "CP1252");
-#endif /* #ifdef HAVE_ICONV */
 
   while( ++arg < argc )
     ret |= process_tape( argv[arg] );
-
-#ifdef HAVE_ICONV
-  if( conversion_descriptor != (iconv_t)(-1) ) {
-    error = iconv_close( conversion_descriptor ); if( error ) return error;
-  }
-#endif /* #ifdef HAVE_ICONV */
 
   return ret;
 }

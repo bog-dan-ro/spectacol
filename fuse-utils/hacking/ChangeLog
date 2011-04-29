@@ -329,3 +329,4 @@
 20110414 tape2wav.c: allow writing WAV file to stdout on Windows (patch
          #3286205) (Sergio Baldovi).
 20110427 tzxlist.c,man/tzxlist.1: add support for reading PZX files (Fred).
+20110429 tzxlist.c: PZX files have archive info text as UTF-8 (Fred).
