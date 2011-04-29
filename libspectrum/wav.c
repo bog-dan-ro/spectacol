@@ -38,6 +38,7 @@ libspectrum_wav_read( libspectrum_tape *tape, const char *filename )
 {
   libspectrum_byte *buffer; size_t length;
   libspectrum_byte *tape_buffer; size_t tape_length;
+  size_t data_length;
   libspectrum_tape_block *block = NULL;
   int frames;
 
@@ -128,10 +129,13 @@ libspectrum_wav_read( libspectrum_tape *tape, const char *filename )
   libspectrum_tape_block_set_bit_length( block,
                                          3500000/afGetRate( handle, track ) );
   libspectrum_set_pause_ms( block, 0 );
-  libspectrum_tape_block_set_bits_in_last_byte( block, length%8 ? length%8 : 8 );
-  libspectrum_tape_block_set_data_length( block, tape_length/8 );
+  libspectrum_tape_block_set_bits_in_last_byte( block,
+              length % LIBSPECTRUM_BITS_IN_BYTE ?
+                length % LIBSPECTRUM_BITS_IN_BYTE : LIBSPECTRUM_BITS_IN_BYTE );
+  data_length = tape_length / LIBSPECTRUM_BITS_IN_BYTE;
+  libspectrum_tape_block_set_data_length( block, data_length );
 
-  tape_buffer = libspectrum_calloc( tape_length/8, sizeof( *tape_buffer ) );
+  tape_buffer = libspectrum_calloc( data_length, sizeof( *tape_buffer ) );
 
   libspectrum_byte *from = buffer;
   libspectrum_byte *to = tape_buffer;

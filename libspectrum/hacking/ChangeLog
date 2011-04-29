@@ -836,3 +836,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          libspectrum.c,libspectrum.h.in,pzx_read.c,tap.c,tape.c,
          tape_accessors.txt,tape_block.[ch],tzx_read.c: add read support for PZX
          tape files (Fred).
+20110429 wav.c: use some more LIBSPECTRUM_BITS_IN_BYTE constants (Fred).
