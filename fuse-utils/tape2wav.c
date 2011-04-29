@@ -166,6 +166,11 @@ write_tape( char *filename, libspectrum_tape *tape )
       }
     }
 
+    if( flags & LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW )
+      level = 0;
+    else if( flags & LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH )
+      level = 1;
+
     for( i = 0; i < pulse_length; i++ ) {
       buffer[ tape_length++ ] = level ? 0xff : 0x00;
     }
