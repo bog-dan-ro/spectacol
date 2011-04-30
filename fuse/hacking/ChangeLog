@@ -3619,3 +3619,6 @@
 20110430 ui/win32/{statusbar.c,win32display.c,win32internals.h}: add machine
          name into the status bar the same as the GTK UI. Fix a few compiler
          warnings (patch #3294566) (Sergio Baldovi).
+20110430 ui/win32/win32ui.c: make selection dialogs accurately resized to show a
+         full caption title, resize properly with high DPI settings (more of
+         patch #3258533) (Sergio Baldovi).

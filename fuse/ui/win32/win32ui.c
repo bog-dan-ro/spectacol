@@ -740,74 +740,173 @@ win32ui_get_monospaced_font( HFONT *font )
   return 0;
 }
 
+int
+window_recommended_width( HWND hwndDlg, TCHAR *title )
+{
+  HDC dc;
+  SIZE sz;
+  LONG_PTR window_style;
+  NONCLIENTMETRICS ncm;
+  HFONT hCaptionFont, hDefaultFont;
+  RECT cr, wr;
+  int width, buttons;
+
+  /* Get window style */
+  window_style = GetWindowLongPtr( hwndDlg, GWL_STYLE );
+  if( !( window_style & WS_CAPTION ) ) return 0;
+
+  /* Get caption bar font */
+  dc = GetDC( hwndDlg );
+  if( !dc ) return 0;
+  ncm.cbSize = sizeof( NONCLIENTMETRICS );
+  /* FIXME: iPaddedBorderWidth,
+     http://msdn.microsoft.com/en-us/library/ms724506%28VS.85%29.aspx */
+  SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0 );
+  hCaptionFont = CreateFontIndirect( &ncm.lfCaptionFont );
+  hDefaultFont = SelectObject( dc, hCaptionFont );
+
+  /* Calculate title width (pixels) */
+  SetMapMode( dc, MM_TEXT );
+  GetTextExtentPoint32( dc, title, _tcslen( title ), &sz );
+  width = sz.cx; /* Actually in pixels because of MM_TEXT map mode */
+  SelectObject( dc, hDefaultFont );
+  DeleteObject( hCaptionFont );
+  ReleaseDC( hwndDlg, dc );
+
+  /* Calculate buttons width (pixels) */
+  buttons = 1; /* close  button */
+  if( window_style & WS_MAXIMIZEBOX ) buttons++;
+  if( window_style & WS_MINIMIZEBOX ) buttons++;
+  width += ncm.iCaptionWidth * buttons;
+
+  /* Window decorations width (pixels) */
+  GetWindowRect( hwndDlg, &wr );
+  GetClientRect( hwndDlg, &cr );
+  width += ( wr.right - wr.left ) - ( cr.right - cr.left ); 
+
+  /* Icon width (pixels) */
+  window_style = GetWindowLongPtr( hwndDlg, GWL_EXSTYLE );
+  if( !(window_style & WS_EX_DLGMODALFRAME) )
+    width += GetSystemMetrics( SM_CXSMICON );
+
+  /* Padding, space between text and buttons */
+  width += 20;
+
+  return width;
+}
+
 void
 win32ui_set_font( HWND hDlg, int nIDDlgItem, HFONT font )
 {
   SendDlgItemMessage( hDlg, nIDDlgItem , WM_SETFONT, (WPARAM) font, FALSE );
 }  
 
+static void
+selector_dialog_build( HWND hwndDlg, win32ui_select_info *items )
+{
+  int i, left, caption_width, decor_width, decor_height;
+  int window_width, window_height, client_width, client_height;
+  DWORD dwStyle;
+  RECT wr, cr, or;
+
+  /* set the title of the window */
+  SendMessage( hwndDlg, WM_SETTEXT, 0, (LPARAM) items->dialog_title );
+
+  /* Get decorations (pixels) */
+  GetWindowRect( hwndDlg, &wr );
+  GetClientRect( hwndDlg, &cr );
+  decor_width = ( wr.right - wr.left ) - ( cr.right - cr.left );
+  decor_height = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
+
+  /* calculate window width (pixels) */
+  or.left = or.top = or.bottom = 0;
+  or.right = 100 + 14 + 5; /* 2 buttons, 2 margins, 1 separation (DLUs) */
+  MapDialogRect( hwndDlg, &or );
+
+  window_width = or.right + decor_width;
+  caption_width = window_recommended_width( hwndDlg, items->dialog_title );
+  if( caption_width > window_width ) window_width = caption_width;
+  client_width = window_width - decor_width;
+
+  /* create radio buttons */
+  client_height = 7; /* Top margin (DLUs) */
+  for( i=0; i< items->length; i++ ) {
+
+    dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTORADIOBUTTON;
+    /* Need for WS_GROUP to allow using arrow up/down to cycle thru this group */
+    if( i == 0 ) dwStyle = dwStyle | WS_GROUP;
+
+    or.left = 7; /* Left margin (DLUs) */
+    or.top = client_height; /* Top position (DLUs) */
+    or.right = 160; /* Control width (DLUs) */
+    or.bottom = 9; /* Control height (DLUs) */
+    MapDialogRect( hwndDlg, &or );
+    client_height += 9; /* Control height (DLUs) */
+
+    CreateWindow( TEXT( "BUTTON" ), items->labels[i],
+                  dwStyle,
+                  or.left, or.top, or.right, or.bottom,
+                  hwndDlg, (HMENU) ( IDC_SELECT_OFFSET + i ), fuse_hInstance, 0 );
+    SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), WM_SETFONT,
+                        (WPARAM) h_ms_font, FALSE );
+
+    /* check the radiobutton corresponding to current label */
+    if( i == items->selected ) {
+      SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), BM_SETCHECK,
+                          BST_CHECKED, 0 );
+    }
+
+    client_height += 2; /* Separation between radio buttons (DLUs) */
+  }
+  client_height += 5; /* Space after radio buttons (actually 7 DLUs) */
+
+  /* create OK and Cancel buttons */
+  or.left = 5; /* Vertical space between buttons (DLUs) */
+  or.top = client_height; /* Position Y (DLUs) */
+  or.right = 50; /* Typical width of buttons (DLUs) */
+  or.bottom = 14; /* Typical height of buttons (DLUs) */
+  MapDialogRect( hwndDlg, &or );
+
+  left = ( client_width - or.left - ( or.right * 2 ) ) / 2; /* centered */
+  CreateWindow( TEXT( "BUTTON" ), TEXT( "&OK" ),
+                WS_VISIBLE | WS_CHILD | WS_TABSTOP | WS_GROUP | BS_DEFPUSHBUTTON,
+                left, or.top, or.right, or.bottom,
+                hwndDlg, (HMENU) IDOK, fuse_hInstance, 0 );
+  SendDlgItemMessage( hwndDlg, IDOK, WM_SETFONT,
+                      (WPARAM) h_ms_font, FALSE );
+
+  left += or.right + or.left;
+  CreateWindow( TEXT( "BUTTON" ), TEXT( "&Cancel" ),
+                WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+                left, or.top, or.right, or.bottom,
+                hwndDlg, (HMENU) IDCANCEL, fuse_hInstance, 0 );
+  SendDlgItemMessage( hwndDlg, IDCANCEL, WM_SETFONT,
+                      (WPARAM) h_ms_font, FALSE );
+
+  client_height += 21; /* Button height (14) + bottom margin (7) (DLUs) */
+
+  /* Calculate window heigth (pixels) */
+  wr.left = wr.top = wr.right = 0;
+  wr.bottom = client_height;
+  MapDialogRect( hwndDlg, &wr );
+  window_height = decor_height + wr.bottom;
+
+  /* the following will only change the size of the window */
+  SetWindowPos( hwndDlg, NULL, 0, 0, window_width, window_height,
+                SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+}
+
 static INT_PTR CALLBACK
 selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-  int i, pos_y;
-  win32ui_select_info *items;
+  int i;
   HWND next_item = NULL;
-  DWORD dwStyle;
 
   switch( uMsg )
   {
     case WM_INITDIALOG: 
       /* items are passed to WM_INITDIALOG as lParam */
-      items = ( win32ui_select_info * ) lParam;
-      
-      /* set the title of the window */
-      SendMessage( hwndDlg, WM_SETTEXT, 0, (LPARAM) items->dialog_title );
-      
-      /* create radio buttons */
-      pos_y = 8;
-      for( i=0; i< items->length; i++ ) {
-
-        dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTORADIOBUTTON;
-        /* Need for WS_GROUP to allow using arrow up/down to cycle thru this group */
-        if( i == 0 ) dwStyle = dwStyle | WS_GROUP;
-
-        CreateWindow( TEXT( "BUTTON" ), items->labels[i],
-                      dwStyle,
-                      8, pos_y, 155, 16,
-                      hwndDlg, (HMENU) ( IDC_SELECT_OFFSET + i ), fuse_hInstance, 0 );
-        SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), WM_SETFONT,
-                            (WPARAM) h_ms_font, FALSE );
-
-        /* check the radiobutton corresponding to current label */
-        if( i == items->selected ) {
-          SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), BM_SETCHECK,
-                              BST_CHECKED, 0 );
-        }
-
-        pos_y += 16;
-      }
-
-      /* create OK and Cancel buttons */
-      pos_y += 6;
-      CreateWindow( TEXT( "BUTTON" ), TEXT( "&OK" ),
-                    WS_VISIBLE | WS_CHILD | WS_TABSTOP | WS_GROUP | BS_DEFPUSHBUTTON,
-                    6, pos_y, 75, 23,
-                    hwndDlg, (HMENU) IDOK, fuse_hInstance, 0 );
-      SendDlgItemMessage( hwndDlg, IDOK, WM_SETFONT,
-                          (WPARAM) h_ms_font, FALSE );
-
-      CreateWindow( TEXT( "BUTTON" ), TEXT( "&Cancel" ),
-                    WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-                    90, pos_y, 75, 23,
-                    hwndDlg, (HMENU) IDCANCEL, fuse_hInstance, 0 );
-      SendDlgItemMessage( hwndDlg, IDCANCEL, WM_SETFONT,
-                          (WPARAM) h_ms_font, FALSE );
-
-      pos_y += 32 + 23 + 5;
-      /* the following will only change the size of the window */
-      SetWindowPos( hwndDlg, NULL, 0, 0, 177, pos_y,
-                    SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
-      
+      selector_dialog_build( hwndDlg, ( win32ui_select_info * ) lParam );
       return TRUE;
 
     case WM_SETFONT:
