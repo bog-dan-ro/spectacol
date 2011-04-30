@@ -3613,4 +3613,6 @@
          (Sergio Baldovi).
 20110425 ui/gtk/{gtkdisplay.c,gtkinternals.h,statusbar.c}: fix warnings.
 20110430 configure.in: fix complilation --without-gtk --with-x with libpng 1.4
-         installed as libpng14 (thanks, rdk77) (Fred).
+         installed as libpng14 (thanks, rkd77) (Fred).
+20110430 ui/xlib/xjoystick.c: fix complilation --without-gtk --with-x with
+         joystick configured (rkd77).

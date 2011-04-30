@@ -26,6 +26,7 @@
 */
 
 #include <config.h>
+#include "peripherals/joystick.h"
 
 #if !defined USE_JOYSTICK || defined HAVE_JSW_H
 /* Fake joystick, or override UI-specific handling */
