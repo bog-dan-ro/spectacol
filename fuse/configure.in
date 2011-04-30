@@ -370,28 +370,29 @@ if test "$libpng" = yes; then
   if test -n "$LIBPNG_CONFIG"; then
     PNG_CFLAGS=`libpng-config --cflags`
     PNG_LIBS=`libpng-config --ldflags`
-    PNG_LIBS=`echo " $PNG_LIBS" | sed 's/ -l[[^ ]][[^ ]]*//g'`
+    AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng])
+  else
+    ac_save_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
+    ac_save_LDFLAGS="$LDFLAGS"
+    LDFLAGS="$PNG_LIBS $LDFLAGS"
+
+    AC_CHECK_LIB( png, png_write_png,
+      [AC_CHECK_HEADER(
+        png.h,
+        [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
+        [AC_CHECK_HEADERS(libpng/png.h,
+                     [CPPFLAGS="$ac_save_CPPFLAGS $PNG_CFLAGS/libpng"
+                      AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
+                     [AC_MSG_WARN(png.h not found - saving screenshots disabled)
+                      PNG_LIBS='']
+        )],
+      )],
+      [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)
+       PNG_LIBS='']
+    )
   fi
 
-  ac_save_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
-  ac_save_LDFLAGS="$LDFLAGS"
-  LDFLAGS="$PNG_LIBS $LDFLAGS"
-
-  AC_CHECK_LIB( png, png_write_png,
-    [AC_CHECK_HEADER(
-      png.h,
-      [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
-      [AC_CHECK_HEADERS(libpng/png.h,
-                   [CPPFLAGS="$ac_save_CPPFLAGS $PNG_CFLAGS/libpng"
-                    AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
-                   [AC_MSG_WARN(png.h not found - saving screenshots disabled)
-                    PNG_LIBS='']
-      )],
-    )],
-    [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)
-     PNG_LIBS='']
-  )
   AC_SUBST(PNG_LIBS)
 fi
 
