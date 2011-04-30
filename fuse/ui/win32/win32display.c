@@ -55,9 +55,9 @@ static unsigned char rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
 static const int rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
 /* The scaled image */
-static unsigned char scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
-                                  (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
-static const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
+static unsigned char scaled_image[ 3 * DISPLAY_SCREEN_HEIGHT *
+                                   6 * DISPLAY_SCREEN_WIDTH ];
+static const ptrdiff_t scaled_pitch = 6 * DISPLAY_SCREEN_WIDTH;
 
 /* Win32 specific variables */
 static void *win32_pixdata;
@@ -222,6 +222,8 @@ win32display_drawing_area_resize( int width, int height, int force_scaler )
 int
 uidisplay_init( int width, int height )
 {
+  const char *machine_name;
+
   image_width = width; image_height = height;
   image_scale = width / DISPLAY_ASPECT_WIDTH;
 
@@ -233,6 +235,9 @@ uidisplay_init( int width, int height )
         scaler_select_scaler( SCALER_NORMAL );
 
   win32display_load_gfx_mode();
+
+  machine_name = libspectrum_machine_name( machine_current->machine );
+  win32statusbar_update_machine( machine_name );
 
   return 0;
 }

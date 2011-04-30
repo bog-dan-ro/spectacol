@@ -124,6 +124,12 @@ win32statusbar_set_visibility( int visible )
   return 0;
 }
 
+void
+win32statusbar_update_machine( const char *name )
+{
+  SendMessage( fuse_hStatusWindow, SB_SETTEXT, (WPARAM) 0, (LPARAM) name );
+}
+
 int
 ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 {
@@ -257,7 +263,7 @@ win32statusbar_redraw( HWND hWnd, LPARAM lParam )
 }
 
 void
-win32statusbar_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
+win32statusbar_resize( HWND hWnd, WPARAM wParam GCC_UNUSED, LPARAM lParam )
 {
   const int speed_bar_width = 70;
   RECT rcClient;

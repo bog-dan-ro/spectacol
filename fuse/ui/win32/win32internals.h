@@ -117,10 +117,11 @@ void win32ui_process_messages( int process_queue_once );
  * Statusbar routines (statusbar.c)
  */
 
-void win32statusbar_create();
+void win32statusbar_create( HWND hWnd );
 int win32statusbar_set_visibility( int visible );
 void win32statusbar_redraw( HWND hWnd, LPARAM lParam );
 void win32statusbar_resize( HWND hWnd, WPARAM wParam, LPARAM lParam );
+void win32statusbar_update_machine( const char *name );
 
 /*
  * Dialog box reset
