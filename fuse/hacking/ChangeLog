@@ -3387,8 +3387,8 @@
 20101231 AUTHORS,Makefile.am,compat.h,compat/{amiga,morphos,unix,wii,
          win32}/Makefile.am,compat/unix/tuntap.c,configure.in,fuse.c,menu.c,
          man/fuse.1,menu_data.dat,nic/{Makefile.am,enc28j60.[ch]},periph.[ch],
-         settings.{dat,pl},speccyboot.[ch],roms/speccyboot-1.4.rom,ui/options.dat:
-         SpeccyBoot emulation (patch #2906047) (Patrik Persson).
+         settings.{dat,pl},speccyboot.[ch],roms/speccyboot-1.4.rom,
+         ui/options.dat: SpeccyBoot emulation (patch #2906047) (Patrik Persson).
 20110101 debugger/breakpoint.c: evaluate all breakpoints again, but store the
          next breakpoint before deleteing the current one from the list 
          (really really fixes bug #3084862) (thanks, Phil) (Fred).
@@ -3460,8 +3460,8 @@
          specplus2.c,specplus3.c,specplus3e.c,spec_se.c,tc2048.c,tc2068.c,
          tc2068.h,ts2068.c},periph.[ch]: move final peripherals into new
          framework. This allows us to kill periph_setup().
-20110130 ULA book says that MIC only isn't enough to drive the speaker as output
-         voltage is below the 1.4v threshold (Fred).
+20110130 sound.c: ULA book says that MIC only isn't enough to drive the speaker
+         as output voltage is below the 1.4v threshold (Fred).
 20110130 fuse.c,machine.h,machines/machines_periph.c,Makefile.am,periph.h,
          settings.dat,sound.c,sound.h,specdrum.[ch],ui/options.dat: SpecDrum
          support (patch #3164313, very slightly reworked) (Jon Mitchell).
@@ -3502,7 +3502,7 @@
          #3175619) (rkd77).
 20110210 ui/{win32/{debugger.c,win32joystick.c,win32ui.c},xlib/xdisplay.c}:
          more compilation fixes (fixes bug #3176005) (Sergio Baldovi).
-20110210 periph.ch: remove warning about accessing uninitialised value (Fred).
+20110210 periph.[ch]: remove warning about accessing uninitialised value (Fred).
 20110213 machine.c,memory.[ch]: reset ROM source to SYSTEM on machine reset
          so tape traps work on machines with fewer ROMs than a machine with a
          custom ROM that is used first (fixes bug #3179123) (thanks, Phil
