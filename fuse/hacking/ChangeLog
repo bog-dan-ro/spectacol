@@ -3622,3 +3622,4 @@
 20110430 ui/win32/win32ui.c: make selection dialogs accurately resized to show a
          full caption title, resize properly with high DPI settings (more of
          patch #3258533) (Sergio Baldovi).
+20110501 man/fuse.1: Fix typo (AY-3-8192 -> AY-3-8912) (Stuart).
