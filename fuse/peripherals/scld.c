@@ -203,7 +203,6 @@ scld_dock_exrom_from_snapshot( memory_page *dest, int page_num, int writable,
   dest->offset = 0;
   dest->page_num = page_num;
   dest->writable = writable;
-  dest->source = MEMORY_SOURCE_CARTRIDGE;
   dest->page =
     memory_pool_allocate( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
   if( !dest->page ) {
@@ -275,8 +274,8 @@ scld_to_snapshot( libspectrum_snap *snap )
 
     for( i = 0; i < 8; i++ ) {
 
-      if( memory_map_exrom[i]->source == MEMORY_SOURCE_CARTRIDGE ||
-	  memory_map_exrom[i]->writable ) {
+      if( memory_map_exrom[i]->save_to_snapshot ||
+          memory_map_exrom[i]->writable            ) {
         buffer = malloc( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
@@ -290,8 +289,8 @@ scld_to_snapshot( libspectrum_snap *snap )
         libspectrum_snap_set_exrom_cart( snap, i, buffer );
       }
 
-      if( memory_map_dock[i]->source == MEMORY_SOURCE_CARTRIDGE ||
-	  memory_map_dock[i]->writable ) {
+      if( memory_map_dock[i]->save_to_snapshot ||
+	  memory_map_dock[i]->writable            ) {
         buffer = malloc( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,

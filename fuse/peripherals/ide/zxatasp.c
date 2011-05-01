@@ -166,6 +166,7 @@ int
 zxatasp_init( void )
 {
   int error = 0, i;
+  int zxatasp_source;
 
   zxatasp_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   zxatasp_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
@@ -188,7 +189,9 @@ zxatasp_init( void )
   }
 
   module_register( &zxatasp_module_info );
-  for( i = 0; i < 2; i++ ) zxatasp_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  zxatasp_source = memory_source_register( "ZXATASP" );
+  for( i = 0; i < 2; i++ ) zxatasp_memory_map_romcs[i].source = zxatasp_source;
 
   periph_register( PERIPH_TYPE_ZXATASP, &zxatasp_periph );
   if( periph_register_paging_events( event_type_string, &page_event,

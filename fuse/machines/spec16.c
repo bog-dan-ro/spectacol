@@ -93,8 +93,7 @@ spec16_reset( void )
     empty_mapping.page = empty_chunk;
     empty_mapping.writable = 0;
     empty_mapping.contended = 0;
-    empty_mapping.bank = MEMORY_BANK_NONE;
-    empty_mapping.source = MEMORY_SOURCE_SYSTEM;
+    empty_mapping.source = memory_source_none;
   }
 
   memory_map_home[4] = memory_map_home[5] = &empty_mapping;

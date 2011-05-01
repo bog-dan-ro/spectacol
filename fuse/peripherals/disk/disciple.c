@@ -155,6 +155,7 @@ disciple_init( void )
 {
   int i;
   wd_fdc_drive *d;
+  int disciple_source;
 
   disciple_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
 
@@ -176,8 +177,10 @@ disciple_init( void )
   index_event = event_register( disciple_event_index, "DISCiPLE index" );
 
   module_register( &disciple_module_info );
+  
+  disciple_source = memory_source_register( "DISCiPLE" );
   for( i = 0; i < 3; i++ )
-    disciple_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+    disciple_memory_map_romcs[i].source = disciple_source;
 
   periph_register( PERIPH_TYPE_DISCIPLE, &disciple_periph );
 
@@ -207,11 +210,7 @@ disciple_reset( int hard_reset )
     return;
   }
 
-  disciple_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-  disciple_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
-
   disciple_memory_map_romcs[2].page = disciple_ram;
-  disciple_memory_map_romcs[2].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 1;
 

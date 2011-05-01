@@ -139,8 +139,6 @@ $[[:xdigit:]]+	{ yylval.integer = strtol( yytext+1, NULL, 16 );
 		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 		  return NUMBER; }
 
-[cdrx][[:digit:]]+ { yylval.integer = debugger_page_hash( yytext ); return PAGE; }
-
 {ID}		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
 ${ID}		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext + 1 ); return VARIABLE; }
 

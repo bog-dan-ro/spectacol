@@ -199,9 +199,9 @@ widget_pokefinder_keyhandler( input_key key )
     {
       widget_rectangle( 128, 32, 112, 8, WIDGET_COLOUR_BACKGROUND );
       if( debugger_breakpoint_add_address(
-            DEBUGGER_BREAKPOINT_TYPE_WRITE, possible_page[selected],
-	    possible_offset[selected], 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT,
-	    NULL
+            DEBUGGER_BREAKPOINT_TYPE_WRITE, memory_source_ram,
+            possible_page[selected], possible_offset[selected], 0,
+            DEBUGGER_BREAKPOINT_LIFE_PERMANENT, NULL
 	  ) ) {
 	widget_printstring( 16, 88, WIDGET_COLOUR_FOREGROUND,
 			    "Breakpoint failed" );

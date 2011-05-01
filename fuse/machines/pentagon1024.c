@@ -46,8 +46,6 @@ static int pentagon1024_memory_map( void );
 int
 pentagon1024_init( fuse_machine_info *machine )
 {
-  int i;
-
   machine->machine = LIBSPECTRUM_MACHINE_PENT1024;
   machine->id = "pentagon1024";
 
@@ -63,8 +61,6 @@ pentagon1024_init( fuse_machine_info *machine )
   machine->shutdown = NULL;
 
   machine->memory_map = pentagon1024_memory_map;
-
-  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
   return 0;
 }

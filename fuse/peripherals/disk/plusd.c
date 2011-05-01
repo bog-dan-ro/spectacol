@@ -140,6 +140,7 @@ plusd_init( void )
 {
   int i;
   wd_fdc_drive *d;
+  int plusd_source;
 
   plusd_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
 
@@ -161,7 +162,9 @@ plusd_init( void )
   index_event = event_register( plusd_event_index, "+D index" );
 
   module_register( &plusd_module_info );
-  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  plusd_source = memory_source_register( "PlusD" );
+  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].source = plusd_source;
 
   periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
 
@@ -191,10 +194,7 @@ plusd_reset( int hard_reset )
     return;
   }
 
-  plusd_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-
   plusd_memory_map_romcs[1].page = plusd_ram;
-  plusd_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
 
@@ -694,7 +694,7 @@ plusd_to_snapshot( libspectrum_snap *snap )
   buffer = alloc_and_copy_page( plusd_memory_map_romcs[0].page );
   if( !buffer ) return;
   libspectrum_snap_set_plusd_rom( snap, 0, buffer );
-  if( plusd_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM )
+  if( plusd_memory_map_romcs[0].save_to_snapshot )
     libspectrum_snap_set_plusd_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( plusd_ram );

@@ -1,5 +1,5 @@
 /* commandy.y: Parse a debugger command
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2011 Philip Kendall
 
    $Id$
 
@@ -53,7 +53,8 @@
 
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
-  struct { int value1; libspectrum_word value2; } pair;
+  struct { libspectrum_word mask, value; } port;
+  struct { int source; int page; int offset; } location;
 
   debugger_expression* exp;
 
@@ -97,7 +98,6 @@
 %token		 TIME
 %token		 WRITE
 
-%token <integer> PAGE
 %token <reg>	 DEBUGGER_REGISTER
 
 %token <integer> NUMBER
@@ -111,8 +111,8 @@
 
 %type  <bplife>  breakpointlife
 %type  <bptype>  breakpointtype
-%type  <integer> pageornumber
-%type  <pair>    breakpointpair
+%type  <port>    breakpointport
+%type  <location> breakpointlocation
 %type  <bptype>  portbreakpointtype
 %type  <integer> numberorpc
 %type  <integer> number
@@ -151,15 +151,14 @@ input:	 /* empty */
 ;
 
 command:   BASE number { debugger_output_base = $2; }
-	 | breakpointlife breakpointtype breakpointpair optionalcondition {
-             debugger_breakpoint_add_address( $2, $3.value1, $3.value2, 0, $1,
-					      $4 );
+	 | breakpointlife breakpointtype breakpointlocation optionalcondition {
+             debugger_breakpoint_add_address( $2, $3.source, $3.page, $3.offset,
+                                              0, $1, $4 );
 	   }
-	 | breakpointlife PORT portbreakpointtype breakpointpair optionalcondition {
-	     int mask; libspectrum_word port;
-	     mask = $4.value1; port = $4.value2;
-	     if( mask == -1 ) mask = ( port < 0x100 ? 0x00ff : 0xffff );
-	     debugger_breakpoint_add_port( $3, port, mask, 0, $1, $5 );
+	 | breakpointlife PORT portbreakpointtype breakpointport optionalcondition {
+	     int mask = $4.mask;
+	     if( mask == 0 ) mask = ( $4.value < 0x100 ? 0x00ff : 0xffff );
+	     debugger_breakpoint_add_port( $3, $4.value, mask, 0, $1, $5 );
            }
 	 | breakpointlife TIME number optionalcondition {
 	     debugger_breakpoint_add_time( DEBUGGER_BREAKPOINT_TYPE_TIME,
@@ -201,12 +200,22 @@ breakpointtype:   /* empty */ { $$ = DEBUGGER_BREAKPOINT_TYPE_EXECUTE; }
                 | WRITE       { $$ = DEBUGGER_BREAKPOINT_TYPE_WRITE; }
 ;
 
-breakpointpair:   numberorpc { $$.value1 = -1; $$.value2 = $1; }
-		| pageornumber ':' number { $$.value1 = $1; $$.value2 = $3; }
+breakpointport:   number { $$.mask = 0; $$.value = $1; }
+		| number ':' number { $$.mask = $1; $$.value = $3; }
 ;
 
-pageornumber:   PAGE { $$ = $1; }
-	      | number { $$ = $1; }
+breakpointlocation:   numberorpc { $$.source = memory_source_any; $$.offset = $1; }
+                    | STRING ':' number ':' number {
+                        $$.source = memory_source_find( $1 );
+                        if( $$.source == -1 ) {
+                          char buffer[80];
+                          snprintf( buffer, 80, "unknown memory source \"%s\"", $1 );
+                          yyerror( buffer );
+                          YYERROR;
+                        }
+                        $$.page = $3;
+                        $$.offset = $5;
+                      }
 
 portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }
 		    | WRITE { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE; }

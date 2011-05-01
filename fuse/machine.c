@@ -271,8 +271,7 @@ machine_load_rom_bank_from_buffer( memory_page* bank_map, size_t which,
   }
 
   memcpy( bank_map[ which ].page, buffer, length );
-  bank_map[ which ].source = custom ? MEMORY_SOURCE_CUSTOMROM :
-                                      MEMORY_SOURCE_SYSTEM;
+  bank_map[ which ].save_to_snapshot = custom;
 
   for( i = 1, offset = MEMORY_PAGE_SIZE;
        offset < length;
@@ -280,8 +279,7 @@ machine_load_rom_bank_from_buffer( memory_page* bank_map, size_t which,
     bank_map[ which + i ].offset = offset;
     bank_map[ which + i ].page_num = page_num;
     bank_map[ which + i ].page = bank_map[ which ].page + offset;
-    bank_map[ which + i ].source = custom ? MEMORY_SOURCE_CUSTOMROM :
-                                            MEMORY_SOURCE_SYSTEM;
+    bank_map[ which + i ].save_to_snapshot = custom;
   }
 
   return 0;

@@ -126,6 +126,7 @@ opus_init( void )
 {
   int i;
   wd_fdc_drive *d;
+  int opus_source;
 
   opus_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_OPUS );
 
@@ -147,7 +148,9 @@ opus_init( void )
   index_event = event_register( opus_event_index, "Opus index" );
 
   module_register( &opus_module_info );
-  for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  opus_source = memory_source_register( "Opus") ;
+  for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].source = opus_source;
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
 
@@ -177,10 +180,7 @@ opus_reset( int hard_reset )
     return;
   }
 
-  opus_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-
   opus_memory_map_romcs[1].page = opus_ram;
-  opus_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
 
@@ -729,7 +729,7 @@ opus_to_snapshot( libspectrum_snap *snap )
   buffer = alloc_and_copy_page( opus_memory_map_romcs[0].page );
   if( !buffer ) return;
   libspectrum_snap_set_opus_rom( snap, 0, buffer );
-  if( opus_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM )
+  if( opus_memory_map_romcs[0].save_to_snapshot )
     libspectrum_snap_set_opus_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( opus_ram );

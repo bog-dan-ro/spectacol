@@ -341,7 +341,7 @@ static void display_registers( void )
     sprintf( pbuf, "P%X", i );
     widget_printstring_right( x, y, 5, pbuf );
     snprintf( pbuf, sizeof( pbuf ), "%s %d",
-	      memory_bank_name( &memory_map_read[i] ),
+              memory_source_description( memory_map_read[i].source ),
 	      memory_map_read[i].page_num );
     x = widget_printstring( x + 4, y, 7, pbuf ) + 4;
     if( memory_map_read[i].writable )
@@ -446,16 +446,14 @@ static void display_breakpts( void )
     case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
     case DEBUGGER_BREAKPOINT_TYPE_READ:
     case DEBUGGER_BREAKPOINT_TYPE_WRITE:
-      if( bp->value.address.page == -1 )
+      if( bp->value.address.source == memory_source_any )
 	sprintf( pbuf, format_16_bit(), bp->value.address.offset );
       else {
-	debugger_breakpoint_decode_page( pbuf, sizeof( pbuf ) - 12,
-					 bp->value.address.page );
-	if( pbuf[0] == '[' )
-	  sprintf( pbuf, "?%d", bp->value.address.page );
-	strcat( pbuf, ":" );
-	sprintf( pbuf + strlen( pbuf ), format_16_bit(),
-		 bp->value.address.offset );
+        snprintf( fmt, sizeof( fmt ), "%%s:%s:%s", format_16_bit(),
+                  format_16_bit() );
+        snprintf( pbuf, sizeof( pbuf ), fmt,
+                  memory_source_description( bp->value.address.source ),
+                  bp->value.address.page, bp->value.address.offset );
       }
       break;
 

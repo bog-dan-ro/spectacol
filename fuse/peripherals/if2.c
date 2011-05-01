@@ -68,9 +68,12 @@ int
 if2_init( void )
 {
   int i;
+  int if2_source;
 
   module_register( &if2_module_info );
-  for( i = 0; i < 2; i++ ) if2_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  if2_source = memory_source_register( "If2" );
+  for( i = 0; i < 2; i++ ) if2_memory_map_romcs[i].source = if2_source;
 
   periph_register( PERIPH_TYPE_INTERFACE2, &if2_periph );
 
@@ -133,9 +136,6 @@ if2_reset( int hard_reset GCC_UNUSED )
 			      2 * MEMORY_PAGE_SIZE ) )
     return;
 
-  if2_memory_map_romcs[0].source =
-    if2_memory_map_romcs[1].source = MEMORY_SOURCE_CARTRIDGE;
-
   machine_current->ram.romcs = 1;
 
   if2_active = 1;
@@ -180,8 +180,6 @@ if2_from_snapshot( libspectrum_snap *snap )
     if2_memory_map_romcs[1].page_num = 0;
     if2_memory_map_romcs[1].page =
       if2_memory_map_romcs[0].page + MEMORY_PAGE_SIZE;
-    if2_memory_map_romcs[1].source =
-      if2_memory_map_romcs[0].source = MEMORY_SOURCE_CARTRIDGE;
   }
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 1 );

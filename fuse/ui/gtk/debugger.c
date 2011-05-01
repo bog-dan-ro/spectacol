@@ -1,5 +1,5 @@
 /* debugger.c: the GTK+ debugger
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2011 Philip Kendall
 
    $Id$
 
@@ -560,7 +560,7 @@ stack_activate( GtkTreeView *tree_view, GtkTreePath *path,
     gtk_tree_model_get( model, &it, STACK_COLUMN_VALUE_INT, &address, -1 );
 
     error = debugger_breakpoint_add_address(
-      DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1, address, 0,
+      DEBUGGER_BREAKPOINT_TYPE_EXECUTE, memory_source_any, 0, address, 0,
       DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
     );
     if( error ) return;
@@ -815,7 +815,8 @@ update_memory_map( void )
     snprintf( buffer, 40, format_16_bit(), (unsigned)i * 0x2000 );
     gtk_label_set_text( GTK_LABEL( map_label[i][0] ), buffer );
 
-    snprintf( buffer, 40, "%s %d", memory_bank_name( &memory_map_read[i] ),
+    snprintf( buffer, 40, "%s %d",
+              memory_source_description( memory_map_read[i].source ),
 	      memory_map_read[i].page_num );
     gtk_label_set_text( GTK_LABEL( map_label[i][1] ), buffer );
 
@@ -840,23 +841,22 @@ update_breakpoints( void )
 
     debugger_breakpoint *bp = ptr->data;
     GtkTreeIter it;
-    gchar buffer[40], page[40], format_string[40];
+    gchar buffer[40], format_string[40];
 
     switch( bp->type ) {
 
     case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
     case DEBUGGER_BREAKPOINT_TYPE_READ:
     case DEBUGGER_BREAKPOINT_TYPE_WRITE:
-      if( bp->value.address.page == -1 ) {
+      if( bp->value.address.source == memory_source_any ) {
 	snprintf( buffer, sizeof( buffer ), format_16_bit(),
 		  bp->value.address.offset );
       } else {
-	debugger_breakpoint_decode_page( page, sizeof( page ),
-					 bp->value.address.page );
-	snprintf( format_string, sizeof( format_string ), "%%s:%s",
-		  format_16_bit() );
-	snprintf( buffer, sizeof( buffer ), format_string, page,
-		  bp->value.address.offset );
+	snprintf( format_string, sizeof( format_string ), "%%s:%s:%s",
+		  format_16_bit(), format_16_bit() );
+	snprintf( buffer, sizeof( buffer ), format_string,
+                  memory_source_description( bp->value.address.source ),
+                  bp->value.address.page, bp->value.address.offset );
       }
       break;
 

@@ -293,6 +293,7 @@ int
 if1_init( void )
 {
   int m, i;
+  int if1_source;
 
   if1_ula.fd_r = -1;
   if1_ula.fd_t = -1;
@@ -330,7 +331,9 @@ if1_init( void )
   }
 
   module_register( &if1_module_info );
-  for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  if1_source = memory_source_register( "If1" );
+  for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].source = if1_source;
 
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
@@ -376,8 +379,6 @@ if1_reset( int hard_reset GCC_UNUSED )
     periph_activate_type( PERIPH_TYPE_INTERFACE1, 0 );
     return;
   }
-
-  if1_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
   
@@ -465,10 +466,10 @@ if1_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_interface1_paged ( snap, if1_active );
   libspectrum_snap_set_interface1_drive_count( snap, 8 );
 
-  if( if1_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
+  if( if1_memory_map_romcs[0].save_to_snapshot ) {
     size_t rom_length = MEMORY_PAGE_SIZE;
 
-    if( if1_memory_map_romcs[1].source == MEMORY_SOURCE_CUSTOMROM ) {
+    if( if1_memory_map_romcs[1].save_to_snapshot ) {
       rom_length <<= 1;
     }
 

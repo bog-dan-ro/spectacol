@@ -149,7 +149,6 @@ dck_reset( void )
 	memcpy( mem[i]->page, dck->dck[num_block]->pages[i],
 		MEMORY_PAGE_SIZE );
         mem[i]->writable = 0;
-        mem[i]->source = MEMORY_SOURCE_CARTRIDGE;
         break;
 
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
@@ -165,7 +164,6 @@ dck_reset( void )
           mem[i]->writable = 1;
         }
 	
-        mem[i]->source = MEMORY_SOURCE_CARTRIDGE;
 	memcpy( mem[i]->page, dck->dck[num_block]->pages[i],
 		MEMORY_PAGE_SIZE );
         break;

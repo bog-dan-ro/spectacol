@@ -113,6 +113,7 @@ int
 divide_init( void )
 {
   int error, i;
+  int divide_source;
 
   divide_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   divide_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
@@ -135,7 +136,9 @@ divide_init( void )
   }
 
   module_register( &divide_module_info );
-  for( i = 0; i < 2; i++ ) divide_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  divide_source = memory_source_register( "DivIDE" );
+  for( i = 0; i < 2; i++ ) divide_memory_map_romcs[i].source = divide_source;
 
   periph_register( PERIPH_TYPE_DIVIDE, &divide_periph );
   if( periph_register_paging_events( event_type_string, &page_event,

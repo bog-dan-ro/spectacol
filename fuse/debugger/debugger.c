@@ -1,5 +1,5 @@
 /* debugger.c: Fuse's monitor/debugger
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2011 Philip Kendall
 
    $Id$
 
@@ -116,9 +116,10 @@ debugger_next( void )
   debugger_disassemble( NULL, 0, &length, PC );
 
   /* And add a breakpoint after that */
-  debugger_breakpoint_add_address( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1,
-				   PC + length, 0,
-				   DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL );
+  debugger_breakpoint_add_address(
+    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, memory_source_any, 0, PC + length, 0,
+    DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
+  );
 
   debugger_run();
 
@@ -146,7 +147,7 @@ debugger_breakpoint_exit( void )
   target = readbyte_internal( SP ) + 0x100 * readbyte_internal( SP+1 );
 
   if( debugger_breakpoint_add_address(
-        DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1, target, 0,
+        DEBUGGER_BREAKPOINT_TYPE_EXECUTE, memory_source_any, 0, target, 0,
 	DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
       )
     )

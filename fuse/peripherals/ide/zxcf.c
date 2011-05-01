@@ -108,6 +108,7 @@ int
 zxcf_init( void )
 {
   int error, i;
+  int zxcf_source;
 
   last_memctl = 0x00;
                                 
@@ -123,7 +124,9 @@ zxcf_init( void )
   }
 
   module_register( &zxcf_module_info );
-  for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  zxcf_source = memory_source_register( "ZXCF" );
+  for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].source = zxcf_source;
 
   periph_register( PERIPH_TYPE_ZXCF, &zxcf_periph );
   if( periph_register_paging_events( event_type_string, &page_event,

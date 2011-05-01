@@ -92,7 +92,7 @@ ts2068_reset( void )
     memory_map_dock[i] = &timex_dock[i];
 
     timex_exrom[i] = memory_map_rom[2];
-    timex_exrom[i].bank = MEMORY_BANK_EXROM;
+    timex_exrom[i].source = memory_source_exrom;
     timex_exrom[i].page_num = i;
     memory_map_exrom[i] = &timex_exrom[i];
 

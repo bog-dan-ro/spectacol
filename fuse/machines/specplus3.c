@@ -199,7 +199,7 @@ specplus3_plus2a_common_reset( void )
 
   /* All memory comes from the home bank */
   for( i = 0; i < 8; i++ )
-    memory_map_read[i].bank = memory_map_write[i].bank = MEMORY_BANK_HOME;
+    memory_map_read[i].source = memory_map_write[i].source = memory_source_ram;
 
   /* RAM pages 4, 5, 6 and 7 contended */
   for( i = 0; i < 8; i++ )

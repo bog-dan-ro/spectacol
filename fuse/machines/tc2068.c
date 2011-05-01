@@ -102,8 +102,7 @@ tc2068_init( fuse_machine_info *machine )
     fake_mapping.page = fake_bank;
     fake_mapping.writable = 0;
     fake_mapping.contended = 0;
-    fake_mapping.bank = MEMORY_BANK_NONE;
-    fake_mapping.source = MEMORY_SOURCE_SYSTEM;
+    fake_mapping.source = memory_source_none;
     fake_mapping.offset = 0x0000;
   }
 
@@ -140,7 +139,7 @@ tc2068_reset( void )
     memory_map_dock[i] = &timex_dock[i];
 
     timex_exrom[i] = memory_map_rom[2];
-    timex_exrom[i].bank = MEMORY_BANK_EXROM;
+    timex_exrom[i].source = memory_source_exrom;
     timex_exrom[i].page_num = i;
     memory_map_exrom[i] = &timex_exrom[i];
 

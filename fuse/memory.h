@@ -1,5 +1,5 @@
 /* memory.h: memory access routines
-   Copyright (c) 2003-2004 Philip Kendall
+   Copyright (c) 2003-2011 Philip Kendall
 
    $Id$
 
@@ -30,25 +30,22 @@
 
 #include "spectrum.h"
 
-typedef enum memory_bank {
+/* Register a new memory source */
+int memory_source_register( const char *description );
 
-  MEMORY_BANK_NONE,
+/* Get the description for a given source */
+const char *memory_source_description( int source );
 
-  MEMORY_BANK_HOME,
-  MEMORY_BANK_DOCK,
-  MEMORY_BANK_EXROM,
-  MEMORY_BANK_ROMCS,
-  
-} memory_bank;
+/* Get the source for a given description */
+int memory_source_find( const char *description );
 
-typedef enum memory_page_source {
-
-  MEMORY_SOURCE_SYSTEM,
-  MEMORY_SOURCE_CARTRIDGE,
-  MEMORY_SOURCE_PERIPHERAL,
-  MEMORY_SOURCE_CUSTOMROM,
-  
-} memory_page_source;
+/* Pre-created memory sources */
+extern int memory_source_rom; /* System ROM */
+extern int memory_source_ram; /* System RAM */
+extern int memory_source_dock; /* Timex DOCK */
+extern int memory_source_exrom; /* Timex EXROM */
+extern int memory_source_any; /* Used by the debugger to signify an absolute address */
+extern int memory_source_none; /* No memory attached here */
 
 typedef struct memory_page {
 
@@ -56,11 +53,13 @@ typedef struct memory_page {
   int writable;			/* Can we write to this data? */
   int contended;		/* Are reads/writes to this page contended? */
 
-  memory_bank bank;		/* Which bank is mapped in here */
-  int page_num;			/* Which page from the bank */
-  libspectrum_word offset;	/* How far into the page this chunk starts */
+  int source;	                /* Where did this page come from? */
+  int save_to_snapshot;         /* Set if this page should be saved snapshots
+                                   (set only if this page would not normally be
+                                    saved; things like RAM are always saved) */
 
-  memory_page_source source;	/* Where did this page come from? */
+  int page_num;			/* Which page from the source */
+  libspectrum_word offset;	/* How far into the page this chunk starts */
 
 } memory_page;
 
@@ -90,8 +89,6 @@ libspectrum_byte *memory_pool_allocate( size_t length );
 libspectrum_byte *memory_pool_allocate_persistent( size_t length,
                                                    int persistent );
 void memory_pool_free( void );
-
-const char *memory_bank_name( memory_page *page );
 
 /* Map in alternate bank if ROMCS is set */
 void memory_romcs_map( void );

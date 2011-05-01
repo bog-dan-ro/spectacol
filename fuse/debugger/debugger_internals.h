@@ -1,5 +1,5 @@
 /* debugger_internals.h: The internals of Fuse's monitor/debugger
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2011 Philip Kendall
 
    $Id$
 
@@ -59,7 +59,6 @@ void debugger_exit_emulator( void );
 /* Utility functions called by the flex scanner */
 
 int debugger_command_input( char *buf, int *result, int max_size );
-int debugger_page_hash( const char *text );
 int yylex( void );
 void yyerror( const char *s );
 

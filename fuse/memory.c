@@ -1,5 +1,5 @@
 /* memory.c: Routines for accessing memory
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -40,6 +40,17 @@
 #include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
+
+/* The various sources of memory available to us */
+static GArray *memory_sources;
+
+/* Some "well-known" memory sources */
+int memory_source_rom; /* System ROM */
+int memory_source_ram; /* System RAM */
+int memory_source_dock; /* Timex DOCK */
+int memory_source_exrom; /* Timex EXROM */
+int memory_source_any; /* Used by the debugger to signify an absolute address */
+int memory_source_none; /* No memory attached here */
 
 /* Each 8Kb RAM chunk accessible by the Z80 */
 memory_page memory_map_read[8];
@@ -96,6 +107,17 @@ memory_init( void )
   size_t i;
   memory_page *mapping1, *mapping2;
 
+  memory_sources = g_array_new( FALSE, FALSE, sizeof( const char* ) );
+  if( !memory_sources ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
+    fuse_abort();
+  }
+
+  memory_source_rom = memory_source_register( "ROM" );
+  memory_source_ram = memory_source_register( "RAM" );
+  memory_source_any = memory_source_register( "Absolute address" );
+  memory_source_none = memory_source_register( "None" );
+
   /* Nothing in the memory pool as yet */
   pool = NULL;
 
@@ -105,9 +127,8 @@ memory_init( void )
 
     mapping1->page = NULL;
     mapping1->writable = 0;
-    mapping1->bank = MEMORY_BANK_HOME;
     mapping1->page_num = i;
-    mapping1->source = MEMORY_SOURCE_SYSTEM;
+    mapping1->source = memory_source_rom;
 
   }
 
@@ -120,13 +141,12 @@ memory_init( void )
     mapping2->page = &RAM[i][ MEMORY_PAGE_SIZE ];
 
     mapping1->writable = mapping2->writable = 0;
-    mapping1->bank = mapping2->bank = MEMORY_BANK_HOME;
     mapping1->page_num = mapping2->page_num = i;
 
     mapping1->offset = 0x0000;
     mapping2->offset = MEMORY_PAGE_SIZE;
 
-    mapping1->source = mapping2->source = MEMORY_SOURCE_SYSTEM;
+    mapping1->source = mapping2->source = memory_source_ram;
   }
 
   /* Just initialise these with something */
@@ -139,7 +159,43 @@ memory_init( void )
   return 0;
 }
 
+int
+memory_source_register( const char *description )
+{
+  const char *copy = strdup( description );
+  if( !copy ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
+    fuse_abort();
+  }
+
+  g_array_append_val( memory_sources, copy );
+
+  return memory_sources->len - 1;
+}
+
+const char*
+memory_source_description( int source )
+{
+  return g_array_index( memory_sources, const char*, source );
+}
+
 /* Allocate some memory from the pool */
+int
+memory_source_find( const char *description )
+{
+  int i, source = -1;
+
+  for( i = 0; i < memory_sources->len; i++ ) {
+    const char *found = g_array_index( memory_sources, const char*, i );
+    if( !strcasecmp( description, found ) ) {
+      source = i;
+      break;
+    }
+  }
+
+  return source;
+}
+
 libspectrum_byte*
 memory_pool_allocate( size_t length )
 {
@@ -192,20 +248,6 @@ memory_pool_free( void )
     free( entry->memory );
     pool = g_slist_remove( pool, entry );
   }
-}
-
-const char*
-memory_bank_name( memory_page *page )
-{
-  switch( page->bank ) {
-  case MEMORY_BANK_NONE: return "Empty";
-  case MEMORY_BANK_HOME: return page->writable ? "RAM" : "ROM";
-  case MEMORY_BANK_DOCK: return "Dock";
-  case MEMORY_BANK_EXROM: return "Exrom";
-  case MEMORY_BANK_ROMCS: return "Chip Select";
-  }
-
-  return "[Undefined]";
 }
 
 libspectrum_byte
@@ -266,7 +308,7 @@ memory_display_dirty_pentagon_16_col( libspectrum_word address,
      page 5 and 4 (if screen 1 is in use), and page 7 & 6 (if screen 2 is in
      use) and both the standard and ALTDFILE areas of those pages
    */
-  if( mapping->bank == MEMORY_BANK_HOME && 
+  if( mapping->source == memory_source_ram && 
       ( ( memory_current_screen  == 5 &&
           ( mapping->page_num == 5 || mapping->page_num == 4 ) ) ||
         ( memory_current_screen  == 7 &&
@@ -289,7 +331,7 @@ memory_display_dirty_sinclair( libspectrum_word address, libspectrum_byte b ) \
 
   /* If this is a write to the current screen (and it actually changes
      the destination), redraw that bit */
-  if( mapping->bank == MEMORY_BANK_HOME && 
+  if( mapping->source == memory_source_ram && 
       mapping->page_num == memory_current_screen &&
       ( offset2 & memory_screen_mask ) < 0x1b00 &&
       memory[ offset ] != b )
@@ -307,7 +349,7 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
   if( opus_active && address >= 0x2800 && address < 0x3800 ) {
     opus_write( address, b );
   } else if( mapping->writable ||
-             (mapping->bank != MEMORY_BANK_NONE &&
+             (mapping->source != memory_source_none &&
               settings_current.writable_roms) ) {
     libspectrum_word offset = address & 0x1fff;
     libspectrum_byte *memory = mapping->page;
@@ -390,30 +432,27 @@ write_rom_to_snap( libspectrum_snap *snap, int *current_rom_num,
   *current_rom = NULL;
 }
 
-/* Look at all ROM entries, to see if any are marked as
-   MEMORY_SOURCE_CUSTOMROM */
+/* Look at all ROM entries, to see if any are marked as being custom ROMs */
 int
 memory_custom_rom( void )
 {
   size_t i;
 
-  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
-    if( memory_map_rom[ i ].source == MEMORY_SOURCE_CUSTOMROM ) return 1;
-  }
+  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ )
+    if( memory_map_rom[ i ].save_to_snapshot )
+      return 1;
 
   return 0;
 }
 
-/* Reset all ROM entries to MEMORY_SOURCE_SYSTEM in case any were marked as
-   MEMORY_SOURCE_CUSTOMROM last reset */
+/* Reset all ROM entries to being non-custom ROMs */
 void
 memory_reset( void )
 {
   size_t i;
 
-  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
-    memory_map_rom[ i ].source = MEMORY_SOURCE_SYSTEM;
-  }
+  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ )
+    memory_map_rom[ i ].save_to_snapshot = 0;
 }
 
 static void

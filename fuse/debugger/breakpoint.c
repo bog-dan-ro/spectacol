@@ -1,5 +1,5 @@
 /* breakpoint.c: a debugger breakpoint
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2011 Philip Kendall
 
    $Id$
 
@@ -79,9 +79,9 @@ static void add_time_event( gpointer data, gpointer user_data );
 
 /* Add a breakpoint */
 int
-debugger_breakpoint_add_address( debugger_breakpoint_type type, int page,
-				 libspectrum_word offset, size_t ignore,
-				 debugger_breakpoint_life life,
+debugger_breakpoint_add_address( debugger_breakpoint_type type, int source,
+                                 int page, libspectrum_word offset,
+                                 size_t ignore, debugger_breakpoint_life life,
 				 debugger_expression *condition )
 {
   debugger_breakpoint_value value;
@@ -98,6 +98,7 @@ debugger_breakpoint_add_address( debugger_breakpoint_type type, int page,
     fuse_abort();
   }
 
+  value.address.source = source;
   value.address.page = page;
   value.address.offset = offset;
 
@@ -270,85 +271,28 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
   return ( debugger_mode == DEBUGGER_MODE_HALTED );
 }
 
-static int
-encode_bank_and_page( debugger_breakpoint_type type, libspectrum_word address )
+static memory_page*
+get_page( debugger_breakpoint_type type, libspectrum_word address )
 {
-  memory_page *read_write, *page;
-  breakpoint_page_offset offset;
+  memory_page *page;
 
   switch( type ) {
   case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
   case DEBUGGER_BREAKPOINT_TYPE_READ:
-    read_write = memory_map_read;
+    page = memory_map_read;
     break;
 
   case DEBUGGER_BREAKPOINT_TYPE_WRITE:
-    read_write = memory_map_write;
+    page = memory_map_write;
     break;
 
   default:
     ui_error( UI_ERROR_ERROR,
-	      "encode_bank_and_page: unexpected breakpoint type %d", type );
-    return -1;
-  }
-
-  page = &read_write[ address >> 13 ];
-
-  switch( page->bank ) {
-  case MEMORY_BANK_HOME:
-    offset = page->writable ? BREAKPOINT_PAGE_RAM : BREAKPOINT_PAGE_ROM;
-    break;
-  case MEMORY_BANK_DOCK: offset = BREAKPOINT_PAGE_DOCK; break;
-  case MEMORY_BANK_EXROM: offset = BREAKPOINT_PAGE_EXROM; break;
-  case MEMORY_BANK_ROMCS: offset = BREAKPOINT_PAGE_ROMCS; break;
-  default: return -1;
-  }
-
-  return offset + page->page_num;
-}
-
-int
-debugger_page_hash( const char *text )
-{
-  int offset;
-
-  switch( tolower( (unsigned char)text[0] ) ) {
-    
-  case 'c': offset = BREAKPOINT_PAGE_ROMCS; break;
-  case 'd': offset = BREAKPOINT_PAGE_DOCK; break;
-  case 'r': offset = BREAKPOINT_PAGE_ROM; break;
-  case 'x': offset = BREAKPOINT_PAGE_EXROM; break;
-
-  default:
-    ui_error( UI_ERROR_ERROR,
-	      "%s:debugger_page_hash: unknown page letter '%c'", __FILE__,
-	      text[0] );
+	      "%s:get_page: unexpected breakpoint type %d", __FILE__, type );
     fuse_abort();
   }
 
-  offset += atoi( &text[1] );
-
-  return offset;
-}
-
-char*
-debugger_breakpoint_decode_page( char *buffer, size_t n, int page )
-{
-  if( page >= BREAKPOINT_PAGE_ROMCS ) {
-    snprintf( buffer, n, "C%d", page - BREAKPOINT_PAGE_ROMCS );
-  } else if( page >= BREAKPOINT_PAGE_EXROM ) {
-    snprintf( buffer, n, "X%d", page - BREAKPOINT_PAGE_EXROM );
-  } else if( page >= BREAKPOINT_PAGE_DOCK ) {
-    snprintf( buffer, n, "D%d", page - BREAKPOINT_PAGE_DOCK );
-  } else if( page >= BREAKPOINT_PAGE_ROM ) {
-    snprintf( buffer, n, "R%d", page - BREAKPOINT_PAGE_ROM );
-  } else if( page >= BREAKPOINT_PAGE_RAM ) {
-    snprintf( buffer, n, "%d", page - BREAKPOINT_PAGE_RAM );
-  } else {
-    snprintf( buffer, n, "[Unknown page %d]", page );
-  }
-
-  return buffer;
+  return page;
 }
 
 int
@@ -371,8 +315,6 @@ static int
 breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
 		  libspectrum_dword value )
 {
-  int page;
-
   if( bp->type != type ) return 0;
 
   switch( type ) {
@@ -381,15 +323,15 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
   case DEBUGGER_BREAKPOINT_TYPE_READ:
   case DEBUGGER_BREAKPOINT_TYPE_WRITE:
 
-    page = bp->value.address.page;
-
-    /* If page == -1, value must match exactly; otherwise, the page and
-       the offset must match */
-    if( page == -1 ) {
+    /* If source == memory_source_any, value must match exactly; otherwise,
+       the source, page and offset must match */
+    if( bp->value.address.source == memory_source_any ) {
       if( bp->value.address.offset != value ) return 0;
     } else {
-      if( page != encode_bank_and_page( type, value ) ) return 0;
-      if( bp->value.address.offset != ( value & 0x3fff ) ) return 0;
+      memory_page *page = get_page( type, value );
+      if( bp->value.address.source != page->source ||
+          bp->value.address.page != page->page_num ||
+          bp->value.address.offset != ( value & 0x3fff ) ) return 0;
     }
     break;
 
@@ -536,7 +478,7 @@ find_breakpoint_by_address( gconstpointer data, gconstpointer user_data )
     return 1;
 
   /* Ignore all page-specific breakpoints */
-  if( bp->value.address.page != -1 ) return 1;
+  if( bp->value.address.source != memory_source_any ) return 1;
 
   return bp->value.address.offset - address;
 }

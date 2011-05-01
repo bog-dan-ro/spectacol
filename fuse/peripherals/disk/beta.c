@@ -151,6 +151,7 @@ beta_init( void )
 {
   int i;
   wd_fdc_drive *d;
+  int beta_source;
 
   beta_fdc = wd_fdc_alloc_fdc( FD1793, 0, WD_FLAG_BETA128 );
   beta_fdc->current_drive = NULL;
@@ -172,7 +173,9 @@ beta_init( void )
   if( index_event == -1 ) return 1;
 
   module_register( &beta_module_info );
-  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  beta_source = memory_source_register( "Betadisk" );
+  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].source = beta_source;
 
   periph_register( PERIPH_TYPE_BETA128, &beta_peripheral );
 
@@ -223,9 +226,6 @@ beta_reset( int hard_reset GCC_UNUSED )
 
     beta_memory_map_romcs[ 0 ].writable = 0;
     beta_memory_map_romcs[ 1 ].writable = 0;
-
-    beta_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-    beta_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
     beta_active = 0;
 
@@ -774,7 +774,7 @@ beta_to_snapshot( libspectrum_snap *snap )
 
   libspectrum_snap_set_beta_active( snap, 1 );
 
-  if( beta_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
+  if( beta_memory_map_romcs[0].save_to_snapshot ) {
     size_t rom_length = MEMORY_PAGE_SIZE * 2;
 
     buffer = malloc( rom_length );

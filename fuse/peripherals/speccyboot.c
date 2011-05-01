@@ -98,7 +98,6 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
                               settings_default.rom_speccyboot, 0x2000 ) )
     return;
 
-  speccyboot_memory_map_romcs.source = MEMORY_SOURCE_PERIPHERAL;
   speccyboot_memory_map_romcs.writable = 0;
 
   out_register_state = 0xff;  /* force transitions to low */
@@ -176,6 +175,7 @@ speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte va
 int
 speccyboot_init( void )
 {
+  int speccyboot_source;
   nic = nic_enc28j60_alloc();
 
   static module_info_t speccyboot_module_info = {
@@ -188,7 +188,8 @@ speccyboot_init( void )
 
   module_register( &speccyboot_module_info );
 
-  speccyboot_memory_map_romcs.bank = MEMORY_BANK_ROMCS;
+  speccyboot_source = memory_source_register( "SpeccyBoot" );
+  speccyboot_memory_map_romcs.source = speccyboot_source;
 
   periph_register( PERIPH_TYPE_SPECCYBOOT, &speccyboot_periph );
 
