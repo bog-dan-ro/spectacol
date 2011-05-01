@@ -586,7 +586,7 @@
 
 	* Graphics filters: essentially arbitrary filters which can be
 	  applied to the Spectrum's screen to give scanlines, smoothing
-	  and all sorts of other possiblities (mostly Fredrick Meunier
+	  and all sorts of other possibilities (mostly Fredrick Meunier
 	  and Philip Kendall; based on the same feature in ScummVM).
 
 	* Transparent monitor/debugger (Philip Kendall).
@@ -685,7 +685,7 @@
 	* Put the keyboard help in a separate window when using the GTK+
 	  UI (Philip Kendall).
 
-	* Changable emulation speed (Philip Kendall).
+	* Changeable emulation speed (Philip Kendall).
 
 	* Change to lib765 0.3.0 for Mac OS X compatibility
 	  (Frederick Meunier).

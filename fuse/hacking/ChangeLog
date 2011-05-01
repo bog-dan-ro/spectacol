@@ -3623,3 +3623,4 @@
          full caption title, resize properly with high DPI settings (more of
          patch #3258533) (Sergio Baldovi).
 20110501 man/fuse.1: Fix typo (AY-3-8192 -> AY-3-8912) (Stuart).
+20110501 ChangeLog: Fix typos (Stuart).
