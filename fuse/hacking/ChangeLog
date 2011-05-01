@@ -3118,9 +3118,9 @@
 20090518 man/fuse.1,ui/gtk/{gtkinternals.h,gtkdisplay.c,gtkui.c}: allow scalers
          to set window size in GTK+ UI (patch #2790063 rkd77 and Fred, also
          resolves feature requests #1841504 and #1729198).
-20090529 Makefile.am,README,compat.h,configure.in,hacking/ChangeLog,man/fuse.1,
-         settings.dat,sound.[c|cpp|h],sound/{Blip_Buffer.[cpp|h],Makefile.am},
-         tape.c,ui/options.dat,ula.c: switch from libsamplerate to Blip_Buffer
+20090529 Makefile.am,README,compat.h,configure.in,man/fuse.1,settings.dat,
+         sound.[c|cpp|h],sound/{Blip_Buffer.[cpp|h],Makefile.am},tape.c,
+         ui/options.dat,ula.c: switch from libsamplerate to Blip_Buffer
          (by Shay Green) for alias noise reduction for beeper and AY (Fred).
 20090530 ui/gtk/gtkui.c: remove unused variable (Fred).
 20090530 timer/timer.c: fixes for speed estimation (part of patch in bug
