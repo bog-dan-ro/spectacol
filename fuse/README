@@ -90,7 +90,7 @@ of things; however, it isn't necessary as libspectrum provides
 replacements for all the routines used by Fuse.
 
 Another useful option is `--with-local-prefix=DIRECTORY' which allows
-you to specify that you have some the the libraries needed by Fuse in
+you to specify that you have some of the libraries needed by Fuse in
 `<DIRECTORY>/lib' and the necessary header files in
 `<DIRECTORY>/include'. If you specify the `--prefix' option to tell
 Fuse to install itself somewhere other than in /usr/local, that
