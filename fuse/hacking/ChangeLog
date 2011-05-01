@@ -13,7 +13,7 @@
 20030516 ui/scaler/scalers.c: fix initialisation bug in AdvMame2x
 	 scaler (Fred)
 20030516 widget/options.pl: refresh screen when dialog finished (Fred?)
-20030516 change scaler calling convention to remove unused paramter
+20030516 change scaler calling convention to remove unused parameter
 	 macroise the declarations in ui/scaler/scaler_internals.h
 	 (Fred/ScummVM team)
 20030516 Add AdvMame3x scaler (Fred/ScummVM team)
@@ -93,7 +93,7 @@
 	 {c,d,e,f}{7,f}: RST nn, cd: CALL nnnn, d{3,b}: OUT (nn),A and
 	 IN A,(nn), d9: EXX, e{3,b}: EX (SP),HL and EX DE,HL, e9: JP
 	 HL, f{3,9,b}: DI, LD SP,HL and EI and 10: DJNZ.
-20030624 Rename DATADIR to FUSEDATADIR; Win32 compatability.
+20030624 Rename DATADIR to FUSEDATADIR; Win32 compatibility.
 20030624 timer.c: add Win32 timing routines (Marek)
 20030625 lib/disk_plus3.z80, utils.c: autoloading for +3 disks.
 20030626 z80/tests: add tests for 27 (DAA) and all of the cb xx
@@ -342,7 +342,7 @@
 	 noyywrap.
 20031107 ui/uijoystick.c: fix typos (thanks, Erik Kunze).
 20031107 event.[ch], spectrum.c, z80/coretest.c, z80/z80.[ch], z80/z80.pl:
-	 improved retrigged interrupt support: interrupts no longer
+	 improved retriggered interrupt support: interrupts no longer
 	 accepted after an EI/EI or EI/DI sequence.
 20031107 snapshot.c: use libspectrum's support for the 'last instruction
 	 EI' flag.
@@ -369,7 +369,7 @@
 20031119 Merge the 'generic' and TC2068 paging schemes.
 20031120 psg.c: write pause lengths out correctly.
 20031120 specplus3.c: make the 64Kb RAM configurations work again.
-20031124 timer.c: prevent too big a 'backlog' from occuring.
+20031124 timer.c: prevent too big a 'backlog' from occurring.
 20031127 memory.h: ensure 'address' is a 16-bit value before using it.
 20031128 fuse.c: initialise the poke finder on startup.
 20031128 ui/gtk/gtkui.c: split create_dialog into multiple functions.
@@ -579,7 +579,7 @@
 	 (Release-0_6_2-branch) (Darren).
 20040218 ui/uijoystick.c: open_stick should be open_joystick
 	 (Release-0_6_2-branch).
-20040219 ChangeLog, README, configure.in, man/fuse.1: documenation etc
+20040219 ChangeLog, README, configure.in, man/fuse.1: documentation etc
 	 updates for the 0.6.2.1 release (Release-0_6_2-branch).
 20040219 TAG: Release-0_6_2_1 (Release-0_6_2-branch).
 20040223 Merge changes from Release-0_6_2_1 to HEAD.
@@ -842,7 +842,7 @@
 	 let ZXCF work there.
 20040521 machines/{machines.h,tc2048.c,tc2068.c}: get the dock/exrom
 	 working properly again.
-20040521 if2.[ch],snapshot.c: Add support for saving interface 2 cart in
+20040521 if2.[ch],snapshot.c: Add support for saving Interface II cart in
          snapshots.
 20040524 if2.c,snapshot.c: Fix Interface II eject menu state after snapshot
          loading.
@@ -948,7 +948,7 @@
          Samohýl).
 20040620 zxatasp.c,zxcf.c: more literal constant removal.
 20040620 README,autogen.sh: add script to do the autotools invocation.
-20040621 configure.in: restore autoconf2.13 compatability.
+20040621 configure.in: restore autoconf2.13 compatibility.
 20040621 man/fuse.1: small man page update.
 20040621 ChangeLog: Darren did the initial Spectrum SE emulation.
 20040623 man/fuse.1: Updates for Interface II and IDE command line options.
@@ -1116,7 +1116,7 @@
 	 tc2048.c,tc2068.c}, roms/{Makefile.am,if1-[12].rom},
 	 ui/{options.dat,ui.h}, ui/gtk/{gtkinternals.h,pixmaps.c,
 	 statusbar.c}, ui/sdl/sdldisplay.c, z80/{coretest.c,z80_ops.c}:
-	 Interface I and microdrive emulation (patch #1060831)
+	 Interface I and Microdrive emulation (patch #1060831)
 	 (Gergely Szasz)
 20041128 if1.c,ui.c,ui/ui.h: simplify menu item (de)activation code.
 20041128 if1.c: add void to prototypes where appropriate.
@@ -1154,7 +1154,7 @@
 20041230 configure.in: improved libao checking (Gergely Szasz).
 20041231 ui/gtk/{gtkkeyboard.c,stock.c}: add appropriate header files.
 20050102 fuse.c, if1.[ch], settings.dat, utils.c, ui/options.dat: variable
-	 length microdrive cartridge handling (rest of patch #1085429)
+	 length Microdrive cartridge handling (rest of patch #1085429)
 	 (Gergely Szasz).
 20050102 fuse.c: update copyright date to 2005.
 20050102 machine.c,periph.c,zxatasp.c,zxcf.c: fix ZXATASP/ZXCF upload/reset
@@ -1312,7 +1312,7 @@
 	 event.c:event_force_events() (fixes bug #1163983; thanks, Jon
 	 Needle).
 20050427 ui/sdl/sdldisplay.c: check smallest supported fullscreen resolution,
-         and if we don't have a resonable match try to find one (Fred).
+         and if we don't have a reasonable match try to find one (Fred).
 20050501 widget/{.cvsignore,Makefile.am,fuse.font.sbf,mkfusefont.pl}: add
 	 proportional font (part of patch #1150693) (Darren).
 20050501 widget/{widget.c,widget_internals.h}: core support for
@@ -1545,7 +1545,7 @@
 	 (Release-0_8_0-branch) (Gergely Szasz).
 20070217 man/fuse.1: small ao improvements (rest of bug #1659865)
 	 (Release-0_8_0-branch) (Gergely Szasz).
-20070217 fuse.c,if1.c,settings.dat,utils.c: allow microdrive cartridge images
+20070217 fuse.c,if1.c,settings.dat,utils.c: allow Microdrive cartridge images
 	 to be used on startup (bug #1660099) (Release-0_8_0-branch)
 	 (Gergely Szasz).
 20070303 settings.dat,man/fuse.1,ui/gtk/gtkui.c: new --strict-aspect-hint
@@ -1561,10 +1561,10 @@
 20070306 sound.c: don't leak memory for tape_buf (Release-0_8_0-branch) (Fred).
 20070306 display.c: don't overrun line_times array (Release-0_8_0-branch)
 	 (Fred).
-20070310 man/fuse.1: add divide url (Release-0_8_0-branch) (Fred).
+20070310 man/fuse.1: add DivIDE url (Release-0_8_0-branch) (Fred).
 20070311 machines/spec_se.c: fix marking Dock and EXROM banks as writable in
          the SE (Release-0_8_0-branch) (thanks, Andrew Owen) (Fred).
-20070317 compat/mkstemp.c: remove abberant break (thanks, Marek Januszewski)
+20070317 compat/mkstemp.c: remove aberrant break (thanks, Marek Januszewski)
 	 (Release-0_8_0-branch).
 20070321 periph.c: when stopping RZX playback due to overrun, ensure the
 	 change is picked up in z80_do_opcodes() (thanks, Julian Wiseman)
@@ -1955,7 +1955,7 @@
 	 configure.in.
 20070731 configure.in: fix spelling of ALSA (thanks, Gergely).
 20070731 configure.in,compat/{Makefile.am,dirname.c,getopt.c,getopt1.c,
-	 mkstemp.c}: move compatability detection logic into configure.in.
+	 mkstemp.c}: move compatibility detection logic into configure.in.
 20070731 timer/{Makefile.am,sdl.c,unix.c,win32.c}: add missing properties and
 	 fix initial comments (Stuart).
 20070802 machines/tc2048.c: correct joystick port mask on TC2048 (verified on
@@ -1971,7 +1971,7 @@
 20070804 compat.h,settings.pl,trdos.c,utils.c,compat/amiga/{Makefile.am,
 	 paths.c},compat/morphos/Makefile.am,compat/unix/{Makefile.am,paths.c},
 	 compat/win32/{Makefile.am,paths.c}: move pathname functions into
-	 compatability directories.
+	 compatibility directories.
 20070804 configure.in: remove debug mode as its not used anywhere.
 20070806 compat/unix/osname.c: ensure we have the prototype for strerror()
          (Fred).
@@ -2060,7 +2060,7 @@
          ui/ggi/Makefile.am,ui/fb/Makefile.am,ui/scaler/{Makefile.am,scaler.c,
          scalers.c},ui/Makefile.am,ui/xlib/{xerror.c,xui.c,Makefile.am,
          xkeyboard.c,xdisplay.c},ui/uijoystick.c: use AM_CPPFLAGS rather than
-         change every header inclusion to be relaive to the current directory
+         change every header inclusion to be relative to the current directory
          (Fred).
 20070819 disk/wd1770.c: fix restore and seek commands and implement 'read
 	 address' command (Stuart).
@@ -2082,7 +2082,7 @@
          (thanks, Gergely) (Fred).
 20070828 TODO: remove unused file; handled by SF trackers.
 20070829 compat.h,compat/{amiga,unix,win32}/paths.c,utils.[ch]: move
-	 utils_is_absolute_path() into compatability directories.
+	 utils_is_absolute_path() into compatibility directories.
 20070830 compat.h,widget/filesel.c: fix up widget builds.
 20070830 ui/xlib/xdisplay.c: remove debugging bloat.
 20070831 BRANCH: xvideo-2007-08-31 for integrating Gergely's xvideo code
@@ -2529,7 +2529,7 @@
          drive (part of patch #1882836) (Gergely Szasz).
 20080315 disk/beta.c: support for Beta 128 custom ROMs in snapshots
          (patch #1844606) (Stuart).
-20080315 disk/{fdd.c,wd_fdc.c}: make disk timing more accruate - improve
+20080315 disk/{fdd.c,wd_fdc.c}: make disk timing more accurate - improve
          emulation of head actions when null actions are performed, improve
          spin duration calculation, turn off motor and set status to not ready
          on head unload, add emulation of finding and reading the address mark
@@ -2769,7 +2769,7 @@
 20080630 dck.c,divide.c,fuse.c,if1.c,menu.c,rzx.c,simpleide.c,snapshot.c,
 	 tape.c,zxatasp.c,zxcf.c: handle new allocator returns object
 	 style API from libspectrum.
-20080630 zxatasp.c: intialise error before returning it (Fred).
+20080630 zxatasp.c: initialise error before returning it (Fred).
 20080701 tape.c: one more function that can no longer error.
 20080706 debugger/commandl.l: fix warning with recent versions of Flex.
 20080706 sound/alsasound.c: don't call deprecated functions (fixes bug
@@ -2842,9 +2842,9 @@
 	 to gtk ui, implemented monospaced font code, which is used by debugger
 	 only for now (Marek).
 20080810 ui/win32/win32ui.c: Win32: modified the procedure preventing to draw
-	 the mouse cursor if it's 'grabbed' to explictly call default window
-	 procedure if the the mouse cursor is not grabbed, to avoid any
-	 confussion (Marek).
+	 the mouse cursor if it's 'grabbed' to explicitly call default window
+	 procedure if the mouse cursor is not grabbed, to avoid any
+	 confusion (Marek).
 20080810 ui/win32/{win32ui.c,debugger.c,win32internals.h}: Win32: fixed the
 	 pause/unpause routines by introducing win32ui_process_messages - an
 	 equivalent of gtk's gtk_main (Marek).
@@ -2919,8 +2919,8 @@
 20081102 ui/win32/win32ui.c: Win32: Made ui_error_specific function work
 	 similarly to the gtk ui equivalent (Marek).
 20081102 ui/win32/{win32ui.c,win32internals.h,win32joystick.[ch}: Win32:
-	 Implemented joystick handling using mmsystem API (and tested using PPJoy
-	 joystick emulator, hope it works with real hardware) (Marek).
+	 Implemented joystick handling using mmsystem API (and tested using
+         PPJoy joystick emulator, hope it works with real hardware) (Marek).
 20081108 disk/disk.c: prevent array overrun (bug #2240211) (Gergely Szasz).
 20081108 disk/disk.c,fuse.c,utils.c: use libspectrum's ability to
          identify more disk image formats (patch #2233744) (Gergely Szasz).
@@ -3148,7 +3148,7 @@
          periph.[ch],settings.dat,sound.cpp,ui/options.dat: add emulation of
          the Melodik and similar AY interfaces (feature request #1841501)
          (Fred).
-20090611 sound.cpp: correct AY capability check (thanks, Stuary Brady) (Fred).
+20090611 sound.cpp: correct AY capability check (thanks, Stuart Brady) (Fred).
 20090613 sound.cpp: ACB stereo fixes (Fred).
 20090613 man/fuse.1,sound.cpp,ui/options.dat: tweak sound output options based
          on listening tests against real hardware, narrow options to a default
@@ -3203,7 +3203,7 @@
 	 present (patch #2801706) (Marek).
 20090831 compat/unix/file.c: Added 'b' to mode argument of fopen in
 	 compat_file_open - this is ignored for POSIX systems, but for others,
-	 like Win32, it is neccessary (Marek).
+	 like Win32, it is necessary (Marek).
 20090831 Makefile.am: Win32: Fixed building the main resource file and made
 	 sure it is rebuilt if any of the included resource files are rebuilt
 	 (Marek).
@@ -3277,7 +3277,7 @@
          capability so Fuse can deal with weak data if it present in the disk
          image (EDSK/UDI) (patch #2927624) (Gergely Szasz).
 20100215 ui/gtk/gtkkeyboard.c: account for group setting on key events to make
-         intertional keyboards work based on key positions rather than default
+         international keyboards work based on key positions rather than default
          symbol (patch #2951275) (Michal Jurica).
 20100302 ui/gtk/gtkui.c: implement drag and drop support (patch #2961519)
          (Dmitry Semyonov).
@@ -3306,7 +3306,7 @@
          the Fuse window is resized by the user.
 20100719 disk/disk.c: set track lengths when inserting a new disk (fixes bug
          #3031299) (Gergely Szasz).
-20100819 disk/beta.c: correct writing of status and system regeisters to
+20100819 disk/beta.c: correct writing of status and system registers to
          snapshots (Patrik Rak).
 20100825 machine.c,machines/{Makefile.am,machines.h},tape.c: reintegrate
          NTSC Spectrum branch.
@@ -3390,7 +3390,7 @@
          settings.{dat,pl},speccyboot.[ch],roms/speccyboot-1.4.rom,
          ui/options.dat: SpeccyBoot emulation (patch #2906047) (Patrik Persson).
 20110101 debugger/breakpoint.c: evaluate all breakpoints again, but store the
-         next breakpoint before deleteing the current one from the list 
+         next breakpoint before deleting the current one from the list 
          (really really fixes bug #3084862) (thanks, Phil) (Fred).
 20110101 roms/Makefile.am: ensure SpeccyBoot ROM is installed.
 20110101 machines/{pentagon1024.c,pentagon512.c,pentagon.c,scorpion.c,
@@ -3531,10 +3531,10 @@
          Dialogs:
           - Increase height and spacing of combobox in dialogs due to Visual
             Styles in Vista/7.
-          - Standarized buttons width in autogenerated dialogs.
+          - Standardised buttons width in autogenerated dialogs.
           - Added an About dialog, similar to GTK UI
           - In joystick options, increased the height of joystick types frame to
-            accomodate Fuller
+            accommodate Fuller
           - Identified a bug with joystick buttons higher than four.
          Debugger:
           - Visual styles in Vista/7 increase rows height in ListView controls.
@@ -3612,9 +3612,9 @@
          separator, e.g., /File/Movie/Stop Movie Recording (patch #3286195)
          (Sergio Baldovi).
 20110425 ui/gtk/{gtkdisplay.c,gtkinternals.h,statusbar.c}: fix warnings.
-20110430 configure.in: fix complilation --without-gtk --with-x with libpng 1.4
+20110430 configure.in: fix compilation --without-gtk --with-x with libpng 1.4
          installed as libpng14 (thanks, rkd77) (Fred).
-20110430 ui/xlib/xjoystick.c: fix complilation --without-gtk --with-x with
+20110430 ui/xlib/xjoystick.c: fix compilation --without-gtk --with-x with
          joystick configured (rkd77).
 20110430 ui/win32/{statusbar.c,win32display.c,win32internals.h}: add machine
          name into the status bar the same as the GTK UI. Fix a few compiler
