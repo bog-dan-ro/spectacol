@@ -222,7 +222,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20040526 accessor.pl,internals.h,snapshot.c,szx.c: tidy up snapshot
 	 alloc/free routines.
 20040527 timings.c: small timing tweak for 128K machines; we now match
-	 the timines for (at least some!) 48K/128K machines.
+	 the timings for (at least some!) 48K/128K machines.
 20040527 szx.c: Write scld block when machine has SE memory capability.
 20040601 libspectrum.c,libspectrum.h.in: Add LIBSPECTRUM_CLASS_CARTRIDGE_IF2
          and LIBSPECTRUM_ID_CARTRIDGE_IF2.
@@ -265,9 +265,9 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          LIBSPECTRUM_FLAG_SNAPSHOT_ALWAYS_COMPRESS flag for use with
          libspectrum_snap_write
 20040814 configure.in,dll.c,internals.h,zlib.c: small Visual C++
-	 compatability fixes.
+	 compatibility fixes.
 20040814 generate.pl.in,libspectrum.h.in,make-perl.c: more Visual C++
-	 compatability fixes.
+	 compatibility fixes.
 20040905 libspectrum.h.in,rzx.c: support multiple input recording blocks
 	 in an RZX file.
 20040906 crypto.c,libspectrum.h.in,rzx.c: re-add support for creator and
@@ -287,7 +287,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 	 (closes bug #1053346).
 20041230 libspectrum.c,libspectrum.h.in: add identification of .mdr files
 	 (part of patch #1085429) (Gergely Szasz).
-20050102 libspectrum.h.in,microdrive.c: variable length microdrive cartridge
+20050102 libspectrum.h.in,microdrive.c: variable length Microdrive cartridge
 	 handling (rest of patch #1085429) (Gergely Szasz).
 20050102 libspectrum.{c,h.in},sna.c,szx.c,timings.c,z80.c: TS2068 support
 	 (patch #1080531) (Fred).
@@ -382,7 +382,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 	 preparation for a release.
 20070120 doc/libspectrum.txt: document RZX iterators.
 20070120 libspectrum.h.in,microdrive.c,doc/libspectrum.txt: tidy up and
-	 document microdrive routines.
+	 document Microdrive routines.
 20070121 ChangeLog: bring up to date.
 20070121 tzx_write.c: support for writing 0x19 blocks.
 20070121 tzx_write.c: we now write TZX v1.20 files.
@@ -662,8 +662,8 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 	 code does not correctly handle write protect flag.
 20080625 microdrive.c: fix write protect flag handling (fixes bug #2002682).
 20080630 libspectrum.h.in: fix prototype for libspectrum_ide_alloc (Fred).
-20080630 myglib/{garray.c,ghash.c}: add <string.h> to elimiate warnings (Fred).
-20080630 rzx.c,sna.c: initialise error as it can be used unintialised (Fred).
+20080630 myglib/{garray.c,ghash.c}: add <string.h> to eliminate warnings (Fred).
+20080630 rzx.c,sna.c: initialise error as it can be used uninitialised (Fred).
 20080701 csw.c,libspectrum.h.in,tap.c,tape.c,tape_block.[ch],tzx_read.c,
          tzx_write.c,warajevo_read.c,wav.c,z80em.c: various functions
          (notably tzx_write_bytes) could never fail but returned an error
