@@ -105,7 +105,7 @@ Blip_Synth *left_beeper_synth = NULL, *right_beeper_synth = NULL;
 Blip_Synth *ay_a_synth = NULL, *ay_b_synth = NULL, *ay_c_synth = NULL;
 Blip_Synth *ay_a_synth_r = NULL, *ay_b_synth_r = NULL, *ay_c_synth_r = NULL;
 
-Blip_Synth *specdrum_synth = NULL;
+Blip_Synth *left_specdrum_synth = NULL, *right_specdrum_synth = NULL;
 
 struct speaker_type_tag
 {
@@ -235,10 +235,10 @@ sound_init( const char *device )
   blip_synth_set_volume( ay_c_synth, sound_get_volume( settings_current.volume_ay) );
   blip_synth_set_treble_eq( ay_c_synth, treble );
 
-  specdrum_synth = new_Blip_Synth();
-  blip_synth_set_volume( specdrum_synth, sound_get_volume( settings_current.volume_specdrum) );
-  blip_synth_set_output( specdrum_synth, left_buf );
-  blip_synth_set_treble_eq( specdrum_synth, treble );
+  left_specdrum_synth = new_Blip_Synth();
+  blip_synth_set_volume( left_specdrum_synth, sound_get_volume( settings_current.volume_specdrum ) );
+  blip_synth_set_output( left_specdrum_synth, left_buf );
+  blip_synth_set_treble_eq( left_specdrum_synth, treble );
   
   /* important to override these settings if not using stereo
    * (it would probably be confusing to mess with the stereo
@@ -302,6 +302,11 @@ sound_init( const char *device )
       blip_synth_set_output( *ay_mid_synth_r, right_buf );
       blip_synth_set_treble_eq( *ay_mid_synth_r, treble );
     }
+
+    right_specdrum_synth = new_Blip_Synth();
+    blip_synth_set_volume( right_specdrum_synth, sound_get_volume( settings_current.volume_specdrum ) );
+    blip_synth_set_output( right_specdrum_synth, right_buf );
+    blip_synth_set_treble_eq( right_specdrum_synth, treble );
   } else {
     blip_synth_set_output( ay_a_synth, left_buf );
     blip_synth_set_output( ay_b_synth, left_buf );
@@ -348,9 +353,7 @@ sound_end( void )
 {
   if( sound_enabled ) {
     delete_Blip_Synth( &left_beeper_synth );
-    delete_Blip_Buffer( &left_buf );
     delete_Blip_Synth( &right_beeper_synth );
-    delete_Blip_Buffer( &right_buf );
 
     delete_Blip_Synth( &ay_a_synth );
     delete_Blip_Synth( &ay_b_synth );
@@ -359,7 +362,11 @@ sound_end( void )
     delete_Blip_Synth( &ay_b_synth_r );
     delete_Blip_Synth( &ay_c_synth_r );
 
-    delete_Blip_Synth( &specdrum_synth );
+    delete_Blip_Synth( &left_specdrum_synth );
+    delete_Blip_Synth( &right_specdrum_synth );
+
+    delete_Blip_Buffer( &left_buf );
+    delete_Blip_Buffer( &right_buf );
 
     sound_lowlevel_end();
     free( samples );
@@ -656,7 +663,10 @@ void
 sound_specdrum_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 {
   if( periph_is_active( PERIPH_TYPE_SPECDRUM ) ) {
-    blip_synth_update( specdrum_synth, tstates, ( val - 128) * 128);
+    blip_synth_update( left_specdrum_synth, tstates, ( val - 128) * 128);
+    if( right_specdrum_synth ) {
+      blip_synth_update( right_specdrum_synth, tstates, ( val - 128) * 128);
+    }
     machine_current->specdrum.specdrum_dac = val - 128;
   }
 }
