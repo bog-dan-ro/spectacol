@@ -70,7 +70,7 @@
 20031216 snap2tzx.c: finish libspectrumification of snap2tzx.
 20031216 ChangeLog: bring up to date.
 20031218 snap2tzx.c: slow 6000 bps loader down slightly so it works with
-	 (more) emulators; this is the only signficant change made between
+	 (more) emulators; this is the only significant change made between
 	 z802tzx 1.0 and z802tzx 1.1.
 20031218 COPYING: add a copy of the GPL to the distribution.
 20040117 rzxtool.c, scl2trd.c: stop recognised options producing two
@@ -107,7 +107,7 @@
 20040715 configure.in: Use libtool to link fuse-utils
 20040715 autogen.sh: copy auxiliary files rather than linking them.
 20040715 .cvsignore: ignore libtool generated files.
-20040716 configure.in: bump veersion umber to 0.7.0.
+20040716 configure.in: bump version umber to 0.7.0.
 20040806 snapconv.c,man/snapconv.1: Add -c and -n options to snapconv that
          allow the writing of uncompressed and completely compressed snapshots.
 20040906 rzxcheck.c: use new RZX signature API.
