@@ -56,11 +56,9 @@ if test "$windres" = yes; then
     AC_DEFINE([VERSION_WIN32], [translit(FUSE_FULL_VERSION, [.], [,])], [Define version information for win32 executable])
     FUSE_FULL[]_VERSION=FUSE_FULL_VERSION
     AC_SUBST(FUSE_FULL[]_VERSION)
-    AM_SUBST_NOTMAKE(FUSE_FULL[]_VERSION)
   fi
 fi
 AC_SUBST(WINDRES_OBJ)
-AM_SUBST_NOTMAKE(WINDRES_OBJ)
 
 dnl Generate commandy.h
 YFLAGS="$YFLAGS -d"
