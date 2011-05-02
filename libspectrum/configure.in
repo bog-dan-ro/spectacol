@@ -74,9 +74,7 @@ if test "$windres" = yes; then
   fi
 fi
 AC_SUBST(WINDRES_OBJ)
-AM_SUBST_NOTMAKE(WINDRES_OBJ)
 AC_SUBST(WINDRES_LDFLAGS)
-AM_SUBST_NOTMAKE(WINDRES_LDFLAGS)
 
 dnl Check for big endianness
 AC_C_BIGENDIAN

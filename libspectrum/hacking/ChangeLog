@@ -838,3 +838,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          tape files (Fred).
 20110429 wav.c: use some more LIBSPECTRUM_BITS_IN_BYTE constants (Fred).
 20110429 tape.c: have raw data blocks report the polarity of pulses (Fred).
+20100502 configure.in: remove unneeded AM_SUBST_NOTMAKE macro as it doesn't get
+         along with older autotools (patch #3295662) (thanks, Tomáš Franke)
+         (Sergio Baldoví)
