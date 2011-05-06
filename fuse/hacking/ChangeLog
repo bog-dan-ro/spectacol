@@ -3629,3 +3629,5 @@
          along with older autotools (patch #3295662) (thanks, Tomáš Franke)
          (Sergio Baldoví)
 20110504 tape.c: fix warnings.
+20110506 configure.in: fix build for mingw+msys broken in revision 4399 (more
+         from patch #3295662) (Sergio Baldoví)

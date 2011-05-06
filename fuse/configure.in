@@ -389,12 +389,13 @@ if test "$libpng" = yes; then
       [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)
        PNG_LIBS='']
     )
+
+    CPPFLAGS="$ac_save_CPPFLAGS"
+    LDFLAGS="$ac_save_LDFLAGS"
   fi
 
   AC_SUBST(PNG_LIBS)
 fi
-
-LDFLAGS="$ac_save_LDFLAGS"
 
 dnl Check if a version of libasound which supplies pcm is available
 AC_MSG_CHECKING(whether ALSA requested)
