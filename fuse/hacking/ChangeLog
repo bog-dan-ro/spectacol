@@ -3631,3 +3631,6 @@
 20110504 tape.c: fix warnings.
 20110506 configure.in: fix build for mingw+msys broken in revision 4399 (more
          from bug #3295295) (Sergio Baldoví)
+20110509 machines/machines_periph.c,peripherals/ay.c,periph.h: reading from
+         port 0xbffd on +2A/+3 was lost in peripheral refactoring (thanks,
+         fusetest).

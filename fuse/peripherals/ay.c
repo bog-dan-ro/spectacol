@@ -69,6 +69,17 @@ static periph_t ay_periph = {
   ay_ports
 };
 
+static periph_port_t ay_ports_plus3[] = {
+  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
+  { 0xc002, 0x8000, ay_registerport_read, ay_dataport_write },
+  { 0, 0, NULL, NULL }
+};
+
+static periph_t ay_periph_plus3 = {
+  NULL,
+  ay_ports_plus3
+};
+
 static periph_port_t ay_ports_full_decode[] = {
   { 0xffff, 0xfffd, ay_registerport_read, ay_registerport_write },
   { 0xffff, 0xbffd, NULL, ay_dataport_write },
@@ -96,6 +107,7 @@ ay_init( void )
 {
   module_register( &ay_module_info );
   periph_register( PERIPH_TYPE_AY, &ay_periph );
+  periph_register( PERIPH_TYPE_AY_PLUS3, &ay_periph_plus3 );
   periph_register( PERIPH_TYPE_AY_FULL_DECODE, &ay_periph_full_decode );
   periph_register( PERIPH_TYPE_AY_TIMEX, &ay_periph_timex );
 

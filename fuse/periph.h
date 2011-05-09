@@ -35,6 +35,7 @@ typedef enum periph_type {
   PERIPH_TYPE_128_MEMORY,     /* 128K-style memory paging */
   PERIPH_TYPE_AY,             /* 128K-style AY chip */
   PERIPH_TYPE_AY_FULL_DECODE, /* 128K-style AY chip responding only to 0xfffd */
+  PERIPH_TYPE_AY_PLUS3,       /* 128K-style AY chip with read from data port */
   PERIPH_TYPE_AY_TIMEX,       /* Timex-style AY chip */
   PERIPH_TYPE_AY_TIMEX_WITH_JOYSTICK, /* Timex-style AY chip with joystick */
   PERIPH_TYPE_BETA128,        /* Beta128 disk interface */
