@@ -835,7 +835,10 @@ tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return;
 
   /* Invert the microphone state */
-  if( edge_tstates || ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ) {
+  if( edge_tstates ||
+      ( flags & ( LIBSPECTRUM_TAPE_FLAGS_STOP |
+                  LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW |
+                  LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH ) ) ) {
 
     if( flags & LIBSPECTRUM_TAPE_FLAGS_NO_EDGE ) {
       /* Do nothing */
