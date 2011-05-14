@@ -333,3 +333,5 @@
 20110429 tape2wav.c: respect polarity when writing audio out (Fred).
 20110501 man/profile2map.1: update my email address (Stuart).
 20110514 tzxlist.c: add support for TZX set signal level block (Fred).
+20110514 tape2wav.c: do a better job of respecting polarity when writing audio
+         out (Fred).
