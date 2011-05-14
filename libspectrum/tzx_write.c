@@ -76,6 +76,10 @@ static void
 tzx_write_stop( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		size_t *length );
 static void
+tzx_write_set_signal_level( libspectrum_tape_block *block,
+                            libspectrum_byte **buffer, libspectrum_byte **ptr,
+                            size_t *length );
+static void
 tzx_write_comment( libspectrum_tape_block *block, libspectrum_byte **buffer,
 		   libspectrum_byte **ptr, size_t *length );
 static void
@@ -190,6 +194,10 @@ internal_tzx_write( libspectrum_byte **buffer, size_t *length,
 
     case LIBSPECTRUM_TAPE_BLOCK_STOP48:
       tzx_write_stop( buffer, &ptr, length );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL:
+      tzx_write_set_signal_level( block, buffer, &ptr, length );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
@@ -571,6 +579,20 @@ tzx_write_stop( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_STOP48;
   *(*ptr)++ = '\0'; *(*ptr)++ = '\0'; *(*ptr)++ = '\0'; *(*ptr)++ = '\0';
+}
+
+static void
+tzx_write_set_signal_level( libspectrum_tape_block *block,
+                            libspectrum_byte **buffer, libspectrum_byte **ptr,
+                            size_t *length )
+{
+  /* Make room for the ID byte, four length bytes and the level byte */
+  libspectrum_make_room( buffer, 6, ptr, length );
+
+  *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL;
+
+  libspectrum_write_dword( ptr, 1 );
+  *(*ptr)++ = libspectrum_tape_block_level( block );
 }
 
 static void

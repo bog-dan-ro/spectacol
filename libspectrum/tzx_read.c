@@ -78,6 +78,9 @@ static libspectrum_error
 tzx_read_stop( libspectrum_tape *tape, const libspectrum_byte **ptr,
 	       const libspectrum_byte *end );
 static libspectrum_error
+tzx_read_set_signal_level( libspectrum_tape *tape, const libspectrum_byte **ptr,
+                           const libspectrum_byte *end );
+static libspectrum_error
 tzx_read_comment( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		  const libspectrum_byte *end );
 static libspectrum_error
@@ -208,6 +211,11 @@ internal_tzx_read( libspectrum_tape *tape, const libspectrum_byte *buffer,
 
     case LIBSPECTRUM_TAPE_BLOCK_STOP48:
       error = tzx_read_stop( tape, &ptr, end );
+      if( error ) { libspectrum_tape_clear( tape ); return error; }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL:
+      error = tzx_read_set_signal_level( tape, &ptr, end );
       if( error ) { libspectrum_tape_clear( tape ); return error; }
       break;
 
@@ -816,6 +824,32 @@ tzx_read_stop( libspectrum_tape *tape, const libspectrum_byte **ptr,
   (*ptr) += 4;
 
   block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_STOP48 );
+
+  libspectrum_tape_append_block( tape, block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}  
+
+static libspectrum_error
+tzx_read_set_signal_level( libspectrum_tape *tape, const libspectrum_byte **ptr,
+                           const libspectrum_byte *end )
+{
+  libspectrum_tape_block *block;
+
+  /* Check the length field exists and signal level is available */
+  if( end - (*ptr) < 5 ) {
+    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+                       "tzx_read_set_signal_level: not enough data in buffer" );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* But then just skip over it, as I don't care what it is */
+  (*ptr) += 4;
+
+  block =
+    libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL );
+
+  libspectrum_tape_block_set_level( block, !!(**ptr) ); (*ptr)++;
 
   libspectrum_tape_append_block( tape, block );
 

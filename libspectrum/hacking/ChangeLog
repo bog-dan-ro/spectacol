@@ -840,4 +840,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20110429 tape.c: have raw data blocks report the polarity of pulses (Fred).
 20100502 configure.in: remove unneeded AM_SUBST_NOTMAKE macro as it doesn't get
          along with older autotools (patch #3295662) (thanks, Tomáš Franke)
-         (Sergio Baldoví)
+         (Sergio Baldoví).
+20100514 doc/libspectrum.txt,libspectrum.h.in,tape.c,tape_accessors.txt,
+         tape_block.[ch],tzx_read.c,tzx_write.c: add support for the TZX set
+         signal level block (Fred).

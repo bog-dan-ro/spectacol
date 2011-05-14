@@ -283,6 +283,13 @@ typedef struct libspectrum_tape_select_block {
 
 /* No `stop tape if in 48K mode' block as it contains no data */
 
+/* A set signal level block */
+typedef struct libspectrum_tape_set_signal_level_block {
+
+  int level;			/* Mic level 0/1 */
+
+} libspectrum_tape_set_signal_level_block;
+
 /* A comment block */
 typedef struct libspectrum_tape_comment_block {
 
@@ -446,6 +453,7 @@ struct libspectrum_tape_block {
 
     /* No `stop tape if in 48K mode' block as it contains no data */
 
+    libspectrum_tape_set_signal_level_block set_signal_level;
     libspectrum_tape_comment_block comment;
     libspectrum_tape_message_block message;
     libspectrum_tape_archive_info_block archive_info;

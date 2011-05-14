@@ -424,6 +424,12 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
       *tstates = 0; *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP48; end_of_block = 1;
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL:
+      *tstates = 0; end_of_block = 1;
+      *flags |= block->types.set_signal_level.level ?
+          LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH : LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW;
+      break;
+
     /* For blocks which contain no Spectrum-readable data, return zero
        tstates and set end of block set so we instantly get the next block */
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START: 
@@ -1369,6 +1375,10 @@ libspectrum_tape_block_description( char *buffer, size_t length,
 
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
     strncpy( buffer, "Stop Tape If In 48K Mode", length );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL:
+    strncpy( buffer, "Set Signal Level", length );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:

@@ -187,6 +187,7 @@ int			values			1	-1
 int			level			0	-1
 	pause
 	data_block      initial_level
+	set_signal_level
 
 libspectrum_byte	bit0_pulse_count	0	-1
 	data_block
