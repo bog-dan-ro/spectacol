@@ -846,3 +846,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          signal level block (Fred).
 20100514 tape.c,tzx_read.c: tweak set signal level and pause blocks to correct
          level information (Fred).
+20100514 tzx_write.c: add support for writing PZX blocks to TZX files (Fred).

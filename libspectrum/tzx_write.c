@@ -100,6 +100,17 @@ tzx_write_rle( libspectrum_tape_block *block, libspectrum_byte **buffer,
                libspectrum_byte **ptr, size_t *length,
                libspectrum_tape *tape,
                libspectrum_tape_iterator iterator );
+static void
+add_pulses_block( size_t pulse_count, libspectrum_dword *lengths,
+                  libspectrum_tape_block *block, libspectrum_byte **buffer,
+                  libspectrum_byte **ptr, size_t *length );
+static void
+tzx_write_pulse_sequence( libspectrum_tape_block *block,
+                          libspectrum_byte **buffer, libspectrum_byte **ptr,
+                          size_t *length );
+static libspectrum_error
+tzx_write_data_block( libspectrum_tape_block *block, libspectrum_byte **buffer,
+                      libspectrum_byte **ptr, size_t *length );
 
 static void
 tzx_write_empty_block( libspectrum_byte **buffer, libspectrum_byte **ptr,
@@ -222,6 +233,14 @@ internal_tzx_write( libspectrum_byte **buffer, size_t *length,
 
     case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:
       error = tzx_write_rle( block, buffer, &ptr, length, tape, iterator );
+      if( error != LIBSPECTRUM_ERROR_NONE ) { libspectrum_free( *buffer ); return error; }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
+      tzx_write_pulse_sequence( block, buffer, &ptr, length );
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
+      error = tzx_write_data_block( block, buffer, &ptr, length );
       if( error != LIBSPECTRUM_ERROR_NONE ) { libspectrum_free( *buffer ); return error; }
       break;
 
@@ -496,6 +515,36 @@ static void
 tzx_write_pause( libspectrum_tape_block *block, libspectrum_byte **buffer,
 		 libspectrum_byte **ptr, size_t *length )
 {
+  /* High pause when represented in the TZX format is really a set signal level
+     1 and then a pulse as TZX format says that all pauses are low, a don't care
+     pause is a pulse too */
+  if( libspectrum_tape_block_level( block ) != 0 ) {
+    libspectrum_tape_block *new_block;
+    if( libspectrum_tape_block_level( block ) == 1 ) {
+      new_block = 
+        libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL );
+
+      libspectrum_tape_block_set_level( new_block, 1 );
+
+      tzx_write_set_signal_level( new_block, buffer, ptr, length );
+
+      libspectrum_free( new_block );
+    }
+
+    new_block = 
+            libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PURE_TONE );
+
+    libspectrum_tape_block_set_pulse_length( new_block,
+                                libspectrum_tape_block_pause_tstates( block ) );
+    libspectrum_tape_block_set_count( new_block, 1 );
+
+    tzx_write_pure_tone( new_block, buffer, ptr, length );
+
+    libspectrum_free( new_block );
+
+    return;
+  }
+
   libspectrum_make_room( buffer, 3, ptr, length );
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_PAUSE;
   libspectrum_write_word( ptr, libspectrum_tape_block_pause( block ) );
@@ -838,6 +887,149 @@ tzx_write_rle( libspectrum_tape_block *block, libspectrum_byte **buffer,
   }
 
   return libspectrum_tape_block_free( raw_block );
+}
+
+static void
+add_pulses_block( size_t pulse_count, libspectrum_dword *lengths,
+                  libspectrum_tape_block *block, libspectrum_byte **buffer,
+                  libspectrum_byte **ptr, size_t *length )
+{
+  libspectrum_tape_block *pulses = 
+              libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PULSES );
+
+  libspectrum_tape_block_set_count( pulses, pulse_count );
+  libspectrum_tape_block_set_pulse_lengths( pulses, lengths );
+
+  tzx_write_pulses( pulses, buffer, ptr, length );
+
+  libspectrum_free( pulses );
+}
+
+/* Use ID 2B to set initial signal level, ID 12 Pure Tone for repeating pulses
+   and ID 13 Pulse Sequence for non-repeating */
+static void
+tzx_write_pulse_sequence( libspectrum_tape_block *block,
+                          libspectrum_byte **buffer, libspectrum_byte **ptr,
+                          size_t *length )
+{
+  size_t count = libspectrum_tape_block_count( block );
+  size_t i;
+  size_t uncommitted_pulse_count = 0;
+  libspectrum_dword *lengths = NULL;
+
+  libspectrum_tape_block *new_block = 
+    libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL );
+
+  libspectrum_tape_block_set_level( new_block, 0 );
+
+  tzx_write_set_signal_level( new_block, buffer, ptr, length );
+
+  libspectrum_free( new_block );
+
+  for( i = 0; i<count; i++ ) {
+    if( libspectrum_tape_block_pulse_repeats( block, i ) > 1 ) {
+      /* Close off any outstanding pulse blocks */
+      if( uncommitted_pulse_count > 0 ) {
+        add_pulses_block( uncommitted_pulse_count, lengths, block, buffer, ptr,
+                          length );
+        uncommitted_pulse_count = 0;
+        lengths = NULL;
+      }
+
+      libspectrum_tape_block *new_block = 
+              libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PURE_TONE );
+
+      libspectrum_tape_block_set_pulse_length( new_block,
+                            libspectrum_tape_block_pulse_lengths( block, i ) );
+      libspectrum_tape_block_set_count( new_block, 
+                            libspectrum_tape_block_pulse_repeats( block, i ) );
+
+      tzx_write_pure_tone( new_block, buffer, ptr, length );
+
+      libspectrum_free( new_block );
+    } else {
+      /* Queue up pulse */
+      lengths =
+        libspectrum_realloc( lengths,
+                         ( uncommitted_pulse_count + 1 ) * sizeof( *lengths ) );
+      lengths[uncommitted_pulse_count++] =
+        libspectrum_tape_block_pulse_lengths( block, i );
+    }
+  }
+
+  /* Close off any outstanding pulse blocks */
+  if( uncommitted_pulse_count > 0 ) {
+    add_pulses_block( uncommitted_pulse_count, lengths, block, buffer, ptr,
+                      length );
+  }
+}
+
+/* Use ID 2B to set initial signal level, ID 14 Pure Data Block and a ID 12
+   Pure Tone for the tail pulse */
+static libspectrum_error
+tzx_write_data_block( libspectrum_tape_block *block, libspectrum_byte **buffer,
+                      libspectrum_byte **ptr, size_t *length )
+{
+  libspectrum_tape_block *new_block;
+  size_t data_length;
+
+  /* Pure data block can only have two identical pulses for bit 0 and bit 1 */
+  if( libspectrum_tape_block_bit0_pulse_count( block ) != 2 ||
+      ( libspectrum_tape_block_bit0_pulses( block, 0 ) !=
+        libspectrum_tape_block_bit0_pulses( block, 1 ) ) ||
+      libspectrum_tape_block_bit1_pulse_count( block ) != 2 ||
+      ( libspectrum_tape_block_bit1_pulses( block, 0 ) !=
+        libspectrum_tape_block_bit1_pulses( block, 1 ) ) ) {
+    /* Could use generalised data block for these cases if a suitable test file
+       is located, right now I haven't seen any */
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+  }
+
+  new_block =
+    libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL );
+
+  libspectrum_tape_block_set_level( new_block, 
+                                    libspectrum_tape_block_level( block ) );
+
+  tzx_write_set_signal_level( new_block, buffer, ptr, length );
+
+  libspectrum_free( new_block );
+
+  new_block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PURE_DATA );
+
+  libspectrum_tape_block_set_bit0_length( new_block,
+                              libspectrum_tape_block_bit0_pulses( block, 0 ) );
+  libspectrum_tape_block_set_bit1_length( new_block,
+                              libspectrum_tape_block_bit1_pulses( block, 0 ) );
+  libspectrum_tape_block_set_bits_in_last_byte( new_block, 
+                          libspectrum_tape_block_bits_in_last_byte( block ) );
+  libspectrum_set_pause_tstates( new_block, 0 );
+
+  /* And the actual data */
+  data_length = libspectrum_tape_block_data_length( block );
+  libspectrum_tape_block_set_data_length( new_block, data_length );
+  libspectrum_byte *data = libspectrum_malloc( data_length * sizeof( *data ) );
+  memcpy( data, libspectrum_tape_block_data( block ), data_length );
+  libspectrum_tape_block_set_data( new_block, data );
+
+  tzx_write_data( new_block, buffer, ptr, length );
+
+  libspectrum_free( new_block );
+
+  if( libspectrum_tape_block_tail_length( block ) ) {
+    new_block = 
+            libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PURE_TONE );
+
+    libspectrum_tape_block_set_pulse_length( new_block,
+                          libspectrum_tape_block_tail_length( block ) );
+    libspectrum_tape_block_set_count( new_block, 1 );
+
+    tzx_write_pure_tone( new_block, buffer, ptr, length );
+
+    libspectrum_free( new_block );
+  }
+
+  return LIBSPECTRUM_ERROR_NONE;
 }
 
 static void
