@@ -332,3 +332,4 @@
 20110429 tzxlist.c: PZX files have archive info text as UTF-8 (Fred).
 20110429 tape2wav.c: respect polarity when writing audio out (Fred).
 20110501 man/profile2map.1: update my email address (Stuart).
+20110514 tzxlist.c: add support for TZX set signal level block (Fred).

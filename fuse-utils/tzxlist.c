@@ -396,6 +396,11 @@ process_tape( char *filename )
       /* Do nothing */
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL:
+      printf( "  Polarity: %s\n",
+                libspectrum_tape_block_level( block ) ? "high" : "low" );
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_JUMP:
       printf("  Offset: %d\n", libspectrum_tape_block_offset( block ) );
       break;
