@@ -844,3 +844,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20100514 doc/libspectrum.txt,libspectrum.h.in,tape.c,tape_accessors.txt,
          tape_block.[ch],tzx_read.c,tzx_write.c: add support for the TZX set
          signal level block (Fred).
+20100514 tape.c,tzx_read.c: tweak set signal level and pause blocks to correct
+         level information (Fred).

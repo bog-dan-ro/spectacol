@@ -387,8 +387,13 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
 
     case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
       *tstates = block->types.pause.length_tstates; end_of_block = 1;
-      *flags |= block->types.pause.level ? LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH :
-                                           LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW;
+      /* If the pause isn't a "don't care" level then set the appropriate pulse
+         level */
+      if( block->types.pause.level != -1 &&
+          block->types.pause.length_tstates ) {
+        *flags |= block->types.pause.level ? LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH :
+                                             LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW;
+      }
       /* 0 ms pause => stop tape */
       if( *tstates == 0 ) { *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP; }
       break;
@@ -426,8 +431,10 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
 
     case LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL:
       *tstates = 0; end_of_block = 1;
+      /* Inverted as the following block will flip the level before recording
+         the edge */
       *flags |= block->types.set_signal_level.level ?
-          LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH : LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW;
+          LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW : LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH;
       break;
 
     /* For blocks which contain no Spectrum-readable data, return zero
