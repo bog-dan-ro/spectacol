@@ -187,6 +187,7 @@ internal_tap_write( libspectrum_byte **buffer, size_t *length,
     case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
     case LIBSPECTRUM_TAPE_BLOCK_JUMP:
     case LIBSPECTRUM_TAPE_BLOCK_SELECT:
+    case LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL:
       error = skip_block( block, "conversion may not work" );
       if( error != LIBSPECTRUM_ERROR_NONE ) { libspectrum_free( *buffer ); return 1; }
       done = 1;
