@@ -848,3 +848,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          level information (Fred).
 20100514 tzx_write.c: add support for writing PZX blocks to TZX files (Fred).
 20100515 tap.c: add support for the TZX set signal level block (Fred).
+20100515 tzx_write.c: factor out common code for writing signal level and pure
+         tone blocks (Fred).
