@@ -138,17 +138,19 @@ dck_reset( void )
 
     for( i = 0; i < 8; i++ ) {
 
+      memory_page *page = mem[i];
+
       switch( dck->dck[num_block]->access[i] ) {
 
       case LIBSPECTRUM_DCK_PAGE_NULL:
         break;
 
       case LIBSPECTRUM_DCK_PAGE_ROM:
-        mem[i]->page = memory_pool_allocate( MEMORY_PAGE_SIZE );
-	if( !mem[i]->page ) return 1;
-	memcpy( mem[i]->page, dck->dck[num_block]->pages[i],
+        page->page = memory_pool_allocate( MEMORY_PAGE_SIZE );
+	memcpy( page->page, dck->dck[num_block]->pages[i],
 		MEMORY_PAGE_SIZE );
-        mem[i]->writable = 0;
+        page->writable = 0;
+        page->save_to_snapshot = 1;
         break;
 
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
@@ -159,12 +161,12 @@ dck_reset( void )
 	   other cases, we allocate ourselves a new page to store the
 	   contents in */
         if( !(dck->dck[num_block]->bank == LIBSPECTRUM_DCK_BANK_HOME && i>1) ) {
-          mem[i]->page = memory_pool_allocate( MEMORY_PAGE_SIZE );
-	  if( !mem[i]->page ) return 1;
-          mem[i]->writable = 1;
+          page->page = memory_pool_allocate( MEMORY_PAGE_SIZE );
+          page->writable = 1;
+          page->save_to_snapshot = 1;
         }
 	
-	memcpy( mem[i]->page, dck->dck[num_block]->pages[i],
+	memcpy( page->page, dck->dck[num_block]->pages[i],
 		MEMORY_PAGE_SIZE );
         break;
 
