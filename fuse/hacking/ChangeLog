@@ -3642,3 +3642,6 @@
          into snapshots.
 20110606 ui/win32/{debugger.c,pokefinder.c,pokefinder.rc}: fix Win32 build
          (Sergio Baldoví)
+20110610 peripherals/if1.c: mirror Interface 1 ROM to seconds 8Kb of ROM as in
+         the real interface (fixes bug #3314682) (thanks, mcleod_ideafix and
+         zx81) (Fred).
