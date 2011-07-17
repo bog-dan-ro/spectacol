@@ -224,6 +224,8 @@ decode_header( libspectrum_tape_block *block )
     case 3:
       printf("  CODE: ");
       print_block_name( data );
+      printf("\n  Start: %d\n", data[14] + data[15] * 0x100 );
+      printf("  Length: %d", data[12] + data[13] * 0x100 );
       break;
     default:
       printf("  Unknown");
