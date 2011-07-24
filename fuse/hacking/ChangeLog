@@ -3645,3 +3645,6 @@
 20110610 peripherals/if1.c: mirror Interface 1 ROM to seconds 8Kb of ROM as in
          the real interface (fixes bug #3314682) (thanks, mcleod_ideafix and
          zx81) (Fred).
+20110724 fuse.c: fix a memory leak while making guesses as to what to do with
+         non-option arguments (patch #3376243) (thanks, valgrind) (Sergio
+         Baldovi).

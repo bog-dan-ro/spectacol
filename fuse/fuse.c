@@ -554,7 +554,10 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
 
     error = libspectrum_identify_file_with_class( &type, &class, filename,
 						  file.buffer, file.length );
-    if( error ) return error;
+    if( error ) {
+      utils_close_file( &file );
+      return error;
+    }
 
     switch( class ) {
 
@@ -640,6 +643,8 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
       break;
 
     }
+
+    utils_close_file( &file );
   }
 
   return 0;
