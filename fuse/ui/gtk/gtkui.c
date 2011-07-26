@@ -178,8 +178,9 @@ ui_init( int *argc, char ***argv )
                      GTK_DEST_DEFAULT_ALL,
                      drag_types,
                      G_N_ELEMENTS( drag_types ),
-                     GDK_ACTION_COPY | GDK_ACTION_PRIVATE );
-                     /* GDK_ACTION_PRIVATE alone DNW with ROX-Filer */
+                     GDK_ACTION_COPY | GDK_ACTION_PRIVATE | GDK_ACTION_MOVE );
+                     /* GDK_ACTION_PRIVATE alone DNW with ROX-Filer,
+                        GDK_ACTION_MOVE allow DnD from KDE */
 
   gtk_signal_connect( GTK_OBJECT( gtkui_window ), "drag-data-received",
 		      GTK_SIGNAL_FUNC( gtkui_drag_data_received ), NULL );

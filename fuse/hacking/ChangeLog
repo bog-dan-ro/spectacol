@@ -3327,18 +3327,18 @@
          #3013768) (Gergely Szasz).
 20100912 menu.c,rzx.[ch]: query for an initial snapshot when opening a rzx file
          which doesn't have one as is common in competition mode rzx files
-         (patch #3054536) (Sergio Baldovi).
+         (patch #3054536) (Sergio Baldoví).
 20100912 configure.in,windres.rc: enhancements to Windows version encoding
-         (patch #3061430) (Sergio Baldovi).
+         (patch #3061430) (Sergio Baldoví).
 20100913 fuse.c,menu.[ch],rzx.[ch],utils.[ch]: extend RZX playback handling of
          files without initial embedded snapshots to cover File->Open, the
          command line and some miscellaneous RZX playback initialisation bugs
-         (more from patch #3054536) (Sergio Baldovi).
+         (more from patch #3054536) (Sergio Baldoví).
 20100919 ui/win32/installer/fuse.nsi: windows installer improvements; correct
          uninstall registry key, parameterise installation directory path, add
          version information fields, optionally register file types, make start
          menu shortcuts optional and add desktop shortcut (patch #3069264)
-         (Sergio Baldovi).
+         (Sergio Baldoví).
 20100930 ChangeLog,fuse.c,man/fuse.1,README: first updates for a "1.0" release.
 20101002 lib/{compressed,uncompressed}/*.szx: update libspectrum signature in
          each file so we know they don't have the A-F swap bug.
@@ -3348,7 +3348,7 @@
 20101006 ui/gtk/{gtkkeyboard.c,gtkui.c,statusbar.c,stock.c}: use F1 as shortcut
          to open menus, set window dialogs as transient for the main window and
          set a fixed width for the emulation speed display (patch #3081729)
-         (Sergio Baldovi).
+         (Sergio Baldoví).
 20101007 ui.c: don't close a disk or mdr if a write fails (patch #3058156)
          (thanks, Crisis) (Gergely Szasz).
 20101007 ui/widget/query.c: fix colour of dialog Cancel entry and correct action
@@ -3357,7 +3357,7 @@
          man/fuse.1,menu.c,menu_data.dat,ui.c,ui/ui.h: change "Eject and write"
          menu items to "Save" and "Save as" (patch #3083639) (Gergely Szasz).
 20101010 configure.in: pad version number for Win32 if needed (patch #3084574)
-         (Sergio Baldovi).
+         (Sergio Baldoví).
 20101011 ui/gtk/gtkdisplay.c: resize window when machine selection switches
          between Timex and non-Timex modes (fixes bug #3084862) (thanks, Phil)
          (Fred).
@@ -3365,7 +3365,7 @@
          "empty" page (thanks, Andrew Owen) (Fred).
 20101029 man/fuse.1: some updates to bring things a bit more up to date (Fred).
 20101102 man/fuse.1: remove reference to fixed issue in RZX playback command
-         line ordering (patch #3100707) (Sergio Baldovi).
+         line ordering (patch #3100707) (Sergio Baldoví).
 20101129 ui/fb/fbdisplay.c: only call fbdisplay_end() when display is
          initialised (fixes bug #3119382) (rkd77).
 20101129 ChangeLog,README,man/fuse.1: more 1.0 updates.
@@ -3383,7 +3383,7 @@
          have run it (fixes bug #3084862) (thanks, Chris Cowley) (Fred).
 20101230 debugger/breakpoint.c: stop evaluating breakpoints when we have hit a
          temporary breakpoint (really fixes bug #3084862) (patch #3142840)
-         (Sergio Baldovi).
+         (Sergio Baldoví).
 20101231 AUTHORS,Makefile.am,compat.h,compat/{amiga,morphos,unix,wii,
          win32}/Makefile.am,compat/unix/tuntap.c,configure.in,fuse.c,menu.c,
          man/fuse.1,menu_data.dat,nic/{Makefile.am,enc28j60.[ch]},periph.[ch],
@@ -3404,14 +3404,14 @@
 20110113 ui/win32/installer/fuse.nsi: windows installer improvements; optionally
          delete configuration file (fuse.cfg) on uninstall, silently uninstall
          previous version if reinstalling to the same folder, include AUTHORS
-         file (patch #3152511) (Sergio Baldovi).
+         file (patch #3152511) (Sergio Baldoví).
 20110113 machine.c,screenshot.[ch],tape.c,ui/{gtk/picture.c,widget/menu.c,
          widget/widget.c,win32/picture.c},utils.[ch]: extract the read_screen()
          function to utils.c and add utils_read_auxiliary_file() to simplify
          auxiliary file reading code (patch #3148363) (Gergely Szasz).
 20110113 configure.in,fuse.c,ui/{gtk/gtkjoystick.c,sdl/sdljoystick.c,
          xlib/xjoystick.c}: allow the use of the SDL joystick code in the GTK+
-         and Xlib UIs (patch #3156508) (Sergio Baldovi).
+         and Xlib UIs (patch #3156508) (Sergio Baldoví).
 20110113 tape.c: remove unused variable.
 20110113 ui/gtk/gtkjoystick.c: unbreak GTK+ compilation.
 20110113 disk/{beta.[ch],opus.c,plusd.[ch]},fuller.[ch],fuse.c,ide/{divide.[ch],
@@ -3469,12 +3469,12 @@
          SpecDrum volume (Fred).
 20110131 machine/machines_periph.c: SpecDrum available on 128K as well.
 20110202 configure.in: update glib and GTK+ required versions to new minimums
-         (more from patch #3160211) (Sergio Baldovi).
+         (more from patch #3160211) (Sergio Baldoví).
 20110203 (all peripheral files): move to new peripherals/ subdirectory.
 20110203 ui/{sdl/sdldisplay.c,widget/{debugger.c,menu.c,widget.c}},
          z80/coretest.c: fix up SDL for new peripherals structure.
 20110204 peripherals/disk/disk.c: fix transposed arguments in memset calls
-         (Sergio Baldovi).
+         (Sergio Baldoví).
 20110204 peripherals/specdrum.h: tweak whitespace (Fred).
 20110204 peripherals: add .deps and Makefile to the ignore property (Fred).
 20110206 memory.[ch],peripherals/ide/{divide.c,zxatasp.c,zxcf.c}: use memory
@@ -3501,14 +3501,14 @@
 20110209 ui/{fb/fbjoystick.c,svga/svgajoystick.c}: fix compilation (fixes bug
          #3175619) (rkd77).
 20110210 ui/{win32/{debugger.c,win32joystick.c,win32ui.c},xlib/xdisplay.c}:
-         more compilation fixes (fixes bug #3176005) (Sergio Baldovi).
+         more compilation fixes (fixes bug #3176005) (Sergio Baldoví).
 20110210 periph.[ch]: remove warning about accessing uninitialised value (Fred).
 20110213 machine.c,memory.[ch]: reset ROM source to SYSTEM on machine reset
          so tape traps work on machines with fewer ROMs than a machine with a
          custom ROM that is used first (fixes bug #3179123) (thanks, Phil
          Reynolds) (Fred).
 20110214 configure.in,ui/win32/fuse.manifest.in,windres.rc: enable win32 themes
-         (patch #3179878) (Sergio Baldovi).
+         (patch #3179878) (Sergio Baldoví).
 20110216 machines/{tc2048.c,tc2068.[ch],ts2068.c}: use memory pool for Timex
          fake memory bank, leave memory marked as no bank so that it doesn't
          get marked as writable by the writeable ROM option (Fred).
@@ -3524,7 +3524,7 @@
            - Fix status bar flickering on +2A, +3 and +3e machines due to high
              refresh rate of disk status
            - Properly sized status bar icons part on startup
-         (patch #3169039) (Sergio Baldovi).
+         (patch #3169039) (Sergio Baldoví).
 20110319 windres.rc,ui/win32/{Makefile.am,about.[c|h|rc],debugger.c,debugger.rc,
          hyperlinks.[ch],options-resource.pl,win32internals.h,
          win32joystick.[c|rc],win32ui.c}: more Win32 UI code improvements;
@@ -3546,7 +3546,7 @@
           - Fix scrolling in disassembly list (1 LINEUP/LINEDOWN), don't
             mismatch next OP if the top OP was 2 bytes.
           - Enabled ESC key to close the dialog.
-         (patch #3201532) (Sergio Baldovi).
+         (patch #3201532) (Sergio Baldoví).
 20110327 man/fuse.1,roms/{128p-[01].rom,256s-[0123].rom,Makefile.am,
          README.copyright,gluck.rom,if1-[12].rom,opus.rom,trdos.rom,
          Makefile.am}: remove ROMs that there is no formal permission to
@@ -3568,11 +3568,11 @@
 20110402 ui/{gtk,win32}/options.pl,utils.c: add const qualifiers (Stuart).
 20110403 ui/win32/win32ui.c: implement Snap Joystick Prompt. Enable default
          button, ESC key and the ability to use arrow up/down to cycle (patch
-         #3258533) (Sergio Baldovi).
+         #3258533) (Sergio Baldoví).
 20110403 peripherals/disk/upd_fdc.c: fix compilation warnings (patch #3259355)
-         (Sergio Baldovi and Gergely Szasz).
+         (Sergio Baldoví and Gergely Szasz).
 20110403 ui/gtk/{gtkdisplay.c,gtkinternals.h,statusbar.c}: add current machine
-         name to GTK+ statusbar (patch #3208815) (Sergio Baldovi).
+         name to GTK+ statusbar (patch #3208815) (Sergio Baldoví).
 20110404 ui/win32/about.rc: fix spelling (Stuart).
 20110404 bitmap.h,peripherals/{disk/{beta.c,opus.[ch],plusd.[ch],upd_fdc.h,
          wd_fdc.[ch]},fuller.h}: update my email address (Stuart).
@@ -3599,9 +3599,9 @@
 20110408 settings.dat: fix name of separation option in config file (Stuart).
 20110412 configure.in,screenshot.c: libpng 1.5.X no longer internally includes
          the zlib.h header file, so applications that refer to Z_ constants need
-         to include it explicitly (patch #3283820) (Sergio Baldovi).
+         to include it explicitly (patch #3283820) (Sergio Baldoví).
 20110412 ui/win32/win32ui.c: improve Win32 UI behaviour when cancelling
-         selection dialogs (patch #3283822) (Sergio Baldovi).
+         selection dialogs (patch #3283822) (Sergio Baldoví).
 20110413 menu_data.dat: remove leading zeroes in eject action values (Stuart).
 20110414 fuse.c,machines/machines_periph.c,man/fuse.1,menu.[ch],menu_data.dat,
          periph.h,peripherals/disk/{Makefile.am,disciple.[ch]},settings.dat,
@@ -3610,7 +3610,7 @@
 20110414 disciple.c: avoid C++/C99 comments (Stuart).
 20110415 ui/win32/win32ui.c: fix the disabling of menu entries below a
          separator, e.g., /File/Movie/Stop Movie Recording (patch #3286195)
-         (Sergio Baldovi).
+         (Sergio Baldoví).
 20110425 ui/gtk/{gtkdisplay.c,gtkinternals.h,statusbar.c}: fix warnings.
 20110430 configure.in: fix compilation --without-gtk --with-x with libpng 1.4
          installed as libpng14 (thanks, rkd77) (Fred).
@@ -3618,10 +3618,10 @@
          joystick configured (rkd77).
 20110430 ui/win32/{statusbar.c,win32display.c,win32internals.h}: add machine
          name into the status bar the same as the GTK UI. Fix a few compiler
-         warnings (patch #3294566) (Sergio Baldovi).
+         warnings (patch #3294566) (Sergio Baldoví).
 20110430 ui/win32/win32ui.c: make selection dialogs accurately resized to show a
          full caption title, resize properly with high DPI settings (more of
-         patch #3258533) (Sergio Baldovi).
+         patch #3258533) (Sergio Baldoví).
 20110501 man/fuse.1: Fix typo (AY-3-8192 -> AY-3-8912) (Stuart).
 20110501 ChangeLog,README,man/fuse.1: Fix typos (Stuart).
 20110501 sound.c: enable SpecDrum on both channels when using stereo (Stuart).
@@ -3647,4 +3647,7 @@
          zx81) (Fred).
 20110724 fuse.c: fix a memory leak while making guesses as to what to do with
          non-option arguments (patch #3376243) (thanks, valgrind) (Sergio
-         Baldovi).
+         Baldoví).
+20110726 ui/gtk/gtkui.c: allow the drag and drop of files from KDE
+         (Dolphin/Konqueror) (patch #3376811) (thanks, Diondeville) (Sergio
+         Baldoví).
