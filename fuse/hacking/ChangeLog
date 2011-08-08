@@ -3651,3 +3651,7 @@
 20110726 ui/gtk/gtkui.c: allow the drag and drop of files from KDE
          (Dolphin/Konqueror) (patch #3376811) (thanks, Diondeville) (Sergio
          Baldoví).
+20110726 machines/Makefile.am,ui/widget/Makefile.am: fix these issues;
+         machines/machines_periph.h is not packed in the tarball,
+         ui/widget/options_internals.h is not removed with distclean, and
+         ui/widget/options.h no longer exists (patch #3388283) (Sergio Baldoví).

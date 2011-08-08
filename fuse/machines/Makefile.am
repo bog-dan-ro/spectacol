@@ -48,6 +48,7 @@ libmachines_a_SOURCES = machines_periph.c \
 			ts2068.c
 
 noinst_HEADERS = machines.h \
+		 machines_periph.h \
 		 pentagon.h \
 		 scorpion.h \
 		 spec128.h \

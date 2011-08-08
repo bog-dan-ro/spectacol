@@ -73,5 +73,5 @@ EXTRA_DIST = mkfusefont.pl \
 
 CLEANFILES = menu_data.c \
 	     options.c \
-	     options.h \
+	     options_internals.h \
 	     fuse.font
