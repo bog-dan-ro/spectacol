@@ -78,6 +78,7 @@
 #include "peripherals/speccyboot.h"
 #include "peripherals/ula.h"
 #include "pokefinder/pokefinder.h"
+#include "pokefinder/pokemem.h"
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
@@ -632,6 +633,12 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     case LIBSPECTRUM_CLASS_TAPE:
       start_files->tape = filename; break;
 
+    case LIBSPECTRUM_CLASS_AUXILIARY:
+      if( type == LIBSPECTRUM_ID_AUX_POK ) {
+        pokemem_set_pokfile( filename );
+      }
+      break;
+
     case LIBSPECTRUM_CLASS_UNKNOWN:
       ui_error( UI_ERROR_WARNING, "couldn't identify '%s'; ignoring it",
 		filename );
@@ -843,6 +850,7 @@ static int fuse_end(void)
   event_end();
   fuse_joystick_end();
   ui_end();
+  pokemem_end();
 
   libspectrum_creator_free( fuse_creator );
 

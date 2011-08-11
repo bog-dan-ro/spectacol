@@ -3655,3 +3655,8 @@
          machines/machines_periph.h is not packed in the tarball,
          ui/widget/options_internals.h is not removed with distclean, and
          ui/widget/options.h no longer exists (patch #3388283) (Sergio Baldoví).
+20110811 compat.h,compat/unix/file.c,fuse.c,machine.c,menu.h,menu_data.dat,
+         pokefinder/{Makefile.am,pokemem.[ch]},ui/fb/fbui.c,
+         ui/gtk/{Makefile.am,pokemem.c},ui/sdl/sdlui.c,ui/svga/svgaui.c,
+         ui/ui.h,ui/win32/win32ui.c,utils.c: add support for POK files
+         (patch #3382538) (Sergio Baldoví).

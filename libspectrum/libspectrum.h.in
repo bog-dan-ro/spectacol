@@ -212,6 +212,8 @@ typedef enum libspectrum_id_t {
 
   LIBSPECTRUM_ID_TAPE_PZX,		/* PZX tape image */
 
+  LIBSPECTRUM_ID_AUX_POK,		/* POKE file */
+
 } libspectrum_id_t;
 
 /* And 'classes' of file */
@@ -247,6 +249,8 @@ typedef enum libspectrum_class_t {
   /* Below here, present only in 0.5.0 and later */
 
   LIBSPECTRUM_CLASS_DISK_GENERIC,	/* generic disk image */
+
+  LIBSPECTRUM_CLASS_AUXILIARY,	        /* auxiliary supported file */
 
 } libspectrum_class_t;
 

@@ -118,6 +118,9 @@ Machine/_Hard reset..., Item,, menu_machine_reset,, 1
 Machine/_Select..., Item, F9,, menu_machine_detail
 Machine/_Debugger..., Item
 Machine/P_oke Finder..., Item
+#ifdef UI_GTK
+Machine/Po_ke Memory..., Item
+#endif
 Machine/_Memory Browser..., Item
 
 Machine/Pro_filer, Branch

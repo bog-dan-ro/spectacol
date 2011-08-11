@@ -90,3 +90,9 @@ compat_file_close( compat_fd fd )
 {
   return fclose( fd );
 }
+
+int
+compat_file_exists( const char *path )
+{
+  return ( access( path, R_OK ) != -1 );
+}

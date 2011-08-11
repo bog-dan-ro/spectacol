@@ -295,4 +295,6 @@ void ui_popup_menu( int native_key );
 
 void ui_widget_keyhandler( int native_key );
 
+void ui_pokemem_selector( const char *filename );
+
 #endif			/* #ifndef FUSE_UI_H */

@@ -850,3 +850,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20100515 tap.c: add support for the TZX set signal level block (Fred).
 20100515 tzx_write.c: factor out common code for writing signal level and pure
          tone blocks (Fred).
+20100811 libspectrum.h.in,libspectrum.c: add support for detecting POK files
+         (patch #3382538) (Sergio Baldoví).

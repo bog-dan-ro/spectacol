@@ -96,6 +96,7 @@ int compat_file_read( compat_fd fd, struct utils_file *file );
 int compat_file_write( compat_fd fd, const unsigned char *buffer,
                        size_t length );
 int compat_file_close( compat_fd fd );
+int compat_file_exists( const char *path );
 
 /* Directory handling */
 

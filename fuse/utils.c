@@ -46,6 +46,7 @@
 #include "peripherals/ide/zxcf.h"
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
+#include "pokefinder/pokemem.h"
 #include "rzx.h"
 #include "screenshot.h"
 #include "settings.h"
@@ -105,11 +106,13 @@ utils_open_file( const char *filename, int autoload,
 
   case LIBSPECTRUM_CLASS_SNAPSHOT:
     error = snapshot_read_buffer( file.buffer, file.length, type );
+    pokemem_find_pokfile( filename );
     break;
 
   case LIBSPECTRUM_CLASS_TAPE:
     error = tape_read_buffer( file.buffer, file.length, type, filename,
 			      autoload );
+    pokemem_find_pokfile( filename );
     break;
 
   case LIBSPECTRUM_CLASS_DISK_PLUS3:
@@ -194,6 +197,12 @@ utils_open_file( const char *filename, int autoload,
     }
     if( error ) return error;
     
+    break;
+
+  case LIBSPECTRUM_CLASS_AUXILIARY:
+    if( type == LIBSPECTRUM_ID_AUX_POK ) {
+      ui_pokemem_selector( filename );
+    }
     break;
 
   default:

@@ -40,6 +40,7 @@
 #include "memory.h"
 #include "module.h"
 #include "peripherals/ula.h"
+#include "pokefinder/pokemem.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
@@ -383,6 +384,9 @@ machine_reset( int hard_reset )
 
   /* clear out old display image ready for new one */
   display_refresh_all();
+
+  /* Clear poke list */
+  pokemem_clear();
 
   return 0;
 }
