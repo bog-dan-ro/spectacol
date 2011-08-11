@@ -1059,7 +1059,7 @@ open_udi( buffer_t *buffer, disk_t *d )
     bpt = buff[1] + 256 * buff[2];		/* current track len... */
     clen = DISK_CLEN( bpt );
 
-    memset( d->track, d->bpt, 0x4e );		/* fillup */
+    memset( d->track, 0x4e, d->bpt );		/* fillup */
 						/* read track + clocks */
     if( ttyp == 0x83 ) {			/* multiple read */
       i--;					/* not a real track */

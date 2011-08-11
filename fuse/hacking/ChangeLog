@@ -3660,3 +3660,5 @@
          ui/gtk/{Makefile.am,pokemem.c},ui/sdl/sdlui.c,ui/svga/svgaui.c,
          ui/ui.h,ui/win32/win32ui.c,utils.c: add support for POK files
          (patch #3382538) (Sergio Baldoví).
+20110811 peripherals/disk/disk.c: fix one more instance of transposed memset
+         arguments (patch #3388285) (Sergio Baldoví).
