@@ -51,6 +51,8 @@ libuiwin32_a_SOURCES = about.c \
 		       picture.rc \
 		       pokefinder.c \
 		       pokefinder.rc \
+		       pokemem.c \
+		       pokemem.rc \
 		       rollback.c \
 		       rollback.rc \
 		       roms.c \
@@ -108,6 +110,7 @@ noinst_HEADERS = about.h \
 		 hyperlinks.h \
 		 picture.h \
 		 pokefinder.h \
+		 pokemem.h \
 		 rollback.h \
 		 roms.h \
 		 select_template.h \

@@ -40,6 +40,7 @@ win32_icon ICON "winfuse.ico"
 #include "ui/win32/options.rc"          /* reserved ids: 3000 - 3099 */
 #include "ui/win32/picture.rc"          /* reserved ids: 1200 - 1299 */
 #include "ui/win32/pokefinder.rc"       /* reserved ids: 1500 - 1599 */
+#include "ui/win32/pokemem.rc"          /* reserved ids: 1900 - 1999 */
 #include "ui/win32/rollback.rc"         /* reserved ids: 1600 - 1699 */
 #include "ui/win32/roms.rc"             /* reserved ids: 1100 - 1199 */
 #include "ui/win32/select_template.rc"  /* reserved ids: 1000 - 1099 */

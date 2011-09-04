@@ -1170,9 +1170,3 @@ win32ui_process_messages( int process_queue_once )
   }
   /* FIXME: somewhere there should be return msg.wParam */
 }
-
-void
-ui_pokemem_selector( const char *filename )
-{
-  /* TODO: implement this */
-}
