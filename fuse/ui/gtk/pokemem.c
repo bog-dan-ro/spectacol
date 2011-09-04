@@ -80,15 +80,23 @@ void
 menu_machine_pokememory( GtkWidget *widget GCC_UNUSED,
                          gpointer data GCC_UNUSED )
 {
+  fuse_emulation_pause();
+
   pokemem_autoload_pokfile();
   create_dialog();
+
+  fuse_emulation_unpause();
 }
 
 void
 ui_pokemem_selector( const char *filename )
 {
+  fuse_emulation_pause();
+
   pokemem_read_from_file( filename );
   create_dialog();
+
+  fuse_emulation_unpause();
 }
 
 void
@@ -96,8 +104,6 @@ create_dialog( void )
 {
   GtkWidget *hbox, *vbox, *label, *scroll;
   GtkAccelGroup *accel_group;
-
-  fuse_emulation_pause();
 
   dialog = gtkstock_dialog_new( "Fuse - Poke Memory",
                                 GTK_SIGNAL_FUNC( pokemem_close ) );
@@ -175,8 +181,6 @@ create_dialog( void )
   /* Process the dialog */
   gtk_widget_show_all( dialog );
   gtk_main();
-
-  fuse_emulation_unpause();
 }
 
 void
@@ -302,12 +306,10 @@ pokemem_update_trainer( GtkTreeModel *model, GtkTreePath *path GCC_UNUSED,
                         GtkTreeIter *iter, gpointer data GCC_UNUSED )
 {
   gboolean selected;
-  gchar *name;
   trainer_t *trainer;
 
   gtk_tree_model_get( model, iter,
                       COL_CHECK, &selected,
-                      COL_NAME, &name,
                       COL_TRAINER, &trainer,
                       -1);
 
@@ -316,8 +318,6 @@ pokemem_update_trainer( GtkTreeModel *model, GtkTreePath *path GCC_UNUSED,
   } else {
     pokemem_trainer_desactivate( trainer );
   }
-
-  g_free( name );
 
   return FALSE;
 }
@@ -383,11 +383,14 @@ pokemem_add_custom_poke( GtkWidget *widget GCC_UNUSED,
 
   /* Updadate store and view */
   trainer = pokemem_trainer_list_add( b, a, v );
-  if( trainer ) {
-    store = GTK_LIST_STORE( gtk_tree_view_get_model(
-                            GTK_TREE_VIEW( poke_list ) ) );
-    trainer_add( trainer, store );
+  if( !trainer ) {
+    ui_error( UI_ERROR_ERROR, "Cannot add trainer" );
+    return;
   }
+
+  store = GTK_LIST_STORE( gtk_tree_view_get_model(
+                          GTK_TREE_VIEW( poke_list ) ) );
+  trainer_add( trainer, store );
 
   /* Mark custom trainer for activate */
   GtkTreeModel *model;

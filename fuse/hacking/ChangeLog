@@ -3662,3 +3662,5 @@
          (patch #3382538) (Sergio Baldoví).
 20110811 peripherals/disk/disk.c: fix one more instance of transposed memset
          arguments (patch #3388285) (Sergio Baldoví).
+20110904 ui/gtk/pokemem.c: fix minor issues in gtk UI (part of patch #3399216)
+         (Sergio Baldoví).
