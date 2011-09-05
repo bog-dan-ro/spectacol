@@ -96,4 +96,21 @@ g_array_set_size( GArray *array, guint length )
   return array;
 }
 
+gchar*
+g_array_free( GArray *array, gboolean free_segment )
+{
+  gchar* segment;
+
+  if( free_segment ) {
+    libspectrum_free( array->data );
+    segment = NULL;
+  }
+  else
+    segment = array->data;
+
+  libspectrum_free( array );
+
+  return segment;
+}
+
 #endif				/* #ifndef HAVE_LIB_GLIB */

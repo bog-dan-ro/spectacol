@@ -253,6 +253,7 @@ int main(void)
 "WIN32_DLL GArray* g_array_append_vals( GArray *array, gconstpointer data, guint len );\n"
 "#define g_array_index(a,t,i) (*(((t*)a->data)+i))\n"
 "WIN32_DLL GArray* g_array_set_size( GArray *array, guint length );\n"
+"WIN32_DLL gchar* g_array_free( GArray *array, gboolean free_segment );\n"
 "\n" );
   if( sizeof( void* ) == sizeof( int ) ) {
     printf( "#define GINT_TO_POINTER(i)      ((gpointer)  (i))\n" );

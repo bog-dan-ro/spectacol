@@ -914,9 +914,7 @@ void
 libspectrum_make_room( libspectrum_byte **dest, size_t requested,
 		       libspectrum_byte **ptr, size_t *allocated )
 {
-  size_t current_length;
-
-  current_length = *ptr - *dest;
+  size_t current_length = 0;
 
   if( *allocated == 0 ) {
 
@@ -924,6 +922,7 @@ libspectrum_make_room( libspectrum_byte **dest, size_t requested,
     *dest = libspectrum_malloc( requested * sizeof( **dest ) );
 
   } else {
+    current_length = *ptr - *dest;
 
     /* If there's already enough room here, just return */
     if( current_length + requested <= (*allocated) ) return;
