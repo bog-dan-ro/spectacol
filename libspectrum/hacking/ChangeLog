@@ -838,17 +838,17 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          tape files (Fred).
 20110429 wav.c: use some more LIBSPECTRUM_BITS_IN_BYTE constants (Fred).
 20110429 tape.c: have raw data blocks report the polarity of pulses (Fred).
-20100502 configure.in: remove unneeded AM_SUBST_NOTMAKE macro as it doesn't get
+20110502 configure.in: remove unneeded AM_SUBST_NOTMAKE macro as it doesn't get
          along with older autotools (patch #3295662) (thanks, Tomáš Franke)
          (Sergio Baldoví).
-20100514 doc/libspectrum.txt,libspectrum.h.in,tape.c,tape_accessors.txt,
+20110514 doc/libspectrum.txt,libspectrum.h.in,tape.c,tape_accessors.txt,
          tape_block.[ch],tzx_read.c,tzx_write.c: add support for the TZX set
          signal level block (Fred).
-20100514 tape.c,tzx_read.c: tweak set signal level and pause blocks to correct
+20110514 tape.c,tzx_read.c: tweak set signal level and pause blocks to correct
          level information (Fred).
-20100514 tzx_write.c: add support for writing PZX blocks to TZX files (Fred).
-20100515 tap.c: add support for the TZX set signal level block (Fred).
-20100515 tzx_write.c: factor out common code for writing signal level and pure
+20110514 tzx_write.c: add support for writing PZX blocks to TZX files (Fred).
+20110515 tap.c: add support for the TZX set signal level block (Fred).
+20110515 tzx_write.c: factor out common code for writing signal level and pure
          tone blocks (Fred).
-20100811 libspectrum.h.in,libspectrum.c: add support for detecting POK files
+20110811 libspectrum.h.in,libspectrum.c: add support for detecting POK files
          (patch #3382538) (Sergio Baldoví).
