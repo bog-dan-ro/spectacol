@@ -852,3 +852,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          tone blocks (Fred).
 20110811 libspectrum.h.in,libspectrum.c: add support for detecting POK files
          (patch #3382538) (Sergio Baldoví).
+20110905 libspectrum.c,make-perl.c,myglib/garray.c: remove operations with
+         uninitialised pointers in libspectrum_make_room, at stopping RZX
+         recordings or saving snapshots (part of patch #3404090) (Sergio
+         Baldoví).
