@@ -105,6 +105,25 @@ mempool_free( int pool )
   g_array_set_size( p, 0 );
 }
 
+/* Tidy-up function called at end of emulation */
+void
+mempool_end( void )
+{
+  int i;
+  GArray *pool;
+
+  if( !memory_pools ) return;
+
+  for( i = 0; i < memory_pools->len; i++ ) {
+    pool = g_array_index( memory_pools, GArray *, i );
+
+    g_array_free( pool, TRUE );
+  }
+
+  g_array_free( memory_pools, TRUE );
+  memory_pools = NULL;
+}
+
 /* Unit test helper routines */
 
 int

@@ -3667,3 +3667,7 @@
 20110904 menu_data.dat,ui/win32/{Makefile.am,pokemem.[ch],pokemem.rc,win32ui.c},
          windres.rc: add support for .pok files in win32 UI (rest of patch
          #3399216) (Sergio Baldoví).
+20110905 debugger/{debugger.c,debugger_internals.h,event.c},event.c,fuse.c,
+         memory.[ch],mempool.[ch],rzx.c,snapshot.c: free up memory (mostly
+         GArray) when Fuse is exiting: memory, mempool, event, debugger/event,
+         rzx (part of patch #3404090) (Sergio Baldoví).

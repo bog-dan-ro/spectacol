@@ -212,6 +212,7 @@ int rzx_stop_recording( void )
   );
 
   length = 0;
+  buffer = NULL;
   libspec_error = libspectrum_rzx_write(
     &buffer, &length, rzx, LIBSPECTRUM_ID_UNKNOWN, fuse_creator,
     settings_current.rzx_compression, rzx_competition_mode ? &rzx_key : NULL
@@ -474,7 +475,7 @@ autosave_prune( void )
       libspectrum_rzx_iterator_delete( rzx, save1.it );
   }
 
-  g_array_set_size( autosaves, 0 );
+  g_array_free( autosaves, TRUE );
 }
 
 static void

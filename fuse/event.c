@@ -264,9 +264,27 @@ event_name( int type )
   return g_array_index( registered_events, event_descriptor_t, type ).description;
 }
 
+void
+registered_events_free( void )
+{
+  int i;
+  event_descriptor_t descriptor;
+
+  if( !registered_events ) return;
+
+  for( i = 0; i < registered_events->len; i++ ) {
+    descriptor = g_array_index( registered_events, event_descriptor_t, i );
+    free( descriptor.description );
+  }
+
+  g_array_free( registered_events, TRUE );
+  registered_events = NULL;
+}
+
 /* Tidy-up function called at end of emulation */
 void
 event_end( void )
 {
   event_reset();
+  registered_events_free();
 }

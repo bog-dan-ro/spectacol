@@ -87,6 +87,8 @@ int
 debugger_end( void )
 {
   debugger_breakpoint_remove_all();
+  debugger_event_end();
+
   return 0;
 }
 

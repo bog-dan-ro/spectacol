@@ -116,3 +116,22 @@ debugger_event( int event_code )
     }
   }
 }
+
+/* Tidy-up function called at end of emulation */
+void
+debugger_event_end( void )
+{
+  int i;
+  debugger_event_t event;
+
+  if( !registered_events ) return;
+
+  for( i = 0; i < registered_events->len; i++ ) {
+    event = g_array_index( registered_events, debugger_event_t, i );
+    free( event.detail );
+    free( event.type );
+  }
+
+  g_array_free( registered_events, TRUE );
+  registered_events = NULL;
+}

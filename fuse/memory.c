@@ -159,6 +159,40 @@ memory_init( void )
   return 0;
 }
 
+static void
+memory_pool_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
+{
+  memory_pool_entry_t *entry = data;
+  free( entry->memory );
+  free( entry );
+}
+
+/* Tidy-up function called at end of emulation */
+void
+memory_end( void )
+{
+  int i;
+  char *description;
+
+  /* Free all the memory we've allocated for this machine */
+  if( pool ) {
+    g_slist_foreach( pool, memory_pool_free_entry, NULL );
+    g_slist_free( pool );
+    pool = NULL;
+  }
+
+  /* Free memory source types */
+  if( memory_sources ) {
+    for( i = 0; i < memory_sources->len; i++ ) {
+      description = g_array_index( memory_sources, char *, i );
+      free( description );
+    }
+
+    g_array_free( memory_sources, TRUE );
+    memory_sources = NULL;
+  }
+}
+
 int
 memory_source_register( const char *description )
 {
@@ -247,6 +281,7 @@ memory_pool_free( void )
     memory_pool_entry_t *entry = ptr->data;
     free( entry->memory );
     pool = g_slist_remove( pool, entry );
+    free( entry );
   }
 }
 

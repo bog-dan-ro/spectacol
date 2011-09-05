@@ -850,6 +850,8 @@ static int fuse_end(void)
   event_end();
   fuse_joystick_end();
   ui_end();
+  memory_end();
+  mempool_end();
   pokemem_end();
 
   libspectrum_creator_free( fuse_creator );

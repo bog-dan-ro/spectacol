@@ -101,6 +101,7 @@ debugger_expression_evaluate( debugger_expression* expression );
 
 int debugger_event_init( void );
 int debugger_event_is_registered( const char *type, const char *detail );
+void debugger_event_end( void );
 
 /* Variables handling */
 
