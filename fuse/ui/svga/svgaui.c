@@ -124,9 +124,3 @@ ui_mouse_release( int suspend )
 {
   return !suspend;
 }
-
-void
-ui_pokemem_selector( const char *filename )
-{
-  /* TODO: implement this */
-}

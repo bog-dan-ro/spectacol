@@ -37,6 +37,7 @@ libwidget_a_SOURCES = \
 	menu_data.c \
 	options.c \
 	picture.c \
+	pokemem.c \
 	pokefinder.c \
 	query.c \
 	roms.c \

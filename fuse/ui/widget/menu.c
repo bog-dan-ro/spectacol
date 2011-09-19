@@ -608,6 +608,12 @@ menu_machine_debugger( int action )
 }
 
 void
+menu_machine_pokememory( int action )
+{
+  widget_do( WIDGET_TYPE_POKEMEM, NULL );
+}
+
+void
 menu_machine_pokefinder( int action )
 {
   widget_do( WIDGET_TYPE_POKEFINDER, NULL );

@@ -681,6 +681,7 @@ widget_t widget_data[] = {
   { widget_text_draw,	  widget_text_finish,	 widget_text_keyhandler     },
   { widget_debugger_draw, NULL,			 widget_debugger_keyhandler },
   { widget_pokefinder_draw, NULL,		 widget_pokefinder_keyhandler },
+  { widget_pokemem_draw, widget_pokemem_finish,	widget_pokemem_keyhandler },
   { widget_memory_draw,   NULL,			 widget_memory_keyhandler   },
   { widget_roms_draw,     widget_roms_finish,	 widget_roms_keyhandler     },
   { widget_peripherals_draw, widget_options_finish,

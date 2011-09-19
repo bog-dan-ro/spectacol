@@ -197,9 +197,3 @@ ui_mouse_release( int suspend )
   SDL_ShowCursor( SDL_ENABLE );
   return 0;
 }
-
-void
-ui_pokemem_selector( const char *filename )
-{
-  /* TODO: implement this */
-}

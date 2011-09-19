@@ -113,9 +113,3 @@ fb_end( void )
   fbkeyboard_end();
   uidisplay_end();
 }
-
-void
-ui_pokemem_selector( const char *filename )
-{
-  /* TODO: implement this */
-}

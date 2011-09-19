@@ -22,6 +22,7 @@
    E-mail: philip-fuse@shadowmagic.org.uk
 
 */
+#include <ctype.h>
 #include <string.h>
 
 #include "compat.h"
@@ -237,6 +238,7 @@ pokemem_read_trainer( const libspectrum_byte **ptr,
                       const libspectrum_byte *end )
 {
   const libspectrum_byte *cpos = *ptr;
+  const libspectrum_byte *clast;
   char *title;
   size_t length = 0;
 
@@ -244,8 +246,13 @@ pokemem_read_trainer( const libspectrum_byte **ptr,
   while( cpos < end && ( *cpos != '\0' && *cpos != '\r' && *cpos != '\n' ) )
     cpos++;
 
+  /* trim trailing spaces */
+  clast = cpos;
+  while( clast >= *ptr && isspace( *clast ) )
+    clast--;
+
   /* store data */
-  length = cpos - *ptr;
+  length = clast - *ptr + 1;
   if( length > 80 ) length = 80;
   title = malloc( length + 1 );
   if( !title ) return 1;

@@ -215,6 +215,12 @@ void widget_error_keyhandler( input_key key );
 int widget_debugger_draw( void *data );
 void widget_debugger_keyhandler( input_key key );
 
+/* The poke file widget */
+
+int widget_pokemem_draw( void *data );
+void widget_pokemem_keyhandler( input_key key );
+int widget_pokemem_finish( widget_finish_state finished );
+
 /* The poke finder widget */
 
 int widget_pokefinder_draw( void *data );

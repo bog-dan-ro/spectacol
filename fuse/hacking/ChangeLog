@@ -3673,3 +3673,6 @@
          rzx (part of patch #3404090) (Sergio Baldoví).
 20110910 menu_data.dat: fix compilation of non GTK+ and Win32 UIs (thanks,
          pmrtvcom) (Sergio Baldoví).
+20110919 ui/fb/fbui.c,ui/sdl/sdlui.c,ui/svga/svgaui.c,ui/widget/{Makefile.am,
+         menu.c,pokemem.c,widget.[ch],widget_internals.h}: add Poke Memory
+         feature to the widget UIs (patch #3410145) (Sergio Baldoví).
