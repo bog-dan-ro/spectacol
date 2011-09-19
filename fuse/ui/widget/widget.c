@@ -500,6 +500,11 @@ int widget_do( widget_type which, void *data )
   /* If we don't have a UI yet, we can't output widgets */
   if( !display_ui_initialised ) return 1;
 
+  if( which == WIDGET_TYPE_QUERY && !settings_current.confirm_actions ) {
+    widget_query.confirm = 1;
+    return 0;
+  }
+
   if( ui_widget_level == -1 ) uidisplay_frame_save();
 
   /* We're now one widget level deeper */
@@ -721,6 +726,8 @@ ui_tape_browser_update( ui_tape_browser_update_type change,
 ui_confirm_save_t
 ui_confirm_save_specific( const char *message )
 {
+  if( !settings_current.confirm_actions ) return UI_CONFIRM_SAVE_DONTSAVE;
+
   if( widget_do( WIDGET_TYPE_QUERY_SAVE, (void *) message ) )
     return UI_CONFIRM_SAVE_CANCEL;
   return widget_query.confirm;

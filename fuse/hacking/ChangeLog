@@ -3676,3 +3676,5 @@
 20110919 ui/fb/fbui.c,ui/sdl/sdlui.c,ui/svga/svgaui.c,ui/widget/{Makefile.am,
          menu.c,pokemem.c,widget.[ch],widget_internals.h}: add Poke Memory
          feature to the widget UIs (patch #3410145) (Sergio Baldoví).
+20110919 ui/widget/widget.c: allow "Confirm actions" to be disabled in the
+         widget UIs (patch #3410837) (Sergio Baldoví).
