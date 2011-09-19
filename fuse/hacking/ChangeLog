@@ -3678,3 +3678,6 @@
          feature to the widget UIs (patch #3410145) (Sergio Baldoví).
 20110919 ui/widget/widget.c: allow "Confirm actions" to be disabled in the
          widget UIs (patch #3410837) (Sergio Baldoví).
+20110919 input.c: fix widget UI crash when JOYSTICK_FIRE_2 button is pressed
+         just after Fuse starts up on non-Wii platforms (patch #3410841) (Sergio
+         Baldoví).
