@@ -3681,3 +3681,8 @@
 20110919 input.c: fix widget UI crash when JOYSTICK_FIRE_2 button is pressed
          just after Fuse starts up on non-Wii platforms (patch #3410841) (Sergio
          Baldoví).
+20110925 ui/win32/installer/fuse.nsi: windows installer improvements; by
+         default, don't register file extensions associated with other programs,
+         association with file extensions can be individually enabled, add fuse
+         to the OpenWith programs list for known extensions and add .pzx
+         extension association (patch #3413548) (Sergio Baldoví).
