@@ -531,7 +531,11 @@ disassemble_ed( libspectrum_word address, char *buffer, size_t buflen,
       break;
 
     case 0x05: case 0x0d:
-      snprintf( buffer, buflen, "RETN" ); *length = 1;
+      if( b == 0x4d ) {
+	snprintf( buffer, buflen, "RETI" ); *length = 1;
+      } else {
+	snprintf( buffer, buflen, "RETN" ); *length = 1;
+      }
       break;
 
     case 0x06: case 0x0e:

@@ -3686,3 +3686,5 @@
          association with file extensions can be individually enabled, add fuse
          to the OpenWith programs list for known extensions and add .pzx
          extension association (patch #3413548) (Sergio Baldoví).
+20110927 debugger/disassemble.c: disassemble ED 4D as RETI (patch #3414394)
+         (Simon Owen).
