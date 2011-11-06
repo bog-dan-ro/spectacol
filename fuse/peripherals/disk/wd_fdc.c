@@ -463,7 +463,6 @@ wd_fdc_type_i( wd_fdc *f )
 {
   libspectrum_byte b = f->command_register;
   wd_fdc_drive *d = f->current_drive;
-  libspectrum_dword delay;
 
   if( f->state == WD_FDC_STATE_SEEK_DELAY ) {	/* after delay */
     if( ( b & 0x60 ) != 0x00 )			/* STEP/STEP-IN/STEP-OUT */
@@ -532,7 +531,6 @@ type_i_verify:
       f->status_register |= WD_FDC_SR_MOTORON;
       fdd_motoron( &f->current_drive->fdd, 1 );
       statusbar_update( 1 );
-      delay = 6 * 200;
       event_remove_type( fdc_event );
       event_add_with_data( tstates + 12 * 		/* 6 revolution 6 * 200 / 1000 */
 		    machine_current->timings.processor_speed / 10,

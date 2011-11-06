@@ -3688,3 +3688,5 @@
          extension association (patch #3413548) (Sergio Baldoví).
 20110927 debugger/disassemble.c: disassemble ED 4D as RETI (patch #3414394)
          (Simon Owen).
+20111106 peripherals/disk/{disk.c,wd_fdc.c},snapshot.c,ui/gtk/options.pl:
+         remove unused variables (thanks, gcc 4.6).

@@ -145,13 +145,6 @@ menu_options_$_->{name}( GtkWidget *widget GCC_UNUSED,
 			 gpointer data GCC_UNUSED )
 {
   menu_options_$_->{name}_t dialog;
-  GtkWidget *frame, *hbox, *text, *combo;
-  gchar buffer[80];
-  int i;
-
-  i = 0;
-  combo = frame = hbox = text = NULL;
-  buffer[0] = '\\0';		/* Shut gcc up */
 
   /* Firstly, stop emulation */
   fuse_emulation_pause();
@@ -184,52 +177,61 @@ CODE
                 # FIXME: Make the entry widget resize sensibly
 
 		print << "CODE";
-  frame = gtk_frame_new( "$text" );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog.dialog )->vbox ),
-			       frame );
+  {
+    GtkWidget *frame = gtk_frame_new( "$text" );
+    GtkWidget *hbox = gtk_hbox_new( FALSE, 0 );
+    GtkWidget *text = gtk_label_new( "$widget->{data2}" );
+    gchar buffer[80];
+
+    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog.dialog )->vbox ),
+                                 frame );
 				    
-  hbox = gtk_hbox_new( FALSE, 0 );
-  gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
-  gtk_container_add( GTK_CONTAINER( frame ), hbox );
+    gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
+    gtk_container_add( GTK_CONTAINER( frame ), hbox );
 
-  dialog.$widget->{value} = gtk_entry_new();
-  gtk_entry_set_max_length( GTK_ENTRY( dialog.$widget->{value} ),
-	   		    $widget->{data1} );
-  snprintf( buffer, 80, "%d", settings_current.$widget->{value} );
-  gtk_entry_set_text( GTK_ENTRY( dialog.$widget->{value} ), buffer );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), dialog.$widget->{value} );
+    dialog.$widget->{value} = gtk_entry_new();
+    gtk_entry_set_max_length( GTK_ENTRY( dialog.$widget->{value} ),
+                              $widget->{data1} );
+    snprintf( buffer, 80, "%d", settings_current.$widget->{value} );
+    gtk_entry_set_text( GTK_ENTRY( dialog.$widget->{value} ), buffer );
 
-  text = gtk_label_new( "$widget->{data2}" );
-  gtk_box_pack_start( GTK_BOX( hbox ), text, FALSE, FALSE, 5 );
+    gtk_box_pack_start_defaults( GTK_BOX( hbox ), dialog.$widget->{value} );
+
+    gtk_box_pack_start( GTK_BOX( hbox ), text, FALSE, FALSE, 5 );
+  }
 
 CODE
             } elsif( $type eq "Combo" ) {
 
 		print << "CODE";
-  hbox = gtk_hbox_new( FALSE, 0 );
-  text = gtk_label_new( "$text" );
-  gtk_box_pack_start( GTK_BOX( hbox ), text, FALSE, FALSE, 5 );
-  text = gtk_label_new( " " );
-  gtk_box_pack_start( GTK_BOX( hbox ), text, TRUE, FALSE, 5 );
+  {
+    GtkWidget *hbox = gtk_hbox_new( FALSE, 0 );
+    GtkWidget *combo = gtk_combo_box_new_text();
+    GtkWidget *text = gtk_label_new( "$text" );
+    int i;
 
-  combo = gtk_combo_box_new_text();
-  for( i = 0; i < $_->{name}_$widget->{value}_combo_count; i++ ) {
-    gtk_combo_box_append_text( GTK_COMBO_BOX( combo ), $_->{name}_$widget->{value}_combo[i] );
-  }
-  gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), $combo_default{$widget->{value}} );
-  if( settings_current.$widget->{value} != NULL ) {
+    gtk_box_pack_start( GTK_BOX( hbox ), text, FALSE, FALSE, 5 );
+    text = gtk_label_new( " " );
+    gtk_box_pack_start( GTK_BOX( hbox ), text, TRUE, FALSE, 5 );
+
     for( i = 0; i < $_->{name}_$widget->{value}_combo_count; i++ ) {
-      if( !strcmp( settings_current.$widget->{value}, $_->{name}_$widget->{value}_combo[i] ) ) {
-        gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), i );
+      gtk_combo_box_append_text( GTK_COMBO_BOX( combo ), $_->{name}_$widget->{value}_combo[i] );
+    }
+    gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), $combo_default{$widget->{value}} );
+    if( settings_current.$widget->{value} != NULL ) {
+      for( i = 0; i < $_->{name}_$widget->{value}_combo_count; i++ ) {
+        if( !strcmp( settings_current.$widget->{value}, $_->{name}_$widget->{value}_combo[i] ) ) {
+          gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), i );
+        }
       }
     }
+
+    dialog.$widget->{value} = combo;
+    gtk_box_pack_start( GTK_BOX( hbox ), dialog.$widget->{value}, FALSE, FALSE, 5 );
+
+    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog.dialog )->vbox ),
+			         hbox );
   }
-
-  dialog.$widget->{value} = combo;
-  gtk_box_pack_start( GTK_BOX( hbox ), dialog.$widget->{value}, FALSE, FALSE, 5 );
-
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog.dialog )->vbox ),
-			       hbox );
 
 CODE
 	    } else {
