@@ -766,8 +766,6 @@ libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
 static libspectrum_error
 rzx_read_header( const libspectrum_byte **ptr, const libspectrum_byte *end )
 {
-  libspectrum_dword flags;
-
   /* Check the header exists */
   if( end - (*ptr) < (ptrdiff_t)strlen( rzx_signature ) + 6 ) {
     libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
@@ -785,7 +783,9 @@ rzx_read_header( const libspectrum_byte **ptr, const libspectrum_byte *end )
   /* Skip over the signature and the version numbers */
   (*ptr) += strlen( rzx_signature ) + 2;
 
-  flags = libspectrum_read_dword( ptr );
+  /* And skip the flags as well - separate call as we'll need the return
+     value if we ever fix the stuff below */
+  libspectrum_read_dword( ptr );
 
   /* FIXME: how to handle signatures */
 
