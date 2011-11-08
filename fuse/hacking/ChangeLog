@@ -3690,3 +3690,4 @@
          (Simon Owen).
 20111106 peripherals/disk/{disk.c,wd_fdc.c},snapshot.c,ui/gtk/options.pl:
          remove unused variables (thanks, gcc 4.6).
+20111108 unittests/unittests.c: beginnings of a paging unit test.

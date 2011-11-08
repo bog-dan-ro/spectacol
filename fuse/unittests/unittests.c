@@ -29,6 +29,7 @@
 
 #include "fuse.h"
 #include "machine.h"
+#include "machines/spec128.h"
 #include "mempool.h"
 #include "peripherals/ula.h"
 #include "settings.h"
@@ -249,6 +250,89 @@ mempool_test( void )
   return 0;
 }
 
+static int
+assert_16k_page( libspectrum_word base, int source, int page )
+{
+  int base_index = base / MEMORY_PAGE_SIZE;
+  int i;
+
+  for( i = 0; i < 0x4000 / MEMORY_PAGE_SIZE; i++ ) {
+    TEST_ASSERT( memory_map_read[ base_index + i ].source == source );
+    TEST_ASSERT( memory_map_read[ base_index + i ].page_num == page );
+    TEST_ASSERT( memory_map_write[ base_index + i ].source == source );
+    TEST_ASSERT( memory_map_write[ base_index + i ].page_num == page );
+  }
+
+  return 0;
+}
+
+static int
+assert_16k_rom_page( libspectrum_word base, int page )
+{
+  return assert_16k_page( base, memory_source_rom, page );
+}
+
+static int
+assert_16k_ram_page( libspectrum_word base, int page )
+{
+  return assert_16k_page( base, memory_source_ram, page );
+}
+
+static int
+assert_16k_pages( int rom, int ram4000, int ram8000, int ramc000 )
+{
+  int r = 0;
+
+  r += assert_16k_rom_page( 0x0000, rom );
+  r += assert_16k_ram_page( 0x4000, ram4000 );
+  r += assert_16k_ram_page( 0x8000, ram8000 );
+  r += assert_16k_ram_page( 0xc000, ramc000 );
+
+  return r;
+}
+
+static int
+paging_test( void )
+{
+  int r = 0;
+
+  if( machine_current->machine != LIBSPECTRUM_MACHINE_128 )
+    return 0;
+
+  TEST_ASSERT( machine_current->ram.locked == 0 );
+
+  r += assert_16k_pages( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  spec128_memoryport_write( 0x7ffd, 0x07 );
+  r += assert_16k_pages( 0, 5, 2, 7 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  spec128_memoryport_write( 0x7ffd, 0x08 );
+  r += assert_16k_pages( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 7 );
+
+  spec128_memoryport_write( 0x7ffd, 0x10 );
+  r += assert_16k_pages( 1, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  spec128_memoryport_write( 0x7ffd, 0x1f );
+  r += assert_16k_pages( 1, 5, 2, 7 );
+  TEST_ASSERT( memory_current_screen == 7 );
+
+  spec128_memoryport_write( 0x7ffd, 0x20 );
+  r += assert_16k_pages( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  TEST_ASSERT( machine_current->ram.locked != 0 );
+
+  spec128_memoryport_write( 0x7ffd, 0x1f );
+  r += assert_16k_pages( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  return 0;
+}
+
 int
 unittests_run( void )
 {
@@ -257,6 +341,7 @@ unittests_run( void )
   r += contention_test();
   r += floating_bus_test();
   r += mempool_test();
+  r += paging_test();
 
   return r;
 }
