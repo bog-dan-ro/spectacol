@@ -3696,3 +3696,5 @@
          paging (as paging is not locked on a write of 0x20 unless the
          secondary port has been written to as well).
 20111114 unittests/unittests.c: add Pentagon paging tests.
+20111114 unittests/unittests.c: get more test coverage by using
+         writeport_internal rather than explicit function calls.

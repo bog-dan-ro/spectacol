@@ -29,9 +29,6 @@
 
 #include "fuse.h"
 #include "machine.h"
-#include "machines/pentagon.h"
-#include "machines/spec128.h"
-#include "machines/specplus3.h"
 #include "mempool.h"
 #include "peripherals/disk/beta.h"
 #include "peripherals/ula.h"
@@ -308,7 +305,7 @@ assert_all_ram( int ram0000, int ram4000, int ram8000, int ramc000 )
 }
 
 static int
-paging_test_128_unlocked( periph_port_write_function paging_fn )
+paging_test_128_unlocked( void )
 {
   int r = 0;
 
@@ -317,19 +314,19 @@ paging_test_128_unlocked( periph_port_write_function paging_fn )
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  paging_fn( 0x7ffd, 0x07 );
+  writeport_internal( 0x7ffd, 0x07 );
   r += assert_16k_pages( 0, 5, 2, 7 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  paging_fn( 0x7ffd, 0x08 );
+  writeport_internal( 0x7ffd, 0x08 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 7 );
 
-  paging_fn( 0x7ffd, 0x10 );
+  writeport_internal( 0x7ffd, 0x10 );
   r += assert_16k_pages( 1, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  paging_fn( 0x7ffd, 0x1f );
+  writeport_internal( 0x7ffd, 0x1f );
   r += assert_16k_pages( 1, 5, 2, 7 );
   TEST_ASSERT( memory_current_screen == 7 );
 
@@ -337,17 +334,17 @@ paging_test_128_unlocked( periph_port_write_function paging_fn )
 }
 
 static int
-paging_test_128_locked( periph_port_write_function paging_fn )
+paging_test_128_locked( void )
 {
   int r = 0;
 
-  paging_fn( 0x7ffd, 0x20 );
+  writeport_internal( 0x7ffd, 0x20 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
   TEST_ASSERT( machine_current->ram.locked != 0 );
 
-  paging_fn( 0x7ffd, 0x1f );
+  writeport_internal( 0x7ffd, 0x1f );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
@@ -370,8 +367,8 @@ paging_test_128( void )
 {
   int r = 0;
 
-  r += paging_test_128_unlocked( spec128_memoryport_write );
-  r += paging_test_128_locked( spec128_memoryport_write );
+  r += paging_test_128_unlocked();
+  r += paging_test_128_locked();
 
   return r;
 }
@@ -381,37 +378,37 @@ paging_test_plus3( void )
 {
   int r = 0;
   
-  r += paging_test_128_unlocked( spec128_memoryport_write );
+  r += paging_test_128_unlocked();
 
-  spec128_memoryport_write( 0x7ffd, 0x00 );
-  specplus3_memoryport2_write( 0x1ffd, 0x04 );
+  writeport_internal( 0x7ffd, 0x00 );
+  writeport_internal( 0x1ffd, 0x04 );
   r += assert_16k_pages( 2, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  spec128_memoryport_write( 0x7ffd, 0x10 );
+  writeport_internal( 0x7ffd, 0x10 );
   r += assert_16k_pages( 3, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  specplus3_memoryport2_write( 0x1ffd, 0x01 );
+  writeport_internal( 0x1ffd, 0x01 );
   r += assert_all_ram( 0, 1, 2, 3 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  specplus3_memoryport2_write( 0x1ffd, 0x03 );
+  writeport_internal( 0x1ffd, 0x03 );
   r += assert_all_ram( 4, 5, 6, 7 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  specplus3_memoryport2_write( 0x1ffd, 0x05 );
+  writeport_internal( 0x1ffd, 0x05 );
   r += assert_all_ram( 4, 5, 6, 3 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  specplus3_memoryport2_write( 0x1ffd, 0x07 );
+  writeport_internal( 0x1ffd, 0x07 );
   r += assert_all_ram( 4, 7, 6, 3 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  specplus3_memoryport2_write( 0x1ffd, 0x00 );
-  r += paging_test_128_locked( spec128_memoryport_write );
+  writeport_internal( 0x1ffd, 0x00 );
+  r += paging_test_128_locked();
 
-  specplus3_memoryport2_write( 0x1ffd, 0x10 );
+  writeport_internal( 0x1ffd, 0x10 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
@@ -419,27 +416,27 @@ paging_test_plus3( void )
 }
 
 static int
-paging_test_pentagon512_unlocked( periph_port_write_function paging_fn )
+paging_test_pentagon512_unlocked( void )
 {
   int r = 0;
 
   beta_unpage();
 
-  r += paging_test_128_unlocked( paging_fn );
+  r += paging_test_128_unlocked();
 
-  paging_fn( 0x7ffd, 0x40 );
+  writeport_internal( 0x7ffd, 0x40 );
   r += assert_16k_pages( 0, 5, 2, 8 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  paging_fn( 0x7ffd, 0x47 );
+  writeport_internal( 0x7ffd, 0x47 );
   r += assert_16k_pages( 0, 5, 2, 15 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  paging_fn( 0x7ffd, 0x80 );
+  writeport_internal( 0x7ffd, 0x80 );
   r += assert_16k_pages( 0, 5, 2, 16 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  paging_fn( 0x7ffd, 0xc7 );
+  writeport_internal( 0x7ffd, 0xc7 );
   r += assert_16k_pages( 0, 5, 2, 31 );
   TEST_ASSERT( memory_current_screen == 5 );
 
@@ -451,8 +448,8 @@ paging_test_pentagon512( void )
 {
   int r = 0;
 
-  r += paging_test_pentagon512_unlocked( spec128_memoryport_write );
-  r += paging_test_128_locked( spec128_memoryport_write );
+  r += paging_test_pentagon512_unlocked();
+  r += paging_test_128_locked();
 
   return r;
 }
@@ -462,47 +459,47 @@ paging_test_pentagon1024( void )
 {
   int r = 0;
 
-  r += paging_test_pentagon512_unlocked( pentagon1024_memoryport_write );
+  r += paging_test_pentagon512_unlocked();
 
-  pentagon1024_memoryport_write( 0x7ffd, 0x20 );
+  writeport_internal( 0x7ffd, 0x20 );
   r += assert_16k_pages( 0, 5, 2, 32 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  pentagon1024_memoryport_write( 0x7ffd, 0x27 );
+  writeport_internal( 0x7ffd, 0x27 );
   r += assert_16k_pages( 0, 5, 2, 39 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  pentagon1024_memoryport_write( 0x7ffd, 0x60 );
+  writeport_internal( 0x7ffd, 0x60 );
   r += assert_16k_pages( 0, 5, 2, 40 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  pentagon1024_memoryport_write( 0x7ffd, 0xa0 );
+  writeport_internal( 0x7ffd, 0xa0 );
   r += assert_16k_pages( 0, 5, 2, 48 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  pentagon1024_memoryport_write( 0x7ffd, 0xe7 );
+  writeport_internal( 0x7ffd, 0xe7 );
   r += assert_16k_pages( 0, 5, 2, 63 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  pentagon1024_memoryport_write( 0x7ffd, 0x00 );
-  pentagon1024_v22_memoryport_write( 0x7ffd, 0x08 );
+  writeport_internal( 0x7ffd, 0x00 );
+  writeport_internal( 0xeff7, 0x08 );
   r += assert_all_ram( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  pentagon1024_memoryport_write( 0x7ffd, 0x00 );
-  pentagon1024_v22_memoryport_write( 0xeff7, 0x04 );
+  writeport_internal( 0x7ffd, 0x00 );
+  writeport_internal( 0xeff7, 0x04 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  pentagon1024_memoryport_write( 0x7ffd, 0x40 );
+  writeport_internal( 0x7ffd, 0x40 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  pentagon1024_memoryport_write( 0x7ffd, 0x80 );
+  writeport_internal( 0x7ffd, 0x80 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  r += paging_test_128_locked( pentagon1024_memoryport_write );
+  r += paging_test_128_locked();
 
   return r;
 }
