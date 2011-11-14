@@ -3695,3 +3695,4 @@
 20111114 machines/pentagon1024.c: Pentagon1024 does not have 128K-style memory
          paging (as paging is not locked on a write of 0x20 unless the
          secondary port has been written to as well).
+20111114 unittests/unittests.c: add Pentagon paging tests.

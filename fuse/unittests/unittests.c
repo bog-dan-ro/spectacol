@@ -29,9 +29,11 @@
 
 #include "fuse.h"
 #include "machine.h"
+#include "machines/pentagon.h"
 #include "machines/spec128.h"
 #include "machines/specplus3.h"
 #include "mempool.h"
+#include "peripherals/disk/beta.h"
 #include "peripherals/ula.h"
 #include "settings.h"
 #include "unittests.h"
@@ -306,7 +308,7 @@ assert_all_ram( int ram0000, int ram4000, int ram8000, int ramc000 )
 }
 
 static int
-paging_test_128_unlocked( void )
+paging_test_128_unlocked( periph_port_write_function paging_fn )
 {
   int r = 0;
 
@@ -315,19 +317,19 @@ paging_test_128_unlocked( void )
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  spec128_memoryport_write( 0x7ffd, 0x07 );
+  paging_fn( 0x7ffd, 0x07 );
   r += assert_16k_pages( 0, 5, 2, 7 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  spec128_memoryport_write( 0x7ffd, 0x08 );
+  paging_fn( 0x7ffd, 0x08 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 7 );
 
-  spec128_memoryport_write( 0x7ffd, 0x10 );
+  paging_fn( 0x7ffd, 0x10 );
   r += assert_16k_pages( 1, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  spec128_memoryport_write( 0x7ffd, 0x1f );
+  paging_fn( 0x7ffd, 0x1f );
   r += assert_16k_pages( 1, 5, 2, 7 );
   TEST_ASSERT( memory_current_screen == 7 );
 
@@ -335,17 +337,17 @@ paging_test_128_unlocked( void )
 }
 
 static int
-paging_test_128_locked( void )
+paging_test_128_locked( periph_port_write_function paging_fn )
 {
   int r = 0;
 
-  spec128_memoryport_write( 0x7ffd, 0x20 );
+  paging_fn( 0x7ffd, 0x20 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
   TEST_ASSERT( machine_current->ram.locked != 0 );
 
-  spec128_memoryport_write( 0x7ffd, 0x1f );
+  paging_fn( 0x7ffd, 0x1f );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
@@ -368,8 +370,8 @@ paging_test_128( void )
 {
   int r = 0;
 
-  r += paging_test_128_unlocked();
-  r += paging_test_128_locked();
+  r += paging_test_128_unlocked( spec128_memoryport_write );
+  r += paging_test_128_locked( spec128_memoryport_write );
 
   return r;
 }
@@ -379,7 +381,7 @@ paging_test_plus3( void )
 {
   int r = 0;
   
-  r += paging_test_128_unlocked();
+  r += paging_test_128_unlocked( spec128_memoryport_write );
 
   spec128_memoryport_write( 0x7ffd, 0x00 );
   specplus3_memoryport2_write( 0x1ffd, 0x04 );
@@ -407,11 +409,100 @@ paging_test_plus3( void )
   TEST_ASSERT( memory_current_screen == 5 );
 
   specplus3_memoryport2_write( 0x1ffd, 0x00 );
-  r += paging_test_128_locked();
+  r += paging_test_128_locked( spec128_memoryport_write );
 
   specplus3_memoryport2_write( 0x1ffd, 0x10 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
+
+  return r;
+}
+
+static int
+paging_test_pentagon512_unlocked( periph_port_write_function paging_fn )
+{
+  int r = 0;
+
+  beta_unpage();
+
+  r += paging_test_128_unlocked( paging_fn );
+
+  paging_fn( 0x7ffd, 0x40 );
+  r += assert_16k_pages( 0, 5, 2, 8 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  paging_fn( 0x7ffd, 0x47 );
+  r += assert_16k_pages( 0, 5, 2, 15 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  paging_fn( 0x7ffd, 0x80 );
+  r += assert_16k_pages( 0, 5, 2, 16 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  paging_fn( 0x7ffd, 0xc7 );
+  r += assert_16k_pages( 0, 5, 2, 31 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  return r;
+}
+
+static int
+paging_test_pentagon512( void )
+{
+  int r = 0;
+
+  r += paging_test_pentagon512_unlocked( spec128_memoryport_write );
+  r += paging_test_128_locked( spec128_memoryport_write );
+
+  return r;
+}
+
+static int
+paging_test_pentagon1024( void )
+{
+  int r = 0;
+
+  r += paging_test_pentagon512_unlocked( pentagon1024_memoryport_write );
+
+  pentagon1024_memoryport_write( 0x7ffd, 0x20 );
+  r += assert_16k_pages( 0, 5, 2, 32 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  pentagon1024_memoryport_write( 0x7ffd, 0x27 );
+  r += assert_16k_pages( 0, 5, 2, 39 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  pentagon1024_memoryport_write( 0x7ffd, 0x60 );
+  r += assert_16k_pages( 0, 5, 2, 40 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  pentagon1024_memoryport_write( 0x7ffd, 0xa0 );
+  r += assert_16k_pages( 0, 5, 2, 48 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  pentagon1024_memoryport_write( 0x7ffd, 0xe7 );
+  r += assert_16k_pages( 0, 5, 2, 63 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  pentagon1024_memoryport_write( 0x7ffd, 0x00 );
+  pentagon1024_v22_memoryport_write( 0x7ffd, 0x08 );
+  r += assert_all_ram( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  pentagon1024_memoryport_write( 0x7ffd, 0x00 );
+  pentagon1024_v22_memoryport_write( 0xeff7, 0x04 );
+  r += assert_16k_pages( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  pentagon1024_memoryport_write( 0x7ffd, 0x40 );
+  r += assert_16k_pages( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  pentagon1024_memoryport_write( 0x7ffd, 0x80 );
+  r += assert_16k_pages( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  r += paging_test_128_locked( pentagon1024_memoryport_write );
 
   return r;
 }
@@ -423,15 +514,23 @@ paging_test( void )
 
   switch( machine_current->machine ) {
     case LIBSPECTRUM_MACHINE_48:
+    case LIBSPECTRUM_MACHINE_48_NTSC:
       r = paging_test_48();
       break;
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_PLUS2:
+    case LIBSPECTRUM_MACHINE_PENT:
       r = paging_test_128();
       break;
     case LIBSPECTRUM_MACHINE_PLUS2A:
     case LIBSPECTRUM_MACHINE_PLUS3:
       r = paging_test_plus3();
+      break;
+    case LIBSPECTRUM_MACHINE_PENT512:
+      r = paging_test_pentagon512();
+      break;
+    case LIBSPECTRUM_MACHINE_PENT1024:
+      r = paging_test_pentagon1024();
       break;
     default:
       r = 0;
