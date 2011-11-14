@@ -3698,3 +3698,4 @@
 20111114 unittests/unittests.c: add Pentagon paging tests.
 20111114 unittests/unittests.c: get more test coverage by using
          writeport_internal rather than explicit function calls.
+20111114 unittests/unittests.c: add TC2068 paging test.
