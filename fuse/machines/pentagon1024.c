@@ -102,6 +102,7 @@ pentagon1024_reset(void)
   machines_periph_pentagon();
 
   /* Pentagon 1024 memory paging */
+  periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_PENTAGON1024_MEMORY, PERIPH_PRESENT_ALWAYS );
 
   /* Later style Betadisk 128 interface */
