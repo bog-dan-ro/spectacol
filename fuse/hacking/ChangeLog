@@ -3691,3 +3691,4 @@
 20111106 peripherals/disk/{disk.c,wd_fdc.c},snapshot.c,ui/gtk/options.pl:
          remove unused variables (thanks, gcc 4.6).
 20111108 unittests/unittests.c: beginnings of a paging unit test.
+20111114 unittests/unittests.c: add 48K and +2A/+3 paging unit tests.

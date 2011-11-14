@@ -30,6 +30,7 @@
 #include "fuse.h"
 #include "machine.h"
 #include "machines/spec128.h"
+#include "machines/specplus3.h"
 #include "mempool.h"
 #include "peripherals/ula.h"
 #include "settings.h"
@@ -292,12 +293,22 @@ assert_16k_pages( int rom, int ram4000, int ram8000, int ramc000 )
 }
 
 static int
-paging_test( void )
+assert_all_ram( int ram0000, int ram4000, int ram8000, int ramc000 )
 {
   int r = 0;
 
-  if( machine_current->machine != LIBSPECTRUM_MACHINE_128 )
-    return 0;
+  r += assert_16k_ram_page( 0x0000, ram0000 );
+  r += assert_16k_ram_page( 0x4000, ram4000 );
+  r += assert_16k_ram_page( 0x8000, ram8000 );
+  r += assert_16k_ram_page( 0xc000, ramc000 );
+
+  return r;
+}
+
+static int
+paging_test_128_unlocked( void )
+{
+  int r = 0;
 
   TEST_ASSERT( machine_current->ram.locked == 0 );
 
@@ -320,6 +331,14 @@ paging_test( void )
   r += assert_16k_pages( 1, 5, 2, 7 );
   TEST_ASSERT( memory_current_screen == 7 );
 
+  return r;
+}
+
+static int
+paging_test_128_locked( void )
+{
+  int r = 0;
+
   spec128_memoryport_write( 0x7ffd, 0x20 );
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
@@ -330,7 +349,96 @@ paging_test( void )
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  return 0;
+  return r;
+}
+
+static int
+paging_test_48( void )
+{
+  int r = 0;
+
+  r += assert_16k_pages( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  return r;
+}
+
+static int
+paging_test_128( void )
+{
+  int r = 0;
+
+  r += paging_test_128_unlocked();
+  r += paging_test_128_locked();
+
+  return r;
+}
+
+static int
+paging_test_plus3( void )
+{
+  int r = 0;
+  
+  r += paging_test_128_unlocked();
+
+  spec128_memoryport_write( 0x7ffd, 0x00 );
+  specplus3_memoryport2_write( 0x1ffd, 0x04 );
+  r += assert_16k_pages( 2, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  spec128_memoryport_write( 0x7ffd, 0x10 );
+  r += assert_16k_pages( 3, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  specplus3_memoryport2_write( 0x1ffd, 0x01 );
+  r += assert_all_ram( 0, 1, 2, 3 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  specplus3_memoryport2_write( 0x1ffd, 0x03 );
+  r += assert_all_ram( 4, 5, 6, 7 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  specplus3_memoryport2_write( 0x1ffd, 0x05 );
+  r += assert_all_ram( 4, 5, 6, 3 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  specplus3_memoryport2_write( 0x1ffd, 0x07 );
+  r += assert_all_ram( 4, 7, 6, 3 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  specplus3_memoryport2_write( 0x1ffd, 0x00 );
+  r += paging_test_128_locked();
+
+  specplus3_memoryport2_write( 0x1ffd, 0x10 );
+  r += assert_16k_pages( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  return r;
+}
+
+static int
+paging_test( void )
+{
+  int r;
+
+  switch( machine_current->machine ) {
+    case LIBSPECTRUM_MACHINE_48:
+      r = paging_test_48();
+      break;
+    case LIBSPECTRUM_MACHINE_128:
+    case LIBSPECTRUM_MACHINE_PLUS2:
+      r = paging_test_128();
+      break;
+    case LIBSPECTRUM_MACHINE_PLUS2A:
+    case LIBSPECTRUM_MACHINE_PLUS3:
+      r = paging_test_plus3();
+      break;
+    default:
+      r = 0;
+      break;
+  }
+
+  return r;
 }
 
 int
