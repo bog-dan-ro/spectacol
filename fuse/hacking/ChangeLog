@@ -3699,3 +3699,5 @@
 20111114 unittests/unittests.c: get more test coverage by using
          writeport_internal rather than explicit function calls.
 20111114 unittests/unittests.c: add TC2068 paging test.
+20111117 unittests/unittests.c: update expected TS2068 contention result after
+         TS2068 timing change in libspectrum change r3854.

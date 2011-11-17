@@ -67,7 +67,7 @@ contention_test( void )
       target = 2307959808UL;
       break;
     case LIBSPECTRUM_MACHINE_TS2068:
-      target = 1976561664UL;
+      target = 1975593984UL;
       break;
     case LIBSPECTRUM_MACHINE_PENT:
     case LIBSPECTRUM_MACHINE_PENT512:
@@ -100,7 +100,7 @@ contention_test( void )
       target = 2307895296UL;
       break;
     case LIBSPECTRUM_MACHINE_TS2068:
-      target = 1976497152UL;
+      target = 1975529472UL;
       break;
     case LIBSPECTRUM_MACHINE_PENT:
     case LIBSPECTRUM_MACHINE_PENT512:
@@ -585,6 +585,7 @@ paging_test( void )
       r = paging_test_pentagon1024();
       break;
     case LIBSPECTRUM_MACHINE_TC2068:
+    case LIBSPECTRUM_MACHINE_TS2068:
       r = paging_test_tc2068();
       break;
     default:
