@@ -115,6 +115,8 @@ memory_init( void )
 
   memory_source_rom = memory_source_register( "ROM" );
   memory_source_ram = memory_source_register( "RAM" );
+  memory_source_dock = memory_source_register( "Timex Dock" );
+  memory_source_exrom = memory_source_register( "Timex EXROM" );
   memory_source_any = memory_source_register( "Absolute address" );
   memory_source_none = memory_source_register( "None" );
 

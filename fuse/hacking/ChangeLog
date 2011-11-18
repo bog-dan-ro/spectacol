@@ -3704,3 +3704,4 @@
 20111118 unittests/unittests.c: add TC2048 paging test.
 20111118 machines/spec_se.c: Spectrum SE does not have 128K-style memory paging
          as "port 0x7ffd" is fully decoded.
+20111118 memory.c: assign memory_source_dock and memory_source_exrom.
