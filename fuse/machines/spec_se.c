@@ -116,6 +116,7 @@ spec_se_reset( void )
   machines_periph_128();
   
   /* SE style memory paging present */
+  periph_set_present( PERIPH_TYPE_128_MEMORY, PERIPH_PRESENT_NEVER );
   periph_set_present( PERIPH_TYPE_SE_MEMORY, PERIPH_PRESENT_ALWAYS );
 
   /* ULA uses full decoding */
