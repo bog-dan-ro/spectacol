@@ -516,7 +516,7 @@ paging_test_pentagon1024( void )
 }
 
 static int
-paging_test_tc2068( void )
+paging_test_timex( int exrom_source )
 {
   int r = 0;
 
@@ -547,14 +547,14 @@ paging_test_tc2068( void )
   r += assert_8k_page( 0xe000, memory_source_none, 7 );
 
   writeport_internal( 0x00ff, 0x80 );
-  r += assert_8k_page( 0x0000, memory_source_exrom, 0 );
-  r += assert_8k_page( 0x2000, memory_source_exrom, 1 );
-  r += assert_8k_page( 0x4000, memory_source_exrom, 2 );
-  r += assert_8k_page( 0x6000, memory_source_exrom, 3 );
-  r += assert_8k_page( 0x8000, memory_source_exrom, 4 );
-  r += assert_8k_page( 0xa000, memory_source_exrom, 5 );
-  r += assert_8k_page( 0xc000, memory_source_exrom, 6 );
-  r += assert_8k_page( 0xe000, memory_source_exrom, 7 );
+  r += assert_8k_page( 0x0000, exrom_source, 0 );
+  r += assert_8k_page( 0x2000, exrom_source, 1 );
+  r += assert_8k_page( 0x4000, exrom_source, 2 );
+  r += assert_8k_page( 0x6000, exrom_source, 3 );
+  r += assert_8k_page( 0x8000, exrom_source, 4 );
+  r += assert_8k_page( 0xa000, exrom_source, 5 );
+  r += assert_8k_page( 0xc000, exrom_source, 6 );
+  r += assert_8k_page( 0xe000, exrom_source, 7 );
   
   return r;
 }
@@ -584,9 +584,12 @@ paging_test( void )
     case LIBSPECTRUM_MACHINE_PENT1024:
       r = paging_test_pentagon1024();
       break;
+    case LIBSPECTRUM_MACHINE_TC2048:
+      r = paging_test_timex( memory_source_none );
+      break;
     case LIBSPECTRUM_MACHINE_TC2068:
     case LIBSPECTRUM_MACHINE_TS2068:
-      r = paging_test_tc2068();
+      r = paging_test_timex( memory_source_exrom );
       break;
     default:
       r = 0;

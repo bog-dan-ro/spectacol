@@ -3701,3 +3701,4 @@
 20111114 unittests/unittests.c: add TC2068 paging test.
 20111117 unittests/unittests.c: update expected TS2068 contention result after
          TS2068 timing change in libspectrum change r3854.
+20111118 unittests/unittests.c: add TC2048 paging test.
