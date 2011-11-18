@@ -317,57 +317,57 @@ assert_all_ram( int ram0000, int ram4000, int ram8000, int ramc000 )
 }
 
 static int
-paging_test_48( void )
+paging_test_48( int ram8000 )
 {
   int r = 0;
 
-  r += assert_16k_pages( 0, 5, 2, 0 );
+  r += assert_16k_pages( 0, 5, ram8000, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
   return r;
 }
 
 static int
-paging_test_128_unlocked( void )
+paging_test_128_unlocked( int ram8000 )
 {
   int r = 0;
 
   TEST_ASSERT( machine_current->ram.locked == 0 );
 
-  r += paging_test_48();
+  r += paging_test_48( ram8000 );
 
   writeport_internal( 0x7ffd, 0x07 );
-  r += assert_16k_pages( 0, 5, 2, 7 );
+  r += assert_16k_pages( 0, 5, ram8000, 7 );
   TEST_ASSERT( memory_current_screen == 5 );
 
   writeport_internal( 0x7ffd, 0x08 );
-  r += assert_16k_pages( 0, 5, 2, 0 );
+  r += assert_16k_pages( 0, 5, ram8000, 0 );
   TEST_ASSERT( memory_current_screen == 7 );
 
   writeport_internal( 0x7ffd, 0x10 );
-  r += assert_16k_pages( 1, 5, 2, 0 );
+  r += assert_16k_pages( 1, 5, ram8000, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
   writeport_internal( 0x7ffd, 0x1f );
-  r += assert_16k_pages( 1, 5, 2, 7 );
+  r += assert_16k_pages( 1, 5, ram8000, 7 );
   TEST_ASSERT( memory_current_screen == 7 );
 
   return r;
 }
 
 static int
-paging_test_128_locked( void )
+paging_test_128_locked( int ram8000 )
 {
   int r = 0;
 
   writeport_internal( 0x7ffd, 0x20 );
-  r += assert_16k_pages( 0, 5, 2, 0 );
+  r += assert_16k_pages( 0, 5, ram8000, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
   TEST_ASSERT( machine_current->ram.locked != 0 );
 
   writeport_internal( 0x7ffd, 0x1f );
-  r += assert_16k_pages( 0, 5, 2, 0 );
+  r += assert_16k_pages( 0, 5, ram8000, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
   return r;
@@ -378,8 +378,8 @@ paging_test_128( void )
 {
   int r = 0;
 
-  r += paging_test_128_unlocked();
-  r += paging_test_128_locked();
+  r += paging_test_128_unlocked( 2 );
+  r += paging_test_128_locked( 2 );
 
   return r;
 }
@@ -389,7 +389,7 @@ paging_test_plus3( void )
 {
   int r = 0;
   
-  r += paging_test_128_unlocked();
+  r += paging_test_128_unlocked( 2 );
 
   writeport_internal( 0x7ffd, 0x00 );
   writeport_internal( 0x1ffd, 0x04 );
@@ -417,7 +417,7 @@ paging_test_plus3( void )
   TEST_ASSERT( memory_current_screen == 5 );
 
   writeport_internal( 0x1ffd, 0x00 );
-  r += paging_test_128_locked();
+  r += paging_test_128_locked( 2 );
 
   writeport_internal( 0x1ffd, 0x10 );
   r += assert_16k_pages( 0, 5, 2, 0 );
@@ -433,7 +433,7 @@ paging_test_pentagon512_unlocked( void )
 
   beta_unpage();
 
-  r += paging_test_128_unlocked();
+  r += paging_test_128_unlocked( 2 );
 
   writeport_internal( 0x7ffd, 0x40 );
   r += assert_16k_pages( 0, 5, 2, 8 );
@@ -460,7 +460,7 @@ paging_test_pentagon512( void )
   int r = 0;
 
   r += paging_test_pentagon512_unlocked();
-  r += paging_test_128_locked();
+  r += paging_test_128_locked( 2 );
 
   return r;
 }
@@ -510,41 +510,41 @@ paging_test_pentagon1024( void )
   r += assert_16k_pages( 0, 5, 2, 0 );
   TEST_ASSERT( memory_current_screen == 5 );
 
-  r += paging_test_128_locked();
+  r += paging_test_128_locked( 2 );
 
   return r;
 }
 
 static int
-paging_test_timex( int exrom_source )
+paging_test_timex( int ram8000, int dock_source, int exrom_source )
 {
   int r = 0;
 
-  r += paging_test_48();
+  r += paging_test_48( ram8000 );
 
   writeport_internal( 0x00f4, 0x01 );
-  r += assert_8k_page( 0x0000, memory_source_none, 0 );
+  r += assert_8k_page( 0x0000, dock_source, 0 );
   r += assert_8k_page( 0x2000, memory_source_rom, 0 );
   r += assert_16k_ram_page( 0x4000, 5 );
-  r += assert_16k_ram_page( 0x8000, 2 );
+  r += assert_16k_ram_page( 0x8000, ram8000 );
   r += assert_16k_ram_page( 0xc000, 0 );
 
   writeport_internal( 0x00f4, 0x04 );
   r += assert_16k_rom_page( 0x0000, 0 );
-  r += assert_8k_page( 0x4000, memory_source_none, 2 );
+  r += assert_8k_page( 0x4000, dock_source, 2 );
   r += assert_8k_page( 0x6000, memory_source_ram, 5 );
-  r += assert_16k_ram_page( 0x8000, 2 );
+  r += assert_16k_ram_page( 0x8000, ram8000 );
   r += assert_16k_ram_page( 0xc000, 0 );
 
   writeport_internal( 0x00f4, 0xff );
-  r += assert_8k_page( 0x0000, memory_source_none, 0 );
-  r += assert_8k_page( 0x2000, memory_source_none, 1 );
-  r += assert_8k_page( 0x4000, memory_source_none, 2 );
-  r += assert_8k_page( 0x6000, memory_source_none, 3 );
-  r += assert_8k_page( 0x8000, memory_source_none, 4 );
-  r += assert_8k_page( 0xa000, memory_source_none, 5 );
-  r += assert_8k_page( 0xc000, memory_source_none, 6 );
-  r += assert_8k_page( 0xe000, memory_source_none, 7 );
+  r += assert_8k_page( 0x0000, dock_source, 0 );
+  r += assert_8k_page( 0x2000, dock_source, 1 );
+  r += assert_8k_page( 0x4000, dock_source, 2 );
+  r += assert_8k_page( 0x6000, dock_source, 3 );
+  r += assert_8k_page( 0x8000, dock_source, 4 );
+  r += assert_8k_page( 0xa000, dock_source, 5 );
+  r += assert_8k_page( 0xc000, dock_source, 6 );
+  r += assert_8k_page( 0xe000, dock_source, 7 );
 
   writeport_internal( 0x00ff, 0x80 );
   r += assert_8k_page( 0x0000, exrom_source, 0 );
@@ -560,6 +560,28 @@ paging_test_timex( int exrom_source )
 }
 
 static int
+paging_test_se( void )
+{
+  int r = 0;
+
+  r += paging_test_128_unlocked( 8 );
+
+  writeport_internal( 0x7ffd, 0x00 );
+  r += paging_test_timex( 8, memory_source_dock, memory_source_exrom );
+
+  writeport_internal( 0x7ffd, 0x01 );
+  writeport_internal( 0x00f4, 0x0c );
+  r += assert_16k_rom_page( 0x0000, 0 );
+  r += assert_8k_page( 0x4000, memory_source_exrom, 2 );
+  r += assert_8k_page( 0x6000, memory_source_exrom, 3 );
+  r += assert_16k_ram_page( 0x8000, 8 );
+  r += assert_8k_page( 0xc000, memory_source_exrom, 6 );
+  r += assert_8k_page( 0xe000, memory_source_exrom, 7 );
+
+  return r;
+}
+
+static int
 paging_test( void )
 {
   int r;
@@ -567,7 +589,7 @@ paging_test( void )
   switch( machine_current->machine ) {
     case LIBSPECTRUM_MACHINE_48:
     case LIBSPECTRUM_MACHINE_48_NTSC:
-      r = paging_test_48();
+      r = paging_test_48( 2 );
       break;
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_PLUS2:
@@ -585,11 +607,14 @@ paging_test( void )
       r = paging_test_pentagon1024();
       break;
     case LIBSPECTRUM_MACHINE_TC2048:
-      r = paging_test_timex( memory_source_none );
+      r = paging_test_timex( 2, memory_source_none, memory_source_none );
       break;
     case LIBSPECTRUM_MACHINE_TC2068:
     case LIBSPECTRUM_MACHINE_TS2068:
-      r = paging_test_timex( memory_source_exrom );
+      r = paging_test_timex( 2, memory_source_none, memory_source_exrom );
+      break;
+    case LIBSPECTRUM_MACHINE_SE:
+      r = paging_test_se();
       break;
     default:
       r = 0;
