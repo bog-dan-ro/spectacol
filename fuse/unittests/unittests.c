@@ -427,6 +427,36 @@ paging_test_plus3( void )
 }
 
 static int
+paging_test_scorpion( void )
+{
+  int r = 0;
+
+  r += paging_test_128_unlocked( 2 );
+
+  writeport_internal( 0x7ffd, 0x00 );
+  writeport_internal( 0x1ffd, 0x01 );
+  r += assert_all_ram( 0, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  writeport_internal( 0x1ffd, 0x02 );
+  r += assert_16k_pages( 2, 5, 2, 0 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  writeport_internal( 0x1ffd, 0x10 );
+  r += assert_16k_pages( 0, 5, 2, 8 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  writeport_internal( 0x7ffd, 0x07 );
+  r += assert_16k_pages( 0, 5, 2, 15 );
+  TEST_ASSERT( memory_current_screen == 5 );
+
+  writeport_internal( 0x1ffd, 0x00 );
+  r += paging_test_128_locked( 2 );
+
+  return r;
+}
+
+static int
 paging_test_pentagon512_unlocked( void )
 {
   int r = 0;
@@ -599,6 +629,9 @@ paging_test( void )
     case LIBSPECTRUM_MACHINE_PLUS2A:
     case LIBSPECTRUM_MACHINE_PLUS3:
       r = paging_test_plus3();
+      break;
+    case LIBSPECTRUM_MACHINE_SCORP:
+      r = paging_test_scorpion();
       break;
     case LIBSPECTRUM_MACHINE_PENT512:
       r = paging_test_pentagon512();
