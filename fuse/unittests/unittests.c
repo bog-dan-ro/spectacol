@@ -53,6 +53,9 @@ contention_test( void )
     case LIBSPECTRUM_MACHINE_SE:
       target = 2308927488UL;
       break;
+    case LIBSPECTRUM_MACHINE_48_NTSC:
+      target = 1962110976UL;
+      break;
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_PLUS2:
       target = 2335248384UL;
@@ -85,6 +88,9 @@ contention_test( void )
     case LIBSPECTRUM_MACHINE_48:
     case LIBSPECTRUM_MACHINE_SE:
       target = 2308862976UL;
+      break;
+    case LIBSPECTRUM_MACHINE_48_NTSC:
+      target = 1962046464UL;
       break;
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_PLUS2:
@@ -141,6 +147,9 @@ floating_bus_test( void )
     case LIBSPECTRUM_MACHINE_48:
       target = 3426156480UL;
       break;
+    case LIBSPECTRUM_MACHINE_48_NTSC:
+      target = 3258908608UL;
+      break;
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_PLUS2:
       target = 2852995008UL;
@@ -167,6 +176,9 @@ floating_bus_test( void )
     case LIBSPECTRUM_MACHINE_16:
     case LIBSPECTRUM_MACHINE_48:
       target = 3427723200UL;
+      break;
+    case LIBSPECTRUM_MACHINE_48_NTSC:
+      target = 3260475328UL;
       break;
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_PLUS2:
