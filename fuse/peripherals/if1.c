@@ -43,6 +43,7 @@
 #include "settings.h"
 #include "utils.h"
 #include "ui/ui.h"
+#include "unittests/unittests.h"
 
 #undef IF1_DEBUG_MDR
 #undef IF1_DEBUG_NET
@@ -222,6 +223,9 @@ static const periph_t if1_periph = {
   if1_ports
 };
 
+/* Memory source */
+static int if1_memory_source;
+
 /* Debugger events */
 static const char *event_type_string = "if1";
 static int page_event, unpage_event;
@@ -293,7 +297,6 @@ int
 if1_init( void )
 {
   int m, i;
-  int if1_source;
 
   if1_ula.fd_r = -1;
   if1_ula.fd_t = -1;
@@ -332,8 +335,9 @@ if1_init( void )
 
   module_register( &if1_module_info );
 
-  if1_source = memory_source_register( "If1" );
-  for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].source = if1_source;
+  if1_memory_source = memory_source_register( "If1" );
+  for( i = 0; i < 2; i++ )
+    if1_memory_map_romcs[i].source = if1_memory_source;
 
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
@@ -1317,3 +1321,22 @@ if1_unplug( int what )
     if1_ula.dtr = 0;
   update_menu( UMENU_RS232 );
 }
+
+int
+if1_unittest( void )
+{
+  int r = 0;
+
+  if1_page();
+
+  r += unittests_assert_8k_page( 0x0000, if1_memory_source, 0 );
+  r += unittests_assert_8k_page( 0x2000, if1_memory_source, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  if1_unpage();
+
+  return r;
+}
+

@@ -31,6 +31,7 @@
 #include "machine.h"
 #include "mempool.h"
 #include "peripherals/disk/beta.h"
+#include "peripherals/if1.h"
 #include "peripherals/ula.h"
 #include "settings.h"
 #include "unittests.h"
@@ -121,7 +122,7 @@ contention_test( void )
   }
 
   if( checksum != target ) {
-    fprintf( stderr, "%s: contention test: checksum = %u, expected = %u\n", fuse_progname, checksum, target );
+    printf( "%s: contention test: checksum = %u, expected = %u\n", fuse_progname, checksum, target );
     error = 1;
   }
 
@@ -204,7 +205,7 @@ floating_bus_test( void )
   }
 
   if( checksum != target ) {
-    fprintf( stderr, "%s: floating bus test: checksum = %u, expected = %u\n", fuse_progname, checksum, target );
+    printf( "%s: floating bus test: checksum = %u, expected = %u\n", fuse_progname, checksum, target );
     error = 1;
   }
 
@@ -278,8 +279,8 @@ assert_page( libspectrum_word base, libspectrum_word length, int source, int pag
   return 0;
 }
 
-static int
-assert_8k_page( libspectrum_word base, int source, int page )
+int
+unittests_assert_8k_page( libspectrum_word base, int source, int page )
 {
   return assert_page( base, 0x2000, source, page );
 }
@@ -296,8 +297,8 @@ assert_16k_rom_page( libspectrum_word base, int page )
   return assert_16k_page( base, memory_source_rom, page );
 }
 
-static int
-assert_16k_ram_page( libspectrum_word base, int page )
+int
+unittests_assert_16k_ram_page( libspectrum_word base, int page )
 {
   return assert_16k_page( base, memory_source_ram, page );
 }
@@ -308,9 +309,9 @@ assert_16k_pages( int rom, int ram4000, int ram8000, int ramc000 )
   int r = 0;
 
   r += assert_16k_rom_page( 0x0000, rom );
-  r += assert_16k_ram_page( 0x4000, ram4000 );
-  r += assert_16k_ram_page( 0x8000, ram8000 );
-  r += assert_16k_ram_page( 0xc000, ramc000 );
+  r += unittests_assert_16k_ram_page( 0x4000, ram4000 );
+  r += unittests_assert_16k_ram_page( 0x8000, ram8000 );
+  r += unittests_assert_16k_ram_page( 0xc000, ramc000 );
 
   return r;
 }
@@ -320,10 +321,23 @@ assert_all_ram( int ram0000, int ram4000, int ram8000, int ramc000 )
 {
   int r = 0;
 
-  r += assert_16k_ram_page( 0x0000, ram0000 );
-  r += assert_16k_ram_page( 0x4000, ram4000 );
-  r += assert_16k_ram_page( 0x8000, ram8000 );
-  r += assert_16k_ram_page( 0xc000, ramc000 );
+  r += unittests_assert_16k_ram_page( 0x0000, ram0000 );
+  r += unittests_assert_16k_ram_page( 0x4000, ram4000 );
+  r += unittests_assert_16k_ram_page( 0x8000, ram8000 );
+  r += unittests_assert_16k_ram_page( 0xc000, ramc000 );
+
+  return r;
+}
+
+static int
+paging_test_16()
+{
+  int r = 0;
+
+  r += assert_16k_rom_page( 0x0000, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += assert_16k_page( 0x8000, memory_source_none, 0 );
+  r += assert_16k_page( 0xc000, memory_source_none, 0 );
 
   return r;
 }
@@ -565,38 +579,38 @@ paging_test_timex( int ram8000, int dock_source, int exrom_source )
   r += paging_test_48( ram8000 );
 
   writeport_internal( 0x00f4, 0x01 );
-  r += assert_8k_page( 0x0000, dock_source, 0 );
-  r += assert_8k_page( 0x2000, memory_source_rom, 0 );
-  r += assert_16k_ram_page( 0x4000, 5 );
-  r += assert_16k_ram_page( 0x8000, ram8000 );
-  r += assert_16k_ram_page( 0xc000, 0 );
+  r += unittests_assert_8k_page( 0x0000, dock_source, 0 );
+  r += unittests_assert_8k_page( 0x2000, memory_source_rom, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, ram8000 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   writeport_internal( 0x00f4, 0x04 );
   r += assert_16k_rom_page( 0x0000, 0 );
-  r += assert_8k_page( 0x4000, dock_source, 2 );
-  r += assert_8k_page( 0x6000, memory_source_ram, 5 );
-  r += assert_16k_ram_page( 0x8000, ram8000 );
-  r += assert_16k_ram_page( 0xc000, 0 );
+  r += unittests_assert_8k_page( 0x4000, dock_source, 2 );
+  r += unittests_assert_8k_page( 0x6000, memory_source_ram, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, ram8000 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   writeport_internal( 0x00f4, 0xff );
-  r += assert_8k_page( 0x0000, dock_source, 0 );
-  r += assert_8k_page( 0x2000, dock_source, 1 );
-  r += assert_8k_page( 0x4000, dock_source, 2 );
-  r += assert_8k_page( 0x6000, dock_source, 3 );
-  r += assert_8k_page( 0x8000, dock_source, 4 );
-  r += assert_8k_page( 0xa000, dock_source, 5 );
-  r += assert_8k_page( 0xc000, dock_source, 6 );
-  r += assert_8k_page( 0xe000, dock_source, 7 );
+  r += unittests_assert_8k_page( 0x0000, dock_source, 0 );
+  r += unittests_assert_8k_page( 0x2000, dock_source, 1 );
+  r += unittests_assert_8k_page( 0x4000, dock_source, 2 );
+  r += unittests_assert_8k_page( 0x6000, dock_source, 3 );
+  r += unittests_assert_8k_page( 0x8000, dock_source, 4 );
+  r += unittests_assert_8k_page( 0xa000, dock_source, 5 );
+  r += unittests_assert_8k_page( 0xc000, dock_source, 6 );
+  r += unittests_assert_8k_page( 0xe000, dock_source, 7 );
 
   writeport_internal( 0x00ff, 0x80 );
-  r += assert_8k_page( 0x0000, exrom_source, 0 );
-  r += assert_8k_page( 0x2000, exrom_source, 1 );
-  r += assert_8k_page( 0x4000, exrom_source, 2 );
-  r += assert_8k_page( 0x6000, exrom_source, 3 );
-  r += assert_8k_page( 0x8000, exrom_source, 4 );
-  r += assert_8k_page( 0xa000, exrom_source, 5 );
-  r += assert_8k_page( 0xc000, exrom_source, 6 );
-  r += assert_8k_page( 0xe000, exrom_source, 7 );
+  r += unittests_assert_8k_page( 0x0000, exrom_source, 0 );
+  r += unittests_assert_8k_page( 0x2000, exrom_source, 1 );
+  r += unittests_assert_8k_page( 0x4000, exrom_source, 2 );
+  r += unittests_assert_8k_page( 0x6000, exrom_source, 3 );
+  r += unittests_assert_8k_page( 0x8000, exrom_source, 4 );
+  r += unittests_assert_8k_page( 0xa000, exrom_source, 5 );
+  r += unittests_assert_8k_page( 0xc000, exrom_source, 6 );
+  r += unittests_assert_8k_page( 0xe000, exrom_source, 7 );
   
   return r;
 }
@@ -614,11 +628,11 @@ paging_test_se( void )
   writeport_internal( 0x7ffd, 0x01 );
   writeport_internal( 0x00f4, 0x0c );
   r += assert_16k_rom_page( 0x0000, 0 );
-  r += assert_8k_page( 0x4000, memory_source_exrom, 2 );
-  r += assert_8k_page( 0x6000, memory_source_exrom, 3 );
-  r += assert_16k_ram_page( 0x8000, 8 );
-  r += assert_8k_page( 0xc000, memory_source_exrom, 6 );
-  r += assert_8k_page( 0xe000, memory_source_exrom, 7 );
+  r += unittests_assert_8k_page( 0x4000, memory_source_exrom, 2 );
+  r += unittests_assert_8k_page( 0x6000, memory_source_exrom, 3 );
+  r += unittests_assert_16k_ram_page( 0x8000, 8 );
+  r += unittests_assert_8k_page( 0xc000, memory_source_exrom, 6 );
+  r += unittests_assert_8k_page( 0xe000, memory_source_exrom, 7 );
 
   return r;
 }
@@ -626,44 +640,55 @@ paging_test_se( void )
 static int
 paging_test( void )
 {
-  int r;
+  int r = 0;
 
   switch( machine_current->machine ) {
+    case LIBSPECTRUM_MACHINE_16:
+      r += paging_test_16();
+      break;
     case LIBSPECTRUM_MACHINE_48:
     case LIBSPECTRUM_MACHINE_48_NTSC:
-      r = paging_test_48( 2 );
+      r += paging_test_48( 2 );
       break;
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_PLUS2:
     case LIBSPECTRUM_MACHINE_PENT:
-      r = paging_test_128();
+      r += paging_test_128();
       break;
     case LIBSPECTRUM_MACHINE_PLUS2A:
     case LIBSPECTRUM_MACHINE_PLUS3:
-      r = paging_test_plus3();
+    case LIBSPECTRUM_MACHINE_PLUS3E:
+      r += paging_test_plus3();
       break;
     case LIBSPECTRUM_MACHINE_SCORP:
-      r = paging_test_scorpion();
+      r += paging_test_scorpion();
       break;
     case LIBSPECTRUM_MACHINE_PENT512:
-      r = paging_test_pentagon512();
+      r += paging_test_pentagon512();
       break;
     case LIBSPECTRUM_MACHINE_PENT1024:
-      r = paging_test_pentagon1024();
+      r += paging_test_pentagon1024();
       break;
     case LIBSPECTRUM_MACHINE_TC2048:
-      r = paging_test_timex( 2, memory_source_none, memory_source_none );
+      r += paging_test_timex( 2, memory_source_none, memory_source_none );
       break;
     case LIBSPECTRUM_MACHINE_TC2068:
     case LIBSPECTRUM_MACHINE_TS2068:
-      r = paging_test_timex( 2, memory_source_none, memory_source_exrom );
+      r += paging_test_timex( 2, memory_source_none, memory_source_exrom );
       break;
     case LIBSPECTRUM_MACHINE_SE:
-      r = paging_test_se();
+      r += paging_test_se();
       break;
-    default:
-      r = 0;
+    case LIBSPECTRUM_MACHINE_UNKNOWN:
+      printf( "%s:%d: unknown machine?\n", __FILE__, __LINE__ );
       break;
+  }
+
+  /* We don't run the peripheral unit tests with the Spectrum SE so as to avoid
+     the problem with it having a different RAM page at 0x8000 */
+  if( machine_current->machine != LIBSPECTRUM_MACHINE_SE )
+  {
+    r += if1_unittest();
   }
 
   return r;

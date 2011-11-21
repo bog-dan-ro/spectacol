@@ -3708,3 +3708,4 @@
 20111118 unittests/unittests.c: add Spectrum SE paging test.
 20111119 unittests/unittests.c: add Scorpion paging test.
 20111119 unittests/unittests.c: add 48K NTSC contention/floating bus results.
+20111121 peripherals/if1.[ch],unittests/unittests.[ch]: add If1 unit test.
