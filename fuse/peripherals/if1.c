@@ -1337,6 +1337,8 @@ if1_unittest( void )
 
   if1_unpage();
 
+  r += unittests_paging_test_48( 2 );
+
   return r;
 }
 

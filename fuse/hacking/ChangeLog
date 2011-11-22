@@ -3709,3 +3709,6 @@
 20111119 unittests/unittests.c: add Scorpion paging test.
 20111119 unittests/unittests.c: add 48K NTSC contention/floating bus results.
 20111121 peripherals/if1.[ch],unittests/unittests.[ch]: add If1 unit test.
+20111122 peripherals/if1.c,unittests/unittests.[ch]: ensure that we get the
+         expected pages after the If1 has paged out again.
+20111122 

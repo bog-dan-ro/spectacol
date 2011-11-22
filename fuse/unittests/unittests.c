@@ -342,8 +342,8 @@ paging_test_16()
   return r;
 }
 
-static int
-paging_test_48( int ram8000 )
+int
+unittests_paging_test_48( int ram8000 )
 {
   int r = 0;
 
@@ -360,7 +360,7 @@ paging_test_128_unlocked( int ram8000 )
 
   TEST_ASSERT( machine_current->ram.locked == 0 );
 
-  r += paging_test_48( ram8000 );
+  r += unittests_paging_test_48( ram8000 );
 
   writeport_internal( 0x7ffd, 0x07 );
   r += assert_16k_pages( 0, 5, ram8000, 7 );
@@ -576,7 +576,7 @@ paging_test_timex( int ram8000, int dock_source, int exrom_source )
 {
   int r = 0;
 
-  r += paging_test_48( ram8000 );
+  r += unittests_paging_test_48( ram8000 );
 
   writeport_internal( 0x00f4, 0x01 );
   r += unittests_assert_8k_page( 0x0000, dock_source, 0 );
@@ -648,7 +648,7 @@ paging_test( void )
       break;
     case LIBSPECTRUM_MACHINE_48:
     case LIBSPECTRUM_MACHINE_48_NTSC:
-      r += paging_test_48( 2 );
+      r += unittests_paging_test_48( 2 );
       break;
     case LIBSPECTRUM_MACHINE_128:
     case LIBSPECTRUM_MACHINE_PLUS2:
