@@ -37,12 +37,16 @@
 #include "periph.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "unittests/unittests.h"
 
 /* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
 static memory_page if2_memory_map_romcs[2];
 
 /* IF2 cart inserted? */
 int if2_active = 0;
+
+/* IF2 memory source */
+static int if2_memory_source;
 
 static void if2_reset( int hard_reset );
 static void if2_memory_map( void );
@@ -206,4 +210,25 @@ if2_to_snapshot( libspectrum_snap *snap )
   memcpy( buffer + MEMORY_PAGE_SIZE, if2_memory_map_romcs[1].page,
 	  MEMORY_PAGE_SIZE );
   libspectrum_snap_set_interface2_rom( snap, 0, buffer );
+}
+
+int
+if2_unittest( void )
+{
+  int r = 0;
+
+  if2_active = 1;
+  machine_current->memory_map();
+
+  r += unittests_assert_16k_page( 0x0000, if2_memory_source, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  if2_active = 0;
+  machine_current->memory_map();
+
+  r += unittests_paging_test_48( 2 );
+
+  return r;
 }

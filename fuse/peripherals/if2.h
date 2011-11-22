@@ -37,4 +37,6 @@ int if2_init( void );
 int if2_insert( const char *filename );
 void if2_eject( void );
 
+int if2_unittest( void );
+
 #endif				/* #ifndef FUSE_IF2_H */

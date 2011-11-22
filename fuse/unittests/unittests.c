@@ -32,6 +32,7 @@
 #include "mempool.h"
 #include "peripherals/disk/beta.h"
 #include "peripherals/if1.h"
+#include "peripherals/if2.h"
 #include "peripherals/ula.h"
 #include "settings.h"
 #include "unittests.h"
@@ -285,8 +286,8 @@ unittests_assert_8k_page( libspectrum_word base, int source, int page )
   return assert_page( base, 0x2000, source, page );
 }
 
-static int
-assert_16k_page( libspectrum_word base, int source, int page )
+int
+unittests_assert_16k_page( libspectrum_word base, int source, int page )
 {
   return assert_page( base, 0x4000, source, page );
 }
@@ -294,13 +295,13 @@ assert_16k_page( libspectrum_word base, int source, int page )
 static int
 assert_16k_rom_page( libspectrum_word base, int page )
 {
-  return assert_16k_page( base, memory_source_rom, page );
+  return unittests_assert_16k_page( base, memory_source_rom, page );
 }
 
 int
 unittests_assert_16k_ram_page( libspectrum_word base, int page )
 {
-  return assert_16k_page( base, memory_source_ram, page );
+  return unittests_assert_16k_page( base, memory_source_ram, page );
 }
 
 static int
@@ -336,8 +337,8 @@ paging_test_16()
 
   r += assert_16k_rom_page( 0x0000, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
-  r += assert_16k_page( 0x8000, memory_source_none, 0 );
-  r += assert_16k_page( 0xc000, memory_source_none, 0 );
+  r += unittests_assert_16k_page( 0x8000, memory_source_none, 0 );
+  r += unittests_assert_16k_page( 0xc000, memory_source_none, 0 );
 
   return r;
 }
@@ -689,6 +690,7 @@ paging_test( void )
   if( machine_current->machine != LIBSPECTRUM_MACHINE_SE )
   {
     r += if1_unittest();
+    r += if2_unittest();
   }
 
   return r;

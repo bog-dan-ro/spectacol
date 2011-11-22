@@ -29,6 +29,7 @@
 int unittests_run( void );
 
 int unittests_assert_8k_page( libspectrum_word base, int source, int page );
+int unittests_assert_16k_page( libspectrum_word base, int source, int page );
 int unittests_assert_16k_ram_page( libspectrum_word base, int page );
 
 int unittests_paging_test_48( int ram8000 );
