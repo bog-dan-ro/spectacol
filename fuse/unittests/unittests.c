@@ -33,6 +33,7 @@
 #include "peripherals/disk/beta.h"
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
+#include "peripherals/speccyboot.h"
 #include "peripherals/ula.h"
 #include "settings.h"
 #include "unittests.h"
@@ -691,6 +692,7 @@ paging_test( void )
   {
     r += if1_unittest();
     r += if2_unittest();
+    r += speccyboot_unittest();
   }
 
   return r;

@@ -40,4 +40,6 @@
 
 int speccyboot_init( void );
 
+int speccyboot_unittest( void );
+
 #endif /* #ifndef FUSE_SPECCYBOOT_H */
