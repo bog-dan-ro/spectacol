@@ -39,6 +39,7 @@
 #include "peripherals/printer.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "unittests/unittests.h"
 #include "wd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 
@@ -48,6 +49,7 @@
 /* Three 8 KiB memory chunks accessible by the Z80 when /ROMCS is low */
 /* Two 8 KiB chunks of ROM, one 8 KiB chunk of RAM */
 static memory_page disciple_memory_map_romcs[3];
+static int disciple_memory_source;
 
 int disciple_memswap = 0;        /* Are the ROM and RAM pages swapped? */
 int disciple_rombank = 0;        /* ROM bank that is paged in */
@@ -155,7 +157,6 @@ disciple_init( void )
 {
   int i;
   wd_fdc_drive *d;
-  int disciple_source;
 
   disciple_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
 
@@ -178,9 +179,11 @@ disciple_init( void )
 
   module_register( &disciple_module_info );
   
-  disciple_source = memory_source_register( "DISCiPLE" );
-  for( i = 0; i < 3; i++ )
-    disciple_memory_map_romcs[i].source = disciple_source;
+  disciple_memory_source = memory_source_register( "DISCiPLE" );
+  for( i = 0; i < 3; i++ ) {
+    disciple_memory_map_romcs[i].source = disciple_memory_source;
+    disciple_memory_map_romcs[i].page_num = i;
+  }
 
   periph_register( PERIPH_TYPE_DISCIPLE, &disciple_periph );
 
@@ -682,4 +685,52 @@ disciple_activate( void )
     disciple_ram = memory_pool_allocate_persistent( 0x2000, 1 );
     memory_allocated = 1;
   }
+}
+
+int
+disciple_unittest( void )
+{
+  int r = 0;
+
+  disciple_page();
+
+  r += unittests_assert_8k_page( 0x0000, disciple_memory_source, 0 );
+  r += unittests_assert_8k_page( 0x2000, disciple_memory_source, 2 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  disciple_cn_write( 0x001f, 0x08 );
+  r += unittests_assert_8k_page( 0x0000, disciple_memory_source, 1 );
+  r += unittests_assert_8k_page( 0x2000, disciple_memory_source, 2 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  disciple_boot_write( 0x007b, 0x00 );
+  r += unittests_assert_8k_page( 0x0000, disciple_memory_source, 2 );
+  r += unittests_assert_8k_page( 0x2000, disciple_memory_source, 1 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  disciple_cn_write( 0x001f, 0x00 );
+  r += unittests_assert_8k_page( 0x0000, disciple_memory_source, 2 );
+  r += unittests_assert_8k_page( 0x2000, disciple_memory_source, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  disciple_boot_read( 0x007b, NULL );
+  r += unittests_assert_8k_page( 0x0000, disciple_memory_source, 0 );
+  r += unittests_assert_8k_page( 0x2000, disciple_memory_source, 2 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  disciple_unpage();
+
+  r += unittests_paging_test_48( 2 );
+
+  return r;
 }

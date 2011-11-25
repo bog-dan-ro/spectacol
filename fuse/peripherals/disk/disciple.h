@@ -82,4 +82,6 @@ int disciple_disk_flip( disciple_drive_number which, int flip );
 int disciple_disk_writeprotect( disciple_drive_number which, int wrprot );
 fdd_t *disciple_get_fdd( disciple_drive_number which );
 
+int disciple_unittest( void );
+
 #endif                  /* #ifndef FUSE_DISCIPLE_H */
