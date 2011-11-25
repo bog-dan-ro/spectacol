@@ -48,6 +48,7 @@
 #include "module.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "unittests/unittests.h"
 #include "utils.h"
 #include "wd_fdc.h"
 #include "z80/z80.h"
@@ -59,6 +60,7 @@
 
 /* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
 memory_page beta_memory_map_romcs[2];
+static int beta_memory_source;
 
 int beta_available = 0;
 int beta_active = 0;
@@ -151,7 +153,6 @@ beta_init( void )
 {
   int i;
   wd_fdc_drive *d;
-  int beta_source;
 
   beta_fdc = wd_fdc_alloc_fdc( FD1793, 0, WD_FLAG_BETA128 );
   beta_fdc->current_drive = NULL;
@@ -174,8 +175,8 @@ beta_init( void )
 
   module_register( &beta_module_info );
 
-  beta_source = memory_source_register( "Betadisk" );
-  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].source = beta_source;
+  beta_memory_source = memory_source_register( "Betadisk" );
+  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].source = beta_memory_source;
 
   periph_register( PERIPH_TYPE_BETA128, &beta_peripheral );
 
@@ -809,3 +810,23 @@ beta_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_beta_data  ( snap, f->data_register );
   libspectrum_snap_set_beta_system( snap, beta_system_register );
 }
+
+int
+beta_unittest( void )
+{
+  int r = 0;
+
+  beta_page();
+
+  r += unittests_assert_16k_page( 0x0000, beta_memory_source, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  beta_unpage();
+
+  r += unittests_paging_test_48( 2 );
+
+  return r;
+}
+

@@ -693,6 +693,8 @@ paging_test( void )
     r += if1_unittest();
     r += if2_unittest();
     r += speccyboot_unittest();
+
+    r += beta_unittest();
   }
 
   return r;

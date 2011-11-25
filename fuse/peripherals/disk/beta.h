@@ -82,4 +82,6 @@ int beta_disk_writeprotect( beta_drive_number which, int wrprot );
 int beta_disk_write( beta_drive_number which, const char *filename );
 fdd_t *beta_get_fdd( beta_drive_number which );
 
+int beta_unittest( void );
+
 #endif                  /* #ifndef FUSE_BETA_H */
