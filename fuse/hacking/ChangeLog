@@ -3719,3 +3719,4 @@
 20111125 peripherals/disk/disciple.[ch],unittests/unittests.c: ensure DISCiPLE
          page numbers are set correctly, and add DISCiPLE unit test.
 20111126 peripherals/disk/opus.[ch],unittests/unittests.c: add Opus unit test.
+20111126 peripherals/disk/plusd.[ch],unittests/unittests.c: add +D unit test.

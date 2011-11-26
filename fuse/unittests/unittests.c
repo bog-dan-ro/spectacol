@@ -33,6 +33,7 @@
 #include "peripherals/disk/beta.h"
 #include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
+#include "peripherals/disk/plusd.h"
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
 #include "peripherals/speccyboot.h"
@@ -699,6 +700,7 @@ paging_test( void )
     r += beta_unittest();
     r += disciple_unittest();
     r += opus_unittest();
+    r += plusd_unittest();
   }
 
   return r;

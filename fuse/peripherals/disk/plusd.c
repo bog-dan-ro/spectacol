@@ -39,6 +39,7 @@
 #include "plusd.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "unittests/unittests.h"
 #include "wd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 
@@ -47,6 +48,7 @@
 
 /* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
 static memory_page plusd_memory_map_romcs[2];
+static int plusd_memory_source;
 
 int plusd_available = 0;
 int plusd_active = 0;
@@ -140,7 +142,6 @@ plusd_init( void )
 {
   int i;
   wd_fdc_drive *d;
-  int plusd_source;
 
   plusd_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
 
@@ -163,8 +164,9 @@ plusd_init( void )
 
   module_register( &plusd_module_info );
 
-  plusd_source = memory_source_register( "PlusD" );
-  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].source = plusd_source;
+  plusd_memory_source = memory_source_register( "PlusD" );
+  for( i = 0; i < 2; i++ )
+    plusd_memory_map_romcs[i].source = plusd_memory_source;
 
   periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
 
@@ -723,3 +725,21 @@ plusd_activate( void )
   }
 }
 
+int
+plusd_unittest( void )
+{
+  int r = 0;
+
+  plusd_page();
+
+  r += unittests_assert_16k_page( 0x0000, plusd_memory_source, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  plusd_unpage();
+
+  r += unittests_paging_test_48( 2 );
+
+  return r;
+}

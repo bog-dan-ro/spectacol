@@ -78,4 +78,6 @@ int plusd_disk_flip( plusd_drive_number which, int flip );
 int plusd_disk_writeprotect( plusd_drive_number which, int wrprot );
 fdd_t *plusd_get_fdd( plusd_drive_number which );
 
+int plusd_unittest( void );
+
 #endif                  /* #ifndef FUSE_PLUSD_H */
