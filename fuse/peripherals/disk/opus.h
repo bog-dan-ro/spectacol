@@ -63,4 +63,6 @@ int opus_disk_flip( opus_drive_number which, int flip );
 int opus_disk_writeprotect( opus_drive_number which, int wrprot );
 fdd_t *opus_get_fdd( opus_drive_number which );
 
+int opus_unittest( void );
+
 #endif                  /* #ifndef FUSE_OPUS_H */

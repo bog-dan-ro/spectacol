@@ -3712,9 +3712,10 @@
 20111122 peripherals/if1.c,unittests/unittests.[ch]: ensure that we get the
          expected pages after the If1 has paged out again.
 20111122 peripherals/if2.[ch],unittests/unittests.[ch]: add If2 unit test.
-20111125 unittests/unittests.c,peripherals/speccyboot.[ch]: add SpeccyBoot
+20111125 peripherals/speccyboot.[ch],unittests/unittests.c: add SpeccyBoot
          unit test.
-20111125 unittests/unittests.c,peripherals/disk/beta.[ch]: add Beta disk unit
+20111125 peripherals/disk/beta.[ch],unittests/unittests.c: add Beta disk unit
          test.
-20111125 unittests/unittests.c,peripherals/disk/disciple.[ch]: ensure DISCiPLE
+20111125 peripherals/disk/disciple.[ch],unittests/unittests.c: ensure DISCiPLE
          page numbers are set correctly, and add DISCiPLE unit test.
+20111126 peripherals/disk/opus.[ch],unittests/unittests.c: add Opus unit test.
