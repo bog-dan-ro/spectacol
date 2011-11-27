@@ -48,4 +48,6 @@ int divide_insert( const char *filename, libspectrum_ide_unit unit );
 int divide_commit( libspectrum_ide_unit unit );
 int divide_eject( libspectrum_ide_unit unit );
 
+int divide_unittest( void );
+
 #endif			/* #ifndef FUSE_DIVIDE_H */

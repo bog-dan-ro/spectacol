@@ -3723,3 +3723,6 @@
 20111127 peripherals/disk/disciple.c: introduce an explicit split between the
          DISCiPLE ROM and RAM.
 20111127 peripherals/disk/disciple.c: fix typo.
+20111127 peripherals/ide/divide.[ch],unittests/unittests.c: refactor DivIDE
+         paging code such that a unit test can be written for it, and then
+         write said unit test.

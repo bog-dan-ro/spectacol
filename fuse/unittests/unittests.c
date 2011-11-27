@@ -1,5 +1,5 @@
 /* unittests.c: unit testing framework for Fuse
-   Copyright (c) 2008 Philip Kendall
+   Copyright (c) 2008-2011 Philip Kendall
 
    $Id$
 
@@ -34,6 +34,7 @@
 #include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
+#include "peripherals/ide/divide.h"
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
 #include "peripherals/speccyboot.h"
@@ -701,6 +702,8 @@ paging_test( void )
     r += disciple_unittest();
     r += opus_unittest();
     r += plusd_unittest();
+
+    r += divide_unittest();
   }
 
   return r;
