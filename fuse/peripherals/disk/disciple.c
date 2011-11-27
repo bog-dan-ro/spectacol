@@ -191,7 +191,7 @@ disciple_init( void )
   }
 
   disciple_memory_map_ram.source = disciple_memory_source_ram;
-  disciple_memory_map_ram.page_num = i;
+  disciple_memory_map_ram.page_num = 0;
   disciple_memory_map_ram.writable = 1;
 
   periph_register( PERIPH_TYPE_DISCIPLE, &disciple_periph );

@@ -3722,3 +3722,4 @@
 20111126 peripherals/disk/plusd.[ch],unittests/unittests.c: add +D unit test.
 20111127 peripherals/disk/disciple.c: introduce an explicit split between the
          DISCiPLE ROM and RAM.
+20111127 peripherals/disk/disciple.c: fix typo.
