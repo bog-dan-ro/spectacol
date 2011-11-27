@@ -3720,3 +3720,5 @@
          page numbers are set correctly, and add DISCiPLE unit test.
 20111126 peripherals/disk/opus.[ch],unittests/unittests.c: add Opus unit test.
 20111126 peripherals/disk/plusd.[ch],unittests/unittests.c: add +D unit test.
+20111127 peripherals/disk/disciple.c: introduce an explicit split between the
+         DISCiPLE ROM and RAM.
