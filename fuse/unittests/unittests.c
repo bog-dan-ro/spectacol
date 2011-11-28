@@ -35,6 +35,7 @@
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
 #include "peripherals/ide/divide.h"
+#include "peripherals/ide/zxatasp.h"
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
 #include "peripherals/speccyboot.h"
@@ -704,6 +705,7 @@ paging_test( void )
     r += plusd_unittest();
 
     r += divide_unittest();
+    r += zxatasp_unittest();
   }
 
   return r;

@@ -3726,3 +3726,5 @@
 20111127 peripherals/ide/divide.[ch],unittests/unittests.c: refactor DivIDE
          paging code such that a unit test can be written for it, and then
          write said unit test.
+20111128 peripherals/ide/zxatasp.[ch],unittests/unittests.c: add ZXATASP unit
+         test.
