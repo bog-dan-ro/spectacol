@@ -36,5 +36,7 @@ int zxcf_commit( void );
 int zxcf_eject( void );
 libspectrum_byte zxcf_last_memctl( void );
 
+int zxcf_unittest( void );
+
 #endif			/* #ifndef FUSE_ZXCF_H */
 

@@ -37,10 +37,12 @@
 #include "periph.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "unittests/unittests.h"
 #include "zxcf.h"
 
 /* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
 static memory_page zxcf_memory_map_romcs[2];
+static int zxcf_memory_source;
 
 /*
   TBD: Allow memory size selection (128K/512K/1024K)
@@ -108,7 +110,6 @@ int
 zxcf_init( void )
 {
   int error, i;
-  int zxcf_source;
 
   last_memctl = 0x00;
                                 
@@ -125,8 +126,9 @@ zxcf_init( void )
 
   module_register( &zxcf_module_info );
 
-  zxcf_source = memory_source_register( "ZXCF" );
-  for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].source = zxcf_source;
+  zxcf_memory_source = memory_source_register( "ZXCF" );
+  for( i = 0; i < 2; i++ )
+    zxcf_memory_map_romcs[i].source = zxcf_memory_source;
 
   periph_register( PERIPH_TYPE_ZXCF, &zxcf_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
@@ -340,5 +342,34 @@ zxcf_activate( void )
       ZXCFMEM[i] = memory + i * ZXCF_PAGE_LENGTH;
     memory_allocated = 1;
   }
+}
+
+int
+zxcf_unittest( void )
+{
+  int r = 0;
+
+  int old_setting = settings_current.zxcf_active;
+
+  settings_current.zxcf_active = 1;
+
+  zxcf_memctl_write( 0x10b4, 0x00 );
+  r += unittests_assert_16k_page( 0x0000, zxcf_memory_source, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  zxcf_memctl_write( 0x10b4, 0x3f );
+  r += unittests_assert_16k_page( 0x0000, zxcf_memory_source, 63 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  zxcf_memctl_write( 0x10b4, 0x80 );
+  r += unittests_paging_test_48( 2 );
+
+  settings_current.zxcf_active = old_setting;
+
+  return r;
 }
 

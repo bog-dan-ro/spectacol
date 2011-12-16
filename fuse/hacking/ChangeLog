@@ -3728,3 +3728,4 @@
          write said unit test.
 20111128 peripherals/ide/zxatasp.[ch],unittests/unittests.c: add ZXATASP unit
          test.
+20111216 peripherals/ide/zxcf.[ch],unittests/unittests.c: add ZXCF unit test.
