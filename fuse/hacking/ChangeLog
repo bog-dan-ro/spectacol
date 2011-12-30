@@ -3733,3 +3733,6 @@
          to prevent the search for a suitable fullscreen scaler from becoming
          recursive when there is only one high resolution mode available
          (thanks, Phil Reynolds and Sergio Baldoví) (Fred).
+20111230 ui/sdl/sdljoystick.c: shutdown the SDL library properly when using
+         SDL joystick support with GTK+ etc. (fixes bug #3467162) (Sergio
+         Baldoví).

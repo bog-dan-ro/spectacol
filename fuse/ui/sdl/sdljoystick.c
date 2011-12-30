@@ -209,7 +209,11 @@ ui_joystick_end( void )
 
   }
 
+#ifdef UI_SDL
   SDL_QuitSubSystem( SDL_INIT_JOYSTICK );
+#else
+  SDL_Quit();
+#endif
 }
 
 #endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
