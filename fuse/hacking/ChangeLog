@@ -3729,3 +3729,7 @@
 20111128 peripherals/ide/zxatasp.[ch],unittests/unittests.c: add ZXATASP unit
          test.
 20111216 peripherals/ide/zxcf.[ch],unittests/unittests.c: add ZXCF unit test.
+20111230 ui/sdl/sdldisplay.c: modify sdldisplay_find_best_fullscreen_scaler()
+         to prevent the search for a suitable fullscreen scaler from becoming
+         recursive when there is only one high resolution mode available
+         (thanks, Phil Reynolds and Sergio Baldoví) (Fred).

@@ -286,11 +286,14 @@ static void
 sdldisplay_find_best_fullscreen_scaler( void )
 {
   static int windowed_scaler = -1;
+  static int searching_fullscreen_scaler = 0;
 
   /* Make sure we have at least more than half of the screen covered in
      fullscreen to avoid the "postage stamp" on machines that don't support
      320x240 anymore e.g. Mac notebooks */
   if( settings_current.full_screen ) {
+    if( searching_fullscreen_scaler ) return;
+    searching_fullscreen_scaler = 1;
     int i = 0;
     while( i < SCALER_NUM &&
            ( image_height*sdldisplay_current_size <= min_fullscreen_height/2 ||
@@ -307,6 +310,7 @@ sdldisplay_find_best_fullscreen_scaler( void )
         sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
       }
     }
+    searching_fullscreen_scaler = 0;
   } else {
     if( windowed_scaler != -1 ) {
       scaler_select_scaler( windowed_scaler );
