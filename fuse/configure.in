@@ -538,7 +538,7 @@ if test "$stick" = yes; then
       dnl Libraries such as svgalib provide their own joystick code.
       AC_MSG_CHECKING([whether to use $UI's joystick support])
       AC_ARG_ENABLE(ui-joystick,
-      [  --enable-ui-joystick    use UI-specific joystick code (where supported)],
+      AS_HELP_STRING([--disable-ui-joystick], [use libjsw joystick code (where supported)]),
       if test "$enableval" = no; then libjsw=yes; else libjsw=no; fi,
       libjsw=no)
       if test "$libjsw" = yes; then
@@ -552,9 +552,9 @@ if test "$stick" = yes; then
       dnl These UIs could use SDL library for handling joysticks
       AC_MSG_CHECKING([whether to use $UI's joystick support])
       AC_ARG_ENABLE(ui-joystick,
-      [  --enable-ui-joystick    use UI-specific joystick code (where supported)],
+      AS_HELP_STRING([--disable-ui-joystick], [use libjsw joystick code (where supported)]),
       if test "$enableval" = no; then libjsw=yes; else libjsw=no; fi,
-      libjsw=yes)
+      libjsw=no)
       if test "$libjsw" = yes; then
         AC_MSG_RESULT([no, use libjsw])
       else
@@ -566,6 +566,11 @@ if test "$stick" = yes; then
           AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks]),
           AC_MSG_WARN([SDL version $SDL_VERSION not found - joystick support disabled]))
       fi
+      ;;
+    wii)
+      dnl Wii UI check this elsewhere
+      AC_MSG_RESULT(yes)
+      libjsw=no
       ;;
     *)
       dnl Our only option is libjsw.

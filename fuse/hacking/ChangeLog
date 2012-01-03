@@ -3736,3 +3736,5 @@
 20111230 ui/sdl/sdljoystick.c: shutdown the SDL library properly when using
          SDL joystick support with GTK+ etc. (fixes bug #3467162) (Sergio
          Baldoví).
+20120103 configure.in: prefer use of SDL joystick code over libjsw which is
+         not maintained (patch #3467163) (Sergio Baldoví).
