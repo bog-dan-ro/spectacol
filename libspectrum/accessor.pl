@@ -216,6 +216,22 @@ struct libspectrum_snap {
   /* Cheetah SpecDrum status */
   int specdrum_active;
   libspectrum_signed_byte specdrum_dac;
+
+  /* Spectranet status */
+  int spectranet_active;
+  int spectranet_paged;
+  int spectranet_paged_via_io;
+  int spectranet_programmable_trap_active;
+  int spectranet_programmable_trap_msb;
+  int spectranet_all_traps_disabled;
+  int spectranet_rst8_trap_disabled;
+  int spectranet_deny_downstream_a15;
+  int spectranet_page_a;
+  int spectranet_page_b;
+  libspectrum_word spectranet_programmable_trap;
+  libspectrum_byte *spectranet_w5100[1];
+  libspectrum_byte *spectranet_flash[1];
+  libspectrum_byte *spectranet_ram[1];
 };
 
 /* Initialise a libspectrum_snap structure */

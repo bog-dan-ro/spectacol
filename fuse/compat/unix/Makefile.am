@@ -31,6 +31,7 @@ libcompatos_a_SOURCES = dir.c \
 			file.c \
 			osname.c \
 			paths.c \
+                        socket.c \
 			timer.c \
                         tuntap.c
 

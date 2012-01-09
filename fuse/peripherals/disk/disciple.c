@@ -47,10 +47,9 @@
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
 /* Three 8 KiB memory chunks accessible by the Z80 when /ROMCS is low */
-/* Two 8 KiB chunks of ROM */
-static memory_page disciple_memory_map_rom[2];
-/* One 8 KiB chunk of RAM */
-static memory_page disciple_memory_map_ram;
+/* Two 8 KiB chunks of ROM, one 8 KiB chunk of RAM */
+static memory_page disciple_memory_map_romcs_rom[ 2 ][ MEMORY_PAGES_IN_8K ];
+static memory_page disciple_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
 
 static int disciple_memory_source_rom;
 static int disciple_memory_source_ram;
@@ -111,17 +110,22 @@ disciple_unpage( void )
 void
 disciple_memory_map( void )
 {
+  struct memory_page *rom_page, *lower_page, *upper_page;
+
   if( !disciple_active ) return;
 
+  rom_page = disciple_memory_map_romcs_rom[ disciple_rombank ];
+
   if( !disciple_memswap ) {
-    memory_map_read[ 0 ] = memory_map_write[ 0 ] =
-      disciple_memory_map_rom[ disciple_rombank ];
-    memory_map_read[ 1 ] = memory_map_write[ 1 ] = disciple_memory_map_ram;
+    lower_page = rom_page;
+    upper_page = disciple_memory_map_romcs_ram;
   } else {
-    memory_map_read[ 0 ] = memory_map_write[ 0 ] = disciple_memory_map_ram;
-    memory_map_read[ 1 ] = memory_map_write[ 1 ] =
-      disciple_memory_map_rom[ disciple_rombank ];
+    lower_page = disciple_memory_map_romcs_ram;
+    upper_page = rom_page;
   }
+
+  memory_map_romcs_8k( 0x0000, lower_page );
+  memory_map_romcs_8k( 0x2000, upper_page );
 }
 
 static const periph_port_t disciple_ports[] = {
@@ -157,7 +161,7 @@ static const periph_t disciple_periph = {
 int
 disciple_init( void )
 {
-  int i;
+  int i, j;
   wd_fdc_drive *d;
 
   disciple_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
@@ -185,14 +189,18 @@ disciple_init( void )
   disciple_memory_source_ram = memory_source_register( "DISCiPLE RAM" );
 
   for( i = 0; i < 2; i++ ) {
-    disciple_memory_map_rom[i].source = disciple_memory_source_rom;
-    disciple_memory_map_rom[i].page_num = i;
-    disciple_memory_map_rom[i].writable = 0;
+    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+      disciple_memory_map_romcs_rom[i][j].source = disciple_memory_source_rom;
+      disciple_memory_map_romcs_rom[i][j].page_num = i;
+      disciple_memory_map_romcs_rom[i][j].writable = 0;
+    }
   }
 
-  disciple_memory_map_ram.source = disciple_memory_source_ram;
-  disciple_memory_map_ram.page_num = 0;
-  disciple_memory_map_ram.writable = 1;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+    disciple_memory_map_romcs_ram[i].source = disciple_memory_source_ram;
+    disciple_memory_map_romcs_ram[i].page_num = 0;
+    disciple_memory_map_romcs_ram[i].writable = 1;
+  }
 
   periph_register( PERIPH_TYPE_DISCIPLE, &disciple_periph );
 
@@ -214,7 +222,7 @@ disciple_reset( int hard_reset )
   if( !periph_is_active( PERIPH_TYPE_DISCIPLE ) )
     return;
 
-  if( machine_load_rom_bank( disciple_memory_map_rom, 0, 0,
+  if( machine_load_rom_bank( disciple_memory_map_romcs_rom[ 0 ], 0,
 			     settings_current.rom_disciple,
 			     settings_default.rom_disciple, 0x4000 ) ) {
     settings_current.disciple = 0;
@@ -222,9 +230,13 @@ disciple_reset( int hard_reset )
     return;
   }
 
-  disciple_memory_map_ram.page = disciple_ram;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    disciple_memory_map_romcs_ram[ i ].page = &disciple_ram[ i * MEMORY_PAGE_SIZE ];
 
   machine_current->ram.romcs = 1;
+
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    disciple_memory_map_romcs_ram[ i ].writable = 1;
 
   disciple_available = 1;
   disciple_active = 1;

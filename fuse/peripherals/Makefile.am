@@ -27,6 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/..
 
 SUBDIRS = \
   disk \
+  flash \
   ide \
   nic
 
@@ -47,6 +48,7 @@ libperipherals_a_SOURCES = \
   scld.c \
   speccyboot.c \
   specdrum.c \
+  spectranet.c \
   ula.c
 
 noinst_HEADERS = \
@@ -62,4 +64,5 @@ noinst_HEADERS = \
   scld.h \
   speccyboot.h \
   specdrum.h \
+  spectranet.h \
   ula.h

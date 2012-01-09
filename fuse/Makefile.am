@@ -104,6 +104,7 @@ debugger/libdebugger.a \
 machines/libmachines.a \
 peripherals/libperipherals.a \
 peripherals/disk/libdisk.a \
+peripherals/flash/libflash.a \
 peripherals/ide/libide.a \
 peripherals/nic/libnic.a \
 pokefinder/libpokefinder.a \
@@ -128,6 +129,7 @@ debugger/libdebugger.a \
 machines/libmachines.a \
 peripherals/libperipherals.a \
 peripherals/disk/libdisk.a \
+peripherals/flash/libflash.a \
 peripherals/ide/libide.a \
 peripherals/nic/libnic.a \
 pokefinder/libpokefinder.a \

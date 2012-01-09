@@ -39,8 +39,8 @@
 #include "ui/ui.h"
 #include "unittests/unittests.h"
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-static memory_page if2_memory_map_romcs[2];
+/* A 16KB memory chunk accessible by the Z80 when /ROMCS is low */
+static memory_page if2_memory_map_romcs[MEMORY_PAGES_IN_16K];
 
 /* IF2 cart inserted? */
 int if2_active = 0;
@@ -77,7 +77,8 @@ if2_init( void )
   module_register( &if2_module_info );
 
   if2_source = memory_source_register( "If2" );
-  for( i = 0; i < 2; i++ ) if2_memory_map_romcs[i].source = if2_source;
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    if2_memory_map_romcs[i].source = if2_source;
 
   periph_register( PERIPH_TYPE_INTERFACE2, &if2_periph );
 
@@ -134,10 +135,9 @@ if2_reset( int hard_reset GCC_UNUSED )
 
   if ( !periph_is_active( PERIPH_TYPE_INTERFACE2 ) ) return;
 
-  if ( machine_load_rom_bank( if2_memory_map_romcs, 0, 0,
+  if ( machine_load_rom_bank( if2_memory_map_romcs, 0,
 			      settings_current.if2_file,
-			      NULL,
-			      2 * MEMORY_PAGE_SIZE ) )
+			      NULL, 0x4000 ) )
     return;
 
   machine_current->ram.romcs = 1;
@@ -153,8 +153,7 @@ if2_memory_map( void )
 {
   if( !if2_active ) return;
 
-  memory_map_read[0] = memory_map_write[0] = if2_memory_map_romcs[0];
-  memory_map_read[1] = memory_map_write[1] = if2_memory_map_romcs[1];
+  memory_map_romcs( if2_memory_map_romcs );
 }
 
 static void

@@ -129,7 +129,8 @@ MENU_CALLBACK( menu_file_movies_recordmovieaspng );
 
 MENU_CALLBACK( menu_options_general );
 MENU_CALLBACK( menu_options_sound );
-MENU_CALLBACK( menu_options_peripherals );
+MENU_CALLBACK( menu_options_peripherals_general );
+MENU_CALLBACK( menu_options_peripherals_disk );
 MENU_CALLBACK( menu_options_rzx );
 MENU_CALLBACK( menu_options_diskoptions );
 MENU_DETAIL( menu_plus3a_detail );

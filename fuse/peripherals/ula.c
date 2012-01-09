@@ -176,7 +176,7 @@ ula_to_snapshot( libspectrum_snap *snap )
 void
 ula_contend_port_early( libspectrum_word port )
 {
-  if( memory_map_read[ port >> 13 ].contended )
+  if( memory_map_read[ port >> MEMORY_PAGE_SIZE_LOGARITHM ].contended )
     tstates += ula_contention_no_mreq[ tstates ];
    
   tstates++;
@@ -191,7 +191,7 @@ ula_contend_port_late( libspectrum_word port )
 
   } else {
 
-    if( memory_map_read[ port >> 13 ].contended ) {
+    if( memory_map_read[ port >> MEMORY_PAGE_SIZE_LOGARITHM ].contended ) {
       tstates += ula_contention_no_mreq[ tstates ]; tstates++;
       tstates += ula_contention_no_mreq[ tstates ]; tstates++;
       tstates += ula_contention_no_mreq[ tstates ];

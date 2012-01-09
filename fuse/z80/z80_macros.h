@@ -1,5 +1,5 @@
 /* z80_macros.h: Some commonly used z80 things as macros
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -104,17 +104,17 @@
 #ifndef CORETEST
 
 #define contend_read(address,time) \
-  if( memory_map_read[ (address) >> 13 ].contended ) \
+  if( memory_map_read[ (address) >> MEMORY_PAGE_SIZE_LOGARITHM ].contended ) \
     tstates += ula_contention[ tstates ]; \
   tstates += (time);
 
 #define contend_read_no_mreq(address,time) \
-  if( memory_map_read[ (address) >> 13 ].contended ) \
+  if( memory_map_read[ (address) >> MEMORY_PAGE_SIZE_LOGARITHM ].contended ) \
     tstates += ula_contention_no_mreq[ tstates ]; \
   tstates += (time);
 
 #define contend_write_no_mreq(address,time) \
-  if( memory_map_write[ (address) >> 13 ].contended ) \
+  if( memory_map_write[ (address) >> MEMORY_PAGE_SIZE_LOGARITHM ].contended ) \
     tstates += ula_contention_no_mreq[ tstates ]; \
   tstates += (time);
 

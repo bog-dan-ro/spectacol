@@ -73,18 +73,17 @@ static int
 pentagon_reset(void)
 {
   int error;
-  int i;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_pentagon512_0,
+  error = machine_load_rom( 0, settings_current.rom_pentagon512_0,
                             settings_default.rom_pentagon512_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_pentagon512_1,
+  error = machine_load_rom( 1, settings_current.rom_pentagon512_1,
                             settings_default.rom_pentagon512_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_pentagon512_3,
+  error = machine_load_rom( 2, settings_current.rom_pentagon512_3,
                             settings_default.rom_pentagon512_3, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
+  error = machine_load_rom_bank( beta_memory_map_romcs, 0,
                                  settings_current.rom_pentagon512_2,
                                  settings_default.rom_pentagon512_2, 0x4000 );
   if( error ) return error;
@@ -106,10 +105,6 @@ pentagon_reset(void)
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
 
-  /* Mark the least 384K as present/writeable */
-  for( i = 16; i < 64; i++ )
-    memory_map_ram[i].writable = 1;
-
   spec48_common_display_setup();
 
   return 0;
@@ -119,7 +114,6 @@ static int
 pentagon_memory_map( void )
 {
   int rom, page, screen;
-  size_t i;
 
   screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
   if( memory_current_screen != screen ) {
@@ -144,9 +138,6 @@ pentagon_memory_map( void )
 
   spec128_select_page( page );
   machine_current->ram.current_page = page;
-
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();
 

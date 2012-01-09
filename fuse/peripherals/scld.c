@@ -1,5 +1,5 @@
 /* scld.c: Routines for handling the Timex SCLD
-   Copyright (c) 2002-2006 Fredrick Meunier, Philip Kendall, Witold Filipczyk
+   Copyright (c) 2002-2011 Fredrick Meunier, Philip Kendall, Witold Filipczyk
 
    $Id$
 
@@ -47,8 +47,8 @@ scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 
 libspectrum_byte scld_last_hsr = 0; /* The last byte sent to Timex HSR port */
 
-memory_page timex_exrom[8];
-memory_page timex_dock[8];
+memory_page timex_exrom[MEMORY_PAGES_IN_64K];
+memory_page timex_dock[MEMORY_PAGES_IN_64K];
 
 static void scld_reset( int hard_reset );
 static void scld_from_snapshot( libspectrum_snap *snap );
@@ -182,38 +182,33 @@ void
 scld_memory_map( void )
 {
   int i;
-  memory_page **exrom_dock;
+  memory_page *exrom_dock;
   
   exrom_dock =
-    scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
+    scld_last_dec.name.altmembank ? timex_exrom : timex_dock;
 
-  for( i = 0; i < 8; i++ ) {
-    if( scld_last_hsr & ( 1 << i ) ) {
-      memory_map_read[i] = memory_map_write[i] = *exrom_dock[i];
-    } else {
-      memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
-    }
-  }
+  for( i = 0; i < 8; i++ )
+    if( scld_last_hsr & (1 << i) )
+      memory_map_8k( i * 0x2000, exrom_dock, i );
 }
 
-static int
+static void
 scld_dock_exrom_from_snapshot( memory_page *dest, int page_num, int writable,
                                void *source )
 {
-  dest->offset = 0;
-  dest->page_num = page_num;
-  dest->writable = writable;
-  dest->page =
-    memory_pool_allocate( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
-  if( !dest->page ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-              __LINE__ );
-    return 1;
+  int i;
+  libspectrum_byte *data = memory_pool_allocate( 0x2000 );
+  
+  memcpy( data, source, 0x2000 );
+
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+    memory_page *page = &dest[ page_num * MEMORY_PAGES_IN_8K + i ];
+    page->offset = i * MEMORY_PAGE_SIZE;
+    page->page_num = page_num;
+    page->writable = writable;
+    page->page = data + page->offset;
+    page->save_to_snapshot = 1;
   }
-
-  memcpy( dest->page, source, MEMORY_PAGE_SIZE );
-
-  return 0;
 }
 
 static void
@@ -224,7 +219,7 @@ scld_from_snapshot( libspectrum_snap *snap )
 
   if( capabilities & ( LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY |
       LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY ) )
-    scld_hsr_write( 0x00fd, libspectrum_snap_out_scld_hsr( snap ) );
+    scld_hsr_write( 0x00f4, libspectrum_snap_out_scld_hsr( snap ) );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO )
     scld_dec_write( 0x00ff, libspectrum_snap_out_scld_dec( snap ) );
@@ -235,19 +230,15 @@ scld_from_snapshot( libspectrum_snap *snap )
 
     for( i = 0; i < 8; i++ ) {
 
-      if( libspectrum_snap_dock_cart( snap, i ) ) {
-        if( scld_dock_exrom_from_snapshot( memory_map_dock[i], i,
-                                           libspectrum_snap_dock_ram( snap, i ),
-                                           libspectrum_snap_dock_cart( snap, i ) ) )
-          return;
-      }
+      if( libspectrum_snap_dock_cart( snap, i ) )
+        scld_dock_exrom_from_snapshot( timex_dock, i,
+          libspectrum_snap_dock_ram( snap, i ),
+          libspectrum_snap_dock_cart( snap, i ) );
 
-      if( libspectrum_snap_exrom_cart( snap, i ) ) {
-        if( scld_dock_exrom_from_snapshot( memory_map_exrom[i], i,
-                                           libspectrum_snap_exrom_ram( snap, i ),
-                                           libspectrum_snap_exrom_cart( snap, i ) ) )
-          return;
-      }
+      if( libspectrum_snap_exrom_cart( snap, i ) )
+        scld_dock_exrom_from_snapshot( timex_exrom, i,
+          libspectrum_snap_exrom_ram( snap, i ),
+          libspectrum_snap_exrom_cart( snap, i ) );
 
     }
 
@@ -274,32 +265,47 @@ scld_to_snapshot( libspectrum_snap *snap )
 
     for( i = 0; i < 8; i++ ) {
 
-      if( memory_map_exrom[i]->save_to_snapshot ||
-          memory_map_exrom[i]->writable            ) {
-        buffer = malloc( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
+      memory_page *exrom_base = &timex_exrom[i * MEMORY_PAGES_IN_8K],
+        *dock_base = &timex_dock[i * MEMORY_PAGES_IN_8K];
+      int j;
+
+      /* In theory, Fuse could somehow have set up a memory map in which the
+         first 4Kb of a DOCK page is writable, but the second 4Kb is not, and
+         this structure is not representable in a snapshot.
+
+         However, there's currently no code which could produce this situation
+         so for simplicity's sake, we assume the properties of the lowest page
+         in the 8Kb chunk apply to all the pages */
+
+      if( exrom_base->save_to_snapshot || exrom_base->writable ) {
+        buffer = malloc( 0x2000 * sizeof( libspectrum_byte ) );
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
                     __LINE__ );
           return;
         }
 
-        libspectrum_snap_set_exrom_ram( snap, i,
-                                        memory_map_exrom[i]->writable );
-        memcpy( buffer, memory_map_exrom[i]->page, MEMORY_PAGE_SIZE );
+        libspectrum_snap_set_exrom_ram( snap, i, exrom_base->writable );
+        for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+          memory_page *page = exrom_base + j;
+          memcpy( buffer + j * MEMORY_PAGE_SIZE, page->page, MEMORY_PAGE_SIZE );
+        }
         libspectrum_snap_set_exrom_cart( snap, i, buffer );
       }
 
-      if( memory_map_dock[i]->save_to_snapshot ||
-	  memory_map_dock[i]->writable            ) {
-        buffer = malloc( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
+      if( dock_base->save_to_snapshot || dock_base->writable ) {
+        buffer = malloc( 0x2000 * sizeof( libspectrum_byte ) );
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
                     __LINE__ );
           return;
         }
 
-        libspectrum_snap_set_dock_ram( snap, i, memory_map_dock[i]->writable );
-        memcpy( buffer, memory_map_dock[i]->page, MEMORY_PAGE_SIZE );
+        libspectrum_snap_set_dock_ram( snap, i, dock_base->writable );
+        for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+          memory_page *page = dock_base + j;
+          memcpy( buffer + j * MEMORY_PAGE_SIZE, page->page, MEMORY_PAGE_SIZE );
+        }
         libspectrum_snap_set_dock_cart( snap, i, buffer );
       }
 

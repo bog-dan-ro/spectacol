@@ -37,8 +37,8 @@ extern int beta_available;  /* Is the Beta disk interface available for use? */
 extern int beta_active;     /* Is the Beta disk interface enabled? */
 extern int beta_builtin;    /* Is the Beta disk interface built-in? */
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-extern memory_page beta_memory_map_romcs[2];
+/* A 16KB memory chunk accessible by the Z80 when /ROMCS is low */
+extern memory_page beta_memory_map_romcs[MEMORY_PAGES_IN_16K];
 
 extern libspectrum_word beta_pc_mask; /* Bits to mask in PC for enable check */
 extern libspectrum_word beta_pc_value; /* Value to compare masked PC against */

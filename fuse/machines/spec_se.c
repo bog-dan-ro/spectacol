@@ -1,9 +1,5 @@
 /* spec_se.c: ZX Spectrum SE specific routines
-   Copyright (c) 2003 Darren Salt
-   Copyright (c) 2004 Fredrick Meunier, Philip Kendall
-   Based on tc2048.c
-   Copyright (c) 1999-2002 Philip Kendall
-   Copyright (c) 2002-2003 Fredrick Meunier
+   Copyright (c) 1999-2011 Fredrick Meunier, Philip Kendall, Darren Salt
 
    $Id$
 
@@ -79,18 +75,6 @@ spec_se_init( fuse_machine_info *machine )
 static int
 dock_exrom_reset( void )
 {
-  memory_map_home[0] = &memory_map_rom[ 0];
-  memory_map_home[1] = &memory_map_rom[ 1];
-
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
-  memory_map_home[4] = &memory_map_ram[16];
-  memory_map_home[5] = &memory_map_ram[17];
-
-  memory_map_home[6] = &memory_map_ram[ 0];
-  memory_map_home[7] = &memory_map_ram[ 1];
-
   /* The dock is always active on the SE */
   dck_active = 1;
 
@@ -101,14 +85,14 @@ int
 spec_se_reset( void )
 {
   int error;
-  size_t i;
+  size_t i, j;
 
   error = dock_exrom_reset(); if( error ) return error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_spec_se_0,
+  error = machine_load_rom( 0, settings_current.rom_spec_se_0,
                             settings_default.rom_spec_se_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_spec_se_1,
+  error = machine_load_rom( 1, settings_current.rom_spec_se_1,
                             settings_default.rom_spec_se_1, 0x4000 );
   if( error ) return error;
 
@@ -138,42 +122,41 @@ spec_se_reset( void )
 
   periph_update();
 
-  /* Mark as present/writeable */
-  for( i = 0; i < 34; ++i )
-    memory_map_ram[i].writable = 1;
-
   for( i = 0; i < 8; i++ ) {
 
-    timex_dock[i] = memory_map_ram[ i + 18 ];
-    timex_dock[i].page_num = i;
-    timex_dock[i].contended = 0;
-    timex_dock[i].source = memory_source_dock;
-    memory_map_dock[i] = &timex_dock[i];
+    libspectrum_byte *dock_ram = memory_pool_allocate( 0x2000 );
+    libspectrum_byte *exrom_ram = memory_pool_allocate( 0x2000 );
 
-    timex_exrom[i] = memory_map_ram[ i + 26 ];
-    timex_exrom[i].page_num = i;
-    timex_exrom[i].contended = 0;
-    timex_exrom[i].source = memory_source_exrom;
-    memory_map_exrom[i] = &timex_exrom[i];
+    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+
+      int page_num = i * MEMORY_PAGES_IN_8K + j;
+
+      timex_dock[page_num].page = dock_ram + j * MEMORY_PAGE_SIZE;
+      timex_dock[page_num].offset = j * MEMORY_PAGE_SIZE;
+      timex_dock[page_num].page_num = i;
+      timex_dock[page_num].contended = 0;
+      timex_dock[page_num].source = memory_source_dock;
+
+      timex_exrom[page_num].page = exrom_ram + j * MEMORY_PAGE_SIZE;
+      timex_exrom[page_num].offset = j * MEMORY_PAGE_SIZE;
+      timex_exrom[page_num].page_num = i;
+      timex_exrom[page_num].contended = 0;
+      timex_exrom[page_num].source = memory_source_exrom;
+    }
   }
 
   /* The dock and exrom aren't cleared by the reset routine, so do
      so manually (only really necessary to keep snapshot sizes down) */
-  for( i = 0; i < 8; i++ ) {
-    memset( memory_map_dock[i]->page,  0, MEMORY_PAGE_SIZE );
-    memset( memory_map_exrom[i]->page, 0, MEMORY_PAGE_SIZE );
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
+    memset( timex_dock[i].page,  0, MEMORY_PAGE_SIZE );
+    memset( timex_exrom[i].page, 0, MEMORY_PAGE_SIZE );
   }
 
-  /* Similarly for 0x8000 to 0xbfff (RAM page 8) */
-  memset( memory_map_home[4]->page, 0, MEMORY_PAGE_SIZE );
-  memset( memory_map_home[5]->page, 0, MEMORY_PAGE_SIZE );
-
   /* RAM pages 1, 3, 5 and 7 contended */
-  for( i = 0; i < 8; i++ ) 
-    memory_map_ram[ 2 * i ].contended =
-      memory_map_ram[ 2 * i + 1 ].contended = i & 1;
+  for( i = 0; i < 8; i++ )
+    memory_ram_set_16k_contention( i, i & 1 );
 
-  machine_current->ram.locked=0;
+  machine_current->ram.locked = 0;
   machine_current->ram.last_byte = 0;
 
   machine_current->ram.current_page=0;
@@ -194,10 +177,15 @@ spec_se_reset( void )
 static int
 spec_se_memory_map( void )
 {
-  memory_page **exrom_dock, **bank;
+  memory_page *exrom_dock;
+
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
+  memory_map_16k( 0x8000, memory_map_ram, 8 );
+  memory_map_16k( 0xc000, memory_map_ram, 0 );
 
   /* Spectrum SE memory paging is just a combination of the 128K
-     0x7ffd and TimexDOCK/EXROM paging schemes with one exception */
+     0x7ffd and Timex DOCK/EXROM paging schemes with one exception */
   spec128_memory_map();
   scld_memory_map();
 
@@ -207,13 +195,13 @@ spec_se_memory_map( void )
   /* If so, bits 2 and 3 of 0xf4 also control whether the DOCK/EXROM
      is paged in at 0xc000 and 0xe000 respectively */
     exrom_dock = 
-      scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
+      scld_last_dec.name.altmembank ? timex_exrom : timex_dock;
 
-    bank = scld_last_hsr & ( 1 << 2 ) ? exrom_dock : memory_map_home;
-    memory_map_read[6] = memory_map_write[6] = *bank[6];
+    if( scld_last_hsr & ( 1 << 2 ) )
+      memory_map_8k( 0xc000, exrom_dock, 6 );
 
-    bank = scld_last_hsr & ( 1 << 3 ) ? exrom_dock : memory_map_home;
-    memory_map_read[7] = memory_map_write[7] = *bank[7];
+    if( scld_last_hsr & ( 1 << 3 ) )
+      memory_map_8k( 0xe000, exrom_dock, 7 );
   }
 
   memory_romcs_map();

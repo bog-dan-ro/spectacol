@@ -75,10 +75,10 @@ int tc2048_init( fuse_machine_info *machine )
 static int
 tc2048_reset( void )
 {
-  size_t i;
+  size_t i, j;
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_tc2048,
+  error = machine_load_rom( 0, settings_current.rom_tc2048,
                             settings_default.rom_tc2048, 0x4000 );
   if( error ) return error;
 
@@ -108,17 +108,18 @@ tc2048_reset( void )
 
   beta_builtin = 0;
 
-  for( i = 0; i < 8; i++ ) {
+  for( i = 0; i < 8; i++ )
+    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+      memory_page *dock_page, *exrom_page;
+      
+      dock_page = &timex_dock[i * MEMORY_PAGES_IN_8K + j];
+      *dock_page = tc2068_empty_mapping[j];
+      dock_page->page_num = i;
 
-    timex_dock[i] = fake_mapping;
-    timex_dock[i].page_num = i;
-    memory_map_dock[i] = &timex_dock[i];
-
-    timex_exrom[i] = fake_mapping;
-    timex_exrom[i].page_num = i;
-    memory_map_exrom[i] = &timex_exrom[i];
-
-  }
+      exrom_page = &timex_exrom[i * MEMORY_PAGES_IN_8K + j];
+      *exrom_page = tc2068_empty_mapping[j];
+      exrom_page->page_num = i;
+    }
 
   return tc2068_tc2048_common_reset();
 }

@@ -64,6 +64,8 @@ Mac OS X
 
 * Either the native port by Fredrick Meunier, or the original version
   will compile on OS X 10.3 (Panther) or later.
+* On Mac OS X Lion you will need to use clang as gcc-llvm-4.2.1 fails to
+  correctly compile z80_ops.c.
 
 Windows
 

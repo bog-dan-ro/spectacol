@@ -390,8 +390,8 @@ enum debugger_mode_t debugger_mode;
 
 libspectrum_byte **ROM = NULL;
 memory_page memory_map[8];
-memory_page *memory_map_home[8];
-memory_page memory_map_rom[8];
+memory_page *memory_map_home[MEMORY_PAGES_IN_64K];
+memory_page memory_map_rom[SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K];
 int memory_contended[8] = { 1 };
 libspectrum_byte spectrum_contention[ 80000 ] = { 0 };
 int profile_active = 0;
@@ -498,6 +498,20 @@ divide_set_automap( int state GCC_UNUSED )
   abort();
 }
 
+int spectranet_available = 0;
+
+void
+spectranet_page( void )
+{
+  abort();
+}
+
+void
+spectranet_unpage( void )
+{
+  abort();
+}
+
 int
 rzx_frame( void )
 {
@@ -532,6 +546,9 @@ settings_info settings_current;
 libspectrum_word beta_pc_mask;
 libspectrum_word beta_pc_value;
 
+int spectranet_programmable_trap_active;
+libspectrum_word spectranet_programmable_trap;
+
 /* Initialise the dummy variables such that we're running on a clean a
    machine as possible */
 static int
@@ -553,6 +570,8 @@ init_dummies( void )
   settings_current.divide_enabled = 0;
   beta_pc_mask = 0xfe00;
   beta_pc_value = 0x3c00;
+  spectranet_programmable_trap_active = 0;
+  spectranet_programmable_trap = 0x0000;
 
   return 0;
 }

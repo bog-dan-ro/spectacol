@@ -125,7 +125,7 @@ static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
 static int create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group );
 
 static int activate_debugger( void );
-static int update_memory_map( void );
+static void update_memory_map( void );
 static void update_breakpoints( void );
 static void update_disassembly( void );
 static void update_events( void );
@@ -147,8 +147,9 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *continue_button, *break_button,	/* Two of its buttons */
   *register_display,			/* The register display */
   *registers[18],			/* Individual registers */
-  *memorymap,				/* The memory map display */
-  *map_label[8][4],			/* Labels in the memory map */
+  *memory_map,				/* The memory map display */
+  *memory_map_table,                    /* The table for the memory map */
+  *map_label[MEMORY_PAGES_IN_64K][4],   /* Labels in the memory map */
   *breakpoints,				/* The breakpoint display */
   *disassembly_box,			/* A box to hold the disassembly */
   *disassembly,				/* The actual disassembly widget */
@@ -279,7 +280,7 @@ get_pane( debugger_pane pane )
 {
   switch( pane ) {
   case DEBUGGER_PANE_REGISTERS: return register_display;
-  case DEBUGGER_PANE_MEMORYMAP: return memorymap;
+  case DEBUGGER_PANE_MEMORYMAP: return memory_map;
   case DEBUGGER_PANE_BREAKPOINTS: return breakpoints;
   case DEBUGGER_PANE_DISASSEMBLY: return disassembly_box;
   case DEBUGGER_PANE_STACK: return stack;
@@ -428,34 +429,25 @@ create_register_display( GtkBox *parent, gtkui_font font )
 static int
 create_memory_map( GtkBox *parent )
 {
-  GtkWidget *table, *label;
-  size_t i, j;
+  GtkWidget *label;
 
-  memorymap = gtk_frame_new( "Memory Map" );
-  gtk_box_pack_start( parent, memorymap, FALSE, FALSE, 0 );
+  memory_map = gtk_frame_new( "Memory Map" );
+  gtk_box_pack_start( parent, memory_map, FALSE, FALSE, 0 );
 
-  table = gtk_table_new( 9, 4, FALSE );
-  gtk_container_add( GTK_CONTAINER( memorymap ), table );
+  memory_map_table = gtk_table_new( 1 + MEMORY_PAGES_IN_64K, 4, FALSE );
+  gtk_container_add( GTK_CONTAINER( memory_map ), memory_map_table );
 
   label = gtk_label_new( "Address" );
-  gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 0, 1, 0, 0, 2, 2 );
+  gtk_table_attach( GTK_TABLE( memory_map_table ), label, 0, 1, 0, 1, 0, 0, 2, 2 );
 
   label = gtk_label_new( "Source" );
-  gtk_table_attach( GTK_TABLE( table ), label, 1, 2, 0, 1, 0, 0, 2, 2 );
+  gtk_table_attach( GTK_TABLE( memory_map_table ), label, 1, 2, 0, 1, 0, 0, 2, 2 );
 
   label = gtk_label_new( "W?" );
-  gtk_table_attach( GTK_TABLE( table ), label, 2, 3, 0, 1, 0, 0, 2, 2 );
+  gtk_table_attach( GTK_TABLE( memory_map_table ), label, 2, 3, 0, 1, 0, 0, 2, 2 );
 
   label = gtk_label_new( "C?" );
-  gtk_table_attach( GTK_TABLE( table ), label, 3, 4, 0, 1, 0, 0, 2, 2 );
-
-  for( i = 0; i < 8; i++ ) {
-    for( j = 0; j < 4; j++ ) {
-      map_label[i][j] = gtk_label_new( "" );
-      gtk_table_attach( GTK_TABLE( table ), map_label[i][j],
-			j, j + 1, 8 - i, 9 - i, 0, 0, 2, 2 );
-    }
-  }
+  gtk_table_attach( GTK_TABLE( memory_map_table ), label, 3, 4, 0, 1, 0, 0, 2, 2 );
 
   return 0;
 }
@@ -685,7 +677,6 @@ ui_debugger_update( void )
   gchar buffer1[80], buffer2[80];
   libspectrum_word address;
   int capabilities; size_t length;
-  int error;
 
   const char *register_name[] = { "PC", "SP",
 				  "AF", "AF'",
@@ -775,9 +766,7 @@ ui_debugger_update( void )
 
   gtk_label_set_text( GTK_LABEL( registers[17] ), buffer );
 
-  /* Update the memory map display */
-  error = update_memory_map(); if( error ) return error;
-
+  update_memory_map();
   update_breakpoints();
   update_disassembly();
 
@@ -804,30 +793,66 @@ ui_debugger_update( void )
   return 0;
 }
 
-static int
+static void
 update_memory_map( void )
 {
-  size_t i;
-  char buffer[ 40 ];
+  int source, page_num, writable, contended;
+  libspectrum_word offset;
+  size_t i, j, block, row;
 
-  for( i = 0; i < 8; i++ ) {
-
-    snprintf( buffer, 40, format_16_bit(), (unsigned)i * 0x2000 );
-    gtk_label_set_text( GTK_LABEL( map_label[i][0] ), buffer );
-
-    snprintf( buffer, 40, "%s %d",
-              memory_source_description( memory_map_read[i].source ),
-	      memory_map_read[i].page_num );
-    gtk_label_set_text( GTK_LABEL( map_label[i][1] ), buffer );
-
-    gtk_label_set_text( GTK_LABEL( map_label[i][2] ),
-			memory_map_read[i].writable ? "Y" : "N" );
-
-    gtk_label_set_text( GTK_LABEL( map_label[i][3] ),
-			memory_map_read[i].contended ? "Y" : "N" );
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
+    if( map_label[i][0] ) {
+      for( j = 0; j < 4; j++ ) {
+        gtk_container_remove( GTK_CONTAINER( memory_map_table ), map_label[i][j] );
+        map_label[i][j] = NULL;
+      }
+    }
   }
 
-  return 0;
+  source = page_num = writable = contended = -1;
+  offset = 0;
+  row = 0;
+
+  for( block = 0; block < MEMORY_PAGES_IN_64K; block++ ) {
+    memory_page *page = &memory_map_read[block];
+
+    if( page->source != source ||
+      page->page_num != page_num ||
+      page->offset != offset ||
+      page->writable != writable ||
+      page->contended != contended ) {
+
+      char buffer[40];
+      GtkWidget **row_labels = map_label[row];
+
+      snprintf( buffer, 40, format_16_bit(), (unsigned)block * 0x1000 );
+      row_labels[0] = gtk_label_new( buffer );
+
+      snprintf( buffer, 40, "%s %d",
+        memory_source_description( page->source ), page->page_num );
+      row_labels[1] = gtk_label_new( buffer );
+
+      row_labels[2] = gtk_label_new( page->writable ? "Y" : "N" );
+      row_labels[3] = gtk_label_new( page->contended ? "Y" : "N" );
+
+      for( i = 0; i < 4; i++ )
+        gtk_table_attach( GTK_TABLE( memory_map_table ), row_labels[i],
+            i, i + 1, row + 1, row + 2, 0, 0, 2, 2 );
+
+      row++;
+
+      source = page->source;
+      page_num = page->page_num;
+      writable = page->writable;
+      contended = page->contended;
+      offset = page->offset;
+    }
+
+    /* We expect the next page to have an increased offset */
+    offset += MEMORY_PAGE_SIZE;
+  }
+
+  gtk_widget_show_all( GTK_WIDGET( memory_map_table ) );
 }
 
 static void

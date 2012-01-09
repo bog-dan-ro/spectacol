@@ -155,8 +155,8 @@ RS232:
     every other 0x00 + 0x## are discarded
 */
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-static memory_page if1_memory_map_romcs[2];
+/* One 8KB memory chunk accessible by the Z80 when /ROMCS is low */
+static memory_page if1_memory_map_romcs[MEMORY_PAGES_IN_8K];
 
 /* IF1 paged out ROM activated? */
 int if1_active = 0;
@@ -336,7 +336,7 @@ if1_init( void )
   module_register( &if1_module_info );
 
   if1_memory_source = memory_source_register( "If1" );
-  for( i = 0; i < 2; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
     if1_memory_map_romcs[i].source = if1_memory_source;
 
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
@@ -375,10 +375,10 @@ if1_reset( int hard_reset GCC_UNUSED )
 
   if( !periph_is_active( PERIPH_TYPE_INTERFACE1 ) ) return;
 
-  if( machine_load_rom_bank( if1_memory_map_romcs, 0, 0,
+  if( machine_load_rom_bank( if1_memory_map_romcs, 0,
 			     settings_current.rom_interface_i,
 			     settings_default.rom_interface_i,
-			     MEMORY_PAGE_SIZE ) ) {
+			     0x2000 ) ) {
     settings_current.interface1 = 0;
     periph_activate_type( PERIPH_TYPE_INTERFACE1, 0 );
     return;
@@ -428,7 +428,8 @@ if1_memory_map( void )
 {
   if( !if1_active ) return;
 
-  memory_map_read[0] = memory_map_write[0] = if1_memory_map_romcs[0];
+  memory_map_romcs_8k( 0x0000, if1_memory_map_romcs );
+  memory_map_romcs_8k( 0x2000, if1_memory_map_romcs );
   memory_map_read[1] = memory_map_write[1] = if1_memory_map_romcs[0];
 }
 
@@ -447,7 +448,7 @@ if1_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_interface1_custom_rom( snap ) &&
       libspectrum_snap_interface1_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             if1_memory_map_romcs, 0, 0,
+                             if1_memory_map_romcs, 0,
                              libspectrum_snap_interface1_rom( snap, 0 ),
                              libspectrum_snap_interface1_rom_length( snap, 0 ),
                              1 ) )

@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2007 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -58,8 +58,8 @@
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
 static int normal_memory_map( int rom, int page );
-static int special_memory_map( int which );
-static int select_special_map( int page1, int page2, int page3, int page4 );
+static void special_memory_map( int which );
+static void select_special_map( int page1, int page2, int page3, int page4 );
 
 static int specplus3_reset( void );
 
@@ -151,16 +151,16 @@ specplus3_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_plus3_0,
+  error = machine_load_rom( 0, settings_current.rom_plus3_0,
                             settings_default.rom_plus3_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_plus3_1,
+  error = machine_load_rom( 1, settings_current.rom_plus3_1,
                             settings_default.rom_plus3_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_plus3_2,
+  error = machine_load_rom( 2, settings_current.rom_plus3_2,
                             settings_default.rom_plus3_2, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 6, 3, settings_current.rom_plus3_3,
+  error = machine_load_rom( 3, settings_current.rom_plus3_3,
                             settings_default.rom_plus3_3, 0x4000 );
   if( error ) return error;
 
@@ -198,17 +198,12 @@ specplus3_plus2a_common_reset( void )
   memory_screen_mask = 0xffff;
 
   /* All memory comes from the home bank */
-  for( i = 0; i < 8; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
     memory_map_read[i].source = memory_map_write[i].source = memory_source_ram;
 
   /* RAM pages 4, 5, 6 and 7 contended */
   for( i = 0; i < 8; i++ )
-    memory_map_ram[ 2 * i     ].contended =
-      memory_map_ram[ 2 * i + 1 ].contended = i & 4;
-
-  /* Mark as present/writeable */
-  for( i = 0; i < 16; i++ )
-    memory_map_ram[i].writable = 1;
+    memory_ram_set_16k_contention( i, i >= 4 );
 
   error = normal_memory_map( 0, 0 ); if( error ) return error;
 
@@ -219,55 +214,39 @@ static int
 normal_memory_map( int rom, int page )
 {
   /* ROM as specified */
-  memory_map_home[0] = &memory_map_rom[ 2 * rom     ];
-  memory_map_home[1] = &memory_map_rom[ 2 * rom + 1 ];
-
+  memory_map_16k( 0x0000, memory_map_rom, rom );
   /* RAM 5 */
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
   /* RAM 2 */
-  memory_map_home[4] = &memory_map_ram[ 4];
-  memory_map_home[5] = &memory_map_ram[ 5];
-
-  /* RAM as specified */
-  memory_map_home[6] = &memory_map_ram[ 2 * page     ];
-  memory_map_home[7] = &memory_map_ram[ 2 * page + 1 ];
+  memory_map_16k( 0x8000, memory_map_ram, 2 );
+  /* RAM 0 */
+  memory_map_16k( 0xc000, memory_map_ram, page );
 
   return 0;
 }
 
-static int
+static void
 special_memory_map( int which )
 {
   switch( which ) {
-  case 0: return select_special_map( 0, 1, 2, 3 );
-  case 1: return select_special_map( 4, 5, 6, 7 );
-  case 2: return select_special_map( 4, 5, 6, 3 );
-  case 3: return select_special_map( 4, 7, 6, 3 );
+  case 0: select_special_map( 0, 1, 2, 3 ); break;
+  case 1: select_special_map( 4, 5, 6, 7 ); break;
+  case 2: select_special_map( 4, 5, 6, 3 ); break;
+  case 3: select_special_map( 4, 7, 6, 3 ); break;
 
   default:
     ui_error( UI_ERROR_ERROR, "unknown +3 special configuration %d", which );
-    return 1;
+    fuse_abort();
   }
 }
 
-static int
+static void
 select_special_map( int page1, int page2, int page3, int page4 )
 {
-  memory_map_home[0] = &memory_map_ram[ 2 * page1     ];
-  memory_map_home[1] = &memory_map_ram[ 2 * page1 + 1 ];
-
-  memory_map_home[2] = &memory_map_ram[ 2 * page2     ];
-  memory_map_home[3] = &memory_map_ram[ 2 * page2 + 1 ];
-
-  memory_map_home[4] = &memory_map_ram[ 2 * page3     ];
-  memory_map_home[5] = &memory_map_ram[ 2 * page3 + 1 ];
-
-  memory_map_home[6] = &memory_map_ram[ 2 * page4     ];
-  memory_map_home[7] = &memory_map_ram[ 2 * page4 + 1 ];
-
-  return 0;
+  memory_map_16k( 0x0000, memory_map_ram, page1 );
+  memory_map_16k( 0x4000, memory_map_ram, page2 );
+  memory_map_16k( 0x8000, memory_map_ram, page3 );
+  memory_map_16k( 0xc000, memory_map_ram, page4 );
 }
 
 void
@@ -303,7 +282,6 @@ int
 specplus3_memory_map( void )
 {
   int page, rom, screen;
-  size_t i;
 
   page = machine_current->ram.last_byte & 0x07;
   screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
@@ -336,9 +314,6 @@ specplus3_memory_map( void )
 
   machine_current->ram.current_page = page;
   machine_current->ram.current_rom  = rom;
-
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();
 

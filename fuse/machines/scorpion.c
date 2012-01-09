@@ -72,18 +72,18 @@ scorpion_init( fuse_machine_info *machine )
 int
 scorpion_reset(void)
 {
-  int i, error;
+  int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_scorpion_0,
+  error = machine_load_rom( 0, settings_current.rom_scorpion_0,
                             settings_default.rom_scorpion_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_scorpion_1,
+  error = machine_load_rom( 1, settings_current.rom_scorpion_1,
                             settings_default.rom_scorpion_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_scorpion_2,
+  error = machine_load_rom( 2, settings_current.rom_scorpion_2,
                             settings_default.rom_scorpion_2, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
+  error = machine_load_rom_bank( beta_memory_map_romcs, 0,
                                  settings_current.rom_scorpion_3,
                                  settings_default.rom_scorpion_3, 0x4000 );
   if( error ) return error;
@@ -93,10 +93,6 @@ scorpion_reset(void)
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
-
-  /* Mark the second 128K as present/writeable */
-  for( i = 16; i < 32; i++ )
-    memory_map_ram[i].writable = 1;
 
   periph_clear();
   machines_periph_pentagon();
@@ -122,7 +118,6 @@ static int
 scorpion_memory_map( void )
 {
   int rom, page, screen;
-  size_t i;
 
   screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
   if( memory_current_screen != screen ) {
@@ -139,8 +134,7 @@ scorpion_memory_map( void )
   machine_current->ram.current_rom = rom;
 
   if( machine_current->ram.last_byte2 & 0x01 ) {
-    memory_map_home[0] = &memory_map_ram[ 0 ];
-    memory_map_home[1] = &memory_map_ram[ 1 ];
+    memory_map_16k( 0x0000, memory_map_ram, 0 );
     machine_current->ram.special = 1;
   } else {
     spec128_select_rom( rom );
@@ -151,9 +145,6 @@ scorpion_memory_map( void )
   
   spec128_select_page( page );
   machine_current->ram.current_page = page;
-
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();
 

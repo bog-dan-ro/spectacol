@@ -58,8 +58,9 @@
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-memory_page beta_memory_map_romcs[2];
+/* A 16KB memory chunk accessible by the Z80 when /ROMCS is low */
+memory_page beta_memory_map_romcs[MEMORY_PAGES_IN_16K];
+static int beta_memory_source;
 static int beta_memory_source;
 
 int beta_available = 0;
@@ -133,8 +134,7 @@ beta_memory_map( void )
 {
   if( !beta_active ) return;
 
-  memory_map_read[0] = memory_map_write[0] = beta_memory_map_romcs[0];
-  memory_map_read[1] = memory_map_write[1] = beta_memory_map_romcs[1];
+  memory_map_romcs( beta_memory_map_romcs );
 }
 
 static void
@@ -176,7 +176,8 @@ beta_init( void )
   module_register( &beta_module_info );
 
   beta_memory_source = memory_source_register( "Betadisk" );
-  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].source = beta_memory_source;
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    beta_memory_map_romcs[i].source = beta_memory_source;
 
   periph_register( PERIPH_TYPE_BETA128, &beta_peripheral );
 
@@ -215,7 +216,7 @@ beta_reset( int hard_reset GCC_UNUSED )
   }
 
   if( !beta_builtin ) {
-    if( machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
+    if( machine_load_rom_bank( beta_memory_map_romcs, 0,
 			       settings_current.rom_beta128,
 			       settings_default.rom_beta128, 0x4000 ) ) {
       beta_active = 0;
@@ -224,9 +225,6 @@ beta_reset( int hard_reset GCC_UNUSED )
       settings_current.beta128 = 0;
       return;
     }
-
-    beta_memory_map_romcs[ 0 ].writable = 0;
-    beta_memory_map_romcs[ 1 ].writable = 0;
 
     beta_active = 0;
 
@@ -744,10 +742,9 @@ beta_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_beta_custom_rom( snap ) &&
       libspectrum_snap_beta_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             beta_memory_map_romcs, 0, 0,
+                             beta_memory_map_romcs, 0,
                              libspectrum_snap_beta_rom( snap, 0 ),
-                             MEMORY_PAGE_SIZE * 2,
-                             1 ) )
+                             0x4000, 1 ) )
     return;
 
   /* ignore drive count for now, there will be an issue with loading snaps where

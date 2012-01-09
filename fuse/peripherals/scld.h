@@ -117,8 +117,8 @@ extern scld scld_last_dec;           /* The last byte sent to Timex DEC port */
 
 extern libspectrum_byte scld_last_hsr; /* Last byte sent to Timex HSR port */
 
-extern memory_page timex_exrom[8];
-extern memory_page timex_dock[8];
+extern memory_page timex_exrom[MEMORY_PAGES_IN_64K];
+extern memory_page timex_dock[MEMORY_PAGES_IN_64K];
 
 int scld_init( void );
 

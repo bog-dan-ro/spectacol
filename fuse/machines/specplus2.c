@@ -1,5 +1,5 @@
 /* specplus2.c: Spectrum +2 specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -67,10 +67,10 @@ specplus2_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_plus2_0,
+  error = machine_load_rom( 0, settings_current.rom_plus2_0,
                             settings_default.rom_plus2_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_plus2_1,
+  error = machine_load_rom( 1, settings_current.rom_plus2_1,
                             settings_default.rom_plus2_1, 0x4000 );
   if( error ) return error;
 

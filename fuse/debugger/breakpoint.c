@@ -274,16 +274,16 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
 static memory_page*
 get_page( debugger_breakpoint_type type, libspectrum_word address )
 {
-  memory_page *page;
+  memory_page *bank;
 
   switch( type ) {
   case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
   case DEBUGGER_BREAKPOINT_TYPE_READ:
-    page = memory_map_read;
+    bank = memory_map_read;
     break;
 
   case DEBUGGER_BREAKPOINT_TYPE_WRITE:
-    page = memory_map_write;
+    bank = memory_map_write;
     break;
 
   default:
@@ -292,7 +292,7 @@ get_page( debugger_breakpoint_type type, libspectrum_word address )
     fuse_abort();
   }
 
-  return page;
+  return &bank[ address >> MEMORY_PAGE_SIZE_LOGARITHM ];
 }
 
 int

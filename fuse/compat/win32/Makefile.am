@@ -31,6 +31,7 @@ libcompatos_a_SOURCES = ../unix/dir.c \
 			../unix/file.c \
 			osname.c \
 			paths.c \
+                        socket.c \
 			timer.c \
                         ../unix/tuntap.c
 

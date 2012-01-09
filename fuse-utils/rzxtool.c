@@ -199,22 +199,20 @@ apply_action( void *data, void *user_data )
 {
   const action_t *action = data;
   libspectrum_rzx *rzx = user_data;
-  int e;
   int where = action->where;
 
   switch( action->type ) {
   case ACTION_DELETE_BLOCK:
-    e = delete_block( rzx, where );
+    delete_block( rzx, where );
     break;
   case ACTION_EXTRACT_SNAP:
-    e = extract_snap( rzx, where, action->filename );
+    extract_snap( rzx, where, action->filename );
     break;
   case ACTION_INSERT_SNAP:
-    e = insert_snap( rzx, where, action->filename );
+    insert_snap( rzx, where, action->filename );
     break;
   default:
     fprintf( stderr, "%s: unknown action type %d\n", progname, action->type );
-    e = 1;
   }
 
   /* Really would like to handle errors */

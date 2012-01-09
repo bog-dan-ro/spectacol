@@ -40,8 +40,9 @@
 #include "unittests/unittests.h"
 #include "zxatasp.h"
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-static memory_page zxatasp_memory_map_romcs[2];
+/* A 16KB memory chunk accessible by the Z80 when /ROMCS is low */
+static memory_page zxatasp_memory_map_romcs[MEMORY_PAGES_IN_16K];
+static int zxatasp_memory_source;
 static int zxatasp_memory_source;
 
 /*
@@ -192,7 +193,7 @@ zxatasp_init( void )
   module_register( &zxatasp_module_info );
 
   zxatasp_memory_source = memory_source_register( "ZXATASP" );
-  for( i = 0; i < 2; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
     zxatasp_memory_map_romcs[i].source = zxatasp_memory_source;
 
   periph_register( PERIPH_TYPE_ZXATASP, &zxatasp_periph );
@@ -442,10 +443,10 @@ set_zxatasp_bank( int bank )
   memory_page *page;
   size_t i, offset;
 
-  for( i = 0; i < 2; i++ ) {
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
 
     page = &zxatasp_memory_map_romcs[i];
-    offset = i & 1 ? MEMORY_PAGE_SIZE : 0x0000;
+    offset = i * MEMORY_PAGE_SIZE;
 
     page->page = &ZXATASPMEM[ bank ][ offset ];
     page->writable = !settings_current.zxatasp_wp;
@@ -494,7 +495,7 @@ zxatasp_writeide(libspectrum_ide_channel *chn,
 static void
 zxatasp_memory_map( void )
 {
-  int writable;
+  int i, writable;
 
   if( !settings_current.zxatasp_active ) return;
 
@@ -505,16 +506,15 @@ zxatasp_memory_map( void )
     writable = 1;
   }
 
-  zxatasp_memory_map_romcs[0].writable =
-    zxatasp_memory_map_romcs[1].writable = writable;
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    zxatasp_memory_map_romcs[i].writable = writable;
 
-  if( !settings_current.zxatasp_upload ) {
-    memory_map_read[0] = zxatasp_memory_map_romcs[0];
-    memory_map_read[1] = zxatasp_memory_map_romcs[1];
-  }
+  if( !settings_current.zxatasp_upload )
+    for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+      memory_map_read[i] = zxatasp_memory_map_romcs[i];
 
-  memory_map_write[0] = zxatasp_memory_map_romcs[0];
-  memory_map_write[1] = zxatasp_memory_map_romcs[1];
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    memory_map_write[i] = zxatasp_memory_map_romcs[i];
 }
 
 static void

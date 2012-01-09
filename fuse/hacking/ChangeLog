@@ -3629,22 +3629,175 @@
          along with older autotools (patch #3295662) (thanks, Tomáš Franke)
          (Sergio Baldoví)
 20110504 tape.c: fix warnings.
+20110505 memory.[ch],peripherals/ula.c: first bits of general memory page
+         sizing.
 20110506 configure.in: fix build for mingw+msys broken in revision 4399 (more
          from bug #3295295) (Sergio Baldoví)
+20110508 memory.[ch],machine.h,machines/spec48.c,spectrum.h,z80/z80_macros.h:
+         base 48K Spectrum working with a page size of 4Kb.
+20110509 machine.c,machines/{spec128.c,spec48.c},memory.[ch]: get 128K machine
+         working working with 8Kb pages again.
+20110509 machine.[ch],machines/{pentagon1024.c,pentagon512.c,pentagon.c,
+         scorpion.c,spec128.c,spec16.c,spec48.c,spec48_ntsc.c,specplus2a.c,
+         specplus2.c,specplus3.c,specplus3e.c,spec_se.c,tc2048.c,tc2068.c,
+         ts2068.c},memory.[ch], peripherals/{disk/beta.c,disciple.c,opus.c,
+         plusd.c},if1.c,if2.c,speccyboot.c}: get 128K machine working with 4Kb
+         pages.
 20110509 machines/machines_periph.c,peripherals/ay.c,periph.h: reading from
          port 0xbffd on +2A/+3 was lost in peripheral refactoring (thanks,
          fusetest).
+20110510 machines/specplus3.c: get +3 to work with a page size of 4Kb.
 20110511 compat/unix/tuntap.c: add missing #include <string.h>.
+20110511 machines/spec16.c: get 16K Spectrum working with a page size of 4Kb.
 20110514 tape.c: add case for set signal level block (Fred).
 20110514 tape.c: we want to allow 0 tstate blocks to twiddle the mic to
          accomodate the set signal level block (Fred).
+20110515 machines/tc2048.c,memory.h,peripherals/scld.[ch]: get TC2048 working
+         with a page size of 4Kb.
+20110515 memory.h: back out accidental commit of page size change.
+20110515 scld.c: use right port number when restoring SCLD state from snapshot
+         (makes no functional difference as we ignore the port number anyway).
+20110516 machines/{tc2048.c,tc2068.[ch],ts2068.c},memory.h: get TC/TS2068
+         working with 4Kb pages.
 20110531 peripherals/dck.c: ensure pages loaded from .dck files get saved back
          into snapshots.
+20110601 peripherals/{dck.c,scld.c}: make .dck files and snapshots containing
+         DOCK/EXROM work with 4Kb pages.
+20110602 machines/{pentagon1024.c,pentagon512.c,scorpion.c},memory.[ch],
+         peripherals/disk/beta.[ch]: get Russian machines working with 4Kb
+         pages.
+20110604 memory.h,peripherals/spectranet.c: Spectranet code now at least does
+         something.
+20110604 machines/spec48.c: one 8Kb page assumption still remained.
+20110605 z80/{z80_checks.h,z80_ops.c}: add 0x3ff8 to 0x3fff trap, and move
+         0x007c trap to the right place.
+20110605 peripherals/spectranet.c: implement debugger events for Spectranet
+         being (un)paged.
+20110605 machine.c,peripherals/disk/{beta.c,disciple.c,opus.c,plusd.c},
+         peripherals/speccyboot.c: set 'writable = 0' when loading ROM images
+         rather than setting it explicitly (Stuart).
+20110605 memory.c,peripherals/{nic/{Makefile.am,w5100.[ch]},spectranet.[ch]}:
+         add stub W5100 emulation.
+20110606 memory.[ch],peripherals/disk/opus.c: guard against overrun of Opus RAM
+         buffer by increasing the amount allocated (Stuart).
+20110606 peripherals/{disk/{beta.[ch],disciple.c,plusd.c},ide/{divide.c,
+         zxatasp.c,zxcf.c},if1.c,if2.c,speccyboot.c}: allow page sizes other
+         than 8KB (Stuart).
+20110606 z80/z80.c: Spectranet should page in on NMI (patch #3312599)
+         (Guesser).
+20110606 peripherals/spectranet.c,roms/{README.copyright,spectranet.rom}: add
+         full Spectranet ROM (patch 3312600) (Guesser).
+20110606 memory.h: switch to 4Kb page size.
+20110606 z80/coretest.c: fix for 4Kb page size (patch #3312596) (Guesser).
 20110606 ui/win32/{debugger.c,pokefinder.c,pokefinder.rc}: fix Win32 build
          (Sergio Baldoví)
+20110607 configure.in,Makefile.am,memory.c,peripherals/{Makefile.am,
+         flash/{am29f010.[ch],Makefile.am},spectranet.[ch]},
+         roms/{Makefile.am,README.copyright,spectranet.rom},settings.dat,
+         ui/options.dat,z80/{z80.c,z80_checks.h,z80_ops.c}: add emulation
+         of the AMD AM29F010 flash (modified from patch #3313062) (Guesser
+         and Phil).
+20110608 peripherals/spectranet.c: beginnings of Spectranet snapshot support.
 20110610 peripherals/if1.c: mirror Interface 1 ROM to seconds 8Kb of ROM as in
          the real interface (fixes bug #3314682) (thanks, mcleod_ideafix and
          zx81) (Fred).
+20110610 peripherals/spectranet.c: pretty much working Spectranet snapshot
+         support.
+20110610 peripherals/spectranet.c: remember to restore Spectranet disabled
+         state when restoring from snapshot (thanks, Guesser).
+20110611 peripherals/spectranet.[ch],z80/{coretest.c,z80_ops.c}: implement
+         Spectranet programmable trap support.
+20110611 peripherals/spectranet.c: implement the shadow screen bit when reading
+         from port 0x033b.
+20110611 peripherals/nic/w5100.c: very slightly less stubby W5100
+         implementation.
+20110611 peripherals/spectranet.c: remember to set paged state in snapshot!
+20110613 peripherals/flash/am29f010.c: ensure flash locations > 64Kb can be
+         written to.
+20110613 memory.c,peripherals/{nic/w5100.c,spectranet.[ch]}: even less stubby
+         W5100 emulation.
+20110615 peripherals/nic/w5100.c: Spectranet can now make a DNS query!
+20110616 peripherals/nic/w5100.c: stop potential deadlock when freeing W5100.
+20110616 peripherals/nic/w5100.c: ensure we don't read more bytes than are free
+         in our rx buffer.
+20110617 peripherals/nic/{Makefile.am,w5100.c,w5100_internals.h,
+         w5100_socket.c}: split W5100 socket code out into a separate file.
+20110617 peripherals/nic/w5100_socket.c: don't process closed sockets (thanks,
+         Winston).
+20110617 peripherals/nic/{w5100_internals.h,w5100_socket.c}: detecting fd
+         changes around the select() call could miss the case of a socket being
+         closed and re-opened with the same fd, so move to explicit
+         invalidation instead.
+20110617 peripherals/nic/w5100_socket.c: socket->old_rx_rd is updated by RECV
+         command, not by new data becoming available. It should be initialised,
+         though.
+20110617 peripherals/nic/w5100_socket.c: don't read from sockets that have no
+         buffer space left to put the data into.
+20110618 peripherals/nic/w5100_socket.c: ensure data is read into the correct
+         space in the case of multiple reads.
+20110618 peripherals/nic/w5100_socket.c: ensure that socket->fd is initialised
+         so we don't try and close() uninitialised values (thanks, valgrind).
+20110619 peripherals/nic/w5100_socket.c: ensure that socket->ok_for_io is
+         initialised (thanks, Winston and valgrind).
+20110619 peripherals/nic/w5100_socket.c: ensure that Spectranet-side sockets
+         are properly cleared out on reset.
+20110619 peripherals/spectranet.c: implement "deny downstream A15" lack of
+         support.
+20110619 peripherals/nic/{w5100_internals.h,w5100_socket.c}: bind sockets when
+         we first attempt to use them rather than we the PORT register is
+         written to to prevent multiple bind attempts. Also deals with the
+         problem of the bytes of PORT being written to in different orders in
+         different bits of the Spectranet code.
+20110620 peripherals/nic/w5100_socket.c: ensure all sockaddr_in structures are
+         zeroed before use.
+20110620 peripherals/nic/{w5100_internals.h,w5100_socket.c}: implement TCP
+         client mode.
+20110621 peripherals/nic/w5100_socket.c: don't add the UDP header to TCP
+         data.
+20110621 peripherals/nic/{w5100_internals.h,w5100_socket.c}: multiple datagrams
+         should not be combined in one sendto() call (thanks, Guesser and Chris
+         Cowley).
+20110621 peripherals/nic/w5100_socket.c: ensure that UDP datagrams which wrap
+         around the transmit buffer are not split into two.
+20110621 peripherals/spectranet.c: don't try and load Spectranet data from a
+         snapshot which doesn't contain it (thanks, Winston).
+20110622 peripherals/nic/w5100_socket.c: remember to implement RECV for TCP
+         sockets (thanks, Guesser).
+20110622 peripherals/spectranet.[ch],z80/{z80.c,z80_ops.c}: implement
+         Spectranet "paged via IO port" flag (thanks, Winston).
+20110623 peripherals/{spectranet.c,nic/w5100.[ch]}: store core W5100 state in
+         snapshots.
+20110623 peripherals/nic/w5100_socket.c: add string.h for memset prototype and
+         add some more verbose error logging and bind information to help with
+         debugging (Fred).
+20110626 peripherals/nic/w5100_socket.c: don't double release the lock if a
+         bind() call fails (thanks, Sergio Baldoví).
+20110628 peripherals/{spectranet.c,nic/w5100.[ch]}: reset the W5100 when the
+         Spectranet is reset.
+20110628 peripherals/nic/w5100_socket.c: don't need to set the sockaddr when
+         reading from a socket.
+20110630 peripherals/nic/w5100.c: check the return code from select(). Also
+         catch the case when a socket is closed between being added to the
+         set and the select call, when select will fail with EBADF (thanks,
+         Winston).
+20110630 peripherals/nic/w5100_socket.c: abort connection if the bind call
+         fails.
+20110630 peripherals/nic/w5100_socket.c: remove duplicated code when opening a
+         new socket.
+20110630 peripherals/nic/w5100_socket.c: set SO_REUSEADDR on new sockets.
+20110630 peripherals/nic/{w5100_internals.h,w5100_socket.c}: handle EOF on TCP
+         sockets.
+20110703 peripherals/nic/{w5100_internals.h,w5100_socket.c}: handle TCP server
+         mode.
+20110703 fuse.c,peripherals/{nic/w5100.c,spectranet.[ch]}: clean up Spectranet
+         on exit (Sergio Baldoví).
+20110703 compat.h,compat/{unix/Makefile.am,socket.c},win32/{Makefile.am,
+         socket.c},configure.in,peripherals/nic/{w5100_internals.h,
+         w5100_socket.c}: first bits of Win32 compatability layer
+         (Sergio Baldoví/Phil)
+20110708 peripherals/nic/{w5100.c,w5100_internals.h,w5100_socket.c}: ensure we
+         don't acquire a lock recursively, thus avoiding deadlock (thanks,
+         Winston).
 20110724 fuse.c: fix a memory leak while making guesses as to what to do with
          non-option arguments (patch #3376243) (thanks, valgrind) (Sergio
          Baldoví).
@@ -3690,6 +3843,8 @@
          (Simon Owen).
 20111106 peripherals/disk/{disk.c,wd_fdc.c},snapshot.c,ui/gtk/options.pl:
          remove unused variables (thanks, gcc 4.6).
+20111107 peripherals/nic/{w5100_internals.h,w5100_socket.c,w5100.c}: stop
+         dumping lots of stuff to stdout.
 20111108 unittests/unittests.c: beginnings of a paging unit test.
 20111114 unittests/unittests.c: add 48K and +2A/+3 paging unit tests.
 20111114 machines/pentagon1024.c: Pentagon1024 does not have 128K-style memory
@@ -3708,7 +3863,27 @@
 20111118 unittests/unittests.c: add Spectrum SE paging test.
 20111119 unittests/unittests.c: add Scorpion paging test.
 20111119 unittests/unittests.c: add 48K NTSC contention/floating bus results.
+20111119 machines/specplus3.c: fix all RAM modes (thanks, unittests).
+20111119 machines/scorpion.c: fix all RAM mode (thanks, unittests).
+20111119 machines/pentagon1024.c: fix all RAM mode (thanks, unittests).
+20111120 ui/scaler/scalers.c: remove unused variable (thanks, gcc 4.6).
+20111120 machines/{pentagon1024.c,pentagon512.c,scorpion.c,spec128.c,spec16.c,
+         spec48.c,specplus3.c,spec_se.c,tc2048.c,tc2068.c,ts2068.c},memory.[ch],
+         peripherals/{dck.c,scld.c}: a fairly brute-force removal of the almost
+         unnecessary memory_map_{home,dock,exrom} layer. The only thing that
+         this makes hard is .dck files containing a "HOME" chunk - will worry
+         about that later.
+20111121 machines/tc2068.c: start fixing Timex paging.
+20111121 machines/{tc2068.c,ts2068.c}: more Timex paging fixes.
+20111121 machines/spec_se: mostly fix Spectrum SE paging.
+20111121 machines/spec_se.c,memory.[ch],peripherals/scld.c: finish fixing
+         Spectrum SE paging.
+20111121 machines/spec_se.c: ensure Spectrum SE has contended RAM.
+20111121 machines/spec_se.c: revert unintended half of last change.
+20111121 machines/spec_se.c: add missing brace (thanks, Guesser).
 20111121 peripherals/if1.[ch],unittests/unittests.[ch]: add If1 unit test.
+20111122 machines/spec48.c: ensure the ROM is paged back in when a device stops
+         asserting /ROMCS (thanks, Guesser).
 20111122 peripherals/if1.c,unittests/unittests.[ch]: ensure that we get the
          expected pages after the If1 has paged out again.
 20111122 peripherals/if2.[ch],unittests/unittests.[ch]: add If2 unit test.
@@ -3729,6 +3904,41 @@
 20111128 peripherals/ide/zxatasp.[ch],unittests/unittests.c: add ZXATASP unit
          test.
 20111216 peripherals/ide/zxcf.[ch],unittests/unittests.c: add ZXCF unit test.
+<<<<<<< .mine
+20111217 peripherals/if1.c: fix paging for 4K page size (thanks, unittests).
+20111217 peripherals/disk/opus.c: make Opus paging less wrong.
+20111217 memory.[ch],peripherals/disk/opus.c,unittests/unittests.[ch]: make
+         Opus paging arguably even less wrong. It's still not right, though.
+20111218 menu_data.dat,menu.h,ui/{options.dat,widget/{menu.c,widget.[ch]}}:
+         peripherals menu had become insanely big; split it in two.
+20111218 peripherals/ide/divide.c: fix paging for 4K page size (thanks,
+         unittests).
+20111218 peripherals/ide/zxatasp.c: fix paging for 4K page size (thanks,
+         unittests). All unit tests now pass.
+20111219 peripherals/ide/divide.c: access the correct object.
+20111219 compat/unix/file.c,peripherals/ide/divide.c: fix warnings.
+20111220 fuse.c,utils.[ch]: make selecting IDE files from the command-line
+	 work properly.
+20111220 hacking/{Makefile.am,peripheral_tests.txt},lib/{Makefile.am,
+	 tests/idedos-success.hdf.bz2}: add some trivial peripheral smoke
+	 tests.
+20111220 hacking/peripheral_tests.txt,lib/{Makefile.am,
+         tests/fatware-success.hdf.bz2}: add DivIDE smoke test.
+20111220 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.mdr}: add
+         Interface I smoke test.
+20111221 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.udi}: add
+	 Beta Disk smoke test.
+20111221 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.opd}: add
+	 Opus smoke test.
+20111223 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.mgt.bz2}:
+	 add +D smoke test (Stuart).
+20111223 peripherals/nic/{w5100.c,w5100_socket.c}: things on the socket thread
+         can't call ui_error as X11 doesn't like that being called from a
+         different thread.
+20111223 hacking/valgrind.supp: add valgrind suppressions file for third party
+         libraries.
+20111223 peripherals/nic/{w5100_internals.h,w5100_socket.c}: make UDP servers
+         bind to the right port (Phil/Sergio).
 20111230 ui/sdl/sdldisplay.c: modify sdldisplay_find_best_fullscreen_scaler()
          to prevent the search for a suitable fullscreen scaler from becoming
          recursive when there is only one high resolution mode available
@@ -3738,3 +3948,11 @@
          Baldoví).
 20120103 configure.in: prefer use of SDL joystick code over libjsw which is
          not maintained (patch #3467163) (Sergio Baldoví).
+20120103 ui/gtk/debugger.c: combine identical lines in the GTK+ debugger memory
+         map, so we don't display 16 lines if we don't need to.
+20120106 peripherals/flash: add .deps and Makefile to the ignore property
+         (Fred).
+20120106 README: add suggested compiler for Mac OS X (Fred).
+20120109 debugger/breakpoint.c: return the correct page when trying to match
+	 breakpoints (fixes bug #3470425).
+20120109 debugger/breakpoint.c: remove debugging code.

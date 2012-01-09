@@ -74,7 +74,7 @@ spec48_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_48,
+  error = machine_load_rom( 0, settings_current.rom_48,
                             settings_default.rom_48, 0x4000 );
   if( error ) return error;
 
@@ -105,34 +105,17 @@ spec48_common_display_setup( void )
 int
 spec48_common_reset( void )
 {
-  size_t i;
-
-  /* ROM 0, RAM 5, RAM 2, RAM 0 */
-  memory_map_home[0] = &memory_map_rom[ 0];
-  memory_map_home[1] = &memory_map_rom[ 1];
-
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
-  memory_map_home[4] = &memory_map_ram[ 4];
-  memory_map_home[5] = &memory_map_ram[ 5];
-
-  memory_map_home[6] = &memory_map_ram[ 0];
-  memory_map_home[7] = &memory_map_ram[ 1];
-
-  /* 0x4000 - 0x7fff contended */
-  memory_map_home[2]->contended = memory_map_home[3]->contended = 1;
-
-  /* 0x8000 - 0xffff not contended */
-  memory_map_home[ 4]->contended = memory_map_home[ 5]->contended = 0;
-  memory_map_home[ 6]->contended = memory_map_home[ 7]->contended = 0;
-
-  /* Mark as present/writeable */
-  for( i = 2; i < 8; ++i )
-    memory_map_home[i]->writable = 1;
-
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
+  /* 0x0000: ROM 0 */
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
+  /* 0x4000: RAM 5, contended */
+  memory_ram_set_16k_contention( 5, 1 );
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
+  /* 0x8000: RAM 2, not contended */
+  memory_ram_set_16k_contention( 2, 0 );
+  memory_map_16k( 0x8000, memory_map_ram, 2 );
+  /* 0xc000: RAM 0, not contended */
+  memory_ram_set_16k_contention( 0, 0 );
+  memory_map_16k( 0xc000, memory_map_ram, 0 );
 
   return 0;
 }
@@ -140,11 +123,7 @@ spec48_common_reset( void )
 int
 spec48_memory_map( void )
 {
-  /* By default, 0x0000 to 0x3fff come from the home bank */
-  memory_map_read[0] = memory_map_write[0] = *memory_map_home[0];
-  memory_map_read[1] = memory_map_write[1] = *memory_map_home[1];
-
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
   memory_romcs_map();
-
   return 0;
 }

@@ -1,7 +1,7 @@
 /* speccyboot.c: SpeccyBoot Ethernet emulation
    See http://speccyboot.sourceforge.net/
    
-   Copyright (c) 2009-2010 Patrik Persson, Philip Kendall
+   Copyright (c) 2009-2011 Patrik Persson, Philip Kendall
    
    $Id$
    
@@ -80,14 +80,14 @@ static const periph_t speccyboot_periph = {
 
 static int speccyboot_rom_active = 0;  /* SpeccyBoot ROM paged in? */
 static int speccyboot_memory_source;
-static memory_page speccyboot_memory_map_romcs;
+static memory_page speccyboot_memory_map_romcs[ MEMORY_PAGES_IN_8K ];
 
 static void
 speccyboot_memory_map( void )
 {
   if ( !speccyboot_rom_active ) return;
 
-  memory_map_read[0] = memory_map_write[0] = speccyboot_memory_map_romcs;
+  memory_map_romcs_8k( 0x0000, speccyboot_memory_map_romcs );
 }
 
 static void
@@ -95,12 +95,10 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
 {
   static int tap_opened = 0;
 
-  if ( machine_load_rom_bank( &speccyboot_memory_map_romcs, 0, 0,
+  if ( machine_load_rom_bank( speccyboot_memory_map_romcs, 0,
                               settings_current.rom_speccyboot,
                               settings_default.rom_speccyboot, 0x2000 ) )
     return;
-
-  speccyboot_memory_map_romcs.writable = 0;
 
   out_register_state = 0xff;  /* force transitions to low */
 
@@ -177,6 +175,8 @@ speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte va
 int
 speccyboot_init( void )
 {
+  int i;
+
   nic = nic_enc28j60_alloc();
 
   static module_info_t speccyboot_module_info = {
@@ -190,7 +190,8 @@ speccyboot_init( void )
   module_register( &speccyboot_module_info );
 
   speccyboot_memory_source = memory_source_register( "SpeccyBoot" );
-  speccyboot_memory_map_romcs.source = speccyboot_memory_source;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    speccyboot_memory_map_romcs[i].source = speccyboot_memory_source;
 
   periph_register( PERIPH_TYPE_SPECCYBOOT, &speccyboot_periph );
 

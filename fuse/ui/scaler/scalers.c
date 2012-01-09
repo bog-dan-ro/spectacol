@@ -695,7 +695,7 @@ FUNCTION( scaler_2xSaI )( const libspectrum_byte *srcPtr,
 
 	register libspectrum_dword colorA, colorB;
 	libspectrum_dword colorC, colorD, colorE, colorF, colorG, colorH,
-	  colorI, colorJ, colorK, colorL, colorM, colorN, colorO, colorP;
+	  colorI, colorJ, colorK, colorL, colorM, colorN, colorO;
 	libspectrum_dword product, product1, product2;
 
 /*---------------------------------------
@@ -703,6 +703,8 @@ FUNCTION( scaler_2xSaI )( const libspectrum_byte *srcPtr,
                                          G|A B|K
                                          H|C D|L
                                          M|N O|P
+
+   Note that P does not contribute to the algorithm
 */
 	colorI = *(bP - nextlineSrc - 1);
 	colorE = *(bP - nextlineSrc);
@@ -722,7 +724,6 @@ FUNCTION( scaler_2xSaI )( const libspectrum_byte *srcPtr,
 	colorM = *(bP + 2 * nextlineSrc - 1);
 	colorN = *(bP + 2 * nextlineSrc);
 	colorO = *(bP + 2 * nextlineSrc + 1);
-	colorP = *(bP + 2 * nextlineSrc + 2);
 
 	if ((colorA == colorD) && (colorB != colorC)) {
 	  if (((colorA == colorE) && (colorB == colorL)) ||

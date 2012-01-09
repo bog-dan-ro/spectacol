@@ -27,31 +27,37 @@ Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Checkbox, Snap (j)oystick prompt, joy_prompt, INPUT_KEY_j
 Checkbox, Late t(i)mings, late_timings, INPUT_KEY_i
 
-peripherals
-Peripheral Options
+peripherals_general
+General Peripheral Options
 Checkbox, (K)empston joystick, joy_kempston, INPUT_KEY_k
 Checkbox, Kempston (m)ouse, kempston_mouse, INPUT_KEY_m
 Checkbox, (S)wap mouse buttons, mouse_swap_buttons, INPUT_KEY_s
-Checkbox, Full(e)r Box, fuller, INPUT_KEY_e
-Checkbox, Mel(o)dik, melodik, INPUT_KEY_o
-Checkbox, Inter(f)ace I, interface1, INPUT_KEY_f
-Checkbox, (I)nterface II, interface2, INPUT_KEY_i
+Checkbox, (F)uller Box, fuller, INPUT_KEY_f
+Checkbox, M(e)lodik, melodik, INPUT_KEY_e
+Checkbox, (I)nterface I, interface1, INPUT_KEY_i
+Checkbox, In(t)erface II, interface2, INPUT_KEY_t
 Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
+Checkbox, Speccy(B)oot interface, speccyboot, INPUT_KEY_b
+Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
+Checkbox, Spectra(n)et, spectranet, INPUT_KEY_n
+Checkbox, Spe(c)tranet disable, spectranet_disable, INPUT_KEY_c
+Posthook, periph_update
+
+peripherals_disk
+Disk Peripheral Options
 Checkbox, Simple (8)-bit IDE, simpleide_active, INPUT_KEY_8
 Checkbox, (Z)XATASP interface, zxatasp_active, INPUT_KEY_z
-Checkbox, ZXATASP (u)pload, zxatasp_upload, INPUT_KEY_u
-Checkbox, ZXATASP (w)rite protect, zxatasp_wp, INPUT_KEY_w
+Checkbox, ZXATASP up(l)oad, zxatasp_upload, INPUT_KEY_l
+Checkbox, Z(X)ATASP write protect, zxatasp_wp, INPUT_KEY_x
 Checkbox, ZX(C)F interface, zxcf_active, INPUT_KEY_c
-Checkbox, ZXCF up(l)oad, zxcf_upload, INPUT_KEY_l
-Checkbox, Di(v)IDE interface, divide_enabled, INPUT_KEY_v
-Checkbox, DivIDE w(r)ite protect, divide_wp, INPUT_KEY_r
-Checkbox, +D i(n)terface, plusd, INPUT_KEY_n
-Checkbox, DISCiPLE interf(a)ce, disciple, INPUT_KEY_a
+Checkbox, ZXCF (u)pload, zxcf_upload, INPUT_KEY_u
+Checkbox, Div(I)DE interface, divide_enabled, INPUT_KEY_i
+Checkbox, DivIDE (w)rite protect, divide_wp, INPUT_KEY_w
+Checkbox, +(D) interface, plusd, INPUT_KEY_d
+Checkbox, DISCi(P)LE interf(a)ce, disciple, INPUT_KEY_p
 Checkbox, (B)eta 128 interface, beta128, INPUT_KEY_b
 Checkbox, Beta 128 (a)uto-boot in 48K machines, beta128_48boot, INPUT_KEY_a
-Checkbox, Opus Discovery in(t)erface, opus, INPUT_KEY_t
-Checkbox, S(p)eccyBoot interface, speccyboot, INPUT_KEY_p
-Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
+Checkbox, (O)pus Discovery interface, opus, INPUT_KEY_o
 Posthook, periph_update
 
 rzx

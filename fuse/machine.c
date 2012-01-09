@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2008 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -201,7 +201,7 @@ machine_get_id( libspectrum_machine type )
 static int
 machine_select_machine( fuse_machine_info *machine )
 {
-  int width, height, i;
+  int width, height;
   int capabilities;
 
   machine_current = machine;
@@ -235,12 +235,6 @@ machine_select_machine( fuse_machine_info *machine )
 
   sound_init( settings_current.sound_device );
 
-  /* Mark RAM as not-present/read-only. The machine's reset function will
-   * mark available pages as present/writeable.
-   */
-  for( i = 0; i < 2 * SPECTRUM_RAM_PAGES; i++ )
-    memory_map_ram[i].writable = 0;
-
   /* Do a hard reset */
   if( machine_reset( 1 ) ) return 1;
 
@@ -256,40 +250,31 @@ machine_select_machine( fuse_machine_info *machine )
 }
 
 int
-machine_load_rom_bank_from_buffer( memory_page* bank_map, size_t which,
-                                   int page_num, unsigned char *buffer,
-                                   size_t length, int custom )
+machine_load_rom_bank_from_buffer( memory_page* bank_map, int page_num,
+  unsigned char *buffer, size_t length, int custom )
 {
-  size_t i, offset;
-  
-  bank_map[ which ].offset = 0;
-  bank_map[ which ].page_num = page_num;
-  bank_map[ which ].page = memory_pool_allocate( length );
-  if( !bank_map[ which ].page ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-              __LINE__ );
-    return 1;
-  }
+  size_t offset;
+  libspectrum_byte *data = memory_pool_allocate( length );
+  memory_page *page;
 
-  memcpy( bank_map[ which ].page, buffer, length );
-  bank_map[ which ].save_to_snapshot = custom;
+  memcpy( data, buffer, length );
 
-  for( i = 1, offset = MEMORY_PAGE_SIZE;
+  for( page = &bank_map[ page_num * MEMORY_PAGES_IN_16K ], offset = 0;
        offset < length;
-       i++, offset += MEMORY_PAGE_SIZE   ) {
-    bank_map[ which + i ].offset = offset;
-    bank_map[ which + i ].page_num = page_num;
-    bank_map[ which + i ].page = bank_map[ which ].page + offset;
-    bank_map[ which + i ].save_to_snapshot = custom;
+       page++, offset += MEMORY_PAGE_SIZE ) {
+    page->offset = offset;
+    page->page_num = page_num;
+    page->page = data + offset;
+    page->writable = 0;
+    page->save_to_snapshot = custom;
   }
 
   return 0;
 }
 
 static int
-machine_load_rom_bank_from_file( memory_page* bank_map, size_t which,
-                                 int page_num, const char *filename,
-                                 size_t expected_length, int custom )
+machine_load_rom_bank_from_file( memory_page* bank_map, int page_num,
+  const char *filename, size_t expected_length, int custom )
 {
   int error;
   utils_file rom;
@@ -310,8 +295,8 @@ machine_load_rom_bank_from_file( memory_page* bank_map, size_t which,
     return 1;
   }
 
-  error = machine_load_rom_bank_from_buffer( bank_map, which, page_num,
-                                             rom.buffer, rom.length, custom );
+  error = machine_load_rom_bank_from_buffer( bank_map, page_num, rom.buffer,
+    rom.length, custom );
 
   error |= utils_close_file( &rom );
 
@@ -319,29 +304,28 @@ machine_load_rom_bank_from_file( memory_page* bank_map, size_t which,
 }
 
 int
-machine_load_rom_bank( memory_page* bank_map, size_t which, int page_num,
-                       const char *filename, const char *fallback,
-                       size_t expected_length )
+machine_load_rom_bank( memory_page* bank_map, int page_num,
+  const char *filename, const char *fallback, size_t expected_length )
 {
   int custom = 0;
   int retval;
 
   if( fallback ) custom = strcmp( filename, fallback );
 
-  retval = machine_load_rom_bank_from_file( bank_map, which, page_num,
-                                            filename, expected_length, custom );
+  retval = machine_load_rom_bank_from_file( bank_map, page_num, filename,
+    expected_length, custom );
   if( retval && fallback )
-    retval = machine_load_rom_bank_from_file( bank_map, which, page_num,
-                                              fallback, expected_length, 0 );
+    retval = machine_load_rom_bank_from_file( bank_map, page_num, fallback,
+      expected_length, 0 );
   return retval;
 }
 
 int
-machine_load_rom( size_t which, int page_num, const char *filename,
-                  const char *fallback, size_t expected_length )
+machine_load_rom( int page_num, const char *filename, const char *fallback,
+  size_t expected_length )
 {
-  return machine_load_rom_bank( memory_map_rom, which, page_num, filename,
-                                fallback, expected_length );
+  return machine_load_rom_bank( memory_map_rom, page_num, filename, fallback,
+    expected_length );
 }
 
 int

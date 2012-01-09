@@ -542,3 +542,17 @@ utils_read_screen( const char *filename, utils_file *screen )
 
   return 0;
 }
+
+char*
+utils_safe_strdup( const char *src )
+{
+  char *dest = NULL;
+  if( src ) {
+    dest = strdup( src );
+    if( !dest ) {
+      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
+      fuse_abort();
+    }
+  }
+  return dest;
+}

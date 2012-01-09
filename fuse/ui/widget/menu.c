@@ -423,9 +423,15 @@ menu_options_general( int action )
 }
 
 void
-menu_options_peripherals( int action )
+menu_options_peripherals_general( int action )
 {
-  widget_do( WIDGET_TYPE_PERIPHERALS, NULL );
+  widget_do( WIDGET_TYPE_PERIPHERALS_GENERAL, NULL );
+}
+
+void
+menu_options_peripherals_disk( int action )
+{
+  widget_do( WIDGET_TYPE_PERIPHERALS_DISK, NULL );
 }
 
 void

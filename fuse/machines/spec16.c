@@ -40,8 +40,8 @@
 
 static int spec16_reset( void );
 
-static libspectrum_byte *empty_chunk;
-static memory_page empty_mapping;
+static memory_page empty_mapping[MEMORY_PAGES_IN_16K];
+static int empty_mapping_allocated = 0;
 
 int spec16_init( fuse_machine_info *machine )
 {
@@ -64,49 +64,49 @@ int spec16_init( fuse_machine_info *machine )
   return 0;
 }
 
+static void
+ensure_empty_mapping( void )
+{
+  int i;
+
+  if( empty_mapping_allocated ) return;
+
+  libspectrum_byte *empty_chunk = memory_pool_allocate_persistent( 0x4000, 1 );
+  memset( empty_chunk, 0xff, 0x4000 );
+
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
+    memory_page *page = &empty_mapping[i];
+    page->page = empty_chunk + i * MEMORY_PAGE_SIZE;
+    page->writable = 0;
+    page->contended = 0;
+    page->source = memory_source_none;
+  }
+
+  empty_mapping_allocated = 1;
+}
+
 static int
 spec16_reset( void )
 {
   int error;
-  size_t i;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_16, 
+  error = machine_load_rom( 0, settings_current.rom_16, 
                             settings_default.rom_16, 0x4000 );
   if( error ) return error;
+
+  ensure_empty_mapping();
 
   periph_clear();
   machines_periph_48();
   periph_update();
 
-  /* ROM 0, RAM 5, nothing, nothing */
-  memory_map_home[0] = &memory_map_rom[ 0];
-  memory_map_home[1] = &memory_map_rom[ 1];
+  /* The one RAM page is contended */
+  memory_ram_set_16k_contention( 5, 1 );
 
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
-  if( !empty_chunk ) {
-    empty_chunk = memory_pool_allocate_persistent( MEMORY_PAGE_SIZE, 1 );
-
-    memset( empty_chunk, 0xff, MEMORY_PAGE_SIZE );
-
-    empty_mapping.page = empty_chunk;
-    empty_mapping.writable = 0;
-    empty_mapping.contended = 0;
-    empty_mapping.source = memory_source_none;
-  }
-
-  memory_map_home[4] = memory_map_home[5] = &empty_mapping;
-  memory_map_home[6] = memory_map_home[7] = &empty_mapping;
-
-  /* The RAM page is present/writable and contended */
-  for( i = 2; i <= 3; i++ ) {
-    memory_map_home[ i ]->writable = 1;
-    memory_map_home[ i ]->contended = 1;
-  }
-
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
+  memory_map_16k( 0x8000, empty_mapping, 0 );
+  memory_map_16k( 0xc000, empty_mapping, 0 );
 
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;

@@ -116,18 +116,24 @@ dck_reset( void )
   }
 
   while( dck->dck[num_block] != NULL ) {
-    memory_page **mem;
+    memory_page *bank;
     int i;
 
     switch( dck->dck[num_block]->bank ) {
     case LIBSPECTRUM_DCK_BANK_HOME:
-      mem = memory_map_home;
+      /* FIXME: make this work again */
+      ui_error( UI_ERROR_INFO, "%s:%d: HOME bank unsupported", __FILE__, __LINE__ );
+      libspectrum_dck_free( dck, 0 );
+      return 1;
+      /* Used to say:
+      bank = memory_map_home;
       break;
+      */
     case LIBSPECTRUM_DCK_BANK_DOCK:
-      mem = memory_map_dock;
+      bank = timex_dock;
       break;
     case LIBSPECTRUM_DCK_BANK_EXROM:
-      mem = memory_map_exrom;
+      bank = timex_exrom;
       break;
     default:
       ui_error( UI_ERROR_INFO, "Sorry, bank ID %i is unsupported",
@@ -138,7 +144,8 @@ dck_reset( void )
 
     for( i = 0; i < 8; i++ ) {
 
-      memory_page *page = mem[i];
+      libspectrum_byte *data;
+      int j;
 
       switch( dck->dck[num_block]->access[i] ) {
 
@@ -146,11 +153,15 @@ dck_reset( void )
         break;
 
       case LIBSPECTRUM_DCK_PAGE_ROM:
-        page->page = memory_pool_allocate( MEMORY_PAGE_SIZE );
-	memcpy( page->page, dck->dck[num_block]->pages[i],
-		MEMORY_PAGE_SIZE );
-        page->writable = 0;
-        page->save_to_snapshot = 1;
+        data = memory_pool_allocate( 0x2000 );
+	memcpy( data, dck->dck[num_block]->pages[i], 0x2000 );
+        for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+          memory_page *page = &bank[i * MEMORY_PAGES_IN_8K + j];
+          page->offset = j * MEMORY_PAGE_SIZE;
+          page->writable = 0;
+          page->save_to_snapshot = 1;
+          page->page = data + page->offset;
+        }
         break;
 
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
@@ -160,14 +171,21 @@ dck_reset( void )
 	   blocks from the HOME bank into the appropriate page; in
 	   other cases, we allocate ourselves a new page to store the
 	   contents in */
-        if( !(dck->dck[num_block]->bank == LIBSPECTRUM_DCK_BANK_HOME && i>1) ) {
-          page->page = memory_pool_allocate( MEMORY_PAGE_SIZE );
-          page->writable = 1;
-          page->save_to_snapshot = 1;
+        if( dck->dck[num_block]->bank == LIBSPECTRUM_DCK_BANK_HOME && i>1 ) {
+          for( j = 0; j < MEMORY_PAGES_IN_8K; j++ )
+            memcpy( &bank[i * MEMORY_PAGES_IN_8K + j],
+              dck->dck[num_block]->pages[i], MEMORY_PAGE_SIZE );
+        } else {
+          data = memory_pool_allocate( 0x2000 );
+          memcpy( data, dck->dck[num_block]->pages[i], 0x2000 );
+          for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+            memory_page *page = &bank[i * MEMORY_PAGES_IN_8K + j];
+            page->offset = j * MEMORY_PAGE_SIZE;
+            page->writable = 1;
+            page->save_to_snapshot = 1;
+            page->page = data + page->offset;
+          }
         }
-	
-	memcpy( page->page, dck->dck[num_block]->pages[i],
-		MEMORY_PAGE_SIZE );
         break;
 
       }

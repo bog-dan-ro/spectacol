@@ -120,4 +120,17 @@ void compat_timer_sleep( int ms );
 
 int compat_get_tap( const char *interface_name );
 
+/* Socket handling */
+
+#ifndef WIN32
+typedef int compat_socket_t;
+#else                           /* #ifndef WIN32 */
+typedef SOCKET compat_socket_t;
+#endif
+
+extern const compat_socket_t compat_socket_invalid;
+
+int compat_socket_close( compat_socket_t fd );
+int compat_socket_get_error( void );
+
 #endif				/* #ifndef FUSE_COMPAT_H */

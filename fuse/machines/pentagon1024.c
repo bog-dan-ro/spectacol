@@ -69,18 +69,17 @@ static int
 pentagon1024_reset(void)
 {
   int error;
-  int i;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_pentagon1024_0,
+  error = machine_load_rom( 0, settings_current.rom_pentagon1024_0,
                             settings_default.rom_pentagon1024_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_pentagon1024_1,
+  error = machine_load_rom( 1, settings_current.rom_pentagon1024_1,
                             settings_default.rom_pentagon1024_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_pentagon1024_3,
+  error = machine_load_rom( 2, settings_current.rom_pentagon1024_3,
                             settings_default.rom_pentagon1024_3, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
+  error = machine_load_rom_bank( beta_memory_map_romcs, 0,
                                  settings_current.rom_pentagon1024_2,
                                  settings_default.rom_pentagon1024_2, 0x4000 );
   if( error ) return error;
@@ -90,10 +89,6 @@ pentagon1024_reset(void)
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
-
-  /* Mark the last 896K as present/writeable */
-  for( i = 16; i < 128; i++ )
-    memory_map_ram[i].writable = 1;
 
   beta_builtin = 1;
   beta_active = 1;
@@ -149,7 +144,6 @@ pentagon1024_v22_memoryport_write( libspectrum_word port GCC_UNUSED,
 static int pentagon1024_memory_map( void )
 {
   int rom, page, screen;
-  size_t i;
 
   screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
   if( memory_current_screen != screen ) {
@@ -167,8 +161,7 @@ static int pentagon1024_memory_map( void )
   machine_current->ram.current_rom = rom;
 
   if( machine_current->ram.last_byte2 & 0x08 ) {
-    memory_map_home[0] = &memory_map_ram[ 0 ];    /* v2.2 */
-    memory_map_home[1] = &memory_map_ram[ 1 ];    /* v2.2 */
+    memory_map_16k( 0x0000, memory_map_ram, 0 );  /* v2.2 */
     machine_current->ram.special = 1;             /* v2.2 */
   } else {
     spec128_select_rom( rom );
@@ -183,9 +176,6 @@ static int pentagon1024_memory_map( void )
 
   spec128_select_page( page );
   machine_current->ram.current_page = page;
-
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();
 

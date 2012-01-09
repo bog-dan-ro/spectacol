@@ -210,6 +210,13 @@ libspectrum_snap_alloc( void )
 
   libspectrum_snap_set_melodik_active( snap, 0 );
 
+  libspectrum_snap_set_spectranet_active( snap, 0 );
+  libspectrum_snap_set_spectranet_all_traps_disabled( snap, 0 );
+  libspectrum_snap_set_spectranet_rst8_trap_disabled( snap, 0 );
+  libspectrum_snap_set_spectranet_w5100( snap, 0, NULL );
+  libspectrum_snap_set_spectranet_flash( snap, 0, NULL );
+  libspectrum_snap_set_spectranet_ram( snap, 0, NULL );
+  
   return snap;
 }
 
@@ -250,6 +257,13 @@ libspectrum_snap_free( libspectrum_snap *snap )
 
   if( libspectrum_snap_interface1_rom( snap, 0 ) )
     libspectrum_free( libspectrum_snap_interface1_rom( snap, 0 ) );
+
+  if( libspectrum_snap_spectranet_w5100( snap, 0 ) )
+    libspectrum_free( libspectrum_snap_spectranet_w5100( snap, 0 ) );
+  if( libspectrum_snap_spectranet_flash( snap, 0 ) )
+    libspectrum_free( libspectrum_snap_spectranet_flash( snap, 0 ) );
+  if( libspectrum_snap_spectranet_ram( snap, 0 ) )
+    libspectrum_free( libspectrum_snap_spectranet_ram( snap, 0 ) );
 
   libspectrum_free( snap );
 

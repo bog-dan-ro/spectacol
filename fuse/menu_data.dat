@@ -65,7 +65,11 @@ File/E_xit..., Item, F10
 _Options, Branch
 Options/_General..., Item, F4
 Options/_Sound..., Item
-Options/_Peripherals..., Item
+
+Options/_Peripherals, Branch
+Options/Peripherals/_General..., Item
+Options/Peripherals/_Disk..., Item
+
 Options/_RZX..., Item
 
 Options/_Joysticks, Branch

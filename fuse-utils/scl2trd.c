@@ -90,7 +90,6 @@ Scl2Trd(char *oldname, char *newname)
   void *TRDh;
   void *tmp;
 
-  unsigned int *trd_free;
   unsigned char *trd_fsec;
   unsigned char *trd_ftrk;
   unsigned char *trd_files;
@@ -148,7 +147,6 @@ Scl2Trd(char *oldname, char *newname)
   read(TRD, TRDh, 4096);
 
   tmp = (char *) TRDh + 0x8E5;
-  trd_free = (unsigned int *) tmp;
   trd_files = (unsigned char *) TRDh + 0x8E4;
   trd_fsec = (unsigned char *) TRDh + 0x8E1;
   trd_ftrk = (unsigned char *) TRDh + 0x8E2;

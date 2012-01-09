@@ -75,6 +75,8 @@ fuller, boolean, 0
 melodik, boolean, 0
 speccyboot, boolean, 0
 specdrum, boolean, 0
+spectranet, boolean, 0
+spectranet_disable, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1
@@ -220,6 +222,7 @@ rom_opus, string, "opus.rom",
 rom_plusd, string, "plusd.rom",
 rom_disciple, string, "disciple.rom",
 rom_beta128, string, "trdos.rom",
+rom_spectranet, string, "spectranet.rom"
 
 drive_plus3a_type, string, NULL
 drive_plus3b_type, string, NULL

@@ -64,7 +64,7 @@ compat_file_read( compat_fd fd, utils_file *file )
   if( bytes != file->length ) {
     ui_error( UI_ERROR_ERROR,
               "error reading file: expected %lu bytes, but read only %lu",
-              file->length, bytes );
+              (unsigned long)file->length, (unsigned long)bytes );
     return 1;
   }
 
@@ -78,7 +78,7 @@ compat_file_write( compat_fd fd, const unsigned char *buffer, size_t length )
   if( bytes != length ) {
     ui_error( UI_ERROR_ERROR,
               "error writing file: expected %lu bytes, but wrote only %lu",
-              length, bytes );
+              (unsigned long)length, (unsigned long)bytes );
     return 1;
   }
 
