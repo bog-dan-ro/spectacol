@@ -61,7 +61,6 @@
 /* A 16KB memory chunk accessible by the Z80 when /ROMCS is low */
 memory_page beta_memory_map_romcs[MEMORY_PAGES_IN_16K];
 static int beta_memory_source;
-static int beta_memory_source;
 
 int beta_available = 0;
 int beta_active = 0;

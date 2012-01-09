@@ -3904,7 +3904,6 @@
 20111128 peripherals/ide/zxatasp.[ch],unittests/unittests.c: add ZXATASP unit
          test.
 20111216 peripherals/ide/zxcf.[ch],unittests/unittests.c: add ZXCF unit test.
-<<<<<<< .mine
 20111217 peripherals/if1.c: fix paging for 4K page size (thanks, unittests).
 20111217 peripherals/disk/opus.c: make Opus paging less wrong.
 20111217 memory.[ch],peripherals/disk/opus.c,unittests/unittests.[ch]: make
@@ -3956,3 +3955,5 @@
 20120109 debugger/breakpoint.c: return the correct page when trying to match
 	 breakpoints (fixes bug #3470425).
 20120109 debugger/breakpoint.c: remove debugging code.
+20120109 peripherals/{disk/{beta.c,plusd.c},ide/{zxatasp.c,zxcf.c}: fix up
+         mismerged files.

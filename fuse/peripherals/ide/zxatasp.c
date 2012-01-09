@@ -43,7 +43,6 @@
 /* A 16KB memory chunk accessible by the Z80 when /ROMCS is low */
 static memory_page zxatasp_memory_map_romcs[MEMORY_PAGES_IN_16K];
 static int zxatasp_memory_source;
-static int zxatasp_memory_source;
 
 /*
   TBD: Allow memory size selection (128K/512K)

@@ -50,7 +50,6 @@
 static memory_page plusd_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page plusd_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
 static int plusd_memory_source;
-static int plusd_memory_source;
 
 int plusd_available = 0;
 int plusd_active = 0;
@@ -202,8 +201,10 @@ plusd_reset( int hard_reset )
 
   machine_current->ram.romcs = 0;
 
-  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+    plusd_memory_map_romcs_ram[ i ].page = &plusd_ram[ i * MEMORY_PAGE_SIZE ];
     plusd_memory_map_romcs_ram[ i ].writable = 1;
+  }
 
   plusd_available = 1;
   plusd_active = 1;
