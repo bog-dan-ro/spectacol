@@ -3957,3 +3957,4 @@
 20120109 debugger/breakpoint.c: remove debugging code.
 20120109 peripherals/{disk/{beta.c,plusd.c},ide/{zxatasp.c,zxcf.c}: fix up
          mismerged files.
+20120109 peripherals/if1.c: one more mismerged file.
