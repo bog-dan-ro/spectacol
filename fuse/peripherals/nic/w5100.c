@@ -96,12 +96,14 @@ w5100_io_thread( void *arg )
   while( !self->stop_io_thread ) {
     fd_set readfds, writefds;
     int active;
-    int max_fd = self->pipe_read;
+    compat_socket_t selfpipe_socket =
+      compat_socket_selfpipe_get_read_fd( self->selfpipe );
+    int max_fd = selfpipe_socket;
 
     FD_ZERO( &readfds );
-    FD_SET( self->pipe_read, &readfds );
-
     FD_ZERO( &writefds );
+
+    FD_SET( selfpipe_socket, &readfds );
 
     for( i = 0; i < 4; i++ )
       nic_w5100_socket_add_to_sets( &self->socket[i], &readfds, &writefds,
@@ -120,38 +122,31 @@ w5100_io_thread( void *arg )
     nic_w5100_debug( "w5100: io thread wake; %d active\n", active );
 
     if( active != -1 ) {
-      if( FD_ISSET( self->pipe_read, &readfds ) ) {
-        char bitbucket;
-        nic_w5100_debug( "w5100: discarding pipe data\n" );
-        read( self->pipe_read, &bitbucket, 1 );
+      if( FD_ISSET( selfpipe_socket, &readfds ) ) {
+        nic_w5100_debug( "w5100: discarding selfpipe data\n" );
+        compat_socket_selfpipe_discard_data( self->selfpipe );
       }
 
       for( i = 0; i < 4; i++ )
         nic_w5100_socket_process_io( &self->socket[i], readfds, writefds );
     }
-    else if( errno == EBADF ) {
+    else if( compat_socket_get_error() == compat_socket_EBADF ) {
       /* Do nothing - just loop again */
     }
     else {
-      nic_w5100_debug( "w5100: select returned unexpected errno %d: %s\n", errno, strerror(errno) );
+      nic_w5100_debug( "w5100: select returned unexpected errno %d: %s\n",
+                       compat_socket_get_error(),
+                       compat_socket_get_strerror() );
     }
   }
 
   return NULL;
 }
 
-void
-nic_w5100_wake_io_thread( nic_w5100_t *self )
-{
-  const char dummy = 0;
-  write( self->pipe_write, &dummy, 1 );
-}
-
 nic_w5100_t*
 nic_w5100_alloc( void )
 {
   int error;
-  int pipefd[2];
   int i;
 
   nic_w5100_t *self = malloc( sizeof( *self ) );
@@ -160,19 +155,12 @@ nic_w5100_alloc( void )
     fuse_abort();
   }
 
+  self->selfpipe = compat_socket_selfpipe_alloc();
+
   for( i = 0; i < 4; i++ )
     nic_w5100_socket_init( &self->socket[i], i );
 
   nic_w5100_reset( self );
-
-  error = pipe( pipefd );
-  if( error ) {
-    ui_error( UI_ERROR_ERROR, "w5100: error %d creating pipe", error );
-    fuse_abort();
-  }
-
-  self->pipe_read = pipefd[0];
-  self->pipe_write = pipefd[1];
 
   self->stop_io_thread = 0;
 
@@ -192,12 +180,14 @@ nic_w5100_free( nic_w5100_t *self )
 
   if( self ) {
     self->stop_io_thread = 1;
-    nic_w5100_wake_io_thread( self );
+    compat_socket_selfpipe_wake( self->selfpipe );
 
     pthread_join( self->thread, NULL );
 
     for( i = 0; i < 4; i++ )
       nic_w5100_socket_reset( &self->socket[i] );
+
+    compat_socket_selfpipe_free( self->selfpipe );
 
     free( self );
   }
@@ -257,9 +247,9 @@ nic_w5100_read( nic_w5100_t *self, libspectrum_word reg )
   }
   else {
     b = 0xff;
-    ui_error( UI_ERROR_WARNING, "w5100: reading 0x%02x from unsupported register 0x%03x\n", b, reg );
+    nic_w5100_error( UI_ERROR_WARNING,
+      "w5100: reading 0x%02x from unsupported register 0x%03x\n", b, reg );
   }
-
 
   return b;
 }
@@ -273,7 +263,8 @@ w5100_write_mr( nic_w5100_t *self, libspectrum_byte b )
     nic_w5100_reset( self );
 
   if( b & 0x7f )
-    ui_error( UI_ERROR_WARNING, "w5100: unsupported value 0x%02x written to MR\n", b );
+    nic_w5100_error( UI_ERROR_WARNING,
+                     "w5100: unsupported value 0x%02x written to MR\n", b );
 }
 
 static void
@@ -282,7 +273,8 @@ w5100_write_imr( nic_w5100_t *self, libspectrum_byte b )
   nic_w5100_debug( "w5100: writing 0x%02x to IMR\n", b );
 
   if( b != 0xef )
-    ui_error( UI_ERROR_WARNING, "w5100: unsupported value 0x%02x written to IMR\n", b );
+    nic_w5100_error( UI_ERROR_WARNING, 
+                     "w5100: unsupported value 0x%02x written to IMR\n", b );
 }
   
 
@@ -294,7 +286,9 @@ w5100_write__msr( nic_w5100_t *self, libspectrum_word reg, libspectrum_byte b )
   nic_w5100_debug( "w5100: writing 0x%02x to %s\n", b, regname );
 
   if( b != 0x55 )
-    ui_error( UI_ERROR_WARNING, "w5100: unsupported value 0x%02x written to %s\n", b, regname );
+    nic_w5100_error( UI_ERROR_WARNING, 
+                     "w5100: unsupported value 0x%02x written to %s\n",
+                     b, regname );
 }
 
 void
@@ -341,7 +335,9 @@ nic_w5100_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byte b )
     nic_w5100_socket_write_tx_buffer( self, reg, b );
   }
   else
-    ui_error( UI_ERROR_WARNING, "w5100: writing 0x%02x to unsupported register 0x%03x\n", b, reg );
+    nic_w5100_error( UI_ERROR_WARNING, 
+                     "w5100: writing 0x%02x to unsupported register 0x%03x\n",
+                     b, reg );
 }
 
 void
@@ -381,3 +377,33 @@ nic_w5100_debug( const char *format, ... )
   }
 }
 
+void
+nic_w5100_vdebug( const char *format, va_list ap )
+{
+  if( W5100_DEBUG ) {
+    vprintf( format, ap );
+  }
+}
+
+void
+nic_w5100_error( int severity, const char *format, ... )
+{
+  va_list ap;
+
+#ifdef WIN32
+  /* pause because contents of the audio buffer are played into a loop */
+  fuse_emulation_pause();
+#endif
+
+  va_start( ap, format );
+  nic_w5100_vdebug( format, ap );
+  va_end( ap );
+
+  va_start( ap, format );
+  ui_verror( severity, format, ap );
+  va_end( ap );
+
+#ifdef WIN32
+  fuse_emulation_unpause();
+#endif
+}

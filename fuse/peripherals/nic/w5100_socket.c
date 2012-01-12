@@ -67,8 +67,9 @@ w5100_socket_acquire_lock( nic_w5100_socket_t *socket )
 {
   int error = pthread_mutex_lock( &socket->lock );
   if( error ) {
-    ui_error( UI_ERROR_ERROR, "%s:%d: error %d locking mutex for socket %d\n",
-      __FILE__, __LINE__, error, socket->id );
+    nic_w5100_error( UI_ERROR_ERROR,
+                     "%s:%d: error %d locking mutex for socket %d\n",
+                     __FILE__, __LINE__, error, socket->id );
     fuse_abort();
   }
 }
@@ -98,7 +99,7 @@ w5100_socket_clean( nic_w5100_socket_t *socket )
   socket->datagram_count = 0;
 
   if( socket->fd != compat_socket_invalid ) {
-    close( socket->fd );
+    compat_socket_close( socket->fd );
     socket->fd = compat_socket_invalid;
     socket->bind_count = 0;
     socket->socket_bound = 0;
@@ -179,16 +180,19 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
 
     socket_obj->fd = socket( AF_INET, type, protocol );
     if( socket_obj->fd == compat_socket_invalid ) {
-      ui_error( UI_ERROR_ERROR, "w5100: failed to open %s socket for socket %d; errno %d: %s\n",
-                description, socket_obj->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
+      nic_w5100_error( UI_ERROR_ERROR,
+        "w5100: failed to open %s socket for socket %d; errno %d: %s\n",
+        description, socket_obj->id, compat_socket_get_error(),
+        compat_socket_get_strerror() );
       w5100_socket_release_lock( socket_obj );
       return;
     }
 
     if( setsockopt( socket_obj->fd, SOL_SOCKET, SO_REUSEADDR, &one,
       sizeof(one) ) == -1 ) {
-      ui_error( UI_ERROR_ERROR, "w5100: failed to set SO_REUSEADDR on socket %d; errno %d: %s\n",
-                socket_obj->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
+      nic_w5100_error( UI_ERROR_ERROR,
+        "w5100: failed to set SO_REUSEADDR on socket %d; errno %d: %s\n",
+        socket_obj->id, compat_socket_get_error(), compat_socket_get_error() );
     }
 
     socket_obj->state = final_state;
@@ -211,8 +215,11 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
 
   nic_w5100_debug( "w5100: attempting to bind socket %d to %s:%d\n", socket->id, inet_ntoa(sa.sin_addr), ntohs(sa.sin_port) );
   if( bind( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
-    ui_error( UI_ERROR_ERROR, "w5100: failed to bind socket %d; errno %d: %s\n",
-              socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
+    nic_w5100_error( UI_ERROR_ERROR,
+                     "w5100: failed to bind socket %d; errno %d: %s\n",
+                     socket->id, compat_socket_get_error(),
+                     compat_socket_get_strerror() );
+
     socket->ir |= 1 << 3;
     socket->state = W5100_SOCKET_STATE_CLOSED;
     return -1;
@@ -237,8 +244,10 @@ w5100_socket_listen( nic_w5100_t *self, nic_w5100_socket_t *socket )
       }
 
     if( listen( socket->fd, 1 ) == -1 ) {
-      ui_error( UI_ERROR_ERROR, "w5100: failed to listen on socket %d; errno %d: %s\n",
-                socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
+      nic_w5100_error( UI_ERROR_ERROR, 
+                       "w5100: failed to listen on socket %d; errno %d: %s\n",
+                       socket->id, compat_socket_get_error(),
+                       compat_socket_get_strerror() );
       w5100_socket_release_lock( socket );
       return;
     }
@@ -249,7 +258,7 @@ w5100_socket_listen( nic_w5100_t *self, nic_w5100_socket_t *socket )
 
     w5100_socket_release_lock( socket );
 
-    nic_w5100_wake_io_thread( self );
+    compat_socket_selfpipe_wake( self->selfpipe );
   }
 }
 
@@ -272,9 +281,11 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
     memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
 
     if( connect( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
-      ui_error( UI_ERROR_ERROR, "w5100: failed to connect socket %d to 0x%08x:0x%04x; errno %d: %s\n",
-                socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port),
-                compat_socket_get_error(), strerror(compat_socket_get_error()) );
+      nic_w5100_error( UI_ERROR_ERROR,
+        "w5100: failed to connect socket %d to 0x%08x:0x%04x; errno %d: %s\n",
+        socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port),
+        compat_socket_get_error(), compat_socket_get_strerror() );
+
       socket->ir |= 1 << 3;
       socket->state = W5100_SOCKET_STATE_CLOSED;
       w5100_socket_release_lock( socket );
@@ -297,7 +308,7 @@ w5100_socket_discon( nic_w5100_t *self, nic_w5100_socket_t *socket )
     socket->ir |= 1 << 1;
     socket->state = W5100_SOCKET_STATE_CLOSED;
     w5100_socket_release_lock( socket );
-    nic_w5100_wake_io_thread( self );
+    compat_socket_selfpipe_wake( self->selfpipe );
 
     nic_w5100_debug( "w5100: disconnected socket %d\n", socket->id );
   }
@@ -308,12 +319,12 @@ w5100_socket_close( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   w5100_socket_acquire_lock( socket );
   if( socket->fd != compat_socket_invalid ) {
-    close( socket->fd );
+    compat_socket_close( socket->fd );
     socket->fd = compat_socket_invalid;
     socket->socket_bound = 0;
     socket->ok_for_io = 0;
     socket->state = W5100_SOCKET_STATE_CLOSED;
-    nic_w5100_wake_io_thread( self );
+    compat_socket_selfpipe_wake( self->selfpipe );
     nic_w5100_debug( "w5100: closed socket %d\n", socket->id );
   }
   w5100_socket_release_lock( socket );
@@ -336,13 +347,13 @@ w5100_socket_send( nic_w5100_t *self, nic_w5100_socket_t *socket )
     socket->last_send = socket->tx_wr;
     socket->write_pending = 1;
     w5100_socket_release_lock( socket );
-    nic_w5100_wake_io_thread( self );
+    compat_socket_selfpipe_wake( self->selfpipe );
   }
   else if( socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
     w5100_socket_acquire_lock( socket );
     socket->write_pending = 1;
     w5100_socket_release_lock( socket );
-    nic_w5100_wake_io_thread( self );
+    compat_socket_selfpipe_wake( self->selfpipe );
   }
 }
 
@@ -357,7 +368,7 @@ w5100_socket_recv( nic_w5100_t *self, nic_w5100_socket_t *socket )
     if( socket->rx_rsr != 0 )
       socket->ir |= 1 << 2;
     w5100_socket_release_lock( socket );
-    nic_w5100_wake_io_thread( self );
+    compat_socket_selfpipe_wake( self->selfpipe );
   }
 }
 
@@ -407,7 +418,7 @@ w5100_write_socket_port( nic_w5100_t *self, nic_w5100_socket_t *socket, int whic
         socket->bind_count = 0;
       }
       w5100_socket_release_lock( socket );
-      nic_w5100_wake_io_thread( self );
+      compat_socket_selfpipe_wake( self->selfpipe );
     }
     socket->bind_count = 0;
   }
@@ -587,11 +598,13 @@ w5100_socket_process_accept( nic_w5100_socket_t *socket )
 {
   struct sockaddr_in sa;
   socklen_t sa_length = sizeof(sa);
-  int new_fd;
+  compat_socket_t new_fd;
 
   new_fd = accept( socket->fd, (struct sockaddr*)&sa, &sa_length );
   if( new_fd == compat_socket_invalid ) {
-    nic_w5100_debug( "w5100: error from accept on socket %d; errno %d: %s\n", socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
+    nic_w5100_debug( "w5100: error from accept on socket %d; errno %d: %s\n",
+                     socket->id, compat_socket_get_error(),
+                     compat_socket_get_strerror() );
     return;
   }
 
@@ -655,10 +668,13 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
   else if( bytes_read == 0 ) {  /* TCP */
     socket->state = W5100_SOCKET_STATE_CLOSE_WAIT;
     nic_w5100_debug( "w5100: EOF on %s socket %d; errno %d: %s\n",
-                     description, socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
+                     description, socket->id, compat_socket_get_error(),
+                     compat_socket_get_strerror() );
   }
   else {
-    nic_w5100_debug( "w5100: error %d reading from %s socket %d: %s\n", compat_socket_get_error(), description, socket->id, strerror(compat_socket_get_error()) );
+    nic_w5100_debug( "w5100: error %d reading from %s socket %d: %s\n",
+                     compat_socket_get_error(), description, socket->id,
+                     compat_socket_get_strerror() );
   }
 }
 
@@ -689,7 +705,8 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
   memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
 
   bytes_sent = sendto( socket->fd, (const char*)data, length, 0, (struct sockaddr*)&sa, sizeof(sa) );
-  nic_w5100_debug( "w5100: sent 0x%03x bytes of 0x%03x to UDP socket %d\n", (int)bytes_sent, length, socket->id );
+  nic_w5100_debug( "w5100: sent 0x%03x bytes of 0x%03x to UDP socket %d\n",
+                   (int)bytes_sent, length, socket->id );
 
   if( bytes_sent == length ) {
     if( --socket->datagram_count )
@@ -705,7 +722,9 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
   else if( bytes_sent != -1 )
     nic_w5100_debug( "w5100: didn't manage to send full datagram to UDP socket %d?\n", socket->id );
   else
-    nic_w5100_debug( "w5100: error %d writing to UDP socket %d: %s\n", compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()) );
+    nic_w5100_debug( "w5100: error %d writing to UDP socket %d: %s\n",
+                     compat_socket_get_error(), socket->id,
+                     compat_socket_get_strerror() );
 }
 
 static void
@@ -723,7 +742,8 @@ w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
     length = 0x800 - offset;
 
   bytes_sent = send( socket->fd, (const char*)data, length, 0 );
-  nic_w5100_debug( "w5100: sent 0x%03x bytes of 0x%03x to TCP socket %d\n", (int)bytes_sent, length, socket->id );
+  nic_w5100_debug( "w5100: sent 0x%03x bytes of 0x%03x to TCP socket %d\n",
+                   (int)bytes_sent, length, socket->id );
 
   if( bytes_sent != -1 ) {
     socket->tx_rr += bytes_sent;
@@ -734,7 +754,8 @@ w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
   }
   else
     nic_w5100_debug( "w5100: error %d writing to TCP socket %d: %s\n",
-                     compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()) );
+                     compat_socket_get_error(), socket->id,
+                     compat_socket_get_strerror() );
 }
 
 void

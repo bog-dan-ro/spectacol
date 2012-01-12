@@ -31,6 +31,10 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+#ifdef WIN32
+#include <winsock2.h>
+#endif
+
 /* Remove the gcc-specific incantations if we're not using gcc */
 #ifdef __GNUC__
 
@@ -129,8 +133,18 @@ typedef SOCKET compat_socket_t;
 #endif
 
 extern const compat_socket_t compat_socket_invalid;
+extern const int compat_socket_EBADF;
 
 int compat_socket_close( compat_socket_t fd );
 int compat_socket_get_error( void );
+const char *compat_socket_get_strerror( void );
+
+typedef struct compat_socket_selfpipe_t compat_socket_selfpipe_t;
+
+compat_socket_selfpipe_t *compat_socket_selfpipe_alloc( void );
+void compat_socket_selfpipe_free( compat_socket_selfpipe_t *self );
+compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self );
+void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self );
+void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self );
 
 #endif				/* #ifndef FUSE_COMPAT_H */

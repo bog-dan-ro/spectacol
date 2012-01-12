@@ -138,11 +138,8 @@ struct nic_w5100_t {
 
   pthread_t thread;         /* Thread for doing I/O */
   sig_atomic_t stop_io_thread; /* Flag to stop I/O thread */
-  int pipe_read;            /* Pipe for waking I/O thread */
-  int pipe_write;
+  compat_socket_selfpipe_t *selfpipe; /* Device for waking I/O thread */
 };
-
-void nic_w5100_wake_io_thread( nic_w5100_t *self );
 
 void nic_w5100_socket_init( nic_w5100_socket_t *socket, int which );
 
@@ -165,5 +162,7 @@ void nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
 #define W5100_DEBUG 0
 
 void nic_w5100_debug( const char *format, ... );
+void nic_w5100_vdebug( const char *format, va_list ap );
+void nic_w5100_error( int severity, const char *format, ... );
 
 #endif                          /* #ifndef FUSE_W5100_H */

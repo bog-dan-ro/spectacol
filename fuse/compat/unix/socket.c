@@ -26,11 +26,20 @@
 #include <config.h>
 
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "compat.h"
+#include "fuse.h"
+#include "ui/ui.h"
 
 const compat_socket_t compat_socket_invalid = -1;
+const int compat_socket_EBADF = EBADF;
+
+struct compat_socket_selfpipe_t {
+  int read_fd;
+  int write_fd;
+};
 
 int
 compat_socket_close( compat_socket_t fd )
@@ -41,4 +50,56 @@ compat_socket_close( compat_socket_t fd )
 int compat_socket_get_error( void )
 {
   return errno;
+}
+
+const char *
+compat_socket_get_strerror( void )
+{
+  return strerror( errno );
+}
+
+compat_socket_selfpipe_t *compat_socket_selfpipe_alloc( void )
+{
+  int error;
+  int pipefd[2];
+
+  compat_socket_selfpipe_t *self = malloc( sizeof( *self ) );
+  if( !self ) {
+    ui_error( UI_ERROR_ERROR, "%s: %d: out of memory", __FILE__, __LINE__ );
+    fuse_abort();
+  }
+
+  error = pipe( pipefd );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "%s: %d: error %d creating pipe", __FILE__, __LINE__, error );
+    fuse_abort();
+  }
+
+  self->read_fd = pipefd[0];
+  self->write_fd = pipefd[1];
+
+  return self;
+}
+
+void compat_socket_selfpipe_free( compat_socket_selfpipe_t *self )
+{
+  close( self->read_fd );
+  close( self->write_fd );
+}
+
+compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self )
+{
+  return self->read_fd;
+}
+
+void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self )
+{
+  const char dummy = 0;
+  write( self->write_fd, &dummy, 1 );
+}
+
+void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )
+{
+  char bitbucket;
+  read( self->read_fd, &bitbucket, 1 );
 }

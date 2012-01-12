@@ -41,3 +41,57 @@ int compat_socket_get_error( void )
 {
   return WSAGetLastError();
 }
+
+const char *
+compat_socket_get_strerror( void )
+{
+  static TCHAR buffer[256];
+  TCHAR *ptr;
+  DWORD msg_size;
+
+  /* get description of last winsock error */
+  msg_size = FormatMessage( 
+               FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+               NULL, WSAGetLastError(),
+               MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
+               buffer, sizeof( buffer ) / sizeof( TCHAR ), NULL );
+
+  if( !msg_size ) return NULL;
+
+  /* skip 'new line' like chars */
+  for( ptr = buffer; *ptr; ptr++ ) {
+    if( ( *ptr == '\r' ) || ( *ptr == '\n' ) ) {
+      *ptr = '\0';
+      break;
+    }
+  }
+
+  return (const char *)buffer;
+}
+
+compat_socket_selfpipe_t *compat_socket_selfpipe_alloc( void )
+{
+  fuse_abort();
+  return NULL;
+}
+
+void compat_socket_selfpipe_free( compat_socket_selfpipe_t *self )
+{
+  fuse_abort();
+}
+
+compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self )
+{
+  fuse_abort();
+  return compat_socket_invalid;
+}
+
+void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self )
+{
+  fuse_abort();
+}
+
+void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )
+{
+  fuse_abort();
+}

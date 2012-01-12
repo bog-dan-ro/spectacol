@@ -3958,3 +3958,6 @@
 20120109 peripherals/{disk/{beta.c,plusd.c},ide/{zxatasp.c,zxcf.c}: fix up
          mismerged files.
 20120109 peripherals/if1.c: one more mismerged file.
+20120112 compat.h,compat/unix/socket.c,compat/win32/socket.c,configure.in,
+         peripherals/nic/{w5100.c,w5100_internals.h,w5100_socket.c}: abstract
+         out selfpipe functionality.

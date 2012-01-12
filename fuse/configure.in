@@ -110,7 +110,7 @@ win32=no)
 AC_MSG_RESULT($win32)
 if test "$win32" = yes; then
   AC_CHECK_HEADER(windows.h,
-                  LIBS="$LIBS -mwindows -lcomctl32 -lwinmm -lpthread";
+                  LIBS="$LIBS -mwindows -lcomctl32 -lwinmm -lpthread -lws2_32";
                   AC_DEFINE([UI_WIN32], 1, [Defined if Win32 UI in use])
                   AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
                   AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
