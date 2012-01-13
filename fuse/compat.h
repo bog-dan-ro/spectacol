@@ -141,7 +141,7 @@ const char *compat_socket_get_strerror( void );
 
 typedef struct compat_socket_selfpipe_t compat_socket_selfpipe_t;
 
-compat_socket_selfpipe_t *compat_socket_selfpipe_alloc( void );
+compat_socket_selfpipe_t* compat_socket_selfpipe_alloc( void );
 void compat_socket_selfpipe_free( compat_socket_selfpipe_t *self );
 compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self );
 void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self );

@@ -58,7 +58,7 @@ compat_socket_get_strerror( void )
   return strerror( errno );
 }
 
-compat_socket_selfpipe_t *compat_socket_selfpipe_alloc( void )
+compat_socket_selfpipe_t* compat_socket_selfpipe_alloc( void )
 {
   int error;
   int pipefd[2];
@@ -85,6 +85,7 @@ void compat_socket_selfpipe_free( compat_socket_selfpipe_t *self )
 {
   close( self->read_fd );
   close( self->write_fd );
+  free( self );
 }
 
 compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self )

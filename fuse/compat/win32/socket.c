@@ -30,6 +30,11 @@
 #include "compat.h"
 
 const compat_socket_t compat_socket_invalid = INVALID_SOCKET;
+const int compat_socket_EBADF = WSAENOTSOCK;
+
+struct compat_socket_selfpipe_t {
+  SOCKET self_socket;
+};
 
 int
 compat_socket_close( compat_socket_t fd )
@@ -69,29 +74,95 @@ compat_socket_get_strerror( void )
   return (const char *)buffer;
 }
 
-compat_socket_selfpipe_t *compat_socket_selfpipe_alloc( void )
+compat_socket_selfpipe_t* compat_socket_selfpipe_alloc( void )
 {
-  fuse_abort();
-  return NULL;
+  unsigned long mode = 1;
+  struct sockaddr_in sa;
+  socklen_t sa_len = sizeof(sa);
+
+  compat_socket_selfpipe_t *self = malloc( sizeof( *self ) );
+  if( !self ) {
+    ui_error( UI_ERROR_ERROR, "%s: %d: out of memory", __FILE__, __LINE__ );
+    fuse_abort();
+  }
+  
+  self->self_socket = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
+  if( self->self_socket == compat_socket_invalid ) {
+    ui_error( UI_ERROR_ERROR,
+              "%s: %d: failed to open socket; errno %d: %s\n",
+              __FILE__, __LINE__, compat_socket_get_error(),
+              compat_socket_get_strerror() );
+    fuse_abort();
+  }
+
+  /* Set nonblocking mode */
+  if( ioctlsocket( self->self_socket, FIONBIO, &mode ) == -1 ) {
+    ui_error( UI_ERROR_ERROR, 
+              "%s: %d: failed to set socket nonblocking; errno %d: %s\n",
+              __FILE__, __LINE__, compat_socket_get_error(),
+              compat_socket_get_strerror() );
+    fuse_abort();
+  }
+
+  memset( &sa, 0, sizeof(sa) );
+  sa.sin_family = AF_INET;
+  sa.sin_addr.s_addr = htonl( INADDR_LOOPBACK );
+
+  if( bind( self->self_socket, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
+    ui_error( UI_ERROR_ERROR,
+              "%s: %d: failed to bind socket; errno %d: %s\n",
+              __FILE__, __LINE__, compat_socket_get_error(),
+              compat_socket_get_strerror() );
+    fuse_abort();
+  }
+
+  /* Get ephemeral port number */
+  if( getsockname( self->self_socket, (struct sockaddr *)&sa, &len ) == -1 ) {
+    ui_error( UI_ERROR_ERROR,
+              "%s: %d: failed to get socket name; errno %d: %s\n",
+              __FILE__, __LINE__, compat_socket_get_error(),
+              compat_socket_get_strerror() );
+    fuse_abort();
+  }
+
+  self->port = sa.sin_port;
+
+  return self;
 }
 
 void compat_socket_selfpipe_free( compat_socket_selfpipe_t *self )
 {
-  fuse_abort();
+  compat_socket_close( self->self_socket );
+  free( self );
 }
 
 compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self )
 {
-  fuse_abort();
-  return compat_socket_invalid;
+  return self->self_socket;
 }
 
 void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self )
 {
-  fuse_abort();
+  struct sockaddr_in sa;
+
+  memset( &sa, 0, sizeof(sa) );
+  sa.sin_family = AF_INET;
+  sa.sin_addr.s_addr = htonl( INADDR_LOOPBACK );
+  memcpy( &sa.sin_port, self->port, 2 );
+
+  sendto( self->self_socket, NULL, 0, 0, (struct sockaddr*)&sa, sizeof(sa) );
 }
 
 void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )
 {
-  fuse_abort();
+  ssize_t bytes_read;
+  struct sockaddr_in sa;
+  socklen_t sa_length = sizeof(sa);
+  static char bitbucket[0x100];
+
+  do {
+    /* Socket is non blocking, so we can do this safely */
+    bytes_read = recvfrom( self->self_socket, bitbucket, sizeof( bitbucket ),
+                           0, (struct sockaddr*)&sa, &sa_length );
+  } while( bytes_read != -1 )
 }

@@ -3961,3 +3961,5 @@
 20120112 compat.h,compat/unix/socket.c,compat/win32/socket.c,configure.in,
          peripherals/nic/{w5100.c,w5100_internals.h,w5100_socket.c}: abstract
          out selfpipe functionality.
+20120113 compat.h,compat/unix/socket.c,compat/win32/socket.c: completely blind
+         attempt to add Win32 "selfpipe" functionality.
