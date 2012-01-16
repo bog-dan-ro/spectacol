@@ -49,6 +49,8 @@
 #define SPECTRANET_RAM_LENGTH 0x20000
 #define SPECTRANET_RAM_BASE 0xc0
 
+static const int SPECTRANET_CPLD_VERSION = 0x03;
+
 static memory_page spectranet_full_map[SPECTRANET_PAGES * MEMORY_PAGES_IN_4K];
 static memory_page spectranet_current_map[MEMORY_PAGES_IN_16K];
 static int spectranet_memory_allocated = 0;
@@ -342,6 +344,13 @@ spectranet_page_b( libspectrum_word port, libspectrum_byte data )
   memory_map_romcs( spectranet_current_map );
 }
 
+static libspectrum_byte
+spectranet_cpld_version( libspectrum_word port, int *attached )
+{
+  *attached = 1;
+  return SPECTRANET_CPLD_VERSION;
+}
+
 static void
 spectranet_trap( libspectrum_word port, libspectrum_byte data )
 {
@@ -385,7 +394,7 @@ spectranet_control_write( libspectrum_word port, libspectrum_byte data )
 static const periph_port_t spectranet_ports[] = {
   { 0xffff, 0x003b, NULL, spectranet_page_a },
   { 0xffff, 0x013b, NULL, spectranet_page_b },
-  { 0xffff, 0x023b, NULL, spectranet_trap },
+  { 0xffff, 0x023b, spectranet_cpld_version, spectranet_trap },
   { 0xffff, 0x033b, spectranet_control_read, spectranet_control_write },
   { 0, 0, NULL, NULL }
 };
