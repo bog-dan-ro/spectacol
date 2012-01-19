@@ -3981,3 +3981,4 @@
          sound/aosound.c,ui/{gtk/{options.pl,roms.c},scaler/scaler.c,widget/
          {filesel.c,roms.c},win32/fileselector.c}: use utils_safe_strdup where
          appropriate.
+20120119 event.[ch],fuse.c: event_init() can never fail.

@@ -49,7 +49,7 @@ typedef void (*event_fn_t)( libspectrum_dword tstates, int type, void *user_data
 extern libspectrum_dword event_next_event;
 
 /* Set up the event list */
-int event_init(void);
+void event_init( void );
 
 /* Register a new event type */
 int event_register( event_fn_t fn, const char *description );

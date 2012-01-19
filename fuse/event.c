@@ -56,20 +56,14 @@ typedef struct event_descriptor_t {
 
 static GArray *registered_events;
 
-int
+void
 event_init( void )
 {
   registered_events = g_array_new( FALSE, FALSE, sizeof( event_descriptor_t ) );
-  if( !registered_events ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
-    return 1;
-  }
 
   event_type_null = event_register( NULL, "[Deleted event]" );
-  if( event_type_null == -1 ) return 1;
 
   event_next_event = event_no_events;
-  return 0;
 }
 
 int

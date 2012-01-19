@@ -249,7 +249,7 @@ static int fuse_init(int argc, char **argv)
   fuse_joystick_init ();
   fuse_keyboard_init();
 
-  if( event_init() ) return 1;
+  event_init();
   
 #ifndef GEKKO
   if( display_init(&argc,&argv) ) return 1;
