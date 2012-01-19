@@ -115,7 +115,6 @@ timer_init( void )
   start_time = timer_get_time(); if( start_time < 0 ) return 1;
 
   timer_event = event_register( timer_frame, "Timer" );
-  if( timer_event == -1 ) return 1;
 
   error = event_add( 0, timer_event );
   if( error ) return error;

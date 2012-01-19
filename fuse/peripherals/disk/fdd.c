@@ -71,7 +71,6 @@ fdd_init_events( void )
   int error;
 
   motor_event = event_register( fdd_event, "FDD motor on" );
-  if( motor_event == -1 ) return 1;
 
   error = upd_fdc_init_events();
   if( error ) return error;

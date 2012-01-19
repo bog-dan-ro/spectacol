@@ -99,10 +99,7 @@ z80_init( void )
 
   z80_interrupt_event = event_register( z80_interrupt_event_fn,
 					"Retriggered interrupt" );
-  if( z80_interrupt_event == -1 ) return 1;
-
   z80_nmi_event = event_register( z80_nmi, "Non-maskable interrupt" );
-  if( z80_nmi_event == -1 ) return 1;
 
   module_register( &z80_module_info );
 

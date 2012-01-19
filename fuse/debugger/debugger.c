@@ -60,7 +60,6 @@ debugger_init( void )
   if( debugger_memory_pool == -1 ) return 1;
 
   debugger_breakpoint_event = event_register( debugger_breakpoint_time_fn, "Breakpoint" );
-  if( debugger_breakpoint_event == -1 ) return 1;
 
   error = debugger_event_init();
   if( error ) return error;

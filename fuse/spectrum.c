@@ -86,7 +86,6 @@ spectrum_init( void )
 {
   spectrum_frame_event = event_register( spectrum_frame_event_fn,
 					 "End of frame" );
-  if( spectrum_frame_event == -1 ) return 1;
 
   return 0;
 }

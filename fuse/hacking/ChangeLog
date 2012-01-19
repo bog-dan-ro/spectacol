@@ -3964,3 +3964,6 @@
 20120113 compat.h,compat/unix/socket.c,compat/win32/socket.c: completely blind
          attempt to add Win32 "selfpipe" functionality.
 20120116 peripherals/spectranet.c: emulate the non-prototype Spectranet.
+20120119 debugger/debugger.c,event.c,peripherals/disk/{beta.c,fdd.c,upd_fdc.c,
+         wd_fdc.c},rzx.c,spectrum.c,tape.c,timer/timer.c,z80/z80.c: make
+         event_register() just blow up if it can't allocate memory.

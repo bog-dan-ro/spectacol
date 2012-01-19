@@ -170,7 +170,6 @@ beta_init( void )
   beta_fdc->reset_datarq = NULL;
 
   index_event = event_register( beta_event_index, "Beta disk index" );
-  if( index_event == -1 ) return 1;
 
   module_register( &beta_module_info );
 

@@ -123,7 +123,6 @@ int rzx_init( void )
   rzx_in_allocated = 0;
 
   sentinel_event = event_register( rzx_sentinel, "RZX sentinel" );
-  if( sentinel_event == -1 ) return 1;
 
   end_event = debugger_event_register( event_type_string, end_event_detail_string );
   if( end_event == -1 ) return 1;

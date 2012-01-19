@@ -103,13 +103,8 @@ int
 upd_fdc_init_events( void )
 {
   fdc_event = event_register( upd_fdc_event, "UPD FDC event" );
-  if( fdc_event == -1 ) return 1;
-
   head_event = event_register( upd_fdc_event, "UPD FDC head (un)load" );
-  if( fdc_event == -1 ) return 1;
-
   timeout_event = event_register( upd_fdc_event, "UPD FDC timeout" );
-  if( timeout_event == -1 ) return 1;
 
   return 0;
 }

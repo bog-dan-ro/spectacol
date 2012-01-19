@@ -100,11 +100,8 @@ int tape_init( void )
   if( play_event == -1 || stop_event == -1 ) return 1;
 
   tape_edge_event = event_register( tape_next_edge, "Tape edge" );
-  if( tape_edge_event == -1 ) return 1;
-
   record_event = event_register( tape_event_record_sample,
 				 "Tape sample record" );
-  if( record_event == -1 ) return 1;
 
   tape_modified = 0;
 

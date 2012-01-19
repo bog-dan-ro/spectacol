@@ -55,13 +55,8 @@ int
 wd_fdc_init_events( void )
 {
   fdc_event = event_register( wd_fdc_event, "WD FDC event" );
-  if( fdc_event == -1 ) return 1;
-
   motor_off_event = event_register( wd_fdc_event, "WD FDC motor off" );
-  if( motor_off_event == -1 ) return 1;
-
   timeout_event = event_register( wd_fdc_event, "WD FDC timeout" );
-  if( timeout_event == -1 ) return 1;
 
   return 0;
 }
