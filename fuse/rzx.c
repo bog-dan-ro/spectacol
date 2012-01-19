@@ -284,10 +284,7 @@ int rzx_start_playback( const char *filename, int check_snapshot )
     return libspec_error;
   }
 
-  if( utils_close_file( &file ) ) {
-    libspectrum_rzx_free( rzx );
-    return 1;
-  }
+  utils_close_file( &file );
 
   snap = rzx_get_initial_snapshot();
   if( !snap && check_snapshot ) {

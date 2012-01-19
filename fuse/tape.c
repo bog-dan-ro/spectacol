@@ -189,11 +189,7 @@ tape_autoload( libspectrum_machine hardware )
   error = snapshot_read_buffer( snap.buffer, snap.length, type );
   if( error ) { utils_close_file( &snap ); return error; }
 
-  if( utils_close_file( &snap ) ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't close '%s': %s", filename,
-	      strerror( errno ) );
-    return 1;
-  }
+  utils_close_file( &snap );
     
   return 0;
 }

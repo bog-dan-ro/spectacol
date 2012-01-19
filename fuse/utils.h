@@ -54,7 +54,7 @@ int utils_read_auxiliary_file( const char *filename, utils_file *file,
 
 int utils_read_file( const char *filename, utils_file *file );
 int utils_read_fd( compat_fd fd, const char *filename, utils_file *file );
-int utils_close_file( utils_file *file );
+void utils_close_file( utils_file *file );
 
 int utils_write_file( const char *filename, const unsigned char *buffer,
 		      size_t length );

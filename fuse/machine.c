@@ -298,7 +298,7 @@ machine_load_rom_bank_from_file( memory_page* bank_map, int page_num,
   error = machine_load_rom_bank_from_buffer( bank_map, page_num, rom.buffer,
     rom.length, custom );
 
-  error |= utils_close_file( &rom );
+  utils_close_file( &rom );
 
   return error;
 }

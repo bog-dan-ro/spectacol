@@ -153,8 +153,7 @@ static int widget_read_font( const char *filename )
     i += 3 + width;
   }
 
-  error = utils_close_file( &file );
-  if( error ) return error;
+  utils_close_file( &file );
 
   return 0;
 }

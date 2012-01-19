@@ -110,10 +110,7 @@ dck_reset( void )
     utils_close_file( &file ); libspectrum_dck_free( dck, 0 ); return error;
   }
 
-  if( utils_close_file( &file ) ) {
-    libspectrum_dck_free( dck, 0 );
-    return 1;
-  }
+  utils_close_file( &file );
 
   while( dck->dck[num_block] != NULL ) {
     memory_page *bank;

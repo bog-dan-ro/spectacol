@@ -213,7 +213,7 @@ utils_open_file( const char *filename, int autoload,
 
   if( error ) { utils_close_file( &file ); return error; }
 
-  if( utils_close_file( &file ) ) return 1;
+  utils_close_file( &file );
 
   if( type_ptr ) *type_ptr = type;
 
@@ -425,12 +425,10 @@ utils_read_fd( compat_fd fd, const char *filename, utils_file *file )
   return 0;
 }
 
-int
+void
 utils_close_file( utils_file *file )
 {
   free( file->buffer );
-
-  return 0;
 }
 
 int utils_write_file( const char *filename, const unsigned char *buffer,
@@ -496,8 +494,7 @@ utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
     return 1;
   }
 
-  error = utils_close_file( &file );
-  if( error ) { close( *fd ); unlink( tempfilename ); return error; }
+  utils_close_file( &file );
 
   return 0;
 }

@@ -1140,7 +1140,7 @@ if1_mdr_insert( int which, const char *filename )
     return 1;
   }
 
-  if( utils_close_file( &mdr->file ) ) return 1;
+  utils_close_file( &mdr->file );
 
   mdr->inserted = 1;
   mdr->modified = 0;

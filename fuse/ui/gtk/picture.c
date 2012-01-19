@@ -67,9 +67,7 @@ gtkui_picture( const char *filename, int border )
 
     draw_screen( screen.buffer, border );
 
-    if( utils_close_file( &screen ) ) {
-      return 1;
-    }
+    utils_close_file( &screen );
 
     dialog = gtkstock_dialog_new( "Fuse - Keyboard",
 				  GTK_SIGNAL_FUNC( gtk_widget_hide ) );

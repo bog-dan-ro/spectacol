@@ -51,10 +51,7 @@ int snapshot_read( const char *filename )
     return error;
   }
 
-  if( utils_close_file( &file ) ) {
-    libspectrum_snap_free( snap );
-    return 1;
-  }
+  utils_close_file( &file );
 
   error = snapshot_copy_from( snap );
   if( error ) { libspectrum_snap_free( snap ); return error; }

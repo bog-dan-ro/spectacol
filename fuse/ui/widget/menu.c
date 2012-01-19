@@ -655,7 +655,7 @@ menu_help_keyboard( int action )
 
   widget_do( WIDGET_TYPE_PICTURE, &info );
 
-  if( utils_close_file( &screen ) ) return;
+  utils_close_file( &screen );
 }
 
 void
