@@ -136,7 +136,6 @@ widget_roms_keyhandler( input_key key )
       key - INPUT_KEY_a < (ptrdiff_t)rom_count ) {
 
     char **setting;
-    int error;
     char buf[32];
     widget_filesel_data data;
 
@@ -150,8 +149,7 @@ widget_roms_keyhandler( input_key key )
     if( !widget_filesel_name ) return;
 
     setting = settings_get_rom_setting( widget_settings, key + first_rom );
-    error = settings_set_string( setting, widget_filesel_name );
-    if( error ) return;
+    settings_set_string( setting, widget_filesel_name );
 
     print_rom( key );
   }

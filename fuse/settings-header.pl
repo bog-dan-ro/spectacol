@@ -108,7 +108,7 @@ int settings_copy( settings_info *dest, settings_info *src );
 #define SETTINGS_ROM_COUNT 30
 char **settings_get_rom_setting( settings_info *settings, size_t which );
 
-int settings_set_string( char **string_setting, const char *value );
+void settings_set_string( char **string_setting, const char *value );
 
 int settings_free( settings_info *settings );
 

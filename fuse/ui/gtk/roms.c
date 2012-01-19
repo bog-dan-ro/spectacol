@@ -140,7 +140,6 @@ static void
 roms_done( GtkButton *button GCC_UNUSED, gpointer data )
 {
   size_t i;
-  int error;
   
   char **setting; const char *string;
 
@@ -151,7 +150,6 @@ roms_done( GtkButton *button GCC_UNUSED, gpointer data )
     setting = settings_get_rom_setting( &settings_current, info->start + i );
     string = gtk_entry_get_text( GTK_ENTRY( rom[i] ) );
 
-    error = settings_set_string( setting, string ); if( error ) return;
-
+    settings_set_string( setting, string );
   }
 }

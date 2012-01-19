@@ -3970,7 +3970,14 @@
 20120119 debugger/event.c,fuse.c,periph.c,peripherals/{ide/{divide.c,zxatasp.c,
          zxcf.c},if1.[ch],spectranet.[ch]},periph.h,rzx.[ch],tape.[ch]: make
          debugger_event_register() just blow up if it can't allocate memory.
-20120119,machine.c,peripherals/{dck.c,if1.c},rzx.c,snapshot.c,tape.c,ui/{
+20120119 machine.c,peripherals/{dck.c,if1.c},rzx.c,snapshot.c,tape.c,ui/{
          gtk/{binary.c,picture.c},widget/{menu.c,widget.c},utils.[ch]:
          utils_close_file() can never fail, so don't write excessive code to
          handle it failing.
+20120119 debugger/{breakpoint.c,command.c,debugger.h,event.c,expression.c,
+         variable.c},event.c,fuse.c,machines/specplus3.c,memory.c,peripherals/
+         {dck.c,disk/{beta.c,disciple.c,disk.c,opus.c,plusd.c},ide/ide.c,if1.c,
+         if2.c},pokefinder/pokemem.c,rzx.c,settings-header.pl,settings.pl,
+         sound/aosound.c,ui/{gtk/{options.pl,roms.c},scaler/scaler.c,widget/
+         {filesel.c,roms.c},win32/fileselector.c}: use utils_safe_strdup where
+         appropriate.

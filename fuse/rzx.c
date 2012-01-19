@@ -137,11 +137,7 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
   rzx = libspectrum_rzx_alloc();
 
   /* Store the filename */
-  rzx_filename = strdup( filename );
-  if( rzx_filename == NULL ) {
-    ui_error( UI_ERROR_ERROR, "out of memory in rzx_start_recording" );
-    return 1;
-  }
+  rzx_filename = utils_safe_strdup( filename );
 
   /* If we're embedding a snapshot, create it now */
   if( embed_snapshot ) {

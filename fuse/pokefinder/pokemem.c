@@ -123,7 +123,7 @@ pokemem_read_from_file( const char *filename )
   error = utils_read_file( filename, &file );
   if( error ) return error;
 
-  pokfile = strdup( filename );
+  pokfile = utils_safe_strdup( filename );
   error = pokemem_read_from_buffer( file.buffer, file.length );
 
   utils_close_file( &file );
@@ -475,7 +475,7 @@ pokemem_set_pokfile( const char *filename )
   if( !compat_file_exists( filename ) )
     return 1;
 
-  pokfile = strdup( filename );
+  pokfile = utils_safe_strdup( filename );
 
   return 0;
 }

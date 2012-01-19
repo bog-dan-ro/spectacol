@@ -33,6 +33,7 @@
 #include "debugger_internals.h"
 #include "mempool.h"
 #include "ui/ui.h"
+#include "utils.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
@@ -46,18 +47,14 @@ int yyparse( void );
 int yywrap( void );
 
 /* Evaluate the debugger command given in 'command' */
-int
+void
 debugger_command_evaluate( const char *command )
 {
-  if( !command ) return 0;
+  if( !command ) return;
 
   if( command_buffer ) free( command_buffer );
 
-  command_buffer = strdup( command );
-  if( !command_buffer ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
+  command_buffer = utils_safe_strdup( command );
 
   /* Start parsing at the start of the given command */
   command_ptr = command_buffer;
@@ -69,8 +66,6 @@ debugger_command_evaluate( const char *command )
   mempool_free( debugger_memory_pool );
 
   ui_debugger_update();
-
-  return 0;
 }
 
 /* Utility functions called from the flex scanner */

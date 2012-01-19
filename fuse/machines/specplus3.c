@@ -583,7 +583,7 @@ specplus3_disk_write( specplus3_drive_number which, const char *filename )
 
   if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
     free( d->disk.filename );
-    d->disk.filename = strdup( filename );
+    d->disk.filename = utils_safe_strdup( filename );
   }
   return 0;
 }

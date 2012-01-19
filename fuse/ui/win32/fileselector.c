@@ -74,7 +74,7 @@ run_dialog( const char *title, int is_saving )
   if( !result ) {
     return NULL;
   } else {
-    return strdup( ofn.lpstrFile );
+    return utils_safe_strdup( ofn.lpstrFile );
   }
 }
 

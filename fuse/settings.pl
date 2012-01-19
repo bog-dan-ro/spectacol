@@ -239,7 +239,7 @@ CODE
       xmlstring = xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
       if( xmlstring ) {
         free( settings->$name );
-        settings->$name = strdup( (char*)xmlstring );
+        settings->$name = utils_safe_strdup( (char*)xmlstring );
         xmlFree( xmlstring );
       }
     } else
@@ -707,8 +707,7 @@ foreach my $name ( sort keys %options ) {
 	print << "CODE";
   dest->$name = NULL;
   if( src->$name ) {
-    dest->$name = strdup( src->$name );
-    if( !dest->$name ) { settings_free( dest ); return 1; }
+    dest->$name = utils_safe_strdup( src->$name );
   }
 CODE
     }
@@ -778,21 +777,15 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   }
 }
 
-int
+void
 settings_set_string( char **string_setting, const char *value )
 {
   /* No need to do anything if the two strings are in fact the
      same pointer */
-  if( *string_setting == value ) return 0;
+  if( *string_setting == value ) return;
 
-  if( *string_setting) free( *string_setting );
-  *string_setting = strdup( value );
-  if( !( *string_setting ) ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
-
-  return 0;
+  if( *string_setting ) free( *string_setting );
+  *string_setting = utils_safe_strdup( value );
 }
 
 int

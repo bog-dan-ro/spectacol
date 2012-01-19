@@ -33,6 +33,7 @@
 #include "fuse.h"
 #include "mempool.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 typedef enum expression_type {
 
@@ -321,11 +322,7 @@ debugger_expression_copy( debugger_expression *src )
     break;
 
   case DEBUGGER_EXPRESSION_TYPE_VARIABLE:
-    dest->types.variable = strdup( src->types.variable );
-    if( !dest->types.variable ) {
-      free( dest );
-      return NULL;
-    }
+    dest->types.variable = utils_safe_strdup( src->types.variable );
     break;
 
   }

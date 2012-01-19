@@ -32,6 +32,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 /* A large value to mean `no events due' */
 static const libspectrum_dword event_no_events = 0xffffffff;
@@ -77,11 +78,7 @@ event_register( event_fn_t fn, const char *description )
   event_descriptor_t descriptor;
 
   descriptor.fn = fn;
-  descriptor.description = strdup( description );
-  if( !descriptor.description ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
-    fuse_abort();
-  }
+  descriptor.description = utils_safe_strdup( description );
 
   g_array_append_val( registered_events, descriptor );
 

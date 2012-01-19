@@ -1907,7 +1907,7 @@ disk_open2( disk_t *d, const char *filename, int preindex )
   d->dirty = 0;
   disk_update_tlens( d );
   update_tracks_mode( d );
-  d->filename = strdup( filename );
+  d->filename = utils_safe_strdup( filename );
   return d->status = DISK_OK;
 }
 
@@ -2017,7 +2017,7 @@ disk_open( disk_t *d, const char *filename, int preindex, int merge_disks )
     return d->status = disk_open2( d, filename, preindex );
   d1.data = NULL; d1.flag = d->flag;
   d2.data = NULL; d2.flag = d->flag;
-  filename2 = strdup( filename );
+  filename2 = utils_safe_strdup( filename );
   *(filename2 + pos) = c;
   if( filename2 == NULL ) {
     fprintf( stderr, "out of memory in merge disk files\n" );

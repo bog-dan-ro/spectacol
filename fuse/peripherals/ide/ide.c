@@ -45,7 +45,7 @@ ide_insert( const char *filename, libspectrum_ide_channel *chn,
     if( ide_eject( chn, unit, commit_fn, setting, item ) )
       return 0;
 
-  error = settings_set_string( setting, filename ); if( error ) return error;
+  settings_set_string( setting, filename );
 
   error = libspectrum_ide_insert( chn, unit, filename );
   if( error ) return error;

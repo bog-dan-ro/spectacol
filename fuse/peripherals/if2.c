@@ -88,16 +88,13 @@ if2_init( void )
 int
 if2_insert( const char *filename )
 {
-  int error;
-
   if ( !periph_is_active( PERIPH_TYPE_INTERFACE2 ) ) {
     ui_error( UI_ERROR_ERROR,
 	      "This machine does not support the Interface II" );
     return 1;
   }
 
-  error = settings_set_string( &settings_current.if2_file, filename );
-  if( error ) return error;
+  settings_set_string( &settings_current.if2_file, filename );
 
   machine_reset( 0 );
 

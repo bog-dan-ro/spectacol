@@ -60,6 +60,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "options_internals.h"
 #include "periph.h"
 #include "settings.h"
+#include "utils.h"
 
 static int
 option_enumerate_combo( const char **options, char *value, guint count,
@@ -284,7 +285,7 @@ CODE
 
 	    print << "CODE";
   free( settings_current.$widget->{value} );
-  settings_current.$widget->{value} = strdup( $_->{name}_$widget->{value}_combo[
+  settings_current.$widget->{value} = utils_safe_strdup( $_->{name}_$widget->{value}_combo[
 	gtk_combo_box_get_active( GTK_COMBO_BOX( ptr->$widget->{value} ) ) ] );
 
 CODE

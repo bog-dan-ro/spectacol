@@ -66,7 +66,7 @@ void debugger_disassemble( char *buffer, size_t buflen, size_t *length,
 			   libspectrum_word address );
 
 /* Evaluate a debugger command */
-int debugger_command_evaluate( const char *command );
+void debugger_command_evaluate( const char *command );
 
 /* Get a deparsed expression */
 int debugger_expression_deparse( char *buffer, size_t length,

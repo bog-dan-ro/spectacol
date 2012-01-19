@@ -41,6 +41,7 @@
 #include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 /* The various sources of memory available to us */
 static GArray *memory_sources;
@@ -171,11 +172,7 @@ memory_end( void )
 int
 memory_source_register( const char *description )
 {
-  const char *copy = strdup( description );
-  if( !copy ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
-    fuse_abort();
-  }
+  const char *copy = utils_safe_strdup( description );
 
   g_array_append_val( memory_sources, copy );
 

@@ -36,6 +36,7 @@
 #include "debugger_internals.h"
 #include "fuse.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 static GArray *registered_events;
 
@@ -53,13 +54,8 @@ debugger_event_register( const char *type, const char *detail )
 {
   debugger_event_t event;
 
-  event.detail = NULL;
-  event.type = strdup( type );
-  event.detail = strdup( detail );
-  if( !event.type || !event.detail ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    fuse_abort();
-  }
+  event.type = utils_safe_strdup( type );
+  event.detail = utils_safe_strdup( detail );
 
   g_array_append_val( registered_events, event );
 

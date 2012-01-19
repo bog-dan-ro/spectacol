@@ -234,11 +234,7 @@ static int fuse_init(int argc, char **argv)
     return 0;
   }
 
-  start_scaler = strdup( settings_current.start_scaler_mode );
-  if( !start_scaler ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
+  start_scaler = utils_safe_strdup( settings_current.start_scaler_mode );
 
   /* Windows will create a console for our output if there isn't one already,
    * so we don't display the copyright message on Win32. */

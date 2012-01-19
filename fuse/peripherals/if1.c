@@ -1144,7 +1144,7 @@ if1_mdr_insert( int which, const char *filename )
 
   mdr->inserted = 1;
   mdr->modified = 0;
-  mdr->filename = strdup( filename );
+  mdr->filename = utils_safe_strdup( filename );
   /* we assume formatted cartridges */
   for( i = libspectrum_microdrive_cartridge_len( mdr->cartridge );
 	i > 0; i-- )
@@ -1232,7 +1232,7 @@ if1_mdr_write( int which, const char *filename )
 
   if( mdr->filename && strcmp( filename, mdr->filename ) ) {
     free( mdr->filename );
-    mdr->filename = strdup( filename );
+    mdr->filename = utils_safe_strdup( filename );
   }
   return 0;
 }

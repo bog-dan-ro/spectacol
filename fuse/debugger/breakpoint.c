@@ -35,6 +35,7 @@
 #include "fuse.h"
 #include "memory.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 /* The current breakpoints */
 GSList *debugger_breakpoints;
@@ -177,13 +178,8 @@ debugger_breakpoint_add_event( debugger_breakpoint_type type,
   }
 
   value.event.detail = NULL;
-  value.event.type = strdup( type_string );
-  value.event.detail = strdup( detail );
-  if( !value.event.type || !value.event.detail ) {
-    free( value.event.type );
-    free( value.event.detail );
-    return 1;
-  }
+  value.event.type = utils_safe_strdup( type_string );
+  value.event.detail = utils_safe_strdup( detail );
 
   return breakpoint_add( type, value, ignore, life, condition );
 }
@@ -566,8 +562,7 @@ debugger_breakpoint_set_commands( size_t id, const char *commands )
   if( !bp ) return 1;
 
   free( bp->commands );
-  bp->commands = strdup( commands );
-  if( !bp->commands ) return 1;
+  bp->commands = utils_safe_strdup( commands );
 
   return 0;
 }

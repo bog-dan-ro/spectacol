@@ -49,16 +49,13 @@ int dck_active = 0;
 int
 dck_insert( const char *filename )
 {
-  int error;
-
   if ( !( libspectrum_machine_capabilities( machine_current->machine ) &
 	  LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) ) {
     ui_error( UI_ERROR_ERROR, "This machine does not support the dock" );
     return 1;
   }
 
-  error = settings_set_string( &settings_current.dck_file, filename );
-  if( error ) return error;
+  settings_set_string( &settings_current.dck_file, filename );
 
   machine_reset( 0 );
 

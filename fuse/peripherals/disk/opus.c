@@ -40,6 +40,7 @@
 #include "settings.h"
 #include "ui/ui.h"
 #include "unittests/unittests.h"
+#include "utils.h"
 #include "wd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 #include "z80/z80.h"
@@ -584,7 +585,7 @@ opus_disk_write( opus_drive_number which, const char *filename )
 
   if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
     free( d->disk.filename );
-    d->disk.filename = strdup( filename );
+    d->disk.filename = utils_safe_strdup( filename );
   }
   return 0;
 }

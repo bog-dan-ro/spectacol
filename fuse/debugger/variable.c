@@ -35,6 +35,7 @@
 
 #include "debugger_internals.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 static GHashTable *debugger_variables;
 
@@ -54,13 +55,8 @@ void
 debugger_variable_set( const char *name, libspectrum_dword value )
 {
   /* Check if we need to allocate memory for this key */
-  if( !g_hash_table_lookup( debugger_variables, name ) ) {
-    name = strdup( name );
-    if( !name ) {
-      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-      return;
-    }
-  }
+  if( !g_hash_table_lookup( debugger_variables, name ) )
+    name = utils_safe_strdup( name );
 
   /* Cast is safe as we have either taken a copy of the key, or know that
      it already exists so we're not going to use it */

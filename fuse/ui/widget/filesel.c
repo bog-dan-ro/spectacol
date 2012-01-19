@@ -135,11 +135,8 @@ widget_get_filename( const char *title, int saving )
     wtype = WIDGET_TYPE_FILESELECTOR;
   }
   widget_do( wtype, &data );
-  if( widget_filesel_name ) {
-    filename = strdup( widget_filesel_name );
-    if( !filename )
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-  }
+  if( widget_filesel_name )
+    filename = utils_safe_strdup( widget_filesel_name );
 
   return filename;
   
@@ -254,7 +251,7 @@ amiga_asl( char *title, BOOL is_saving ) {
 #else				/* #ifndef __MORPHOS__ */
         AddPart( filename, filereq->fr_File, 1024 );
 #endif				/* #ifndef __MORPHOS__ */
-        widget_filesel_name = strdup( filename );
+        widget_filesel_name = utils_safe_strdup( filename );
 #ifndef __MORPHOS__
         IExec->FreeVec( filename );
 #else				/* #ifndef __MORPHOS__ */
@@ -911,11 +908,7 @@ widget_filesel_keyhandler( input_key key )
         strcat( fn, FUSE_DIR_SEP_STR );
         strcat( fn, widget_text_text );
       } else {						/* absolute name */
-	fn = strdup( widget_text_text );
-        if( !fn ) {
-	  widget_end_widget( WIDGET_FINISHED_CANCEL );
-	  return;
-        }
+	fn = utils_safe_strdup( widget_text_text );
       }
       widget_filesel_name = fn;
       if( exit_all_widgets ) {
