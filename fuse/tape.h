@@ -28,7 +28,7 @@
 
 #include <libspectrum.h>
 
-int tape_init( void );
+void tape_init( void );
 
 int tape_open( const char *filename, int autoload );
 

@@ -59,7 +59,7 @@ extern size_t rzx_instruction_count;
 /* The actual RZX data */
 extern libspectrum_rzx *rzx;
 
-int rzx_init( void );
+void rzx_init( void );
 
 int rzx_start_recording( const char *filename, int embed_snapshot );
 int rzx_stop_recording( void );

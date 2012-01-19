@@ -405,20 +405,17 @@ static const periph_t spectranet_periph = {
   spectranet_activate
 };
 
-int
+void
 spectranet_init( void )
 {
   module_register( &spectranet_module_info );
   spectranet_source = memory_source_register( "Spectranet" );
   periph_register( PERIPH_TYPE_SPECTRANET, &spectranet_periph );
-  if( periph_register_paging_events( event_type_string, &page_event,
-				     &unpage_event ) )
-    return 1;
+  periph_register_paging_events( event_type_string, &page_event,
+				 &unpage_event );
 
   w5100 = nic_w5100_alloc();
   flash_rom = flash_am29f010_alloc();
-
-  return 0;
 }
 
 void

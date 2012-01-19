@@ -58,9 +58,7 @@ debugger_event_register( const char *type, const char *detail )
   event.detail = strdup( detail );
   if( !event.type || !event.detail ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    free( event.type );
-    free( event.detail );
-    return -1;
+    fuse_abort();
   }
 
   g_array_append_val( registered_events, event );

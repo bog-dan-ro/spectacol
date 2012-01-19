@@ -115,7 +115,8 @@ static void rzx_sentinel( libspectrum_dword ts, int type,
 
 static int sentinel_event;
 
-int rzx_init( void )
+void
+rzx_init( void )
 {
   rzx_recording = rzx_playback = 0;
 
@@ -125,9 +126,6 @@ int rzx_init( void )
   sentinel_event = event_register( rzx_sentinel, "RZX sentinel" );
 
   end_event = debugger_event_register( event_type_string, end_event_detail_string );
-  if( end_event == -1 ) return 1;
-
-  return 0;
 }
 
 int rzx_start_recording( const char *filename, int embed_snapshot )

@@ -167,7 +167,7 @@ static module_info_t zxatasp_module_info = {
 int
 zxatasp_init( void )
 {
-  int error = 0, i;
+  int error, i;
 
   zxatasp_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   zxatasp_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
@@ -196,11 +196,10 @@ zxatasp_init( void )
     zxatasp_memory_map_romcs[i].source = zxatasp_memory_source;
 
   periph_register( PERIPH_TYPE_ZXATASP, &zxatasp_periph );
-  if( periph_register_paging_events( event_type_string, &page_event,
-				     &unpage_event ) )
-    return 1;
+  periph_register_paging_events( event_type_string, &page_event,
+				 &unpage_event );
 
-  return error;
+  return 0;
 }
 
 int

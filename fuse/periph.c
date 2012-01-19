@@ -406,13 +406,10 @@ periph_update( void )
 }
 
 /* Register debugger page/unpage events for a peripheral */
-int
+void
 periph_register_paging_events( const char *type_string, int *page_event,
 			       int *unpage_event )
 {
   *page_event = debugger_event_register( type_string, page_event_string );
   *unpage_event = debugger_event_register( type_string, unpage_event_string );
-  if( *page_event == -1 || *unpage_event == -1 ) return 1;
-
-  return 0;
 }

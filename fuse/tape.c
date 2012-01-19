@@ -89,7 +89,8 @@ tape_event_record_sample( libspectrum_dword last_tstates, int type,
 
 /* Function definitions */
 
-int tape_init( void )
+void
+tape_init( void )
 {
   tape = libspectrum_tape_alloc();
 
@@ -97,7 +98,6 @@ int tape_init( void )
 					play_event_detail_string );
   stop_event = debugger_event_register( event_type_string,
 					stop_event_detail_string );
-  if( play_event == -1 || stop_event == -1 ) return 1;
 
   tape_edge_event = event_register( tape_next_edge, "Tape edge" );
   record_event = event_register( tape_event_record_sample,
@@ -109,7 +109,6 @@ int tape_init( void )
      so we can't update the statusbar */
   tape_playing = 0;
   tape_microphone = 0;
-  return 0;
 }
 
 int tape_open( const char *filename, int autoload )

@@ -147,7 +147,7 @@ void writeport_internal( libspectrum_word port, libspectrum_byte b );
 void periph_update( void );
 
 /* Register debugger page/unpage events for a peripheral */
-int periph_register_paging_events( const char *type_string, int *page_event,
-				   int *unpage_event );
+void periph_register_paging_events( const char *type_string, int *page_event,
+				    int *unpage_event );
 
 #endif				/* #ifndef FUSE_PERIPH_H */

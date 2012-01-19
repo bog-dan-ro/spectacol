@@ -131,9 +131,8 @@ zxcf_init( void )
     zxcf_memory_map_romcs[i].source = zxcf_memory_source;
 
   periph_register( PERIPH_TYPE_ZXCF, &zxcf_periph );
-  if( periph_register_paging_events( event_type_string, &page_event,
-				     &unpage_event ) )
-    return 1;
+  periph_register_paging_events( event_type_string, &page_event,
+                                 &unpage_event );
 
   return 0;
 }

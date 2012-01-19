@@ -32,7 +32,7 @@
 extern int if1_active;
 extern int if1_available;
 
-int if1_init( void );
+void if1_init( void );
 libspectrum_error if1_end( void );
 
 void if1_page( void );

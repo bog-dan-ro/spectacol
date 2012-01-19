@@ -26,7 +26,7 @@
 #ifndef FUSE_SPECTRANET_H
 #define FUSE_SPECTRANET_H
 
-int spectranet_init( void );
+void spectranet_init( void );
 void spectranet_end( void );
 void spectranet_page( int via_io );
 void spectranet_unpage( void );

@@ -284,7 +284,7 @@ static int fuse_init(int argc, char **argv)
 
   if( spectrum_init() ) return 1;
   if( printer_init() ) return 1;
-  if( rzx_init() ) return 1;
+  rzx_init();
   if( psg_init() ) return 1;
   if( beta_init() ) return 1;
   if( opus_init() ) return 1;
@@ -294,7 +294,7 @@ static int fuse_init(int argc, char **argv)
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
-  if( if1_init() ) return 1;
+  if1_init();
   if( if2_init() ) return 1;
   if( divide_init() ) return 1;
   if( scld_init() ) return 1;
@@ -307,7 +307,7 @@ static int fuse_init(int argc, char **argv)
   if( melodik_init() ) return 1;
   if( speccyboot_init() ) return 1;
   if( specdrum_init() ) return 1;
-  if( spectranet_init() ) return 1;
+  spectranet_init();
   machines_periph_init();
 
   error = pokefinder_clear(); if( error ) return error;
@@ -324,7 +324,7 @@ static int fuse_init(int argc, char **argv)
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
 
-  error = tape_init(); if( error ) return error;
+  tape_init();
 
   error = scaler_select_id( start_scaler ); free( start_scaler );
   if( error ) return error;

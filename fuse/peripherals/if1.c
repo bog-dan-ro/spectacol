@@ -293,7 +293,7 @@ update_menu( enum if1_menu_item what )
   }
 }
 
-int
+void
 if1_init( void )
 {
   int m, i;
@@ -340,11 +340,8 @@ if1_init( void )
     if1_memory_map_romcs[i].source = if1_memory_source;
 
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
-  if( periph_register_paging_events( event_type_string, &page_event,
-				     &unpage_event ) )
-    return 1;
-
-  return 0;
+  periph_register_paging_events( event_type_string, &page_event,
+				 &unpage_event );
 }
 
 libspectrum_error
