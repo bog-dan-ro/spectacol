@@ -48,38 +48,26 @@ int debugger_memory_pool;
 /* The event type used for time breakpoints */
 int debugger_breakpoint_event;
 
-int
+void
 debugger_init( void )
 {
-  int error;
-
   debugger_breakpoints = NULL;
   debugger_output_base = 16;
 
   debugger_memory_pool = mempool_register_pool();
-  if( debugger_memory_pool == -1 ) return 1;
 
   debugger_breakpoint_event = event_register( debugger_breakpoint_time_fn, "Breakpoint" );
 
-  error = debugger_event_init();
-  if( error ) return error;
-
-  error = debugger_variable_init();
-  if( error ) return error;
-
-  error = debugger_reset();
-  if( error ) return error;
-
-  return 0;
+  debugger_event_init();
+  debugger_variable_init();
+  debugger_reset();
 }
 
-int
+void
 debugger_reset( void )
 {
   debugger_breakpoint_remove_all();
   debugger_mode = DEBUGGER_MODE_INACTIVE;
-
-  return 0;
 }
 
 int

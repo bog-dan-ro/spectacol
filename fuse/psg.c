@@ -45,11 +45,10 @@ static FILE *psg_file;
 
 static int write_frame_separator( void );
 
-int
+void
 psg_init( void )
 {
   psg_recording = 0;
-  return 0;
 }
 
 int

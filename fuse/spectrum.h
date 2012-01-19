@@ -79,7 +79,7 @@ libspectrum_byte spectrum_unattached_port_none( void );
 
 extern int spectrum_frame_event;
 
-int spectrum_init( void );
+void spectrum_init( void );
 int spectrum_frame( void );
 
 #endif			/* #ifndef FUSE_SPECTRUM_H */

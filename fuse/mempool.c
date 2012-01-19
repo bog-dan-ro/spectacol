@@ -40,23 +40,16 @@ static GArray *memory_pools;
 
 const int MEMPOOL_UNTRACKED = -1;
 
-int
+void
 mempool_init( void )
 {
   memory_pools = g_array_new( FALSE, FALSE, sizeof( GArray* ) );
-  if( !memory_pools ) {
-    fprintf( stderr, "%s: error initialising memory pools\n", fuse_progname );
-    return 1;
-  }
-
-  return 0;
 }
 
 int
 mempool_register_pool( void )
 {
   GArray *pool = g_array_new( FALSE, FALSE, sizeof( void* ) );
-  if( !pool ) return -1;
 
   g_array_append_val( memory_pools, pool );
 

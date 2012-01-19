@@ -273,15 +273,15 @@ static int fuse_init(int argc, char **argv)
   if( !geteuid() ) { setuid( getuid() ); }
 #endif				/* #ifdef HAVE_GETEUID */
 
-  if( mempool_init() ) return 1;
-  if( memory_init() ) return 1;
+  mempool_init();
+  memory_init();
 
-  if( debugger_init() ) return 1;
+  debugger_init();
 
-  if( spectrum_init() ) return 1;
-  if( printer_init() ) return 1;
+  spectrum_init();
+  printer_init();
   rzx_init();
-  if( psg_init() ) return 1;
+  psg_init();
   if( beta_init() ) return 1;
   if( opus_init() ) return 1;
   if( plusd_init() ) return 1;

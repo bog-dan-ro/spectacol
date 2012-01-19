@@ -104,7 +104,7 @@ extern int memory_current_screen;
 /* Which bits to look at when working out where the screen is */
 extern libspectrum_word memory_screen_mask;
 
-int memory_init( void );
+void memory_init( void );
 void memory_end( void );
 libspectrum_byte *memory_pool_allocate( size_t length );
 libspectrum_byte *memory_pool_allocate_persistent( size_t length,

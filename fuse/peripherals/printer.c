@@ -691,14 +691,13 @@ parallel_data=b;
 }
 
 
-int printer_init(void)
+void printer_init(void)
 {
 printer_graphics_enabled=printer_text_enabled=1;
 printer_graphics_file=printer_text_file=NULL;
 
 printer_zxp_init();
 printer_text_init();
-return(0);
 }
 
 

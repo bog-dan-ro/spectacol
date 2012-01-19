@@ -3955,7 +3955,7 @@
 20120109 debugger/breakpoint.c: return the correct page when trying to match
 	 breakpoints (fixes bug #3470425).
 20120109 debugger/breakpoint.c: remove debugging code.
-20120109 peripherals/{disk/{beta.c,plusd.c},ide/{zxatasp.c,zxcf.c}: fix up
+20120109 peripherals/{disk/{beta.c,plusd.c},ide/{zxatasp.c,zxcf.c}}: fix up
          mismerged files.
 20120109 peripherals/if1.c: one more mismerged file.
 20120112 compat.h,compat/unix/socket.c,compat/win32/socket.c,configure.in,
@@ -3971,7 +3971,7 @@
          zxcf.c},if1.[ch],spectranet.[ch]},periph.h,rzx.[ch],tape.[ch]: make
          debugger_event_register() just blow up if it can't allocate memory.
 20120119 machine.c,peripherals/{dck.c,if1.c},rzx.c,snapshot.c,tape.c,ui/{
-         gtk/{binary.c,picture.c},widget/{menu.c,widget.c},utils.[ch]:
+         gtk/{binary.c,picture.c},widget/{menu.c,widget.c}},utils.[ch]:
          utils_close_file() can never fail, so don't write excessive code to
          handle it failing.
 20120119 debugger/{breakpoint.c,command.c,debugger.h,event.c,expression.c,
@@ -3982,3 +3982,6 @@
          {filesel.c,roms.c},win32/fileselector.c}: use utils_safe_strdup where
          appropriate.
 20120119 event.[ch],fuse.c: event_init() can never fail.
+20120119 debugger/{debugger.[ch],debugger_internals.h,event.c,variable.c},
+         fuse.c,memory.[ch],mempool.[ch],peripherals/{printer.[ch]},psg.[ch],
+         spectrum.[ch]: more init functions that can never fail.

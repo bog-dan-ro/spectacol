@@ -49,8 +49,8 @@ extern enum debugger_mode_t debugger_mode;
 /* Which base should we display things in */
 extern int debugger_output_base;
 
-int debugger_init( void );
-int debugger_reset( void );
+void debugger_init( void );
+void debugger_reset( void );
 
 int debugger_end( void );
 

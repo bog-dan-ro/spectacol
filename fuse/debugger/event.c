@@ -40,13 +40,10 @@
 
 static GArray *registered_events;
 
-int
+void
 debugger_event_init( void )
 {
   registered_events = g_array_new( FALSE, FALSE, sizeof( debugger_event_t ) );
-  if( !registered_events ) return 1;
-
-  return 0;
 }
 
 int

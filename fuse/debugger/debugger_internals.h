@@ -99,13 +99,13 @@ debugger_expression_evaluate( debugger_expression* expression );
 
 /* Event handling */
 
-int debugger_event_init( void );
+void debugger_event_init( void );
 int debugger_event_is_registered( const char *type, const char *detail );
 void debugger_event_end( void );
 
 /* Variables handling */
 
-int debugger_variable_init( void );
+void debugger_variable_init( void );
 void debugger_variable_set( const char *name, libspectrum_dword value );
 libspectrum_dword debugger_variable_get( const char *name );
 

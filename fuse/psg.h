@@ -31,7 +31,7 @@
 /* Are we currently recording a .psg file? */
 extern int psg_recording;
 
-int psg_init( void );
+void psg_init( void );
 
 int psg_start_recording( const char *filename );
 int psg_stop_recording( void );

@@ -81,13 +81,11 @@ spectrum_frame_event_fn( libspectrum_dword last_tstates, int type,
   ui_error_frame();
 }
 
-int
+void
 spectrum_init( void )
 {
   spectrum_frame_event = event_register( spectrum_frame_event_fn,
 					 "End of frame" );
-
-  return 0;
 }
 
 int

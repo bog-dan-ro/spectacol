@@ -39,16 +39,10 @@
 
 static GHashTable *debugger_variables;
 
-int
+void
 debugger_variable_init( void )
 {
   debugger_variables = g_hash_table_new( g_str_hash, g_str_equal );
-  if( !debugger_variables ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
-
-  return 0;
 }
 
 void

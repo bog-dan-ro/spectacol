@@ -95,7 +95,7 @@ static module_info_t memory_module_info = {
 /* Set up the information about the normal page mappings.
    Memory contention and usable pages vary from machine to machine and must
    be set in the appropriate _reset function */
-int
+void
 memory_init( void )
 {
   size_t i, j;
@@ -131,8 +131,6 @@ memory_init( void )
     }
 
   module_register( &memory_module_info );
-
-  return 0;
 }
 
 static void
