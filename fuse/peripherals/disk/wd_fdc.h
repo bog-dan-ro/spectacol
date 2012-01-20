@@ -143,7 +143,7 @@ typedef struct wd_fdc {
 
 } wd_fdc;
 
-int wd_fdc_init_events( void );
+void wd_fdc_init_events( void );
 
 /* allocate an fdc */
 wd_fdc *wd_fdc_alloc_fdc( wd_type_t type, int hlt_time, unsigned int flags );

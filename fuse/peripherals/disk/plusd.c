@@ -139,7 +139,7 @@ static const periph_t plusd_periph = {
   plusd_activate
 };
 
-int
+void
 plusd_init( void )
 {
   int i;
@@ -173,8 +173,6 @@ plusd_init( void )
     plusd_memory_map_romcs_ram[ i ].source = plusd_memory_source;
 
   periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
-
-  return 0;
 }
 
 static void

@@ -147,7 +147,7 @@ beta_select_drive( int i )
   }
 }
 
-int
+void
 beta_init( void )
 {
   int i;
@@ -178,8 +178,6 @@ beta_init( void )
     beta_memory_map_romcs[i].source = beta_memory_source;
 
   periph_register( PERIPH_TYPE_BETA128, &beta_peripheral );
-
-  return 0;
 }
 
 static void

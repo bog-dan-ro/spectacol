@@ -116,7 +116,7 @@ typedef struct fdd_params_t {
 extern const fdd_params_t fdd_params[];
 
 /* initialize the event codes */
-int fdd_init_events( void );
+void fdd_init_events( void );
 
 const char *fdd_strerror( int error );
 /* initialize the fdd_t struct, and set fdd_heads and cylinders (e.g. 2/83 ) */

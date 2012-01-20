@@ -159,7 +159,7 @@ static const periph_t disciple_periph = {
   disciple_activate
 };
 
-int
+void
 disciple_init( void )
 {
   int i, j;
@@ -204,8 +204,6 @@ disciple_init( void )
   }
 
   periph_register( PERIPH_TYPE_DISCIPLE, &disciple_periph );
-
-  return 0;
 }
 
 static void

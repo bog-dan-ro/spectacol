@@ -65,20 +65,13 @@ fdd_event( libspectrum_dword last_tstates, int event, void *user_data );
 
 static int motor_event;
 
-int
+void
 fdd_init_events( void )
 {
-  int error;
-
   motor_event = event_register( fdd_event, "FDD motor on" );
 
-  error = upd_fdc_init_events();
-  if( error ) return error;
-
-  error = wd_fdc_init_events();
-  if( error ) return error;
-
-  return 0;
+  upd_fdc_init_events();
+  wd_fdc_init_events();
 }
 
 const char *

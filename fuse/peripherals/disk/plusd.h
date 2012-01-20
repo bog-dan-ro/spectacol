@@ -42,7 +42,7 @@ typedef enum plusd_drive_number {
 extern int plusd_available;  /* Is the +D available for use? */
 extern int plusd_active;     /* +D enabled? */
 
-int plusd_init( void );
+void plusd_init( void );
 void plusd_end( void );
 
 void plusd_page( void );

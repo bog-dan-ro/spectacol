@@ -135,7 +135,7 @@ opus_set_datarq( struct wd_fdc *f )
   event_add( 0, z80_nmi_event );
 }
 
-int
+void
 opus_init( void )
 {
   int i;
@@ -170,8 +170,6 @@ opus_init( void )
     opus_memory_map_romcs_ram[i].source = opus_ram_memory_source;
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
-
-  return 0;
 }
 
 static void

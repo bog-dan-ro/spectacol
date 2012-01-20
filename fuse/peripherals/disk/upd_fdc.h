@@ -168,7 +168,7 @@ typedef struct upd_fdc {
 
 } upd_fdc;
 
-int upd_fdc_init_events( void );
+void upd_fdc_init_events( void );
 
 /* allocate an fdc */
 upd_fdc *upd_fdc_alloc_fdc( upd_type_t type, upd_clock_t clock );

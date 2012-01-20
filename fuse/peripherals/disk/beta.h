@@ -43,7 +43,7 @@ extern memory_page beta_memory_map_romcs[MEMORY_PAGES_IN_16K];
 extern libspectrum_word beta_pc_mask; /* Bits to mask in PC for enable check */
 extern libspectrum_word beta_pc_value; /* Value to compare masked PC against */
 
-int beta_init( void );
+void beta_init( void );
 
 void beta_end( void );
 

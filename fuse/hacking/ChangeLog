@@ -3985,3 +3985,6 @@
 20120119 debugger/{debugger.[ch],debugger_internals.h,event.c,variable.c},
          fuse.c,memory.[ch],mempool.[ch],peripherals/{printer.[ch]},psg.[ch],
          spectrum.[ch]: more init functions that can never fail.
+20120120 fuse.c,peripherals/disk/{beta.[ch],disciple.[ch],fdd.[ch],opus.[ch],
+         plusd.[ch],upd_fdc.[ch],wd_fdc.[ch]}: yet more init functions that can
+	 never fail.

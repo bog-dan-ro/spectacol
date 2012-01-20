@@ -99,14 +99,12 @@ static int fdc_event, head_event, timeout_event;
 static void
 upd_fdc_event( libspectrum_dword last_tstates, int event, void *user_data );
 
-int
+void
 upd_fdc_init_events( void )
 {
   fdc_event = event_register( upd_fdc_event, "UPD FDC event" );
   head_event = event_register( upd_fdc_event, "UPD FDC head (un)load" );
   timeout_event = event_register( upd_fdc_event, "UPD FDC timeout" );
-
-  return 0;
 }
 
 static void

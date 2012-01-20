@@ -51,14 +51,12 @@ static void wd_fdc_event( libspectrum_dword last_tstates, int event,
 
 static int fdc_event, motor_off_event, timeout_event;
 
-int
+void
 wd_fdc_init_events( void )
 {
   fdc_event = event_register( wd_fdc_event, "WD FDC event" );
   motor_off_event = event_register( wd_fdc_event, "WD FDC motor off" );
   timeout_event = event_register( wd_fdc_event, "WD FDC timeout" );
-
-  return 0;
 }
 
 void

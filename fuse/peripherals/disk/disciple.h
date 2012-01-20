@@ -42,7 +42,7 @@ typedef enum disciple_drive_number {
 extern int disciple_available;  /* Is the DISCiPLE available for use? */
 extern int disciple_active;     /* DISCiPLE enabled? */
 
-int disciple_init( void );
+void disciple_init( void );
 void disciple_end( void );
 
 void disciple_page( void );

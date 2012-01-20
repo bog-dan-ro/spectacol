@@ -43,7 +43,7 @@ typedef enum opus_drive_number {
 extern int opus_available;  /* Is the Opus available for use? */
 extern int opus_active;     /* Opus enabled? */
 
-int opus_init( void );
+void opus_init( void );
 void opus_end( void );
 
 void opus_page( void );

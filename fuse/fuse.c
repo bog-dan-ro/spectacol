@@ -59,6 +59,7 @@
 #include "machine.h"
 #include "machines/machines_periph.h"
 #include "memory.h"
+#include "mempool.h"
 #include "peripherals/ay.h"
 #include "peripherals/dck.h"
 #include "peripherals/disk/beta.h"
@@ -191,8 +192,6 @@ int main(int argc, char **argv)
 
 }
 
-#include "mempool.h"
-
 static int fuse_init(int argc, char **argv)
 {
   int error, first_arg;
@@ -282,11 +281,11 @@ static int fuse_init(int argc, char **argv)
   printer_init();
   rzx_init();
   psg_init();
-  if( beta_init() ) return 1;
-  if( opus_init() ) return 1;
-  if( plusd_init() ) return 1;
-  if( disciple_init() ) return 1;
-  if( fdd_init_events() ) return 1;
+  beta_init();
+  opus_init();
+  plusd_init();
+  disciple_init();
+  fdd_init_events();
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
