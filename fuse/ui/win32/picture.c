@@ -85,9 +85,7 @@ win32ui_picture( const char *filename, int border )
 
     draw_screen( screen.buffer, border );
 
-    if( utils_close_file( &screen ) ) {
-      return 1;
-    }
+    utils_close_file( &screen );
 
     ReleaseDC( hDialogPicture, dc );
 

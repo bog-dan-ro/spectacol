@@ -52,6 +52,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "options_internals.h"
 #include "periph.h"
 #include "settings.h"
+#include "utils.h"
 #include "win32internals.h"
 
 static int
@@ -148,7 +149,7 @@ menu_options_$_->{name}_proc( HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lPar
     {
       /* FIXME: save the handle returned by LoadIcon() in win32ui.c */
       SendMessage( hwndDlg, WM_SETICON, ICON_SMALL,
-	(LPARAM)LoadIcon( fuse_hInstance, "win32_icon" ) );
+        (LPARAM)LoadIcon( fuse_hInstance, "win32_icon" ) );
 
       /* initialize the controls with current settings */
 
@@ -163,6 +164,7 @@ CODE
         print << "CODE";
       SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname}, BM_SETCHECK,
         settings_current.$widget->{value} ? BST_CHECKED : BST_UNCHECKED, 0 );
+
 CODE
 	} elsif( $widget->{type} eq "Entry" ) {
 	    my $idcname = uc( "$widget->{value}" );
@@ -171,6 +173,7 @@ CODE
       snprintf( buffer, 80, "%d", settings_current.$widget->{value} );
       SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname}, WM_SETTEXT,
         0, (LPARAM) buffer );
+
 CODE
 	} elsif( $type eq "Combo" ) {
           my $idcname = uc( "$widget->{value}" );
@@ -191,6 +194,7 @@ CODE
           }
         }
       }
+
 CODE
 	} else {
           die "Unknown type `$type'";
@@ -198,15 +202,14 @@ CODE
     }
 
 print << "CODE";
-
       return FALSE;
     }
 
     case WM_COMMAND:
       switch( LOWORD( wParam ) )
       {
-	case IDOK:
-	{
+        case IDOK:
+        {
           /* Read the controls and apply the settings */
 CODE
     foreach my $widget ( @{ $_->{widgets} } ) {
@@ -218,23 +221,24 @@ CODE
 	    print << "CODE";
           settings_current.$widget->{value} =
             IsDlgButtonChecked( hwndDlg, IDC_${optname}_${idcname} );
+
 CODE
 	} elsif( $widget->{type} eq "Entry" ) {
 	    my $idcname = uc( "$widget->{value}" );
         print << "CODE";
-      /* FIXME This is asuming SendDlgItemMessage is not UNICODE */
-      SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname}, WM_GETTEXT,
-        80, (LPARAM) buffer );
-      settings_current.$widget->{value} = atoi( buffer );  
+          /* FIXME This is asuming SendDlgItemMessage is not UNICODE */
+          SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname}, WM_GETTEXT, 80, (LPARAM) buffer );
+          settings_current.$widget->{value} = atoi( buffer );  
+
 CODE
 	} elsif( $widget->{type} eq "Combo" ) {
 	    my $idcname = uc( "$widget->{value}" );
 	    print << "CODE";
-      free( settings_current.$widget->{value} );
-      settings_current.$widget->{value} =
-        strdup( $_->{name}_$widget->{value}_combo[
-        SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname},
-          CB_GETCURSEL, 0, 0 ) ] );
+          free( settings_current.$widget->{value} );
+          settings_current.$widget->{value} =
+            utils_safe_strdup( $_->{name}_$widget->{value}_combo[
+            SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname}, CB_GETCURSEL, 0, 0 ) ] );
+
 CODE
         } else {
           die "Unknown type `$widget->{type}'";
@@ -247,20 +251,21 @@ CODE
           win32statusbar_set_visibility( settings_current.statusbar );
           display_refresh_all();
 
-	  EndDialog( hwndDlg, 0 );
-	  return 0;
-	}
+          EndDialog( hwndDlg, 0 );
+          return 0;
+        }
 
-	case IDCANCEL:
-	  EndDialog( hwndDlg, 0 );
-	  return 0;
-      }
-      break;
+        case IDCANCEL:
+          EndDialog( hwndDlg, 0 );
+          return 0;
+        }
+        break;
 
     case WM_CLOSE:
       EndDialog( hwndDlg, 0 );
       return 0;
   }
+
   return FALSE;
 }
 

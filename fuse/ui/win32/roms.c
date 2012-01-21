@@ -29,11 +29,10 @@
 #include <windows.h>
 
 #include "fuse.h"
+#include "roms.h"
 #include "settings.h"
 #include "ui/ui.h"
 #include "win32internals.h"
-
-#include "roms.h"
 
 static void add_rom( HWND hwndDlg, size_t start, size_t row );
 static void select_new_rom( HWND hedit );
@@ -244,9 +243,8 @@ static void
 roms_done( HWND hwndDlg, LONG lParam )
 {
   size_t i;
-  int error;
   
-  TCHAR **setting; const TCHAR *string;
+  TCHAR **setting; TCHAR *string;
   size_t string_len;
   
   struct callback_info *info = ( struct callback_info * ) lParam;
@@ -258,11 +256,8 @@ roms_done( HWND hwndDlg, LONG lParam )
     string_len = SendMessage( rom[i], WM_GETTEXTLENGTH, 0, 0 );
     string = malloc( sizeof( TCHAR ) * ( string_len + 1 ) );
     SendMessage( rom[i], WM_GETTEXT, string_len + 1, ( LPARAM ) string );
-    
-    error = settings_set_string( setting, string ); if( error ) return;
 
-/* FIXME: do I need to free string?
+    settings_set_string( setting, string );
     free( string );
-*/
   }
 }

@@ -27,6 +27,7 @@
 
 #include <windows.h>
 
+#include "utils.h"
 #include "win32internals.h"
 
 /* FIXME: remember the last directory when opening/saving

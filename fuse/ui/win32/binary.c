@@ -157,8 +157,7 @@ change_load_filename( HWND hwndDlg, LONG user_data )
   if( error ) { free( new_filename ); return; }
 
   /* Remove the data for the old file */
-  error = utils_close_file( &info->file );
-  if( error ) { free( new_filename ); return; }
+  utils_close_file( &info->file );
 
   free( info->filename );
 
