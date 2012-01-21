@@ -33,7 +33,7 @@
 /* IF2 cart inserted? */
 extern int if2_active;
 
-int if2_init( void );
+void if2_init( void );
 int if2_insert( const char *filename );
 void if2_eject( void );
 

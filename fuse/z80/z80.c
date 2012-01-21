@@ -92,7 +92,7 @@ z80_interrupt_event_fn( libspectrum_dword tstates, int type, void *user_data )
 }
 
 /* Set up the z80 emulation */
-int
+void
 z80_init( void )
 {
   z80_init_tables();
@@ -102,8 +102,6 @@ z80_init( void )
   z80_nmi_event = event_register( z80_nmi, "Non-maskable interrupt" );
 
   module_register( &z80_module_info );
-
-  return 0;
 }
 
 /* Initalise the tables used to set flags */

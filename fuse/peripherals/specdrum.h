@@ -37,7 +37,7 @@ typedef struct specdrum_info {
   libspectrum_signed_byte specdrum_dac; /* Current byte in the SpecDrum 8bit DAC */
 } specdrum_info;
 
-int specdrum_init( void );
+void specdrum_init( void );
 void specdrum_write( libspectrum_word port, libspectrum_byte val );
 
 #endif                          /* #ifndef FUSE_SPECRUM_H */

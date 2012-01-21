@@ -38,7 +38,7 @@ libspectrum_byte pokefinder_possible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ]
 libspectrum_byte pokefinder_impossible[ MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES ][ MEMORY_PAGE_SIZE / 8 ];
 size_t pokefinder_count;
 
-int
+void
 pokefinder_clear( void )
 {
   size_t page, max_page;
@@ -52,8 +52,6 @@ pokefinder_clear( void )
       memset( pokefinder_impossible[page], 0, MEMORY_PAGE_SIZE / 8 );
     } else
       memset( pokefinder_impossible[page], 255, MEMORY_PAGE_SIZE / 8 );
-
-  return 0;
 }
 
 int

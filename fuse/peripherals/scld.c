@@ -78,12 +78,11 @@ static const periph_t scld_periph = {
   scld_ports
 };
 
-int
+void
 scld_init( void )
 {
   module_register( &scld_module_info );
   periph_register( PERIPH_TYPE_SCLD, &scld_periph );
-  return 0;
 }
 
 static libspectrum_byte

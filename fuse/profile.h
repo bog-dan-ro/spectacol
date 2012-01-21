@@ -28,7 +28,7 @@
 
 extern int profile_active;
 
-int profile_init( void );
+void profile_init( void );
 void profile_start( void );
 void profile_map( libspectrum_word pc );
 void profile_frame( libspectrum_dword frame_length );

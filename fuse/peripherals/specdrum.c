@@ -61,12 +61,11 @@ static const periph_t specdrum_periph = {
   specdrum_ports
 };
 
-int
+void
 specdrum_init( void )
 {
   module_register( &specdrum_module_info );
   periph_register( PERIPH_TYPE_SPECDRUM, &specdrum_periph );
-  return 0;
 }
 
 static void

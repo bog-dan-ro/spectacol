@@ -34,7 +34,7 @@ extern libspectrum_byte ula_contention[ ULA_CONTENTION_SIZE ];
 /* And how much when it is inactive */
 extern libspectrum_byte ula_contention_no_mreq[ ULA_CONTENTION_SIZE ];
 
-int ula_init( void );
+void ula_init( void );
 
 libspectrum_byte ula_last_byte( void );
 

@@ -172,7 +172,7 @@ speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte va
   out_register_state = val;
 }
 
-int
+void
 speccyboot_init( void )
 {
   int i;
@@ -194,8 +194,6 @@ speccyboot_init( void )
     speccyboot_memory_map_romcs[i].source = speccyboot_memory_source;
 
   periph_register( PERIPH_TYPE_SPECCYBOOT, &speccyboot_periph );
-
-  return 0;
 }
 
 int

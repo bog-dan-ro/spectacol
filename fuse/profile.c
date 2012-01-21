@@ -55,12 +55,10 @@ static module_info_t profile_module_info = {
 
 };
 
-int
+void
 profile_init( void )
 {
   module_register( &profile_module_info );
-
-  return 0;
 }
 
 static void

@@ -79,7 +79,6 @@
 #include "peripherals/speccyboot.h"
 #include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
-#include "pokefinder/pokefinder.h"
 #include "pokefinder/pokemem.h"
 #include "profile.h"
 #include "psg.h"
@@ -290,22 +289,22 @@ static int fuse_init(int argc, char **argv)
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
   if1_init();
-  if( if2_init() ) return 1;
+  if2_init();
   if( divide_init() ) return 1;
-  if( scld_init() ) return 1;
-  if( ula_init() ) return 1;
-  if( ay_init() ) return 1;
-  if( slt_init() ) return 1;
-  if( profile_init() ) return 1;
-  if( kempmouse_init() ) return 1;
-  if( fuller_init() ) return 1;
-  if( melodik_init() ) return 1;
-  if( speccyboot_init() ) return 1;
-  if( specdrum_init() ) return 1;
+  scld_init();
+  ula_init();
+  ay_init();
+  slt_init();
+  profile_init();
+  kempmouse_init();
+  fuller_init();
+  melodik_init();
+  speccyboot_init();
+  specdrum_init();
   spectranet_init();
   machines_periph_init();
 
-  if( z80_init() ) return 1;
+  z80_init();
 
   if( timer_init() ) return 1;
 

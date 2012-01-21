@@ -120,7 +120,7 @@ extern libspectrum_byte scld_last_hsr; /* Last byte sent to Timex HSR port */
 extern memory_page timex_exrom[MEMORY_PAGES_IN_64K];
 extern memory_page timex_dock[MEMORY_PAGES_IN_64K];
 
-int scld_init( void );
+void scld_init( void );
 
 void scld_dec_write( libspectrum_word port, libspectrum_byte b );
 void scld_hsr_write( libspectrum_word port, libspectrum_byte b );

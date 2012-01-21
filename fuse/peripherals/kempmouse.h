@@ -29,7 +29,7 @@
 #include <libspectrum.h>
 #include "periph.h"
 
-int kempmouse_init( void );
+void kempmouse_init( void );
 void kempmouse_update( int dx, int dy, int button, int down );
 
 #endif

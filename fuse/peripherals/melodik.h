@@ -26,6 +26,6 @@
 #ifndef FUSE_MELODIK_H
 #define FUSE_MELODIK_H
 
-int melodik_init( void );
+void melodik_init( void );
 
 #endif				/* #ifndef FUSE_MELODIK_H */

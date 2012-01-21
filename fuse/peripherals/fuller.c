@@ -82,11 +82,9 @@ fuller_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_fuller_box_active( snap, active );
 }
 
-int
+void
 fuller_init( void )
 {
   module_register( &fuller_module_info );
   periph_register( PERIPH_TYPE_FULLER, &fuller_periph );
-
-  return 0;
 }

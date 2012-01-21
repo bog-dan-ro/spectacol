@@ -28,6 +28,6 @@
 #ifndef FUSE_FULLER_H
 #define FUSE_FULLER_H
 
-int fuller_init( void );
+void fuller_init( void );
 
 #endif				/* #ifndef FUSE_FULLER_H */

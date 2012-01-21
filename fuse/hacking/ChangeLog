@@ -3999,3 +3999,7 @@
          (Sergio Baldoví).
 20120121 peripherals/{nic/w5100.c,spectranet.c},ui/gtk/pokemem.c: include
          <string.h> for memset template (Fred).
+20120121 fuse.c,peripherals/{ay.[ch],fuller.[ch],if2.[ch],kempmouse.[ch],
+         melodik.[ch],scld.[ch],speccyboot.[ch],specdrum.[ch],ula.[ch]},
+         pokefinder/pokefinder.[ch],profile.[ch],slt.[ch],z80/z80.[ch]: even
+         more init functions that cannot fail.
