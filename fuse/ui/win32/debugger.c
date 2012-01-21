@@ -88,10 +88,10 @@ static void events_click( LPNMITEMACTIVATE lpnmitem );
 /* int create_buttons( void ); this function is handled by rc */
 
 static int activate_debugger( void );
-static int update_memory_map( void );
-static int update_breakpoints( void );
-static int update_disassembly( void );
-static int update_events( void );
+static void update_memory_map( void );
+static void update_breakpoints( void );
+static void update_disassembly( void );
+static void update_events( void );
 static void add_event( gpointer data, gpointer user_data GCC_UNUSED );
 static int deactivate_debugger( void );
 
@@ -577,7 +577,6 @@ ui_debugger_update( void )
   TCHAR *disassembly_text[2] = { &buffer[0], &buffer[40] };
   libspectrum_word address;
   int capabilities; size_t length;
-  int error;
 
   const char *register_name[] = { TEXT( "PC" ), TEXT( "SP" ),
 				  TEXT( "AF" ), TEXT( "AF'" ),
@@ -678,13 +677,9 @@ ui_debugger_update( void )
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_ULA,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
 
-  /* Update the memory map display */
-  error = update_memory_map(); if( error ) return error;
-
-  error = update_breakpoints(); if( error ) return error;
-
-  /* Update the disassembly */
-  error = update_disassembly(); if( error ) return error;
+  update_memory_map();
+  update_breakpoints();
+  update_disassembly();
 
   /* And the stack display */
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_STACK,
@@ -714,46 +709,76 @@ ui_debugger_update( void )
   }
 
   /* And the events display */
-  error = update_events(); if( error ) return error;
+  update_events();
 
   return 0;
 }
 
-static int
+static void
 update_memory_map( void )
 {
-  size_t i;
   TCHAR buffer[ 40 ];
+  int source, page_num, writable, contended;
+  libspectrum_word offset;
+  size_t i, j, block, row;
 
-  for( i = 0; i < 8; i++ ) {
+  source = page_num = writable = contended = -1;
+  offset = 0;
+  row = 0;
 
-    _sntprintf( buffer, 40, format_16_bit(), (unsigned)i * 0x2000 );
-    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ), 
-                        WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
+  for( block = 0; block < MEMORY_PAGES_IN_64K && row < 8; block++ ) {
+    memory_page *page = &memory_map_read[block];
 
-    /* FIXME: memory_source_description is not unicode */
-    _snprintf( buffer, 40, TEXT( "%s %d" ),
-               memory_source_description( memory_map_read[i].source ),
-               memory_map_read[i].page_num );
+    if( page->source != source ||
+      page->page_num != page_num ||
+      page->offset != offset ||
+      page->writable != writable ||
+      page->contended != contended ) {
 
-    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ) + 1, 
-                        WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
+      _sntprintf( buffer, 40, format_16_bit(), (unsigned)block * 0x1000 );
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( row * 4 ), 
+                          WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
 
-    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ) + 2, 
-                        WM_SETTEXT, (WPARAM) 0,
-                        ( LPARAM ) ( memory_map_read[i].writable
-                        ? TEXT( "Y" ) : TEXT( "N" ) ) );
+      /* FIXME: memory_source_description is not unicode */
+      _snprintf( buffer, 40, TEXT( "%s %d" ),
+                 memory_source_description( page->source ), page->page_num );
 
-    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ) + 2, 
-                        WM_SETTEXT, (WPARAM) 0,
-                        ( LPARAM ) ( memory_map_read[i].contended
-                        ? TEXT( "Y" ) : TEXT( "N" ) ) );
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( row * 4 ) + 1,
+                          WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
+
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( row * 4 ) + 2,
+                          WM_SETTEXT, (WPARAM) 0,
+                          ( LPARAM ) ( page->writable
+                          ? TEXT( "Y" ) : TEXT( "N" ) ) );
+
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( row * 4 ) + 3,
+                          WM_SETTEXT, (WPARAM) 0,
+                          ( LPARAM ) ( page->contended
+                          ? TEXT( "Y" ) : TEXT( "N" ) ) );
+      row++;
+
+      source = page->source;
+      page_num = page->page_num;
+      writable = page->writable;
+      contended = page->contended;
+      offset = page->offset;
+    }
+
+    /* We expect the next page to have an increased offset */
+    offset += MEMORY_PAGE_SIZE;
   }
 
-  return 0;
+  /* Hide unused rows */
+  for( i = row; i < 8; i++ ) {
+    for( j = 0; j < 4; j++ ) {
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ) + j,
+                          WM_SETTEXT, (WPARAM) 0, (LPARAM) NULL );
+    }
+  }
+
 }
 
-static int
+static void
 update_breakpoints( void )
 {
   /* FIXME: review this function for unicode compatibility */
@@ -838,11 +863,9 @@ update_breakpoints( void )
                             ( LPARAM ) &lvi );
     }
   }
-
-  return 0;
 }
 
-static int
+static void
 update_disassembly()
 {
   size_t i, length; libspectrum_word address;
@@ -880,10 +903,9 @@ update_disassembly()
                         ( LPARAM ) &lvi );
   }
 
-  return 0;
 }
 
-static int
+static void
 update_events( void )
 {
   /* clear the listview */
@@ -891,8 +913,6 @@ update_events( void )
                       LVM_DELETEALLITEMS, 0, 0 );
 
   event_foreach( add_event, NULL );
-
-  return 0;
 }
 
 static void
