@@ -125,7 +125,7 @@ move_button( int button, int dlg_height )
 static void
 update_pokefinder( void )
 {
-  size_t page, offset;
+  size_t page, offset, bank, bank_offset;
   TCHAR buffer[256], *possible_text[2] = { &buffer[0], &buffer[128] };
   int rcx, rcy;
   DWORD dw_res;
@@ -142,16 +142,20 @@ update_pokefinder( void )
 
     size_t which = 0;
 
-    for( page = 0; page < 2 * SPECTRUM_RAM_PAGES; page++ )
-      for( offset = 0; offset < 0x2000; offset++ )
-	if( ! (pokefinder_impossible[page][offset/8] & 1 << (offset & 7)) ) {
+    for( page = 0; page < MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES; page++ ) {
+      memory_page *mapping = &memory_map_ram[page];
+      bank = mapping->page_num;
 
-	  possible_page[ which ] = page / 2;
-	  possible_offset[ which ] = offset + 8192 * (page & 1);
+      for( offset = 0; offset < MEMORY_PAGE_SIZE; offset++ )
+	if( ! (pokefinder_impossible[page][offset/8] & 1 << (offset & 7)) ) {
+	  bank_offset = mapping->offset + offset;
+
+	  possible_page[ which ] = bank;
+	  possible_offset[ which ] = bank_offset;
 	  which++;
 	
-	  _sntprintf( possible_text[0], 128, "%d", (unsigned)page );
-	  _sntprintf( possible_text[1], 128, "0x%04X", (unsigned)offset );
+	  _sntprintf( possible_text[0], 128, "%d", (unsigned)bank );
+	  _sntprintf( possible_text[1], 128, "0x%04X", (unsigned)bank_offset );
 
           /* set new count of items */
           SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LIST, LVM_SETITEMCOUNT,
@@ -170,6 +174,7 @@ update_pokefinder( void )
 
           i++;
         }
+    }
 
     /* show the listview */
     ShowWindow( lv_hWnd, SW_SHOW );
@@ -339,7 +344,7 @@ possible_click( LPNMITEMACTIVATE lpnmitem )
   row = lpnmitem->iItem;
   
   error = debugger_breakpoint_add_address(
-    DEBUGGER_BREAKPOINT_TYPE_WRITE, memory_source_ram, possible_page[ row ] + 1,
+    DEBUGGER_BREAKPOINT_TYPE_WRITE, memory_source_ram, possible_page[ row ],
     possible_offset[ row ], 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, NULL
   );
   if( error ) return;

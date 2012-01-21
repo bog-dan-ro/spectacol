@@ -305,8 +305,6 @@ static int fuse_init(int argc, char **argv)
   spectranet_init();
   machines_periph_init();
 
-  error = pokefinder_clear(); if( error ) return error;
-
   if( z80_init() ) return 1;
 
   if( timer_init() ) return 1;

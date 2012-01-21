@@ -66,6 +66,8 @@ typedef struct spectrum_raminfo {
 
   int romcs;			/* Is the /ROMCS line low? */
 
+  int valid_pages;		/* Available RAM */
+
 } spectrum_raminfo;
 
 libspectrum_byte spectrum_contend_delay_none( libspectrum_dword time );

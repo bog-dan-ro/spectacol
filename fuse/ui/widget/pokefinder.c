@@ -73,21 +73,27 @@ widget_pokefinder_draw( void *data )
 static void
 update_possible( void )
 {
-  size_t page, offset, i = 0;
+  size_t page, offset, bank, bank_offset, i = 0;
 
   selected = 0;
 
   if( !FEW_ENOUGH() )
     return;
 
-  for( page = 0; page < SPECTRUM_RAM_PAGES; ++page )
-    for( offset = 0; offset < 0x4000; ++offset )
+  for( page = 0; page < MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES; page++ ) {
+    memory_page *mapping = &memory_map_ram[page];
+    bank = mapping->page_num;
+
+    for( offset = 0; offset < MEMORY_PAGE_SIZE; ++offset )
       if( ! (pokefinder_impossible[page][offset/8] & 1 << (offset & 7)) ) {
-	possible_page[i] = page / 2;
-	possible_offset[i] = offset + 8192 * (page & 1);
+	bank_offset = mapping->offset + offset;
+
+	possible_page[i] = bank;
+	possible_offset[i] = bank_offset;
 	if( ++i == pokefinder_count )
 	  return;
       }
+  }
 }
 
 static void
@@ -197,16 +203,16 @@ widget_pokefinder_keyhandler( input_key key )
   case INPUT_KEY_b:		/* Add breakpoint */
     if( FEW_ENOUGH() )
     {
-      widget_rectangle( 128, 32, 112, 8, WIDGET_COLOUR_BACKGROUND );
+      widget_rectangle( 128, 24, 112, 8, WIDGET_COLOUR_BACKGROUND );
       if( debugger_breakpoint_add_address(
             DEBUGGER_BREAKPOINT_TYPE_WRITE, memory_source_ram,
             possible_page[selected], possible_offset[selected], 0,
             DEBUGGER_BREAKPOINT_LIFE_PERMANENT, NULL
 	  ) ) {
-	widget_printstring( 16, 88, WIDGET_COLOUR_FOREGROUND,
+	widget_printstring( 16, 80, WIDGET_COLOUR_FOREGROUND,
 			    "Breakpoint failed" );
       } else {
-	widget_printstring( 16, 88, WIDGET_COLOUR_FOREGROUND,
+	widget_printstring( 16, 80, WIDGET_COLOUR_FOREGROUND,
 			    "Breakpoint added" );
       }
       widget_display_lines( 10, 1 );

@@ -3989,3 +3989,11 @@
          plusd.[ch],upd_fdc.[ch],wd_fdc.[ch]}: yet more init functions that can
 	 never fail.
 20120121 ui/widget/{options.pl,pokemem.c,widget.c}: fix warnings.
+20120121 fuse.c,machines/{pentagon.c,pentagon1024.c,pentagon512.c,scorpion.c,
+         spec128.c,spec16.c,spec48.c,spec48_ntsc.c,spec_se.c,specplus2.c,
+         specplus2a.c,specplus3.c,specplus3e.c,tc2048.c,tc2068.c,ts2068.c},
+         pokefinder/pokefinder.[ch],spectrum.h,ui/gtk/pokefinder.c,
+         ui/widget/pokefinder.c,ui/win32/pokefinder.c: fix pokefinder for
+         Spectranet branch changes, fix breakpoint adding, limit RAM page
+         search to active pages for the current machine (fixes bug #3470623)
+         (Sergio Baldoví).
