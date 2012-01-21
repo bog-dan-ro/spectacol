@@ -25,6 +25,8 @@
 
 #include "config.h"
 
+#include <string.h>
+
 #include "compat.h"
 #include "debugger/debugger.h"
 #include "flash/am29f010.h"

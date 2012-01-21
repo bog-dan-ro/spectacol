@@ -26,6 +26,7 @@
 #include <config.h>
 #include <ctype.h>
 #include <errno.h>
+#include <string.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>

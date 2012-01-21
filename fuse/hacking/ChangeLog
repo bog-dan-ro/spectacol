@@ -3997,3 +3997,5 @@
          Spectranet branch changes, fix breakpoint adding, limit RAM page
          search to active pages for the current machine (fixes bug #3470623)
          (Sergio Baldoví).
+20120121 peripherals/{nic/w5100.c,spectranet.c},ui/gtk/pokemem.c: include
+         <string.h> for memset template (Fred).

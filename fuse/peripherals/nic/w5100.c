@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
