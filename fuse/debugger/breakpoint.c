@@ -193,8 +193,8 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
 
   bp = malloc( sizeof( *bp ) );
   if( !bp ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    fuse_abort();
   }
 
   bp->id = next_breakpoint_id++; bp->type = type;
@@ -219,12 +219,8 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
 
   /* If this was a timed breakpoint, set an event to stop emulation
      at that point */
-  if( type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
-    int error;
-
-    error = event_add( value.time.tstates, debugger_breakpoint_event );
-    if( error ) return error;
-  }
+  if( type == DEBUGGER_BREAKPOINT_TYPE_TIME )
+    event_add( value.time.tstates, debugger_breakpoint_event );
 
   return 0;
 }

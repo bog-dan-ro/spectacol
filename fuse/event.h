@@ -55,13 +55,13 @@ void event_init( void );
 int event_register( event_fn_t fn, const char *description );
 
 /* Add an event at the correct place in the event list */
-int event_add_with_data( libspectrum_dword event_time, int type,
-			 void *user_data );
+void event_add_with_data( libspectrum_dword event_time, int type,
+			  void *user_data );
 
-static inline int
+static inline void
 event_add( libspectrum_dword event_time, int type )
 {
-  return event_add_with_data( event_time, type, NULL );
+  event_add_with_data( event_time, type, NULL );
 }
 
 /* Do all events which have passed */

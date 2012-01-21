@@ -212,9 +212,8 @@ machine_select_machine( fuse_machine_info *machine )
 
   /* Reset the event stack */
   event_reset();
-  if( event_add( 0, timer_event ) ) return 1;
-  if( event_add( machine->timings.tstates_per_frame, spectrum_frame_event ) )
-    return 1;
+  event_add( 0, timer_event );
+  event_add( machine->timings.tstates_per_frame, spectrum_frame_event );
 
   sound_end();
 

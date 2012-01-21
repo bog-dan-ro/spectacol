@@ -688,7 +688,6 @@ beta_get_fdd( beta_drive_number which )
 static void
 beta_event_index( libspectrum_dword last_tstates, int type, void *user_data )
 {
-  int error;
   int next_tstates;
   int i;
 
@@ -706,8 +705,8 @@ beta_event_index( libspectrum_dword last_tstates, int type, void *user_data )
   }
   next_tstates = ( beta_index_pulse ? 10 : 190 ) *
     machine_current->timings.processor_speed / 1000;
-  error = event_add( last_tstates + next_tstates, index_event );
-  if( error ) return;
+
+  event_add( last_tstates + next_tstates, index_event );
 }
 
 static void

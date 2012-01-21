@@ -348,8 +348,7 @@ start_playback( libspectrum_rzx *rzx )
   event_remove_type( spectrum_frame_event );
 
   /* Add a sentinel event to prevent tstates overrun (bug #1057471) */
-  error = event_add( RZX_SENTINEL_TIME, sentinel_event );
-  if( error ) return error;
+  event_add( RZX_SENTINEL_TIME, sentinel_event );
 
   tstates = libspectrum_rzx_tstates( rzx );
   rzx_instruction_count = libspectrum_rzx_instructions( rzx );
@@ -364,7 +363,7 @@ start_playback( libspectrum_rzx *rzx )
 
 int rzx_stop_playback( int add_interrupt )
 {
-  libspectrum_error libspec_error; int error;
+  libspectrum_error libspec_error;
 
   rzx_playback = 0;
 
@@ -379,9 +378,8 @@ int rzx_stop_playback( int add_interrupt )
      and everything works normally as rzx_playback is now zero again */
   if( add_interrupt ) {
 
-    error = event_add( machine_current->timings.tstates_per_frame,
-		       spectrum_frame_event );
-    if( error ) return error;
+    event_add( machine_current->timings.tstates_per_frame,
+               spectrum_frame_event );
 
     /* We're no longer doing RZX playback, so tstates now be <= the
        normal frame count */
@@ -692,8 +690,6 @@ rzx_rollback_to( void )
 static void
 rzx_sentinel( libspectrum_dword ts, int type, void *user_data )
 {
-  int error;
-
   ui_error( UI_ERROR_WARNING, "RZX frame is longer than %u tstates",
 	    RZX_SENTINEL_TIME );
   tstates -= RZX_SENTINEL_TIME_REDUCE;
@@ -701,6 +697,5 @@ rzx_sentinel( libspectrum_dword ts, int type, void *user_data )
 
   /* Add another sentinel event in case this frame continues a lot more after
      this */
-  error = event_add( RZX_SENTINEL_TIME, sentinel_event );
-  if( error ) return;
+  event_add( RZX_SENTINEL_TIME, sentinel_event );
 }

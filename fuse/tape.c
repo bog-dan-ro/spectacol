@@ -690,11 +690,9 @@ int tape_recording = 0;
 
 static tape_rec_state rec_state;
 
-int
+void
 tape_record_start( void )
 {
-  int error;
-
   /* sample rate will be 44.1KHz */
   rec_state.tstates_per_sample =
     machine_current->timings.processor_speed/44100;
@@ -705,9 +703,7 @@ tape_record_start( void )
 
   /* start scheduling events that record into a buffer that we
      start allocating here */
-  error = event_add( tstates + rec_state.tstates_per_sample,
-                     record_event );
-  if( error ) return error;
+  event_add( tstates + rec_state.tstates_per_sample, record_event );
 
   rec_state.last_level = ula_tape_level();
   rec_state.last_level_count = 1;
@@ -716,8 +712,6 @@ tape_record_start( void )
 
   /* Also want to disable other tape actions */
   ui_menu_activate( UI_MENU_ITEM_TAPE_RECORDING, 1 );
-
-  return 0;
 }
 
 static int
@@ -742,8 +736,6 @@ void
 tape_event_record_sample( libspectrum_dword last_tstates, int type,
 			  void *user_data )
 {
-  int error;
-
   if( rec_state.last_level != (ula_tape_level()) ) {
     /* put a sample into the recording buffer */
     rec_state.tape_buffer_used =
@@ -764,12 +756,7 @@ tape_event_record_sample( libspectrum_dword last_tstates, int type,
   rec_state.last_level_count++;
 
   /* schedule next timer */
-  error = event_add( last_tstates + rec_state.tstates_per_sample,
-                     record_event );
-  if( error ) {
-    ui_error( UI_ERROR_ERROR,
-              "tape_event_record_sample: error scheduling next event" );
-  }
+  event_add( last_tstates + rec_state.tstates_per_sample, record_event );
 }
 
 int
@@ -879,7 +866,7 @@ tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
      should occur 'edge_tstates' after the last edge, not after the
      current time (these will be slightly different as we only process
      events between instructions). */
-  if( event_add( last_tstates + edge_tstates, tape_edge_event ) ) return;
+  event_add( last_tstates + edge_tstates, tape_edge_event );
 
   /* Store length flags for acceleration purposes */
   loader_set_acceleration_flags( flags );

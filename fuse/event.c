@@ -89,7 +89,7 @@ event_add_cmp( gconstpointer a1, gconstpointer b1 )
 }
 
 /* Add an event at the correct place in the event list */
-int
+void
 event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
 {
   event_t *ptr;
@@ -99,7 +99,10 @@ event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
     event_free = NULL;
   } else {
     ptr = malloc( sizeof( *ptr ) );
-    if( !ptr ) return 1;
+    if( !ptr ) {
+      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+      fuse_abort();
+    }
   }
 
   ptr->tstates = event_time;
@@ -112,8 +115,6 @@ event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
   } else {
     event_list = g_slist_insert_sorted( event_list, ptr, event_add_cmp );
   }
-
-  return 0;
 }
 
 /* Do all events which have passed */

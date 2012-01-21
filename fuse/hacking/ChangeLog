@@ -4003,3 +4003,6 @@
          melodik.[ch],scld.[ch],speccyboot.[ch],specdrum.[ch],ula.[ch]},
          pokefinder/pokefinder.[ch],profile.[ch],slt.[ch],z80/z80.[ch]: even
          more init functions that cannot fail.
+20120121 debugger/breakpoint.c,event.[ch],machine.c,peripherals/disk/beta.c,
+         rzx.c,spectrum.c,tape.[ch],timer/timer.c: make event_add_with_data()
+         just blow up if it can't allocate memory.
