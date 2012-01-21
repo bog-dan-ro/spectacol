@@ -524,12 +524,11 @@ writeport_internal( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNU
   abort();
 }
 
-int
+void
 event_add_with_data( libspectrum_dword event_time GCC_UNUSED,
 		     int type GCC_UNUSED, void *user_data GCC_UNUSED )
 {
   /* Do nothing */
-  return 0;
 }
 
 int

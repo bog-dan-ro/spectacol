@@ -4010,3 +4010,5 @@
          memory map (patch #3476936) (Sergio).
 20120121 ui/win32/{binary.c,fileselector.c,options.pl,picture.c,roms.c}: fix
          up Win32 for recent error handling changes (patch #3476971) (Sergio).
+20120121 z80/coretest.c: fix up for event_add_with_data() change (thanks,
+         guesser).
