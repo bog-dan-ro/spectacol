@@ -3988,3 +3988,4 @@
 20120120 fuse.c,peripherals/disk/{beta.[ch],disciple.[ch],fdd.[ch],opus.[ch],
          plusd.[ch],upd_fdc.[ch],wd_fdc.[ch]}: yet more init functions that can
 	 never fail.
+20120121 ui/widget/{options.pl,pokemem.c,widget.c}: fix warnings.

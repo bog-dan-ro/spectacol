@@ -494,8 +494,6 @@ int widget_end( void )
 
 int widget_do( widget_type which, void *data )
 {
-  int error;
-
   /* If we don't have a UI yet, we can't output widgets */
   if( !display_ui_initialised ) return 1;
 
@@ -516,7 +514,7 @@ int widget_do( widget_type which, void *data )
   uidisplay_frame_restore();
 
   /* Draw this widget */
-  error = widget_data[ which ].draw( data );
+  widget_data[ which ].draw( data );
 
   /* Set up the keyhandler for this widget */
   widget_keyhandler = widget_data[which].keyhandler;

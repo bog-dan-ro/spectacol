@@ -415,13 +415,13 @@ widget_pokemem_trainer_click( int index )
 void
 widget_pokemem_ask_value( trainer_t *trainer )
 {
-  int error, value;
+  int value;
   widget_text_t text_data;
 
   text_data.title = "Enter trainer value";
   text_data.allow = WIDGET_INPUT_DIGIT;
   snprintf( text_data.text, sizeof( text_data.text ), "%d", trainer->value );
-  error = widget_do( WIDGET_TYPE_TEXT, &text_data );
+  widget_do( WIDGET_TYPE_TEXT, &text_data );
 
   if( widget_text_text ) {
     value = atoi( widget_text_text );
