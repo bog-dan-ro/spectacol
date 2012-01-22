@@ -239,7 +239,6 @@ static int
 parse_options(int argc, char **argv, struct options * options)
 {
   /* Defined by getopt */
-  extern char *optarg;
   extern int optind;
 
   int c;
