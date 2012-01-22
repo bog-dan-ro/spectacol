@@ -29,12 +29,17 @@
 #include "config.h"
 
 #include <errno.h>
-#include <netinet/in.h>
 #include <pthread.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifdef WIN32
+#include <signal.h>
+#else
+#include <netinet/in.h>
+#include <sys/socket.h>
+#endif
 
 #include "fuse.h"
 #include "ui/ui.h"
@@ -149,6 +154,8 @@ nic_w5100_alloc( void )
 {
   int error;
   int i;
+  
+  compat_socket_networking_init();
 
   nic_w5100_t *self = malloc( sizeof( *self ) );
   if( !self ) {
@@ -189,6 +196,8 @@ nic_w5100_free( nic_w5100_t *self )
       nic_w5100_socket_reset( &self->socket[i] );
 
     compat_socket_selfpipe_free( self->selfpipe );
+
+    compat_socket_networking_end();
 
     free( self );
   }

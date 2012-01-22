@@ -4012,3 +4012,6 @@
          up Win32 for recent error handling changes (patch #3476971) (Sergio).
 20120121 z80/coretest.c: fix up for event_add_with_data() change (thanks,
          guesser).
+20120122 compat.h,compat/{unix/socket.c,win32/socket.c},
+         peripherals/{nic/w5100.c,w5100_socket.c},utils.[ch]: make Win32 build
+         at least compile (almost entirely guesser).

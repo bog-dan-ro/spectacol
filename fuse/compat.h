@@ -135,6 +135,9 @@ typedef SOCKET compat_socket_t;
 extern const compat_socket_t compat_socket_invalid;
 extern const int compat_socket_EBADF;
 
+void compat_socket_networking_init( void );
+void compat_socket_networking_end( void );
+
 int compat_socket_close( compat_socket_t fd );
 int compat_socket_get_error( void );
 const char *compat_socket_get_strerror( void );

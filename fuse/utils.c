@@ -66,6 +66,8 @@ typedef struct path_context {
 static void init_path_context( path_context *ctx, utils_aux_type type );
 static int get_next_path( path_context *ctx );
 
+static int networking_init_count = 0;
+
 /* Open `filename' and do something sensible with it; autoload tapes
    if `autoload' is true and return the type of file found in `type' */
 int
@@ -553,3 +555,22 @@ utils_safe_strdup( const char *src )
   }
   return dest;
 }
+
+void
+utils_networking_init( void )
+{
+  if( !networking_init_count )
+    compat_socket_networking_init();
+
+  networking_init_count++;
+}
+
+void
+utils_networking_end( void )
+{
+  networking_init_count--;
+
+  if( !networking_init_count )
+    compat_socket_networking_end();
+}
+

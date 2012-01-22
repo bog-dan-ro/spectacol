@@ -28,13 +28,20 @@
 
 #include "config.h"
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
 #include <pthread.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifdef WIN32
+#include <winsock.h>
+#include <signal.h>
+typedef int socklen_t;
+#else
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#endif
 
 #include "fuse.h"
 #include "ui/ui.h"

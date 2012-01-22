@@ -68,4 +68,7 @@ int utils_read_screen( const char *filename, utils_file *screen );
 
 char* utils_safe_strdup( const char *src );
 
+void utils_networking_init( void );
+void utils_networking_end( void );
+
 #endif			/* #ifndef FUSE_UTILS_H */

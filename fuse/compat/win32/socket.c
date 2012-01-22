@@ -25,15 +25,19 @@
 
 #include <config.h>
 
-#include <winsock2.h>
+#include <winsock.h>
+typedef int socklen_t;
 
 #include "compat.h"
+#include "fuse.h"
+#include "ui/ui.h"
 
 const compat_socket_t compat_socket_invalid = INVALID_SOCKET;
 const int compat_socket_EBADF = WSAENOTSOCK;
 
 struct compat_socket_selfpipe_t {
   SOCKET self_socket;
+  int port;
 };
 
 int
@@ -117,7 +121,7 @@ compat_socket_selfpipe_t* compat_socket_selfpipe_alloc( void )
   }
 
   /* Get ephemeral port number */
-  if( getsockname( self->self_socket, (struct sockaddr *)&sa, &len ) == -1 ) {
+  if( getsockname( self->self_socket, (struct sockaddr *)&sa, &sa_len ) == -1 ) {
     ui_error( UI_ERROR_ERROR,
               "%s: %d: failed to get socket name; errno %d: %s\n",
               __FILE__, __LINE__, compat_socket_get_error(),
@@ -164,5 +168,35 @@ void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )
     /* Socket is non blocking, so we can do this safely */
     bytes_read = recvfrom( self->self_socket, bitbucket, sizeof( bitbucket ),
                            0, (struct sockaddr*)&sa, &sa_length );
-  } while( bytes_read != -1 )
+  } while( bytes_read != -1 );
 }
+
+void
+compat_socket_networking_init( void )
+{
+  WORD wVersionRequested;
+  WSADATA wsaData;
+  int error;
+
+  wVersionRequested = MAKEWORD( 2, 2 );
+  error = WSAStartup( wVersionRequested, &wsaData );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "%s:%d: error %d from WSAStartup()", __FILE__,
+              __LINE__, error );
+    fuse_abort();
+  }
+
+  if( LOBYTE( wsaData.wVersion ) != 2 || HIBYTE( wsaData.wVersion ) != 2 ) {
+    ui_error( UI_ERROR_ERROR,
+              "%s:%d: unexpected version 0x%02x from WSAStartup()",
+              __FILE__, __LINE__, wsaData.wVersion );
+    fuse_abort();
+  }
+}
+
+void
+compat_socket_networking_end( void )
+{
+  WSACleanup();
+}
+
