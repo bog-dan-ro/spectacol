@@ -1,4 +1,4 @@
-/* file.c: Socket-related compatibility routines
+/* socket.c: Socket-related compatibility routines
    Copyright (c) 2011 Philip Kendall
 
    $Id$

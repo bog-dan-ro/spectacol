@@ -34,9 +34,7 @@
 #include <unistd.h>
 
 #ifdef WIN32
-#include <winsock.h>
-#include <signal.h>
-typedef int socklen_t;
+#include <winsock2.h>
 #else
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -181,7 +179,9 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
     int protocol = tcp ? IPPROTO_TCP : IPPROTO_UDP;
     const char *description = tcp ? "TCP" : "UDP";
     int final_state = tcp ? W5100_SOCKET_STATE_INIT : W5100_SOCKET_STATE_UDP;
+#ifndef WIN32
     int one = 1;
+#endif
 
     w5100_socket_clean( socket_obj );
 
@@ -195,12 +195,15 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
       return;
     }
 
+#ifndef WIN32
+    /* Windows warning: this could forcibly bind sockets already in use */
     if( setsockopt( socket_obj->fd, SOL_SOCKET, SO_REUSEADDR, &one,
       sizeof(one) ) == -1 ) {
       nic_w5100_error( UI_ERROR_ERROR,
         "w5100: failed to set SO_REUSEADDR on socket %d; errno %d: %s\n",
         socket_obj->id, compat_socket_get_error(), compat_socket_get_error() );
     }
+#endif
 
     socket_obj->state = final_state;
 
@@ -423,6 +426,7 @@ w5100_write_socket_port( nic_w5100_t *self, nic_w5100_socket_t *socket, int whic
       if( w5100_socket_bind_port( self, socket ) ) {
         w5100_socket_release_lock( socket );
         socket->bind_count = 0;
+        return;
       }
       w5100_socket_release_lock( socket );
       compat_socket_selfpipe_wake( self->selfpipe );
@@ -617,7 +621,7 @@ w5100_socket_process_accept( nic_w5100_socket_t *socket )
 
   nic_w5100_debug( "w5100: accepted connection from %s:%d on socket %d\n", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port), socket->id );
 
-  if( close( socket->fd ) == -1 )
+  if( compat_socket_close( socket->fd ) == -1 )
     nic_w5100_debug( "w5100: error attempting to close fd %d for socket %d\n", socket->fd, socket->id );
 
   socket->fd = new_fd;

@@ -28,18 +28,10 @@
 
 #include "config.h"
 
-#include <errno.h>
 #include <pthread.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#ifdef WIN32
-#include <signal.h>
-#else
-#include <netinet/in.h>
-#include <sys/socket.h>
-#endif
 
 #include "fuse.h"
 #include "ui/ui.h"
@@ -400,20 +392,7 @@ nic_w5100_error( int severity, const char *format, ... )
 {
   va_list ap;
 
-#ifdef WIN32
-  /* pause because contents of the audio buffer are played into a loop */
-  fuse_emulation_pause();
-#endif
-
   va_start( ap, format );
   nic_w5100_vdebug( format, ap );
   va_end( ap );
-
-  va_start( ap, format );
-  ui_verror( severity, format, ap );
-  va_end( ap );
-
-#ifdef WIN32
-  fuse_emulation_unpause();
-#endif
 }

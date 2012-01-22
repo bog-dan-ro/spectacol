@@ -4015,3 +4015,5 @@
 20120122 compat.h,compat/{unix/socket.c,win32/socket.c},
          peripherals/{nic/w5100.c,w5100_socket.c},utils.[ch]: make Win32 build
          at least compile (almost entirely guesser).
+20120122 compat/{unix/socket.c,win32/socket.c},peripherals/nic/{w5100.c,
+         w5100_internals.h,w5100_socket.c}: make Win32 build work (Sergio).

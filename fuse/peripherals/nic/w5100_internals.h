@@ -29,6 +29,10 @@
 #ifndef FUSE_W5100_INTERNALS_H
 #define FUSE_W5100_INTERNALS_H
 
+#ifdef WIN32
+#include <signal.h>
+#endif       /* #ifdef WIN32 */
+
 typedef enum w5100_socket_mode {
   W5100_SOCKET_MODE_CLOSED = 0x00,
   W5100_SOCKET_MODE_TCP,

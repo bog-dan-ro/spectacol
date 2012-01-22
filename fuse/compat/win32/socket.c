@@ -1,4 +1,4 @@
-/* file.c: Socket-related compatibility routines
+/* socket.c: Socket-related compatibility routines
    Copyright (c) 2011 Sergio Baldoví, Philip Kendall
 
    $Id$
@@ -25,8 +25,8 @@
 
 #include <config.h>
 
-#include <winsock.h>
-typedef int socklen_t;
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
 #include "compat.h"
 #include "fuse.h"
@@ -37,7 +37,7 @@ const int compat_socket_EBADF = WSAENOTSOCK;
 
 struct compat_socket_selfpipe_t {
   SOCKET self_socket;
-  int port;
+  libspectrum_word port;
 };
 
 int
@@ -78,7 +78,34 @@ compat_socket_get_strerror( void )
   return (const char *)buffer;
 }
 
-compat_socket_selfpipe_t* compat_socket_selfpipe_alloc( void )
+static int
+selfpipe_test( compat_socket_selfpipe_t *self )
+{
+  fd_set readfds;
+  int active;
+  struct timeval tv = { 1, 0 };
+
+  /* Send testing packet */
+  compat_socket_selfpipe_wake( self );
+
+  /* Safe reading from control socket */
+  FD_ZERO( &readfds );
+  FD_SET( self->self_socket, &readfds );
+  active = select( 0, &readfds, NULL, NULL, &tv );
+  if( active == 0 || active == compat_socket_invalid ) {
+    return -1;
+  }
+
+  /* Discard testing packet */
+  if( FD_ISSET( self->self_socket, &readfds ) ) {
+    compat_socket_selfpipe_discard_data( self );
+  }
+
+  return 0;
+}
+
+compat_socket_selfpipe_t *
+compat_socket_selfpipe_alloc( void )
 {
   unsigned long mode = 1;
   struct sockaddr_in sa;
@@ -129,35 +156,46 @@ compat_socket_selfpipe_t* compat_socket_selfpipe_alloc( void )
     fuse_abort();
   }
 
-  self->port = sa.sin_port;
+  self->port = ntohs( sa.sin_port );
+ 
+  /* Test communications in order to detect blocking firewalls */
+  if( selfpipe_test( self ) == -1 ) {
+    ui_error( UI_ERROR_ERROR,
+              "w5100: failed to test internal communications" );
+    fuse_abort();
+  }
 
   return self;
 }
 
-void compat_socket_selfpipe_free( compat_socket_selfpipe_t *self )
+void
+compat_socket_selfpipe_free( compat_socket_selfpipe_t *self )
 {
   compat_socket_close( self->self_socket );
   free( self );
 }
 
-compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self )
+compat_socket_t
+compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self )
 {
   return self->self_socket;
 }
 
-void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self )
+void
+compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self )
 {
   struct sockaddr_in sa;
 
   memset( &sa, 0, sizeof(sa) );
   sa.sin_family = AF_INET;
   sa.sin_addr.s_addr = htonl( INADDR_LOOPBACK );
-  memcpy( &sa.sin_port, self->port, 2 );
+  sa.sin_port = htons( self->port );
 
   sendto( self->self_socket, NULL, 0, 0, (struct sockaddr*)&sa, sizeof(sa) );
 }
 
-void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )
+void
+compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )
 {
   ssize_t bytes_read;
   struct sockaddr_in sa;
@@ -170,6 +208,7 @@ void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )
                            0, (struct sockaddr*)&sa, &sa_length );
   } while( bytes_read != -1 );
 }
+
 
 void
 compat_socket_networking_init( void )
