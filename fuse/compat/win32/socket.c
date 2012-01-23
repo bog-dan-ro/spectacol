@@ -161,7 +161,7 @@ compat_socket_selfpipe_alloc( void )
   /* Test communications in order to detect blocking firewalls */
   if( selfpipe_test( self ) == -1 ) {
     ui_error( UI_ERROR_ERROR,
-              "w5100: failed to test internal communications" );
+              "Networking: failed to test internal communications" );
     fuse_abort();
   }
 

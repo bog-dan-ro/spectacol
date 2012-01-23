@@ -4017,3 +4017,5 @@
          at least compile (almost entirely guesser).
 20120122 compat/{unix/socket.c,win32/socket.c},peripherals/nic/{w5100.c,
          w5100_internals.h,w5100_socket.c}: make Win32 build work (Sergio).
+20120123 compat/win32/socket.c,peripherals/nic/w5100_socket.c: final tweaks to
+         Win32 Spectranet code (Sergio).
