@@ -4019,3 +4019,4 @@
          w5100_internals.h,w5100_socket.c}: make Win32 build work (Sergio).
 20120123 compat/win32/socket.c,peripherals/nic/w5100_socket.c: final tweaks to
          Win32 Spectranet code (Sergio).
+20120126 hacking/spectranet.txt: add some Spectranet documentation.
