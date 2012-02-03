@@ -290,7 +290,7 @@ OSStatus coreaudiowrite( void *inRefCon,
 
   /* Try to only read an even number of bytes so as not to fragment a sample */
   len = MIN( len, sfifo_used( &sound_fifo ) );
-  len &= sound_stereo ? 0xfffc : 0xfffe;
+  len &= sound_stereo_ay != SOUND_STEREO_AY_NONE ? 0xfffc : 0xfffe;
 
   /* Read input_size bytes from fifo into sound stream */
   while( ( f = sfifo_read( &sound_fifo, out, len ) ) > 0 ) {

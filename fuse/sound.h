@@ -41,7 +41,20 @@ libspectrum_dword sound_get_effective_processor_speed( void );
 
 extern int sound_enabled;
 extern int sound_framesiz;
-extern int sound_stereo;
+
+/* Stereo separation types:
+ *  * ACB is used in the Melodik interface.
+ *  * ABC stereo is used in the Pentagon/Scorpion.
+ *  * BAC stereo does seem to exist but is quite rare:
+ *      Z80Stealth emulates BAC stereo but that's about all.
+ *  * CAB, BCA and CBA don't get many search results.
+ */
+
+#define SOUND_STEREO_AY_NONE	0
+#define SOUND_STEREO_AY_ACB	1
+#define SOUND_STEREO_AY_ABC	2
+
+extern int sound_stereo_ay;
 
 /* The low-level sound interface */
 

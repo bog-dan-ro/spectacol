@@ -41,11 +41,10 @@
 
 /* configuration */
 int sound_enabled = 0;		/* Are we currently using the sound card */
-int sound_stereo = 0;		/* true for stereo *output sample* (only) */
 
 static int sound_enabled_ever = 0; /* whether sound has *ever* been in use; see
 				      sound_ay_write() and sound_ay_reset() */
-static int sound_stereo_ay = 0;	/* local copy of settings_current.stereo_ay */
+int sound_stereo_ay = SOUND_STEREO_AY_NONE; /* local copy of settings_current.stereo_ay */
 
 /* assume all three tone channels together match the beeper volume (ish).
  * Must be <=127 for all channels; 50+2+(24*3) = 124.
@@ -60,18 +59,6 @@ static int sound_stereo_ay = 0;	/* local copy of settings_current.stereo_ay */
  * 50th I think this should be plenty.
  */
 #define AY_CHANGE_MAX		8000
-
-/* Stereo separation types:
- *  * ACB is used in the Melodik interface.
- *  * ABC stereo is used in the Pentagon/Scorpion.
- *  * BAC stereo does seem to exist but is quite rare:
- *      Z80Stealth emulates BAC stereo but that's about all.
- *  * CAB, BCA and CBA don't get many search results.
- */
-
-#define SOUND_STEREO_AY_NONE	0
-#define SOUND_STEREO_AY_ACB	1
-#define SOUND_STEREO_AY_ABC	2
 
 int sound_framesiz;
 
@@ -190,7 +177,6 @@ sound_ay_init( void )
 void
 sound_init( const char *device )
 {
-  int ret;
   float hz;
   double treble;
   Blip_Synth **ay_left_synth;
@@ -206,20 +192,18 @@ sound_init( const char *device )
          settings_current.emulation_speed > 1 ) )
     return;
 
+  /* only try for stereo if we need it */
   sound_stereo_ay = option_enumerate_sound_stereo_ay();
 
-  /* only try for stereo if we need it */
-  if( sound_stereo_ay != SOUND_STEREO_AY_NONE )
-    sound_stereo = 1;
-
-  ret =
-    sound_lowlevel_init( device, &settings_current.sound_freq, &sound_stereo );
-
-  if( ret )
+  if( settings_current.sound &&
+      sound_lowlevel_init( device, &settings_current.sound_freq,
+                           &sound_stereo_ay ) )
     return;
 
   if( !sound_init_blip(&left_buf, &left_beeper_synth) ) return;
-  if( sound_stereo && !sound_init_blip(&right_buf, &right_beeper_synth) ) return;
+  if( sound_stereo_ay != SOUND_STEREO_AY_NONE &&
+      !sound_init_blip(&right_buf, &right_beeper_synth) )
+    return;
 
   treble = speaker_type[ option_enumerate_sound_speaker_type() ].treble;
 
@@ -245,77 +229,68 @@ sound_init( const char *device )
    * settings in settings_current though, which is why we make copies
    * rather than using the real ones).
    */
-  if( !sound_stereo ) {
-    sound_stereo_ay = SOUND_STEREO_AY_NONE;
-  }
 
   ay_a_synth_r = NULL;
   ay_b_synth_r = NULL;
   ay_c_synth_r = NULL;
 
-  if( sound_stereo ) {
-    if( sound_stereo_ay == SOUND_STEREO_AY_NONE ) {
-      /* Attach the Blip_Synth's we've already created to the left buffer,
-       * and create an addition Blip_Synth for each channel's right buffer. */
-      blip_synth_set_output( ay_a_synth, left_buf );
-      blip_synth_set_output( ay_b_synth, left_buf );
-      blip_synth_set_output( ay_c_synth, left_buf );
-
-      ay_a_synth_r = new_Blip_Synth();
-      blip_synth_set_volume( ay_a_synth_r, sound_get_volume( settings_current.volume_ay ) );
-      blip_synth_set_output( ay_a_synth_r, right_buf );
-      blip_synth_set_treble_eq( ay_a_synth_r, treble );
-
-      ay_b_synth_r = new_Blip_Synth();
-      blip_synth_set_volume( ay_b_synth_r, sound_get_volume( settings_current.volume_ay ) );
-      blip_synth_set_output( ay_b_synth_r, right_buf );
-      blip_synth_set_treble_eq( ay_b_synth_r, treble );
-
-      ay_c_synth_r = new_Blip_Synth();
-      blip_synth_set_volume( ay_c_synth_r, sound_get_volume( settings_current.volume_ay ) );
-      blip_synth_set_output( ay_c_synth_r, right_buf );
-      blip_synth_set_treble_eq( ay_c_synth_r, treble );
-    } else {
-      /* Attach the Blip_Synth's we've already created as appropriate, and
-       * create one more Blip_Synth for the middle channel's right buffer. */
-      if( sound_stereo_ay == SOUND_STEREO_AY_ACB ) {
-        ay_left_synth = &ay_a_synth;
-        ay_mid_synth = &ay_c_synth;
-        ay_mid_synth_r = &ay_c_synth_r;
-        ay_right_synth = &ay_b_synth;
-      } else if ( sound_stereo_ay == SOUND_STEREO_AY_ABC ) {
-        ay_left_synth = &ay_a_synth;
-        ay_mid_synth = &ay_b_synth;
-        ay_mid_synth_r = &ay_b_synth_r;
-        ay_right_synth = &ay_c_synth;
-      } else {
-        ui_error( UI_ERROR_ERROR, "unknown AY stereo separation type: %d", sound_stereo_ay );
-        fuse_abort();
-      }
-
-      blip_synth_set_output( *ay_left_synth, left_buf );
-      blip_synth_set_output( *ay_mid_synth, left_buf );
-      blip_synth_set_output( *ay_right_synth, right_buf );
-
-      *ay_mid_synth_r = new_Blip_Synth();
-      blip_synth_set_volume( *ay_mid_synth_r, sound_get_volume( settings_current.volume_ay ) );
-      blip_synth_set_output( *ay_mid_synth_r, right_buf );
-      blip_synth_set_treble_eq( *ay_mid_synth_r, treble );
-    }
-
-    right_specdrum_synth = new_Blip_Synth();
-    blip_synth_set_volume( right_specdrum_synth, sound_get_volume( settings_current.volume_specdrum ) );
-    blip_synth_set_output( right_specdrum_synth, right_buf );
-    blip_synth_set_treble_eq( right_specdrum_synth, treble );
-  } else {
+  if( sound_stereo_ay == SOUND_STEREO_AY_NONE ) {
+    /* Attach the Blip_Synth's we've already created to the left buffer,
+     * and create an addition Blip_Synth for each channel's right buffer. */
     blip_synth_set_output( ay_a_synth, left_buf );
     blip_synth_set_output( ay_b_synth, left_buf );
     blip_synth_set_output( ay_c_synth, left_buf );
+
+    ay_a_synth_r = new_Blip_Synth();
+    blip_synth_set_volume( ay_a_synth_r, sound_get_volume( settings_current.volume_ay ) );
+    blip_synth_set_output( ay_a_synth_r, right_buf );
+    blip_synth_set_treble_eq( ay_a_synth_r, treble );
+
+    ay_b_synth_r = new_Blip_Synth();
+    blip_synth_set_volume( ay_b_synth_r, sound_get_volume( settings_current.volume_ay ) );
+    blip_synth_set_output( ay_b_synth_r, right_buf );
+    blip_synth_set_treble_eq( ay_b_synth_r, treble );
+
+    ay_c_synth_r = new_Blip_Synth();
+    blip_synth_set_volume( ay_c_synth_r, sound_get_volume( settings_current.volume_ay ) );
+    blip_synth_set_output( ay_c_synth_r, right_buf );
+    blip_synth_set_treble_eq( ay_c_synth_r, treble );
+  } else {
+    /* Attach the Blip_Synth's we've already created as appropriate, and
+     * create one more Blip_Synth for the middle channel's right buffer. */
+    if( sound_stereo_ay == SOUND_STEREO_AY_ACB ) {
+      ay_left_synth = &ay_a_synth;
+      ay_mid_synth = &ay_c_synth;
+      ay_mid_synth_r = &ay_c_synth_r;
+      ay_right_synth = &ay_b_synth;
+    } else if ( sound_stereo_ay == SOUND_STEREO_AY_ABC ) {
+      ay_left_synth = &ay_a_synth;
+      ay_mid_synth = &ay_b_synth;
+      ay_mid_synth_r = &ay_b_synth_r;
+      ay_right_synth = &ay_c_synth;
+    } else {
+      ui_error( UI_ERROR_ERROR, "unknown AY stereo separation type: %d", sound_stereo_ay );
+      fuse_abort();
+    }
+
+    blip_synth_set_output( *ay_left_synth, left_buf );
+    blip_synth_set_output( *ay_mid_synth, left_buf );
+    blip_synth_set_output( *ay_right_synth, right_buf );
+
+    *ay_mid_synth_r = new_Blip_Synth();
+    blip_synth_set_volume( *ay_mid_synth_r, sound_get_volume( settings_current.volume_ay ) );
+    blip_synth_set_output( *ay_mid_synth_r, right_buf );
+    blip_synth_set_treble_eq( *ay_mid_synth_r, treble );
   }
+
+  right_specdrum_synth = new_Blip_Synth();
+  blip_synth_set_volume( right_specdrum_synth, sound_get_volume( settings_current.volume_specdrum ) );
+  blip_synth_set_output( right_specdrum_synth, right_buf );
+  blip_synth_set_treble_eq( right_specdrum_synth, treble );
 
   sound_enabled = sound_enabled_ever = 1;
 
-  sound_channels = ( sound_stereo ? 2 : 1 );
+  sound_channels = ( sound_stereo_ay != SOUND_STEREO_AY_NONE ? 2 : 1 );
 
   /* Adjust relative processor speed to deal with adjusting sound generation
      frequency against emulation speed (more flexible than adjusting generated
@@ -684,7 +659,7 @@ sound_frame( void )
 
   blip_buffer_end_frame( left_buf, machine_current->timings.tstates_per_frame );
 
-  if( sound_stereo ) {
+  if( sound_stereo_ay != SOUND_STEREO_AY_NONE ) {
     blip_buffer_end_frame( right_buf, machine_current->timings.tstates_per_frame );
 
     /* Read left channel into even samples, right channel into odd samples:
@@ -722,5 +697,6 @@ sound_beeper( int on )
   val = -beeper_ampl[3] + beeper_ampl[on]*2;
 
   blip_synth_update( left_beeper_synth, tstates, val );
-  if( sound_stereo ) blip_synth_update( right_beeper_synth, tstates, val );
+  if( sound_stereo_ay != SOUND_STEREO_AY_NONE )
+    blip_synth_update( right_beeper_synth, tstates, val );
 }
