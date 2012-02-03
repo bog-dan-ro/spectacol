@@ -2267,10 +2267,10 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
 
   default:
     libspectrum_print_error(
-      LIBSPECTRUM_MACHINE_UNKNOWN,
+      LIBSPECTRUM_ERROR_UNKNOWN,
       "libspectrum_szx_read: unknown machine type %d", (int)*buffer
     );
-    return LIBSPECTRUM_MACHINE_UNKNOWN;
+    return LIBSPECTRUM_ERROR_UNKNOWN;
   }
 
   /* Skip to the end of the header */
