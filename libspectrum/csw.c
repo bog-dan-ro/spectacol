@@ -86,8 +86,8 @@ libspectrum_csw_read( libspectrum_tape *tape,
 
     if( compressed != 0 && compressed != 1 ) goto csw_bad_compress;
 
+    if( length < 29 - buffer[12] ) goto csw_short;
     length -= 29 - buffer[12];
-    if( length < 0 ) goto csw_short;
     buffer += 29 + buffer[12];
 
     break;

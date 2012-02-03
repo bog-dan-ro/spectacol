@@ -869,3 +869,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          recordings or saving snapshots (part of patch #3404090) (Sergio
          Baldoví).
 20111106 rzx.c,szx.c: remove unused variables (thanks, gcc 4.6).
+20120203 csw.c: fix less than 0 check on unsigned expression (thanks, clang
+         2.1) (Fred).
