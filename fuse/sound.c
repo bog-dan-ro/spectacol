@@ -234,28 +234,7 @@ sound_init( const char *device )
   ay_b_synth_r = NULL;
   ay_c_synth_r = NULL;
 
-  if( sound_stereo_ay == SOUND_STEREO_AY_NONE ) {
-    /* Attach the Blip_Synth's we've already created to the left buffer,
-     * and create an addition Blip_Synth for each channel's right buffer. */
-    blip_synth_set_output( ay_a_synth, left_buf );
-    blip_synth_set_output( ay_b_synth, left_buf );
-    blip_synth_set_output( ay_c_synth, left_buf );
-
-    ay_a_synth_r = new_Blip_Synth();
-    blip_synth_set_volume( ay_a_synth_r, sound_get_volume( settings_current.volume_ay ) );
-    blip_synth_set_output( ay_a_synth_r, right_buf );
-    blip_synth_set_treble_eq( ay_a_synth_r, treble );
-
-    ay_b_synth_r = new_Blip_Synth();
-    blip_synth_set_volume( ay_b_synth_r, sound_get_volume( settings_current.volume_ay ) );
-    blip_synth_set_output( ay_b_synth_r, right_buf );
-    blip_synth_set_treble_eq( ay_b_synth_r, treble );
-
-    ay_c_synth_r = new_Blip_Synth();
-    blip_synth_set_volume( ay_c_synth_r, sound_get_volume( settings_current.volume_ay ) );
-    blip_synth_set_output( ay_c_synth_r, right_buf );
-    blip_synth_set_treble_eq( ay_c_synth_r, treble );
-  } else {
+  if( sound_stereo_ay != SOUND_STEREO_AY_NONE ) {
     /* Attach the Blip_Synth's we've already created as appropriate, and
      * create one more Blip_Synth for the middle channel's right buffer. */
     if( sound_stereo_ay == SOUND_STEREO_AY_ACB ) {
@@ -281,6 +260,15 @@ sound_init( const char *device )
     blip_synth_set_volume( *ay_mid_synth_r, sound_get_volume( settings_current.volume_ay ) );
     blip_synth_set_output( *ay_mid_synth_r, right_buf );
     blip_synth_set_treble_eq( *ay_mid_synth_r, treble );
+
+    right_specdrum_synth = new_Blip_Synth();
+    blip_synth_set_volume( right_specdrum_synth, sound_get_volume( settings_current.volume_specdrum ) );
+    blip_synth_set_output( right_specdrum_synth, right_buf );
+    blip_synth_set_treble_eq( right_specdrum_synth, treble );
+  } else {
+    blip_synth_set_output( ay_a_synth, left_buf );
+    blip_synth_set_output( ay_b_synth, left_buf );
+    blip_synth_set_output( ay_c_synth, left_buf );
   }
 
   right_specdrum_synth = new_Blip_Synth();

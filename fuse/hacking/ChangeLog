@@ -4020,6 +4020,8 @@
 20120123 compat/win32/socket.c,peripherals/nic/w5100_socket.c: final tweaks to
          Win32 Spectranet code (Sergio).
 20120126 hacking/spectranet.txt: add some Spectranet documentation.
-20120203 sound.[ch],sound/coreaudiosound.c: Remove remnants of
+20120203 sound.[ch],sound/coreaudiosound.c: remove remnants of
          sound_stereo_beeper, stereo is now determined exclusively by AY
          configuration (Fred).
+20120204 sound.c,sound/coreaudiosound.c: fix the removal of sound_stereo_beeper
+         (Fred).
