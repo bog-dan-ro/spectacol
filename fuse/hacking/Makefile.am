@@ -23,10 +23,14 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST =
+EXTRA_DIST = \
 	coding_style.txt \
 	cvs-tags \
 	implementation_notes.txt \
+	input.txt \
 	peripheral_tests.txt \
+	sound.txt \
+	spectranet.txt \
 	tc2048_tech_notes.txt \
+	timer.txt \
 	ui.txt

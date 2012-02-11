@@ -4025,3 +4025,4 @@
          configuration (Fred).
 20120204 sound.c,sound/coreaudiosound.c: fix the removal of sound_stereo_beeper
          (Fred).
+20120211 hacking/Makefile.am: add missing backslash and files (Fred).
