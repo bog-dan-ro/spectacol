@@ -96,3 +96,12 @@ Combo, (O)pus Drive 1, drive_opus1_type, INPUT_KEY_o, *Single-sided 40 track|Dou
 Combo, O(p)us Drive 2, drive_opus2_type, INPUT_KEY_p, Disabled|*Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
 Combo, (T)ry merge 'B' side of disks, disk_try_merge, INPUT_KEY_t, Never|*With single-sided drives|Always
 Checkbox, Con(f)irm merge disk sides, disk_ask_merge, INPUT_KEY_f
+
+movie
+Movie Options
+#ifdef HAVE_ZLIB_H
+Combo, Movie (c)ompression, movie_compr, INPUT_KEY_c, None|*Lossless|High
+#else
+Combo, Movie (c)ompression, movie_compr, INPUT_KEY_c, *None
+#endif
+Checkbox, (S)top recording after RZX ends, movie_stop_after_rzx, INPUT_KEY_S

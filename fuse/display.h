@@ -67,6 +67,9 @@ extern int display_ui_initialised;
 extern libspectrum_byte display_lores_border;
 extern libspectrum_byte display_hires_border;
 
+extern libspectrum_dword
+display_last_screen[ DISPLAY_SCREEN_WIDTH_COLS * DISPLAY_SCREEN_HEIGHT ];
+
 /* Offsets as to where the data and the attributes for each pixel
    line start */
 extern libspectrum_word display_line_start[ DISPLAY_HEIGHT ];

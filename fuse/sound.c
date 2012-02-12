@@ -30,6 +30,7 @@
 
 #include "fuse.h"
 #include "machine.h"
+#include "movie.h"
 #include "options.h"
 #include "settings.h"
 #include "sound.h"
@@ -257,7 +258,8 @@ sound_init( const char *device )
     blip_synth_set_output( *ay_right_synth, right_buf );
 
     *ay_mid_synth_r = new_Blip_Synth();
-    blip_synth_set_volume( *ay_mid_synth_r, sound_get_volume( settings_current.volume_ay ) );
+    blip_synth_set_volume( *ay_mid_synth_r,
+                           sound_get_volume( settings_current.volume_ay ) );
     blip_synth_set_output( *ay_mid_synth_r, right_buf );
     blip_synth_set_treble_eq( *ay_mid_synth_r, treble );
 
@@ -272,7 +274,8 @@ sound_init( const char *device )
   }
 
   right_specdrum_synth = new_Blip_Synth();
-  blip_synth_set_volume( right_specdrum_synth, sound_get_volume( settings_current.volume_specdrum ) );
+  blip_synth_set_volume( right_specdrum_synth,
+                         sound_get_volume( settings_current.volume_specdrum ) );
   blip_synth_set_output( right_specdrum_synth, right_buf );
   blip_synth_set_treble_eq( right_specdrum_synth, treble );
 
@@ -292,6 +295,9 @@ sound_init( const char *device )
 
   samples = (blip_sample_t *)calloc( sound_framesiz * sound_channels,
                                      sizeof(blip_sample_t) );
+  /* initialize movie settings... */
+  movie_init_sound( settings_current.sound_freq, sound_stereo_ay );
+
 }
 
 void
@@ -331,7 +337,8 @@ sound_end( void )
     delete_Blip_Buffer( &left_buf );
     delete_Blip_Buffer( &right_buf );
 
-    sound_lowlevel_end();
+    if( settings_current.sound ) 
+      sound_lowlevel_end();
     free( samples );
     sound_enabled = 0;
   }
@@ -659,8 +666,11 @@ sound_frame( void )
     count = blip_buffer_read_samples( left_buf, samples, sound_framesiz, BLIP_BUFFER_DEF_STEREO );
   }
 
-  sound_lowlevel_frame( samples, count );
+  if( settings_current.sound ) 
+    sound_lowlevel_frame( samples, count );
 
+  if( movie_recording )
+      movie_add_sound( samples, count );
   ay_change_count = 0;
 }
 

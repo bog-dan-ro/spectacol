@@ -36,6 +36,59 @@ AC_C_BIGENDIAN
 
 dnl Check for header files
 AC_CHECK_HEADERS(strings.h)
+AC_CHECK_HEADERS(termios.h)
+
+dnl Check for zlib (the UNIX version is called z, Win32 zdll)
+AC_MSG_CHECKING(whether to use zlib)
+AC_ARG_WITH(zlib,
+[  --without-zlib          don't use zlib],
+if test "$withval" = no; then zlib=no; else zlib=yes; fi,
+zlib=yes)
+AC_MSG_RESULT($zlib)
+if test "$zlib" = yes; then
+  AC_CHECK_HEADERS(
+    zlib.h,
+    AC_SEARCH_LIBS(compress2, z zdll)
+  )
+fi
+
+dnl Check for ffmpeg libs
+AC_MSG_CHECKING(whether ffmpeg movie recording requested)
+AC_ARG_WITH(ffmpeg,
+  [  --with-ffmpeg            use ffmpeg for movie converting],
+  if test "$withval" = no; then ffmpeglib=no; else ffmpeglib=yes; fi,
+  ffmpeglib=yes
+)
+AC_MSG_RESULT($ffmpeglib)
+if test "$ffmpeglib" = yes; then
+  AC_CHECK_HEADERS(
+    libavformat/avformat.h libswscale/swscale.h,
+    FFMPEG_LIBS="-lavformat -lavcodec -lswscale -lavutil",
+    FFMPEG_LIBS=''; break
+  )
+  if test "x$FFMPEG_LIBS" != "x"
+  then
+    AC_SUBST(FFMPEG_LIBS)
+    AC_DEFINE([USE_FFMPEG], 1, [Defined if ffmpeg available and requested])
+dnl AC_CHECK_LIB(avcore, av_get_bytes_per_sample,
+    AC_CHECK_LIB(avutil, av_get_bytes_per_sample,
+      AC_DEFINE([HAVE_FFMPEG_BYTES_SAMPLE],1,[Defined if av_get_bytes_per_sample available]),
+      true
+    )
+    AC_CHECK_LIB(avutil, av_get_bits_per_sample_fmt,
+      AC_DEFINE([HAVE_FFMPEG_SAMPLE_FMT],1,[Defined if av_get_bits_per_sample_fmt available]),
+      true
+    )
+    AC_CHECK_LIB(avformat, avio_open,
+      AC_DEFINE([HAVE_FFMPEG_AVIO_OPEN],1,[Defined if avio_open available]),
+      true
+    )
+    AC_CHECK_LIB(avformat, avformat_write_header,
+      AC_DEFINE([HAVE_FFMPEG_AVFORMAT_WRITE_HEADER],1,[Defined if avformat_write_header available]),
+      true
+    )
+  fi
+fi
 
 dnl Allow the user to say that various libraries are in one place
 AC_ARG_WITH(local-prefix,
@@ -170,6 +223,22 @@ AC_MSG_RESULT($COMPAT_OSNAME)
 COMPAT_SUBDIR="compat/$COMPAT_OSNAME"
 AC_SUBST(COMPAT_SUBDIR)
 AC_SUBST(COMPAT_OSNAME)
+
+if test "$ac_cv_func_getopt_long" = no; then
+  case "$target_os" in
+    amigaos|morphos)
+      dnl Our getopt_long replacement doesn't work, so don't use it
+      ;;
+    *)
+      compat_getopt=yes
+      missing_routines="$missing_routines"'getopt_long '
+      ;;
+  esac
+fi
+AM_CONDITIONAL(COMPAT_GETOPT, test "$compat_getopt" = yes)
+if test "$ac_cv_func_mkstemp" = no; then
+  missing_routines="$missing_routines"'mkstemp '
+fi
 
 AC_OUTPUT(Makefile \
 compat/amiga/Makefile \

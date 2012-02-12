@@ -66,6 +66,7 @@ fuse_SOURCES = display.c \
 	memory.c \
 	mempool.c \
 	menu.c \
+	movie.c \
 	module.c \
 	periph.c \
 	profile.c \
@@ -175,6 +176,8 @@ noinst_HEADERS = bitmap.h \
 	memory.h \
 	mempool.h \
 	menu.h \
+	movie.h \
+	movie_tables.h \
 	module.h \
 	periph.h \
 	psg.h \

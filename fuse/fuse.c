@@ -59,6 +59,7 @@
 #include "machine.h"
 #include "machines/machines_periph.h"
 #include "memory.h"
+#include "movie.h"
 #include "mempool.h"
 #include "peripherals/ay.h"
 #include "peripherals/dck.h"
@@ -331,6 +332,7 @@ static int fuse_init(int argc, char **argv)
   if( ui_mouse_present ) ui_mouse_grabbed = ui_mouse_grab( 1 );
 
   fuse_emulation_paused = 0;
+  movie_init();
 
   return 0;
 }
@@ -822,6 +824,7 @@ do_start_files( start_files_t *start_files )
 /* Tidy-up function called at end of emulation */
 static int fuse_end(void)
 {
+  movie_stop();		/* stop movie recording */
   /* Must happen before memory is deallocated as we read the character
      set from memory for the text output */
   printer_end();

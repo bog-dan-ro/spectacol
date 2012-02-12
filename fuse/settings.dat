@@ -65,6 +65,9 @@ interface2, boolean, 1
 snapsasz80, null, 0
 opus, boolean, 0
 pal_tv2x, boolean, 0
+movie_compr, string, NULL
+movie_start, string, NULL
+movie_stop_after_rzx, boolean, 1
 plusd, boolean, 0
 disciple, boolean, 0
 beta128, boolean, 0

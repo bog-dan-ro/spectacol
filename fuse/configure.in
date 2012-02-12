@@ -356,6 +356,20 @@ AC_LINK_FILES([
 	lib/tape_se.szx
 	lib/tape_ts2068.szx])
 
+dnl Check whether to use zlib (the UNIX version is called z, Win32 zdll)
+AC_MSG_CHECKING(whether to use zlib)
+AC_ARG_WITH(zlib,
+[  --without-zlib          don't use zlib],
+if test "$withval" = no; then zlib=no; else zlib=yes; fi,
+zlib=yes)
+AC_MSG_RESULT($zlib)
+if test "$zlib" = yes; then
+  AC_CHECK_HEADERS(
+    zlib.h,
+    AC_SEARCH_LIBS(compress2, z zdll)
+  )
+fi
+
 dnl Check if a version of libpng which supplies png_write_png is available
 AC_MSG_CHECKING(whether PNG support requested)
 AC_ARG_WITH(png,

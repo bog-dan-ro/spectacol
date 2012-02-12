@@ -338,3 +338,9 @@
 20110717 tzxlist.c: print CODE header start address and length (Fred).
 20111219 rzxtool.c,scl2trd.c,snap2tzx.c: fix warnings.
 20120122 scl2trd.c: fix unused variable warning (Fred).
+20120122 Makefile.am,compat/{getopt.[ch],getopt1.c},configure.in,fmfconv.[ch],
+         fmfconv_aiff.c,fmfconv_au.c,fmfconv_ff.c,fmfconv_ppm.c,fmfconv_scr.c,
+         fmfconv_wav.c,fmfconv_yuv.c,hacking/ChangeLog,man/Makefile.am,
+         man/fmfconv.1,movie_tables.h: add converter tool for fmf files
+         (patch #3034770) (Gergely Szasz with contributions from Sergio Baldoví
+         and Fred).

@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include "event.h"
+#include "movie.h"
 #include "settings.h"
 #include "sound.h"
 #include "tape.h"
@@ -169,7 +170,7 @@ timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
   double current_time, difference;
   long tstates;
 
-  if( sound_enabled ) {
+  if( sound_enabled && settings_current.sound ) {
     timer_frame_callback_sound( last_tstates );
     return;
   }

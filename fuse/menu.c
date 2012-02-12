@@ -30,6 +30,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "menu.h"
+#include "movie.h"
 #include "machines/specplus3.h"
 #include "peripherals/dck.h"
 #include "peripherals/disk/beta.h"
@@ -184,12 +185,18 @@ MENU_CALLBACK( menu_file_openscrscreenshot )
   fuse_emulation_unpause();
 }
 
-MENU_CALLBACK( menu_file_movies_stopmovierecording )
+MENU_CALLBACK( menu_file_movie_stop )
 {
   ui_widget_finish();
 
-  screenshot_movie_record = 0;
-  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 0 );
+  movie_stop();
+}
+
+MENU_CALLBACK( menu_file_movie_pause )
+{
+  ui_widget_finish();
+
+  movie_pause();
 }
 
 MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
@@ -772,57 +779,55 @@ MENU_CALLBACK( menu_file_savescreenaspng )
 }
 #endif
 
-MENU_CALLBACK( menu_file_movies_recordmovieasscr )
+MENU_CALLBACK( menu_file_movie_record )
 {
   char *filename;
 
   ui_widget_finish();
-  
+
   fuse_emulation_pause();
 
-  filename = ui_get_save_filename( "Fuse - Record Movie as SCR" );
+  filename = ui_get_save_filename( "Fuse - Record Movie File" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
-            filename );
-
-  screenshot_movie_record = 1;
-  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
-
+  movie_start( filename );
   free( filename );
 
   fuse_emulation_unpause();
 }
 
-#ifdef USE_LIBPNG
-MENU_CALLBACK( menu_file_movies_recordmovieaspng )
+MENU_CALLBACK( menu_file_movie_record_recordfromrzx )
 {
-  char *filename;
+  char *rzx_file, *fmf_file;
 
   ui_widget_finish();
 
+  if( rzx_playback || rzx_recording || movie_recording ) return;
+
   fuse_emulation_pause();
 
-  screenshot_movie_scaler = menu_get_scaler( screenshot_available_scalers );
-  if( screenshot_movie_scaler == SCALER_NUM ) {
-    fuse_emulation_unpause();
-    return;
+  rzx_file = ui_get_open_filename( "Fuse - Load RZX" );
+  if( !rzx_file ) { fuse_emulation_unpause(); return; }
+
+  rzx_start_playback( rzx_file, 1 );
+  free( rzx_file );
+  display_refresh_all();
+
+  if( rzx_playback ) {
+    fmf_file = ui_get_save_filename( "Fuse - Record Movie File" );
+    if( !fmf_file ) { 
+      rzx_stop_playback( 1 );
+      fuse_emulation_unpause();
+      return;
+    }
+
+    movie_start( fmf_file );
+    free( fmf_file );
+    ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
   }
 
-  filename = ui_get_save_filename( "Fuse - Record Movie as PNG" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
-            filename );
-
-  screenshot_movie_record = 2;
-  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
-
-  free( filename );
-
   fuse_emulation_unpause();
 }
-#endif
 
 MENU_CALLBACK( menu_file_recording_record )
 {

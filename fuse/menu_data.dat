@@ -46,12 +46,12 @@ File/S_ave Screen as SCR..., Item
 File/Save S_creen as PNG..., Item
 #endif
 
-File/_Movies, Branch
-File/Movies/Record Movie as _SCR..., Item
-#ifdef USE_LIBPNG
-File/Movies/Record Movie as _PNG..., Item
-#endif
-File/Movies/S_top Movie Recording, Item
+File/_Movie, Branch
+File/Movie/_Record..., Item
+File/Movie/R_ecord from RZX..., Item,, menu_file_movie_record_recordfromrzx
+File/Movie/_Pause, Item
+File/Movie/_Continue, Item,, menu_file_movie_pause
+File/Movie/_Stop, Item
 
 #ifndef USE_WIDGET
 File/separator, Separator
@@ -71,6 +71,7 @@ Options/Peripherals/_General..., Item
 Options/Peripherals/_Disk..., Item
 
 Options/_RZX..., Item
+Options/_Movie..., Item
 
 Options/_Joysticks, Branch
 #ifdef USE_JOYSTICK

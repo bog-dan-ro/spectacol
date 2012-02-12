@@ -25,6 +25,7 @@ AUTOMAKE_OPTIONS = foreign
 
 man_MANS = audio2tape.1 \
 	   createhdf.1 \
+	   fmfconv.1 \
 	   fuse-utils.1 \
 	   listbasic.1 \
 	   profile2map.1 \

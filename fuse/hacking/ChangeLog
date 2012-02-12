@@ -4026,3 +4026,10 @@
 20120204 sound.c,sound/coreaudiosound.c: fix the removal of sound_stereo_beeper
          (Fred).
 20120211 hacking/Makefile.am: add missing backslash and files (Fred).
+20120212 Makefile.am,configure.in,display.[ch],fuse.c,machine.c,man/fuse.1,
+         menu.[ch],menu_data.dat,movie.[ch],movie_tables.h,rzx.c,
+         screenshot.[ch],settings.dat,sound.c,timer/timer.c,ui.c,
+         ui/gtk/gtkui.c,ui/{options.dat,ui.h},ui/widget/widget.c,
+         ui/win32/win32ui.c: add recording of movies to fmf files 
+         (patch #3034770) (Gergely Szasz with contributions from Sergio Baldoví
+         and Fred).

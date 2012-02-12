@@ -61,7 +61,8 @@ MENU_CALLBACK( menu_file_recording_play );
 MENU_CALLBACK( menu_file_recording_stop );
 MENU_CALLBACK( menu_file_aylogging_stop );
 MENU_CALLBACK( menu_file_openscrscreenshot );
-MENU_CALLBACK( menu_file_movies_stopmovierecording );
+MENU_CALLBACK( menu_file_movie_stop );
+MENU_CALLBACK( menu_file_movie_pause );
 
 MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select );
 MENU_CALLBACK( menu_options_filter );
@@ -124,14 +125,15 @@ MENU_CALLBACK( menu_file_aylogging_record );
 MENU_CALLBACK( menu_file_savescreenasscr );
 MENU_CALLBACK( menu_file_savescreenaspng );
 
-MENU_CALLBACK( menu_file_movies_recordmovieasscr );
-MENU_CALLBACK( menu_file_movies_recordmovieaspng );
+MENU_CALLBACK( menu_file_movie_record );
+MENU_CALLBACK( menu_file_movie_record_recordfromrzx );
 
 MENU_CALLBACK( menu_options_general );
 MENU_CALLBACK( menu_options_sound );
 MENU_CALLBACK( menu_options_peripherals_general );
 MENU_CALLBACK( menu_options_peripherals_disk );
 MENU_CALLBACK( menu_options_rzx );
+MENU_CALLBACK( menu_options_movie );
 MENU_CALLBACK( menu_options_diskoptions );
 MENU_DETAIL( menu_plus3a_detail );
 MENU_DETAIL( menu_plus3b_detail );

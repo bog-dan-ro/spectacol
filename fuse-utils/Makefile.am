@@ -33,6 +33,7 @@ DIST_SUBDIRS = compat/amiga \
                man
 
 bin_PROGRAMS = createhdf \
+	       fmfconv \
 	       listbasic \
 	       profile2map \
 	       raw2hdf \
@@ -57,6 +58,21 @@ EXTRA_PROGRAMS = rzxcheck audio2tape tape2wav
 INCLUDES = @LIBSPEC_CFLAGS@ @AUDIOFILE_CFLAGS@ @GLIB_CFLAGS@
 
 createhdf_SOURCES = ide.c createhdf.c
+
+fmfconv_SOURCES = fmfconv.c \
+		  fmfconv_ff.c \
+		  fmfconv_yuv.c \
+		  fmfconv_scr.c \
+		  fmfconv_ppm.c \
+		  fmfconv_wav.c \
+		  fmfconv_au.c \
+		  fmfconv_aiff.c
+
+if COMPAT_GETOPT
+fmfconv_SOURCES += compat/getopt.c compat/getopt1.c
+endif
+
+fmfconv_LDADD = @FFMPEG_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
 
 listbasic_SOURCES = listbasic.c utils.c
 listbasic_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
@@ -106,4 +122,5 @@ noinst_HEADERS = compat.h ide.h utils.h audio2tape.h importer/interpolator.h \
                  importer/trigger.h converter/findpilot.h \
                  converter/findsync1.h converter/getpulse1.h \
                  converter/getpulse2.h converter/getsync2.h \
-                 converter/romloader.h converter/romloaderstate.h
+                 converter/romloader.h converter/romloaderstate.h \
+                 fmfconv.h
