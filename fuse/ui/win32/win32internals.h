@@ -39,6 +39,11 @@
 
 #define ID_STATUSBAR 900
 
+/* Reduce listview flickering. Defined from WINVER >= 6.00 */
+#ifndef LVS_EX_DOUBLEBUFFER
+#define LVS_EX_DOUBLEBUFFER 0x00010000
+#endif
+
 /* window handler */
 HWND fuse_hWnd;
 

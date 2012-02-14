@@ -4044,3 +4044,16 @@
 20120214 ui/gtk/memory.c: remember memory position in GTK+ memory browser and
          pause emulation while browsing memory (part of patch #3487118)
          (Sergio).
+20120214 ui/win32/{memorybrowser.c,memorybrowser.rc,win32internals.h}:
+         more Win32 UI code improvements;
+           - Remember memory position when closing.
+           - Pause emulation while browsing because it is a modal dialog.
+           - Set focus on list when opening.
+           - Allow cursor/page keys to scroll.
+           - If the scrollbar position is on the bottom, clicking on the down
+               arrow didn't show address 0x0000.
+           - Allow mouse wheel to scroll when the list has the focus.
+           - Use delta displacement of mouse wheel for scrolling.
+           - Reduce flickering when scrolling on Windows XP (or later).
+           - Fix compile warnings.
+         (rest of patch #3487118) (Sergio).
