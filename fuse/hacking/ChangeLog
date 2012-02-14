@@ -4041,3 +4041,6 @@
 20120214 ui/xlib/{xdisplay.c,xui.c}: fix X11 close button, confirm before exit,
          fix some memory leaks and drain the event queue properly (bug #3481425)
          (Sergio).
+20120214 ui/gtk/memory.c: remember memory position in GTK+ memory browser and
+         pause emulation while browsing memory (part of patch #3487118)
+         (Sergio).

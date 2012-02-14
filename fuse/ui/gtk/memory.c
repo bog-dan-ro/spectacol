@@ -32,9 +32,12 @@
 #include <gtk/gtk.h>
 
 #include "compat.h"
+#include "fuse.h"
 #include "gtkinternals.h"
 #include "memory.h"
 #include "menu.h"
+
+static libspectrum_word memaddr = 0x0000;
 
 static void
 update_display( GtkCList *clist, libspectrum_word base )
@@ -45,6 +48,7 @@ update_display( GtkCList *clist, libspectrum_word base )
   gchar *text[] = { &buffer[0], &buffer[ 8 ], &buffer[ 8 + 64 ] };
   char buffer2[ 8 ];
 
+  memaddr = base;
   gtk_clist_freeze( clist );
   gtk_clist_clear( clist );
 
@@ -91,6 +95,7 @@ menu_machine_memorybrowser( GtkWidget *widget GCC_UNUSED,
   int error;
   gtkui_font font;
 
+  fuse_emulation_pause();
   gchar *titles[] = { "Address", "Hex", "Data" };
 
   error = gtkui_get_monospaced_font( &font ); if( error ) return;
@@ -107,10 +112,10 @@ menu_machine_memorybrowser( GtkWidget *widget GCC_UNUSED,
   for( i = 0; i < 3; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( clist ), i, TRUE );
   gtkui_set_font( clist, font );
-  update_display( GTK_CLIST( clist ), 0x0000 );
+  update_display( GTK_CLIST( clist ), memaddr );
   gtk_box_pack_start_defaults( GTK_BOX( box ), clist );
 
-  adjustment = gtk_adjustment_new( 0, 0x0000, 0xffff, 0x10, 0xa0, 0x13f );
+  adjustment = gtk_adjustment_new( memaddr, 0x0000, 0xffff, 0x10, 0xa0, 0x13f );
   gtk_signal_connect( adjustment, "value-changed", G_CALLBACK( scroller ),
 		      clist );
 
@@ -123,6 +128,7 @@ menu_machine_memorybrowser( GtkWidget *widget GCC_UNUSED,
   gtk_main();
 
   gtkui_free_font( font );
+  fuse_emulation_unpause();
 
   return;
 }
