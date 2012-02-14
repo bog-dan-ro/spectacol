@@ -997,6 +997,7 @@ ui_statusbar_update_speed( float speed )
 
   XStringListToTextProperty( list, 1, &text);
   XSetWMName( display, xui_mainWindow, &text );
+  XFree( text.value );
 
   return 0;
 }

@@ -4038,3 +4038,6 @@
          gtkinternals.h,gtkjoystick.c,gtkui.c,memory.c,options.pl,picture.c,
          pokefinder.c,pokemem.c,rollback.c,roms.c,stock.c}: remove use of
          deprecated GTK_SIGNAL_FUNC and GtkSignalFunc (patch #3481335) (rkd77).
+20120214 ui/xlib/{xdisplay.c,xui.c}: fix X11 close button, confirm before exit,
+         fix some memory leaks and drain the event queue properly (bug #3481425)
+         (Sergio).
