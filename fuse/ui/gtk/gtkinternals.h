@@ -77,9 +77,9 @@ GtkAccelGroup* gtkstock_add_accel_group( GtkWidget *widget );
  */
 typedef struct gtkstock_button {
   gchar *label;
-  GtkSignalFunc action;		/* "clicked" func; data is actiondata. */
+  GCallback action;		/* "clicked" func; data is actiondata. */
   gpointer actiondata;
-  GtkSignalFunc destroy;	/* "clicked" func; data is parent widget */
+  GCallback destroy;	/* "clicked" func; data is parent widget */
   guint shortcut;
   GdkModifierType modifier;     /* primary shortcut */
   guint shortcut_alt;
@@ -106,17 +106,17 @@ gtkstock_create_buttons( GtkWidget *widget, GtkAccelGroup *accel,
 			 const gtkstock_button *buttons, size_t count );
 GtkAccelGroup* gtkstock_create_ok_cancel( GtkWidget *widget,
 					  GtkAccelGroup *accel,
-	/* for OK button -> */	          GtkSignalFunc action,
+	/* for OK button -> */	          GCallback action,
 				          gpointer actiondata,
-	/* for both buttons -> */         GtkSignalFunc destroy );
+	/* for both buttons -> */         GCallback destroy );
 GtkAccelGroup* gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
-				      GtkSignalFunc destroy,
+				      GCallback destroy,
 				      gboolean esconly );
 	/* destroy==NULL => use DEFAULT_DESTROY */
 
-#define DEFAULT_DESTROY ( GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ) )
+#define DEFAULT_DESTROY ( G_CALLBACK( gtkui_destroy_widget_and_quit ) )
 
-GtkWidget *gtkstock_dialog_new( const gchar *title, GtkSignalFunc destroy );
+GtkWidget *gtkstock_dialog_new( const gchar *title, GCallback destroy );
 
 typedef PangoFontDescription *gtkui_font;
 

@@ -58,7 +58,7 @@ gtkui_confirm( const char *string )
   gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label,
 		      TRUE, TRUE, 5 );
 
-  gtkstock_create_ok_cancel( dialog, NULL, GTK_SIGNAL_FUNC( set_confirmed ),
+  gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( set_confirmed ),
 			     &confirm, NULL );
 
   gtk_widget_show_all( dialog );
@@ -97,9 +97,9 @@ ui_confirm_save_specific( const char *message )
 
   {
     static gtkstock_button btn[] = {
-      { GTK_STOCK_NO, GTK_SIGNAL_FUNC( set_dont_save ), NULL, DEFAULT_DESTROY, 0, 0, GDK_VoidSymbol, 0 }, /* override Escape */
+      { GTK_STOCK_NO, G_CALLBACK( set_dont_save ), NULL, DEFAULT_DESTROY, 0, 0, GDK_VoidSymbol, 0 }, /* override Escape */
       { GTK_STOCK_CANCEL, NULL, NULL, DEFAULT_DESTROY, 0, 0, 0, 0 },
-      { GTK_STOCK_SAVE, GTK_SIGNAL_FUNC( set_save ), NULL, DEFAULT_DESTROY, 0, 0, 0, 0 }
+      { GTK_STOCK_SAVE, G_CALLBACK( set_save ), NULL, DEFAULT_DESTROY, 0, 0, 0, 0 }
     };
     btn[0].actiondata = btn[2].actiondata = &confirm;
     gtkstock_create_buttons( dialog, NULL, btn,

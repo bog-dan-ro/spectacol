@@ -319,7 +319,7 @@ create_dialog( void )
   error = gtkui_get_monospaced_font( &font ); if( error ) return error;
 
   dialog = gtkstock_dialog_new( "Fuse - Debugger",
-				GTK_SIGNAL_FUNC( delete_dialog ) );
+				G_CALLBACK( delete_dialog ) );
 
   /* Keyboard shortcuts */
   accel_group = gtk_accel_group_new();
@@ -502,7 +502,7 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   disassembly_scrollbar_adjustment =
     gtk_adjustment_new( 0, 0x0000, 0xffff, 0.5, 20, 20 );
   gtk_signal_connect( GTK_OBJECT( disassembly_scrollbar_adjustment ),
-		      "value-changed", GTK_SIGNAL_FUNC( move_disassembly ),
+		      "value-changed", G_CALLBACK( move_disassembly ),
 		      NULL );
   scrollbar =
     gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
@@ -619,13 +619,13 @@ create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group )
   /* The command entry widget */
   entry = gtk_entry_new();
   gtk_signal_connect( GTK_OBJECT( entry ), "activate",
-		      GTK_SIGNAL_FUNC( evaluate_command ), NULL );
+		      G_CALLBACK( evaluate_command ), NULL );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), entry );
 
   /* The 'command evaluate' button */
   eval_button = gtk_button_new_with_label( "Evaluate" );
   gtk_signal_connect_object( GTK_OBJECT( eval_button ), "clicked",
-			     GTK_SIGNAL_FUNC( evaluate_command ),
+			     G_CALLBACK( evaluate_command ),
 			     GTK_OBJECT( entry ) );
   gtk_box_pack_start( GTK_BOX( hbox ), eval_button, FALSE, FALSE, 0 );
 
@@ -640,9 +640,9 @@ static int
 create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group )
 {
   static const gtkstock_button
-    step  = { "Single step", GTK_SIGNAL_FUNC( gtkui_debugger_done_step ), NULL, NULL, 0, 0, 0, 0 },
-    cont  = { "Continue", GTK_SIGNAL_FUNC( gtkui_debugger_done_continue ), NULL, NULL, 0, 0, 0, 0 },
-    brk   = { "Break", GTK_SIGNAL_FUNC( gtkui_debugger_break ), NULL, NULL, 0, 0, 0, 0 };
+    step  = { "Single step", G_CALLBACK( gtkui_debugger_done_step ), NULL, NULL, 0, 0, 0, 0 },
+    cont  = { "Continue", G_CALLBACK( gtkui_debugger_done_continue ), NULL, NULL, 0, 0, 0, 0 },
+    brk   = { "Break", G_CALLBACK( gtkui_debugger_break ), NULL, NULL, 0, 0, 0, 0 };
 
   /* Create the action buttons for the dialog box */
   gtkstock_create_button( GTK_WIDGET( parent ), accel_group, &step );
@@ -651,7 +651,7 @@ create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group )
   break_button = gtkstock_create_button( GTK_WIDGET( parent ), accel_group,
 					 &brk );
   gtkstock_create_close( GTK_WIDGET( parent ), accel_group,
-			 GTK_SIGNAL_FUNC( gtkui_debugger_done_close ), TRUE );
+			 G_CALLBACK( gtkui_debugger_done_close ), TRUE );
 
   return 0;
 }

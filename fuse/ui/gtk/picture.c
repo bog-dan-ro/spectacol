@@ -70,18 +70,18 @@ gtkui_picture( const char *filename, int border )
     utils_close_file( &screen );
 
     dialog = gtkstock_dialog_new( "Fuse - Keyboard",
-				  GTK_SIGNAL_FUNC( gtk_widget_hide ) );
+				  G_CALLBACK( gtk_widget_hide ) );
   
     drawing_area = gtk_drawing_area_new();
     gtk_drawing_area_size( GTK_DRAWING_AREA( drawing_area ),
 			   DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
     gtk_signal_connect( GTK_OBJECT( drawing_area ),
-			"expose_event", GTK_SIGNAL_FUNC( picture_expose ),
+			"expose_event", G_CALLBACK( picture_expose ),
 			NULL );
     gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
 		       drawing_area );
 
-    gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC( gtk_widget_hide ),
+    gtkstock_create_close( dialog, NULL, G_CALLBACK( gtk_widget_hide ),
 			   FALSE );
 
     /* Stop users resizing this window */

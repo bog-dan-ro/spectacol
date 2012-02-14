@@ -107,7 +107,7 @@ create_dialog( void )
   GtkAccelGroup *accel_group;
 
   dialog = gtkstock_dialog_new( "Fuse - Poke Memory",
-                                GTK_SIGNAL_FUNC( pokemem_close ) );
+                                G_CALLBACK( pokemem_close ) );
 
   vbox = GTK_DIALOG( dialog )->vbox;
 
@@ -124,9 +124,9 @@ create_dialog( void )
   gtk_entry_set_width_chars( GTK_ENTRY( bank ), 7 );
   gtk_entry_set_max_length( GTK_ENTRY( bank ), 1 );
   gtk_signal_connect( GTK_OBJECT( bank ), "activate",
-                      GTK_SIGNAL_FUNC( pokemem_add_custom_poke ), NULL );
+                      G_CALLBACK( pokemem_add_custom_poke ), NULL );
   gtk_signal_connect( GTK_OBJECT( bank ), "insert_text",
-                      GTK_SIGNAL_FUNC( entry_validate_digit ), NULL );
+                      G_CALLBACK( entry_validate_digit ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), bank, TRUE, TRUE, 5 );
 
@@ -136,9 +136,9 @@ create_dialog( void )
   gtk_entry_set_width_chars( GTK_ENTRY( address ), 7 );
   gtk_entry_set_max_length( GTK_ENTRY( address ), 6 );
   gtk_signal_connect( GTK_OBJECT( address ), "activate",
-                      GTK_SIGNAL_FUNC( pokemem_add_custom_poke ), NULL );
+                      G_CALLBACK( pokemem_add_custom_poke ), NULL );
   gtk_signal_connect( GTK_OBJECT( address ), "insert_text",
-                      GTK_SIGNAL_FUNC( entry_validate_address ), NULL );
+                      G_CALLBACK( entry_validate_address ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), address, TRUE, TRUE, 5 );
 
@@ -148,15 +148,15 @@ create_dialog( void )
   gtk_entry_set_width_chars( GTK_ENTRY( value ), 7 );
   gtk_entry_set_max_length( GTK_ENTRY( value ), 3 );
   gtk_signal_connect( GTK_OBJECT( value ), "activate",
-                      GTK_SIGNAL_FUNC( pokemem_add_custom_poke ), NULL );
+                      G_CALLBACK( pokemem_add_custom_poke ), NULL );
   gtk_signal_connect( GTK_OBJECT( value ), "insert_text",
-                      GTK_SIGNAL_FUNC( entry_validate_digit ), NULL );
+                      G_CALLBACK( entry_validate_digit ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), value, TRUE, TRUE, 5 );
 
   /* Create Add button for custom pokes */
   static const gtkstock_button
-    add  = { "Add", GTK_SIGNAL_FUNC( pokemem_add_custom_poke ), NULL, NULL,
+    add  = { "Add", G_CALLBACK( pokemem_add_custom_poke ), NULL, NULL,
              0, 0, 0, 0 };
   gtkstock_create_button( GTK_WIDGET( hbox ), accel_group, &add );
 
@@ -171,9 +171,9 @@ create_dialog( void )
 
   /* Create and add the actions buttons to the dialog box */
   gtkstock_create_ok_cancel( dialog, accel_group,
-                             GTK_SIGNAL_FUNC( pokemem_update_list ),
+                             G_CALLBACK( pokemem_update_list ),
                              (gpointer) &dialog,
-                             GTK_SIGNAL_FUNC( pokemem_close ) );
+                             G_CALLBACK( pokemem_close ) );
   gtk_accel_group_disconnect_key( accel_group, GDK_Return, 0 );
 
   /* Users shouldn't be able to resize this window */

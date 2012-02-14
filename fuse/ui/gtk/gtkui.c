@@ -161,18 +161,18 @@ ui_init( int *argc, char ***argv )
   gtk_window_set_wmclass( GTK_WINDOW(gtkui_window), fuse_progname, "Fuse" );
 
   gtk_signal_connect(GTK_OBJECT(gtkui_window), "delete-event",
-		     GTK_SIGNAL_FUNC(gtkui_delete), NULL);
+		     G_CALLBACK(gtkui_delete), NULL);
   gtk_signal_connect(GTK_OBJECT(gtkui_window), "key-press-event",
-		     GTK_SIGNAL_FUNC(gtkkeyboard_keypress), NULL);
+		     G_CALLBACK(gtkkeyboard_keypress), NULL);
   gtk_widget_add_events( gtkui_window, GDK_KEY_RELEASE_MASK );
   gtk_signal_connect(GTK_OBJECT(gtkui_window), "key-release-event",
-		     GTK_SIGNAL_FUNC(gtkkeyboard_keyrelease), NULL);
+		     G_CALLBACK(gtkkeyboard_keyrelease), NULL);
 
   /* If we lose the focus, disable all keys */
   gtk_signal_connect( GTK_OBJECT( gtkui_window ), "focus-out-event",
-		      GTK_SIGNAL_FUNC( gtkui_lose_focus ), NULL );
+		      G_CALLBACK( gtkui_lose_focus ), NULL );
   gtk_signal_connect( GTK_OBJECT( gtkui_window ), "focus-in-event",
-		      GTK_SIGNAL_FUNC( gtkui_gain_focus ), NULL );
+		      G_CALLBACK( gtkui_gain_focus ), NULL );
 
   gtk_drag_dest_set( GTK_WIDGET( gtkui_window ),
                      GTK_DEST_DEFAULT_ALL,
@@ -183,7 +183,7 @@ ui_init( int *argc, char ***argv )
                         GDK_ACTION_MOVE allow DnD from KDE */
 
   gtk_signal_connect( GTK_OBJECT( gtkui_window ), "drag-data-received",
-		      GTK_SIGNAL_FUNC( gtkui_drag_data_received ), NULL );
+		      G_CALLBACK( gtkui_drag_data_received ), NULL );
 
   box = gtk_vbox_new( FALSE, 0 );
   gtk_container_add(GTK_CONTAINER(gtkui_window), box);
@@ -204,11 +204,11 @@ ui_init( int *argc, char ***argv )
   gtk_widget_add_events( GTK_WIDGET( gtkui_drawing_area ),
     GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK );
   gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "motion-notify-event",
-		      GTK_SIGNAL_FUNC( gtkmouse_position ), NULL );
+		      G_CALLBACK( gtkmouse_position ), NULL );
   gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "button-press-event",
-		      GTK_SIGNAL_FUNC( gtkmouse_button ), NULL );
+		      G_CALLBACK( gtkmouse_button ), NULL );
   gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "button-release-event",
-		      GTK_SIGNAL_FUNC( gtkmouse_button ), NULL );
+		      G_CALLBACK( gtkmouse_button ), NULL );
 
   gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, TRUE, TRUE, 0 );
 
@@ -243,7 +243,7 @@ gtkui_make_menu(GtkAccelGroup **accel_group,
 				 NULL);
   *menu_bar = gtk_item_factory_get_widget( menu_factory, "<main>" );
   gtk_signal_connect( GTK_OBJECT( *menu_bar ), "deactivate",
-		      GTK_SIGNAL_FUNC( gtkui_menu_deactivate ), NULL );
+		      G_CALLBACK( gtkui_menu_deactivate ), NULL );
 
   /* We have to recreate the menus for the popup, unfortunately... */
   popup_factory = gtk_item_factory_new( GTK_TYPE_MENU, "<main>", NULL );
@@ -314,10 +314,10 @@ ui_error_specific( ui_error_level severity, const char *message )
   }
 
   /* Create the dialog box */
-  dialog = gtkstock_dialog_new( title, GTK_SIGNAL_FUNC( gtk_widget_destroy ) );
+  dialog = gtkstock_dialog_new( title, G_CALLBACK( gtk_widget_destroy ) );
 
   /* Add the OK button into the lower half */
-  gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC (gtk_widget_destroy),
+  gtkstock_create_close( dialog, NULL, G_CALLBACK (gtk_widget_destroy),
 			 FALSE );
 
   /* Create a label with that message */
@@ -432,7 +432,7 @@ menu_get_scaler( scaler_available_fn selector )
 
   /* Create and add the actions buttons to the dialog box */
   gtkstock_create_ok_cancel( dialog.dialog, NULL,
-			     GTK_SIGNAL_FUNC( menu_options_filter_done ),
+			     G_CALLBACK( menu_options_filter_done ),
 			     (gpointer) &dialog, NULL );
 
   gtk_widget_show_all( dialog.dialog );
@@ -554,7 +554,7 @@ menu_machine_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   /* Create and add the actions buttons to the dialog box */
   gtkstock_create_ok_cancel( dialog.dialog, NULL,
-			     GTK_SIGNAL_FUNC( menu_machine_select_done ),
+			     G_CALLBACK( menu_machine_select_done ),
 			     (gpointer) &dialog, NULL );
 
   gtk_widget_show_all( dialog.dialog );
@@ -715,7 +715,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
 
   /* Create and add the actions buttons to the dialog box */
   gtkstock_create_ok_cancel( dialog.dialog, NULL,
-			     GTK_SIGNAL_FUNC( confirm_joystick_done ),
+			     G_CALLBACK( confirm_joystick_done ),
 			     (gpointer) &dialog, NULL );
 
   gtk_widget_show_all( dialog.dialog );
@@ -831,7 +831,7 @@ void
 gtkui_scroll_connect( GtkCList *clist, GtkAdjustment *adj )
 {
   gtk_signal_connect( GTK_OBJECT( clist ), "scroll-vertical",
-		      GTK_SIGNAL_FUNC( key_scroll_event ), adj );
+		      G_CALLBACK( key_scroll_event ), adj );
   gtk_signal_connect( GTK_OBJECT( clist ), "scroll-event",
-		      GTK_SIGNAL_FUNC( wheel_scroll_event ), adj );
+		      G_CALLBACK( wheel_scroll_event ), adj );
 }

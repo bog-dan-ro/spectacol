@@ -73,7 +73,7 @@ menu_select_roms_with_title( const char *title, size_t start, size_t n )
   info.n = n;
 
   /* Create the OK and Cancel buttons */
-  gtkstock_create_ok_cancel( dialog, NULL, GTK_SIGNAL_FUNC( roms_done ), &info,
+  gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( roms_done ), &info,
 			     NULL );
 
   /* And the current values of each of the ROMs */
@@ -118,7 +118,7 @@ add_rom( GtkBox *parent, size_t start, gint row )
 
   change_button = gtk_button_new_with_label( "Select..." );
   gtk_signal_connect( GTK_OBJECT( change_button ), "clicked",
-		      GTK_SIGNAL_FUNC( select_new_rom ),
+		      G_CALLBACK( select_new_rom ),
 		      rom[ row ] );
   gtk_box_pack_start( GTK_BOX( hbox ), change_button, FALSE, FALSE, 2 );
 }

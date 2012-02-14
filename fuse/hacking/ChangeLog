@@ -4034,3 +4034,7 @@
          (patch #3034770) (Gergely Szasz with contributions from Sergio Baldoví
          and Fred).
 20120214 ui/gtk/gtkmouse.c: prefer to include gtk.h (patch #3481334) (rkd77).
+20120214 ui/gtk/{binary.c,browse.c,confirm.c,debugger.c,gtkdisplay.c,
+         gtkinternals.h,gtkjoystick.c,gtkui.c,memory.c,options.pl,picture.c,
+         pokefinder.c,pokemem.c,rollback.c,roms.c,stock.c}: remove use of
+         deprecated GTK_SIGNAL_FUNC and GtkSignalFunc (patch #3481335) (rkd77).

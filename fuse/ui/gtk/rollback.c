@@ -59,7 +59,7 @@ create_dialog( void )
   gtk_clist_column_titles_passive( GTK_CLIST( list ) );
   gtk_clist_set_column_auto_resize( GTK_CLIST( list ), 0, TRUE );
   gtk_signal_connect( GTK_OBJECT( list ), "select-row",
-		      GTK_SIGNAL_FUNC( select_row ), NULL );
+		      G_CALLBACK( select_row ), NULL );
 
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), list );
 

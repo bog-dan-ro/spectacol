@@ -244,7 +244,7 @@ CODE
     print << "CODE";
   /* Create the OK and Cancel buttons */
   gtkstock_create_ok_cancel( dialog.dialog, NULL,
-			     GTK_SIGNAL_FUNC( menu_options_$_->{name}_done ),
+			     G_CALLBACK( menu_options_$_->{name}_done ),
 			     (gpointer) &dialog, NULL );
 
   /* Display the window */

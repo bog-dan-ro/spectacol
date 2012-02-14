@@ -147,9 +147,9 @@ uidisplay_init( int width, int height )
   const char *machine_name;
 
   gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "expose_event",
-                      GTK_SIGNAL_FUNC(gtkdisplay_expose ), NULL );
+                      G_CALLBACK(gtkdisplay_expose ), NULL );
   gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "configure_event",
-                      GTK_SIGNAL_FUNC( drawing_area_resize_callback ), NULL );
+                      G_CALLBACK( drawing_area_resize_callback ), NULL );
 
   error = init_colours(); if( error ) return error;
 

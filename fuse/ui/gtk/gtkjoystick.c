@@ -168,7 +168,7 @@ menu_options_joysticks_select( gpointer callback_data GCC_UNUSED,
       }
   }
 
-  gtkstock_create_ok_cancel( dialog, NULL, GTK_SIGNAL_FUNC( joystick_done ),
+  gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( joystick_done ),
 			     &info, NULL );
 
   gtk_widget_show_all( dialog );

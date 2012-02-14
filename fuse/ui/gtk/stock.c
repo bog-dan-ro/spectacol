@@ -146,8 +146,8 @@ gtkstock_create_buttons( GtkWidget *widget, GtkAccelGroup *accel,
 
 GtkAccelGroup*
 gtkstock_create_ok_cancel( GtkWidget *widget, GtkAccelGroup *accel,
-			   GtkSignalFunc action, gpointer actiondata,
-			   GtkSignalFunc destroy )
+			   GCallback action, gpointer actiondata,
+			   GCallback destroy )
 {
   gtkstock_button btn[] = {
     { GTK_STOCK_CANCEL, NULL, NULL, NULL, 0, 0, 0, 0 },
@@ -163,7 +163,7 @@ gtkstock_create_ok_cancel( GtkWidget *widget, GtkAccelGroup *accel,
 
 GtkAccelGroup*
 gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
-		       GtkSignalFunc destroy, gboolean esconly )
+		       GCallback destroy, gboolean esconly )
 {
   gtkstock_button btn = {
     GTK_STOCK_CLOSE, NULL, NULL, (destroy ? destroy : DEFAULT_DESTROY),
@@ -173,7 +173,7 @@ gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
 }
 
 GtkWidget*
-gtkstock_dialog_new( const gchar *title, GtkSignalFunc destroy )
+gtkstock_dialog_new( const gchar *title, GCallback destroy )
 {
   GtkWidget *dialog = gtk_dialog_new();
   if( title ) gtk_window_set_title( GTK_WINDOW( dialog ), title );

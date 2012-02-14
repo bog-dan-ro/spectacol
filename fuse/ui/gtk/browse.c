@@ -89,7 +89,7 @@ create_dialog( void )
 
   /* Give me a new dialog box */
   dialog = gtkstock_dialog_new( "Fuse - Browse Tape",
-				GTK_SIGNAL_FUNC( delete_dialog ) );
+				G_CALLBACK( delete_dialog ) );
 
   /* And a scrolled window to pack the CList into */
   scrolled_window = gtk_scrolled_window_new( NULL, NULL );
@@ -104,7 +104,7 @@ create_dialog( void )
   for( i = 0; i < 3; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( blocks ), i, TRUE );
   gtk_signal_connect( GTK_OBJECT( blocks ), "select-row",
-		      GTK_SIGNAL_FUNC( select_row ), NULL );
+		      G_CALLBACK( select_row ), NULL );
   gtk_container_add( GTK_CONTAINER( scrolled_window ), blocks );
 
   /* The tape marker pixmap */
@@ -119,7 +119,7 @@ create_dialog( void )
 		      FALSE, FALSE, 0 );
 
   /* Create the OK button */
-  gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC( browse_done ), FALSE );
+  gtkstock_create_close( dialog, NULL, G_CALLBACK( browse_done ), FALSE );
 
   /* Make the window big enough to show at least some data */
   gtk_window_set_default_size( GTK_WINDOW( dialog ), -1, 200 );

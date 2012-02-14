@@ -90,7 +90,7 @@ create_dialog( void )
   gchar *location_titles[] = { "Page", "Offset" };
 
   dialog = gtkstock_dialog_new( "Fuse - Poke Finder",
-				GTK_SIGNAL_FUNC( delete_dialog ) );
+				G_CALLBACK( delete_dialog ) );
 
   hbox = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
@@ -100,7 +100,7 @@ create_dialog( void )
 
   entry = gtk_entry_new();
   gtk_signal_connect( GTK_OBJECT( entry ), "activate",
-		      GTK_SIGNAL_FUNC( gtkui_pokefinder_search ), NULL );
+		      G_CALLBACK( gtkui_pokefinder_search ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), entry, TRUE, TRUE, 5 );
 
   vbox = gtk_vbox_new( FALSE, 0 );
@@ -116,20 +116,20 @@ create_dialog( void )
   gtk_box_pack_start( GTK_BOX( vbox ), location_list, TRUE, TRUE, 5 );
 
   gtk_signal_connect( GTK_OBJECT( location_list ), "select-row",
-		      GTK_SIGNAL_FUNC( possible_click ), NULL );
+		      G_CALLBACK( possible_click ), NULL );
 
   {
     static gtkstock_button btn[] = {
-      { "Incremented", GTK_SIGNAL_FUNC( gtkui_pokefinder_incremented ), NULL, NULL, 0, 0, 0, 0 },
-      { "Decremented", GTK_SIGNAL_FUNC( gtkui_pokefinder_decremented ), NULL, NULL, 0, 0, 0, 0 },
-      { "!Search", GTK_SIGNAL_FUNC( gtkui_pokefinder_search ), NULL, NULL, GDK_Return, 0, 0, 0 },
-      { "Reset", GTK_SIGNAL_FUNC( gtkui_pokefinder_reset ), NULL, NULL, 0, 0, 0, 0 }
+      { "Incremented", G_CALLBACK( gtkui_pokefinder_incremented ), NULL, NULL, 0, 0, 0, 0 },
+      { "Decremented", G_CALLBACK( gtkui_pokefinder_decremented ), NULL, NULL, 0, 0, 0, 0 },
+      { "!Search", G_CALLBACK( gtkui_pokefinder_search ), NULL, NULL, GDK_Return, 0, 0, 0 },
+      { "Reset", G_CALLBACK( gtkui_pokefinder_reset ), NULL, NULL, 0, 0, 0, 0 }
     };
     btn[2].actiondata = GTK_OBJECT( entry );
     accel_group = gtkstock_create_buttons( dialog, NULL, btn,
 					   sizeof( btn ) / sizeof( btn[0] ) );
     gtkstock_create_close( dialog, accel_group,
-			   GTK_SIGNAL_FUNC( gtkui_pokefinder_close ), TRUE );
+			   G_CALLBACK( gtkui_pokefinder_close ), TRUE );
   }
 
   /* Users shouldn't be able to resize this window */

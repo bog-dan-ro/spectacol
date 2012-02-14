@@ -111,7 +111,7 @@ menu_machine_memorybrowser( GtkWidget *widget GCC_UNUSED,
   gtk_box_pack_start_defaults( GTK_BOX( box ), clist );
 
   adjustment = gtk_adjustment_new( 0, 0x0000, 0xffff, 0x10, 0xa0, 0x13f );
-  gtk_signal_connect( adjustment, "value-changed", GTK_SIGNAL_FUNC( scroller ),
+  gtk_signal_connect( adjustment, "value-changed", G_CALLBACK( scroller ),
 		      clist );
 
   gtkui_scroll_connect( GTK_CLIST( clist ), GTK_ADJUSTMENT( adjustment ) );
