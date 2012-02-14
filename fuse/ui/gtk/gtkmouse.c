@@ -26,7 +26,7 @@
 #include <config.h>
 
 #include <gdk/gdk.h>
-#include <gtk/gtkwidget.h>
+#include <gtk/gtk.h>
 
 #include "gtkinternals.h"
 #include "ui/ui.h"

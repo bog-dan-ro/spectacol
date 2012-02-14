@@ -4033,3 +4033,4 @@
          ui/win32/win32ui.c: add recording of movies to fmf files 
          (patch #3034770) (Gergely Szasz with contributions from Sergio Baldoví
          and Fred).
+20120214 ui/gtk/gtkmouse.c: prefer to include gtk.h (patch #3481334) (rkd77).
