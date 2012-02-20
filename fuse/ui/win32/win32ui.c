@@ -240,9 +240,11 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     case WM_ACTIVATE:
       if( ( LOWORD( wParam ) == WA_ACTIVE ) ||
           ( LOWORD( wParam ) == WA_CLICKACTIVE ) )
-        return win32ui_gain_focus( hWnd, wParam, lParam );
+        win32ui_gain_focus( hWnd, wParam, lParam );
       else if( LOWORD( wParam ) == WA_INACTIVE )
-        return win32ui_lose_focus( hWnd, wParam, lParam );
+        win32ui_lose_focus( hWnd, wParam, lParam );
+      /* We'll call DefWindowProc to get keyboard focus when debugger window
+         is open and inactive */
       break;
 
 #if defined USE_JOYSTICK && !defined HAVE_JSW_H

@@ -4061,3 +4061,5 @@
          #3488677) (Sergio).
 20120220 ui/widget/{menu.c,widget.[ch]}: fix compilation on widget UIs (bug
          #3488674) (Sergio).
+20120220 ui/win32/win32ui.c: fix bug causing Fuse to have keyboard input blocked
+         in the main window (bug #3488910) (Sergio).
