@@ -322,10 +322,11 @@ CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
 AC_TRY_COMPILE([#include <libspectrum.h>],[
   int test = LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION;
 ],
-  AUTOLOAD_SNAPS=compressed; AC_MSG_RESULT(yes),
-  AUTOLOAD_SNAPS=uncompressed; AC_MSG_RESULT(no))
+  AUTOLOAD_SNAPS=compressed; LIBSPEC_HAVE_ZLIB=yes; AC_MSG_RESULT(yes),
+  AUTOLOAD_SNAPS=uncompressed; LIBSPEC_HAVE_ZLIB=""; AC_MSG_RESULT(no))
 CPPFLAGS="$ac_save_CPPFLAGS"
 AC_SUBST(AUTOLOAD_SNAPS)
+AC_SUBST(LIBSPEC_HAVE_ZLIB)
 AC_LINK_FILES([
 	lib/"$AUTOLOAD_SNAPS"/disk_plus3.szx
 	lib/"$AUTOLOAD_SNAPS"/tape_128.szx
@@ -369,6 +370,30 @@ if test "$zlib" = yes; then
     AC_SEARCH_LIBS(compress2, z zdll)
   )
 fi
+
+dnl Check if supplied libspectrum has support for bz2 compressed files
+AC_MSG_CHECKING(whether libspectrum supports compressed bz2 files)
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+AC_TRY_COMPILE([#include <libspectrum.h>],[
+  int test = LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION;
+],
+  LIBSPEC_HAVE_BZ2=yes; AC_MSG_RESULT(yes),
+  LIBSPEC_HAVE_BZ2=""; AC_MSG_RESULT(no))
+CPPFLAGS="$ac_save_CPPFLAGS"
+AC_SUBST(LIBSPEC_HAVE_BZ2)
+
+dnl Check if supplied libspectrum has support for wav files
+AC_MSG_CHECKING(whether libspectrum supports wav files)
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+AC_TRY_COMPILE([#include <libspectrum.h>],[
+  int test = LIBSPECTRUM_SUPPORTS_AUDIOFILE;
+],
+  LIBSPEC_HAVE_AUDIOFILE=yes; AC_MSG_RESULT(yes),
+  LIBSPEC_HAVE_AUDIOFILE=""; AC_MSG_RESULT(no))
+CPPFLAGS="$ac_save_CPPFLAGS"
+AC_SUBST(LIBSPEC_HAVE_AUDIOFILE)
 
 dnl Check if a version of libpng which supplies png_write_png is available
 AC_MSG_CHECKING(whether PNG support requested)
@@ -695,6 +720,29 @@ COMPAT_SUBDIR="compat/$COMPAT_OSNAME"
 AC_SUBST(COMPAT_SUBDIR)
 AC_SUBST(COMPAT_OSNAME)
 
+dnl Decide whether to install desktop and mime files
+AC_ARG_ENABLE(desktop-integration,
+AS_HELP_STRING([--enable-desktop-integration], [add menu entry and file associations]),
+if test "$enableval" = yes; then desktopintegration=yes; else desktopintegration=no; fi,
+desktdesktopintegration=no)
+AC_MSG_CHECKING(whether to install desktop file)
+AC_MSG_RESULT($desktopintegration)
+AM_CONDITIONAL(DESKTOP_INTEGRATION, test "$desktopintegration" = yes)
+AC_CHECK_PROGS(GTK_UPDATE_ICON_CACHE,gtk-update-icon-cache,true)
+
+dnl Where to install the desktop and mime files
+AC_ARG_WITH(desktop-dir,
+AS_HELP_STRING([--with-desktop-dir=DIR], [location of desktop files (default=datadir)]),
+if test "$withval" = no; then desktopdir=no; else desktopdir=yes; fi,
+desktopdir=no)
+if test "$desktopdir" = yes; then
+  DESKTOP_DATADIR=$with_desktop_dir
+else
+  DESKTOP_DATADIR="$datadir"
+fi
+AM_CONDITIONAL(DESKTOP_DATADIR, test "$desktopdir" == yes)
+AC_SUBST(DESKTOP_DATADIR)
+
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)
 AC_ARG_ENABLE(smallmem,
@@ -737,6 +785,7 @@ compat/morphos/Makefile \
 compat/unix/Makefile \
 compat/wii/Makefile \
 compat/win32/Makefile \
+data/Makefile \
 debugger/Makefile \
 hacking/Makefile \
 lib/Makefile \

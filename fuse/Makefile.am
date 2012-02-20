@@ -26,6 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 bin_PROGRAMS = fuse
 
 SUBDIRS = @COMPAT_SUBDIR@ \
+	  data \
 	  debugger \
 	  hacking \
 	  lib \
@@ -41,7 +42,8 @@ SUBDIRS = @COMPAT_SUBDIR@ \
 	  unittests \
 	  z80
 
-DIST_SUBDIRS = debugger \
+DIST_SUBDIRS = data \
+	       debugger \
 	       hacking \
 	       lib \
 	       machines \

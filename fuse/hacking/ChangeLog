@@ -4063,3 +4063,11 @@
          #3488674) (Sergio).
 20120220 ui/win32/win32ui.c: fix bug causing Fuse to have keyboard input blocked
          in the main window (bug #3488910) (Sergio).
+20120220 Makefile.am,configure.in,data/{Makefile.am,fuse.desktop.in,
+         fuse.xml.in},data/icons/{128x128/application-x-spectrum.png,
+         128x128/fuse.png,16x16/application-x-spectrum.png,16x16/fuse.png,
+         256x256/application-x-spectrum.png,256x256/fuse.png,
+         32x32/application-x-spectrum.png,32x32/fuse.png,
+         48x48/application-x-spectrum.png,48x48/fuse.png,
+         64x64/application-x-spectrum.png,64x64/fuse.png}: add freedesktop
+         integration (patch #3413549) (Sergio).
