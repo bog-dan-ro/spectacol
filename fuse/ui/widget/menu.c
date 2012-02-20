@@ -447,6 +447,12 @@ menu_options_rzx( int action )
 }
 
 void
+menu_options_movie( int action )
+{
+  widget_do( WIDGET_TYPE_MOVIE, NULL );
+}
+
+void
 menu_options_diskoptions( int action )
 {
   widget_do( WIDGET_TYPE_DISKOPTIONS, NULL );

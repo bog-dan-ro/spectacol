@@ -46,6 +46,7 @@ typedef enum widget_type {
   WIDGET_TYPE_SOUND,		/* Sound options */
   WIDGET_TYPE_ERROR,		/* Error report */
   WIDGET_TYPE_RZX,		/* RZX options */
+  WIDGET_TYPE_MOVIE,		/* Movie options */
   WIDGET_TYPE_BROWSE,		/* Browse tape */
   WIDGET_TYPE_TEXT,		/* Text entry widget */
   WIDGET_TYPE_DEBUGGER,		/* Debugger widget */
