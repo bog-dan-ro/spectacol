@@ -4057,3 +4057,5 @@
            - Reduce flickering when scrolling on Windows XP (or later).
            - Fix compile warnings.
          (rest of patch #3487118) (Sergio).
+20120220 sound/sdlsound.c: fix for the removal of sound_stereo_beeper (bug
+         #3488677) (Sergio).

@@ -194,7 +194,7 @@ sdlwrite( void *userdata, Uint8 *stream, int len )
 
   /* Try to only read an even number of bytes so as not to fragment a sample */
   len = MIN( len, sfifo_used( &sound_fifo ) );
-  len &= sound_stereo ? 0xfffc : 0xfffe;
+  len &= sound_stereo_ay ? 0xfffc : 0xfffe;
 
   /* Read input_size bytes from fifo into sound stream */
   while( ( f = sfifo_read( &sound_fifo, stream, len ) ) > 0 ) {
