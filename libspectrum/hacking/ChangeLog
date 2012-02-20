@@ -873,3 +873,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          2.1) (Fred).
 20120203 szx.c: correct error argument in libspectrum_print_error() calls
          (thanks, clang 2.1) (Fred).
+20120220 make-perl.c: advertise that we support bzip2 compressed and wav files
+         (part of patch #3413549) (Sergio Baldoví).

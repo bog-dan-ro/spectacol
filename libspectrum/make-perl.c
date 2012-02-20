@@ -321,6 +321,16 @@ int main(void)
 
 #endif				/* #ifdef HAVE_ZLIB_H */
 
+#ifdef HAVE_LIBBZ2
+  printf( "\n/* we support files compressed with bz2 */\n" );
+  printf( "#define	LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION	(1)\n\n" );
+#endif				/* #ifdef HAVE_LIBBZ2 */
+
+#ifdef HAVE_LIB_AUDIOFILE
+  printf( "\n/* we support files wav files */\n" );
+  printf( "#define	LIBSPECTRUM_SUPPORTS_AUDIOFILE	(1)\n\n" );
+#endif				/* #ifdef HAVE_LIB_AUDIOFILE */
+
   printf( "CODE\n}\n\n" );
 
   return 0;
