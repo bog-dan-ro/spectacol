@@ -195,8 +195,6 @@ get_screentype()
 static void
 fwrite_compr( void *b, size_t n, size_t m, FILE *f )
 {
-  int s;			/* zlib status */
-
   if( fmf_compr == 0 ) {
     fwrite( b, n, m, f );
   } else {
@@ -205,7 +203,7 @@ fwrite_compr( void *b, size_t n, size_t m, FILE *f )
     zstream.avail_out = ZBUF_SIZE;
     zstream.next_out = zbuf_o;
     do {
-      s = deflate( &zstream, Z_NO_FLUSH );
+      deflate( &zstream, Z_NO_FLUSH );
       while( zstream.avail_out != ZBUF_SIZE ) {
         fwrite( zbuf_o, ZBUF_SIZE - zstream.avail_out, 1, of );
 	zstream.avail_out = ZBUF_SIZE;
@@ -364,14 +362,12 @@ movie_stop( void )
   fwrite_compr( "X", 1, 1, of );	/* End of Recording! */
 #ifdef HAVE_ZLIB_H
   {
-    int s;
-
     if( fmf_compr != 0 ) {		/* close zlib */
       zstream.avail_in = 0;
       do {
         zstream.avail_out = ZBUF_SIZE;
         zstream.next_out = zbuf_o;
-        s = deflate( &zstream, Z_SYNC_FLUSH );
+        deflate( &zstream, Z_SYNC_FLUSH );
         if( zstream.avail_out != ZBUF_SIZE )
           fwrite( zbuf_o, ZBUF_SIZE - zstream.avail_out, 1, of );
       } while ( zstream.avail_out != ZBUF_SIZE );
