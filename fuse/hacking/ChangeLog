@@ -4072,3 +4072,5 @@
          64x64/application-x-spectrum.png,64x64/fuse.png}: add freedesktop
          integration (patch #3413549) (Sergio).
 20120226 movie.c: fix warnings.
+20120226 settings.dat: we don't load the Spectranet firmware from a .rom file
+         any more.
