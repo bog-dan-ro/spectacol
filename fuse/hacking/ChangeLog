@@ -4074,3 +4074,5 @@
 20120226 movie.c: fix warnings.
 20120226 settings.dat: we don't load the Spectranet firmware from a .rom file
          any more.
+20120227 man/fuse.1: document the --swap-mouse-buttons option and various other
+         minor tweaks.

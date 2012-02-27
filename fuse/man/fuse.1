@@ -135,9 +135,10 @@ Emulate a Beta 128 interface. Same as the Peripherals Options dialog's
 option.
 .RE
 .PP
+.I "\-\-betadisk file"
 .RS
-.I \-\-betadisk
-Specify a Betadisk image to load.
+Insert the specified file into the emulated Beta disk interface's drive A:
+and select Pentagon mode on startup.
 .RE
 .PP
 .I \-\-bw\-tv
@@ -487,35 +488,42 @@ option.
 Specify Interface I Microdrive cartridge files to open.
 .RE
 .PP
+.I \-\-mouse\-swap\-buttons
+.RS
+Swap the left and right mouse buttons when emulating the Kempston mouse. The
+same as the General Peripherals dialog's 
+.I Swap mouse buttons
+option.
+.RE
+.PP
+.I \-\-movie-compr level
+.RS
+If Fuse was compiled with Zlib support, this option sets the compression level
+used when creating movies. Valid values are 0 (no compression) and 1 (least
+compression) through 9 (most compression).
+.br
+See also the
+.B "MOVIE RECORDING"
+section
+.RE
+.PP
 .I \-\-movie-start filename
 .RS
-With this command line option, Fuse start movie recording as started.
-So you can make recordings from the "beginning".
-See also the
+With this command line option, Fuse will start movie recording as soon as the
+emulator is started. See also the
 .B "MOVIE RECORDING"
 section
 .RE
 .PP
 .I \-\-movie-stop-after-rzx
 .RS
-With this command line option, Fuse stop movie recording when RZX playback
-ends or RZX recording ends.  (Enabled by default, but you can use
+With this command line option, Fuse will stop movie recording when RZX playback
+or RZX recording ends.  (Enabled by default, but you can use
 .RI ` \-\-no\-movie-stop-after-rzx'
 to disable).
 See also the
 .B "MOVIE RECORDING"
 section
-.RE
-.PP
-.I \-\-movie-compr level
-.RS
-if Fuse compiled with Zlib support, this option you can set the compression
-level from 1 to 9. 0 switch off the Zlib compression.
-.br
-See also the
-.B "MOVIE RECORDING"
-section
-
 .RE
 .PP
 .I \-\-movie-sound type
@@ -847,22 +855,6 @@ full details on the SpeccyBoot.
 .I "\-\-speccyboot-tap device"
 .RS
 Specify the TAP device to use for SpeccyBoot emulation.
-.RE
-.PP
-.I "\-\-volume\-ay volume"
-.RS
-Sets the relative volume of the AY-3-8912 chip from a range of
-0-100%. Same as the Sound Options dialog's
-.I "AY volume"
-option.
-.RE
-.PP
-.I "\-\-volume\-beeper volume"
-.RS
-Sets the relative volume of the beeper from a range of 0-100%.
-Same as the Sound Options dialog's
-.I "Beeper volume"
-option.
 .RE
 .PP
 .I "\-d device"
@@ -1226,17 +1218,27 @@ to disable). Same as the General Options dialog's
 option.
 .RE
 .PP
-.I "\-\-betadisk file"
-.RS
-Insert the specified file into the emulated Beta disk interface's drive A:
-and select Pentagon mode on startup.
-.RE
-.PP
 .I \-V
 .br
 .I \-\-version
 .RS
 Show which version of Fuse is being used.
+.RE
+.PP
+.I "\-\-volume\-ay volume"
+.RS
+Sets the relative volume of the AY-3-8912 chip from a range of
+0-100%. Same as the Sound Options dialog's
+.I "AY volume"
+option.
+.RE
+.PP
+.I "\-\-volume\-beeper volume"
+.RS
+Sets the relative volume of the beeper from a range of 0-100%.
+Same as the Sound Options dialog's
+.I "Beeper volume"
+option.
 .RE
 .PP
 .I \-\-writable\-roms
