@@ -4079,4 +4079,4 @@
 20120229 ui/gtk/{binary.c,browse.c,debugger.c,gtkdisplay.c,gtkinternals.h,
          gtkui.c,memory.c,picture.c,pokefinder.c,pokemem.c,rollback.c,roms.c,
          stock.c}: replace deprecated gtk_signal_connect() with
-         g_signal_connect() (patch #3495406) (Alberto Garcia).
+         g_signal_connect() (patch #3495404) (Alberto Garcia).
