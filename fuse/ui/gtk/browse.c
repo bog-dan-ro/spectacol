@@ -103,8 +103,8 @@ create_dialog( void )
   gtk_clist_column_titles_passive( GTK_CLIST( blocks ) );
   for( i = 0; i < 3; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( blocks ), i, TRUE );
-  gtk_signal_connect( GTK_OBJECT( blocks ), "select-row",
-		      G_CALLBACK( select_row ), NULL );
+  g_signal_connect( GTK_OBJECT( blocks ), "select-row",
+		    G_CALLBACK( select_row ), NULL );
   gtk_container_add( GTK_CONTAINER( scrolled_window ), blocks );
 
   /* The tape marker pixmap */

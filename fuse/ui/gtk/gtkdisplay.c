@@ -146,10 +146,10 @@ uidisplay_init( int width, int height )
   libspectrum_dword black;
   const char *machine_name;
 
-  gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "expose_event",
-                      G_CALLBACK(gtkdisplay_expose ), NULL );
-  gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "configure_event",
-                      G_CALLBACK( drawing_area_resize_callback ), NULL );
+  g_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "expose_event",
+                    G_CALLBACK(gtkdisplay_expose ), NULL );
+  g_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "configure_event",
+                    G_CALLBACK( drawing_area_resize_callback ), NULL );
 
   error = init_colours(); if( error ) return error;
 

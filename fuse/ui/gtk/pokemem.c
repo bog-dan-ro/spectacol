@@ -123,10 +123,10 @@ create_dialog( void )
   bank = gtk_entry_new();
   gtk_entry_set_width_chars( GTK_ENTRY( bank ), 7 );
   gtk_entry_set_max_length( GTK_ENTRY( bank ), 1 );
-  gtk_signal_connect( GTK_OBJECT( bank ), "activate",
-                      G_CALLBACK( pokemem_add_custom_poke ), NULL );
-  gtk_signal_connect( GTK_OBJECT( bank ), "insert_text",
-                      G_CALLBACK( entry_validate_digit ), NULL );
+  g_signal_connect( GTK_OBJECT( bank ), "activate",
+                    G_CALLBACK( pokemem_add_custom_poke ), NULL );
+  g_signal_connect( GTK_OBJECT( bank ), "insert_text",
+                    G_CALLBACK( entry_validate_digit ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), bank, TRUE, TRUE, 5 );
 
@@ -135,10 +135,10 @@ create_dialog( void )
   address = gtk_entry_new();
   gtk_entry_set_width_chars( GTK_ENTRY( address ), 7 );
   gtk_entry_set_max_length( GTK_ENTRY( address ), 6 );
-  gtk_signal_connect( GTK_OBJECT( address ), "activate",
-                      G_CALLBACK( pokemem_add_custom_poke ), NULL );
-  gtk_signal_connect( GTK_OBJECT( address ), "insert_text",
-                      G_CALLBACK( entry_validate_address ), NULL );
+  g_signal_connect( GTK_OBJECT( address ), "activate",
+                    G_CALLBACK( pokemem_add_custom_poke ), NULL );
+  g_signal_connect( GTK_OBJECT( address ), "insert_text",
+                    G_CALLBACK( entry_validate_address ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), address, TRUE, TRUE, 5 );
 
@@ -147,10 +147,10 @@ create_dialog( void )
   value = gtk_entry_new();
   gtk_entry_set_width_chars( GTK_ENTRY( value ), 7 );
   gtk_entry_set_max_length( GTK_ENTRY( value ), 3 );
-  gtk_signal_connect( GTK_OBJECT( value ), "activate",
-                      G_CALLBACK( pokemem_add_custom_poke ), NULL );
-  gtk_signal_connect( GTK_OBJECT( value ), "insert_text",
-                      G_CALLBACK( entry_validate_digit ), NULL );
+  g_signal_connect( GTK_OBJECT( value ), "activate",
+                    G_CALLBACK( pokemem_add_custom_poke ), NULL );
+  g_signal_connect( GTK_OBJECT( value ), "insert_text",
+                    G_CALLBACK( entry_validate_digit ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), value, TRUE, TRUE, 5 );
 

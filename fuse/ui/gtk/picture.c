@@ -75,9 +75,9 @@ gtkui_picture( const char *filename, int border )
     drawing_area = gtk_drawing_area_new();
     gtk_drawing_area_size( GTK_DRAWING_AREA( drawing_area ),
 			   DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
-    gtk_signal_connect( GTK_OBJECT( drawing_area ),
-			"expose_event", G_CALLBACK( picture_expose ),
-			NULL );
+    g_signal_connect( GTK_OBJECT( drawing_area ),
+		      "expose_event", G_CALLBACK( picture_expose ),
+		      NULL );
     gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
 		       drawing_area );
 

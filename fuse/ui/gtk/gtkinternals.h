@@ -96,8 +96,8 @@ typedef struct gtkstock_button {
  * If the target widget is a GtkDialog, then created buttons are put in its
  * action area.
  *
- * If the label begins with "!", then gtk_signal_connect_object, rather than
- * gtk_signal_connect, is used to connect the action function.
+ * If the label begins with "!", then g_signal_connect_swapped, rather than
+ * g_signal_connect, is used to connect the action function.
  */
 GtkWidget* gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
 				   const gtkstock_button *btn );

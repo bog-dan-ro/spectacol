@@ -501,9 +501,9 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   /* The disassembly scrollbar */
   disassembly_scrollbar_adjustment =
     gtk_adjustment_new( 0, 0x0000, 0xffff, 0.5, 20, 20 );
-  gtk_signal_connect( GTK_OBJECT( disassembly_scrollbar_adjustment ),
-		      "value-changed", G_CALLBACK( move_disassembly ),
-		      NULL );
+  g_signal_connect( GTK_OBJECT( disassembly_scrollbar_adjustment ),
+		    "value-changed", G_CALLBACK( move_disassembly ),
+		    NULL );
   scrollbar =
     gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
   gtk_box_pack_start( GTK_BOX( disassembly_box ), scrollbar, FALSE, FALSE, 0 );
@@ -618,15 +618,15 @@ create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group )
 
   /* The command entry widget */
   entry = gtk_entry_new();
-  gtk_signal_connect( GTK_OBJECT( entry ), "activate",
-		      G_CALLBACK( evaluate_command ), NULL );
+  g_signal_connect( GTK_OBJECT( entry ), "activate",
+		    G_CALLBACK( evaluate_command ), NULL );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), entry );
 
   /* The 'command evaluate' button */
   eval_button = gtk_button_new_with_label( "Evaluate" );
-  gtk_signal_connect_object( GTK_OBJECT( eval_button ), "clicked",
-			     G_CALLBACK( evaluate_command ),
-			     GTK_OBJECT( entry ) );
+  g_signal_connect_swapped( GTK_OBJECT( eval_button ), "clicked",
+			    G_CALLBACK( evaluate_command ),
+			    GTK_OBJECT( entry ) );
   gtk_box_pack_start( GTK_BOX( hbox ), eval_button, FALSE, FALSE, 0 );
 
   /* Return is equivalent to clicking on 'evaluate' */

@@ -99,8 +99,8 @@ create_dialog( void )
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
 
   entry = gtk_entry_new();
-  gtk_signal_connect( GTK_OBJECT( entry ), "activate",
-		      G_CALLBACK( gtkui_pokefinder_search ), NULL );
+  g_signal_connect( GTK_OBJECT( entry ), "activate",
+		    G_CALLBACK( gtkui_pokefinder_search ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), entry, TRUE, TRUE, 5 );
 
   vbox = gtk_vbox_new( FALSE, 0 );
@@ -115,8 +115,8 @@ create_dialog( void )
     gtk_clist_set_column_auto_resize( GTK_CLIST( location_list ), i, TRUE );
   gtk_box_pack_start( GTK_BOX( vbox ), location_list, TRUE, TRUE, 5 );
 
-  gtk_signal_connect( GTK_OBJECT( location_list ), "select-row",
-		      G_CALLBACK( possible_click ), NULL );
+  g_signal_connect( GTK_OBJECT( location_list ), "select-row",
+		    G_CALLBACK( possible_click ), NULL );
 
   {
     static gtkstock_button btn[] = {

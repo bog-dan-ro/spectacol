@@ -91,8 +91,8 @@ menu_file_loadbinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
   button = gtk_button_new_with_label( "Browse..." );
   gtk_table_attach( GTK_TABLE( table ), button, 2, 3, 0, 1,
 		    GTK_FILL, GTK_FILL, 3, 3 );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      G_CALLBACK( change_load_filename ), &info );
+  g_signal_connect( GTK_OBJECT( button ), "clicked",
+		    G_CALLBACK( change_load_filename ), &info );
 
   label = gtk_label_new( "Start" );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 1, 2, 0, 0, 3, 3 );
@@ -100,8 +100,8 @@ menu_file_loadbinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
   info.start_widget = gtk_entry_new();
   gtk_table_attach( GTK_TABLE( table ), info.start_widget, 1, 3, 1, 2,
 		    GTK_FILL, GTK_FILL, 3, 3 );
-  gtk_signal_connect( GTK_OBJECT( info.start_widget ), "activate",
-		      G_CALLBACK( load_data ), &info );
+  g_signal_connect( GTK_OBJECT( info.start_widget ), "activate",
+		    G_CALLBACK( load_data ), &info );
 
   label = gtk_label_new( "Length" );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 2, 3,
@@ -112,8 +112,8 @@ menu_file_loadbinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
   gtk_entry_set_text( GTK_ENTRY( info.length_widget ), buffer );
   gtk_table_attach( GTK_TABLE( table ), info.length_widget, 1, 3, 2, 3,
 		    GTK_FILL, GTK_FILL, 3, 3 );
-  gtk_signal_connect( GTK_OBJECT( info.length_widget ), "activate",
-		      G_CALLBACK( load_data ), &info );
+  g_signal_connect( GTK_OBJECT( info.length_widget ), "activate",
+		    G_CALLBACK( load_data ), &info );
 
   /* Command buttons */
   gtkstock_create_ok_cancel( info.dialog, NULL, G_CALLBACK( load_data ),
@@ -234,8 +234,8 @@ menu_file_savebinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
   button = gtk_button_new_with_label( "Browse..." );
   gtk_table_attach( GTK_TABLE( table ), button, 2, 3, 0, 1,
 		    GTK_FILL, GTK_FILL, 3, 3 );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      G_CALLBACK( change_save_filename ), &info );
+  g_signal_connect( GTK_OBJECT( button ), "clicked",
+		    G_CALLBACK( change_save_filename ), &info );
 
   label = gtk_label_new( "Start" );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 1, 2,
@@ -244,8 +244,8 @@ menu_file_savebinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
   info.start_widget = gtk_entry_new();
   gtk_table_attach( GTK_TABLE( table ), info.start_widget, 1, 3, 1, 2,
 		    GTK_FILL, GTK_FILL, 3, 3 );
-  gtk_signal_connect( GTK_OBJECT( info.start_widget ), "activate",
-		      G_CALLBACK( save_data ), &info );
+  g_signal_connect( GTK_OBJECT( info.start_widget ), "activate",
+		    G_CALLBACK( save_data ), &info );
 
   label = gtk_label_new( "Length" );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 2, 3,
@@ -254,8 +254,8 @@ menu_file_savebinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
   info.length_widget = gtk_entry_new();
   gtk_table_attach( GTK_TABLE( table ), info.length_widget, 1, 3, 2, 3,
 		    GTK_FILL, GTK_FILL, 3, 3 );
-  gtk_signal_connect( GTK_OBJECT( info.length_widget ), "activate",
-		      G_CALLBACK( save_data ), &info );
+  g_signal_connect( GTK_OBJECT( info.length_widget ), "activate",
+		    G_CALLBACK( save_data ), &info );
 
   /* Command buttons */
   gtkstock_create_ok_cancel( info.dialog, NULL, G_CALLBACK( save_data ),
