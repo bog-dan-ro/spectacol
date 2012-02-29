@@ -159,7 +159,7 @@ static GtkWidget *dialog,		/* The debugger dialog box */
 static GtkListStore *breakpoints_model, *disassembly_model, *stack_model,
   *events_model;
 
-static GtkObject *disassembly_scrollbar_adjustment;
+static GtkAdjustment *disassembly_scrollbar_adjustment;
 
 /* The top line of the current disassembly */
 static libspectrum_word disassembly_top;
@@ -499,17 +499,17 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   gtk_box_pack_start_defaults( GTK_BOX( disassembly_box ), disassembly );
 
   /* The disassembly scrollbar */
-  disassembly_scrollbar_adjustment =
-    gtk_adjustment_new( 0, 0x0000, 0xffff, 0.5, 20, 20 );
-  g_signal_connect( GTK_OBJECT( disassembly_scrollbar_adjustment ),
+  disassembly_scrollbar_adjustment = GTK_ADJUSTMENT(
+    gtk_adjustment_new( 0, 0x0000, 0xffff, 0.5, 20, 20 ) );
+  g_signal_connect( G_OBJECT( disassembly_scrollbar_adjustment ),
 		    "value-changed", G_CALLBACK( move_disassembly ),
 		    NULL );
   scrollbar =
-    gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
+    gtk_vscrollbar_new( disassembly_scrollbar_adjustment );
   gtk_box_pack_start( GTK_BOX( disassembly_box ), scrollbar, FALSE, FALSE, 0 );
 /*
   gtkui_scroll_connect( GTK_CLIST( disassembly ),
-			GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
+			disassembly_scrollbar_adjustment );
 */
 }
 
@@ -618,15 +618,15 @@ create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group )
 
   /* The command entry widget */
   entry = gtk_entry_new();
-  g_signal_connect( GTK_OBJECT( entry ), "activate",
+  g_signal_connect( G_OBJECT( entry ), "activate",
 		    G_CALLBACK( evaluate_command ), NULL );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), entry );
 
   /* The 'command evaluate' button */
   eval_button = gtk_button_new_with_label( "Evaluate" );
-  g_signal_connect_swapped( GTK_OBJECT( eval_button ), "clicked",
+  g_signal_connect_swapped( G_OBJECT( eval_button ), "clicked",
 			    G_CALLBACK( evaluate_command ),
-			    GTK_OBJECT( entry ) );
+			    G_OBJECT( entry ) );
   gtk_box_pack_start( GTK_BOX( hbox ), eval_button, FALSE, FALSE, 0 );
 
   /* Return is equivalent to clicking on 'evaluate' */
@@ -983,8 +983,7 @@ deactivate_debugger( void )
 int
 ui_debugger_disassemble( libspectrum_word address )
 {
-  GTK_ADJUSTMENT( disassembly_scrollbar_adjustment )->value =
-    disassembly_top = address;
+  disassembly_scrollbar_adjustment->value = disassembly_top = address;
   return 0;
 }
 

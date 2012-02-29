@@ -90,7 +90,7 @@ menu_machine_memorybrowser( GtkWidget *widget GCC_UNUSED,
 			    gpointer data GCC_UNUSED )
 {
   GtkWidget *dialog, *box, *clist, *scrollbar;
-  GtkObject *adjustment;
+  GtkAdjustment *adjustment;
   size_t i;
   int error;
   gtkui_font font;
@@ -115,13 +115,14 @@ menu_machine_memorybrowser( GtkWidget *widget GCC_UNUSED,
   update_display( GTK_CLIST( clist ), memaddr );
   gtk_box_pack_start_defaults( GTK_BOX( box ), clist );
 
-  adjustment = gtk_adjustment_new( memaddr, 0x0000, 0xffff, 0x10, 0xa0, 0x13f );
+  adjustment = GTK_ADJUSTMENT(
+    gtk_adjustment_new( memaddr, 0x0000, 0xffff, 0x10, 0xa0, 0x13f ) );
   g_signal_connect( adjustment, "value-changed", G_CALLBACK( scroller ),
 		    clist );
 
-  gtkui_scroll_connect( GTK_CLIST( clist ), GTK_ADJUSTMENT( adjustment ) );
+  gtkui_scroll_connect( GTK_CLIST( clist ), adjustment );
 
-  scrollbar = gtk_vscrollbar_new( GTK_ADJUSTMENT( adjustment ) );
+  scrollbar = gtk_vscrollbar_new( adjustment );
   gtk_box_pack_start( GTK_BOX( box ), scrollbar, FALSE, FALSE, 0 );
 
   gtk_widget_show_all( dialog );

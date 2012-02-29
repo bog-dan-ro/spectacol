@@ -4080,3 +4080,7 @@
          gtkui.c,memory.c,picture.c,pokefinder.c,pokemem.c,rollback.c,roms.c,
          stock.c}: replace deprecated gtk_signal_connect() with
          g_signal_connect() (patch #3495404) (Alberto Garcia).
+20120301 ui/gtk/{binary.c,browse.c,debugger.c,gtkdisplay.c,gtkui.c,memory.c,
+         picture.c,pokefinder.c,pokemem.c,rollback.c,roms.c,stock.c}:
+         GtkObject is deprecated, remove all references to it (patch #3495406)
+         (Alberto Garcia).

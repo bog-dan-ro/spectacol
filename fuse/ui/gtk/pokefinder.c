@@ -99,7 +99,7 @@ create_dialog( void )
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
 
   entry = gtk_entry_new();
-  g_signal_connect( GTK_OBJECT( entry ), "activate",
+  g_signal_connect( G_OBJECT( entry ), "activate",
 		    G_CALLBACK( gtkui_pokefinder_search ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), entry, TRUE, TRUE, 5 );
 
@@ -115,7 +115,7 @@ create_dialog( void )
     gtk_clist_set_column_auto_resize( GTK_CLIST( location_list ), i, TRUE );
   gtk_box_pack_start( GTK_BOX( vbox ), location_list, TRUE, TRUE, 5 );
 
-  g_signal_connect( GTK_OBJECT( location_list ), "select-row",
+  g_signal_connect( G_OBJECT( location_list ), "select-row",
 		    G_CALLBACK( possible_click ), NULL );
 
   {
@@ -125,7 +125,7 @@ create_dialog( void )
       { "!Search", G_CALLBACK( gtkui_pokefinder_search ), NULL, NULL, GDK_Return, 0, 0, 0 },
       { "Reset", G_CALLBACK( gtkui_pokefinder_reset ), NULL, NULL, 0, 0, 0, 0 }
     };
-    btn[2].actiondata = GTK_OBJECT( entry );
+    btn[2].actiondata = G_OBJECT( entry );
     accel_group = gtkstock_create_buttons( dialog, NULL, btn,
 					   sizeof( btn ) / sizeof( btn[0] ) );
     gtkstock_create_close( dialog, accel_group,

@@ -160,18 +160,18 @@ ui_init( int *argc, char ***argv )
   gtk_window_set_title( GTK_WINDOW(gtkui_window), "Fuse" );
   gtk_window_set_wmclass( GTK_WINDOW(gtkui_window), fuse_progname, "Fuse" );
 
-  g_signal_connect(GTK_OBJECT(gtkui_window), "delete-event",
+  g_signal_connect(G_OBJECT(gtkui_window), "delete-event",
 		   G_CALLBACK(gtkui_delete), NULL);
-  g_signal_connect(GTK_OBJECT(gtkui_window), "key-press-event",
+  g_signal_connect(G_OBJECT(gtkui_window), "key-press-event",
 		   G_CALLBACK(gtkkeyboard_keypress), NULL);
   gtk_widget_add_events( gtkui_window, GDK_KEY_RELEASE_MASK );
-  g_signal_connect(GTK_OBJECT(gtkui_window), "key-release-event",
+  g_signal_connect(G_OBJECT(gtkui_window), "key-release-event",
 		   G_CALLBACK(gtkkeyboard_keyrelease), NULL);
 
   /* If we lose the focus, disable all keys */
-  g_signal_connect( GTK_OBJECT( gtkui_window ), "focus-out-event",
+  g_signal_connect( G_OBJECT( gtkui_window ), "focus-out-event",
 		    G_CALLBACK( gtkui_lose_focus ), NULL );
-  g_signal_connect( GTK_OBJECT( gtkui_window ), "focus-in-event",
+  g_signal_connect( G_OBJECT( gtkui_window ), "focus-in-event",
 		    G_CALLBACK( gtkui_gain_focus ), NULL );
 
   gtk_drag_dest_set( GTK_WIDGET( gtkui_window ),
@@ -182,7 +182,7 @@ ui_init( int *argc, char ***argv )
                      /* GDK_ACTION_PRIVATE alone DNW with ROX-Filer,
                         GDK_ACTION_MOVE allow DnD from KDE */
 
-  g_signal_connect( GTK_OBJECT( gtkui_window ), "drag-data-received",
+  g_signal_connect( G_OBJECT( gtkui_window ), "drag-data-received",
 		    G_CALLBACK( gtkui_drag_data_received ), NULL );
 
   box = gtk_vbox_new( FALSE, 0 );
@@ -203,11 +203,11 @@ ui_init( int *argc, char ***argv )
 
   gtk_widget_add_events( GTK_WIDGET( gtkui_drawing_area ),
     GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK );
-  g_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "motion-notify-event",
+  g_signal_connect( G_OBJECT( gtkui_drawing_area ), "motion-notify-event",
 		    G_CALLBACK( gtkmouse_position ), NULL );
-  g_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "button-press-event",
+  g_signal_connect( G_OBJECT( gtkui_drawing_area ), "button-press-event",
 		    G_CALLBACK( gtkmouse_button ), NULL );
-  g_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "button-release-event",
+  g_signal_connect( G_OBJECT( gtkui_drawing_area ), "button-release-event",
 		    G_CALLBACK( gtkmouse_button ), NULL );
 
   gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, TRUE, TRUE, 0 );
@@ -242,7 +242,7 @@ gtkui_make_menu(GtkAccelGroup **accel_group,
   gtk_item_factory_create_items( menu_factory, menu_data_size, menu_data,
 				 NULL);
   *menu_bar = gtk_item_factory_get_widget( menu_factory, "<main>" );
-  g_signal_connect( GTK_OBJECT( *menu_bar ), "deactivate",
+  g_signal_connect( G_OBJECT( *menu_bar ), "deactivate",
 		    G_CALLBACK( gtkui_menu_deactivate ), NULL );
 
   /* We have to recreate the menus for the popup, unfortunately... */
@@ -830,8 +830,8 @@ wheel_scroll_event( GtkWidget *clist GCC_UNUSED, GdkEvent *event,
 void
 gtkui_scroll_connect( GtkCList *clist, GtkAdjustment *adj )
 {
-  g_signal_connect( GTK_OBJECT( clist ), "scroll-vertical",
+  g_signal_connect( G_OBJECT( clist ), "scroll-vertical",
 		    G_CALLBACK( key_scroll_event ), adj );
-  g_signal_connect( GTK_OBJECT( clist ), "scroll-event",
+  g_signal_connect( G_OBJECT( clist ), "scroll-event",
 		    G_CALLBACK( wheel_scroll_event ), adj );
 }

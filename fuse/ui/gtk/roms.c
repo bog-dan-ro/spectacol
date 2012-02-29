@@ -117,7 +117,7 @@ add_rom( GtkBox *parent, size_t start, gint row )
   gtk_box_pack_start( GTK_BOX( hbox ), rom[ row ], FALSE, FALSE, 2 );
 
   change_button = gtk_button_new_with_label( "Select..." );
-  g_signal_connect( GTK_OBJECT( change_button ), "clicked",
+  g_signal_connect( G_OBJECT( change_button ), "clicked",
 		    G_CALLBACK( select_new_rom ),
 		    rom[ row ] );
   gtk_box_pack_start( GTK_BOX( hbox ), change_button, FALSE, FALSE, 2 );

@@ -97,18 +97,18 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
 
   if( button->action ) {
     if( link_object ) {
-      g_signal_connect_swapped( GTK_OBJECT( btn ), "clicked",
+      g_signal_connect_swapped( G_OBJECT( btn ), "clicked",
 				button->action,
-				GTK_OBJECT( button->actiondata ) );
+				G_OBJECT( button->actiondata ) );
     } else {
-      g_signal_connect( GTK_OBJECT( btn ), "clicked", button->action,
+      g_signal_connect( G_OBJECT( btn ), "clicked", button->action,
 			button->actiondata );
     }
   }
 
   if( button->destroy )
-    g_signal_connect_swapped( GTK_OBJECT( btn ), "clicked", button->destroy,
-			      GTK_OBJECT( widget ) );
+    g_signal_connect_swapped( G_OBJECT( btn ), "clicked", button->destroy,
+			      G_OBJECT( widget ) );
 
   if( is_stock ) {
     if( !strcmp( button->label, GTK_STOCK_CLOSE ) )
@@ -177,7 +177,7 @@ gtkstock_dialog_new( const gchar *title, GCallback destroy )
 {
   GtkWidget *dialog = gtk_dialog_new();
   if( title ) gtk_window_set_title( GTK_WINDOW( dialog ), title );
-  g_signal_connect( GTK_OBJECT( dialog ), "delete-event",
+  g_signal_connect( G_OBJECT( dialog ), "delete-event",
 		    destroy ? destroy : DEFAULT_DESTROY, NULL );
   if( destroy == NULL ) gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
   gtk_window_set_transient_for( GTK_WINDOW( dialog ),
