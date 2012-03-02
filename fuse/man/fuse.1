@@ -130,8 +130,17 @@ option.
 .PP
 .I \-\-beta128
 .RS
-Emulate a Beta 128 interface. Same as the Peripherals Options dialog's
+Emulate a Beta 128 interface. Same as the Disk Peripherals Options dialog's
 .I "Beta 128 interface"
+option.
+.RE
+.PP
+.I \-\-beta128\-48boot
+.RS
+When a Beta 128 interface is used in 48K or TC2048 emulation the
+option additionally controls whether the machine boots directly into the TR-DOS
+system. Same as the Disk Peripherals Options dialog's
+.I "Beta 128 auto-boot in 48K machines"
 option.
 .RE
 .PP
@@ -211,14 +220,14 @@ option.
 .PP
 .I \-\-disciple
 .RS
-Emulate a DISCiPLE interface. Same as the Peripherals Options dialog's
+Emulate a DISCiPLE interface. Same as the Disk Peripherals Options dialog's
 .I "DISCiPLE interface"
 option.
 .RE
 .PP
 .I \-\-divide
 .RS
-Emulate the DivIDE interface. The same as the Peripherals Options
+Emulate the DivIDE interface. The same as the Disk Peripherals Options
 dialog's
 .I "DivIDE interface"
 option.
@@ -235,7 +244,7 @@ and slave drives respectively.
 .I \-\-divide\-write\-protect
 .RS
 Specify that the emulated DivIDE's write protect jumper should be
-considered set. The same as the Peripherals Options dialog's
+considered set. The same as the Disk Peripherals Options dialog's
 .I "DivIDE write protect"
 option.
 .RE
@@ -539,7 +548,7 @@ section
 .PP
 .I \-\-opus
 .RS
-Emulate a Opus Discovery interface. Same as the Peripherals Options dialog's
+Emulate a Opus Discovery interface. Same as the Disk Peripherals Options dialog's
 .I "Opus Discovery interface"
 option.
 .RE
@@ -587,7 +596,7 @@ option.
 .PP
 .I \-\-plusd
 .RS
-Emulate a +D interface. Same as the Peripherals Options dialog's
+Emulate a +D interface. Same as the Disk Peripherals Options dialog's
 .I "+D interface"
 option.
 .RE
@@ -782,7 +791,7 @@ option.
 .I \-\-simpleide
 .RS
 Specify whether Fuse will emulate the simple 8-bit IDE interface
-as used by the Spectrum +3e. Same as the Peripherals
+as used by the Spectrum +3e. Same as the Disk Peripherals
 Options dialog's
 .I "Simple 8-bit IDE"
 option.
@@ -1252,7 +1261,7 @@ option.
 .I \-\-zxatasp
 .RS
 Specify whether Fuse emulate the ZXATASP interface. Same as the
-Peripherals Options dialog's
+Disk Peripherals Options dialog's
 .I "ZXATASP interface"
 option.
 .RE
@@ -1260,7 +1269,7 @@ option.
 .I \-\-zxatasp\-upload
 .RS
 Specify the state of the ZXATASP upload jumper. Same as the
-Peripherals Options dialog's
+Disk Peripherals Options dialog's
 .I "ZXATASP upload"
 option.
 .RE
@@ -1268,7 +1277,7 @@ option.
 .I \-\-zxatasp\-write\-protect
 .RS
 Specify the state of the ZXATASP write protect jumper. Same as the
-Peripherals Options dialog's
+Disk Peripherals Options dialog's
 .I "ZXATASP write protect"
 option.
 .RE
@@ -1288,14 +1297,14 @@ slave channel.
 .I \-\-zxcf
 .RS
 Specify whether Fuse emulate the ZXCF interface. Same as the
-Peripherals Options dialog's
+Disk Peripherals Options dialog's
 .I "ZXCF interface"
 option.
 .RE
 .PP
 .I \-\-zxcf\-upload
 .RS
-Specify the state of the ZXCF upload jumper. Same as the Peripherals
+Specify the state of the ZXCF upload jumper. Same as the Disk Peripherals
 Options dialog's
 .I "ZXCF upload"
 option.
@@ -2216,7 +2225,7 @@ to each other, except that the +3 features a 3" disk drive while the
 .RS
 A +3 with modified ROMs allowing access to IDE hard disks via the
 simple 8-bit interface, as activated from the
-.I "Options, Peripherals"
+.I "Options, Disk Peripherals"
 dialog. See
 .I "http://www.zxplus3e.plus.com/"
 for more details.
@@ -3039,7 +3048,7 @@ RAM in the ZXATASP and 1024K in the ZXCF.
 To activate the ZXATASP, simply select the
 .I "ZXATASP interface"
 option from the
-.I "Options, Peripherals..."
+.I "Options, Disk Peripherals..."
 dialog. The state of the upload and write protect jumpers is then
 controlled by the
 .I "ZXATASP upload"
@@ -3068,7 +3077,7 @@ details can be found at
 The interface can be activated via the
 .I "DivIDE interface"
 option from the
-.I "Options, Peripherals..."
+.I "Options, Disk Peripherals..."
 dialog, and the state of its write protect jumper controlled via the
 .IR "DivIDE write protect option" .
 If you're going to be using the DivIDE, you'll probably want one of
@@ -3612,9 +3621,11 @@ emulation, and also under 48K, TC2048, 128K and +2 (but not +2A)
 emulation if the
 .I Beta 128 interface
 option from the
-.I "Options, Peripherals..."
-dialog is enabled.
-See the
+.I "Options, Disk Peripherals..."
+dialog is enabled. When that option is used in 48K or TC2048 emulation the
+.I Beta 128 auto-boot in 48K machines
+option additionally controls whether the machine boots directly into the TR-DOS
+system. See the
 .B "DISK FILE FORMATS"
 section for more details on supported disk file formats.
 .\"
@@ -3833,8 +3844,8 @@ command line option to 2 than recording frame rate reduces about 25/s. The
 exact frame rate depends on the Z80 clock frequency which varying on the
 specific emulated machine.
 .br
-Note: You can see all of the "gfx" effects only if Fuse frame rate option
-set to 1, but most of the cases you can safely use 2. Also, movie recording
+Note: You can see all of the "gfx" effects only if the Fuse frame rate option
+is set to 1, but in most cases you can safely use 2. Also, movie recording
 stops if the emulated machine is changed.
 .PP
 The recorded sound sampling rate and the channel number is equal with the
@@ -3844,7 +3855,7 @@ standard video files are 44100 Hz and 48000 Hz. If you use
 .I \-\-sound\-freq
 command line option you can record sound on 44100Hz or even 48000Hz.
 .br
-You can record stereo sound if use
+You can record stereo sound if you use
 .I "AY stereo separation"
 or the equivalent
 .I \-\-separation

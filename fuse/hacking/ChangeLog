@@ -4084,3 +4084,5 @@
          picture.c,pokefinder.c,pokemem.c,rollback.c,roms.c,stock.c}:
          GtkObject is deprecated, remove all references to it (patch #3495406)
          (Alberto Garcia).
+20120302 man/fuse.1: document the --beta128-48boot option and various other
+         minor tweaks (fixes bug #3495087) (Fred).
