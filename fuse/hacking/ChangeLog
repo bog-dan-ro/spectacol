@@ -4086,3 +4086,6 @@
          (Alberto Garcia).
 20120302 man/fuse.1: document the --beta128-48boot option and various other
          minor tweaks (fixes bug #3495087) (Fred).
+20120303 man/fuse.1: first stab at documenting the --disk-ask-merge and
+         --disk-try-merge options (the man page really needs a new section for
+         drives setup) (fixes bug #3495089) (Fred).

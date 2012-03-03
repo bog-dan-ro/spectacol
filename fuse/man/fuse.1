@@ -218,6 +218,38 @@ to disable). Same as the General Options dialog's
 option.
 .RE
 .PP
+.I \-\-disk\-ask\-merge
+.RS
+Prompt the user to confirm whether Fuse should try to merge the 'B' side of a
+disk image from a separate file when opening a new single-sided disk image.
+.RE
+.PP
+.I "\-\-disk\-try\-merge mode"
+.RS
+Select whether Fuse should try to merge a separate file for the 'B' side of a
+disk image separate file when opening a new disk image. Most double sided disk 
+images are dumped as two single sided disk images e.g.  
+`Golden Axe - Side A.dsk' and `Golden Axe - Side B.dsk'. So, if we want to play
+Golden Axe, first we have to insert the first disk image and when the game asks to 
+insert side B, we have to find and open the second disk image, instead just
+of just 'flip'-ing the disk inside the drive. If enabled, Fuse will try to open
+the second image too and create a double sided disk image (merging the two one
+sided disk images) and insert this merged virtual disk into the disk drive. The
+function detects whether the file is one side of a double-sided image if the
+filename matches a pattern like [Ss]ide[ _][abAB12][ _.] in the file name of a
+disk that is being opened. If found, Fuse will try to open the other side of
+the disk too substituting the appropriate characters in the filename e.g. 1->2,
+a->b, A->B. If successful then it will merge the two images and now we have a
+double sided disk in drive. This means that if we open
+`Golden Axe - Side A.dsk', then Fuse will try to open `Golden Axe - Side B.dsk'
+too. Now, we can just 'flip' the disk if Golden Axe asks for 'Side B'. The
+available options are
+.IR Never ,
+.IR "With single\-sided drives" 
+and
+.IR Always .
+.RE
+.PP
 .I \-\-disciple
 .RS
 Emulate a DISCiPLE interface. Same as the Disk Peripherals Options dialog's
