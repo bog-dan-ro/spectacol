@@ -433,7 +433,111 @@ or
 .RI ` /dev/js1 "'."
 .RE
 .PP
-.I \-\-joystick-prompt
+.I "\-\-joystick\-1\-output type"
+.br
+.I "\-\-joystick\-2\-output type"
+.br
+.I "\-\-joystick\-keyboard\-output type"
+.RS
+Select which joystick interface to attach for the first two real
+joysticks and the keyboard joystick. The default is
+.IR 0 ,
+which is no output. The available options are
+.IR 1 
+(cursor),
+.IR 2 
+(kempston),
+.IR 3 
+(Sinclair 1),
+.IR 4 
+(Sinclair 2),
+.IR 5 
+(Timex 1),
+.IR 6 
+(Timex 2),
+and
+.IR 7 
+(Fuller). Same as the Joysticks Options dialog's
+.I "Joystick type"
+option.
+.RE
+.PP
+.I "\-\-joystick\-1\-fire\-1 code"
+.br
+.I "\-\-joystick\-1\-fire\-2 code"
+.br
+.I "\-\-joystick\-1\-fire\-3 code"
+.br
+.I "\-\-joystick\-1\-fire\-4 code"
+.br
+.I "\-\-joystick\-1\-fire\-5 code"
+.br
+.I "\-\-joystick\-1\-fire\-6 code"
+.br
+.I "\-\-joystick\-1\-fire\-7 code"
+.br
+.I "\-\-joystick\-1\-fire\-8 code"
+.br
+.I "\-\-joystick\-1\-fire\-9 code"
+.br
+.I "\-\-joystick\-1\-fire\-10 code"
+.br
+.I "\-\-joystick\-2\-fire\-1 code"
+.br
+.I "\-\-joystick\-2\-fire\-2 code"
+.br
+.I "\-\-joystick\-2\-fire\-3 code"
+.br
+.I "\-\-joystick\-2\-fire\-4 code"
+.br
+.I "\-\-joystick\-2\-fire\-5 code"
+.br
+.I "\-\-joystick\-2\-fire\-6 code"
+.br
+.I "\-\-joystick\-2\-fire\-7 code"
+.br
+.I "\-\-joystick\-2\-fire\-8 code"
+.br
+.I "\-\-joystick\-2\-fire\-9 code"
+.br
+.I "\-\-joystick\-2\-fire\-10 code"
+.RS
+Select which Fuse key code should be triggered by the applicable
+real joystick button press. The codes are the Fuse keyboard codes
+corresponding to the keys. The default value is 
+.IR 4096 
+which corresponds to the virtual joystick fire button. Same as the
+Joysticks Options dialog's
+.I "Joystick fire"
+options.
+.RE
+.PP
+.I "\-\-joystick\-keyboard\-up code"
+.br
+.I "\-\-joystick\-keyboard\-down code"
+.br
+.I "\-\-joystick\-keyboard\-left code"
+.br
+.I "\-\-joystick\-keyboard\-right code"
+.br
+.I "\-\-joystick\-keyboard\-fire code"
+.RS
+Select which Fuse key code should correspond with each direction and 
+fire for the keyboard virtual joystick. The same as the Keyboard
+Joysticks Options dialog's
+.I "Button for UP"
+,
+.I "Button for DOWN"
+,
+.I "Button for LEFT"
+,
+.I "Button for RIGHT" 
+and
+.I "Button for FIRE" 
+options respectively.
+.RE
+.PP
+.I \-\-joystick\-prompt
 .RS
 If this option is specified, then Fuse will prompt you which form of
 joystick emulation you wish to use when loading a snapshot. No prompt
