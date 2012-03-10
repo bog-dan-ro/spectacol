@@ -4093,3 +4093,5 @@
          --joystick-{1,2}-fire-{1,2,3,4,5,6,7,8,9,10} and
          --joystick-keyboard-{output,up,down,left,right,fire} options 
          (fixes bug #3495086) (Fred).
+20120310 fuse.xml.in: remove mime types for compressed hdf/mdr/rom files as Fuse
+         doesn't support them (more from patch #3413549) (Sergio).

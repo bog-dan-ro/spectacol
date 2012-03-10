@@ -225,13 +225,10 @@
     <icon name="application-x-spectrum"/>
     <glob pattern="*.csw.gz"/>
     <glob pattern="*.dck.gz"/>
-    <glob pattern="*.hdf.gz"/>
-    <glob pattern="*.mdr.gz"/>
     <glob pattern="*.mgtsnp.gz"/>
     <glob pattern="*.ltp.gz"/>
     <glob pattern="*.pzx.gz"/>
     <glob pattern="*.raw.gz"/>
-    <glob pattern="*.rom.gz"/>
     <glob pattern="*.rzx.gz"/>
     <glob pattern="*.slt.gz"/>
     <glob pattern="*.sna.gz"/>
@@ -256,13 +253,10 @@
     <icon name="application-x-spectrum"/>
     <glob pattern="*.csw.bz2"/>
     <glob pattern="*.dck.bz2"/>
-    <glob pattern="*.hdf.bz2"/>
-    <glob pattern="*.mdr.bz2"/>
     <glob pattern="*.mgtsnp.bz2"/>
     <glob pattern="*.ltp.bz2"/>
     <glob pattern="*.pzx.bz2"/>
     <glob pattern="*.raw.bz2"/>
-    <glob pattern="*.rom.bz2"/>
     <glob pattern="*.rzx.bz2"/>
     <glob pattern="*.slt.bz2"/>
     <glob pattern="*.sna.bz2"/>
