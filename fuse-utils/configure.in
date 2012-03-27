@@ -183,11 +183,17 @@ if test "$withval" = no; then audiofile=no; else audiofile=yes; fi,
 audiofile=yes)
 AC_MSG_RESULT($audiofile)
 if test "$audiofile" = yes; then
-  AM_PATH_AUDIOFILE(
-    0.2.3,
-    AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile]),
-    audiofile=no
+  PKG_CHECK_MODULES(
+    AUDIOFILE,
+    audiofile,
+    AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile]), []
   )
+  if test -z "$AUDIOFILE_LIBS"; then
+    AM_PATH_AUDIOFILE(
+      0.2.3,
+      AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile])
+    )
+  fi
 fi
 AM_CONDITIONAL(BUILD_AUDIOTOOLS, test "$audiofile" = yes)
 

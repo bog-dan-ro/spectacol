@@ -344,3 +344,5 @@
          man/fmfconv.1,movie_tables.h: add converter tool for fmf files
          (patch #3034770) (Gergely Szasz with contributions from Sergio Baldoví
          and Fred).
+20120327 configure.in: add support for audiofile 0.3.x (patch #3508658) (Alberto
+         Garcia).
