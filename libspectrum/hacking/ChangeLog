@@ -875,3 +875,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (thanks, clang 2.1) (Fred).
 20120220 make-perl.c: advertise that we support bzip2 compressed and wav files
          (part of patch #3413549) (Sergio Baldoví).
+20120327 configure.in,Makefile.am,acinclude.m4: simplify detection of GLib
+         and drop support for version 1.x (patch #3508792) (Alberto Garcia)
