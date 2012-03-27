@@ -86,8 +86,8 @@ scroller( GtkAdjustment *adjustment, gpointer user_data )
 }
 
 void
-menu_machine_memorybrowser( GtkWidget *widget GCC_UNUSED,
-			    gpointer data GCC_UNUSED )
+menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
+                            gpointer data GCC_UNUSED )
 {
   GtkWidget *dialog, *box, *clist, *scrollbar;
   GtkAdjustment *adjustment;

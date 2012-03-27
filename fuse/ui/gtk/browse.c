@@ -59,8 +59,8 @@ static GtkWidget
 static int dialog_created;	/* Have we created the dialog box yet? */
 
 void
-menu_media_tape_browse( GtkWidget *widget GCC_UNUSED,
-			gpointer data GCC_UNUSED )
+menu_media_tape_browse( GtkAction *gtk_action GCC_UNUSED,
+                        gpointer data GCC_UNUSED )
 {
   /* Firstly, stop emulation */
   fuse_emulation_pause();

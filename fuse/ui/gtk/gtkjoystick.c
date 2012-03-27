@@ -130,9 +130,8 @@ static GtkItemFactoryEntry key_menu[] = {
 static const guint key_menu_count = sizeof( key_menu ) / sizeof( key_menu[0] );
 
 void
-menu_options_joysticks_select( gpointer callback_data GCC_UNUSED,
-			       guint callback_action,
-			       GtkWidget *widget GCC_UNUSED )
+menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
+                               guint callback_action )
 {
   GtkWidget *dialog, *hbox, *vbox;
   struct joystick_info info;

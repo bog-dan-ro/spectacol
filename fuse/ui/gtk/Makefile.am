@@ -56,14 +56,20 @@ libuigtk_la_LIBADD = @GTK_LIBS@ -lX11
 
 BUILT_SOURCES = keysyms.c \
 		menu_data.c \
+		menu_data.ui \
 		options.c \
 		options_internals.h
+
+pkgdata_DATA = menu_data.ui
 
 keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl gtk $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
 menu_data.c: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(srcdir)/../../menu_data.dat ../../config.h
-	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl gtk > $@.tmp && mv $@.tmp $@
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl gtk c > $@.tmp && mv $@.tmp $@
+
+menu_data.ui: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(srcdir)/../../menu_data.dat ../../config.h
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl gtk ui > $@.tmp && mv $@.tmp $@
 
 options.c: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
 	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options.pl - > $@.tmp && mv $@.tmp $@
@@ -78,5 +84,6 @@ noinst_HEADERS = gtkinternals.h \
 
 CLEANFILES = keysyms.c \
 	     menu_data.c \
+	     menu_data.ui \
 	     options.c \
 	     options_internals.h

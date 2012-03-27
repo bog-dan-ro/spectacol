@@ -337,10 +337,12 @@ get_next_path( path_context *ctx )
     case UTILS_AUXILIARY_LIB: strncpy( ctx->path, "PROGDIR:lib/", PATH_MAX); return 1;
     case UTILS_AUXILIARY_ROM: strncpy( ctx->path, "PROGDIR:roms/", PATH_MAX); return 1;
     case UTILS_AUXILIARY_WIDGET: strncpy( ctx->path, "PROGDIR:ui/widget/", PATH_MAX); return 1;
+    case UTILS_AUXILIARY_GTK: strncpy( ctx->path, "PROGDIR:ui/gtk/", PATH_MAX); return 1;
 #else
     case UTILS_AUXILIARY_LIB: path_segment = "lib"; break;
     case UTILS_AUXILIARY_ROM: path_segment = "roms"; break;
     case UTILS_AUXILIARY_WIDGET: path_segment = "ui/widget"; break;
+    case UTILS_AUXILIARY_GTK: path_segment = "ui/gtk"; break;
 #endif
     default:
       ui_error( UI_ERROR_ERROR, "unknown auxiliary file type %d", ctx->type );

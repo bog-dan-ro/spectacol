@@ -34,11 +34,13 @@
 
 #ifdef UI_GTK
 
+#include "compat.h"
 #include <gtk/gtk.h>
 
-#define MENU_CALLBACK( name ) void name( GtkWidget *widget, gpointer data )
+#define MENU_CALLBACK( name ) \
+  void name( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 #define MENU_CALLBACK_WITH_ACTION( name ) \
-  void name( gpointer data, guint action, GtkWidget *widget )
+  void name( GtkAction *gtk_action GCC_UNUSED, guint action )
 
 #else			/* #ifdef UI_GTK */
 
@@ -153,7 +155,7 @@ MENU_DETAIL( menu_joystick_1_detail );
 MENU_DETAIL( menu_joystick_2_detail );
 
 MENU_CALLBACK( menu_machine_pause );
-MENU_CALLBACK( menu_machine_reset );
+MENU_CALLBACK_WITH_ACTION( menu_machine_reset );
 MENU_CALLBACK( menu_machine_select );
 MENU_DETAIL( menu_machine_detail );
 MENU_CALLBACK( menu_machine_debugger );

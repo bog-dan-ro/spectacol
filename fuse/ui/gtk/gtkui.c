@@ -61,14 +61,8 @@ GtkWidget *gtkui_window;
 /* The area into which the screen will be drawn */
 GtkWidget *gtkui_drawing_area;
 
-/* Popup menu widget(s), as invoked by F1 */
-GtkWidget *gtkui_menu_popup;
-
-/* The item factory used to create the menu bar */
-GtkItemFactory *menu_factory;
-
-/* And that used to create the popup menus */
-GtkItemFactory *popup_factory;
+/* The UIManager used to create the menu bar */
+GtkUIManager *ui_manager_menu = NULL;
 
 /* True if we were paused via the Machine/Pause menu item */
 static int paused = 0;
@@ -91,7 +85,7 @@ typedef struct gtkui_select_info {
 
 static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 				GtkWidget **menu_bar,
-				GtkItemFactoryEntry *menu_data,
+				GtkActionEntry *menu_data,
 				guint menu_data_size);
 
 static gboolean gtkui_lose_focus( GtkWidget*, GdkEvent*, gpointer );
@@ -188,8 +182,12 @@ ui_init( int *argc, char ***argv )
   box = gtk_vbox_new( FALSE, 0 );
   gtk_container_add(GTK_CONTAINER(gtkui_window), box);
 
-  gtkui_make_menu( &accel_group, &menu_bar, gtkui_menu_data,
-		   gtkui_menu_data_size );
+  if( gtkui_make_menu( &accel_group, &menu_bar, gtkui_menu_data,
+                       gtkui_menu_data_size ) ) {
+    fprintf(stderr,"%s: couldn't make menus %s:%d\n",
+	    fuse_progname,__FILE__,__LINE__);
+    return 1;
+  }
 
   gtk_window_add_accel_group( GTK_WINDOW(gtkui_window), accel_group );
   gtk_box_pack_start( GTK_BOX(box), menu_bar, FALSE, FALSE, 0 );
@@ -233,23 +231,43 @@ gtkui_menu_deactivate( GtkMenuShell *menu GCC_UNUSED,
 static gboolean
 gtkui_make_menu(GtkAccelGroup **accel_group,
                 GtkWidget **menu_bar,
-                GtkItemFactoryEntry *menu_data,
+                GtkActionEntry *menu_data,
                 guint menu_data_size)
 {
-  *accel_group = gtk_accel_group_new();
-  menu_factory = gtk_item_factory_new( GTK_TYPE_MENU_BAR, "<main>",
-				       *accel_group );
-  gtk_item_factory_create_items( menu_factory, menu_data_size, menu_data,
-				 NULL);
-  *menu_bar = gtk_item_factory_get_widget( menu_factory, "<main>" );
+  *accel_group = NULL;
+  *menu_bar = NULL;
+  GError *error = NULL;
+  char ui_file[ PATH_MAX ];
+
+  ui_manager_menu = gtk_ui_manager_new();
+
+  /* Load actions */
+  GtkActionGroup *menu_action_group = gtk_action_group_new( "MenuActionGroup" );
+  gtk_action_group_add_actions( menu_action_group, menu_data, menu_data_size,
+                                NULL );
+  gtk_ui_manager_insert_action_group( ui_manager_menu, menu_action_group, 0 );
+  g_object_unref( menu_action_group );
+
+  /* Load the UI */
+  if( utils_find_file_path( "menu_data.ui", ui_file, UTILS_AUXILIARY_GTK ) ) {
+    fprintf( stderr, "%s: Error getting path for menu_data.ui\n",
+                     fuse_progname );
+    return TRUE;
+  }
+
+  guint ui_menu_id = gtk_ui_manager_add_ui_from_file( ui_manager_menu, ui_file,
+                                                      &error );
+  if( error ) {
+    g_error_free( error );
+    return TRUE;
+  }
+  else if( !ui_menu_id ) return TRUE;
+
+  *accel_group = gtk_ui_manager_get_accel_group( ui_manager_menu );
+
+  *menu_bar = gtk_ui_manager_get_widget( ui_manager_menu, "/MainMenu" );
   g_signal_connect( G_OBJECT( *menu_bar ), "deactivate",
 		    G_CALLBACK( gtkui_menu_deactivate ), NULL );
-
-  /* We have to recreate the menus for the popup, unfortunately... */
-  popup_factory = gtk_item_factory_new( GTK_TYPE_MENU, "<main>", NULL );
-  gtk_item_factory_create_items( popup_factory, menu_data_size, menu_data,
-				 NULL);
-  gtkui_menu_popup = gtk_item_factory_get_widget( popup_factory, "<main>" );
 
   /* Start various menus in the 'off' state */
   ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
@@ -260,22 +278,6 @@ gtkui_make_menu(GtkAccelGroup **accel_group,
   ui_menu_activate( UI_MENU_ITEM_TAPE_RECORDING, 0 );
 
   return FALSE;
-}
-
-static void
-gtkui_popup_menu_pos( GtkMenu *menu GCC_UNUSED, gint *xp, gint *yp,
-		      GtkWidget *data GCC_UNUSED )
-{
-  gdk_window_get_position( gtkui_window->window, xp, yp );
-}
-
-/* Popup main menu, as invoked by F1. */
-void
-gtkui_popup_menu(void)
-{
-  gtk_menu_popup( GTK_MENU(gtkui_menu_popup), NULL, NULL,
-		  (GtkMenuPositionFunc)gtkui_popup_menu_pos, NULL,
-		  0, 0 );
 }
 
 int
@@ -291,6 +293,8 @@ ui_end(void)
 {
   /* Don't display the window whilst doing all this! */
   gtk_widget_hide( gtkui_window );
+
+  g_object_unref( ui_manager_menu );
 
   return 0;
 }
@@ -360,15 +364,16 @@ gtkui_gain_focus( GtkWidget *widget GCC_UNUSED,
 
 /* Called by the main window on a "delete-event" */
 static gboolean
-gtkui_delete( GtkWidget *widget, GdkEvent *event GCC_UNUSED, gpointer data )
+gtkui_delete( GtkWidget *widget GCC_UNUSED, GdkEvent *event GCC_UNUSED,
+              gpointer data GCC_UNUSED )
 {
-  menu_file_exit( widget, data );
+  menu_file_exit( NULL, NULL );
   return TRUE;
 }
 
 /* Called by the menu when File/Exit selected */
 void
-menu_file_exit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+menu_file_exit( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   if( gtkui_confirm( "Exit Fuse?" ) ) {
 
@@ -472,7 +477,7 @@ menu_options_filter_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 
 /* Machine/Pause */
 void
-menu_machine_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+menu_machine_pause( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   int error;
 
@@ -499,9 +504,9 @@ menu_machine_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
 /* Called by the menu when Machine/Reset selected */
 void
-menu_machine_reset( GtkWidget *widget GCC_UNUSED, gpointer data )
+menu_machine_reset( GtkAction *gtk_action GCC_UNUSED, guint action )
 {
-  int hard_reset = GPOINTER_TO_INT( data );
+  int hard_reset = action;
 
   if( gtkui_confirm( "Reset?" ) && machine_reset( hard_reset ) ) {
     ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
@@ -513,7 +518,8 @@ menu_machine_reset( GtkWidget *widget GCC_UNUSED, gpointer data )
 
 /* Called by the menu when Machine/Select selected */
 void
-menu_machine_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+menu_machine_select( GtkAction *gtk_action GCC_UNUSED,
+                     gpointer data GCC_UNUSED )
 {
   gtkui_select_info dialog;
 
@@ -587,7 +593,8 @@ menu_machine_select_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 }
 
 void
-menu_machine_debugger( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+menu_machine_debugger( GtkAction *gtk_action GCC_UNUSED,
+                       gpointer data GCC_UNUSED )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
   if( paused ) ui_debugger_activate();
@@ -602,13 +609,13 @@ ui_widgets_reset( void )
 }
 
 void
-menu_help_keyboard( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+menu_help_keyboard( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_picture( "keyboard.scr", 0 );
 }
 
 void
-menu_help_about( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+menu_help_about( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtk_show_about_dialog( GTK_WINDOW( gtkui_window ),
                          "name", "Fuse",
@@ -634,17 +641,14 @@ ui_menu_item_set_active( const char *path, int active )
 {
   GtkWidget *menu_item;
 
-  menu_item = gtk_item_factory_get_widget( menu_factory, path );
+  /* Translate UI-indepentment path to GTK UI path */
+  gchar *full_path = g_strdup_printf ("/MainMenu%s", path );
+
+  menu_item = gtk_ui_manager_get_widget( ui_manager_menu, full_path );
+  g_free( full_path );
+
   if( !menu_item ) {
     ui_error( UI_ERROR_ERROR, "couldn't get menu item '%s' from menu_factory",
-	      path );
-    return 1;
-  }
-  gtk_widget_set_sensitive( menu_item, active );
-
-  menu_item = gtk_item_factory_get_widget( popup_factory, path );
-  if( !menu_item ) {
-    ui_error( UI_ERROR_ERROR, "couldn't get menu item '%s' from popup_factory",
 	      path );
     return 1;
   }

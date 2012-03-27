@@ -4095,3 +4095,7 @@
          (fixes bug #3495086) (Fred).
 20120310 fuse.xml.in: remove mime types for compressed hdf/mdr/rom files as Fuse
          doesn't support them (more from patch #3413549) (Sergio).
+20120327 menu.h,menu_data.pl,ui/gtk/{Makefile.am,binary.c,browse.c,
+         gtkinternals.h,gtkjoystick.c,gtkui.c,memory.c,pokefinder.c,pokemem.c},
+         utils.[ch]: remove deprecated GTK+ menu functions (patch #3510225)
+         (Sergio).

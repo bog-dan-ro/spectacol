@@ -43,6 +43,7 @@ typedef enum utils_aux_type {
   UTILS_AUXILIARY_LIB,		/* Something from the lib/ directory */
   UTILS_AUXILIARY_ROM,		/* Something from the roms/ directory */
   UTILS_AUXILIARY_WIDGET,	/* Something from the widget/ directory */
+  UTILS_AUXILIARY_GTK,		/* Something from the gtk/ directory */
 
 } utils_aux_type;
 

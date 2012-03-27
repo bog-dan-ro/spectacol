@@ -128,7 +128,7 @@ void gtkui_set_font( GtkWidget *widget, gtkui_font font );
  * The menu data (menu_data.c)
  */
 
-extern GtkItemFactoryEntry gtkui_menu_data[];
+extern GtkActionEntry gtkui_menu_data[];
 extern guint gtkui_menu_data_size;
 
 /*

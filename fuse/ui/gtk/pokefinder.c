@@ -67,8 +67,8 @@ int possible_page[ MAX_POSSIBLE ];
 libspectrum_word possible_offset[ MAX_POSSIBLE ];
 
 void
-menu_machine_pokefinder( GtkWidget *widget GCC_UNUSED,
-			 gpointer data GCC_UNUSED )
+menu_machine_pokefinder( GtkAction *gtk_action GCC_UNUSED,
+                         gpointer data GCC_UNUSED )
 {
   int error;
 
