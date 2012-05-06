@@ -4106,3 +4106,5 @@
 20120506 peripherals/nic/enc28j60.c: fix LOBYTE and HIBYTE redeclarations on
          Win32 (part of bug #3514721) (Sergio).
 20120506 compat/unix/socket.c: fix warning (part of bug #3514721) (Sergio).
+20120506 peripherals,peripherals/flash,peripherals/nic: add *.a to the ignore
+         property (part of bug #3514721) (Sergio).
