@@ -4103,3 +4103,5 @@
          without glib (fixes bug #3513990) (Sergio).
 20120506 ui/widget/pokemem.c: fix crash in widget Poke Memory dialog (fixes bug
          #3514720) (Sergio).
+20120506 peripherals/nic/enc28j60.c: fix LOBYTE and HIBYTE redeclarations on
+         Win32 (part of bug #3514721) (Sergio).

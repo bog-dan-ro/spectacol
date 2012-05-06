@@ -82,8 +82,13 @@
 #define GET_PTR_REG(_x, _nm)          (((_nm ## H(_x) & 0x1f) * 0x0100) + _nm ## L(_x))
 #define SET_PTR_REG(_x, _nm, _v)      ((_nm ## H(_x) = HIBYTE(_v)),(_nm ## L(_x) = LOBYTE(_v)))
 
+#ifndef LOBYTE
 #define LOBYTE(x)                       ((x) & 0x00ff)
+#endif
+
+#ifndef HIBYTE
 #define HIBYTE(x)                       (((x) >> 8) & 0x00ff)
+#endif
 
 /* ---------------------------------------------------------------------------
  * Ethernet frame layout
