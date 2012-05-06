@@ -879,3 +879,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          and drop support for version 1.x (patch #3508792) (Alberto Garcia)
 20120327 configure.in: add support for audiofile 0.3.x (patch #3508658) (Alberto
          Garcia).
+20120506 make-perl.c,myglib/gslist.c: fix some const qualifiers for the data
+         argument to g_slist_remove and g_slist_find_custom (part of bug
+         #3514721) (Sergio Baldoví).

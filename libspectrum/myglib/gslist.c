@@ -186,7 +186,7 @@ gint	last_function		(gconstpointer	 a,
 }
 
 GSList* g_slist_remove		(GSList		*list,
-				 gpointer	 data) {
+				 gconstpointer	 data) {
 
   GSList *tmp;
   GSList *prev;
@@ -326,7 +326,7 @@ GSList* g_slist_nth		(GSList		*list,
 }
 
 GSList* g_slist_find_custom	(GSList		*list,
-				 gpointer	data,
+				 gconstpointer	data,
 				 GCompareFunc	func ) {
   while (list)
     {
