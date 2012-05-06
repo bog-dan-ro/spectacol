@@ -444,6 +444,8 @@ widget_pokemem_add_custom_poke( void )
   text_data.allow = WIDGET_INPUT_DIGIT;
   if( widget_do( WIDGET_TYPE_TEXT, &text_data ) ) return 1;
 
+  if( !widget_text_text ) return 1;
+
   errno = 0;
   b = strtol( widget_text_text, &endptr, 10 );
 
@@ -457,6 +459,8 @@ widget_pokemem_add_custom_poke( void )
   /* Address */
   text_data.title = "Enter address / offset";
   if( widget_do( WIDGET_TYPE_TEXT, &text_data ) ) return 1;
+
+  if( !widget_text_text ) return 1;
 
   errno = 0;
   a = strtol( widget_text_text, &endptr, 10 );
@@ -476,7 +480,9 @@ widget_pokemem_add_custom_poke( void )
   /* Value */
   text_data.title = "Enter value";
   if( widget_do( WIDGET_TYPE_TEXT, &text_data ) ) return 1;
-    
+
+  if( !widget_text_text ) return 1;
+
   errno = 0;
   v = strtol( widget_text_text, &endptr, 10 );
 
