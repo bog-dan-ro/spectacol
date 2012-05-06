@@ -4099,3 +4099,5 @@
          gtkinternals.h,gtkjoystick.c,gtkui.c,memory.c,pokefinder.c,pokemem.c},
          utils.[ch]: remove deprecated GTK+ menu functions (patch #3510225)
          (Sergio).
+20120506 peripherals/nic/w5100_internals.h: fix build break when building
+         without glib (fixes bug #3513990) (Sergio).
