@@ -4108,3 +4108,6 @@
 20120506 compat/unix/socket.c: fix warning (part of bug #3514721) (Sergio).
 20120506 peripherals,peripherals/flash,peripherals/nic: add *.a to the ignore
          property (part of bug #3514721) (Sergio).
+20120506 ui/{gtk/options-header.pl,widget/options-header.pl,
+         win32/options-header.pl}: fix "Use of uninitialized value within @ARGV"
+         warnings (rest of bug #3514721) (Sergio).

@@ -33,7 +33,7 @@ die "No data file specified" unless @ARGV;
 my @dialogs = Fuse::Dialog::read( shift @ARGV );
 my $internal = 1;
 
-$internal = 0 if( shift( @ARGV ) eq 'public' );
+$internal = 0 if( @ARGV && shift( @ARGV ) eq 'public' );
 
 if( $internal ) {
     print Fuse::GPL( 'options_internals.h: options dialog boxes',
