@@ -363,10 +363,6 @@ machine_reset( int hard_reset )
     ula_contention_no_mreq[ i ] = machine_current->ram.contend_delay_no_mreq( i );
   }
 
-  /* Check for an Interface I ROM */
-  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
-		       UI_STATUSBAR_STATE_NOT_AVAILABLE );
-  
   /* Update the disk menu items */
   ui_menu_disk_update();
 

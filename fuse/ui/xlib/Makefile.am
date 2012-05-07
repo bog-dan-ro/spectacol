@@ -34,13 +34,18 @@ libuixlib_a_SOURCES = xdisplay.c \
 		      xui.c \
 		      keysyms.c
 
-BUILT_SOURCES = keysyms.c
+BUILT_SOURCES = keysyms.c xpixmaps.c
 
 keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl x $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
+
+xpixmaps.c: xstatusbar.pl $(srcdir)/../gtk/pixmaps.c
+	@PERL@ -I$(srcdir)/../../perl xstatusbar.pl > $@.tmp && mv $@.tmp $@
 
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 noinst_HEADERS = xdisplay.h xkeyboard.h xui.h
 
-CLEANFILES = keysyms.c
+EXTRA_DIST = xstatusbar.pl
+
+CLEANFILES = keysyms.c xpixmaps.c

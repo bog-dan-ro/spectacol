@@ -4117,3 +4117,6 @@
          peripherals/speccyboot.[ch],settings.pl,tape.[ch],ui/sdl/sdldisplay.c,
          ui/widget/widget.c: fix various memory leaks (rest of bug #3515269)
          (Sergio).
+20120507 machine.c,ui/widget/widget.c,ui/xlib/{Makefile.am,xdisplay.c,
+         xstatusbar.pl}: add a statusbar for the xlib UI (patch #3496134)
+         (Gergely Szasz).

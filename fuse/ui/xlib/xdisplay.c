@@ -63,6 +63,7 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 
+
 typedef enum {
   MSB_RED = 0,			/* 0RGB */
   LSB_RED,			/* 0BGR */
@@ -157,6 +158,9 @@ static xdisplay_putpixel_t xdisplay_putpixel_15;
 static xdisplay_putpixel_t xdisplay_putpixel_16;
 static xdisplay_putpixel_t xdisplay_putpixel_24;
 
+#include "xpixmaps.c"
+void xstatusbar_overlay();
+
 static libspectrum_word pal_colour[16] = {
   0x0000, 0x0017, 0xb800, 0xb817, 0x05e0, 0x05f7, 0xbde0, 0xbdf7,
   0x0000, 0x001f, 0xf800, 0xf81f, 0x07e0, 0x07ff, 0xffe0, 0xffff,
@@ -194,6 +198,7 @@ xdisplay_init( void )
   if( xdisplay_depth == 8 && xdisplay_allocate_colours8() ) return 1;
   if( xdisplay_allocate_gc( xui_mainWindow,&gc ) ) return 1;
   if( xdisplay_allocate_image() ) return 1;
+  ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
 
   return 0;
 }
@@ -207,7 +212,7 @@ xdisplay_find_visual( void )
   int sel_v = -1;
   int sel_v_depth = -1;
   int sel_v_class = -1;
-    
+
   visual_tmpl.screen = xui_screenNum;
   vis = XGetVisualInfo( display,
                              VisualScreenMask,
@@ -410,7 +415,11 @@ xdisplay_allocate_image( void )
     image = XCreateImage( display, xdisplay_visual,
 		       xdisplay_depth, ZPixmap, 0, NULL,
 		       3 * DISPLAY_ASPECT_WIDTH,
-		       3 * DISPLAY_SCREEN_HEIGHT, 8, 0 );
+		       3 * DISPLAY_SCREEN_HEIGHT + PIXMAPS_H, 8, 0 );
+/*
+   we allocate extra space after the screen for status bar icons
+   status bar icons total width always smaller than 3xDISPLAY_ASPECT_WIDTH
+*/
     if(!image) {
       fprintf(stderr,"%s: couldn't create image\n",fuse_progname);
       return 1;
@@ -463,7 +472,11 @@ try_shm( void )
 			   xdisplay_depth, ZPixmap,
 			   NULL, &shm_info,
 			   3 * DISPLAY_ASPECT_WIDTH,
-			   3 * DISPLAY_SCREEN_HEIGHT );
+			   3 * DISPLAY_SCREEN_HEIGHT + PIXMAPS_H);
+/*
+   we allocate extra space after the screen for status bar icons
+   status bar icons total width always smaller than 3xDISPLAY_ASPECT_WIDTH
+*/
   if( !image ) return 0;
 
   /* Get an SHM to work with */
@@ -581,7 +594,7 @@ static void
 register_scalers( void )
 {
   int f = -1;
-  
+
   scaler_register_clear();
   scaler_select_bitformat( 565 );		/* 16bit always */
 
@@ -727,12 +740,14 @@ uidisplay_frame_end( void )
     updated_rects[0].h = image_height;
   }
 
-  if ( !( ui_widget_level >= 0 ) && num_rects == 0 ) return;
+  if ( !( ui_widget_level >= 0 ) && num_rects == 0 && !status_updated ) return;
 
   last_rect = updated_rects + num_rects;
 
   for( r = updated_rects; r != last_rect; r++ )
     xdisplay_update_rect( r->x, r->y, r->w, r->h );
+  if ( settings_current.statusbar )
+    xstatusbar_overlay();
   num_rects = 0;
   xdisplay_force_full_refresh = 0;
 }
@@ -855,6 +870,7 @@ uidisplay_hotswap_gfx_mode( void )
       xdisplay_allocate_colours8();
   }
   xdisplay_setup_rgb_putpixel();
+  xstatusbar_init();
   display_refresh_all();
   return 0;
 }
@@ -982,6 +998,41 @@ uidisplay_plot16( int x, int y, libspectrum_word data,
   *(dest + rgb_pitch) = *dest = ( data & 0x0004 ) ? pi : pp; dest++;
   *(dest + rgb_pitch) = *dest = ( data & 0x0002 ) ? pi : pp; dest++;
   *(dest + rgb_pitch) = *dest = ( data & 0x0001 ) ? pi : pp;
+}
+
+int
+ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
+{
+  switch( item ) {
+
+  case UI_STATUSBAR_ITEM_DISK:
+    pixmap_disk_state = state;
+    status_updated = 1;
+    return 0;
+
+  case UI_STATUSBAR_ITEM_PAUSED:
+    /* We don't support pausing this version of Fuse */
+    return 0;
+
+  case UI_STATUSBAR_ITEM_TAPE:
+    pixmap_tape_state = state;
+    status_updated = 1;
+    return 0;
+
+  case UI_STATUSBAR_ITEM_MICRODRIVE:
+    pixmap_mdr_state = state;
+    status_updated = 1;
+    return 0;
+
+  case UI_STATUSBAR_ITEM_MOUSE:
+    /* We don't support showing a grab icon */
+    return 0;
+
+  }
+
+  ui_error( UI_ERROR_ERROR, "Attempt to update unknown statusbar item %d",
+            item );
+  return 1;
 }
 
 int
