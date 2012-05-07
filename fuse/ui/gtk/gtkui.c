@@ -476,6 +476,13 @@ menu_options_filter_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
   gtk_main_quit();
 }
 
+static gboolean
+gtkui_run_main_loop( gpointer user_data GCC_UNUSED )
+{
+  gtk_main();
+  return FALSE;
+}
+
 /* Machine/Pause */
 void
 menu_machine_pause( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
@@ -498,7 +505,9 @@ menu_machine_pause( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 
     paused = 1;
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED, UI_STATUSBAR_STATE_ACTIVE );
-    gtk_main();
+
+    /* Create nested main loop outside this callback to allow unpause */
+    g_idle_add( (GSourceFunc)gtkui_run_main_loop, NULL );
   }
 
 }

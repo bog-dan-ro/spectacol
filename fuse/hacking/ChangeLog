@@ -4128,4 +4128,6 @@
 20120507 ui/gtk/{binary.c,browse.c,confirm.c,debugger.c,gtkjoystick.c,gtkui.c,
          memory.c,options.pl,picture.c,pokefinder.c,pokemem.c,rollback.c,roms.c,
          stock.c}: don't access GtkDialog's vbox and action_area directly
-         (Alberto Garcia).
+         (patch #3518505) (Alberto Garcia).
+20120507 ui/gtk/gtkui.c: fix regression in GTK UI pause menu from r4685
+         (bug #3523741) (Sergio).
