@@ -4123,3 +4123,5 @@
 20120507 input.h,keysyms.dat,keysyms.pl,ui/sdl/sdlkeyboard.c,
          ui/widget/fuse.font.sbf,ui/xlib/xkeyboard.c: extend supported symbol
          characters on SDL and xlib UIs (bug #3517588) (Sergio).
+20120507 ui/win32/win32ui.c: fix win32 problem with closing modal dialogs
+         (bug #3516228) (Sergio).

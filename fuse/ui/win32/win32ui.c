@@ -67,6 +67,9 @@ static int paused = 0;
 /* this helps pause fuse while the main window is minimized */
 static int size_paused = 0;
 
+/* this helps to finalize some blocking operations */
+static int exit_process_messages = 0;
+
 /* Structure used by the radio button selection widgets (eg the
    graphics filter selectors and Machine/Select) */
 typedef struct win32ui_select_info {
@@ -246,6 +249,12 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       /* We'll call DefWindowProc to get keyboard focus when debugger window
          is open and inactive */
       break;
+
+    case WM_USER_EXIT_PROCESS_MESSAGES:
+      /* Odd case when message loop is overridden by a modal dialog. This
+         should not be caught here, so we delay this notification */
+      exit_process_messages++;
+      return 0;
 
 #if defined USE_JOYSTICK && !defined HAVE_JSW_H
 
@@ -1167,7 +1176,14 @@ win32ui_process_messages( int process_queue_once )
       }
     }
     if( process_queue_once ) return;
-    
+
+    /* If we miss WM_USER_EXIT_PROCESS_MESSAGES, the window procedure will
+       kindly notify us */
+    if( exit_process_messages ) {
+      exit_process_messages--;
+      return;
+    }
+
     WaitMessage();
   }
   /* FIXME: somewhere there should be return msg.wParam */
