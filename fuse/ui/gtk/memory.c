@@ -89,7 +89,7 @@ void
 menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
                             gpointer data GCC_UNUSED )
 {
-  GtkWidget *dialog, *box, *clist, *scrollbar;
+  GtkWidget *dialog, *box, *content_area, *clist, *scrollbar;
   GtkAdjustment *adjustment;
   size_t i;
   int error;
@@ -105,7 +105,8 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
   gtkstock_create_close( dialog, NULL, NULL, FALSE );
 
   box = gtk_hbox_new( FALSE, 0 );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), box );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
+  gtk_box_pack_start_defaults( GTK_BOX( content_area ), box );
 
   clist = gtk_clist_new_with_titles( 3, titles );
   gtk_clist_column_titles_passive( GTK_CLIST( clist ) );

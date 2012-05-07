@@ -133,7 +133,7 @@ void
 menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
                                guint callback_action )
 {
-  GtkWidget *dialog, *hbox, *vbox;
+  GtkWidget *dialog, *hbox, *vbox, *content_area;
   struct joystick_info info;
   size_t i;
 
@@ -142,11 +142,11 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
   setup_info( &info, callback_action );
 
   dialog = gtkstock_dialog_new( "Fuse - Configure Joystick", NULL );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
 
   hbox = gtk_hbox_new( FALSE, 4 );
   gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
-  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox,
-		      FALSE, FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX( content_area ), hbox, FALSE, FALSE, 0 );
 
   create_joystick_type_selector( &info, GTK_BOX( hbox ) );
 

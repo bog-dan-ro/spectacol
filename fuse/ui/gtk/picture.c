@@ -57,7 +57,7 @@ gtkui_picture( const char *filename, int border )
 {
   utils_file screen;
 
-  GtkWidget *drawing_area;
+  GtkWidget *drawing_area, *content_area;
 
   if( !dialog_created ) {
 
@@ -78,8 +78,8 @@ gtkui_picture( const char *filename, int border )
     g_signal_connect( G_OBJECT( drawing_area ),
 		      "expose_event", G_CALLBACK( picture_expose ),
 		      NULL );
-    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
-		       drawing_area );
+    content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
+    gtk_container_add( GTK_CONTAINER( content_area ), drawing_area );
 
     gtkstock_create_close( dialog, NULL, G_CALLBACK( gtk_widget_hide ),
 			   FALSE );

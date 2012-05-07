@@ -82,7 +82,7 @@ menu_media_tape_browse( GtkAction *gtk_action GCC_UNUSED,
 static int
 create_dialog( void )
 {
-  GtkWidget *scrolled_window;
+  GtkWidget *scrolled_window, *content_area;
 
   size_t i;
   gchar *titles[3] = { "", "Block type", "Data" };
@@ -90,13 +90,13 @@ create_dialog( void )
   /* Give me a new dialog box */
   dialog = gtkstock_dialog_new( "Fuse - Browse Tape",
 				G_CALLBACK( delete_dialog ) );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
 
   /* And a scrolled window to pack the CList into */
   scrolled_window = gtk_scrolled_window_new( NULL, NULL );
   gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scrolled_window ),
 				  GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
-			       scrolled_window );
+  gtk_box_pack_start_defaults( GTK_BOX( content_area ), scrolled_window );
 
   /* And the CList itself */
   blocks = gtk_clist_new_with_titles( 3, titles );
@@ -115,8 +115,7 @@ create_dialog( void )
 
   /* And the "tape modified" label */
   modified_label = gtk_label_new( "" );
-  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), modified_label,
-		      FALSE, FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX( content_area ), modified_label, FALSE, FALSE, 0 );
 
   /* Create the OK button */
   gtkstock_create_close( dialog, NULL, G_CALLBACK( browse_done ), FALSE );

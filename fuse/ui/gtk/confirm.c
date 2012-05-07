@@ -41,7 +41,7 @@ static void set_dont_save( GtkButton *button, gpointer user_data );
 int
 gtkui_confirm( const char *string )
 {
-  GtkWidget *dialog, *label;
+  GtkWidget *dialog, *label, *content_area;
   int confirm;
 
   /* Return value isn't an error code, but signifies whether to undertake
@@ -55,8 +55,8 @@ gtkui_confirm( const char *string )
   dialog = gtkstock_dialog_new( "Fuse - Confirm", NULL );
 
   label = gtk_label_new( string );
-  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label,
-		      TRUE, TRUE, 5 );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
+  gtk_box_pack_start( GTK_BOX( content_area ), label, TRUE, TRUE, 5 );
 
   gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( set_confirmed ),
 			     &confirm, NULL );
@@ -80,7 +80,7 @@ set_confirmed( GtkButton *button GCC_UNUSED, gpointer user_data )
 ui_confirm_save_t
 ui_confirm_save_specific( const char *message )
 {
-  GtkWidget *dialog, *label;
+  GtkWidget *dialog, *label, *content_area;
   ui_confirm_save_t confirm;
 
   if( !settings_current.confirm_actions ) return UI_CONFIRM_SAVE_DONTSAVE;
@@ -90,10 +90,10 @@ ui_confirm_save_specific( const char *message )
   confirm = UI_CONFIRM_SAVE_CANCEL;
 
   dialog = gtkstock_dialog_new( "Fuse - Confirm", NULL );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
 
   label = gtk_label_new( message );
-  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label,
-		      TRUE, TRUE, 5 );
+  gtk_box_pack_start( GTK_BOX( content_area ), label, TRUE, TRUE, 5 );
 
   {
     static gtkstock_button btn[] = {

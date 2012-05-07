@@ -89,8 +89,8 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
   }
 
   if( GTK_IS_DIALOG( widget ) ) {
-    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( widget )->action_area ),
-		       btn );
+    GtkWidget *action_area = gtk_dialog_get_action_area( GTK_DIALOG( widget ) );
+    gtk_container_add( GTK_CONTAINER( action_area ), btn );
   } else {
     gtk_container_add( GTK_CONTAINER( widget ), btn );
   }

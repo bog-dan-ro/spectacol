@@ -59,7 +59,7 @@ menu_file_loadbinarydata( GtkAction *gtk_action GCC_UNUSED,
 {
   struct binary_info info;
 
-  GtkWidget *table, *label, *button;
+  GtkWidget *table, *label, *button, *content_area;
 
   char buffer[80];
   int error;
@@ -73,12 +73,12 @@ menu_file_loadbinarydata( GtkAction *gtk_action GCC_UNUSED,
   if( error ) { free( info.filename ); fuse_emulation_unpause(); return; }
 
   info.dialog = gtkstock_dialog_new( "Fuse - Load Binary Data", NULL );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( info.dialog ) );
 
   /* Information display */
 
   table = gtk_table_new( 3, 3, FALSE );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( info.dialog )->vbox ),
-			       table );
+  gtk_box_pack_start_defaults( GTK_BOX( content_area ), table );
 
   label = gtk_label_new( "Filename" );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 0, 1,
@@ -208,7 +208,7 @@ menu_file_savebinarydata( GtkAction *gtk_action GCC_UNUSED,
 {
   struct binary_info info;
 
-  GtkWidget *table, *label, *button;
+  GtkWidget *table, *label, *button, *content_area;
 
   fuse_emulation_pause();
 
@@ -216,12 +216,12 @@ menu_file_savebinarydata( GtkAction *gtk_action GCC_UNUSED,
   if( !info.filename ) { fuse_emulation_unpause(); return; }
 
   info.dialog = gtkstock_dialog_new( "Fuse - Save Binary Data", NULL );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( info.dialog ) );
 
   /* Information display */
 
   table = gtk_table_new( 3, 3, FALSE );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( info.dialog )->vbox ),
-			       table );
+  gtk_box_pack_start_defaults( GTK_BOX( content_area ), table );
 
   label = gtk_label_new( "Filename" );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 0, 1,

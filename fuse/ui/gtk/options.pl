@@ -145,6 +145,7 @@ void
 menu_options_$_->{name}( GtkWidget *widget GCC_UNUSED,
 			 gpointer data GCC_UNUSED )
 {
+  GtkWidget *content_area;
   menu_options_$_->{name}_t dialog;
 
   /* Firstly, stop emulation */
@@ -152,6 +153,7 @@ menu_options_$_->{name}( GtkWidget *widget GCC_UNUSED,
 
   /* Create the necessary widgets */
   dialog.dialog = gtkstock_dialog_new( "Fuse - $_->{title}", NULL );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog.dialog ) );
 
   /* Create the various widgets */
 CODE
@@ -169,8 +171,7 @@ CODE
     gtk_check_button_new_with_label( "$text" );
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.$widget->{value} ),
 				settings_current.$widget->{value} );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		     dialog.$widget->{value} );
+  gtk_container_add( GTK_CONTAINER( content_area ), dialog.$widget->{value} );
 
 CODE
             } elsif( $type eq "Entry" ) {
@@ -184,8 +185,7 @@ CODE
     GtkWidget *text = gtk_label_new( "$widget->{data2}" );
     gchar buffer[80];
 
-    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog.dialog )->vbox ),
-                                 frame );
+    gtk_box_pack_start_defaults( GTK_BOX( content_area ), frame );
 				    
     gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
     gtk_container_add( GTK_CONTAINER( frame ), hbox );
@@ -230,8 +230,7 @@ CODE
     dialog.$widget->{value} = combo;
     gtk_box_pack_start( GTK_BOX( hbox ), dialog.$widget->{value}, FALSE, FALSE, 5 );
 
-    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog.dialog )->vbox ),
-			         hbox );
+    gtk_box_pack_start_defaults( GTK_BOX( content_area ), hbox );
   }
 
 CODE

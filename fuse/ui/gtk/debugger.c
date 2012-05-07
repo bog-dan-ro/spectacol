@@ -310,7 +310,7 @@ static int
 create_dialog( void )
 {
   int error;
-  GtkWidget *hbox, *vbox, *hbox2;
+  GtkWidget *hbox, *vbox, *hbox2, *content_area;
   GtkAccelGroup *accel_group;
   debugger_pane i;
 
@@ -320,20 +320,19 @@ create_dialog( void )
 
   dialog = gtkstock_dialog_new( "Fuse - Debugger",
 				G_CALLBACK( delete_dialog ) );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
 
   /* Keyboard shortcuts */
   accel_group = gtk_accel_group_new();
   gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
 
   /* The menu bar */
-  error = create_menu_bar( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
-			   accel_group );
+  error = create_menu_bar( GTK_BOX( content_area ), accel_group );
   if( error ) return error;
 
   /* Some boxes to contain the things we want to display */
   hbox = gtk_hbox_new( FALSE, 0 );
-  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox,
-		      TRUE, TRUE, 5 );
+  gtk_box_pack_start( GTK_BOX( content_area ), hbox, TRUE, TRUE, 5 );
 
   vbox = gtk_vbox_new( FALSE, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 5 );
@@ -352,8 +351,7 @@ create_dialog( void )
   create_stack_display( GTK_BOX( hbox ), font );
   create_events( GTK_BOX( hbox ) );
 
-  error = create_command_entry( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
-				accel_group );
+  error = create_command_entry( GTK_BOX( content_area ), accel_group );
   if( error ) return error;
 
   /* The action buttons */

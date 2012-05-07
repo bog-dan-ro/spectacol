@@ -50,6 +50,7 @@ static int
 create_dialog( void )
 {
   gchar *title[1] = { "Seconds" };
+  GtkWidget *content_area;
 
   dialog = gtkstock_dialog_new( "Fuse - Select Rollback Point", NULL );
 
@@ -61,7 +62,8 @@ create_dialog( void )
   g_signal_connect( G_OBJECT( list ), "select-row",
 		    G_CALLBACK( select_row ), NULL );
 
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), list );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
+  gtk_box_pack_start_defaults( GTK_BOX( content_area ), list );
 
   return 0;
 }

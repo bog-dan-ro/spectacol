@@ -109,7 +109,7 @@ create_dialog( void )
   dialog = gtkstock_dialog_new( "Fuse - Poke Memory",
                                 G_CALLBACK( pokemem_close ) );
 
-  vbox = GTK_DIALOG( dialog )->vbox;
+  vbox = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
 
   /* Keyboard shortcuts */
   accel_group = gtk_accel_group_new();

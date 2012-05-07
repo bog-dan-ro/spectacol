@@ -77,7 +77,7 @@ menu_select_roms_with_title( const char *title, size_t start, size_t n )
 			     NULL );
 
   /* And the current values of each of the ROMs */
-  vbox = GTK_BOX( GTK_DIALOG( dialog )->vbox );
+  vbox = GTK_BOX( gtk_dialog_get_content_area( GTK_DIALOG( dialog ) ) );
 
   gtk_container_set_border_width( GTK_CONTAINER( vbox ), 5 );
   for( i = 0; i < n; i++ ) add_rom( vbox, start, i );

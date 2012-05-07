@@ -303,7 +303,7 @@ ui_end(void)
 int
 ui_error_specific( ui_error_level severity, const char *message )
 {
-  GtkWidget *dialog, *label, *vbox;
+  GtkWidget *dialog, *label, *vbox, *content_area, *action_area;
   const gchar *title;
 
   /* If we don't have a UI yet, we can't output widgets */
@@ -329,11 +329,11 @@ ui_error_specific( ui_error_level severity, const char *message )
 
   /* Make a new vbox for the top part for saner spacing */
   vbox=gtk_vbox_new( FALSE, 0 );
-  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
-                      vbox, TRUE, TRUE, 0 );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
+  action_area = gtk_dialog_get_action_area( GTK_DIALOG( dialog ) );
+  gtk_box_pack_start( GTK_BOX( content_area ), vbox, TRUE, TRUE, 0 );
   gtk_container_set_border_width( GTK_CONTAINER( vbox ), 5 );
-  gtk_container_set_border_width( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-                                  5 );
+  gtk_container_set_border_width( GTK_CONTAINER( action_area ), 5 );
 
   /* Put the label in it */
   gtk_container_add( GTK_CONTAINER( vbox ), label );
@@ -392,6 +392,7 @@ menu_file_exit( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 scaler_type
 menu_get_scaler( scaler_available_fn selector )
 {
+  GtkWidget *content_area;
   gtkui_select_info dialog;
   GSList *button_group = NULL;
 
@@ -416,6 +417,7 @@ menu_get_scaler( scaler_available_fn selector )
 
   /* Create the necessary widgets */
   dialog.dialog = gtkstock_dialog_new( "Fuse - Select Scaler", NULL );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog.dialog ) );
 
   for( scaler = 0; scaler < SCALER_NUM; scaler++ ) {
 
@@ -429,8 +431,7 @@ menu_get_scaler( scaler_available_fn selector )
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.buttons[ count ] ),
 				  current_scaler == scaler );
 
-    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		       dialog.buttons[ count ] );
+    gtk_container_add( GTK_CONTAINER( content_area ), dialog.buttons[ count ] );
 
     count++;
   }
@@ -521,6 +522,7 @@ void
 menu_machine_select( GtkAction *gtk_action GCC_UNUSED,
                      gpointer data GCC_UNUSED )
 {
+  GtkWidget *content_area;
   gtkui_select_info dialog;
 
   int i;
@@ -537,6 +539,7 @@ menu_machine_select( GtkAction *gtk_action GCC_UNUSED,
 
   /* Create the necessary widgets */
   dialog.dialog = gtkstock_dialog_new( "Fuse - Select Machine", NULL );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog.dialog ) );
 
   dialog.buttons[0] =
     gtk_radio_button_new_with_label(
@@ -554,8 +557,7 @@ menu_machine_select( GtkAction *gtk_action GCC_UNUSED,
   for( i=0; i<machine_count; i++ ) {
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.buttons[i] ),
 				  machine_current == machine_types[i] );
-    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		       dialog.buttons[i] );
+    gtk_container_add( GTK_CONTAINER( content_area ), dialog.buttons[i] );
   }
 
   /* Create and add the actions buttons to the dialog box */
@@ -681,6 +683,7 @@ ui_confirm_joystick_t
 ui_confirm_joystick( libspectrum_joystick libspectrum_type,
 		     int inputs GCC_UNUSED )
 {
+  GtkWidget *content_area;
   gtkui_select_info dialog;
   char title[ 80 ];
   int i;
@@ -703,6 +706,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
   snprintf( title, sizeof( title ), "Fuse - Configure %s Joystick",
 	    libspectrum_joystick_name( libspectrum_type ) );
   dialog.dialog = gtkstock_dialog_new( title, NULL );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog.dialog ) );
 
   for( i = 0; i < JOYSTICK_CONN_COUNT; i++ ) {
 
@@ -713,8 +717,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
     group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( *button ) );
 
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( *button ), i == 0 );
-    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		       *button );
+    gtk_container_add( GTK_CONTAINER( content_area ), *button );
   }
 
   /* Create and add the actions buttons to the dialog box */

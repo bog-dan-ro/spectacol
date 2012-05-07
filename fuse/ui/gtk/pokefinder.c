@@ -83,7 +83,7 @@ menu_machine_pokefinder( GtkAction *gtk_action GCC_UNUSED,
 static int
 create_dialog( void )
 {
-  GtkWidget *hbox, *vbox, *label, *entry;
+  GtkWidget *hbox, *vbox, *label, *entry, *content_area;
   GtkAccelGroup *accel_group;
   size_t i;
 
@@ -93,7 +93,8 @@ create_dialog( void )
 				G_CALLBACK( delete_dialog ) );
 
   hbox = gtk_hbox_new( FALSE, 0 );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
+  content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
+  gtk_box_pack_start_defaults( GTK_BOX( content_area ), hbox );
 
   label = gtk_label_new( "Search for:" );
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
