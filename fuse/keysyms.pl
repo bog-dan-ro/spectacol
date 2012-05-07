@@ -158,15 +158,18 @@ my %ui_data = (
     sdl  => { headers => [ 'SDL.h' ],
 	      max_length => 15,
 	      skips => { map { $_ => 1 } ( 'Hyper_L','Hyper_R','Caps_Lock',
-                         'A' .. 'Z' ) },
+                         'A' .. 'Z', 'bar', 'dead_circumflex' ) },
 	      unicode_skips => { map { $_ => 1 } qw( Hyper_L Hyper_R Caps_Lock
                          Escape F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12
                          BackSpace Tab Caps_Lock Return Shift_L Shift_R
                          Control_L Control_R Alt_L Alt_R Meta_L Meta_R
                          Super_L Super_R Mode_switch Up Down Left Right
-                         Insert Delete Home End Page_Up Page_Down KP_Enter ) },
+                         Insert Delete Home End Page_Up Page_Down KP_Enter
+                         dead_circumflex ) },
 	      translations => {
 		  apostrophe  => 'QUOTE',
+		  asciicircum => 'CARET',
+		  exclam      => 'EXCLAIM',
 		  Control_L   => 'LCTRL',	 
 		  Control_R   => 'RCTRL',	 
 		  equal       => 'EQUALS',
@@ -174,17 +177,31 @@ my %ui_data = (
 		  Mode_switch => 'MENU',
 		  Page_Up     => 'PAGEUP',
 		  Page_Down   => 'PAGEDOWN',
+		  parenleft   => 'LEFTPAREN',
+		  parenright  => 'RIGHTPAREN',
 	      },
 	      unicode_translations => {
                   space       => ' ',
+                  exclam      => '!',
+                  dollar      => '$',
                   numbersign  => '#',
+                  ampersand   => "&",
                   apostrophe  => "'",
+                  parenleft   => "(",
+                  parenright  => ")",
+                  asterisk    => "*",
+                  plus        => "+",
                   comma       => ',',
                   minus       => '-',
                   period      => '.',
                   slash       => '/',
+                  colon       => ':',
                   semicolon   => ';',
+                  less        => '<',
                   equal       => '=',
+                  greater     => '>',
+                  asciicircum => '^',
+                  bar         => '|',
 	      },
 	      function => \&sdl_keysym,
 	      unicode_function => \&sdl_unicode_keysym,
@@ -192,8 +209,9 @@ my %ui_data = (
 
     svga => { headers => [ 'vgakeyboard.h' ],
 	      max_length => 26,
-	      skips => { map { $_ => 1 } qw( Hyper_L Hyper_R
-					     Super_L Super_R ) },
+	      skips => { map { $_ => 1 } qw( Hyper_L Hyper_R Super_L Super_R
+                 dollar less greater exclam ampersand parenleft parenright
+                 asterisk plus colon asciicircum dead_circumflex bar ) },
 	      translations => {
 		  Caps_Lock  => 'CAPSLOCK',
 		  numbersign => 'BACKSLASH',
@@ -222,6 +240,10 @@ my %ui_data = (
 					   'Hyper_L','Hyper_R',
 					   'Super_L','Super_R',
 					   'KP_Enter',
+					   'dollar','less','greater','exclam',
+					   'ampersand','parenleft','parenright',
+					   'asterisk','plus','colon','bar',
+					   'asciicircum','dead_circumflex',
 					   'A' .. 'Z' ) },
 	      translations => { 
 		  numbersign  => 'OEM_5',

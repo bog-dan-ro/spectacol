@@ -33,9 +33,16 @@ Return
 Escape
 
 space
+exclam
 
 numbersign
+dollar
+ampersand
 apostrophe
+parenleft
+parenright
+asterisk
+plus
 comma
 minus
 period
@@ -52,8 +59,11 @@ slash
 8
 9
 
+colon
 semicolon
+less
 equal
+greater
 
 A
 B
@@ -82,6 +92,9 @@ X
 Y
 Z
 
+asciicircum
+dead_circumflex
+
 a
 b
 c
@@ -109,6 +122,7 @@ x
 y
 z
 
+bar
 BackSpace
 
 KP_Enter

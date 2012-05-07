@@ -4120,3 +4120,6 @@
 20120507 machine.c,ui/widget/widget.c,ui/xlib/{Makefile.am,xdisplay.c,
          xstatusbar.pl}: add a statusbar for the xlib UI (patch #3496134)
          (Gergely Szasz).
+20120507 input.h,keysyms.dat,keysyms.pl,ui/sdl/sdlkeyboard.c,
+         ui/widget/fuse.font.sbf,ui/xlib/xkeyboard.c: extend supported symbol
+         characters on SDL and xlib UIs (bug #3517588) (Sergio).
