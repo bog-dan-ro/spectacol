@@ -258,4 +258,14 @@ libspectrum_set_pause_tstates( libspectrum_tape_block *block,
 
 extern const int LIBSPECTRUM_BITS_IN_BYTE;
 
+/* glib replacement functions */
+
+#ifndef HAVE_LIB_GLIB		/* Only if we are using glib replacement */
+void
+libspectrum_slist_cleanup( void );
+
+void
+libspectrum_hashtable_cleanup( void );
+#endif				/* #ifndef HAVE_LIB_GLIB */
+
 #endif				/* #ifndef LIBSPECTRUM_INTERNALS_H */

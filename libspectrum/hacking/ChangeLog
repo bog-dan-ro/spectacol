@@ -882,3 +882,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20120506 make-perl.c,myglib/gslist.c: fix some const qualifiers for the data
          argument to g_slist_remove and g_slist_find_custom (part of bug
          #3514721) (Sergio Baldoví).
+20120507 internals.h,libspectrum.c,libspectrum.h.in,make-perl.c,myglib/{ghash.c,
+         gslist.c}: add g_hash_table_new_full() and libspectrum_end() for memory
+         releasing (part of bug #3515269) (Sergio Baldoví).

@@ -121,6 +121,15 @@ libspectrum_init( void )
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+void
+libspectrum_end( void )
+{
+#ifndef HAVE_LIB_GLIB
+  libspectrum_slist_cleanup();
+  libspectrum_hashtable_cleanup();
+#endif				/* #ifndef HAVE_LIB_GLIB */
+}
+
 #ifdef HAVE_GCRYPT_H
 static void
 gcrypt_log_handler( void *opaque, int level, const char *format, va_list ap )

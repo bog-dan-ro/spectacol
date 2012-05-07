@@ -100,6 +100,7 @@ LIBSPECTRUM_CAPABILITIES
 /* Initialisation */
 
 WIN32_DLL libspectrum_error libspectrum_init( void );
+WIN32_DLL void libspectrum_end( void );
 
 /* Version checking */
 

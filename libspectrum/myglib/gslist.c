@@ -43,12 +43,14 @@ gint	last_function		(gconstpointer	 a,
 static int FREE_LIST_ALLOCATE_CHUNK = 1024;
 
 GSList * free_list = NULL;
+GSList * allocated_list = NULL;
 
 static
 void    allocate_free   ( void ) {
     if(!free_list) {
         int i;
         free_list=libspectrum_malloc(FREE_LIST_ALLOCATE_CHUNK*sizeof(GSList));
+        allocated_list = free_list;
         for(i=0;i<FREE_LIST_ALLOCATE_CHUNK-1;i++)
             free_list[i].next=&free_list[i+1];
         free_list[FREE_LIST_ALLOCATE_CHUNK-1].next=NULL;
@@ -350,6 +352,14 @@ gint	g_slist_position	(GSList		*list,
   }
 
   return -1;
+}
+
+void
+libspectrum_slist_cleanup( void )
+{
+  libspectrum_free( allocated_list );
+  allocated_list = NULL;
+  free_list = NULL;
 }
 
 #endif				/* #ifndef HAVE_LIB_GLIB */

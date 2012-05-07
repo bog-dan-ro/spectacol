@@ -57,9 +57,12 @@ struct _GHashTable
   GHashNode   **nodes;
   GHashFunc	hash_func;
   GCompareFunc	key_equal_func;
+  GDestroyNotify	key_destroy_func;
+  GDestroyNotify	value_destroy_func;
 };
 
 static GHashNode *node_free_list = NULL;
+static GHashNode *node_allocated_list = NULL;
 
 guint
 g_direct_hash (gconstpointer v)
@@ -71,6 +74,15 @@ GHashTable*
 g_hash_table_new (GHashFunc	hash_func,
 		  GCompareFunc	key_equal_func)
 {
+  return g_hash_table_new_full( hash_func, key_equal_func, NULL, NULL );
+}
+
+GHashTable*
+g_hash_table_new_full (GHashFunc       hash_func,
+		       GCompareFunc    key_equal_func,
+		       GDestroyNotify  key_destroy_func,
+		       GDestroyNotify  value_destroy_func)
+{
   GHashTable *hash_table;
   guint i;
 
@@ -79,6 +91,8 @@ g_hash_table_new (GHashFunc	hash_func,
   hash_table->nnodes = 0;
   hash_table->hash_func = hash_func? hash_func : g_direct_hash;
   hash_table->key_equal_func = key_equal_func;
+  hash_table->key_destroy_func   = key_destroy_func;
+  hash_table->value_destroy_func = value_destroy_func;
   hash_table->nodes = libspectrum_malloc (HASH_TABLE_SIZE * sizeof (GHashNode*));
 
   for (i = 0; i < HASH_TABLE_SIZE; i++)
@@ -88,14 +102,27 @@ g_hash_table_new (GHashFunc	hash_func,
 }
 
 static void
-g_hash_nodes_destroy (GHashNode *hash_node)
+g_hash_nodes_destroy (GHashNode *hash_node,
+                      GFreeFunc  key_destroy_func,
+                      GFreeFunc  value_destroy_func)
 {
   if (hash_node)
     {
       GHashNode *node = hash_node;
 
-      while (node->next)
-	node = node->next;
+      while (node->next) {
+        if (key_destroy_func)
+          key_destroy_func (node->key);
+        if (value_destroy_func)
+          value_destroy_func (node->value);
+
+        node = node->next;
+      }
+
+      if (key_destroy_func)
+        key_destroy_func (node->key);
+      if (value_destroy_func)
+        value_destroy_func (node->value);
 
       node->next = node_free_list;
       node_free_list = hash_node;
@@ -108,8 +135,10 @@ g_hash_table_destroy (GHashTable *hash_table)
   guint i;
   
   for (i = 0; i < HASH_TABLE_SIZE; i++)
-    g_hash_nodes_destroy (hash_table->nodes[i]);
-  
+    g_hash_nodes_destroy (hash_table->nodes[i],
+                          hash_table->key_destroy_func,
+                          hash_table->value_destroy_func);
+
   libspectrum_free (hash_table->nodes);
   libspectrum_free (hash_table);
 }
@@ -157,6 +186,7 @@ g_hash_node_new (gpointer key,
   if (!node_free_list)
     {
       node_free_list = libspectrum_malloc (1024 * sizeof (GHashNode));
+      node_allocated_list = node_free_list;
 
       for(i = 0; i < 1023; i++ )
 	node_free_list[i].next = &node_free_list[i+1];
@@ -185,6 +215,13 @@ g_hash_table_insert (GHashTable *hash_table,
   
   if (*node)
     {
+      /* free the passed key */
+      if (hash_table->key_destroy_func)
+        hash_table->key_destroy_func (key);
+      
+      if (hash_table->value_destroy_func)
+        hash_table->value_destroy_func ((*node)->value);
+
       (*node)->value = value;
     }
   else
@@ -195,8 +232,15 @@ g_hash_table_insert (GHashTable *hash_table,
 }
 
 static void
-g_hash_node_destroy (GHashNode *hash_node)
+g_hash_node_destroy (GHashNode *hash_node,
+		     GDestroyNotify  key_destroy_func,
+		     GDestroyNotify  value_destroy_func)
 {
+  if (key_destroy_func)
+    key_destroy_func (hash_node->key);
+  if (value_destroy_func)
+    value_destroy_func (hash_node->value);
+
   hash_node->next = node_free_list;
   node_free_list = hash_node;
 }
@@ -227,13 +271,17 @@ g_hash_table_foreach_remove (GHashTable *hash_table,
               if (prev)
                 {
                   prev->next = node->next;
-                  g_hash_node_destroy (node);
+                  g_hash_node_destroy (node,
+                                       hash_table->key_destroy_func,
+                                       hash_table->value_destroy_func);
                   node = prev;
                 }
               else
                 {
                   hash_table->nodes[i] = node->next;
-                  g_hash_node_destroy (node);
+                  g_hash_node_destroy (node,
+                                       hash_table->key_destroy_func,
+                                       hash_table->value_destroy_func);
                   goto restart;
                 }
             }
@@ -299,4 +347,11 @@ g_str_equal (gconstpointer v1,
   return strcmp (string1, string2) == 0;
 }
 
+void
+libspectrum_hashtable_cleanup( void )
+{
+  libspectrum_free( node_allocated_list );
+  node_allocated_list = NULL;
+  node_free_list = NULL;
+}
 #endif				/* #ifndef HAVE_LIB_GLIB */
