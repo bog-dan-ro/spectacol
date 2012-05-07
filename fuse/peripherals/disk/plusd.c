@@ -256,6 +256,7 @@ void
 plusd_end( void )
 {
   plusd_available = 0;
+  free( plusd_fdc );
 }
 
 libspectrum_byte

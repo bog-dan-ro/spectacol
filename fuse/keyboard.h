@@ -91,6 +91,7 @@ typedef enum keyboard_key_name {
 } keyboard_key_name;
 
 void fuse_keyboard_init(void);
+void fuse_keyboard_end(void);
 libspectrum_byte keyboard_read( libspectrum_byte porth );
 void keyboard_press(keyboard_key_name key);
 void keyboard_release(keyboard_key_name key);

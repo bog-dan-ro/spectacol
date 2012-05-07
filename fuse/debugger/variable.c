@@ -42,7 +42,15 @@ static GHashTable *debugger_variables;
 void
 debugger_variable_init( void )
 {
-  debugger_variables = g_hash_table_new( g_str_hash, g_str_equal );
+  debugger_variables = g_hash_table_new_full( g_str_hash, g_str_equal,
+                                              free, NULL );
+}
+
+void
+debugger_variable_end( void )
+{
+  g_hash_table_destroy( debugger_variables );
+  debugger_variables = NULL;
 }
 
 void

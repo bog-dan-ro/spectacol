@@ -106,6 +106,7 @@ void debugger_event_end( void );
 /* Variables handling */
 
 void debugger_variable_init( void );
+void debugger_variable_end( void );
 void debugger_variable_set( const char *name, libspectrum_dword value );
 libspectrum_dword debugger_variable_get( const char *name );
 

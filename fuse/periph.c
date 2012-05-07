@@ -91,7 +91,7 @@ void
 periph_register( periph_type type, const periph_t *periph )
 {
   if( !peripherals )
-    peripherals = g_hash_table_new( NULL, NULL );
+    peripherals = g_hash_table_new_full( NULL, NULL, NULL, free );
 
   periph_private_t *private = malloc( sizeof( *private ) );
   if( !private ) {
@@ -204,6 +204,18 @@ periph_clear( void )
   g_slist_free( ports );
   ports = NULL;
   set_types_inactive();
+}
+
+/* Tidy-up function called at end of emulation */
+void
+periph_end( void )
+{
+  g_slist_foreach( ports, free_peripheral, NULL );
+  g_slist_free( ports );
+  ports = NULL;
+
+  g_hash_table_destroy( peripherals );
+  peripherals = NULL;
 }
 
 /*

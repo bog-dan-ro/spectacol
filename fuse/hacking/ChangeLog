@@ -4111,3 +4111,9 @@
 20120506 ui/{gtk/options-header.pl,widget/options-header.pl,
          win32/options-header.pl}: fix "Use of uninitialized value within @ARGV"
          warnings (rest of bug #3514721) (Sergio).
+20120507 debugger/{debugger.c,debugger_internals.h,variable.c},fuse.c,
+         keyboard.[ch],module.[ch],periph.[ch],
+         peripherals/disk/{beta.c,disciple.c,opus.c,plusd.c},
+         peripherals/speccyboot.[ch],settings.pl,tape.[ch],ui/sdl/sdldisplay.c,
+         ui/widget/widget.c: fix various memory leaks (rest of bug #3515269)
+         (Sergio).

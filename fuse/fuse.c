@@ -59,6 +59,7 @@
 #include "machine.h"
 #include "machines/machines_periph.h"
 #include "memory.h"
+#include "module.h"
 #include "movie.h"
 #include "mempool.h"
 #include "peripherals/ay.h"
@@ -835,16 +836,19 @@ static int fuse_end(void)
 
   psg_end();
   rzx_end();
+  tape_end();
   debugger_end();
   simpleide_end();
   zxatasp_end();
   zxcf_end();
   if1_end();
   divide_end();
+  beta_end();
   opus_end();
   plusd_end();
   disciple_end();
   spectranet_end();
+  speccyboot_end();
 
   machine_end();
 
@@ -852,13 +856,17 @@ static int fuse_end(void)
 
   sound_end();
   event_end();
+  periph_end();
+  fuse_keyboard_end();
   fuse_joystick_end();
   ui_end();
   memory_end();
   mempool_end();
+  module_end();
   pokemem_end();
 
   libspectrum_creator_free( fuse_creator );
+  libspectrum_end();
 
   return 0;
 }

@@ -46,6 +46,7 @@ typedef struct module_info_t
 } module_info_t;
 
 int module_register( module_info_t *module );
+void module_end( void );
 
 void module_reset( int hard_reset );
 void module_romcs( void );

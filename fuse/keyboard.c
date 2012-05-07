@@ -294,6 +294,14 @@ void fuse_keyboard_init(void)
 
 }
 
+void fuse_keyboard_end(void)
+{
+  g_hash_table_destroy( keyboard_data );
+  g_hash_table_destroy( spectrum_keys );
+  g_hash_table_destroy( keysyms_hash );
+  g_hash_table_destroy( key_text );
+}
+
 libspectrum_byte
 keyboard_read( libspectrum_byte porth )
 {

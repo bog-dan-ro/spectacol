@@ -196,6 +196,12 @@ speccyboot_init( void )
   periph_register( PERIPH_TYPE_SPECCYBOOT, &speccyboot_periph );
 }
 
+void
+speccyboot_end( void )
+{
+  nic_enc28j60_free( nic );
+}
+
 int
 speccyboot_unittest( void )
 {

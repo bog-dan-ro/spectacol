@@ -487,6 +487,9 @@ int widget_end( void )
     free( widget_filenames );
   }
 
+  /* we don't currently have more than page 0 */
+  free( widget_font[0] );
+
   return 0;
 }
 

@@ -111,6 +111,13 @@ tape_init( void )
   tape_microphone = 0;
 }
 
+void
+tape_end( void )
+{
+  libspectrum_tape_free( tape );
+  tape = NULL;
+}
+
 int tape_open( const char *filename, int autoload )
 {
   utils_file file;

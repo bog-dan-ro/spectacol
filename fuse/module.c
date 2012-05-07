@@ -44,6 +44,13 @@ module_register( module_info_t *module )
   return 0;
 }
 
+void
+module_end( void )
+{
+  g_slist_free( registered_modules );
+  registered_modules = NULL;
+}
+
 static void
 reset( gpointer data, gpointer user_data )
 {

@@ -192,9 +192,14 @@ read_config_file( settings_info *settings )
     return 1;
   }
 
-  if( parse_xml( doc, settings ) ) { xmlFreeDoc( doc ); return 1; }
+  if( parse_xml( doc, settings ) ) {
+    xmlFreeDoc( doc );
+    xmlCleanupParser();
+    return 1;
+  }
 
   xmlFreeDoc( doc );
+  xmlCleanupParser();
 
   return 0;
 }
@@ -318,6 +323,9 @@ CODE
   print hashline( __LINE__ ), << 'CODE';
 
   xmlSaveFormatFile( path, doc, 1 );
+
+  xmlFreeDoc( doc );
+  xmlCleanupParser();
 
   return 0;
 }
@@ -686,14 +694,7 @@ print hashline( __LINE__ ), << 'CODE';
 static int
 settings_copy_internal( settings_info *dest, settings_info *src )
 {
-  if( dest->start_machine ) {
-    free( dest->start_machine );
-    dest->start_machine = NULL;
-  }
-  if( dest->start_scaler_mode ) {
-    free( dest->start_scaler_mode );
-    dest->start_scaler_mode = NULL;
-  }
+  settings_free( dest );
 
 CODE
 

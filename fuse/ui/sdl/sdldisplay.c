@@ -327,7 +327,13 @@ sdldisplay_load_gfx_mode( void )
 
   sdldisplay_force_full_refresh = 1;
 
-  tmp_screen = NULL;
+  /* Free the old surface */
+  if( tmp_screen ) {
+    free( tmp_screen->pixels );
+    SDL_FreeSurface( tmp_screen );
+    tmp_screen = NULL;
+  }
+
   tmp_screen_width = (image_width + 3);
 
   sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );

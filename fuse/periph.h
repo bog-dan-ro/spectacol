@@ -130,6 +130,9 @@ int periph_is_active( periph_type type );
 /* Empty out the list of peripherals */
 void periph_clear( void );
 
+/* Free up peripherals */
+void periph_end( void );
+
 /*
  * The actual routines to read and write a port
  */
