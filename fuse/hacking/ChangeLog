@@ -4140,3 +4140,6 @@
 20120521 ui/gtk/{pokefinder.c,debugger.c,browse.c}: replace deprecated
          gtk_widget_hide_all() with gtk_widget_hide() (more of patch #3527406)
          (Sergio).
+20120521 ui/gtk/{picture.c,pokefinder.c,pokemem.c,roms.c}: replace deprecated
+         gtk_box_pack_start_defaults() with gtk_box_pack_start() (rest of patch
+         #3527406) (Sergio).

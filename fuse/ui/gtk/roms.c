@@ -83,7 +83,7 @@ menu_select_roms_with_title( const char *title, size_t start, size_t n )
   for( i = 0; i < n; i++ ) add_rom( vbox, start, i );
 
   /* Users shouldn't be able to resize this window */
-  gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
+  gtk_window_set_resizable( GTK_WINDOW( dialog ), FALSE );
 
   /* Display the window */
   gtk_widget_show_all( dialog );

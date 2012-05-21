@@ -177,7 +177,7 @@ create_dialog( void )
   gtk_accel_group_disconnect_key( accel_group, GDK_Return, 0 );
 
   /* Users shouldn't be able to resize this window */
-  gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
+  gtk_window_set_resizable( GTK_WINDOW( dialog ), FALSE );
 
   /* Process the dialog */
   gtk_widget_show_all( dialog );

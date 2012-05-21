@@ -85,7 +85,7 @@ gtkui_picture( const char *filename, int border )
 			   FALSE );
 
     /* Stop users resizing this window */
-    gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
+    gtk_window_set_resizable( GTK_WINDOW( dialog ), FALSE );
 
     dialog_created = 1;
   }
