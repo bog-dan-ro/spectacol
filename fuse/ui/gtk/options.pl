@@ -185,7 +185,7 @@ CODE
     GtkWidget *text = gtk_label_new( "$widget->{data2}" );
     gchar buffer[80];
 
-    gtk_box_pack_start_defaults( GTK_BOX( content_area ), frame );
+    gtk_box_pack_start( GTK_BOX( content_area ), frame, TRUE, TRUE, 0 );
 				    
     gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
     gtk_container_add( GTK_CONTAINER( frame ), hbox );
@@ -196,7 +196,7 @@ CODE
     snprintf( buffer, 80, "%d", settings_current.$widget->{value} );
     gtk_entry_set_text( GTK_ENTRY( dialog.$widget->{value} ), buffer );
 
-    gtk_box_pack_start_defaults( GTK_BOX( hbox ), dialog.$widget->{value} );
+    gtk_box_pack_start( GTK_BOX( hbox ), dialog.$widget->{value}, TRUE, TRUE, 0 );
 
     gtk_box_pack_start( GTK_BOX( hbox ), text, FALSE, FALSE, 5 );
   }
@@ -230,7 +230,7 @@ CODE
     dialog.$widget->{value} = combo;
     gtk_box_pack_start( GTK_BOX( hbox ), dialog.$widget->{value}, FALSE, FALSE, 5 );
 
-    gtk_box_pack_start_defaults( GTK_BOX( content_area ), hbox );
+    gtk_box_pack_start( GTK_BOX( content_area ), hbox, TRUE, TRUE, 0 );
   }
 
 CODE

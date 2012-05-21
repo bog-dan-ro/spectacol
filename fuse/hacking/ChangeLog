@@ -4131,3 +4131,7 @@
          (patch #3518505) (Alberto Garcia).
 20120507 ui/gtk/gtkui.c: fix regression in GTK UI pause menu from r4685
          (bug #3523741) (Sergio).
+20120521 ui/gtk/{binary.c,browse.c,debugger.c,gtkjoystick.c,memory.c,options.pl,
+         pokefinder.c,rollback.c}: replace deprecated
+         gtk_box_pack_start_defaults() with gtk_box_pack_start() (part of patch
+         #3527406) (Sergio).

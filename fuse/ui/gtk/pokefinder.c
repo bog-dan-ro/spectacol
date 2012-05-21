@@ -94,7 +94,7 @@ create_dialog( void )
 
   hbox = gtk_hbox_new( FALSE, 0 );
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
-  gtk_box_pack_start_defaults( GTK_BOX( content_area ), hbox );
+  gtk_box_pack_start( GTK_BOX( content_area ), hbox, TRUE, TRUE, 0 );
 
   label = gtk_label_new( "Search for:" );
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );

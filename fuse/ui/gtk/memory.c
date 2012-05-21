@@ -106,7 +106,7 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
 
   box = gtk_hbox_new( FALSE, 0 );
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
-  gtk_box_pack_start_defaults( GTK_BOX( content_area ), box );
+  gtk_box_pack_start( GTK_BOX( content_area ), box, TRUE, TRUE, 0 );
 
   clist = gtk_clist_new_with_titles( 3, titles );
   gtk_clist_column_titles_passive( GTK_CLIST( clist ) );
@@ -114,7 +114,7 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
     gtk_clist_set_column_auto_resize( GTK_CLIST( clist ), i, TRUE );
   gtkui_set_font( clist, font );
   update_display( GTK_CLIST( clist ), memaddr );
-  gtk_box_pack_start_defaults( GTK_BOX( box ), clist );
+  gtk_box_pack_start( GTK_BOX( box ), clist, TRUE, TRUE, 0 );
 
   adjustment = GTK_ADJUSTMENT(
     gtk_adjustment_new( memaddr, 0x0000, 0xffff, 0x10, 0xa0, 0x13f ) );

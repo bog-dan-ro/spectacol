@@ -151,14 +151,14 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
   create_joystick_type_selector( &info, GTK_BOX( hbox ) );
 
   vbox = gtk_vbox_new( FALSE, 2 );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), vbox );
+  gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 0 );
 
   for( i = 0; i < 10; i += 5 ) {
     
     int j;
     
     vbox = gtk_vbox_new( FALSE, 2 );
-    gtk_box_pack_start_defaults( GTK_BOX( hbox ), vbox );
+    gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 0 );
     
     for( j = i; j < i + 5; j++ )
       if( info.button[j].setting ) {
@@ -272,7 +272,7 @@ create_fire_button_selector( const char *title, struct button_info *info,
   size_t i;
 
   frame = gtk_frame_new( title );
-  gtk_box_pack_start_defaults( parent, frame );
+  gtk_box_pack_start( parent, frame, TRUE, TRUE, 0 );
 
   box = gtk_hbox_new( FALSE, 4 );
   gtk_container_set_border_width( GTK_CONTAINER( box ), 2 );
@@ -298,13 +298,13 @@ create_fire_button_selector( const char *title, struct button_info *info,
 
   }
 
-  gtk_box_pack_start_defaults( GTK_BOX( box ), info->label );
+  gtk_box_pack_start( GTK_BOX( box ), info->label, TRUE, TRUE, 0 );
 
   factory = gtk_item_factory_new( GTK_TYPE_OPTION_MENU, "<fire>", NULL );
   gtk_item_factory_create_items( factory, key_menu_count, key_menu, info );
 
   menu = gtk_item_factory_get_widget( factory, "<fire>" );
-  gtk_box_pack_start_defaults( GTK_BOX( box ), menu );
+  gtk_box_pack_start( GTK_BOX( box ), menu, TRUE, TRUE, 0 );
 }
 
 static void

@@ -338,7 +338,7 @@ create_dialog( void )
   gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 5 );
 
   hbox2 = gtk_hbox_new( FALSE, 5 );
-  gtk_box_pack_start_defaults( GTK_BOX( vbox ), hbox2 );
+  gtk_box_pack_start( GTK_BOX( vbox ), hbox2, TRUE, TRUE, 0 );
 
   /* The main display areas */
   error = create_register_display( GTK_BOX( hbox2 ), font );
@@ -467,7 +467,7 @@ create_breakpoints( GtkBox *parent )
     gtk_tree_view_append_column( GTK_TREE_VIEW( breakpoints ), column );
   }
 
-  gtk_box_pack_start_defaults( parent, breakpoints );
+  gtk_box_pack_start( parent, breakpoints, TRUE, TRUE, 0 );
 }
 
 static void
@@ -480,7 +480,7 @@ create_disassembly( GtkBox *parent, gtkui_font font )
 
   /* A box to hold the disassembly listing and the scrollbar */
   disassembly_box = gtk_hbox_new( FALSE, 0 );
-  gtk_box_pack_start_defaults( parent, disassembly_box );
+  gtk_box_pack_start( parent, disassembly_box, TRUE, TRUE, 0 );
 
   /* The disassembly itself */
   disassembly_model =
@@ -494,7 +494,7 @@ create_disassembly( GtkBox *parent, gtkui_font font )
     gtk_tree_view_append_column( GTK_TREE_VIEW( disassembly ), column );
   }
 
-  gtk_box_pack_start_defaults( GTK_BOX( disassembly_box ), disassembly );
+  gtk_box_pack_start( GTK_BOX( disassembly_box ), disassembly, TRUE, TRUE, 0 );
 
   /* The disassembly scrollbar */
   disassembly_scrollbar_adjustment = GTK_ADJUSTMENT(
@@ -618,7 +618,7 @@ create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group )
   entry = gtk_entry_new();
   g_signal_connect( G_OBJECT( entry ), "activate",
 		    G_CALLBACK( evaluate_command ), NULL );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), entry );
+  gtk_box_pack_start( GTK_BOX( hbox ), entry, TRUE, TRUE, 0 );
 
   /* The 'command evaluate' button */
   eval_button = gtk_button_new_with_label( "Evaluate" );

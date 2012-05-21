@@ -78,7 +78,7 @@ menu_file_loadbinarydata( GtkAction *gtk_action GCC_UNUSED,
   /* Information display */
 
   table = gtk_table_new( 3, 3, FALSE );
-  gtk_box_pack_start_defaults( GTK_BOX( content_area ), table );
+  gtk_box_pack_start( GTK_BOX( content_area ), table, TRUE, TRUE, 0 );
 
   label = gtk_label_new( "Filename" );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 0, 1,
@@ -221,7 +221,7 @@ menu_file_savebinarydata( GtkAction *gtk_action GCC_UNUSED,
   /* Information display */
 
   table = gtk_table_new( 3, 3, FALSE );
-  gtk_box_pack_start_defaults( GTK_BOX( content_area ), table );
+  gtk_box_pack_start( GTK_BOX( content_area ), table, TRUE, TRUE, 0 );
 
   label = gtk_label_new( "Filename" );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 0, 1,

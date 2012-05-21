@@ -96,7 +96,7 @@ create_dialog( void )
   scrolled_window = gtk_scrolled_window_new( NULL, NULL );
   gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scrolled_window ),
 				  GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
-  gtk_box_pack_start_defaults( GTK_BOX( content_area ), scrolled_window );
+  gtk_box_pack_start( GTK_BOX( content_area ), scrolled_window, TRUE, TRUE, 0 );
 
   /* And the CList itself */
   blocks = gtk_clist_new_with_titles( 3, titles );

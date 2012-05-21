@@ -63,7 +63,7 @@ create_dialog( void )
 		    G_CALLBACK( select_row ), NULL );
 
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
-  gtk_box_pack_start_defaults( GTK_BOX( content_area ), list );
+  gtk_box_pack_start( GTK_BOX( content_area ), list, TRUE, TRUE, 0 );
 
   return 0;
 }
