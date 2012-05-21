@@ -4143,3 +4143,6 @@
 20120521 ui/gtk/{picture.c,pokefinder.c,pokemem.c,roms.c}: replace deprecated
          gtk_box_pack_start_defaults() with gtk_box_pack_start() (rest of patch
          #3527406) (Sergio).
+20120521 machine.c: revert change from patch #3496134 so that microdrive
+         activity icon is only shown when microdrives are used in GTK+ and Win32
+         UIs (thanks, Sergio).
