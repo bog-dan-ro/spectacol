@@ -193,7 +193,7 @@ delete_dialog( GtkWidget *widget, GdkEvent *event GCC_UNUSED,
 static void
 gtkui_pokefinder_close( GtkWidget *widget, gpointer user_data GCC_UNUSED )
 {
-  gtk_widget_hide_all( widget );
+  gtk_widget_hide( widget );
 }
 
 static void

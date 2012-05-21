@@ -235,7 +235,7 @@ hide_hidden_panes( void )
 
     pane = get_pane( i ); if( !pane ) return 1;
 
-    gtk_widget_hide_all( pane );
+    gtk_widget_hide( pane );
   }
 
   return 0;
@@ -402,7 +402,7 @@ toggle_display( gpointer callback_data GCC_UNUSED, guint callback_action,
   if( GTK_CHECK_MENU_ITEM( widget )->active ) {
     gtk_widget_show_all( pane );
   } else {
-    gtk_widget_hide_all( pane );
+    gtk_widget_hide( pane );
   }
 }
 
@@ -1085,6 +1085,6 @@ delete_dialog( GtkWidget *widget, GdkEvent *event GCC_UNUSED,
 static void
 gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data GCC_UNUSED )
 {
-  gtk_widget_hide_all( widget );
+  gtk_widget_hide( widget );
   gtkui_debugger_done_continue( NULL, NULL );
 }

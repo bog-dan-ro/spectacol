@@ -4137,3 +4137,6 @@
          #3527406) (Sergio).
 20120521 ui/gtk/statusbar.c: replace deprecated gtk_label_set() with
          gtk_label_set_text() (part of patch #3527406) (Sergio).
+20120521 ui/gtk/{pokefinder.c,debugger.c,browse.c}: replace deprecated
+         gtk_widget_hide_all() with gtk_widget_hide() (more of patch #3527406)
+         (Sergio).

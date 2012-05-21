@@ -206,7 +206,7 @@ select_row( GtkCList *clist, gint row, gint column GCC_UNUSED,
 static void
 browse_done( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  gtk_widget_hide_all( dialog );
+  gtk_widget_hide( dialog );
 }
 
 /* Catch attempts to delete the window and just hide it instead */
@@ -214,6 +214,6 @@ static gboolean
 delete_dialog( GtkWidget *widget, GdkEvent *event GCC_UNUSED,
 	       gpointer user_data GCC_UNUSED )
 {
-  gtk_widget_hide_all( widget );
+  gtk_widget_hide( widget );
   return TRUE;
 }
