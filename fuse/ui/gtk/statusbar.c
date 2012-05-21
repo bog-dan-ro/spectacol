@@ -144,7 +144,7 @@ gtkstatusbar_set_visibility( int visible )
 void
 gtkstatusbar_update_machine( const char *name )
 {
-  gtk_label_set( GTK_LABEL( machine_name ), name );
+  gtk_label_set_text( GTK_LABEL( machine_name ), name );
 }
 
 int
@@ -217,7 +217,7 @@ ui_statusbar_update_speed( float speed )
   char buffer[8];
 
   snprintf( buffer, 8, "%3.0f%%", speed );
-  gtk_label_set( GTK_LABEL( speed_status ), buffer );
+  gtk_label_set_text( GTK_LABEL( speed_status ), buffer );
 
   return 0;
 }

@@ -4135,3 +4135,5 @@
          pokefinder.c,rollback.c}: replace deprecated
          gtk_box_pack_start_defaults() with gtk_box_pack_start() (part of patch
          #3527406) (Sergio).
+20120521 ui/gtk/statusbar.c: replace deprecated gtk_label_set() with
+         gtk_label_set_text() (part of patch #3527406) (Sergio).
