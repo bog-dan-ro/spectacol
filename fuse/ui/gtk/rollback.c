@@ -36,31 +36,71 @@ GtkWidget *dialog, *list;
 static int dialog_created = 0;
 static int current_block;
 
-static void
-select_row( GtkCList *clist GCC_UNUSED, gint row, gint column GCC_UNUSED,
-	    GdkEventButton *event, gpointer data GCC_UNUSED )
+/* List columns */
+enum
 {
-  /* Ignore events which aren't double-clicks or select-via-keyboard */
-  if( event && event->type != GDK_2BUTTON_PRESS ) return;
+  COL_SECONDS = 0,
+  NUM_COLS
+};
 
-  current_block = row;
+static void
+select_row( GtkButton *button GCC_UNUSED, gpointer user_data )
+{
+  GtkTreePath *path;
+  GtkTreeView *view = user_data;
+  GtkTreeViewColumn *focus_column;
+
+  current_block = -1;
+
+  /* Get selected row */
+  gtk_tree_view_get_cursor( GTK_TREE_VIEW( view ), &path, &focus_column );
+  if( path ) {
+    int *indices = gtk_tree_path_get_indices( path );
+    if( indices ) current_block = indices[0];
+    gtk_tree_path_free( path );
+  }
+}
+
+static GtkWidget *
+create_rollback_list( void )
+{
+  GtkWidget *view;
+  GtkCellRenderer *renderer;
+  GtkTreeModel *model;
+  GtkListStore *store;
+
+  view = gtk_tree_view_new();
+
+  /* Add columns */
+  renderer = gtk_cell_renderer_text_new();
+  gtk_tree_view_insert_column_with_attributes( GTK_TREE_VIEW( view ),
+                                               -1,
+                                               "Seconds",
+                                               renderer,
+                                               "text", COL_SECONDS,
+                                               NULL );
+
+  /* Create data model */
+  store = gtk_list_store_new( NUM_COLS, G_TYPE_STRING );
+
+  model = GTK_TREE_MODEL( store );
+  gtk_tree_view_set_model( GTK_TREE_VIEW( view ), model );
+  g_object_unref( model );
+
+  return view;
 }
 
 static int
 create_dialog( void )
 {
-  gchar *title[1] = { "Seconds" };
   GtkWidget *content_area;
 
   dialog = gtkstock_dialog_new( "Fuse - Select Rollback Point", NULL );
 
-  gtkstock_create_ok_cancel( dialog, NULL, NULL, NULL, NULL );
+  list = create_rollback_list();
 
-  list = gtk_clist_new_with_titles( 1, title );
-  gtk_clist_column_titles_passive( GTK_CLIST( list ) );
-  gtk_clist_set_column_auto_resize( GTK_CLIST( list ), 0, TRUE );
-  g_signal_connect( G_OBJECT( list ), "select-row",
-		    G_CALLBACK( select_row ), NULL );
+  gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( select_row ), list,
+                             NULL );
 
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
   gtk_box_pack_start( GTK_BOX( content_area ), list, TRUE, TRUE, 0 );
@@ -71,22 +111,26 @@ create_dialog( void )
 static int
 update_list( GSList *points )
 {
-  gtk_clist_freeze( GTK_CLIST( list ) );
+  GtkTreeIter iter;
+  GtkTreeModel *model;
 
-  gtk_clist_clear( GTK_CLIST( list ) );
+  model = gtk_tree_view_get_model( GTK_TREE_VIEW( list ) );
+
+  gtk_list_store_clear( GTK_LIST_STORE( model ) );
 
   while( points ) {
     gchar buffer[256];
-    gchar *buffer2[1] = { buffer };
 
     snprintf( buffer, 256, "%.2f", GPOINTER_TO_INT( points->data ) / 50.0 );
 
-    gtk_clist_append( GTK_CLIST( list ), buffer2 );
+    /* Append a new row and fill data */
+    gtk_list_store_append( GTK_LIST_STORE( model ), &iter );
+    gtk_list_store_set( GTK_LIST_STORE( model ), &iter,
+                        COL_SECONDS, buffer,
+                        -1 );
 
     points = points->next;
   }
-
-  gtk_clist_thaw( GTK_CLIST( list ) );
 
   return 0;
 }

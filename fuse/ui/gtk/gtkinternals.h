@@ -30,6 +30,22 @@
 #include <libspectrum.h>
 
 /*
+ * Compat symbols. Transition to GTK+ 3
+ */
+
+/* Define keys for old GDK versions */
+#if !GTK_CHECK_VERSION( 2, 22, 0 )
+
+#define GDK_KEY_Up        GDK_Up
+#define GDK_KEY_Down      GDK_Down
+#define GDK_KEY_Page_Up   GDK_Page_Up
+#define GDK_KEY_Page_Down GDK_Page_Down
+#define GDK_KEY_Home      GDK_Home
+#define GDK_KEY_End       GDK_End
+
+#endif				/* #if !GTK_CHECK_VERSION( 2, 22, 0 ) */
+
+/*
  * Display routines (gtkdisplay.c)
  */
 
@@ -142,7 +158,7 @@ extern char *gtkpixmap_disk_inactive[];
 extern char *gtkpixmap_disk_active[];
 extern char *gtkpixmap_pause_inactive[];
 extern char *gtkpixmap_pause_active[];
-extern char *gtkpixmap_tape_marker[];
+extern const char *gtkpixmap_tape_marker[];
 extern char *gtkpixmap_mouse_inactive[];
 extern char *gtkpixmap_mouse_active[];
 
@@ -158,7 +174,7 @@ void gtkstatusbar_update_machine( const char *name );
  * Scrolling for GtkCList widgets
  */
 
-void gtkui_scroll_connect( GtkCList *clist, GtkAdjustment *adj );
+void gtkui_scroll_connect( GtkTreeView *list, GtkAdjustment *adj );
 
 /*
  * Dialog box reset

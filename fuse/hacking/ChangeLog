@@ -4148,3 +4148,6 @@
          UIs (thanks, Sergio).
 20120525 ui/xlib/{xdisplay.c,xstatusbar.pl}: scale the statusbar icons with the
          main display (more from patch #3496134) (Gergely Szasz).
+20120525 ui/gtk/{browse.c,gtkinternals.h,gtkui.c,memory.c,pixmaps.c,
+         pokefinder.c,rollback.c}: replace deprecated GtkCList with GtkTreeView
+         (patch #3529236) (Sergio).

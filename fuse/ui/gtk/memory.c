@@ -39,18 +39,27 @@
 
 static libspectrum_word memaddr = 0x0000;
 
+/* List columns */
+enum
+{
+  COL_ADDRESS = 0,
+  COL_HEX,
+  COL_DATA,
+  NUM_COLS
+};
+
 static void
-update_display( GtkCList *clist, libspectrum_word base )
+update_display( GtkTreeModel *model, libspectrum_word base )
 {
   size_t i, j;
+  GtkTreeIter iter;
 
   gchar buffer[ 8 + 64 + 20 ];
   gchar *text[] = { &buffer[0], &buffer[ 8 ], &buffer[ 8 + 64 ] };
   char buffer2[ 8 ];
 
   memaddr = base;
-  gtk_clist_freeze( clist );
-  gtk_clist_clear( clist );
+  gtk_list_store_clear( GTK_LIST_STORE( model ) );
 
   for( i = 0; i < 20; i++ ) {
     snprintf( text[0], 8, "%04X", base );
@@ -67,36 +76,86 @@ update_display( GtkCList *clist, libspectrum_word base )
     }
     text[2][ 0x10 ] = '\0';
 
-    gtk_clist_append( clist, text );
+    /* Append a new row and fill data */
+    gtk_list_store_append( GTK_LIST_STORE( model ), &iter );
+    gtk_list_store_set( GTK_LIST_STORE( model ), &iter,
+                        COL_ADDRESS, text[0],
+                        COL_HEX,     text[1],
+                        COL_DATA,    text[2],
+                        -1 );
   }
 
-  gtk_clist_thaw( clist );
 }
 
 static void
 scroller( GtkAdjustment *adjustment, gpointer user_data )
 {
   libspectrum_word base;
-  GtkCList *clist = user_data;
+  GtkTreeModel *model = user_data;
 
   /* Drop the low bits before displaying anything */
   base = adjustment->value; base &= 0xfff0;
 
-  update_display( clist, base );
+  update_display( model, base );
+}
+
+GtkWidget *
+create_mem_list( void )
+{
+  GtkWidget *view;
+  GtkCellRenderer *renderer;
+  GtkTreeModel *model;
+  GtkListStore *store;
+
+  view = gtk_tree_view_new();
+
+  /* Add columns */
+  renderer = gtk_cell_renderer_text_new();
+  gtk_tree_view_insert_column_with_attributes( GTK_TREE_VIEW( view ),
+                                               -1,
+                                               "Address",
+                                               renderer,
+                                               "text", COL_ADDRESS,
+                                               NULL );
+
+  renderer = gtk_cell_renderer_text_new();
+  gtk_tree_view_insert_column_with_attributes( GTK_TREE_VIEW( view ),
+                                               -1,
+                                               "Hex",
+                                               renderer,
+                                               "text", COL_HEX,
+                                               NULL );
+
+  renderer = gtk_cell_renderer_text_new();
+  gtk_tree_view_insert_column_with_attributes( GTK_TREE_VIEW( view ),
+                                               -1,
+                                               "Data",
+                                               renderer,
+                                               "text", COL_DATA,
+                                               NULL );
+
+  /* Create data model */
+  store = gtk_list_store_new( NUM_COLS, G_TYPE_STRING, G_TYPE_STRING,
+                              G_TYPE_STRING );
+
+  model = GTK_TREE_MODEL( store );
+  gtk_tree_view_set_model( GTK_TREE_VIEW( view ), model );
+  g_object_unref( model );
+
+  return view;
 }
 
 void
 menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
                             gpointer data GCC_UNUSED )
 {
-  GtkWidget *dialog, *box, *content_area, *clist, *scrollbar;
+  GtkWidget *dialog, *box, *content_area, *list, *scrollbar;
   GtkAdjustment *adjustment;
-  size_t i;
+  GtkTreeModel *model;
   int error;
   gtkui_font font;
 
   fuse_emulation_pause();
-  gchar *titles[] = { "Address", "Hex", "Data" };
 
   error = gtkui_get_monospaced_font( &font ); if( error ) return;
 
@@ -108,20 +167,19 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
   gtk_box_pack_start( GTK_BOX( content_area ), box, TRUE, TRUE, 0 );
 
-  clist = gtk_clist_new_with_titles( 3, titles );
-  gtk_clist_column_titles_passive( GTK_CLIST( clist ) );
-  for( i = 0; i < 3; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( clist ), i, TRUE );
-  gtkui_set_font( clist, font );
-  update_display( GTK_CLIST( clist ), memaddr );
-  gtk_box_pack_start( GTK_BOX( box ), clist, TRUE, TRUE, 0 );
+  /* The list itself */
+  list = create_mem_list();
+  gtkui_set_font( list, font );
+  model = gtk_tree_view_get_model( GTK_TREE_VIEW( list ) );
+  update_display( GTK_TREE_MODEL( model ), memaddr );
+  gtk_box_pack_start( GTK_BOX( box ), list, TRUE, TRUE, 0 );
 
   adjustment = GTK_ADJUSTMENT(
     gtk_adjustment_new( memaddr, 0x0000, 0xffff, 0x10, 0xa0, 0x13f ) );
   g_signal_connect( adjustment, "value-changed", G_CALLBACK( scroller ),
-		    clist );
+                    model );
 
-  gtkui_scroll_connect( GTK_CLIST( clist ), adjustment );
+  gtkui_scroll_connect( GTK_TREE_VIEW( list ), adjustment );
 
   scrollbar = gtk_vscrollbar_new( adjustment );
   gtk_box_pack_start( GTK_BOX( box ), scrollbar, FALSE, FALSE, 0 );

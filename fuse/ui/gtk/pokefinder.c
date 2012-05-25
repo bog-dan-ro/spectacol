@@ -49,15 +49,17 @@ static void gtkui_pokefinder_close( GtkWidget *widget, gpointer user_data );
 static gboolean delete_dialog( GtkWidget *widget, GdkEvent *event,
 			       gpointer user_data );
 static void update_pokefinder( void );
-static void possible_click( GtkCList *clist, gint row, gint column,
-			    GdkEventButton *event, gpointer user_data );
+static void possible_click( GtkTreeView *treeview, GtkTreePath *path,
+                            GtkTreeViewColumn *col, gpointer user_data );
 
 static int dialog_created = 0;
 
 static GtkWidget
   *dialog,			/* The dialog box itself */
   *count_label,			/* The number of possible locations */
-  *location_list;		/* The list of possible locations */
+  *location_list;		/* The list view of possible locations */
+
+static GtkTreeModel *location_model; /* The data of possible locations */
 
 /* The possible locations */
 
@@ -65,6 +67,14 @@ static GtkWidget
 
 int possible_page[ MAX_POSSIBLE ];
 libspectrum_word possible_offset[ MAX_POSSIBLE ];
+
+/* List columns */
+enum
+{
+  COL_PAGE = 0,
+  COL_OFFSET,
+  NUM_COLS
+};
 
 void
 menu_machine_pokefinder( GtkAction *gtk_action GCC_UNUSED,
@@ -80,14 +90,51 @@ menu_machine_pokefinder( GtkAction *gtk_action GCC_UNUSED,
   update_pokefinder();
 }
 
+GtkWidget *
+create_location_list( void )
+{
+  GtkWidget *view;
+  GtkCellRenderer *renderer;
+  GtkListStore *store;
+
+  view = gtk_tree_view_new();
+
+  /* Add columns */
+  renderer = gtk_cell_renderer_text_new();
+  gtk_tree_view_insert_column_with_attributes( GTK_TREE_VIEW( view ),
+                                               -1,
+                                               "Page",
+                                               renderer,
+                                               "text", COL_PAGE,
+                                               NULL );
+
+  renderer = gtk_cell_renderer_text_new();
+  gtk_tree_view_insert_column_with_attributes( GTK_TREE_VIEW( view ),
+                                               -1,
+                                               "Offset",
+                                               renderer,
+                                               "text", COL_OFFSET,
+                                               NULL );
+
+  /* Create data model */
+  store = gtk_list_store_new( NUM_COLS, G_TYPE_STRING, G_TYPE_STRING );
+
+  location_model = GTK_TREE_MODEL( store );
+  gtk_tree_view_set_model( GTK_TREE_VIEW( view ), location_model );
+  g_object_unref( location_model );
+
+  /* Activate breakpoints */
+  g_signal_connect( G_OBJECT( view ), "row-activated",
+                    G_CALLBACK( possible_click ), NULL );
+
+  return view;
+}
+
 static int
 create_dialog( void )
 {
   GtkWidget *hbox, *vbox, *label, *entry, *content_area;
   GtkAccelGroup *accel_group;
-  size_t i;
-
-  gchar *location_titles[] = { "Page", "Offset" };
 
   dialog = gtkstock_dialog_new( "Fuse - Poke Finder",
 				G_CALLBACK( delete_dialog ) );
@@ -110,14 +157,8 @@ create_dialog( void )
   count_label = gtk_label_new( "" );
   gtk_box_pack_start( GTK_BOX( vbox ), count_label, TRUE, TRUE, 5 );
 
-  location_list = gtk_clist_new_with_titles( 2, location_titles );
-  gtk_clist_column_titles_passive( GTK_CLIST( location_list ) );
-  for( i = 0; i < 2; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( location_list ), i, TRUE );
+  location_list = create_location_list();
   gtk_box_pack_start( GTK_BOX( vbox ), location_list, TRUE, TRUE, 5 );
-
-  g_signal_connect( G_OBJECT( location_list ), "select-row",
-		    G_CALLBACK( possible_click ), NULL );
 
   {
     static gtkstock_button btn[] = {
@@ -201,9 +242,9 @@ update_pokefinder( void )
 {
   size_t page, offset, bank, bank_offset;
   gchar buffer[256], *possible_text[2] = { &buffer[0], &buffer[128] };
+  GtkTreeIter iter;
 
-  gtk_clist_freeze( GTK_CLIST( location_list ) );
-  gtk_clist_clear( GTK_CLIST( location_list ) );
+  gtk_list_store_clear( GTK_LIST_STORE( location_model ) );
 
   if( pokefinder_count && pokefinder_count <= MAX_POSSIBLE ) {
 
@@ -226,7 +267,12 @@ update_pokefinder( void )
 	  snprintf( possible_text[0], 128, "%lu", (unsigned long)bank );
 	  snprintf( possible_text[1], 128, "0x%04X", (unsigned)bank_offset );
 
-	  gtk_clist_append( GTK_CLIST( location_list ), possible_text );
+	  /* Append a new row and fill data */
+	  gtk_list_store_append( GTK_LIST_STORE( location_model ), &iter );
+	  gtk_list_store_set( GTK_LIST_STORE( location_model ), &iter,
+	                      COL_PAGE, possible_text[0],
+	                      COL_OFFSET, possible_text[1],
+	                      -1 );
 	}
     }
 
@@ -236,21 +282,22 @@ update_pokefinder( void )
     gtk_widget_hide( location_list );
   }
 
-  gtk_clist_thaw( GTK_CLIST( location_list ) );
-
   snprintf( buffer, 256, "Possible locations: %lu",
 	    (unsigned long)pokefinder_count );
   gtk_label_set_text( GTK_LABEL( count_label ), buffer );
 }  
 
 static void
-possible_click( GtkCList *clist GCC_UNUSED, gint row, gint column GCC_UNUSED,
-		GdkEventButton *event, gpointer user_data GCC_UNUSED )
+possible_click( GtkTreeView *treeview GCC_UNUSED, GtkTreePath *path,
+                GtkTreeViewColumn *col GCC_UNUSED,
+                gpointer user_data GCC_UNUSED )
 {
-  int error;
+  int error, *indices, row;
 
-  /* Ignore events which aren't double-clicks or select-via-keyboard */
-  if( event && event->type != GDK_2BUTTON_PRESS ) return;
+  /* Get selected row via double-clicks or keyboard */
+  indices = gtk_tree_path_get_indices( path );
+  if( !indices ) return;
+  row = indices[0];
 
   error = debugger_breakpoint_add_address(
     DEBUGGER_BREAKPOINT_TYPE_WRITE, memory_source_ram, possible_page[ row ],

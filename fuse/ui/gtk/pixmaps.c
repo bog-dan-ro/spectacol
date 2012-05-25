@@ -273,7 +273,7 @@ char *gtkpixmap_pause_active[] = {
 "                   #$$$$+     ",
 "                     %$@      "};
 
-char *gtkpixmap_tape_marker[] = {
+const char *gtkpixmap_tape_marker[] = {
 "8 16 2 1",
 " 	c None",
 ".	c #212FC6",

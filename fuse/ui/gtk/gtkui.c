@@ -774,33 +774,57 @@ gtkui_set_font( GtkWidget *widget, gtkui_font font )
   gtk_widget_modify_font( widget, font );
 }
 
-static void
-key_scroll_event( GtkCList *clist GCC_UNUSED, GtkScrollType scroll,
-		  gfloat position, gpointer user_data )
+static gboolean
+key_press( GtkTreeView *list, GdkEventKey *event, gpointer user_data )
 {
   GtkAdjustment *adjustment = user_data;
+  GtkTreePath *path;
+  GtkTreeViewColumn *focus_column;
   long int oldbase = adjustment->value;
   long int base = oldbase;
+  int cursor_row = 0;
+  int num_rows = ( adjustment->page_size + 1 ) / adjustment->step_increment;
 
-  switch( scroll )
+  /* Get selected row */
+  gtk_tree_view_get_cursor( list, &path, &focus_column );
+  if( path ) {
+    int *indices = gtk_tree_path_get_indices( path );
+    if( indices ) cursor_row = indices[0];
+    gtk_tree_path_free( path );
+  }
+
+  switch( event->keyval )
   {
-  case GTK_SCROLL_JUMP:
-    base = position ? adjustment->upper : adjustment->lower;
+  case GDK_KEY_Up:
+    if( cursor_row == 0 )
+      base -= adjustment->step_increment;
     break;
-  case GTK_SCROLL_STEP_BACKWARD:
-    base -= adjustment->step_increment;
+
+  case GDK_KEY_Down:
+    if( cursor_row == num_rows - 1 )
+      base += adjustment->step_increment;
     break;
-  case GTK_SCROLL_STEP_FORWARD:
-    base += adjustment->step_increment;
-    break;
-  case GTK_SCROLL_PAGE_BACKWARD:
+
+  case GDK_KEY_Page_Up:
     base -= adjustment->page_increment;
     break;
-  case GTK_SCROLL_PAGE_FORWARD:
+
+  case GDK_KEY_Page_Down:
     base += adjustment->page_increment;
     break;
+
+  case GDK_KEY_Home:
+    cursor_row = 0;
+    base = adjustment->lower;
+    break;
+
+  case GDK_KEY_End:
+    cursor_row = num_rows - 1;
+    base = adjustment->upper - adjustment->page_size;
+    break;
+
   default:
-    return;
+    return FALSE;
   }
 
   if( base < 0 ) {
@@ -809,12 +833,22 @@ key_scroll_event( GtkCList *clist GCC_UNUSED, GtkScrollType scroll,
     base = adjustment->upper - adjustment->page_size;
   }
 
-  if( base != oldbase ) gtk_adjustment_set_value( adjustment, base );
+  if( base != oldbase ) {
+    gtk_adjustment_set_value( adjustment, base );
+
+    /* Mark selected row */
+    path = gtk_tree_path_new_from_indices( cursor_row, -1 );
+    gtk_tree_view_set_cursor( list, path, NULL, FALSE );
+    gtk_tree_path_free( path );
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 static gboolean
-wheel_scroll_event( GtkWidget *clist GCC_UNUSED, GdkEvent *event,
-		    gpointer user_data )
+wheel_scroll_event( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
+                    gpointer user_data )
 {
   GtkAdjustment *adjustment = user_data;
   long int oldbase = adjustment->value;
@@ -844,10 +878,10 @@ wheel_scroll_event( GtkWidget *clist GCC_UNUSED, GdkEvent *event,
 }
 
 void
-gtkui_scroll_connect( GtkCList *clist, GtkAdjustment *adj )
+gtkui_scroll_connect( GtkTreeView *list, GtkAdjustment *adj )
 {
-  g_signal_connect( G_OBJECT( clist ), "scroll-vertical",
-		    G_CALLBACK( key_scroll_event ), adj );
-  g_signal_connect( G_OBJECT( clist ), "scroll-event",
-		    G_CALLBACK( wheel_scroll_event ), adj );
+  g_signal_connect( list, "key-press-event",
+                    G_CALLBACK( key_press ), adj );
+  g_signal_connect( list, "scroll-event",
+                    G_CALLBACK( wheel_scroll_event ), adj );
 }
