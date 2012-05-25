@@ -4146,3 +4146,5 @@
 20120521 machine.c: revert change from patch #3496134 so that microdrive
          activity icon is only shown when microdrives are used in GTK+ and Win32
          UIs (thanks, Sergio).
+20120525 ui/xlib/{xdisplay.c,xstatusbar.pl}: scale the statusbar icons with the
+         main display (more from patch #3496134) (Gergely Szasz).

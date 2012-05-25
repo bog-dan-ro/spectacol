@@ -63,6 +63,7 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 
+void xstatusbar_init( int size );
 
 typedef enum {
   MSB_RED = 0,			/* 0RGB */
@@ -415,7 +416,7 @@ xdisplay_allocate_image( void )
     image = XCreateImage( display, xdisplay_visual,
 		       xdisplay_depth, ZPixmap, 0, NULL,
 		       3 * DISPLAY_ASPECT_WIDTH,
-		       3 * DISPLAY_SCREEN_HEIGHT + PIXMAPS_H, 8, 0 );
+		       3 * DISPLAY_SCREEN_HEIGHT + 3 * PIXMAPS_H, 8, 0 );
 /*
    we allocate extra space after the screen for status bar icons
    status bar icons total width always smaller than 3xDISPLAY_ASPECT_WIDTH
@@ -472,7 +473,7 @@ try_shm( void )
 			   xdisplay_depth, ZPixmap,
 			   NULL, &shm_info,
 			   3 * DISPLAY_ASPECT_WIDTH,
-			   3 * DISPLAY_SCREEN_HEIGHT + PIXMAPS_H);
+			   3 * DISPLAY_SCREEN_HEIGHT + 3 * PIXMAPS_H);
 /*
    we allocate extra space after the screen for status bar icons
    status bar icons total width always smaller than 3xDISPLAY_ASPECT_WIDTH
@@ -679,7 +680,7 @@ xdisplay_configure_notify( int width, int height )
 
   /* Else set ourselves to the new height */
   xdisplay_current_size = size;
-  
+
   /* Get a new scaler */
   register_scalers();
 
@@ -854,7 +855,6 @@ uidisplay_hotswap_gfx_mode( void )
   image_scale = 4.0 * scaler_get_scaling_factor( current_scaler );
   scaled_image_w = image_width  * image_scale >> 2;
   scaled_image_h = image_height * image_scale >> 2;
-
   if( current_scaler == SCALER_NORMAL )
     xdisplay_update_rect = xdisplay_update_rect_noscale;
   else
@@ -870,7 +870,7 @@ uidisplay_hotswap_gfx_mode( void )
       xdisplay_allocate_colours8();
   }
   xdisplay_setup_rgb_putpixel();
-  xstatusbar_init();
+  xstatusbar_init( xdisplay_current_size );
   display_refresh_all();
   return 0;
 }

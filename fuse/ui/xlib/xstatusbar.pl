@@ -73,24 +73,38 @@ print "#define PIXMAPS_W $offset\n#define PIXMAPS_H $maxh\n\n";
 print <<EOS;
 static ui_statusbar_state $xstates;
 static int status_updated;
+static int icon_size = 0;
 
 void
 xstatusbar_add_pixmap(int x, int pw, int h, libspectrum_word *colors)
 {
   int y = 3 * DISPLAY_SCREEN_HEIGHT;
+  x *= icon_size;
   for( ; h > 0; h-- ) {
     int w = pw;
     for( ; w > 0; w-- ) {
-      xdisplay_putpixel( x++, y, colors);
+      int i;
+      for( i = icon_size; i > 0; i-- ) {
+        xdisplay_putpixel( x, y, colors);
+        if( icon_size > 1 )
+          xdisplay_putpixel( x, y + 1, colors);
+        if( icon_size > 2 )
+          xdisplay_putpixel( x, y + 2, colors);
+        x++;
+      }
       colors++;
     }
-    x -= pw; y++;
+    x -= pw * icon_size; y += icon_size;
   }
 }
 /* put status icons to X(Shm)Image extra area */
 void
-xstatusbar_init()
+xstatusbar_init( int size )
 {
+  if( icon_size == size )
+    return;
+  icon_size = size;
+
 $add_pixmap}
 
 void
@@ -98,9 +112,10 @@ xstatusbar_put_icon( int x, int w, int h )
 {
   static int dx = 0;
   static int dy = 0;
-  if( x == -1 || dx == 0 ) {
+  w *= icon_size; x *= icon_size; h *= icon_size;
+  if( x < 0 || dx == 0 ) {
     dx = ( DISPLAY_ASPECT_WIDTH - 2 ) * xdisplay_current_size;
-    dy = ( DISPLAY_SCREEN_HEIGHT - 2 ) * xdisplay_current_size - PIXMAPS_H;
+    dy = ( DISPLAY_SCREEN_HEIGHT - 2 ) * xdisplay_current_size - PIXMAPS_H * icon_size;
     return;
   }
   dx -= w;
