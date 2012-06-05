@@ -4154,3 +4154,5 @@
 20120605 ui/gtk/debugger.c: replace deprecated GtkItemFactory,
          GtkItemFactoryEntry and GtkItemFactoryCallback1 in favour of
          GtkUIManager, GtkActionEntry and GtkAction (patch #3531492) (Sergio).
+20120605 ui/gtk/gtkjoystick.c: replace deprecated GtkOptionMenu widgets with
+         GtkComboBox (patch #3531495) (Sergio).

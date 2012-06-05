@@ -28,6 +28,7 @@
 #include <config.h>
 
 #include <gtk/gtk.h>
+#include <string.h>
 
 #include "compat.h"
 #include "fuse.h"
@@ -47,6 +48,13 @@
 
 #endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
 
+enum
+{
+  COL_TEXT = 0,
+  COL_KEY,
+  NUM_COLS
+};
+
 struct button_info {
   int *setting;
   char name[80];
@@ -62,80 +70,130 @@ struct joystick_info {
   struct button_info button[10];
 };
 
+typedef enum key_item_t {
+  ITEM = 0,
+  GROUP,
+  SUBITEM,
+} key_item_t;
+
+typedef struct key_menu_t {
+  key_item_t item;
+  const gchar *text;
+  keyboard_key_name key;
+} key_menu_t;
+
 static void setup_info( struct joystick_info *info, int callback_action );
 static void create_joystick_type_selector( struct joystick_info *info,
 					   GtkBox *parent );
 static void
 create_fire_button_selector( const char *title, struct button_info *info,
-			     GtkBox *parent );
+                             GtkBox *parent, GtkTreeModel *model );
 static void set_key_text( GtkWidget *label, keyboard_key_name key );
 
-static void key_callback( gpointer data, guint action, GtkWidget *widget );
-static void nothing_callback( gpointer data, guint action, GtkWidget *widget );
+static void key_callback( GtkComboBox *widget, gpointer user_data );
 static void joystick_done( GtkButton *button, gpointer user_data );
 
-static GtkItemFactoryEntry key_menu[] = {
+static key_menu_t key_menu[] = {
 
-  { "/Joystick Fire", NULL, key_callback, KEYBOARD_JOYSTICK_FIRE, "<Item>", NULL },
+    { ITEM, "Joystick Fire", KEYBOARD_JOYSTICK_FIRE }, 
 
-  { "/Numbers/0", NULL, key_callback, KEYBOARD_0, "<Item>", NULL },
-  { "/Numbers/1", NULL, key_callback, KEYBOARD_1, "<Item>", NULL },
-  { "/Numbers/2", NULL, key_callback, KEYBOARD_2, "<Item>", NULL },
-  { "/Numbers/3", NULL, key_callback, KEYBOARD_3, "<Item>", NULL },
-  { "/Numbers/4", NULL, key_callback, KEYBOARD_4, "<Item>", NULL },
-  { "/Numbers/5", NULL, key_callback, KEYBOARD_5, "<Item>", NULL },
-  { "/Numbers/6", NULL, key_callback, KEYBOARD_6, "<Item>", NULL },
-  { "/Numbers/7", NULL, key_callback, KEYBOARD_7, "<Item>", NULL },
-  { "/Numbers/8", NULL, key_callback, KEYBOARD_8, "<Item>", NULL },
-  { "/Numbers/9", NULL, key_callback, KEYBOARD_9, "<Item>", NULL },
+    { GROUP, "Numbers", KEYBOARD_NONE }, 
+    { SUBITEM, "0", KEYBOARD_0 },
+    { SUBITEM, "1", KEYBOARD_1 },
+    { SUBITEM, "2", KEYBOARD_2 },
+    { SUBITEM, "3", KEYBOARD_3 },
+    { SUBITEM, "4", KEYBOARD_4 },
+    { SUBITEM, "5", KEYBOARD_5 },
+    { SUBITEM, "6", KEYBOARD_6 },
+    { SUBITEM, "7", KEYBOARD_7 },
+    { SUBITEM, "8", KEYBOARD_8 },
+    { SUBITEM, "9", KEYBOARD_9 },
 
-  { "/A-M/A", NULL, key_callback, KEYBOARD_a, "<Item>", NULL },
-  { "/A-M/B", NULL, key_callback, KEYBOARD_b, "<Item>", NULL },
-  { "/A-M/C", NULL, key_callback, KEYBOARD_c, "<Item>", NULL },
-  { "/A-M/D", NULL, key_callback, KEYBOARD_d, "<Item>", NULL },
-  { "/A-M/E", NULL, key_callback, KEYBOARD_e, "<Item>", NULL },
-  { "/A-M/F", NULL, key_callback, KEYBOARD_f, "<Item>", NULL },
-  { "/A-M/G", NULL, key_callback, KEYBOARD_g, "<Item>", NULL },
-  { "/A-M/H", NULL, key_callback, KEYBOARD_h, "<Item>", NULL },
-  { "/A-M/I", NULL, key_callback, KEYBOARD_i, "<Item>", NULL },
-  { "/A-M/J", NULL, key_callback, KEYBOARD_j, "<Item>", NULL },
-  { "/A-M/K", NULL, key_callback, KEYBOARD_k, "<Item>", NULL },
-  { "/A-M/L", NULL, key_callback, KEYBOARD_l, "<Item>", NULL },
-  { "/A-M/M", NULL, key_callback, KEYBOARD_m, "<Item>", NULL },
+    { GROUP, "A - M", KEYBOARD_NONE },
+    { SUBITEM, "A", KEYBOARD_a },
+    { SUBITEM, "B", KEYBOARD_b },
+    { SUBITEM, "C", KEYBOARD_c },
+    { SUBITEM, "D", KEYBOARD_d },
+    { SUBITEM, "E", KEYBOARD_e },
+    { SUBITEM, "F", KEYBOARD_f },
+    { SUBITEM, "G", KEYBOARD_g },
+    { SUBITEM, "H", KEYBOARD_h },
+    { SUBITEM, "I", KEYBOARD_i },
+    { SUBITEM, "J", KEYBOARD_j },
+    { SUBITEM, "K", KEYBOARD_k },
+    { SUBITEM, "L", KEYBOARD_l },
+    { SUBITEM, "M", KEYBOARD_m },
 
-  { "/N-Z/N", NULL, key_callback, KEYBOARD_n, "<Item>", NULL },
-  { "/N-Z/O", NULL, key_callback, KEYBOARD_o, "<Item>", NULL },
-  { "/N-Z/P", NULL, key_callback, KEYBOARD_p, "<Item>", NULL },
-  { "/N-Z/Q", NULL, key_callback, KEYBOARD_q, "<Item>", NULL },
-  { "/N-Z/R", NULL, key_callback, KEYBOARD_r, "<Item>", NULL },
-  { "/N-Z/S", NULL, key_callback, KEYBOARD_s, "<Item>", NULL },
-  { "/N-Z/T", NULL, key_callback, KEYBOARD_t, "<Item>", NULL },
-  { "/N-Z/U", NULL, key_callback, KEYBOARD_u, "<Item>", NULL },
-  { "/N-Z/V", NULL, key_callback, KEYBOARD_v, "<Item>", NULL },
-  { "/N-Z/W", NULL, key_callback, KEYBOARD_w, "<Item>", NULL },
-  { "/N-Z/X", NULL, key_callback, KEYBOARD_x, "<Item>", NULL },
-  { "/N-Z/Y", NULL, key_callback, KEYBOARD_y, "<Item>", NULL },
-  { "/N-Z/Z", NULL, key_callback, KEYBOARD_z, "<Item>", NULL },
+    { GROUP, "N - Z", KEYBOARD_NONE },
+    { SUBITEM, "N", KEYBOARD_n },
+    { SUBITEM, "O", KEYBOARD_o },
+    { SUBITEM, "P", KEYBOARD_p },
+    { SUBITEM, "Q", KEYBOARD_q },
+    { SUBITEM, "R", KEYBOARD_r },
+    { SUBITEM, "S", KEYBOARD_s },
+    { SUBITEM, "T", KEYBOARD_t },
+    { SUBITEM, "U", KEYBOARD_u },
+    { SUBITEM, "V", KEYBOARD_v },
+    { SUBITEM, "W", KEYBOARD_w },
+    { SUBITEM, "X", KEYBOARD_x },
+    { SUBITEM, "Y", KEYBOARD_y },
+    { SUBITEM, "Z", KEYBOARD_z },
 
-  { "/Space", NULL, key_callback, KEYBOARD_space, "<Item>", NULL },
-  { "/Enter", NULL, key_callback, KEYBOARD_Enter, "<Item>", NULL },
-  { "/Caps Shift", NULL, key_callback, KEYBOARD_Caps, "<Item>", NULL },
-  { "/Symbol Shift", NULL, key_callback, KEYBOARD_Symbol, "<Item>", NULL },
-
-  /* Different callback needed as KEYBOARD_NONE has the value 0 */
-  { "/Nothing", NULL, nothing_callback, 1, "<Item>", NULL },
+    { ITEM, "Space", KEYBOARD_space },
+    { ITEM, "Enter", KEYBOARD_Enter },
+    { ITEM, "Caps Shift", KEYBOARD_Caps },
+    { ITEM, "Symbol Shift", KEYBOARD_Symbol },
+    { ITEM, "Nothing", KEYBOARD_NONE },
 
 };
 
-static const guint key_menu_count = sizeof( key_menu ) / sizeof( key_menu[0] );
+static const guint key_menu_count = G_N_ELEMENTS( key_menu );
+
+GtkTreeModel *
+create_joystick_options_store( void )
+{
+  GtkTreeIter iter, iter2;
+  GtkTreeStore *store;
+  guint i;
+
+  store = gtk_tree_store_new( NUM_COLS, G_TYPE_STRING, G_TYPE_INT );
+
+  for( i = 0; i < key_menu_count; i++ ) {
+
+    switch( key_menu[i].item ) {
+
+      case ITEM:
+      case GROUP:
+        gtk_tree_store_append( store, &iter, NULL );
+        gtk_tree_store_set( store, &iter,
+                            COL_TEXT, key_menu[i].text,
+                            COL_KEY, key_menu[i].key,
+                            -1 );
+        break;
+
+      case SUBITEM:
+        gtk_tree_store_append( store, &iter2, &iter );
+        gtk_tree_store_set( store, &iter2,
+                            COL_TEXT, key_menu[i].text,
+                            COL_KEY, key_menu[i].key,
+                            -1 );
+        break;
+
+    }
+
+  }
+
+  return GTK_TREE_MODEL( store );
+}
 
 void
 menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
                                guint callback_action )
 {
   GtkWidget *dialog, *hbox, *vbox, *content_area;
+  GtkTreeModel *model;
   struct joystick_info info;
-  size_t i;
+  int i;
 
   fuse_emulation_pause();
 
@@ -153,6 +211,8 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
   vbox = gtk_vbox_new( FALSE, 2 );
   gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 0 );
 
+  model = create_joystick_options_store();
+
   for( i = 0; i < 10; i += 5 ) {
     
     int j;
@@ -162,10 +222,12 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
     
     for( j = i; j < i + 5; j++ )
       if( info.button[j].setting ) {
-	create_fire_button_selector( info.button[j].name, &( info.button[j] ),
-				     GTK_BOX( vbox ) );
+        create_fire_button_selector( info.button[j].name, &( info.button[j] ),
+                                     GTK_BOX( vbox ), model );
       }
   }
+
+  g_object_unref( model );
 
   gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( joystick_done ),
 			     &info, NULL );
@@ -238,7 +300,7 @@ create_joystick_type_selector( struct joystick_info *info, GtkBox *parent )
 {
   GtkWidget *frame, *box;
   GSList *button_group;
-  size_t i;
+  int i;
 
   frame = gtk_frame_new( "Joystick type" );
   gtk_box_pack_start( parent, frame, FALSE, FALSE, 0 );
@@ -253,7 +315,7 @@ create_joystick_type_selector( struct joystick_info *info, GtkBox *parent )
     info->radio[ i ] =
       gtk_radio_button_new_with_label( button_group, joystick_name[ i ] );
     button_group =
-      gtk_radio_button_group( GTK_RADIO_BUTTON( info->radio[ i ] ) );
+      gtk_radio_button_get_group( GTK_RADIO_BUTTON( info->radio[ i ] ) );
     gtk_box_pack_start( GTK_BOX( box ), info->radio[ i ], FALSE, FALSE, 0 );
 
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( info->radio[ i ] ),
@@ -264,11 +326,27 @@ create_joystick_type_selector( struct joystick_info *info, GtkBox *parent )
 }
 
 static void
-create_fire_button_selector( const char *title, struct button_info *info,
-			     GtkBox *parent )
+set_entry_properties( GtkCellLayout *cell_layout GCC_UNUSED,
+                      GtkCellRenderer *cell, GtkTreeModel *tree_model,
+                      GtkTreeIter *iter, gpointer data  GCC_UNUSED )
 {
-  GtkWidget *menu, *frame, *box;
-  GtkItemFactory *factory;
+  gboolean sensitive;
+
+  sensitive = !gtk_tree_model_iter_has_child( tree_model, iter );
+
+  g_object_set( cell, "sensitive", sensitive, NULL );
+
+  g_object_set( cell, "xpad", 10, NULL );
+}
+
+static void
+create_fire_button_selector( const char *title, struct button_info *info,
+                             GtkBox *parent, GtkTreeModel *model )
+{
+  GtkWidget *frame, *box, *combo;
+  GtkCellRenderer *renderer;
+  GtkTreeIter iter;
+  GtkTreePath *path;
   size_t i;
 
   frame = gtk_frame_new( title );
@@ -278,20 +356,17 @@ create_fire_button_selector( const char *title, struct button_info *info,
   gtk_container_set_border_width( GTK_CONTAINER( box ), 2 );
   gtk_container_add( GTK_CONTAINER( frame ), box );
 
+  /* Create label */
   info->key = *info->setting;
   info->label = gtk_label_new( "" );
 
   for( i = 0; i < key_menu_count; i++ ) {
     
     keyboard_key_name key;
-      
-    if( key_menu[i].callback == nothing_callback ) {
-      key = KEYBOARD_NONE;
-    } else {
-      key = key_menu[i].callback_action;
-    }
 
-    if( key == *info->setting ) {
+    key = key_menu[i].key;
+
+    if( key_menu[i].item != GROUP && key == (unsigned int)*info->setting ) {
       set_key_text( info->label, key );
       break;
     }
@@ -300,11 +375,25 @@ create_fire_button_selector( const char *title, struct button_info *info,
 
   gtk_box_pack_start( GTK_BOX( box ), info->label, TRUE, TRUE, 0 );
 
-  factory = gtk_item_factory_new( GTK_TYPE_OPTION_MENU, "<fire>", NULL );
-  gtk_item_factory_create_items( factory, key_menu_count, key_menu, info );
+  /* Create combobox */
+  combo = gtk_combo_box_new_with_model( model );    
+  renderer = gtk_cell_renderer_text_new();
+  gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( combo ), renderer, TRUE );
+  gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT( combo ), renderer,
+                                  "text", 0, NULL );
+  gtk_cell_layout_set_cell_data_func( GTK_CELL_LAYOUT( combo ), renderer,
+                                      set_entry_properties, NULL, NULL );
 
-  menu = gtk_item_factory_get_widget( factory, "<fire>" );
-  gtk_box_pack_start( GTK_BOX( box ), menu, TRUE, TRUE, 0 );
+  /* Select first item */
+  path = gtk_tree_path_new_from_indices( 0, -1 );
+  gtk_tree_model_get_iter( model, &iter, path );
+  gtk_tree_path_free( path );
+  gtk_combo_box_set_active_iter( GTK_COMBO_BOX( combo ), &iter );
+
+  gtk_box_pack_start( GTK_BOX( box ), combo, TRUE, TRUE, 0 );
+
+  g_signal_connect( G_OBJECT( combo ), "changed", G_CALLBACK( key_callback ),
+                    info );
 }
 
 static void
@@ -320,21 +409,26 @@ set_key_text( GtkWidget *label, keyboard_key_name key )
   gtk_label_set_text( GTK_LABEL( label ), buffer );
 }
 
-
 static void
-key_callback( gpointer data, guint action, GtkWidget *widget GCC_UNUSED )
+key_callback( GtkComboBox *widget, gpointer user_data )
 {
-  struct button_info *info = data;
+  GtkTreeIter iter;
+  GValue value;
+  struct button_info *info = user_data;
+  keyboard_key_name key;
+  GtkTreeModel *model;
 
-  info->key = action;
+  /* Get current selection */
+  gtk_combo_box_get_active_iter( GTK_COMBO_BOX( widget ), &iter );
+  memset( &value, 0, sizeof( value ) );
+  model = gtk_combo_box_get_model( GTK_COMBO_BOX( widget ) );
+  gtk_tree_model_get_value( model, &iter, COL_KEY, &value );
+  key = g_value_get_int( &value );
+  g_value_unset( &value );
+
+  /* Store and display selection */
+  info->key = key;
   set_key_text( info->label, info->key );
-}
-
-static void
-nothing_callback( gpointer data, guint action GCC_UNUSED,
-		  GtkWidget *widget GCC_UNUSED )
-{
-  key_callback( data, KEYBOARD_NONE, NULL );
 }
 
 static void
