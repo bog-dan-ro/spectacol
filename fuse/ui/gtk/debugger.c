@@ -108,9 +108,16 @@ static int create_dialog( void );
 static int hide_hidden_panes( void );
 static GtkCheckMenuItem* get_pane_menu_item( debugger_pane pane );
 static GtkWidget* get_pane( debugger_pane pane );
-static int create_menu_bar( GtkBox *parent, GtkAccelGroup *accel_group );
-static void toggle_display( gpointer callback_data, guint callback_action,
-			    GtkWidget *widget );
+static int create_menu_bar( GtkBox *parent, GtkAccelGroup **accel_group );
+static void toggle_display( GtkToggleAction* action, debugger_pane pane );
+static void toggle_display_registers( GtkToggleAction* action, gpointer data );
+static void toggle_display_memory_map( GtkToggleAction* action, gpointer data );
+static void toggle_display_breakpoints( GtkToggleAction* action,
+                                        gpointer data );
+static void toggle_display_disassembly( GtkToggleAction* action,
+                                        gpointer data );
+static void toggle_display_stack( GtkToggleAction* action, gpointer data );
+static void toggle_display_events( GtkToggleAction* action, gpointer data );
 static int create_register_display( GtkBox *parent, gtkui_font font );
 static int create_memory_map( GtkBox *parent );
 static void create_breakpoints( GtkBox *parent );
@@ -170,24 +177,43 @@ static int dialog_created = 0;
 /* Is the debugger window active (as opposed to the debugger itself)? */
 static int debugger_active;
 
-/* The factory used to create the menu bar */
-static GtkItemFactory *menu_factory;
+/* The UIManager used to create the menu bar */
+static GtkUIManager *ui_manager_debugger = NULL;
 
 /* The debugger's menu bar */
-static GtkItemFactoryEntry menu_data[] = {
+const gchar debugger_menu[] =
+"<menubar name='DebuggerMenu'>"
+"  <menu name='View' action='VIEW'>"
+"    <menuitem name='Registers' action='VIEW_REGISTERS'/>"
+"    <menuitem name='Memory Map' action='VIEW_MEMORY_MAP'/>"
+"    <menuitem name='Breakpoints' action='VIEW_BREAKPOINTS'/>"
+"    <menuitem name='Disassembly' action='VIEW_DISASSEMBLY'/>"
+"    <menuitem name='Stack' action='VIEW_STACK'/>"
+"    <menuitem name='Events' action='VIEW_EVENTS'/>"
+"  </menu>"
+"</menubar>";
 
-  { "/_View", NULL, NULL, 0, "<Branch>", NULL },
-  { "/View/_Registers", NULL, toggle_display, DEBUGGER_PANE_REGISTERS, "<ToggleItem>", NULL },
-  { "/View/_Memory Map", NULL, toggle_display, DEBUGGER_PANE_MEMORYMAP, "<ToggleItem>", NULL },
-  { "/View/_Breakpoints", NULL, toggle_display, DEBUGGER_PANE_BREAKPOINTS, "<ToggleItem>", NULL },
-  { "/View/_Disassembly", NULL, toggle_display, DEBUGGER_PANE_DISASSEMBLY, "<ToggleItem>", NULL },
-  { "/View/_Stack", NULL, toggle_display, DEBUGGER_PANE_STACK, "<ToggleItem>", NULL },
-  { "/View/_Events", NULL, toggle_display, DEBUGGER_PANE_EVENTS, "<ToggleItem>", NULL },
+/* The debugger's menu actions */
+static GtkActionEntry menu_data[] = {
+
+  { "VIEW", NULL, "_View", NULL, NULL, NULL },
 
 };
 
-static guint menu_data_count =
-  sizeof( menu_data ) / sizeof( GtkItemFactoryEntry );
+static guint menu_data_count = G_N_ELEMENTS( menu_data );
+
+static GtkToggleActionEntry menu_toggles[] = {
+
+  { "VIEW_REGISTERS", NULL, "_Registers", NULL, NULL, G_CALLBACK( toggle_display_registers ), TRUE },
+  { "VIEW_MEMORY_MAP", NULL, "_Memory Map", NULL, NULL, G_CALLBACK( toggle_display_memory_map ), TRUE },
+  { "VIEW_BREAKPOINTS", NULL, "_Breakpoints", NULL, NULL, G_CALLBACK( toggle_display_breakpoints ), TRUE },
+  { "VIEW_DISASSEMBLY", NULL, "_Disassembly", NULL, NULL, G_CALLBACK( toggle_display_disassembly ), TRUE },
+  { "VIEW_STACK", NULL, "_Stack", NULL, NULL, G_CALLBACK( toggle_display_stack ), TRUE },
+  { "VIEW_EVENTS", NULL, "_Events", NULL, NULL, G_CALLBACK( toggle_display_events ), TRUE },
+
+};
+
+static guint menu_toggles_count = G_N_ELEMENTS( menu_toggles );
 
 static const char*
 format_8_bit( void )
@@ -265,9 +291,12 @@ get_pane_menu_item( debugger_pane pane )
     return NULL;
   }
 
-  menu_item = gtk_item_factory_get_widget( menu_factory, path );
+  gchar *full_path = g_strdup_printf( "/DebuggerMenu%s", path );
+  menu_item = gtk_ui_manager_get_widget( ui_manager_debugger, full_path );
+  g_free( full_path );
+
   if( !menu_item ) {
-    ui_error( UI_ERROR_ERROR, "couldn't get menu item '%s' from factory",
+    ui_error( UI_ERROR_ERROR, "couldn't get menu item '%s'",
 	      path );
     return NULL;
   }
@@ -312,7 +341,6 @@ create_dialog( void )
   int error;
   GtkWidget *hbox, *vbox, *hbox2, *content_area;
   GtkAccelGroup *accel_group;
-  debugger_pane i;
 
   gtkui_font font;
 
@@ -322,13 +350,12 @@ create_dialog( void )
 				G_CALLBACK( delete_dialog ) );
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
 
-  /* Keyboard shortcuts */
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
-
   /* The menu bar */
-  error = create_menu_bar( GTK_BOX( content_area ), accel_group );
+  error = create_menu_bar( GTK_BOX( content_area ), &accel_group );
   if( error ) return error;
+
+  /* Keyboard shortcuts */
+  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
 
   /* Some boxes to contain the things we want to display */
   hbox = gtk_hbox_new( FALSE, 0 );
@@ -359,15 +386,6 @@ create_dialog( void )
   error = create_buttons( GTK_DIALOG( dialog ), accel_group );
   if( error ) return error;
 
-  /* Initially, have all the panes visible */
-  for( i = DEBUGGER_PANE_BEGIN; i < DEBUGGER_PANE_END; i++ ) {
-    
-    GtkCheckMenuItem *check_item;
-
-    check_item = get_pane_menu_item( i ); if( !check_item ) break;
-    gtk_check_menu_item_set_active( check_item, TRUE );
-  }
-
   gtkui_free_font( font );
 
   dialog_created = 1;
@@ -376,15 +394,40 @@ create_dialog( void )
 }
 
 static int
-create_menu_bar( GtkBox *parent, GtkAccelGroup *accel_group )
+create_menu_bar( GtkBox *parent, GtkAccelGroup **accel_group )
 {
+  GError *error = NULL;
+  GtkActionGroup *menu_action_group;
   GtkWidget *menu_bar;
+  guint ui_menu_id;
 
-  menu_factory = gtk_item_factory_new( GTK_TYPE_MENU_BAR, "<main>",
-				       accel_group );
-  gtk_item_factory_create_items( menu_factory, menu_data_count, menu_data,
-				 NULL);
-  menu_bar = gtk_item_factory_get_widget( menu_factory, "<main>" );
+  /* FIXME: we should unref this at some point */
+  ui_manager_debugger = gtk_ui_manager_new();
+
+  /* Load actions */
+  menu_action_group = gtk_action_group_new( "DebuggerActionGroup" );
+  gtk_action_group_add_actions( menu_action_group, menu_data, menu_data_count,
+                                NULL );
+  gtk_action_group_add_toggle_actions( menu_action_group, menu_toggles,
+                                       menu_toggles_count, NULL );
+  gtk_ui_manager_insert_action_group( ui_manager_debugger, menu_action_group,
+                                      0 );
+  g_object_unref( menu_action_group );
+
+  /* Load the menu */
+  ui_menu_id = gtk_ui_manager_add_ui_from_string( ui_manager_debugger,
+                                                  debugger_menu,
+                                                  sizeof( debugger_menu ),
+                                                  &error );
+  if( error ) {
+    g_error_free( error );
+    return 1;
+  }
+  else if( !ui_menu_id ) return 1;
+
+  *accel_group = gtk_ui_manager_get_accel_group( ui_manager_debugger );
+
+  menu_bar = gtk_ui_manager_get_widget( ui_manager_debugger, "/DebuggerMenu" );
 
   gtk_box_pack_start( parent, menu_bar, FALSE, FALSE, 0 );
   
@@ -392,18 +435,53 @@ create_menu_bar( GtkBox *parent, GtkAccelGroup *accel_group )
 }
 
 static void
-toggle_display( gpointer callback_data GCC_UNUSED, guint callback_action,
-		GtkWidget *widget )
+toggle_display( GtkToggleAction* action, debugger_pane pane_id )
 {
   GtkWidget *pane;
 
-  pane = get_pane( callback_action ); if( !pane ) return;
+  pane = get_pane( pane_id ); if( !pane ) return;
 
-  if( GTK_CHECK_MENU_ITEM( widget )->active ) {
+  if( gtk_toggle_action_get_active( action ) ) {
     gtk_widget_show_all( pane );
   } else {
     gtk_widget_hide( pane );
   }
+}
+
+static void
+toggle_display_registers( GtkToggleAction* action, gpointer data GCC_UNUSED )
+{
+  toggle_display( action, DEBUGGER_PANE_REGISTERS );
+}
+
+static void
+toggle_display_memory_map( GtkToggleAction* action, gpointer data GCC_UNUSED )
+{
+  toggle_display( action, DEBUGGER_PANE_MEMORYMAP );
+}
+
+static void
+toggle_display_breakpoints( GtkToggleAction* action, gpointer data GCC_UNUSED )
+{
+  toggle_display( action, DEBUGGER_PANE_BREAKPOINTS );
+}
+
+static void
+toggle_display_disassembly( GtkToggleAction* action, gpointer data GCC_UNUSED )
+{
+  toggle_display( action, DEBUGGER_PANE_DISASSEMBLY );
+}
+
+static void
+toggle_display_stack( GtkToggleAction* action, gpointer data GCC_UNUSED )
+{
+  toggle_display( action, DEBUGGER_PANE_STACK );
+}
+
+static void
+toggle_display_events( GtkToggleAction* action, gpointer data GCC_UNUSED )
+{
+  toggle_display( action, DEBUGGER_PANE_EVENTS );
 }
 
 static int

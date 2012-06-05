@@ -4151,3 +4151,6 @@
 20120525 ui/gtk/{browse.c,gtkinternals.h,gtkui.c,memory.c,pixmaps.c,
          pokefinder.c,rollback.c}: replace deprecated GtkCList with GtkTreeView
          (patch #3529236) (Sergio).
+20120605 ui/gtk/debugger.c: replace deprecated GtkItemFactory,
+         GtkItemFactoryEntry and GtkItemFactoryCallback1 in favour of
+         GtkUIManager, GtkActionEntry and GtkAction (patch #3531492) (Sergio).
