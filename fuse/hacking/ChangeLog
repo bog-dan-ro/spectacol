@@ -4156,3 +4156,4 @@
          GtkUIManager, GtkActionEntry and GtkAction (patch #3531492) (Sergio).
 20120605 ui/gtk/gtkjoystick.c: replace deprecated GtkOptionMenu widgets with
          GtkComboBox (patch #3531495) (Sergio).
+20120605 ui/gtk/binary.c: plug a memory leak (thanks, cppcheck) (Fred).

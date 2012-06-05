@@ -315,11 +315,13 @@ save_data( GtkButton *button GCC_UNUSED, gpointer user_data )
 		  NULL, 10 );
   if( errno || start < 0 || start > 0xffff ) {
     ui_error( UI_ERROR_ERROR, "Start must be between 0 and 65535" );
+    free( buffer );
     return;
   }
 
   if( start + length > 0x10000 ) {
     ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
+    free( buffer );
     return;
   }
 
