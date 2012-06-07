@@ -4158,3 +4158,5 @@
          GtkComboBox (patch #3531495) (Sergio).
 20120605 ui/gtk/binary.c: plug a memory leak (thanks, cppcheck) (Fred).
 20120607 ui/win32/binary.c: plug another memory leak (thanks, cppcheck) (Fred).
+20120607 display.c,machine.c,memory.c,rectangle.c,rzx.c,tape.c,ui/widget/text.c:
+         switch to using libspectrum_realloc over raw realloc (Fred).

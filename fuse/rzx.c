@@ -573,13 +573,9 @@ int rzx_store_byte( libspectrum_byte value )
 
     new_allocated = rzx_in_allocated >= 25 ? 2 * rzx_in_allocated : 50;
     ptr =
-      (libspectrum_byte*)realloc(
+      (libspectrum_byte*)libspectrum_realloc(
         rzx_in_bytes, new_allocated * sizeof(libspectrum_byte)
       );
-    if( ptr == NULL ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory in rzx_store_byte" );
-      return 1;
-    }
 
     rzx_in_bytes = ptr;
     rzx_in_allocated = new_allocated;

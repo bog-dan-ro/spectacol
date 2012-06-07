@@ -755,8 +755,8 @@ tape_event_record_sample( libspectrum_dword last_tstates, int type,
     /* make sure we can still fit a dword and a flag byte in the buffer */
     if( rec_state.tape_buffer_used+5 >= rec_state.tape_buffer_size ) {
       rec_state.tape_buffer_size = rec_state.tape_buffer_size*2;
-      rec_state.tape_buffer = realloc( rec_state.tape_buffer,
-                                       rec_state.tape_buffer_size );
+      rec_state.tape_buffer = libspectrum_realloc( rec_state.tape_buffer,
+                                                   rec_state.tape_buffer_size );
     }
   }
 

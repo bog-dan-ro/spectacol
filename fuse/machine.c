@@ -113,12 +113,9 @@ static int machine_add_machine( int (*init_function)( fuse_machine_info *machine
 
   machine_count++;
 
-  machine_types = realloc( machine_types,
-			   machine_count * sizeof( fuse_machine_info* ) );
-  if( machine_types == NULL ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
+  machine_types =
+    libspectrum_realloc( machine_types,
+                         machine_count * sizeof( fuse_machine_info* ) );
 
   machine_types[ machine_count - 1 ] = malloc( sizeof( fuse_machine_info ) );
   if( !machine_types[ machine_count - 1 ] ) {

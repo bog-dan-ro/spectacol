@@ -137,14 +137,10 @@ alloc_change(void)
 
   if( border_changes_size == border_changes_last ) {
     border_changes_size += 10;
-    border_changes = realloc( border_changes,
-                              border_changes_size*
-                                sizeof( struct border_change_t )
-                            );
-    if( !border_changes ) {
-      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-      fuse_abort();
-    }
+    border_changes = libspectrum_realloc( border_changes,
+                                          border_changes_size *
+                                            sizeof( struct border_change_t )
+                                        );
   }
   return border_changes + border_changes_last++; 
 }

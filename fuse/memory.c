@@ -580,12 +580,8 @@ memory_rom_to_snapshot( libspectrum_snap *snap )
         current_page_num = memory_map_rom[ i ].page_num;
       } else {
         /* Extend the current ROM image */
-        current_rom = realloc( current_rom, rom_length + MEMORY_PAGE_SIZE );
-        if( !current_rom ) {
-          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-                    __LINE__ );
-          return;
-        }
+        current_rom = libspectrum_realloc( current_rom,
+                                           rom_length + MEMORY_PAGE_SIZE );
 
         memcpy( current_rom + rom_length, memory_map_rom[ i ].page,
                 MEMORY_PAGE_SIZE );
