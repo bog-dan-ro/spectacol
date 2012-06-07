@@ -311,11 +311,13 @@ save_data( HWND hwndDlg, LONG user_data )
   free( temp_buffer );
   if( errno || start < 0 || start > 0xffff ) {
     ui_error( UI_ERROR_ERROR, "Start must be between 0 and 65535" );
+    free( buffer );
     return;
   }
 
   if( start + length > 0x10000 ) {
     ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
+    free( buffer );
     return;
   }
 
