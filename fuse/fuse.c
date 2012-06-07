@@ -320,7 +320,7 @@ static int fuse_init(int argc, char **argv)
 
   tape_init();
 
-  error = scaler_select_id( start_scaler ); free( start_scaler );
+  error = scaler_select_id( start_scaler ); libspectrum_free( start_scaler );
   if( error ) return error;
 
   if( setup_start_files( &start_files ) ) return 1;
@@ -384,7 +384,7 @@ int creator_init( void )
     fuse_creator, (libspectrum_byte*)custom, strlen( custom )
   );
   if( error ) {
-    free( custom ); libspectrum_creator_free( fuse_creator );
+    libspectrum_free( custom ); libspectrum_creator_free( fuse_creator );
     return error;
   }
 

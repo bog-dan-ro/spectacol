@@ -693,7 +693,7 @@ ui_tape_write( void )
 
   tape_write( filename );
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 
@@ -722,7 +722,7 @@ ui_plus3_disk_write( specplus3_drive_number which, int saveas )
   }
   err = specplus3_disk_write( which, filename );
 
-  if( saveas ) free( filename );
+  if( saveas ) libspectrum_free( filename );
 
   fuse_emulation_unpause();
 
@@ -754,7 +754,7 @@ ui_beta_disk_write( beta_drive_number which, int saveas )
 
   err = beta_disk_write( which, filename );
 
-  if( saveas ) free( filename );
+  if( saveas ) libspectrum_free( filename );
 
   fuse_emulation_unpause();
 
@@ -784,7 +784,7 @@ ui_opus_disk_write( opus_drive_number which, int saveas )
 
   err = opus_disk_write( which, filename );
 
-  if( saveas ) free( filename );
+  if( saveas ) libspectrum_free( filename );
 
   fuse_emulation_unpause();
 
@@ -814,7 +814,7 @@ ui_plusd_disk_write( plusd_drive_number which, int saveas )
 
   err = plusd_disk_write( which, filename );
 
-  if( saveas ) free( filename );
+  if( saveas ) libspectrum_free( filename );
 
   fuse_emulation_unpause();
 
@@ -844,7 +844,7 @@ ui_disciple_disk_write( disciple_drive_number which, int saveas )
 
   err = disciple_disk_write( which, filename );
 
-  if( saveas ) free( filename );
+  if( saveas ) libspectrum_free( filename );
 
   fuse_emulation_unpause();
 
@@ -868,7 +868,7 @@ ui_mdr_write( int which, int saveas )
 
   err = if1_mdr_write( which, filename );
 
-  if( saveas ) free( filename );
+  if( saveas ) libspectrum_free( filename );
 
   fuse_emulation_unpause();
 

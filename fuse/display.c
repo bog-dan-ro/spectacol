@@ -199,7 +199,7 @@ display_init( int *argc, char ***argv )
 
   border_changes_last = 0;
   if( border_changes ) {
-    free( border_changes );
+    libspectrum_free( border_changes );
   }
   border_changes = NULL;
   error = add_border_sentinel(); if( error ) return error;

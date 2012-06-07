@@ -87,7 +87,7 @@ void
 periph_register( periph_type type, const periph_t *periph )
 {
   if( !peripherals )
-    peripherals = g_hash_table_new_full( NULL, NULL, NULL, free );
+    peripherals = g_hash_table_new_full( NULL, NULL, NULL, libspectrum_free );
 
   periph_private_t *private = libspectrum_malloc( sizeof( *private ) );
 
@@ -169,7 +169,7 @@ static void
 free_peripheral( gpointer data, gpointer user_data GCC_UNUSED )
 {
   periph_port_private_t *private = data;
-  free( private );
+  libspectrum_free( private );
 }
 
 /* Make a peripheral as being never present on this machine */

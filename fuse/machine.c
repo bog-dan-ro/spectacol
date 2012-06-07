@@ -435,10 +435,10 @@ int machine_end( void )
 
   for( i=0; i<machine_count; i++ ) {
     if( machine_types[i]->shutdown ) machine_types[i]->shutdown();
-    free( machine_types[i] );
+    libspectrum_free( machine_types[i] );
   }
 
-  free( machine_types );
+  libspectrum_free( machine_types );
 
   return 0;
 }

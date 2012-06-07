@@ -218,10 +218,14 @@ int rzx_stop_recording( void )
   }
 
   error = utils_write_file( rzx_filename, buffer, length );
-  free( rzx_filename );
-  if( error ) { free( buffer ); libspectrum_rzx_free( rzx ); return error; }
+  libspectrum_free( rzx_filename );
+  if( error ) {
+    libspectrum_free( buffer );
+    libspectrum_rzx_free( rzx );
+    return error;
+  }
 
-  free( buffer );
+  libspectrum_free( buffer );
 
   libspec_error = libspectrum_rzx_free( rzx );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return libspec_error;

@@ -136,7 +136,7 @@ event_do_events( void )
     if( descriptor.fn ) descriptor.fn( ptr->tstates, ptr->type, ptr->user_data );
 
     if( event_free ) {
-      free( ptr );
+      libspectrum_free( ptr );
     } else {
       event_free = ptr;
     }
@@ -222,7 +222,7 @@ event_remove_type_user_data( int type, gpointer user_data )
 static void
 event_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
 {
-  free( data );
+  libspectrum_free( data );
 }
 
 /* Clear the event stack */
@@ -235,7 +235,7 @@ event_reset( void )
 
   event_next_event = event_no_events;
 
-  free( event_free );
+  libspectrum_free( event_free );
   event_free = NULL;
 }
 
@@ -263,7 +263,7 @@ registered_events_free( void )
 
   for( i = 0; i < registered_events->len; i++ ) {
     descriptor = g_array_index( registered_events, event_descriptor_t, i );
-    free( descriptor.description );
+    libspectrum_free( descriptor.description );
   }
 
   g_array_free( registered_events, TRUE );

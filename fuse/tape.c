@@ -299,12 +299,12 @@ int tape_write( const char* filename )
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   error = utils_write_file( filename, buffer, length );
-  if( error ) { free( buffer ); return error; }
+  if( error ) { libspectrum_free( buffer ); return error; }
 
   tape_modified = 0;
   ui_tape_browser_update( UI_TAPE_BROWSER_MODIFIED, NULL );
 
-  free( buffer );
+  libspectrum_free( buffer );
 
   return 0;
 

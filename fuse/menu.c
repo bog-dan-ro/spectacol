@@ -67,7 +67,7 @@ MENU_CALLBACK( menu_file_open )
 
   utils_open_file( filename, tape_can_autoload(), NULL );
 
-  free( filename );
+  libspectrum_free( filename );
 
   display_refresh_all();
 
@@ -140,7 +140,7 @@ MENU_CALLBACK( menu_file_recording_play )
 
   rzx_start_playback( recording, 1 );
 
-  free( recording );
+  libspectrum_free( recording );
 
   display_refresh_all();
 
@@ -180,7 +180,7 @@ MENU_CALLBACK( menu_file_openscrscreenshot )
 
   screenshot_scr_read( filename );
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -275,7 +275,7 @@ MENU_CALLBACK( menu_machine_profiler_stop )
 
   profile_finish( filename );
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -297,7 +297,7 @@ MENU_CALLBACK( menu_media_tape_open )
 
   tape_open( filename, 0 );
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -352,7 +352,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 )
 
     if1_plug( filename, action );
 
-    free( filename );
+    libspectrum_free( filename );
   }
   fuse_emulation_unpause();
 
@@ -448,7 +448,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
     break;
   }
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -594,7 +594,7 @@ MENU_CALLBACK( menu_media_cartridge_timexdock_insert )
 
   dck_insert( filename );
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -616,7 +616,7 @@ MENU_CALLBACK( menu_media_cartridge_interfaceii_insert )
 
   if2_insert( filename );
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -646,7 +646,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_insert )
   case 7: divide_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
   }
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -727,7 +727,7 @@ MENU_CALLBACK( menu_file_savesnapshot )
 
   snapshot_write( filename );
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -745,7 +745,7 @@ MENU_CALLBACK( menu_file_savescreenasscr )
 
   screenshot_scr_write( filename );
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -773,7 +773,7 @@ MENU_CALLBACK( menu_file_savescreenaspng )
 
   screenshot_write( filename, scaler );
 
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -791,7 +791,7 @@ MENU_CALLBACK( menu_file_movie_record )
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   movie_start( filename );
-  free( filename );
+  libspectrum_free( filename );
 
   fuse_emulation_unpause();
 }
@@ -810,7 +810,7 @@ MENU_CALLBACK( menu_file_movie_record_recordfromrzx )
   if( !rzx_file ) { fuse_emulation_unpause(); return; }
 
   rzx_start_playback( rzx_file, 1 );
-  free( rzx_file );
+  libspectrum_free( rzx_file );
   display_refresh_all();
 
   if( rzx_playback ) {
@@ -822,7 +822,7 @@ MENU_CALLBACK( menu_file_movie_record_recordfromrzx )
     }
 
     movie_start( fmf_file );
-    free( fmf_file );
+    libspectrum_free( fmf_file );
     ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
   }
 
@@ -842,7 +842,7 @@ MENU_CALLBACK( menu_file_recording_record )
 
   rzx_start_recording( recording, 1 );
 
-  free( recording );
+  libspectrum_free( recording );
 
   fuse_emulation_unpause();
 }
@@ -859,15 +859,22 @@ MENU_CALLBACK( menu_file_recording_recordfromsnapshot )
   if( !snap ) { fuse_emulation_unpause(); return; }
 
   recording = ui_get_save_filename( "Fuse - Start Recording" );
-  if( !recording ) { free( snap ); fuse_emulation_unpause(); return; }
+  if( !recording ) {
+    libspectrum_free( snap );
+    fuse_emulation_unpause();
+    return;
+  }
 
   if( snapshot_read( snap ) ) {
-    free( snap ); free( recording ); fuse_emulation_unpause(); return;
+    libspectrum_free( snap );
+    libspectrum_free( recording );
+    fuse_emulation_unpause();
+    return;
   }
 
   rzx_start_recording( recording, settings_current.embed_snapshot );
 
-  free( recording );
+  libspectrum_free( recording );
 
   display_refresh_all();
 
@@ -887,7 +894,7 @@ MENU_CALLBACK( menu_file_aylogging_record )
 
   psg_start_recording( psgfile );
 
-  free( psgfile );
+  libspectrum_free( psgfile );
 
   display_refresh_all();
 

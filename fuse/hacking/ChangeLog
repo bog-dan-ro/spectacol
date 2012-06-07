@@ -4164,3 +4164,7 @@
 20120607 event.c,fuse.c,memory.c,mempool.c,periph.c,slt.c,tape.c,utils.c:
          switch to using libspectrum_malloc over raw malloc (Fred).
 20120607 settings.pl: switch to using libspectrum_malloc over raw malloc (Fred).
+20120607 display.c,event.c,fuse.c,machine.c,memory.c,mempool.c,menu.c,periph.c,
+         rzx.c,settings.pl,snapshot.c,sound.c,tape.c,ui.c,utils.c:
+         switch to using libspectrum_free over free to match our allocations
+         (Fred).

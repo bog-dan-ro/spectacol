@@ -93,7 +93,8 @@ mempool_free( int pool )
 
   GArray *p = g_array_index( memory_pools, GArray*, pool );
 
-  for( i = 0; i < p->len; i++ ) free( g_array_index( p, void*, i ) );
+  for( i = 0; i < p->len; i++ )
+    libspectrum_free( g_array_index( p, void*, i ) );
 
   g_array_set_size( p, 0 );
 }

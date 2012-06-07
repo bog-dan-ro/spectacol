@@ -233,7 +233,7 @@ utils_open_snap( void )
   if( !filename ) return -1;
 
   error = snapshot_read( filename );
-  free( filename );
+  libspectrum_free( filename );
   return error;
 }
 
@@ -410,7 +410,7 @@ utils_read_fd( compat_fd fd, const char *filename, utils_file *file )
   file->buffer = libspectrum_malloc( file->length );
 
   if( compat_file_read( fd, file ) ) {
-    free( file->buffer );
+    libspectrum_free( file->buffer );
     compat_file_close( fd );
     return 1;
   }
@@ -418,7 +418,7 @@ utils_read_fd( compat_fd fd, const char *filename, utils_file *file )
   if( compat_file_close( fd ) ) {
     ui_error( UI_ERROR_ERROR, "Couldn't close '%s': %s", filename,
 	      strerror( errno ) );
-    free( file->buffer );
+    libspectrum_free( file->buffer );
     return 1;
   }
 
@@ -428,7 +428,7 @@ utils_read_fd( compat_fd fd, const char *filename, utils_file *file )
 void
 utils_close_file( utils_file *file )
 {
-  free( file->buffer );
+  libspectrum_free( file->buffer );
 }
 
 int utils_write_file( const char *filename, const unsigned char *buffer,

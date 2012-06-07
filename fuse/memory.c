@@ -137,8 +137,8 @@ static void
 memory_pool_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
 {
   memory_pool_entry_t *entry = data;
-  free( entry->memory );
-  free( entry );
+  libspectrum_free( entry->memory );
+  libspectrum_free( entry );
 }
 
 /* Tidy-up function called at end of emulation */
@@ -159,7 +159,7 @@ memory_end( void )
   if( memory_sources ) {
     for( i = 0; i < memory_sources->len; i++ ) {
       description = g_array_index( memory_sources, char *, i );
-      free( description );
+      libspectrum_free( description );
     }
 
     g_array_free( memory_sources, TRUE );
@@ -240,9 +240,9 @@ memory_pool_free( void )
   while( ( ptr = g_slist_find_custom( pool, NULL, find_non_persistent ) ) != NULL )
   {
     memory_pool_entry_t *entry = ptr->data;
-    free( entry->memory );
+    libspectrum_free( entry->memory );
     pool = g_slist_remove( pool, entry );
-    free( entry );
+    libspectrum_free( entry );
   }
 }
 

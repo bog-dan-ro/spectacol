@@ -149,12 +149,12 @@ int snapshot_write( const char *filename )
   }
 
   error = libspectrum_snap_free( snap );
-  if( error ) { free( buffer ); return 1; }
+  if( error ) { libspectrum_free( buffer ); return 1; }
 
   error = utils_write_file( filename, buffer, length );
-  if( error ) { free( buffer ); return error; }
+  if( error ) { libspectrum_free( buffer ); return error; }
 
-  free( buffer );
+  libspectrum_free( buffer );
 
   return 0;
 

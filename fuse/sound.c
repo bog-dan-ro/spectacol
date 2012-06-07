@@ -340,7 +340,7 @@ sound_end( void )
 
     if( settings_current.sound ) 
       sound_lowlevel_end();
-    free( samples );
+    libspectrum_free( samples );
     sound_enabled = 0;
   }
 }

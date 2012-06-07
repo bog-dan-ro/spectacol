@@ -243,7 +243,7 @@ CODE
     if( !strcmp( (const char*)node->name, "$options{$name}->{configfile}" ) ) {
       xmlstring = xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
       if( xmlstring ) {
-        free( settings->$name );
+        libspectrum_free( settings->$name );
         settings->$name = utils_safe_strdup( (char*)xmlstring );
         xmlFree( xmlstring );
       }
@@ -453,7 +453,7 @@ parse_ini( utils_file *file, settings_info *settings )
 	n = (char *)cpos - value;
 	if( n > 0 ) {
 	  if( *val_char != NULL ) {
-	    free( *val_char );
+	    libspectrum_free( *val_char );
 	    *val_char = NULL;
 	  }
 	  *val_char = libspectrum_malloc( n + 1 );
@@ -781,7 +781,7 @@ settings_set_string( char **string_setting, const char *value )
      same pointer */
   if( *string_setting == value ) return;
 
-  if( *string_setting ) free( *string_setting );
+  if( *string_setting ) libspectrum_free( *string_setting );
   *string_setting = utils_safe_strdup( value );
 }
 
@@ -792,7 +792,7 @@ CODE
 
 foreach my $name ( sort keys %options ) {
     if( $options{$name}->{type} eq 'string' ) {
-	print "  if( settings->$name ) free( settings->$name );\n";
+	print "  if( settings->$name ) libspectrum_free( settings->$name );\n";
     }
 }
 
