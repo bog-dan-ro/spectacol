@@ -456,11 +456,7 @@ parse_ini( utils_file *file, settings_info *settings )
 	    free( *val_char );
 	    *val_char = NULL;
 	  }
-	  *val_char = malloc( n + 1 );
-	  if( ! *val_char ) {
-	    ui_error( UI_ERROR_WARNING, "Out of memory!" );
-	    return 1;
-	  }
+	  *val_char = libspectrum_malloc( n + 1 );
 	  (*val_char)[n] = '\\0';
 	  memcpy( *val_char, value, n );
 	}

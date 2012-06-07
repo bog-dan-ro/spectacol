@@ -4163,3 +4163,4 @@
 20120607 sound.c: switch to using libspectrum_calloc over raw calloc (Fred).
 20120607 event.c,fuse.c,memory.c,mempool.c,periph.c,slt.c,tape.c,utils.c:
          switch to using libspectrum_malloc over raw malloc (Fred).
+20120607 settings.pl: switch to using libspectrum_malloc over raw malloc (Fred).
