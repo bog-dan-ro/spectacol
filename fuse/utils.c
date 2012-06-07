@@ -407,11 +407,7 @@ utils_read_fd( compat_fd fd, const char *filename, utils_file *file )
   file->length = compat_file_get_length( fd );
   if( file->length == -1 ) return 1;
 
-  file->buffer = malloc( file->length );
-  if( !file->buffer ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
+  file->buffer = libspectrum_malloc( file->length );
 
   if( compat_file_read( fd, file ) ) {
     free( file->buffer );

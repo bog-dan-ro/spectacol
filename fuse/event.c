@@ -98,11 +98,7 @@ event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
     ptr = event_free;
     event_free = NULL;
   } else {
-    ptr = malloc( sizeof( *ptr ) );
-    if( !ptr ) {
-      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-      fuse_abort();
-    }
+    ptr = libspectrum_malloc( sizeof( *ptr ) );
   }
 
   ptr->tstates = event_time;

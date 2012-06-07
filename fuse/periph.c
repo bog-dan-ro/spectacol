@@ -74,11 +74,7 @@ port_register( periph_type type, const periph_port_t *port )
 {
   periph_port_private_t *private;
 
-  private = malloc( sizeof( *private ) );
-  if( !private ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    fuse_abort();
-  }
+  private = libspectrum_malloc( sizeof( *private ) );
 
   private->type = type;
   private->port = *port;
@@ -93,11 +89,7 @@ periph_register( periph_type type, const periph_t *periph )
   if( !peripherals )
     peripherals = g_hash_table_new_full( NULL, NULL, NULL, free );
 
-  periph_private_t *private = malloc( sizeof( *private ) );
-  if( !private ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    fuse_abort();
-  }
+  periph_private_t *private = libspectrum_malloc( sizeof( *private ) );
 
   private->present = PERIPH_PRESENT_NEVER;
   private->active = 0;

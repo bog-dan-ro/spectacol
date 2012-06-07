@@ -212,17 +212,9 @@ memory_pool_allocate_persistent( size_t length, int persistent )
   memory_pool_entry_t *entry;
   libspectrum_byte *memory;
 
-  memory = malloc( length * sizeof( *memory ) );
-  if( !memory ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    fuse_abort();
-  }
+  memory = libspectrum_malloc( length * sizeof( *memory ) );
 
-  entry = malloc( sizeof( *entry ) );
-  if( !entry ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    fuse_abort();
-  }
+  entry = libspectrum_malloc( sizeof( *entry ) );
 
   entry->persistent = persistent;
   entry->memory = memory;
@@ -569,12 +561,7 @@ memory_rom_to_snapshot( libspectrum_snap *snap )
 
         /* Start a new ROM image */
         rom_length = MEMORY_PAGE_SIZE;
-        current_rom = malloc( rom_length );
-        if( !current_rom ) {
-          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-                    __LINE__ );
-          return;
-        }
+        current_rom = libspectrum_malloc( rom_length );
 
         memcpy( current_rom, memory_map_rom[ i ].page, MEMORY_PAGE_SIZE );
         current_page_num = memory_map_rom[ i ].page_num;
@@ -610,12 +597,7 @@ memory_to_snapshot( libspectrum_snap *snap )
   for( i = 0; i < 16; i++ ) {
     if( RAM[i] != NULL ) {
 
-      buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
-      if( !buffer ) {
-	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-		  __LINE__ );
-	return;
-      }
+      buffer = libspectrum_malloc( 0x4000 * sizeof( libspectrum_byte ) );
 
       memcpy( buffer, RAM[i], 0x4000 );
       libspectrum_snap_set_pages( snap, i, buffer );

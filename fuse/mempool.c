@@ -61,11 +61,11 @@ mempool_alloc( int pool, size_t size )
 {
   void *ptr;
 
-  if( pool == MEMPOOL_UNTRACKED ) return malloc( size );
+  if( pool == MEMPOOL_UNTRACKED ) return libspectrum_malloc( size );
 
   if( pool < 0 || pool >= memory_pools->len ) return NULL;
 
-  ptr = malloc( size );
+  ptr = libspectrum_malloc( size );
   if( !ptr ) return NULL;
 
   g_array_append_val( g_array_index( memory_pools, GArray*, pool ), ptr );
