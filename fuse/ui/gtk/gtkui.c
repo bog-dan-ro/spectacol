@@ -426,7 +426,7 @@ menu_get_scaler( scaler_available_fn selector )
     dialog.buttons[ count ] =
       gtk_radio_button_new_with_label( button_group, scaler_name( scaler ) );
     button_group =
-      gtk_radio_button_group( GTK_RADIO_BUTTON( dialog.buttons[ count ] ) );
+      gtk_radio_button_get_group( GTK_RADIO_BUTTON( dialog.buttons[ count ] ) );
 
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.buttons[ count ] ),
 				  current_scaler == scaler );
@@ -558,7 +558,7 @@ menu_machine_select( GtkAction *gtk_action GCC_UNUSED,
   for( i=1; i<machine_count; i++ ) {
     dialog.buttons[i] =
       gtk_radio_button_new_with_label(
-        gtk_radio_button_group (GTK_RADIO_BUTTON (dialog.buttons[i-1] ) ),
+        gtk_radio_button_get_group( GTK_RADIO_BUTTON( dialog.buttons[i-1] ) ),
 	libspectrum_machine_name( machine_types[i]->machine )
       );
   }

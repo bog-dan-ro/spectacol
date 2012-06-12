@@ -4168,3 +4168,5 @@
          rzx.c,settings.pl,snapshot.c,sound.c,tape.c,ui.c,utils.c:
          switch to using libspectrum_free over free to match our allocations
          (Fred).
+20120612 ui/gtk/gtkui.c: replace deprecated gtk_radio_button_group() with
+         gtk_radio_button_get_group() (patch #3534178) (Sergio).
