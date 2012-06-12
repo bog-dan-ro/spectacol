@@ -102,35 +102,46 @@ static const GtkTargetEntry drag_types[] =
     { "text/uri-list", GTK_TARGET_OTHER_APP, 0 }
 };
 
-static void gtkui_drag_data_received( GtkWidget *widget,
+static void gtkui_drag_data_received( GtkWidget *widget GCC_UNUSED,
                                       GdkDragContext *drag_context,
-                                      gint x, gint y,
+                                      gint x GCC_UNUSED, gint y GCC_UNUSED,
                                       GtkSelectionData *data,
-                                      guint info, guint time )
+                                      guint info GCC_UNUSED, guint timestamp )
 {
   static char uri_prefix[] = "file://";
-  char *filename, *p, *data_end;
+  char *filename, *selection_filename;
+  const guchar *selection_data, *data_begin, *data_end, *p;
+  gint selection_length;
 
-  if ( data && data->length > sizeof( uri_prefix ) ) {
-    filename = ( char * )( data->data + sizeof( uri_prefix ) - 1 );
-    data_end = ( char * )( data->data + data->length );
-    p = filename; 
+  selection_length = gtk_selection_data_get_length( data );
+
+  if ( data && selection_length > (gint) sizeof( uri_prefix ) ) {
+    selection_data = gtk_selection_data_get_data( data );
+    data_begin = selection_data + sizeof( uri_prefix ) - 1;
+    data_end = selection_data + selection_length;
+    p = data_begin; 
     do {
       if ( *p == '\r' || *p == '\n' ) {
-        *p = '\0';
-	break;
+        data_end = p;
+        break;
       }
     } while ( p++ != data_end );
 
-    if ( ( filename = g_uri_unescape_string( filename, NULL ) ) != NULL ) {
+    selection_filename = g_strndup( (const gchar *)data_begin,
+                                    data_end - data_begin );
+
+    filename = g_uri_unescape_string( selection_filename, NULL );
+    if ( filename ) {
       fuse_emulation_pause();
       utils_open_file( filename, settings_current.auto_load, NULL );
       free( filename );
       display_refresh_all();
       fuse_emulation_unpause();
     }
+
+    g_free( selection_filename );
   }
-  gtk_drag_finish(drag_context, FALSE, FALSE, time);
+  gtk_drag_finish( drag_context, FALSE, FALSE, timestamp );
 }
 
 int
@@ -780,10 +791,15 @@ key_press( GtkTreeView *list, GdkEventKey *event, gpointer user_data )
   GtkAdjustment *adjustment = user_data;
   GtkTreePath *path;
   GtkTreeViewColumn *focus_column;
-  long int oldbase = adjustment->value;
-  long int base = oldbase;
+  gdouble base, oldbase, base_limit;
+  gdouble page_size, step_increment;
   int cursor_row = 0;
-  int num_rows = ( adjustment->page_size + 1 ) / adjustment->step_increment;
+  int num_rows;
+
+  base = oldbase = gtk_adjustment_get_value( adjustment );
+  page_size = gtk_adjustment_get_page_size( adjustment );
+  step_increment = gtk_adjustment_get_step_increment( adjustment );
+  num_rows = ( page_size + 1 ) / step_increment;
 
   /* Get selected row */
   gtk_tree_view_get_cursor( list, &path, &focus_column );
@@ -797,30 +813,30 @@ key_press( GtkTreeView *list, GdkEventKey *event, gpointer user_data )
   {
   case GDK_KEY_Up:
     if( cursor_row == 0 )
-      base -= adjustment->step_increment;
+      base -= step_increment;
     break;
 
   case GDK_KEY_Down:
     if( cursor_row == num_rows - 1 )
-      base += adjustment->step_increment;
+      base += step_increment;
     break;
 
   case GDK_KEY_Page_Up:
-    base -= adjustment->page_increment;
+    base -= gtk_adjustment_get_page_increment( adjustment );
     break;
 
   case GDK_KEY_Page_Down:
-    base += adjustment->page_increment;
+    base += gtk_adjustment_get_page_increment( adjustment );
     break;
 
   case GDK_KEY_Home:
     cursor_row = 0;
-    base = adjustment->lower;
+    base = gtk_adjustment_get_lower( adjustment );
     break;
 
   case GDK_KEY_End:
     cursor_row = num_rows - 1;
-    base = adjustment->upper - adjustment->page_size;
+    base = gtk_adjustment_get_upper( adjustment ) - page_size;
     break;
 
   default:
@@ -829,8 +845,9 @@ key_press( GtkTreeView *list, GdkEventKey *event, gpointer user_data )
 
   if( base < 0 ) {
     base = 0;
-  } else if( base > adjustment->upper - adjustment->page_size ) {
-    base = adjustment->upper - adjustment->page_size;
+  } else {
+    base_limit = gtk_adjustment_get_upper( adjustment ) - page_size;
+    if( base > base_limit ) base = base_limit;
   }
 
   if( base != oldbase ) {
@@ -851,16 +868,17 @@ wheel_scroll_event( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
                     gpointer user_data )
 {
   GtkAdjustment *adjustment = user_data;
-  long int oldbase = adjustment->value;
-  long int base = oldbase;
+  gdouble base, oldbase, base_limit;
+
+  base = oldbase = gtk_adjustment_get_value( adjustment );
 
   switch( event->scroll.direction )
   {
   case GDK_SCROLL_UP:
-    base -= adjustment->page_increment / 2;
+    base -= gtk_adjustment_get_page_increment( adjustment ) / 2;
     break;
   case GDK_SCROLL_DOWN:
-    base += adjustment->page_increment / 2;
+    base += gtk_adjustment_get_page_increment( adjustment ) / 2;
     break;
   default:
     return FALSE;
@@ -868,8 +886,10 @@ wheel_scroll_event( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
 
   if( base < 0 ) {
     base = 0;
-  } else if( base > adjustment->upper - adjustment->page_size ) {
-    base = adjustment->upper - adjustment->page_size;
+  } else {
+    base_limit = gtk_adjustment_get_upper( adjustment ) - 
+                 gtk_adjustment_get_page_size( adjustment );
+    if( base > base_limit ) base = base_limit;
   }
 
   if( base != oldbase ) gtk_adjustment_set_value( adjustment, base );

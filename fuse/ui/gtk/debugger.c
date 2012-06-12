@@ -257,7 +257,7 @@ hide_hidden_panes( void )
 
     checkitem = get_pane_menu_item( i ); if( !checkitem ) return 1;
 
-    if( checkitem->active ) continue;
+    if( gtk_check_menu_item_get_active( checkitem ) ) continue;
 
     pane = get_pane( i ); if( !pane ) return 1;
 
@@ -1059,7 +1059,8 @@ deactivate_debugger( void )
 int
 ui_debugger_disassemble( libspectrum_word address )
 {
-  disassembly_scrollbar_adjustment->value = disassembly_top = address;
+  disassembly_top = address;
+  gtk_adjustment_set_value( disassembly_scrollbar_adjustment, address );
   return 0;
 }
 
@@ -1067,8 +1068,10 @@ ui_debugger_disassemble( libspectrum_word address )
 static void
 move_disassembly( GtkAdjustment *adjustment, gpointer user_data GCC_UNUSED )
 {
-  float value = adjustment->value;
+  gdouble value;
   size_t length;
+
+  value = gtk_adjustment_get_value( adjustment );
 
   /* disassembly_top < value < disassembly_top + 1 => 'down' button pressed
      Move the disassembly on by one instruction */

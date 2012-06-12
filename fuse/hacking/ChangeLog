@@ -4170,3 +4170,5 @@
          (Fred).
 20120612 ui/gtk/gtkui.c: replace deprecated gtk_radio_button_group() with
          gtk_radio_button_get_group() (patch #3534178) (Sergio).
+20120612 ui/gtk/{debugger.c,gtkui.c,memory.c}: replace direct access to struct
+         members with accessor functions (patch #3534179) (Sergio).

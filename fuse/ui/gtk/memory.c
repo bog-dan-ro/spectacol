@@ -94,7 +94,8 @@ scroller( GtkAdjustment *adjustment, gpointer user_data )
   GtkTreeModel *model = user_data;
 
   /* Drop the low bits before displaying anything */
-  base = adjustment->value; base &= 0xfff0;
+  base = gtk_adjustment_get_value( adjustment );
+  base &= 0xfff0;
 
   update_display( model, base );
 }
