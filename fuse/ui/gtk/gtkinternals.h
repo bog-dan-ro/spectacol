@@ -150,17 +150,17 @@ extern guint gtkui_menu_data_size;
 /*
  * The icon pixmaps (pixmaps.c)
  */
-extern char *gtkpixmap_tape_inactive[];
-extern char *gtkpixmap_tape_active[];
-extern char *gtkpixmap_mdr_inactive[];
-extern char *gtkpixmap_mdr_active[];
-extern char *gtkpixmap_disk_inactive[];
-extern char *gtkpixmap_disk_active[];
-extern char *gtkpixmap_pause_inactive[];
-extern char *gtkpixmap_pause_active[];
+extern const char *gtkpixmap_tape_inactive[];
+extern const char *gtkpixmap_tape_active[];
+extern const char *gtkpixmap_mdr_inactive[];
+extern const char *gtkpixmap_mdr_active[];
+extern const char *gtkpixmap_disk_inactive[];
+extern const char *gtkpixmap_disk_active[];
+extern const char *gtkpixmap_pause_inactive[];
+extern const char *gtkpixmap_pause_active[];
 extern const char *gtkpixmap_tape_marker[];
-extern char *gtkpixmap_mouse_inactive[];
-extern char *gtkpixmap_mouse_active[];
+extern const char *gtkpixmap_mouse_inactive[];
+extern const char *gtkpixmap_mouse_active[];
 
 /*
  * Statusbar routines (statusbar.c)

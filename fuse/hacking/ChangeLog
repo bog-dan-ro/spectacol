@@ -4176,3 +4176,6 @@
          gtk_combo_box_new_text and gtk_combo_box_append_text symbols with
          gtk_combo_box_text_new and gtk_combo_box_text_append_text respectively
          (patch #3534182) (Sergio).
+20120618 ui/gtk/{gtkinternals.h,pixmaps.c,statusbar.c}: replace pixmaps in the
+         statusbar with pixbufs for GTK+ 3 compatibility (patch #3535005)
+         (Sergio).

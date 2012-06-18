@@ -27,7 +27,7 @@
 
 #include "gtkinternals.h"
 
-char *gtkpixmap_tape_inactive[] = {
+const char *gtkpixmap_tape_inactive[] = {
 "27 17 13 1",
 " 	c None",
 ".	c #D5D5D5",
@@ -60,7 +60,7 @@ char *gtkpixmap_tape_inactive[] = {
 ".+..>.................>..+.",
 "....>.................>...."};
 
-char *gtkpixmap_tape_active[] = {
+const char *gtkpixmap_tape_active[] = {
 "27 17 13 1",
 " 	c None",
 ".	c #00D500",
@@ -93,7 +93,7 @@ char *gtkpixmap_tape_active[] = {
 ".+..>.................>..+.",
 "....>.................>...."};
 
-char *gtkpixmap_mdr_inactive[] = {
+const char *gtkpixmap_mdr_inactive[] = {
 "15 20 6 1",
 " 	c None",
 ".	c #000000",
@@ -122,7 +122,7 @@ char *gtkpixmap_mdr_inactive[] = {
 "+++++++++++++++",
 "+++++++++++++++"};
 
-char *gtkpixmap_mdr_active[] = {
+const char *gtkpixmap_mdr_active[] = {
 "15 20 6 1",
 " 	c None",
 ".	c #000000",
@@ -151,7 +151,7 @@ char *gtkpixmap_mdr_active[] = {
 "+++++++++++++++",
 "+++++++++++++++"};
 
-char *gtkpixmap_disk_inactive[] = {
+const char *gtkpixmap_disk_inactive[] = {
 "15 20 7 1",
 " 	c None",
 ".	c #A5A5A5",
@@ -181,7 +181,7 @@ char *gtkpixmap_disk_inactive[] = {
 "++@@@@@@@#@@#..",
 "..##@#@@@@#@#.+"};
 
-char *gtkpixmap_disk_active[] = {
+const char *gtkpixmap_disk_active[] = {
 "15 20 7 1",
 " 	c None",
 ".	c #00A500",
@@ -211,7 +211,7 @@ char *gtkpixmap_disk_active[] = {
 "++@@@@@@@#@@#..",
 "..##@#@@@@#@#.+"};
 
-char *gtkpixmap_pause_inactive[] = {
+const char *gtkpixmap_pause_inactive[] = {
 "30 21 7 1",
 " 	c None",
 ".	c #6C6C6C",
@@ -242,7 +242,7 @@ char *gtkpixmap_pause_inactive[] = {
 "                   #$$$$+     ",
 "                     %$@      "};
 
-char *gtkpixmap_pause_active[] = {
+const char *gtkpixmap_pause_active[] = {
 "30 21 7 1",
 " 	c None",
 ".	c #D80000",
@@ -294,7 +294,7 @@ const char *gtkpixmap_tape_marker[] = {
 "..      ",
 ".       "};
 
-char *gtkpixmap_mouse_inactive[] = {
+const char *gtkpixmap_mouse_inactive[] = {
 "14 21 4 1",
 "     c None",
 "#    c #6C6C6C",
@@ -322,7 +322,7 @@ char *gtkpixmap_mouse_inactive[] = {
 " +##########+ ",
 "  ++######++  "};
 
-char *gtkpixmap_mouse_active[] = {
+const char *gtkpixmap_mouse_active[] = {
 "14 21 4 1",
 "     c None",
 "#    c #0000D0",

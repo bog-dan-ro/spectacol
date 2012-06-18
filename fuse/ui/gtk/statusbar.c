@@ -34,14 +34,12 @@
 
 static GtkWidget *status_bar;
 
-static GdkPixmap
-  *pixmap_tape_inactive, *pixmap_tape_active,
-  *pixmap_mdr_inactive, *pixmap_mdr_active,
-  *pixmap_disk_inactive, *pixmap_disk_active,
-  *pixmap_pause_inactive, *pixmap_pause_active,
-  *pixmap_mouse_inactive, *pixmap_mouse_active;
-
-static GdkBitmap *pause_mask, *mouse_mask;
+static GdkPixbuf
+  *pixbuf_tape_inactive,  *pixbuf_tape_active,
+  *pixbuf_mdr_inactive,   *pixbuf_mdr_active,
+  *pixbuf_disk_inactive,  *pixbuf_disk_active,
+  *pixbuf_pause_inactive, *pixbuf_pause_active,
+  *pixbuf_mouse_inactive, *pixbuf_mouse_active;
 
 static GtkWidget
   *microdrive_status,	/* Is any microdrive motor running? */
@@ -60,42 +58,31 @@ gtkstatusbar_create( GtkBox *parent )
   status_bar = gtk_hbox_new( FALSE, 5 );
   gtk_box_pack_start( parent, status_bar, FALSE, FALSE, 3 );
 
-  pixmap_tape_inactive = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
-					   NULL, gtkpixmap_tape_inactive );
-  pixmap_tape_active = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
-					   NULL, gtkpixmap_tape_active );
+  /* FIXME: unref these pixbuf on statusbar destroy */
+  pixbuf_tape_inactive =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_tape_inactive );
+  pixbuf_tape_active =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_tape_active );
 
-  pixmap_mdr_inactive = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
-					   NULL, gtkpixmap_mdr_inactive );
-  pixmap_mdr_active = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
-					   NULL, gtkpixmap_mdr_active );
+  pixbuf_mdr_inactive =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_mdr_inactive );
+  pixbuf_mdr_active =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_mdr_active );
 
-  pixmap_disk_inactive = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
-					   NULL, gtkpixmap_disk_inactive );
-  pixmap_disk_active = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
-					   NULL, gtkpixmap_disk_active );
+  pixbuf_disk_inactive =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_disk_inactive );
+  pixbuf_disk_active =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_disk_active );
 
-  pixmap_pause_inactive = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(),
-					   &pause_mask, NULL,
-					   gtkpixmap_pause_inactive );
-  pixmap_pause_active = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
-					   NULL, gtkpixmap_pause_active );
+  pixbuf_pause_inactive =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_pause_inactive );
+  pixbuf_pause_active =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_pause_active );
 
-  pixmap_mouse_inactive = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(),
-					   &mouse_mask, NULL,
-					   gtkpixmap_mouse_inactive );
-  pixmap_mouse_active = 
-    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
-					   NULL, gtkpixmap_mouse_active );
+  pixbuf_mouse_inactive =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_mouse_inactive );
+  pixbuf_mouse_active =
+    gdk_pixbuf_new_from_xpm_data( gtkpixmap_mouse_active );
 
   speed_status = gtk_label_new( "100%" );
   gtk_label_set_width_chars( GTK_LABEL( speed_status ), 8 );
@@ -104,20 +91,20 @@ gtkstatusbar_create( GtkBox *parent )
   separator = gtk_vseparator_new();
   gtk_box_pack_end( GTK_BOX( status_bar ), separator, FALSE, FALSE, 0 );
 
-  tape_status = gtk_pixmap_new( pixmap_tape_inactive, NULL );
+  tape_status = gtk_image_new_from_pixbuf( pixbuf_tape_inactive );
   gtk_box_pack_end( GTK_BOX( status_bar ), tape_status, FALSE, FALSE, 0 );
 
-  microdrive_status = gtk_pixmap_new( pixmap_mdr_inactive, NULL );
+  microdrive_status = gtk_image_new_from_pixbuf( pixbuf_mdr_inactive );
   gtk_box_pack_end( GTK_BOX( status_bar ), microdrive_status, FALSE, FALSE,
 		    0 );
 
-  disk_status = gtk_pixmap_new( pixmap_disk_inactive, NULL );
+  disk_status = gtk_image_new_from_pixbuf( pixbuf_disk_inactive );
   gtk_box_pack_end( GTK_BOX( status_bar ), disk_status, FALSE, FALSE, 0 );
 
-  pause_status = gtk_pixmap_new( pixmap_pause_inactive, pause_mask );
+  pause_status = gtk_image_new_from_pixbuf( pixbuf_pause_inactive );
   gtk_box_pack_end( GTK_BOX( status_bar ), pause_status, FALSE, FALSE, 0 );
 
-  mouse_status = gtk_pixmap_new( pixmap_mouse_inactive, mouse_mask );
+  mouse_status = gtk_image_new_from_pixbuf( pixbuf_mouse_inactive );
   gtk_box_pack_end( GTK_BOX( status_bar ), mouse_status, FALSE, FALSE, 0 );
 
   separator = gtk_vseparator_new();
@@ -150,7 +137,7 @@ gtkstatusbar_update_machine( const char *name )
 int
 ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 {
-  GdkPixmap *which;
+  GdkPixbuf *which;
 
   switch( item ) {
 
@@ -160,25 +147,26 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
       gtk_widget_hide( disk_status ); break;
     case UI_STATUSBAR_STATE_ACTIVE:
       gtk_widget_show( disk_status );
-      gtk_pixmap_set( GTK_PIXMAP( disk_status ), pixmap_disk_active, NULL );
+      gtk_image_set_from_pixbuf( GTK_IMAGE( disk_status ), pixbuf_disk_active );
       break;
     default:
       gtk_widget_show( disk_status );
-      gtk_pixmap_set( GTK_PIXMAP( disk_status ), pixmap_disk_inactive, NULL );
+      gtk_image_set_from_pixbuf( GTK_IMAGE( disk_status ),
+                                 pixbuf_disk_inactive );
       break;
     }      
     return 0;
 
   case UI_STATUSBAR_ITEM_MOUSE:
     which = ( state == UI_STATUSBAR_STATE_ACTIVE ?
-	      pixmap_mouse_active : pixmap_mouse_inactive );
-    gtk_pixmap_set( GTK_PIXMAP( mouse_status ), which, mouse_mask  );
+              pixbuf_mouse_active : pixbuf_mouse_inactive );
+    gtk_image_set_from_pixbuf( GTK_IMAGE( mouse_status ), which );
     return 0;
 
   case UI_STATUSBAR_ITEM_PAUSED:
     which = ( state == UI_STATUSBAR_STATE_ACTIVE ?
-	      pixmap_pause_active : pixmap_pause_inactive );
-    gtk_pixmap_set( GTK_PIXMAP( pause_status ), which, pause_mask  );
+              pixbuf_pause_active : pixbuf_pause_inactive );
+    gtk_image_set_from_pixbuf( GTK_IMAGE( pause_status ), which );
     return 0;
 
   case UI_STATUSBAR_ITEM_MICRODRIVE:
@@ -187,21 +175,22 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
       gtk_widget_hide( microdrive_status ); break;
     case UI_STATUSBAR_STATE_ACTIVE:
       gtk_widget_show( microdrive_status );
-      gtk_pixmap_set( GTK_PIXMAP( microdrive_status ), pixmap_mdr_active,
-		      NULL );
+      gtk_image_set_from_pixbuf( GTK_IMAGE( microdrive_status ),
+                                 pixbuf_mdr_active );
       break;
     default:
       gtk_widget_show( microdrive_status );
-      gtk_pixmap_set( GTK_PIXMAP( microdrive_status ), pixmap_mdr_inactive,
-		      NULL );
+      gtk_image_set_from_pixbuf( GTK_IMAGE( microdrive_status ),
+                                 pixbuf_mdr_inactive );
       break;
     }      
     return 0;
 
   case UI_STATUSBAR_ITEM_TAPE:
     which = ( state == UI_STATUSBAR_STATE_ACTIVE ?
-	      pixmap_tape_active : pixmap_tape_inactive );
-    gtk_pixmap_set( GTK_PIXMAP( tape_status ), which, NULL  );
+              pixbuf_tape_active : pixbuf_tape_inactive );
+    gtk_image_set_from_pixbuf( GTK_IMAGE( tape_status ), which );
+
     return 0;
 
   }
