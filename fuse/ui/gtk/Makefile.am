@@ -77,7 +77,8 @@ options.c: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options.pl 
 options_internals.h: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-header.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
 	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options-header.pl - > $@.tmp && mv $@.tmp $@
 
-noinst_HEADERS = gtkinternals.h \
+noinst_HEADERS = gtkcompat.h \
+		 gtkinternals.h \
 		 options_internals.h \
 		 options.pl \
 		 options-header.pl

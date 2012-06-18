@@ -4172,3 +4172,7 @@
          gtk_radio_button_get_group() (patch #3534178) (Sergio).
 20120612 ui/gtk/{debugger.c,gtkui.c,memory.c}: replace direct access to struct
          members with accessor functions (patch #3534179) (Sergio).
+20120618 ui/gtk/{Makefile.am,gtkcompat.h,options.pl}: replace deprecated
+         gtk_combo_box_new_text and gtk_combo_box_append_text symbols with
+         gtk_combo_box_text_new and gtk_combo_box_text_append_text respectively
+         (patch #3534182) (Sergio).

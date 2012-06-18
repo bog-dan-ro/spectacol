@@ -55,6 +55,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "compat.h"
 #include "display.h"
 #include "fuse.h"
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "options.h"
 #include "options_internals.h"
@@ -207,7 +208,7 @@ CODE
 		print << "CODE";
   {
     GtkWidget *hbox = gtk_hbox_new( FALSE, 0 );
-    GtkWidget *combo = gtk_combo_box_new_text();
+    GtkWidget *combo = gtk_combo_box_text_new();
     GtkWidget *text = gtk_label_new( "$text" );
     int i;
 
@@ -216,7 +217,7 @@ CODE
     gtk_box_pack_start( GTK_BOX( hbox ), text, TRUE, FALSE, 5 );
 
     for( i = 0; i < $_->{name}_$widget->{value}_combo_count; i++ ) {
-      gtk_combo_box_append_text( GTK_COMBO_BOX( combo ), $_->{name}_$widget->{value}_combo[i] );
+      gtk_combo_box_text_append_text( GTK_COMBO_BOX_TEXT( combo ), $_->{name}_$widget->{value}_combo[i] );
     }
     gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), $combo_default{$widget->{value}} );
     if( settings_current.$widget->{value} != NULL ) {
