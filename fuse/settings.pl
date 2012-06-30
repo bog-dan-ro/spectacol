@@ -194,12 +194,10 @@ read_config_file( settings_info *settings )
 
   if( parse_xml( doc, settings ) ) {
     xmlFreeDoc( doc );
-    xmlCleanupParser();
     return 1;
   }
 
   xmlFreeDoc( doc );
-  xmlCleanupParser();
 
   return 0;
 }
@@ -325,7 +323,6 @@ CODE
   xmlSaveFormatFile( path, doc, 1 );
 
   xmlFreeDoc( doc );
-  xmlCleanupParser();
 
   return 0;
 }
@@ -808,6 +805,10 @@ settings_end( void )
     settings_write_config( &settings_current );
 
   settings_free( &settings_current );
+
+#ifdef HAVE_LIB_XML2
+  xmlCleanupParser();
+#endif				/* #ifdef HAVE_LIB_XML2 */
 
   return 0;
 }

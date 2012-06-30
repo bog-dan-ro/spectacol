@@ -4179,3 +4179,5 @@
 20120618 ui/gtk/{gtkinternals.h,pixmaps.c,statusbar.c}: replace pixmaps in the
          statusbar with pixbufs for GTK+ 3 compatibility (patch #3535005)
          (Sergio).
+20120630 settings.pl: cleanup XML memory only once right before exiting (bug
+         #3537598) (Sergio).
