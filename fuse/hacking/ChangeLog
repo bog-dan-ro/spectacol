@@ -4186,3 +4186,7 @@
          gtkmouse.c,gtkui.c,memory.c,options.pl,picture.c,pokefinder.c,
          pokemem.c,roms.c,statusbar.c,stock.c}: add GTK+ 3 compatibility (patch
          #3534181) (Sergio).
+20120708 machines/{spec_se.c,tc2048.c,tc2068.c,ts2068.c},memory.[ch],
+         peripherals/{dck.c,scld.[ch]}: restore loading of DCK files, fix issue
+         loading DCK files with uninitialised RAM (patch #3525261 rkd77 and
+         Fred)

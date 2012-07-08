@@ -258,33 +258,41 @@ memory_ram_set_16k_contention( int page_num, int contended )
 
 /* Map 16K of memory */
 void
-memory_map_16k( libspectrum_word address, memory_page *source, int page_num )
+memory_map_16k( libspectrum_word address, memory_page source[], int page_num )
 {
   int i;
 
   for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
     int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
-    memory_map_read[ page ] = source[ page_num * MEMORY_PAGES_IN_16K + i ];
-    memory_map_write[ page ] = source[ page_num * MEMORY_PAGES_IN_16K + i ];
+    memory_map_read[ page ] = memory_map_write[ page ] =
+      source[ page_num * MEMORY_PAGES_IN_16K + i ];
   }
 }
 
 /* Map 8K of memory */
 void
-memory_map_8k( libspectrum_word address, memory_page *source, int page_num )
+memory_map_8k( libspectrum_word address, memory_page source[], int page_num )
 {
   int i;
 
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
     int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
-    memory_map_read[ page ] = source[ page_num * MEMORY_PAGES_IN_8K + i ];
-    memory_map_write[ page ] = source[ page_num * MEMORY_PAGES_IN_8K + i ];
+    memory_map_read[ page ] = memory_map_write[ page ] =
+      source[ page_num * MEMORY_PAGES_IN_8K + i ];
   }
+}
+
+/* Map one page of memory */
+void
+memory_map_page( memory_page *source[], int page_num )
+{
+  memory_map_read[ page_num ] = memory_map_write[ page_num ] =
+    *source[ page_num ];
 }
 
 /* Page in from /ROMCS */
 void
-memory_map_romcs( memory_page *source )
+memory_map_romcs( memory_page source[] )
 {
   int i;
 
@@ -294,7 +302,7 @@ memory_map_romcs( memory_page *source )
 
 /* Page in 8K from /ROMCS */
 void
-memory_map_romcs_8k( libspectrum_word address, memory_page *source )
+memory_map_romcs_8k( libspectrum_word address, memory_page source[] )
 {
   int i, start;
 
@@ -305,7 +313,7 @@ memory_map_romcs_8k( libspectrum_word address, memory_page *source )
 
 /* Page in 4K from /ROMCS */
 void
-memory_map_romcs_4k( libspectrum_word address, memory_page *source )
+memory_map_romcs_4k( libspectrum_word address, memory_page source[] )
 {
   int i, start;
 

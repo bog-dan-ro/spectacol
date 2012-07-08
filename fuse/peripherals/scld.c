@@ -47,6 +47,7 @@ scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 
 libspectrum_byte scld_last_hsr = 0; /* The last byte sent to Timex HSR port */
 
+memory_page * timex_home[MEMORY_PAGES_IN_64K];
 memory_page timex_exrom[MEMORY_PAGES_IN_64K];
 memory_page timex_dock[MEMORY_PAGES_IN_64K];
 
@@ -191,6 +192,16 @@ scld_memory_map( void )
       memory_map_8k( i * 0x2000, exrom_dock, i );
 }
 
+/* Initialise the memory map to point to the home bank */
+void
+scld_memory_map_home( void )
+{
+  int i;
+
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
+    memory_map_page( timex_home, i );
+}
+
 static void
 scld_dock_exrom_from_snapshot( memory_page *dest, int page_num, int writable,
                                void *source )
@@ -310,5 +321,20 @@ scld_to_snapshot( libspectrum_snap *snap )
 
     }
 
+  }
+}
+
+/* Map 16K of memory and record default mapping for dock */
+void
+scld_home_map_16k( libspectrum_word address, memory_page source[],
+                   int page_num )
+{
+  int i;
+
+  memory_map_16k( address, source, page_num );
+
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
+    int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
+    timex_home[ page ] = &source[ page_num * MEMORY_PAGES_IN_16K + i ];
   }
 }

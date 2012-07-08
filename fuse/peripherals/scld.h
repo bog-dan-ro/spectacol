@@ -117,6 +117,10 @@ extern scld scld_last_dec;           /* The last byte sent to Timex DEC port */
 
 extern libspectrum_byte scld_last_hsr; /* Last byte sent to Timex HSR port */
 
+/* Home map has pointers to the related entries in the RAM array so that the
+   dck loading code can locate the associated pages when extracting data from
+   its files */
+extern memory_page * timex_home[MEMORY_PAGES_IN_64K];
 extern memory_page timex_exrom[MEMORY_PAGES_IN_64K];
 extern memory_page timex_dock[MEMORY_PAGES_IN_64K];
 
@@ -126,8 +130,13 @@ void scld_dec_write( libspectrum_word port, libspectrum_byte b );
 void scld_hsr_write( libspectrum_word port, libspectrum_byte b );
 
 void scld_memory_map( void );
+/* Initialise the memory map to point to the home bank */
+void scld_memory_map_home( void );
 
 libspectrum_byte hires_get_attr( void );
 libspectrum_byte hires_convert_dec( libspectrum_byte attr );
+
+void scld_home_map_16k( libspectrum_word address, memory_page source[],
+                        int page_num );
 
 #endif                  /* #ifndef FUSE_SCLD_H */

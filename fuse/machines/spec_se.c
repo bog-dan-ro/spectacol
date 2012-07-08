@@ -97,6 +97,15 @@ spec_se_reset( void )
                             settings_default.rom_spec_se_1, 0x4000 );
   if( error ) return error;
 
+  scld_home_map_16k( 0x0000, memory_map_rom, 0 );
+  scld_home_map_16k( 0x4000, memory_map_ram, 5 );
+  scld_home_map_16k( 0x8000, memory_map_ram, 8 );
+  scld_home_map_16k( 0xc000, memory_map_ram, 0 );
+
+  /* RAM pages 1, 3, 5 and 7 contended */
+  for( i = 0; i < 8; i++ )
+    memory_ram_set_16k_contention( i, i & 1 );
+
   periph_clear();
   machines_periph_128();
   
@@ -153,10 +162,6 @@ spec_se_reset( void )
     memset( timex_exrom[i].page, 0, MEMORY_PAGE_SIZE );
   }
 
-  /* RAM pages 1, 3, 5 and 7 contended */
-  for( i = 0; i < 8; i++ )
-    memory_ram_set_16k_contention( i, i & 1 );
-
   machine_current->ram.locked = 0;
   machine_current->ram.last_byte = 0;
 
@@ -180,10 +185,7 @@ spec_se_memory_map( void )
 {
   memory_page *exrom_dock;
 
-  memory_map_16k( 0x0000, memory_map_rom, 0 );
-  memory_map_16k( 0x4000, memory_map_ram, 5 );
-  memory_map_16k( 0x8000, memory_map_ram, 8 );
-  memory_map_16k( 0xc000, memory_map_ram, 0 );
+  scld_memory_map_home();
 
   /* Spectrum SE memory paging is just a combination of the 128K
      0x7ffd and Timex DOCK/EXROM paging schemes with one exception */

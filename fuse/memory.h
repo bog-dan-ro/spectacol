@@ -125,21 +125,24 @@ void memory_reset( void );
 void memory_ram_set_16k_contention( int page_num, int contended );
 
 /* Map 16K of memory */
-void memory_map_16k( libspectrum_word address, memory_page *source,
+void memory_map_16k( libspectrum_word address, memory_page source[],
   int page_num );
 
 /* Map 8K of memory */
-void memory_map_8k( libspectrum_word address, memory_page *source,
+void memory_map_8k( libspectrum_word address, memory_page source[],
   int page_num );
 
+/* Map one page of memory */
+void memory_map_page( memory_page *source[], int page_num );
+
 /* Page in from /ROMCS */
-void memory_map_romcs( memory_page *source );
+void memory_map_romcs( memory_page source[] );
 
 /* Page in 8K from /ROMCS */
-void memory_map_romcs_8k( libspectrum_word address, memory_page *source );
+void memory_map_romcs_8k( libspectrum_word address, memory_page source[] );
 
 /* Page in 4K from /ROMCS */
-void memory_map_romcs_4k( libspectrum_word address, memory_page *source );
+void memory_map_romcs_4k( libspectrum_word address, memory_page source[] );
 
 libspectrum_byte readbyte( libspectrum_word address );
 

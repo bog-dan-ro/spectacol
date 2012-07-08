@@ -83,6 +83,18 @@ tc2048_reset( void )
                             settings_default.rom_tc2048, 0x4000 );
   if( error ) return error;
 
+  /* 0x0000: ROM 0 */
+  scld_home_map_16k( 0x0000, memory_map_rom, 0 );
+  /* 0x4000: RAM 5, contended */
+  memory_ram_set_16k_contention( 5, 1 );
+  scld_home_map_16k( 0x4000, memory_map_ram, 5 );
+  /* 0x8000: RAM 2, not contended */
+  memory_ram_set_16k_contention( 2, 0 );
+  scld_home_map_16k( 0x8000, memory_map_ram, 2 );
+  /* 0xc000: RAM 0, not contended */
+  memory_ram_set_16k_contention( 0, 0 );
+  scld_home_map_16k( 0xc000, memory_map_ram, 0 );
+
   periph_clear();
   machines_periph_48();
 
