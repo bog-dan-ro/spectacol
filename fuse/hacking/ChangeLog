@@ -4190,3 +4190,4 @@
          peripherals/{dck.c,scld.[ch]}: restore loading of DCK files, fix issue
          loading DCK files with uninitialised RAM (patch #3525261 rkd77 and
          Fred)
+20120709 ui/gtk/gtkcompat.c: missed adding file from patch #3534181.
