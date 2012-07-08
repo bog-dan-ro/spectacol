@@ -182,7 +182,7 @@ CODE
 		print << "CODE";
   {
     GtkWidget *frame = gtk_frame_new( "$text" );
-    GtkWidget *hbox = gtk_hbox_new( FALSE, 0 );
+    GtkWidget *hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
     GtkWidget *text = gtk_label_new( "$widget->{data2}" );
     gchar buffer[80];
 
@@ -207,7 +207,7 @@ CODE
 
 		print << "CODE";
   {
-    GtkWidget *hbox = gtk_hbox_new( FALSE, 0 );
+    GtkWidget *hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
     GtkWidget *combo = gtk_combo_box_text_new();
     GtkWidget *text = gtk_label_new( "$text" );
     int i;

@@ -36,6 +36,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "machine.h"
 #include "memory.h"
@@ -358,13 +359,13 @@ create_dialog( void )
   gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
 
   /* Some boxes to contain the things we want to display */
-  hbox = gtk_hbox_new( FALSE, 0 );
+  hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
   gtk_box_pack_start( GTK_BOX( content_area ), hbox, TRUE, TRUE, 5 );
 
-  vbox = gtk_vbox_new( FALSE, 5 );
+  vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 5 );
 
-  hbox2 = gtk_hbox_new( FALSE, 5 );
+  hbox2 = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 5 );
   gtk_box_pack_start( GTK_BOX( vbox ), hbox2, TRUE, TRUE, 0 );
 
   /* The main display areas */
@@ -557,7 +558,7 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   const gchar *titles[] = { "Address", "Instruction" };
 
   /* A box to hold the disassembly listing and the scrollbar */
-  disassembly_box = gtk_hbox_new( FALSE, 0 );
+  disassembly_box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
   gtk_box_pack_start( parent, disassembly_box, TRUE, TRUE, 0 );
 
   /* The disassembly itself */
@@ -580,8 +581,8 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   g_signal_connect( G_OBJECT( disassembly_scrollbar_adjustment ),
 		    "value-changed", G_CALLBACK( move_disassembly ),
 		    NULL );
-  scrollbar =
-    gtk_vscrollbar_new( disassembly_scrollbar_adjustment );
+  scrollbar = gtk_scrollbar_new( GTK_ORIENTATION_VERTICAL,
+                                 disassembly_scrollbar_adjustment );
   gtk_box_pack_start( GTK_BOX( disassembly_box ), scrollbar, FALSE, FALSE, 0 );
 /*
   gtkui_scroll_connect( GTK_CLIST( disassembly ),
@@ -689,7 +690,7 @@ create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group )
   GtkWidget *hbox, *entry, *eval_button;
 
   /* An hbox to hold the command entry widget and the 'evaluate' button */
-  hbox = gtk_hbox_new( FALSE, 5 );
+  hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 5 );
   gtk_box_pack_start( parent, hbox, FALSE, FALSE, 0 );
 
   /* The command entry widget */
@@ -707,7 +708,7 @@ create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group )
 
   /* Return is equivalent to clicking on 'evaluate' */
   gtk_widget_add_accelerator( eval_button, "clicked", accel_group,
-			      GDK_Return, 0, 0 );
+			      GDK_KEY_Return, 0, 0 );
 
   return 0;
 }

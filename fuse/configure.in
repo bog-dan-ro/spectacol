@@ -226,15 +226,51 @@ if test -z "$UI"; then
   if test "$withval" = no; then gtk=no; else gtk=yes; fi,
   gtk=yes)
   AC_MSG_RESULT($gtk)
+
   if test "$gtk" = yes; then
-    AM_PATH_GTK_2_0(2.18.0,
-		AC_DEFINE([UI_GTK], 1,
-		          [Defined if GTK+ UI 2.x is in use])
-		AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-	        UI=gtk; UI_LIBS="ui/gtk/libuigtk.la",
-		AC_MSG_WARN([GTK+ not found. Reverting to Xlib]))
+
+    AC_ARG_ENABLE(gtk3,
+      AC_HELP_STRING([--enable-gtk3],[prefer GTK+ 3 to GTK+ 2]),
+      if test "$enableval" = yes; then gtk3=yes; else gtk3=no; fi,
+      gtk3=auto
+    )
+
+    if test "$gtk3" = yes; then
+      PKG_CHECK_MODULES(GTK, [gtk+-3.0],,
+        AC_MSG_ERROR([GTK+ not found])
+      )
+
+    elif test "$gtk3" = no; then
+      AM_PATH_GTK_2_0(2.18.0,,
+        AC_MSG_WARN([GTK+ not found. Reverting to Xlib])
+        gtk=no
+      )
+
+    elif test "$gtk3" = auto; then
+      AM_PATH_GTK_2_0(2.18.0,
+        gtk3=no,
+      )
+
+      if test "$gtk3" = auto; then
+        PKG_CHECK_MODULES(GTK, [gtk+-3.0],
+          gtk3=yes,
+          AC_MSG_WARN([GTK+ not found. Reverting to Xlib])
+          gtk3=no
+          gtk=no
+        )
+      fi
+    fi
+
+  fi
+
+  if test "$gtk" = yes; then
+    AC_DEFINE([UI_GTK], 1, [Defined if GTK+ UI is in use])
+    AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
+    UI=gtk; UI_LIBS="ui/gtk/libuigtk.la"
   fi
 fi
+
+AM_CONDITIONAL(HAVE_GTK2, test "$gtk3" != yes)
 
 if test "$UI" = gtk; then
   AC_PATH_XTRA

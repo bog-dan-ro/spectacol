@@ -30,22 +30,6 @@
 #include <libspectrum.h>
 
 /*
- * Compat symbols. Transition to GTK+ 3
- */
-
-/* Define keys for old GDK versions */
-#if !GTK_CHECK_VERSION( 2, 22, 0 )
-
-#define GDK_KEY_Up        GDK_Up
-#define GDK_KEY_Down      GDK_Down
-#define GDK_KEY_Page_Up   GDK_Page_Up
-#define GDK_KEY_Page_Down GDK_Page_Down
-#define GDK_KEY_Home      GDK_Home
-#define GDK_KEY_End       GDK_End
-
-#endif				/* #if !GTK_CHECK_VERSION( 2, 22, 0 ) */
-
-/*
  * Display routines (gtkdisplay.c)
  */
 
@@ -89,7 +73,7 @@ GtkAccelGroup* gtkstock_add_accel_group( GtkWidget *widget );
 
 /* Set modifier=0 to use the first default accel key.
  * Set modifier_alt=0 to use the second default accel key.
- * For either, GDK_VoidSymbol means "no accel key".
+ * For either, GDK_KEY_VoidSymbol means "no accel key".
  */
 typedef struct gtkstock_button {
   gchar *label;

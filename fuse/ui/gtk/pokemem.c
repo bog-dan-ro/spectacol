@@ -28,10 +28,11 @@
 #include <errno.h>
 #include <string.h>
 
-#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 
 #include "fuse.h"
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "menu.h"
 #include "pokefinder/pokemem.h"
@@ -115,7 +116,7 @@ create_dialog( void )
   accel_group = gtk_accel_group_new();
   gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
 
-  hbox = gtk_hbox_new( FALSE, 0 );
+  hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );    
   gtk_box_pack_start( GTK_BOX( vbox ), hbox,  TRUE, TRUE, 5 );
 
   /* Bank */
@@ -166,6 +167,14 @@ create_dialog( void )
   /* Create list widget */
   create_and_fill_treeview();
   scroll = gtk_scrolled_window_new( NULL, NULL );
+
+  /* Adjust size for list */ 
+#if !GTK_CHECK_VERSION( 3, 0, 0 )
+  gtk_widget_set_size_request( GTK_WIDGET( poke_list ), -1, 250 );
+#else
+  gtk_scrolled_window_set_min_content_height( GTK_SCROLLED_WINDOW( scroll ), 250 );
+#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
+
   gtk_container_add( GTK_CONTAINER( scroll ), GTK_WIDGET( poke_list ) );
   gtk_box_pack_start( GTK_BOX( vbox ), GTK_WIDGET( scroll ), TRUE, TRUE, 5 );
 
@@ -174,7 +183,7 @@ create_dialog( void )
                              G_CALLBACK( pokemem_update_list ),
                              (gpointer) &dialog,
                              G_CALLBACK( pokemem_close ) );
-  gtk_accel_group_disconnect_key( accel_group, GDK_Return, 0 );
+  gtk_accel_group_disconnect_key( accel_group, GDK_KEY_Return, 0 );
 
   /* Users shouldn't be able to resize this window */
   gtk_window_set_resizable( GTK_WINDOW( dialog ), FALSE );
@@ -245,12 +254,6 @@ create_and_fill_treeview( void )
   gtk_tree_view_set_model( GTK_TREE_VIEW( poke_list ), model );
 
   g_object_unref( model );
-
-  /* Adjust size for list */
-  GtkRequisition size;
-  gtk_widget_size_request( GTK_WIDGET( poke_list ), &size );
-  size.height = 200;
-  gtk_widget_set_size_request( GTK_WIDGET( poke_list ), -1, size.height );
 }
 
 static void

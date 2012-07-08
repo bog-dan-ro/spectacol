@@ -33,6 +33,7 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "menu.h"
 #include "pokefinder/pokefinder.h"
@@ -139,7 +140,7 @@ create_dialog( void )
   dialog = gtkstock_dialog_new( "Fuse - Poke Finder",
 				G_CALLBACK( delete_dialog ) );
 
-  hbox = gtk_hbox_new( FALSE, 0 );
+  hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
   gtk_box_pack_start( GTK_BOX( content_area ), hbox, TRUE, TRUE, 0 );
 
@@ -151,7 +152,7 @@ create_dialog( void )
 		    G_CALLBACK( gtkui_pokefinder_search ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), entry, TRUE, TRUE, 5 );
 
-  vbox = gtk_vbox_new( FALSE, 0 );
+  vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
   gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 5 );
 
   count_label = gtk_label_new( "" );
@@ -164,7 +165,7 @@ create_dialog( void )
     static gtkstock_button btn[] = {
       { "Incremented", G_CALLBACK( gtkui_pokefinder_incremented ), NULL, NULL, 0, 0, 0, 0 },
       { "Decremented", G_CALLBACK( gtkui_pokefinder_decremented ), NULL, NULL, 0, 0, 0, 0 },
-      { "!Search", G_CALLBACK( gtkui_pokefinder_search ), NULL, NULL, GDK_Return, 0, 0, 0 },
+      { "!Search", G_CALLBACK( gtkui_pokefinder_search ), NULL, NULL, GDK_KEY_Return, 0, 0, 0 },
       { "Reset", G_CALLBACK( gtkui_pokefinder_reset ), NULL, NULL, 0, 0, 0, 0 }
     };
     btn[2].actiondata = G_OBJECT( entry );

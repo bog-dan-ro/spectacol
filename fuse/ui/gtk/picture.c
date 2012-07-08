@@ -30,8 +30,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 #include <libspectrum.h>
 
 #include "display.h"
@@ -47,8 +47,18 @@ static const gint picture_pitch = DISPLAY_ASPECT_WIDTH * 4;
 static int dialog_created = 0;
 
 static void draw_screen( libspectrum_byte *screen, int border );
+
+#if !GTK_CHECK_VERSION( 3, 0, 0 )
+
 static gint
 picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data );
+
+#else
+
+static gboolean
+picture_draw( GtkWidget *widget, cairo_t *cr, gpointer user_data );
+
+#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
 
 static GtkWidget *dialog;
 
@@ -73,11 +83,19 @@ gtkui_picture( const char *filename, int border )
 				  G_CALLBACK( gtk_widget_hide ) );
   
     drawing_area = gtk_drawing_area_new();
-    gtk_drawing_area_size( GTK_DRAWING_AREA( drawing_area ),
-			   DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
+    gtk_widget_set_size_request( drawing_area, DISPLAY_ASPECT_WIDTH,
+                                 DISPLAY_SCREEN_HEIGHT );
+
+#if !GTK_CHECK_VERSION( 3, 0, 0 )
     g_signal_connect( G_OBJECT( drawing_area ),
 		      "expose_event", G_CALLBACK( picture_expose ),
 		      NULL );
+#else
+    g_signal_connect( G_OBJECT( drawing_area ),
+		      "draw", G_CALLBACK( picture_draw ),
+		      NULL );
+#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
+
     content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
     gtk_container_add( GTK_CONTAINER( content_area ), drawing_area );
 
@@ -149,6 +167,8 @@ draw_screen( libspectrum_byte *screen, int border )
   }
 }
 
+#if !GTK_CHECK_VERSION( 3, 0, 0 )
+
 static gint
 picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data GCC_UNUSED )
 {
@@ -163,3 +183,27 @@ picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data GCC_UNUSED )
 
   return TRUE;
 }
+
+#else                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
+
+static gboolean
+picture_draw( GtkWidget *widget, cairo_t *cr, gpointer user_data )
+{
+  cairo_surface_t *surface;
+
+  surface = cairo_image_surface_create_for_data( picture,
+                                                 CAIRO_FORMAT_RGB24,
+                                                 DISPLAY_ASPECT_WIDTH,
+                                                 DISPLAY_SCREEN_HEIGHT,
+                                                 picture_pitch );
+
+  cairo_set_source_surface( cr, surface, 0, 0 );
+  cairo_set_operator( cr, CAIRO_OPERATOR_SOURCE );
+  cairo_paint( cr );
+
+  cairo_surface_destroy( surface );
+
+  return FALSE;
+}
+
+#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */

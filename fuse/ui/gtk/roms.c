@@ -33,6 +33,7 @@
 
 #include "compat.h"
 #include "fuse.h"
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "menu.h"
 #include "settings.h"
@@ -107,7 +108,7 @@ add_rom( GtkBox *parent, size_t start, gint row )
   frame = gtk_frame_new( buffer );
   gtk_box_pack_start( parent, frame, FALSE, FALSE, 2 );
 
-  hbox = gtk_hbox_new( FALSE, 4 );
+  hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 4 );
   gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
   gtk_container_add( GTK_CONTAINER( frame ), hbox );
 

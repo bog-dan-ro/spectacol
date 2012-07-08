@@ -33,6 +33,7 @@
 
 #include "compat.h"
 #include "fuse.h"
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "memory.h"
 #include "menu.h"
@@ -164,7 +165,7 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
 
   gtkstock_create_close( dialog, NULL, NULL, FALSE );
 
-  box = gtk_hbox_new( FALSE, 0 );
+  box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
   gtk_box_pack_start( GTK_BOX( content_area ), box, TRUE, TRUE, 0 );
 
@@ -182,7 +183,7 @@ menu_machine_memorybrowser( GtkAction *gtk_action GCC_UNUSED,
 
   gtkui_scroll_connect( GTK_TREE_VIEW( list ), adjustment );
 
-  scrollbar = gtk_vscrollbar_new( adjustment );
+  scrollbar = gtk_scrollbar_new( GTK_ORIENTATION_VERTICAL, adjustment );
   gtk_box_pack_start( GTK_BOX( box ), scrollbar, FALSE, FALSE, 0 );
 
   gtk_widget_show_all( dialog );

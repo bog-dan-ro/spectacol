@@ -37,6 +37,7 @@
 
 #include "debugger/debugger.h"
 #include "fuse.h"
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "keyboard.h"
 #include "machine.h"
@@ -153,10 +154,12 @@ ui_init( int *argc, char ***argv )
 
   gtk_init(argc,argv);
 
+#if !GTK_CHECK_VERSION( 3, 0, 0 )
   gdk_rgb_init();
   gdk_rgb_set_install( TRUE );
   gtk_widget_set_default_colormap( gdk_rgb_get_cmap() );
   gtk_widget_set_default_visual( gdk_rgb_get_visual() );
+#endif                /* #if !GTK_CHECK_VERSION( 3, 0, 0 ) */
 
   gtkui_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -190,7 +193,7 @@ ui_init( int *argc, char ***argv )
   g_signal_connect( G_OBJECT( gtkui_window ), "drag-data-received",
 		    G_CALLBACK( gtkui_drag_data_received ), NULL );
 
-  box = gtk_vbox_new( FALSE, 0 );
+  box = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
   gtk_container_add(GTK_CONTAINER(gtkui_window), box);
 
   if( gtkui_make_menu( &accel_group, &menu_bar, gtkui_menu_data,
@@ -209,6 +212,10 @@ ui_init( int *argc, char ***argv )
 	    fuse_progname,__FILE__,__LINE__);
     return 1;
   }
+
+  /* Set minimum size for drawing area */
+  gtk_widget_set_size_request( gtkui_drawing_area, DISPLAY_ASPECT_WIDTH,
+                               DISPLAY_SCREEN_HEIGHT );
 
   gtk_widget_add_events( GTK_WIDGET( gtkui_drawing_area ),
     GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK );
@@ -339,7 +346,7 @@ ui_error_specific( ui_error_level severity, const char *message )
   label = gtk_label_new( message );
 
   /* Make a new vbox for the top part for saner spacing */
-  vbox=gtk_vbox_new( FALSE, 0 );
+  vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
   action_area = gtk_dialog_get_action_area( GTK_DIALOG( dialog ) );
   gtk_box_pack_start( GTK_BOX( content_area ), vbox, TRUE, TRUE, 0 );

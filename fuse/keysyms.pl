@@ -148,11 +148,11 @@ my %ui_data = (
 	      function => \&wii_keysym
 	    },
 
-    gtk  => { headers => [ 'gdk/gdkkeysyms.h' ],
+    gtk  => { headers => [ 'gdk/gdkkeysyms.h', 'gtkcompat.h' ],
 	      max_length => 16,
 	      skips => { },
 	      translations => { },
-	      function => sub ($) { "GDK_$_[0]" },
+	      function => sub ($) { "GDK_KEY_$_[0]" },
     	    },
 
     sdl  => { headers => [ 'SDL.h' ],

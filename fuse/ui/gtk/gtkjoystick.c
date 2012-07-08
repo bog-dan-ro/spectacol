@@ -32,6 +32,7 @@
 
 #include "compat.h"
 #include "fuse.h"
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "keyboard.h"
 #include "peripherals/joystick.h"
@@ -202,13 +203,13 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
   dialog = gtkstock_dialog_new( "Fuse - Configure Joystick", NULL );
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
 
-  hbox = gtk_hbox_new( FALSE, 4 );
+  hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 4 );
   gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
   gtk_box_pack_start( GTK_BOX( content_area ), hbox, FALSE, FALSE, 0 );
 
   create_joystick_type_selector( &info, GTK_BOX( hbox ) );
 
-  vbox = gtk_vbox_new( FALSE, 2 );
+  vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 2 );
   gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 0 );
 
   model = create_joystick_options_store();
@@ -216,8 +217,8 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
   for( i = 0; i < 10; i += 5 ) {
     
     int j;
-    
-    vbox = gtk_vbox_new( FALSE, 2 );
+
+    vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 2 );
     gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 0 );
     
     for( j = i; j < i + 5; j++ )
@@ -305,7 +306,7 @@ create_joystick_type_selector( struct joystick_info *info, GtkBox *parent )
   frame = gtk_frame_new( "Joystick type" );
   gtk_box_pack_start( parent, frame, FALSE, FALSE, 0 );
 
-  box = gtk_vbox_new( FALSE, 0 );
+  box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
   gtk_container_add( GTK_CONTAINER( frame ), box );
 
   button_group = NULL;
@@ -352,7 +353,7 @@ create_fire_button_selector( const char *title, struct button_info *info,
   frame = gtk_frame_new( title );
   gtk_box_pack_start( parent, frame, TRUE, TRUE, 0 );
 
-  box = gtk_hbox_new( FALSE, 4 );
+  box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 4 );
   gtk_container_set_border_width( GTK_CONTAINER( box ), 2 );
   gtk_container_add( GTK_CONTAINER( frame ), box );
 

@@ -52,6 +52,10 @@ libuigtk_la_SOURCES = binary.c \
 		     statusbar.c \
 		     stock.c
 
+if HAVE_GTK2
+libuigtk_la_SOURCES += gtkcompat.c
+endif
+
 libuigtk_la_LIBADD = @GTK_LIBS@ -lX11 
 
 BUILT_SOURCES = keysyms.c \

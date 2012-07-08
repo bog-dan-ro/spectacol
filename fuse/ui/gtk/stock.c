@@ -30,6 +30,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 
 GtkAccelGroup*
@@ -45,7 +46,7 @@ add_click( GtkWidget *btn, const gtkstock_button *button, GtkAccelGroup *accel,
 	   guint key1, GdkModifierType mod1, guint key2, GdkModifierType mod2 )
 {
   if( button->shortcut ) {
-    if( button->shortcut != GDK_VoidSymbol )
+    if( button->shortcut != GDK_KEY_VoidSymbol )
       gtk_widget_add_accelerator( btn, "clicked", accel, button->shortcut,
 				  button->modifier, 0 );
   } else if( key1 ) {
@@ -53,7 +54,7 @@ add_click( GtkWidget *btn, const gtkstock_button *button, GtkAccelGroup *accel,
   }
 
   if( button->shortcut_alt ) {
-    if( button->shortcut_alt != GDK_VoidSymbol )
+    if( button->shortcut_alt != GDK_KEY_VoidSymbol )
       gtk_widget_add_accelerator( btn, "clicked", accel, button->shortcut_alt,
 				  button->modifier_alt, 0 );
   }
@@ -112,17 +113,17 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
 
   if( is_stock ) {
     if( !strcmp( button->label, GTK_STOCK_CLOSE ) )
-      add_click( btn, button, accel, GDK_Return, 0, GDK_Escape, 0 );
+      add_click( btn, button, accel, GDK_KEY_Return, 0, GDK_KEY_Escape, 0 );
     else if( !strcmp( button->label, GTK_STOCK_OK ) )
-      add_click( btn, button, accel, GDK_Return, 0, 0, 0 );
+      add_click( btn, button, accel, GDK_KEY_Return, 0, 0, 0 );
     else if( !strcmp( button->label, GTK_STOCK_CANCEL ) )
-      add_click( btn, button, accel, GDK_Escape, 0, 0, 0 );
+      add_click( btn, button, accel, GDK_KEY_Escape, 0, 0, 0 );
     else if( !strcmp( button->label, GTK_STOCK_SAVE ) )
-      add_click( btn, button, accel, GDK_S, GDK_MOD1_MASK, 0, 0 );
+      add_click( btn, button, accel, GDK_KEY_S, GDK_MOD1_MASK, 0, 0 );
     else if( !strcmp( button->label, GTK_STOCK_YES ) )
-      add_click( btn, button, accel, GDK_Y, GDK_MOD1_MASK, GDK_Return, 0 );
+      add_click( btn, button, accel, GDK_KEY_Y, GDK_MOD1_MASK, GDK_KEY_Return, 0 );
     else if( !strcmp( button->label, GTK_STOCK_NO ) )
-      add_click( btn, button, accel, GDK_N, GDK_MOD1_MASK, GDK_Escape, 0 );
+      add_click( btn, button, accel, GDK_KEY_N, GDK_MOD1_MASK, GDK_KEY_Escape, 0 );
     else
       add_click( btn, button, accel, 0, 0, 0, 0 );
   } else {
@@ -167,7 +168,7 @@ gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
 {
   gtkstock_button btn = {
     GTK_STOCK_CLOSE, NULL, NULL, (destroy ? destroy : DEFAULT_DESTROY),
-    (esconly ? GDK_VoidSymbol : 0), 0, 0, 0
+    (esconly ? GDK_KEY_VoidSymbol : 0), 0, 0, 0
   };
   return gtkstock_create_buttons( widget, accel, &btn, 1 );
 }

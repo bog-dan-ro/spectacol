@@ -29,6 +29,7 @@
 
 #include <gtk/gtk.h>
 
+#include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "ui/ui.h"
 
@@ -55,7 +56,7 @@ gtkstatusbar_create( GtkBox *parent )
 {
   GtkWidget *separator;
 
-  status_bar = gtk_hbox_new( FALSE, 5 );
+  status_bar = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 5 );
   gtk_box_pack_start( parent, status_bar, FALSE, FALSE, 3 );
 
   /* FIXME: unref these pixbuf on statusbar destroy */
@@ -88,7 +89,7 @@ gtkstatusbar_create( GtkBox *parent )
   gtk_label_set_width_chars( GTK_LABEL( speed_status ), 8 );
   gtk_box_pack_end( GTK_BOX( status_bar ), speed_status, FALSE, FALSE, 0 );
 
-  separator = gtk_vseparator_new();
+  separator = gtk_separator_new( GTK_ORIENTATION_VERTICAL );
   gtk_box_pack_end( GTK_BOX( status_bar ), separator, FALSE, FALSE, 0 );
 
   tape_status = gtk_image_new_from_pixbuf( pixbuf_tape_inactive );
@@ -107,7 +108,7 @@ gtkstatusbar_create( GtkBox *parent )
   mouse_status = gtk_image_new_from_pixbuf( pixbuf_mouse_inactive );
   gtk_box_pack_end( GTK_BOX( status_bar ), mouse_status, FALSE, FALSE, 0 );
 
-  separator = gtk_vseparator_new();
+  separator = gtk_separator_new( GTK_ORIENTATION_VERTICAL );
   gtk_box_pack_end( GTK_BOX( status_bar ), separator, FALSE, FALSE, 0 );
 
   machine_name = gtk_label_new( NULL );

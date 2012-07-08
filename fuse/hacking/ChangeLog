@@ -4181,3 +4181,8 @@
          (Sergio).
 20120630 settings.pl: cleanup XML memory only once right before exiting (bug
          #3537598) (Sergio).
+20120708 configure.in,keysyms.pl,ui/gtk/{Makefile.am,confirm.c,debugger.c,
+         gtkcompat.h,gtkdisplay.c,gtkinternals.h,gtkjoystick.c,gtkkeyboard.c,
+         gtkmouse.c,gtkui.c,memory.c,options.pl,picture.c,pokefinder.c,
+         pokemem.c,roms.c,statusbar.c,stock.c}: add GTK+ 3 compatibility (patch
+         #3534181) (Sergio).
