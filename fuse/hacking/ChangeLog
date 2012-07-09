@@ -4189,5 +4189,7 @@
 20120708 machines/{spec_se.c,tc2048.c,tc2068.c,ts2068.c},memory.[ch],
          peripherals/{dck.c,scld.[ch]}: restore loading of DCK files, fix issue
          loading DCK files with uninitialised RAM (patch #3525261 rkd77 and
-         Fred)
-20120709 ui/gtk/gtkcompat.c: missed adding file from patch #3534181.
+         Fred).
+20120709 ui/gtk/gtkcompat.c: missed adding file from patch #3534181 (thanks,
+         rkd77) (Fred).
+20120709 ui/gtk/gtkcompat.c: removed duplicate text (Sergio).
