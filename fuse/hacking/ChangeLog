@@ -4193,5 +4193,7 @@
 20120709 ui/gtk/gtkcompat.c: missed adding file from patch #3534181 (thanks,
          rkd77) (Fred).
 20120709 ui/gtk/gtkcompat.c: removed duplicate text (Sergio).
-20120716 ui/gtk/gtkjoystick.c: joystick type should be aligned vertically (patch
+20120716 ui/gtk/gtkjoystick.c: joystick type should be aligned vertically (bug
          #3543781) (Sergio).
+20120716 machine.c,peripherals/if1.c: show microdrive icon in the status bar
+         before the first access (patch #3543783) (Sergio).

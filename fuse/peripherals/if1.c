@@ -370,14 +370,24 @@ if1_reset( int hard_reset GCC_UNUSED )
   if1_active = 0;
   if1_available = 0;
 
-  if( !periph_is_active( PERIPH_TYPE_INTERFACE1 ) ) return;
+  if( !periph_is_active( PERIPH_TYPE_INTERFACE1 ) ) {
+    ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
+                         UI_STATUSBAR_STATE_NOT_AVAILABLE );
 
+    return;
+  }
+
+  /* Check for an Interface I ROM */
   if( machine_load_rom_bank( if1_memory_map_romcs, 0,
 			     settings_current.rom_interface_i,
 			     settings_default.rom_interface_i,
 			     0x2000 ) ) {
     settings_current.interface1 = 0;
     periph_activate_type( PERIPH_TYPE_INTERFACE1, 0 );
+
+    ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
+                         UI_STATUSBAR_STATE_NOT_AVAILABLE );
+
     return;
   }
 
