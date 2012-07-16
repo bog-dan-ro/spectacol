@@ -4197,3 +4197,6 @@
          #3543781) (Sergio).
 20120716 machine.c,peripherals/if1.c: show microdrive icon in the status bar
          before the first access (patch #3543783) (Sergio).
+20120716 ui/win32/{win32display.c,win32ui.c}: limit screen updates to the
+         rectangle bounding the union of the updated section of the screen
+         (patch #3544453) (Sergio).

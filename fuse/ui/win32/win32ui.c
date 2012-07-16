@@ -256,6 +256,11 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       exit_process_messages++;
       return 0;
 
+    case WM_ERASEBKGND:
+      /* Improves speed and avoid flickering when main window is invalidated by
+         another window */
+      return TRUE;
+
 #if defined USE_JOYSTICK && !defined HAVE_JSW_H
 
     case MM_JOY1BUTTONDOWN:

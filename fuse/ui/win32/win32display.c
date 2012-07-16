@@ -63,6 +63,7 @@ static const ptrdiff_t scaled_pitch = 6 * DISPLAY_SCREEN_WIDTH;
 static void *win32_pixdata;
 static BITMAPINFO fuse_BMI;
 static HBITMAP fuse_BMP;
+static RECT invalidated_area;
 
 static const unsigned char rgb_colours[16][3] = {
 
@@ -100,20 +101,25 @@ blit( void )
 {
   PAINTSTRUCT ps;
   HDC dest_dc, src_dc;
-  RECT dest_rec;
   HBITMAP src_bmp;
+  int x, y, width, height;
 
   dest_dc = BeginPaint( fuse_hWnd, &ps );
-  
-  GetClientRect( fuse_hWnd, &dest_rec );
 
-  src_dc = CreateCompatibleDC(0);
-  src_bmp = SelectObject( src_dc, fuse_BMP );
-  BitBlt( dest_dc, 0, 0, image_width * win32display_current_size,
-          image_height * win32display_current_size, src_dc, 0, 0, SRCCOPY );
-  SelectObject( src_dc, src_bmp );
-  DeleteObject( src_bmp );
-  DeleteDC( src_dc );
+  x = ps.rcPaint.left;
+  y = ps.rcPaint.top;
+  width = ps.rcPaint.right - ps.rcPaint.left;
+  height = ps.rcPaint.bottom - ps.rcPaint.top;
+
+  if( width && height ) {
+    src_dc = CreateCompatibleDC( dest_dc );
+    src_bmp = SelectObject( src_dc, fuse_BMP );
+
+    BitBlt( dest_dc, x, y, width, height, src_dc, x, y, SRCCOPY );
+
+    SelectObject( src_dc, src_bmp );
+    DeleteDC( src_dc );
+  }
 
   EndPaint( fuse_hWnd, &ps );
 }
@@ -226,6 +232,7 @@ uidisplay_init( int width, int height )
 
   image_width = width; image_height = height;
   image_scale = width / DISPLAY_ASPECT_WIDTH;
+  SetRectEmpty( &invalidated_area );
 
   register_scalers( 0 );
 
@@ -294,7 +301,14 @@ register_scalers( int force_scaler )
 void
 uidisplay_frame_end( void )
 {
-  InvalidateRect( fuse_hWnd, NULL, FALSE );
+  if( !IsRectEmpty( &invalidated_area ) ) {
+
+    InvalidateRect( fuse_hWnd, &invalidated_area, FALSE );
+
+    SetRectEmpty( &invalidated_area );
+
+    UpdateWindow( fuse_hWnd );
+  }
 }
 
 void
@@ -342,12 +356,17 @@ void
 win32display_area(int x, int y, int width, int height)
 {
   int disp_x,disp_y;
+  int bottom, right;
   long ofs;
+  RECT r;
   char *pixdata = win32_pixdata;
 
-  for( disp_y = y; disp_y < y + height; disp_y++ ) {
-    for( disp_x = x; disp_x < x + width; disp_x++ ) {
-      ofs = ( 4 * disp_x ) + ( disp_y * scaled_pitch );
+  bottom = y + height;
+  right = x + width;
+
+  for( disp_y = y; disp_y < bottom; disp_y++ ) {
+    for( disp_x = x; disp_x < right; disp_x++ ) {
+      ofs = ( disp_x << 2 ) + ( disp_y * scaled_pitch );
 
       pixdata[ ofs + 0 ] = scaled_image[ ofs + 2 ]; /* blue */
       pixdata[ ofs + 1 ] = scaled_image[ ofs + 1 ]; /* green */
@@ -355,7 +374,10 @@ win32display_area(int x, int y, int width, int height)
       pixdata[ ofs + 3 ] = 0; /* unused */
     }
   }
-  RedrawWindow( fuse_hWnd, NULL, NULL, RDW_INTERNALPAINT );
+
+  /* Mark area for updating */
+  SetRect( &r, x, y, right, bottom );
+  UnionRect( &invalidated_area, &invalidated_area, &r );
 }
 
 int
