@@ -306,7 +306,7 @@ create_joystick_type_selector( struct joystick_info *info, GtkBox *parent )
   frame = gtk_frame_new( "Joystick type" );
   gtk_box_pack_start( parent, frame, FALSE, FALSE, 0 );
 
-  box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
+  box = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
   gtk_container_add( GTK_CONTAINER( frame ), box );
 
   button_group = NULL;
