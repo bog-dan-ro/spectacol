@@ -130,6 +130,9 @@ debugger_register_hash( const char *name )
     case 0x7063:		/* PC */
     case 0x6978:		/* IX */
     case 0x6979:		/* IY */
+    case 0x696d:		/* IM */
+    case 0x69666631:		/* IFF1 */
+    case 0x69666632:		/* IFF2 */
       return hash;
 
     default: return -1;
@@ -184,6 +187,11 @@ debugger_register_get( int which )
   case 0x6978: return IX;
   case 0x6979: return IY;
 
+   /* interrupt flags */
+  case 0x696d: return IM;
+  case 0x69666631: return IFF1;
+  case 0x69666632: return IFF2;
+
   default:
     ui_error( UI_ERROR_ERROR, "attempt to get unknown register '%d'", which );
     return 0;
@@ -229,6 +237,11 @@ debugger_register_set( int which, libspectrum_word value )
     case 0x6978: IX = value; break;
     case 0x6979: IY = value; break;
 
+     /* interrupt flags */
+    case 0x696d: if( value >= 0 && value <=2 ) IM = value; break;
+    case 0x69666631: IFF1 = !!value; break;
+    case 0x69666632: IFF2 = !!value; break;
+
   default:
     ui_error( UI_ERROR_ERROR, "attempt to set unknown register '%d'", which );
     break;
@@ -273,6 +286,11 @@ debugger_register_text( int which )
   case 0x7063: return "PC";
   case 0x6978: return "IX";
   case 0x6979: return "IY";
+
+   /* interrupt flags */
+  case 0x696d: return "IM";
+  case 0x69666631: return "IFF1";
+  case 0x69666632: return "IFF2";
 
   default:
     ui_error( UI_ERROR_ERROR, "attempt to get unknown register '%d'", which );

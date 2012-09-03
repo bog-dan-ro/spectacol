@@ -96,6 +96,9 @@ af|bc|de|hl|"af\'"|"bc\'"|"de\'"|"hl\'" {
 sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
 	      return DEBUGGER_REGISTER; }
 
+im|iff1|iff2 { yylval.reg = debugger_register_hash( yytext );
+	      return DEBUGGER_REGISTER; }
+
 "("		{ return '('; }
 ")"		{ return ')'; }
 

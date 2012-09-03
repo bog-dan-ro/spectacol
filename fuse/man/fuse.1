@@ -3598,6 +3598,17 @@ to
 .RE
 .PP
 se{t}
+.I [im|iff1|iff2] value
+.RS
+Set the interrupt mode or interrupt flip flops.
+.I register
+to
+.IR value .
+If the im mode is not 0, 1 or 2 it will be ignored, while non-zero iff values 
+will be converted to one.
+.RE
+.PP
+se{t}
 .RI $ variable
 .I value
 .RS

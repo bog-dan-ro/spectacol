@@ -4200,3 +4200,5 @@
 20120716 ui/win32/{win32display.c,win32ui.c}: limit screen updates to the
          rectangle bounding the union of the updated section of the screen
          (patch #3544453) (Sergio).
+20120903 debugger/{commandl.[lc]},man/fuse.1: add im, iff1 and iff2 setting and
+         getting (Alex Badea).
