@@ -1,5 +1,5 @@
 /* debugger.c: the GTK+ debugger
-   Copyright (c) 2002-2011 Philip Kendall
+   Copyright (c) 2002-2012 Philip Kendall
 
    $Id$
 
@@ -902,7 +902,8 @@ update_memory_map( void )
       char buffer[40];
       GtkWidget **row_labels = map_label[row];
 
-      snprintf( buffer, 40, format_16_bit(), (unsigned)block * 0x1000 );
+      snprintf( buffer, 40, format_16_bit(),
+                (unsigned)block * MEMORY_PAGE_SIZE );
       row_labels[0] = gtk_label_new( buffer );
 
       snprintf( buffer, 40, "%s %d",

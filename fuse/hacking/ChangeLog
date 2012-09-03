@@ -4202,3 +4202,5 @@
          (patch #3544453) (Sergio).
 20120903 debugger/{commandl.[lc]},man/fuse.1: add im, iff1 and iff2 setting and
          getting (Alex Badea).
+20120903 ui/gtk/debugger.c,ui/win32/debugger.c: use MEMORY_PAGE_SIZE rather than
+         the hardcoded 4K value (Alex Badea).

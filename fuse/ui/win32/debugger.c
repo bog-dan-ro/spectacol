@@ -1,5 +1,5 @@
 /* debugger.c: the Win32 debugger
-   Copyright (c) 2004 Philip Kendall, Marek Januszewski
+   Copyright (c) 2004-2012 Philip Kendall, Marek Januszewski
 
    $Id$
 
@@ -735,7 +735,8 @@ update_memory_map( void )
       page->writable != writable ||
       page->contended != contended ) {
 
-      _sntprintf( buffer, 40, format_16_bit(), (unsigned)block * 0x1000 );
+      _sntprintf( buffer, 40, format_16_bit(),
+                  (unsigned)block * MEMORY_PAGE_SIZE );
       SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( row * 4 ), 
                           WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
 
