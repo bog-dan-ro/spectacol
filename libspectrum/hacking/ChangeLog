@@ -885,3 +885,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20120507 internals.h,libspectrum.c,libspectrum.h.in,make-perl.c,myglib/{ghash.c,
          gslist.c}: add g_hash_table_new_full() and libspectrum_end() for memory
          releasing (part of bug #3515269) (Sergio Baldoví).
+20120916 Makefile.am: allow custom build flags for make-perl to address warning
+         from the debian build system (bug #3567469) (Sergio Baldoví).

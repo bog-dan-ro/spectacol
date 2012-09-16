@@ -78,7 +78,7 @@ noinst_DATA =
 AM_CFLAGS = -DLIBSPECTRUM_EXPORTS
 
 make-perl$(EXEEXT): $(srcdir)/make-perl.c config.h
-	$(CC_FOR_BUILD) -I. -o $@ $<
+	$(CC_FOR_BUILD) -I. $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
 libspectrum.h: libspectrum.h.in generate.pl snap_accessors.txt tape_accessors.txt config.h
 	@PERL@ -p generate.pl $(srcdir) $(srcdir)/libspectrum.h.in > $@.tmp && mv $@.tmp $@
