@@ -346,3 +346,5 @@
          and Fred).
 20120327 configure.in: add support for audiofile 0.3.x (patch #3508658) (Alberto
          Garcia).
+20120922 tapeconv.c: correct check of LIBSPECTRUM_ID_UNKNOWN (fixes bug
+         #3570483) (Michael Tautschnig).

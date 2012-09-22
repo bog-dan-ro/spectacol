@@ -133,7 +133,7 @@ get_type_from_string( libspectrum_id_t *type, const char *string )
 						0 );
   if( error ) return error;
 
-  if( class != LIBSPECTRUM_CLASS_TAPE || type == LIBSPECTRUM_ID_UNKNOWN )
+  if( class != LIBSPECTRUM_CLASS_TAPE || *type == LIBSPECTRUM_ID_UNKNOWN )
     *type = LIBSPECTRUM_ID_TAPE_TZX;
 
   return 0;
