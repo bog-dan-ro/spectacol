@@ -304,6 +304,7 @@ append_inlay_file( char *inlay_file, libspectrum_tape *tape )
   } else if( is_filetype( inlay_file, ".gif" ) ) {
     custom_block_data[0] = 0;
   } else {
+    free( custom_block_data );
     return 1;
   }
 

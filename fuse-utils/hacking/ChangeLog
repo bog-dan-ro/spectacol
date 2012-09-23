@@ -348,3 +348,4 @@
          Garcia).
 20120922 tapeconv.c: correct check of LIBSPECTRUM_ID_UNKNOWN (fixes bug
          #3570483) (Michael Tautschnig).
+20120923 tapeconv.c: remove potential memory leak (Fred).
