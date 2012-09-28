@@ -34,6 +34,7 @@
 #include "machines.h"
 #include "machines_periph.h"
 #include "memory.h"
+#include "module.h"
 #include "pentagon.h"
 #include "periph.h"
 #include "peripherals/disk/beta.h"
@@ -41,6 +42,18 @@
 #include "settings.h"
 #include "spec48.h"
 #include "spec128.h"
+
+static void pentagon_from_snapshot( libspectrum_snap *snap );
+
+static module_info_t pentagon_module_info = {
+
+  NULL,
+  NULL,
+  NULL,
+  pentagon_from_snapshot,
+  NULL,
+
+};
 
 static int pentagon_reset( void );
 
@@ -103,6 +116,8 @@ pentagon_init( fuse_machine_info *machine )
 
   machine->memory_map = spec128_memory_map;
 
+  module_register( &pentagon_module_info );
+
   return 0;
 }
 
@@ -142,4 +157,20 @@ pentagon_reset(void)
   spec48_common_display_setup();
 
   return 0;
+}
+
+static void
+pentagon_from_snapshot( libspectrum_snap *snap )
+{
+  /* During init we set beta_active to true unconditionally to bootstrap into
+     the TR-DOS ROM, but during snapshot loading we should repect the paging
+     setting from the snapshot itself */
+  if( periph_is_active( PERIPH_TYPE_BETA128_PENTAGON ) || 
+      periph_is_active( PERIPH_TYPE_BETA128_PENTAGON_LATE ) ) {
+    if( libspectrum_snap_beta_paged( snap ) ) {
+      beta_page();
+    } else {
+      beta_unpage();
+    }
+  }
 }

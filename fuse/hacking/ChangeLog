@@ -4204,3 +4204,8 @@
          getting (Alex Badea).
 20120903 ui/gtk/debugger.c,ui/win32/debugger.c: use MEMORY_PAGE_SIZE rather than
          the hardcoded 4K value (Alex Badea).
+20120928 memory.c,machines/pentagon.c,snapshot.c: read and write all potential
+         1024k worth of memory pages from a snap, initialise the Pentagon 1024k
+         memory ports from a snapshot and ensure that we respect the paged state
+         of the Beta ROM when loading Pentagon 128k/512k/1024k snapshots (ketmar
+         and Fred).

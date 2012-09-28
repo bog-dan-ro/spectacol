@@ -32,6 +32,7 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "machines/pentagon.h"
 #include "machines/spec128.h"
 #include "memory.h"
 #include "module.h"
@@ -485,17 +486,24 @@ memory_from_snapshot( libspectrum_snap *snap )
   size_t i;
   int capabilities = machine_current->capabilities;
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY )
-    spec128_memoryport_write( 0x7ffd,
+  if( capabilities & PERIPH_TYPE_PENTAGON1024_MEMORY ) {
+    pentagon1024_memoryport_write( 0x7ffd,
 			      libspectrum_snap_out_128_memoryport( snap ) );
+    pentagon1024_v22_memoryport_write( 0xeff7,
+                              libspectrum_snap_out_plus3_memoryport( snap ) );
+  } else {
+    if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY )
+      spec128_memoryport_write( 0x7ffd,
+                                libspectrum_snap_out_128_memoryport( snap ) );
 
-  if( ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY ) ||
-      ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SCORP_MEMORY )    )
-    specplus3_memoryport2_write(
-      0x1ffd, libspectrum_snap_out_plus3_memoryport( snap )
-    );
+    if( ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY ) ||
+        ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SCORP_MEMORY )    )
+      specplus3_memoryport2_write(
+        0x1ffd, libspectrum_snap_out_plus3_memoryport( snap )
+      );
+  }
 
-  for( i = 0; i < 16; i++ )
+  for( i = 0; i < 64; i++ )
     if( libspectrum_snap_pages( snap, i ) )
       memcpy( RAM[i], libspectrum_snap_pages( snap, i ), 0x4000 );
 
@@ -507,9 +515,6 @@ memory_from_snapshot( libspectrum_snap *snap )
           libspectrum_snap_rom_length( snap, i ), 1 );
       }
     }
-
-    /* Need to reset memory_map_[read|write] */
-    machine_current->memory_map();
   }
 }
 
@@ -602,7 +607,7 @@ memory_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_out_plus3_memoryport( snap,
 					     machine_current->ram.last_byte2 );
 
-  for( i = 0; i < 16; i++ ) {
+  for( i = 0; i < 64; i++ ) {
     if( RAM[i] != NULL ) {
 
       buffer = libspectrum_malloc( 0x4000 * sizeof( libspectrum_byte ) );

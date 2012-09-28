@@ -102,6 +102,10 @@ snapshot_copy_from( libspectrum_snap *snap )
 
   module_snapshot_from( snap );
 
+  /* Need to reset memory_map_[read|write] after all modules have had a turn
+     initialising from the snapshot */
+  machine_current->memory_map();
+
   return 0;
 }
 
