@@ -1,5 +1,5 @@
 /* szx.c: Routines for .szx snapshots
-   Copyright (c) 1998-2010 Philip Kendall, Fredrick Meunier, Stuart Brady
+   Copyright (c) 1998-2012 Philip Kendall, Fredrick Meunier, Stuart Brady
 
    $Id$
 
@@ -1237,7 +1237,7 @@ read_ramp_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   error = read_ram_page( &data, &page, buffer, data_length, 0x4000, &flags );
   if( error ) return error;
 
-  if( page > 15 ) {
+  if( page > 63 ) {
     libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
 			     "%s:read_ramp_chunk: unknown page number %lu",
 			     __FILE__, (unsigned long)page );
