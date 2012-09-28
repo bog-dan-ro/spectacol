@@ -1,5 +1,5 @@
 /* snapshot.c: snapshot handling routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2012 Philip Kendall
 
    $Id$
 

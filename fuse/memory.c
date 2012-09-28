@@ -1,5 +1,5 @@
 /* memory.c: Routines for accessing memory
-   Copyright (c) 1999-2011 Philip Kendall
+   Copyright (c) 1999-2012 Philip Kendall
 
    $Id$
 

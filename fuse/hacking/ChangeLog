@@ -4209,3 +4209,4 @@
          memory ports from a snapshot and ensure that we respect the paged state
          of the Beta ROM when loading Pentagon 128k/512k/1024k snapshots (ketmar
          and Fred).
+20120928 memory.c,machines/pentagon.c,snapshot.c: tweak copyright dates (Fred).

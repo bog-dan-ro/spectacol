@@ -1,7 +1,7 @@
 /* pentagon.c: Pentagon 128K specific routines, this is intended to be a 1991
                era Pentagon machine with Beta 128 and AY as described in the
                Russian Speccy FAQ and emulated on most Spectrum emulators.
-   Copyright (c) 1999-2011 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2012 Philip Kendall and Fredrick Meunier
 
    $Id$
 
