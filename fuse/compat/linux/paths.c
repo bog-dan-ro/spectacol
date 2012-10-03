@@ -1,5 +1,5 @@
 /* paths.c: Path-related compatibility routines
-   Copyright (c) 1999-2012 Philip Kendall
+   Copyright (c) 2012 Philip Kendall
 
    $Id$
 
@@ -29,7 +29,7 @@
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>
 #endif				/* #ifdef HAVE_LIBGEN_H */
-#include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "compat.h"
@@ -39,19 +39,25 @@
 const char*
 compat_get_temp_path( void )
 {
-  return "T:";
+  const char *dir;
+
+  /* Use TMPDIR if specified, if not /tmp */
+  dir = getenv( "TMPDIR" ); if( dir ) return dir;
+  return "/tmp";
 }
 
 const char*
 compat_get_home_path( void )
 {
-  return "PROGDIR:settings";
+  const char *dir;
+  dir = getenv( "HOME" ); if( dir ) return dir;
+  return ".";
 }
 
 int
 compat_is_absolute_path( const char *path )
 {
-  return strchr(path,':');
+  return path[0] == '/';
 }
 
 int
@@ -64,17 +70,17 @@ compat_get_next_path( path_context *ctx )
 
     /* First look relative to the current directory */
   case 0:
-    strncpy( ctx->path, "PROGDIR:", PATH_MAX );
+    strncpy( ctx->path, ".", PATH_MAX );
     return 1;
 
     /* Then relative to the Fuse executable */
   case 1:
 
     switch( ctx->type ) {
-    case UTILS_AUXILIARY_LIB: strncpy( ctx->path, "PROGDIR:lib/", PATH_MAX); return 1;
-    case UTILS_AUXILIARY_ROM: strncpy( ctx->path, "PROGDIR:roms/", PATH_MAX); return 1;
-    case UTILS_AUXILIARY_WIDGET: strncpy( ctx->path, "PROGDIR:ui/widget/", PATH_MAX); return 1;
-    case UTILS_AUXILIARY_GTK: strncpy( ctx->path, "PROGDIR:ui/gtk/", PATH_MAX); return 1;
+    case UTILS_AUXILIARY_LIB: path_segment = "lib"; break;
+    case UTILS_AUXILIARY_ROM: path_segment = "roms"; break;
+    case UTILS_AUXILIARY_WIDGET: path_segment = "ui/widget"; break;
+    case UTILS_AUXILIARY_GTK: path_segment = "ui/gtk"; break;
     default:
       ui_error( UI_ERROR_ERROR, "unknown auxiliary file type %d", ctx->type );
       return 0;
@@ -84,15 +90,15 @@ compat_get_next_path( path_context *ctx )
       strncpy( buffer, fuse_progname, PATH_MAX );
       buffer[ PATH_MAX - 1 ] = '\0';
     } else {
-      size_t len;
-      len = PATH_MAX - strlen( fuse_progname ) - strlen( FUSE_DIR_SEP_STR );
-      if( !getcwd( buffer, len ) ) {
+      ssize_t retval;
+      retval = readlink( "/proc/self/exe", buffer, PATH_MAX - 1 );
+
+      if( retval <= 0 ) {
         ui_error( UI_ERROR_ERROR, "error getting current working directory: %s",
 	          strerror( errno ) );
         return 0;
       }
-      strcat( buffer, FUSE_DIR_SEP_STR );
-      strcat( buffer, fuse_progname );
+      buffer[ retval ] = '\0';
     }
 
     path2 = dirname( buffer );

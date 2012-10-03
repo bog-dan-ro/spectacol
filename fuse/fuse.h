@@ -1,5 +1,5 @@
 /* fuse.h: Variables exported from the main file
-   Copyright (c) 2000-2003 Philip Kendall
+   Copyright (c) 2000-2012 Philip Kendall
 
    $Id$
 
@@ -33,7 +33,6 @@
 #include "compat.h"
 
 extern char *fuse_progname;		/* argv[0] */
-extern char fuse_directory[ PATH_MAX ];	/* The directory we started in */
 
 extern int fuse_exiting;		/* Shall we exit now? */
 

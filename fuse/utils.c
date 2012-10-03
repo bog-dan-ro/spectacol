@@ -1,5 +1,5 @@
 /* utils.c: some useful helper functions
-   Copyright (c) 1999-2011 Philip Kendall
+   Copyright (c) 1999-2012 Philip Kendall
 
    $Id$
 
@@ -54,17 +54,7 @@
 #include "tape.h"
 #include "utils.h"
 
-typedef struct path_context {
-
-  int state;
-
-  utils_aux_type type;
-  char path[ PATH_MAX ];
-
-} path_context;
-
 static void init_path_context( path_context *ctx, utils_aux_type type );
-static int get_next_path( path_context *ctx );
 
 static int networking_init_count = 0;
 
@@ -245,25 +235,19 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
   compat_fd fd;
 
   char path[ PATH_MAX ];
-  path_context ctx;
 
   /* If given an absolute path, just look there */
   if( compat_is_absolute_path( filename ) )
     return compat_file_open( filename, 0 );
 
   /* Otherwise look in some likely locations */
-  init_path_context( &ctx, type );
-
-  while( get_next_path( &ctx ) ) {
-#ifdef AMIGA
-    snprintf( path, PATH_MAX, "%s%s", ctx.path, filename );
-#else
-    snprintf( path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", ctx.path, filename );
-#endif
-    fd = compat_file_open( path, 0 );
-    if( fd != COMPAT_FILE_OPEN_FAILED ) return fd;
-
+  if( utils_find_file_path( filename, path, type ) ) {
+    return COMPAT_FILE_OPEN_FAILED;
   }
+
+  fd = compat_file_open( path, 0 );
+
+  if( fd != COMPAT_FILE_OPEN_FAILED ) return fd;
 
   /* Give up. Couldn't find this file */
   return COMPAT_FILE_OPEN_FAILED;
@@ -286,7 +270,7 @@ utils_find_file_path( const char *filename, char *ret_path,
   /* Otherwise look in some likely locations */
   init_path_context( &ctx, type );
 
-  while( get_next_path( &ctx ) ) {
+  while( compat_get_next_path( &ctx ) ) {
 
 #ifdef AMIGA
     snprintf( ret_path, PATH_MAX, "%s%s", ctx.path, filename );
@@ -310,75 +294,6 @@ init_path_context( path_context *ctx, utils_aux_type type )
 {
   ctx->state = 0;
   ctx->type = type;
-}
-
-static int
-get_next_path( path_context *ctx )
-{
-  char buffer[ PATH_MAX ];
-  const char *path_segment, *path2;
-
-  switch( (ctx->state)++ ) {
-
-    /* First look relative to the current directory */
-  case 0:
-#ifdef AMIGA
-    strncpy( ctx->path, "PROGDIR:", PATH_MAX );
-#else
-    strncpy( ctx->path, ".", PATH_MAX );
-#endif
-    return 1;
-
-    /* Then relative to the Fuse executable */
-  case 1:
-
-    switch( ctx->type ) {
-#ifdef AMIGA
-    case UTILS_AUXILIARY_LIB: strncpy( ctx->path, "PROGDIR:lib/", PATH_MAX); return 1;
-    case UTILS_AUXILIARY_ROM: strncpy( ctx->path, "PROGDIR:roms/", PATH_MAX); return 1;
-    case UTILS_AUXILIARY_WIDGET: strncpy( ctx->path, "PROGDIR:ui/widget/", PATH_MAX); return 1;
-    case UTILS_AUXILIARY_GTK: strncpy( ctx->path, "PROGDIR:ui/gtk/", PATH_MAX); return 1;
-#else
-    case UTILS_AUXILIARY_LIB: path_segment = "lib"; break;
-    case UTILS_AUXILIARY_ROM: path_segment = "roms"; break;
-    case UTILS_AUXILIARY_WIDGET: path_segment = "ui/widget"; break;
-    case UTILS_AUXILIARY_GTK: path_segment = "ui/gtk"; break;
-#endif
-    default:
-      ui_error( UI_ERROR_ERROR, "unknown auxiliary file type %d", ctx->type );
-      return 0;
-    }
-
-    if( compat_is_absolute_path( fuse_progname ) ) {
-      strncpy( buffer, fuse_progname, PATH_MAX );
-      buffer[ PATH_MAX - 1 ] = '\0';
-    } else {
-      snprintf( buffer, PATH_MAX, "%s%s", fuse_directory, fuse_progname );
-    }
-    path2 = dirname( buffer );
-    snprintf( ctx->path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", path2,
-              path_segment );
-    return 1;
-
-    /* Then where we may have installed the data files */
-  case 2:
-
-#ifdef GEKKO 
-    path2 = "sd:/apps/fuse";
-#else				/* #ifdef GEKKO */
-#ifndef ROMSDIR
-    path2 = FUSEDATADIR;
-#else				/* #ifndef ROMSDIR */
-    path2 = ctx->type == UTILS_AUXILIARY_ROM ? ROMSDIR : FUSEDATADIR;
-#endif				/* #ifndef ROMSDIR */
-#endif				/* #ifdef GEKKO */
-    strncpy( ctx->path, path2, PATH_MAX ); buffer[ PATH_MAX - 1 ] = '\0';
-    return 1;
-
-  case 3: return 0;
-  }
-  ui_error( UI_ERROR_ERROR, "unknown path_context state %d", ctx->state );
-  fuse_abort();
 }
 
 int

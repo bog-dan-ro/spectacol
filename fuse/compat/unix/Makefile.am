@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2007-2008 Philip Kendall
+## Copyright (c) 2007-2012 Philip Kendall
 
 ## $Id$
 
@@ -35,4 +35,5 @@ libcompatos_a_SOURCES = dir.c \
 			timer.c \
                         tuntap.c
 
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
+INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
+-DFUSEDATADIR="\"${pkgdatadir}\""

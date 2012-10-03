@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2003-2012 Philip Kendall
+## Copyright (c) 2012 Philip Kendall
 
 ## $Id$
 
@@ -21,18 +21,19 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AM_CPPFLAGS += -I$(srcdir)/compat
+AUTOMAKE_OPTIONS = foreign
 
-DIST_SUBDIRS += compat/amiga \
-	       compat/linux \
-	       compat/morphos \
-	       compat/unix \
-	       compat/wii \
-	       compat/win32
+AM_CPPFLAGS = -I$(srcdir)/../..
 
-EXTRA_fuse_SOURCES += compat/dirname.c \
-		compat/getopt.c \
-		compat/getopt1.c \
-		compat/mkstemp.c
+noinst_LIBRARIES = libcompatos.a
 
-noinst_HEADERS += compat/getopt.h
+libcompatos_a_SOURCES = ../unix/dir.c \
+			../unix/file.c \
+			../unix/osname.c \
+			paths.c \
+			../unix/socket.c \
+			../unix/timer.c \
+			../unix/tuntap.c
+
+INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
+-DFUSEDATADIR="\"${pkgdatadir}\""

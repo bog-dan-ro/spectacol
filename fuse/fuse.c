@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2011 Philip Kendall and others
+   Copyright (c) 1999-2012 Philip Kendall and others
 
    $Id$
 
@@ -101,9 +101,6 @@
 
 /* What name were we called under? */
 char *fuse_progname;
-
-/* Which directory were we started in? */
-char fuse_directory[ PATH_MAX ];
 
 /* A flag to say when we want to exit the emulator */
 int fuse_exiting;
@@ -216,13 +213,6 @@ static int fuse_init(int argc, char **argv)
      messages */
   if( display_init(&argc,&argv) ) return 1;
 #endif
-
-  if( !getcwd( fuse_directory, PATH_MAX - 1 ) ) {
-    ui_error( UI_ERROR_ERROR, "error getting current working directory: %s",
-	      strerror( errno ) );
-    return 1;
-  }
-  strcat( fuse_directory, FUSE_DIR_SEP_STR );
 
   if( settings_init( &first_arg, argc, argv ) ) return 1;
 

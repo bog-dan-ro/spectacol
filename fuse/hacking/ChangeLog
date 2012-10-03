@@ -4210,3 +4210,9 @@
          of the Beta ROM when loading Pentagon 128k/512k/1024k snapshots (ketmar
          and Fred).
 20120928 memory.c,machines/pentagon.c,snapshot.c: tweak copyright dates (Fred).
+20121003 compat.h,compat/Makefile.am,compat/amiga/{Makefile.am,paths.c},
+         compat/linux/{Makefile.am,paths.c},compat/unix/{Makefile.am,paths.c},
+         compat/wii/paths.c,compat/win32/paths.c,configure.in,fuse.[ch],
+         utils.[ch]: add a compat function for get_next_dir() to accommodate
+         platform-specific strategies for locating resources (bug #3571689)
+         (Sergio).

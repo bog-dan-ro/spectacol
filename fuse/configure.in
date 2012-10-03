@@ -738,6 +738,9 @@ case "$target_os" in
   amigaos)
     COMPAT_OSNAME='amiga'
     ;;
+  linux*)
+    COMPAT_OSNAME='linux'
+    ;;
   morphos)
     COMPAT_OSNAME='morphos'
     ;;
@@ -817,6 +820,7 @@ fi
 
 AC_OUTPUT(Makefile \
 compat/amiga/Makefile \
+compat/linux/Makefile \
 compat/morphos/Makefile \
 compat/unix/Makefile \
 compat/wii/Makefile \

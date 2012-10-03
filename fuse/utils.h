@@ -1,5 +1,5 @@
 /* utils.h: some useful helper functions
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2012 Philip Kendall
 
    $Id$
 
@@ -36,16 +36,6 @@ typedef struct utils_file {
   size_t length;
 
 } utils_file;
-
-/* The types of auxiliary file we can look for */
-typedef enum utils_aux_type {
-
-  UTILS_AUXILIARY_LIB,		/* Something from the lib/ directory */
-  UTILS_AUXILIARY_ROM,		/* Something from the roms/ directory */
-  UTILS_AUXILIARY_WIDGET,	/* Something from the widget/ directory */
-  UTILS_AUXILIARY_GTK,		/* Something from the gtk/ directory */
-
-} utils_aux_type;
 
 int utils_open_file( const char *filename, int autoload,
 		     libspectrum_id_t *type );
