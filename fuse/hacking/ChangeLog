@@ -4223,3 +4223,5 @@
          ui/win32/installer/{Makefile.am,fuse.nsi,fuse.nsi.in},windres.rc: have
          configure.in as the repository of version, copyright and URL
          information (patch #3575830) (Sergio).
+20121010 configure.in: remove some obsolete autoconf macros (patch #3575831)
+         (Sergio).
