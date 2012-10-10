@@ -4216,5 +4216,10 @@
          utils.[ch]: add a compat function for get_next_dir() to accommodate
          platform-specific strategies for locating resources (bug #3571689)
          (Sergio).
-20121003 compat/{linux/paths.c,win32/paths.c}: add missing #include <string.h>
+20121010 compat/{linux/paths.c,win32/paths.c}: add missing #include <string.h>
          (more from bug #3571689) (Sergio).
+20121010 configure.in,fuse.c,ui/gtk/gtkui.c,ui/widget/menu.c,
+         ui/win32/{Makefile.am,about.c,about.rc},
+         ui/win32/installer/{Makefile.am,fuse.nsi,fuse.nsi.in},windres.rc: have
+         configure.in as the repository of version, copyright and URL
+         information (patch #3575830) (Sergio).

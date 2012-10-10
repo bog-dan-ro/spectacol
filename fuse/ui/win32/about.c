@@ -23,6 +23,8 @@
 
 */
 
+#include <config.h>
+
 #include <tchar.h>
 #include <windows.h>
 
@@ -94,8 +96,7 @@ dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
           if( hBoldFont ) DeleteObject( hBoldFont );
           return TRUE;
         case IDC_ABOUT_STATIC_WEBSITE:
-          ShellExecute( hwndDlg, "open",
-                 "http://sourceforge.net/fuse-emulator/",
+          ShellExecute( hwndDlg, "open", PACKAGE_URL,
                  NULL, NULL, SW_SHOWNORMAL );
           return TRUE;
       }

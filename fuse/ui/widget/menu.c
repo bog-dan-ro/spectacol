@@ -668,7 +668,9 @@ void
 menu_help_about( int action )
 {
   widget_end_all( WIDGET_FINISHED_OK );
-  ui_error( UI_ERROR_INFO, "Free Unix Spectrum Emulator (Fuse) %s (c) 1999-2011 Philip Kendall and others. See http://fuse-emulator.sf.net/ for details.", VERSION );
+  ui_error( UI_ERROR_INFO,
+           "Free Unix Spectrum Emulator (Fuse) %s %s. See %s for details.",
+            VERSION, FUSE_COPYRIGHT, PACKAGE_URL );
 }
 
 static int

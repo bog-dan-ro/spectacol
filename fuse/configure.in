@@ -19,14 +19,42 @@ dnl Author contact information:
 dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
-AC_INIT(fuse.c)
-AM_CONFIG_HEADER(config.h)
+dnl Package version
+m4_define([fuse_version], [1.0.0])
+
+dnl Product full version
+m4_define([fuse_major_version], [1])
+m4_define([fuse_minor_version], [0])
+m4_define([fuse_micro_version], [0])
+m4_define([fuse_nano_version],  [0])
+m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
+m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
+
+dnl Package info
+m4_define([fuse_copyright], ["(c) 1999-2012 Philip Kendall and others"])
+m4_define([fuse_url], [http://fuse-emulator.sourceforge.net])
+m4_define([fuse_bugreport], [http://sourceforge.net/tracker/?group_id=91293&atid=596648])
+
+AC_INIT([fuse],[fuse_version],[fuse_bugreport],[fuse],[fuse_url])
+AC_CONFIG_SRCDIR(fuse.c)
+AC_CONFIG_HEADERS(config.h)
 AC_CANONICAL_SYSTEM
 
-define(FUSE_VERSION, [1.0.0])
-
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, FUSE_VERSION)
+AM_INIT_AUTOMAKE
+
+dnl Substitutions for .in files
+FUSE_FULL_VERSION=fuse_full_version
+FUSE_COPYRIGHT=fuse_copyright
+FUSE_URL=fuse_url
+AC_SUBST(FUSE_FULL_VERSION)
+AC_SUBST(FUSE_COPYRIGHT)
+AC_SUBST(FUSE_URL)
+
+dnl Definitions for config.h
+AC_DEFINE([FUSE_RC_VERSION], [fuse_rc_version],
+          [Define version information for win32 executables])
+AC_DEFINE([FUSE_COPYRIGHT], [fuse_copyright], [Define copyright of Fuse])
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -49,13 +77,6 @@ if test "$windres" = yes; then
   AC_SUBST(WINDRES)
   if test "$WINDRES" != no; then
     WINDRES_OBJ="windres.o"
-    define(FUSE_FULL_VERSION,
-           [ifelse(translit(FUSE_VERSION, [0-9]), [.], [FUSE_VERSION[.0.0]],
-                   translit(FUSE_VERSION, [0-9]), [..], [FUSE_VERSION[.0]],
-                   [FUSE_VERSION])])dnl
-    AC_DEFINE([VERSION_WIN32], [translit(FUSE_FULL_VERSION, [.], [,])], [Define version information for win32 executable])
-    FUSE_FULL[]_VERSION=FUSE_FULL_VERSION
-    AC_SUBST(FUSE_FULL[]_VERSION)
   fi
 fi
 AC_SUBST(WINDRES_OBJ)
@@ -853,7 +874,7 @@ ui/widget/Makefile \
 ui/win32/fuse.manifest \
 ui/win32/Makefile \
 ui/win32/icons/Makefile \
-ui/win32/installer/Makefile \
+ui/win32/installer/fuse.nsi \
 ui/xlib/Makefile \
 unittests/Makefile \
 z80/Makefile \

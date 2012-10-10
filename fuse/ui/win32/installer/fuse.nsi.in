@@ -21,8 +21,8 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-!define FUSE_VERSION "1.0.0.1" ; can contain letters like -RC1
-!define FUSE_FULL_VERSION "1.0.0.1" ; must contain four numeric tokens
+!define FUSE_VERSION "@PACKAGE_VERSION@" ; could have letters like -RC1
+!define FUSE_FULL_VERSION "@FUSE_FULL_VERSION@" ; must have four numeric tokens
 !define DISPLAY_NAME "Free Unix Spectrum Emulator (Fuse) ${FUSE_VERSION}"
 !define SETUP_FILENAME "fuse-${FUSE_VERSION}-setup"
 !define SETUP_FILE "${SETUP_FILENAME}.exe"
@@ -84,7 +84,7 @@ SetCompressor lzma
   VIProductVersion ${FUSE_FULL_VERSION}
   VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" ""
   VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "${SETUP_FILENAME}"
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright (c) 1999-2011 Philip Kendall and others; see the file 'AUTHORS' for more details."
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "@FUSE_COPYRIGHT@"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Fuse"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${FUSE_VERSION}"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "${SETUP_FILE}"
@@ -261,7 +261,7 @@ section "!Fuse Core Files (required)" SecCore
     ; Write the uninstall keys for Windows
     WriteRegStr HKLM "${HKLM_REG_KEY}" "DisplayName" "${DISPLAY_NAME}"
     WriteRegStr HKLM "${HKLM_REG_KEY}" "DisplayVersion" "${FUSE_VERSION}"
-    WriteRegStr HKLM "${HKLM_REG_KEY}" "HelpLink" "http://fuse-emulator.sourceforge.net"
+    WriteRegStr HKLM "${HKLM_REG_KEY}" "HelpLink" "@PACKAGE_URL@"
     WriteRegStr HKLM "${HKLM_REG_KEY}" "UninstallString" '"$INSTDIR\uninstall.exe"'
     WriteRegDWORD HKLM "${HKLM_REG_KEY}" "NoModify" 1
     WriteRegDWORD HKLM "${HKLM_REG_KEY}" "NoRepair" 1

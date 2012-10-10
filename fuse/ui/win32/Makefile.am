@@ -100,8 +100,7 @@ options.rc: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-re
 
 menu_data: menu_data.c menu_data.h menu_data.rc
 
-DIST_SUBDIRS = icons \
-	       installer
+DIST_SUBDIRS = icons
 
 noinst_HEADERS = about.h \
 		 binary.h \
