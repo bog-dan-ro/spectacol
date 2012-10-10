@@ -4225,3 +4225,5 @@
          information (patch #3575830) (Sergio).
 20121010 configure.in: remove some obsolete autoconf macros (patch #3575831)
          (Sergio).
+20121010 configure.ac: rename configure.in to configure.ac as that is the new
+         standard (Fred).
