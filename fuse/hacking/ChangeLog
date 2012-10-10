@@ -4216,3 +4216,5 @@
          utils.[ch]: add a compat function for get_next_dir() to accommodate
          platform-specific strategies for locating resources (bug #3571689)
          (Sergio).
+20121003 compat/{linux/paths.c,win32/paths.c}: add missing #include <string.h>
+         (more from bug #3571689) (Sergio).

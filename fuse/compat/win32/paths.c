@@ -29,6 +29,7 @@
 #include <libgen.h>
 #endif				/* #ifdef HAVE_LIBGEN_H */
 #include <stdlib.h>
+#include <string.h>
 #include <windows.h>
 
 #include "compat.h"
