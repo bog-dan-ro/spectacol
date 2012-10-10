@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libdisk.a
 
-INCLUDES = @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@
+AM_CPPFLAGS += @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@
 
 libdisk_a_SOURCES = beta.c \
 		    crc.c \

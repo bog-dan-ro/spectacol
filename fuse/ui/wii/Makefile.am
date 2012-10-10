@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libuiwii.a
 
-INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+AM_CPPFLAGS += @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 libuiwii_a_SOURCES = wiidisplay.c \
 		    wiijoystick.c \

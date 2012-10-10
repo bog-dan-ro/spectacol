@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libuisvga.a
 
-INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+AM_CPPFLAGS += @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 libuisvga_a_SOURCES = svgadisplay.c \
 		      svgajoystick.c \

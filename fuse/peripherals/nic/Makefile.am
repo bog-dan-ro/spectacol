@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libnic.a
 
-INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
+AM_CPPFLAGS += @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
 libnic_a_SOURCES = \
   enc28j60.c \

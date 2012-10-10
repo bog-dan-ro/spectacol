@@ -42,7 +42,7 @@ keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 xpixmaps.c: xstatusbar.pl $(srcdir)/../gtk/pixmaps.c
 	@PERL@ -I$(srcdir)/../../perl xstatusbar.pl > $@.tmp && mv $@.tmp $@
 
-INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+AM_CPPFLAGS += @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 noinst_HEADERS = xdisplay.h xkeyboard.h xui.h
 

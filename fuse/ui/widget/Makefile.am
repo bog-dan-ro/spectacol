@@ -45,7 +45,7 @@ libwidget_a_SOURCES = \
 	text.c \
 	widget.c
 
-INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@ @SDL_CFLAGS@
+AM_CPPFLAGS += @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@ @SDL_CFLAGS@
 
 BUILT_SOURCES = menu_data.c \
 		options.c \

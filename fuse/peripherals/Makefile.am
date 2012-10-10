@@ -33,7 +33,7 @@ SUBDIRS = \
 
 noinst_LIBRARIES = libperipherals.a
 
-INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
+AM_CPPFLAGS += @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
 libperipherals_a_SOURCES = \
   ay.c \

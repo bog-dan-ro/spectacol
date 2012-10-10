@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libuiwin32.a
 
-INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+AM_CPPFLAGS += @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 libuiwin32_a_SOURCES = about.c \
 		       about.rc \

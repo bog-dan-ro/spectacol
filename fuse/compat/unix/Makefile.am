@@ -35,5 +35,5 @@ libcompatos_a_SOURCES = dir.c \
 			timer.c \
                         tuntap.c
 
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
+AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
 -DFUSEDATADIR="\"${pkgdatadir}\""

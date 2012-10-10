@@ -4227,3 +4227,15 @@
          (Sergio).
 20121010 configure.ac: rename configure.in to configure.ac as that is the new
          standard (Fred).
+20121010 Makefile.am,compat/amiga/Makefile.am,compat/linux/Makefile.am,
+         compat/morphos/Makefile.am,compat/unix/Makefile.am,
+         compat/wii/Makefile.am,compat/win32/Makefile.am,debugger/Makefile.am,
+         machines/Makefile.am,peripherals/Makefile.am,
+         peripherals/disk/Makefile.am,peripherals/flash/Makefile.am,
+         peripherals/ide/Makefile.am,peripherals/nic/Makefile.am,
+         pokefinder/Makefile.am,sound/Makefile.am,timer/Makefile.am,
+         ui/fb/Makefile.am,ui/gtk/Makefile.am,ui/scaler/Makefile.am,
+         ui/sdl/Makefile.am,ui/svga/Makefile.am,ui/widget/Makefile.am,
+         ui/wii/Makefile.am,ui/win32/Makefile.am,ui/xlib/Makefile.am,
+         unittests/Makefile.am,z80/Makefile.am: migrate INCLUDES to AM_CPPFLAGS
+         (Fred).

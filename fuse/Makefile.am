@@ -163,7 +163,7 @@ options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@UI@/options-header.
 	@PERL@ $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | @PERL@ -I$(srcdir)/perl $(srcdir)/ui/@UI@/options-header.pl - public > $@.tmp && mv $@.tmp $@
 endif
 
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
+AM_CPPFLAGS = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
 @XML_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\"" @SDL_CFLAGS@
 
 noinst_HEADERS = bitmap.h \
@@ -211,7 +211,5 @@ EXTRA_DIST = AUTHORS \
 CLEANFILES = options.h \
 	     settings.c \
 	     settings.h
-
-AM_CPPFLAGS =
 
 include compat/Makefile.am

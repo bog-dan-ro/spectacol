@@ -33,4 +33,4 @@ libpokefinder_a_SOURCES = pokefinder.c \
 noinst_HEADERS = pokefinder.h \
   pokemem.h
 
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
+AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@

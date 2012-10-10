@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LTLIBRARIES = libuigtk.la
 
-INCLUDES = @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
+AM_CPPFLAGS += @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
 libuigtk_la_SOURCES = binary.c \
 		     browse.c \

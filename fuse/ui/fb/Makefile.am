@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libuifb.a
 
-INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+AM_CPPFLAGS += @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 libuifb_a_SOURCES = fbdisplay.c \
 		    fbjoystick.c \
