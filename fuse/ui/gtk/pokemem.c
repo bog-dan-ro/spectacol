@@ -385,7 +385,7 @@ pokemem_add_custom_poke( GtkWidget *widget GCC_UNUSED,
     return;
   }
 
-  /* Updadate store and view */
+  /* Update store and view */
   trainer = pokemem_trainer_list_add( b, a, v );
   if( !trainer ) {
     ui_error( UI_ERROR_ERROR, "Cannot add trainer" );
