@@ -4241,3 +4241,5 @@
          (Fred).
 20121011 acinclude.m4: remove obsolete GLIB 1.x and GTK 1.x autoconf macros
          (more from patch #3575831) (Sergio).
+20121011 configure.ac: don't use AC_OUTPUT with parameters (more from patch
+         #3575831) (Sergio).

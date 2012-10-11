@@ -839,43 +839,46 @@ if test "$ac_cv_prog_gcc" = yes; then
     fi
 fi
 
-AC_OUTPUT(Makefile \
-compat/amiga/Makefile \
-compat/linux/Makefile \
-compat/morphos/Makefile \
-compat/unix/Makefile \
-compat/wii/Makefile \
-compat/win32/Makefile \
-data/Makefile \
-debugger/Makefile \
-hacking/Makefile \
-lib/Makefile \
-machines/Makefile \
-man/Makefile \
-peripherals/Makefile \
-peripherals/disk/Makefile \
-peripherals/ide/Makefile \
-peripherals/nic/Makefile \
-peripherals/flash/Makefile \
-perl/Makefile \
-perl/Fuse/Makefile \
-pokefinder/Makefile \
-roms/Makefile \
-sound/Makefile \
-timer/Makefile \
-ui/Makefile \
-ui/fb/Makefile \
-ui/wii/Makefile \
-ui/gtk/Makefile \
-ui/svga/Makefile \
-ui/sdl/Makefile \
-ui/scaler/Makefile \
-ui/widget/Makefile \
-ui/win32/fuse.manifest \
-ui/win32/Makefile \
-ui/win32/icons/Makefile \
-ui/win32/installer/fuse.nsi \
-ui/xlib/Makefile \
-unittests/Makefile \
-z80/Makefile \
-z80/tests/Makefile)
+AC_CONFIG_FILES([
+Makefile
+compat/amiga/Makefile
+compat/linux/Makefile
+compat/morphos/Makefile
+compat/unix/Makefile
+compat/wii/Makefile
+compat/win32/Makefile
+data/Makefile
+debugger/Makefile
+hacking/Makefile
+lib/Makefile
+machines/Makefile
+man/Makefile
+peripherals/Makefile
+peripherals/disk/Makefile
+peripherals/ide/Makefile
+peripherals/nic/Makefile
+peripherals/flash/Makefile
+perl/Makefile
+perl/Fuse/Makefile
+pokefinder/Makefile
+roms/Makefile
+sound/Makefile
+timer/Makefile
+ui/Makefile
+ui/fb/Makefile
+ui/wii/Makefile
+ui/gtk/Makefile
+ui/svga/Makefile
+ui/sdl/Makefile
+ui/scaler/Makefile
+ui/widget/Makefile
+ui/win32/fuse.manifest
+ui/win32/Makefile
+ui/win32/icons/Makefile
+ui/win32/installer/fuse.nsi
+ui/xlib/Makefile
+unittests/Makefile
+z80/Makefile
+z80/tests/Makefile])
+
+AC_OUTPUT
