@@ -38,7 +38,7 @@ m4_define([fuse_bugreport], [http://sourceforge.net/tracker/?group_id=91293&atid
 AC_INIT([fuse],[fuse_version],[fuse_bugreport],[fuse],[fuse_url])
 AC_CONFIG_SRCDIR(fuse.c)
 AC_CONFIG_HEADERS(config.h)
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_HOST
 
 dnl Use automake to produce `Makefile.in'
 AM_INIT_AUTOMAKE
@@ -63,7 +63,7 @@ AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
 AM_PROG_LEX
 AC_PROG_YACC
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl Check for Win32 resource tool
 AC_MSG_CHECKING(whether to use windres)
@@ -201,7 +201,7 @@ if test -z "$UI"; then
     AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
     UI=wii; WIDGET=widget;
     UI_LIBS="ui/wii/libuiwii.a ui/widget/libwidget.a"
-    target_os=wii
+    host_os=wii
     dnl Look for libgpm (default=yes)
     AC_MSG_CHECKING(whether gpm requested)
     AC_ARG_WITH(gpm,
@@ -733,7 +733,7 @@ if test "$ac_cv_func_dirname" = no; then
 fi
 AM_CONDITIONAL(COMPAT_DIRNAME, test "$ac_cv_func_dirname" = no)
 if test "$ac_cv_func_getopt_long" = no; then
-  case "$target_os" in
+  case "$host_os" in
     amigaos|morphos)
       dnl Our getopt_long replacement doesn't work, so don't use it
       ;;
@@ -755,7 +755,7 @@ AC_MSG_RESULT($missing_routines)
 
 dnl Work out which compatibility routines to use
 AC_MSG_CHECKING(which compatibility routines to use)
-case "$target_os" in
+case "$host_os" in
   amigaos)
     COMPAT_OSNAME='amiga'
     ;;

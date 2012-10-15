@@ -4246,3 +4246,5 @@
 20121011 ui/gtk/pokemem.c: fix typo (Fred).
 20121015 ui/win32/installer/Makefile.am: remove obsolete file (more from patch
          #3575831) (Sergio).
+20121015 configure.ac: replace obsolete macros: AC_CANONICAL_SYSTEM and
+         AC_PROG_LIBTOOL (more from patch #3575831) (Sergio).
