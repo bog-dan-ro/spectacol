@@ -4244,3 +4244,5 @@
 20121011 configure.ac: don't use AC_OUTPUT with parameters (more from patch
          #3575831) (Sergio).
 20121011 ui/gtk/pokemem.c: fix typo (Fred).
+20121015 ui/win32/installer/Makefile.am: remove obsolete file (more from patch
+         #3575831) (Sergio).
