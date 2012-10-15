@@ -4248,3 +4248,7 @@
          #3575831) (Sergio).
 20121015 configure.ac: replace obsolete macros: AC_CANONICAL_SYSTEM and
          AC_PROG_LIBTOOL (more from patch #3575831) (Sergio).
+20121015 Makefile.am,acinclude.m4,autogen.sh,configure.ac,m4/{glib-2.0.m4,
+         gtk-2.0.m4,libxml.m4,pkg.m4,sdl.m4}: split acinclude.m4 in files in a
+         m4 directory; acinclude.m4 has been removed (more from patch #3575831)
+         (Sergio).

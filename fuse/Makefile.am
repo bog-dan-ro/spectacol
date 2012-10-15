@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+ACLOCAL_AMFLAGS = -I m4
+
 bin_PROGRAMS = fuse
 
 SUBDIRS = @COMPAT_SUBDIR@ \

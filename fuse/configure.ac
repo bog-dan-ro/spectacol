@@ -37,6 +37,7 @@ m4_define([fuse_bugreport], [http://sourceforge.net/tracker/?group_id=91293&atid
 
 AC_INIT([fuse],[fuse_version],[fuse_bugreport],[fuse],[fuse_url])
 AC_CONFIG_SRCDIR(fuse.c)
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS(config.h)
 AC_CANONICAL_HOST
 

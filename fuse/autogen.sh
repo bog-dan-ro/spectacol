@@ -26,7 +26,7 @@
 # Exit on errors
 set -e
 
-aclocal
+aclocal -I m4
 # Mac OS X: Use glibtoolize instead
 libtoolize --automake
 autoheader
