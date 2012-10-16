@@ -203,6 +203,11 @@ EXTRA_DIST = AUTHORS \
 	     THANKS \
 	     keysyms.dat \
 	     keysyms.pl \
+	     m4/glib-2.0.m4 \
+	     m4/gtk-2.0.m4 \
+	     m4/libxml.m4 \
+	     m4/pkg.m4 \
+	     m4/sdl.m4 \
 	     menu_data.dat \
 	     menu_data.pl \
 	     settings.pl \

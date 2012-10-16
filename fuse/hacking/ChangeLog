@@ -4252,3 +4252,5 @@
          gtk-2.0.m4,libxml.m4,pkg.m4,sdl.m4}: split acinclude.m4 in files in a
          m4 directory; acinclude.m4 has been removed (more from patch #3575831)
          (Sergio).
+20121016 Makefile.am: distribute m4 directory and contents with the release
+         tarball (Fred).
