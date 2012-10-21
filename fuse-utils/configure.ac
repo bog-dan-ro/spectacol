@@ -19,17 +19,19 @@ dnl Author contact information:
 dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
-AC_INIT(tzxlist.c)
-AM_CONFIG_HEADER(config.h)
-AC_CANONICAL_SYSTEM
+AC_INIT([fuse-utils],[1.0.0])
+AC_CONFIG_SRCDIR([tzxlist.c])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_HEADERS([config.h])
+AC_CANONICAL_HOST
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse-utils, [1.0.0])
+AM_INIT_AUTOMAKE
 
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl Check for big endianness
 AC_C_BIGENDIAN
@@ -213,7 +215,7 @@ AC_SUBST(LTLIBICONV)
 
 dnl Work out which compatibility routines to use
 AC_MSG_CHECKING(which compatibility routines to use)
-case "$target_os" in
+case "$host_os" in
   amigaos)
     COMPAT_OSNAME='amiga'
     ;;
@@ -231,7 +233,7 @@ AC_SUBST(COMPAT_SUBDIR)
 AC_SUBST(COMPAT_OSNAME)
 
 if test "$ac_cv_func_getopt_long" = no; then
-  case "$target_os" in
+  case "$host_os" in
     amigaos|morphos)
       dnl Our getopt_long replacement doesn't work, so don't use it
       ;;
@@ -246,10 +248,14 @@ if test "$ac_cv_func_mkstemp" = no; then
   missing_routines="$missing_routines"'mkstemp '
 fi
 
-AC_OUTPUT(Makefile \
-compat/amiga/Makefile \
-compat/unix/Makefile \
-compat/win32/Makefile \
-fuse-utils.qpg \
-hacking/Makefile \
-man/Makefile)
+AC_CONFIG_FILES([
+  Makefile
+  compat/amiga/Makefile
+  compat/unix/Makefile
+  compat/win32/Makefile
+  fuse-utils.qpg
+  hacking/Makefile
+  man/Makefile
+])
+
+AC_OUTPUT

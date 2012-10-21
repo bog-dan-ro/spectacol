@@ -30,4 +30,4 @@ noinst_LIBRARIES = libcompatos.a
 libcompatos_a_SOURCES = ../unix/basename.c \
                         osname.c
 
-INCLUDES = @LIBSPEC_CFLAGS@
+AM_CPPFLAGS += @LIBSPEC_CFLAGS@

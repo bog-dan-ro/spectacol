@@ -349,3 +349,7 @@
 20120922 tapeconv.c: correct check of LIBSPECTRUM_ID_UNKNOWN (fixes bug
          #3570483) (Michael Tautschnig).
 20120923 tapeconv.c: remove potential memory leak (Fred).
+20121021 Makefile.am,acinclude.m4,autogen.sh,compat/amiga/Makefile.am,
+         compat/unix/Makefile.am,compat/win32/Makefile.am,configure.[ac|in],
+         m4/{audiofile.m4,m4/glib-1.0.m4,m4/glib-2.0.m4,m4/iconv.m4}:
+         modernise autoconf support (more from patch #3575831) (Sergio).

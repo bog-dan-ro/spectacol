@@ -23,12 +23,15 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+ACLOCAL_AMFLAGS = -I m4
+
 SUBDIRS = @COMPAT_SUBDIR@ \
           hacking \
           man
 
 DIST_SUBDIRS = compat/amiga \
                compat/unix \
+               compat/win32 \
                hacking \
                man
 
@@ -55,7 +58,7 @@ endif
 
 EXTRA_PROGRAMS = rzxcheck audio2tape tape2wav
 
-INCLUDES = @LIBSPEC_CFLAGS@ @AUDIOFILE_CFLAGS@ @GLIB_CFLAGS@
+AM_CPPFLAGS = @LIBSPEC_CFLAGS@ @AUDIOFILE_CFLAGS@ @GLIB_CFLAGS@
 
 createhdf_SOURCES = ide.c createhdf.c
 
@@ -123,4 +126,9 @@ noinst_HEADERS = compat.h ide.h utils.h audio2tape.h importer/interpolator.h \
                  converter/findsync1.h converter/getpulse1.h \
                  converter/getpulse2.h converter/getsync2.h \
                  converter/romloader.h converter/romloaderstate.h \
-                 fmfconv.h
+                 fmfconv.h movie_tables.h
+
+EXTRA_DIST = m4/audiofile.m4 \
+             m4/glib-1.0.m4 \
+             m4/glib-2.0.m4 \
+             m4/iconv.m4
