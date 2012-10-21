@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+ACLOCAL_AMFLAGS = -I m4
+
 lib_LTLIBRARIES = libspectrum.la
 
 libspectrum_la_SOURCES = bzip2.c \
@@ -99,10 +101,11 @@ tape_set.c: tape_set.pl tape_accessors.txt
 windres.o: windres.rc
 	@WINDRES@ $(srcdir)/windres.rc windres.o
 
-INCLUDES = @GLIB_CFLAGS@ @AUDIOFILE_CFLAGS@
+AM_CPPFLAGS = @GLIB_CFLAGS@ @AUDIOFILE_CFLAGS@
 
 EXTRA_DIST = accessor.pl \
 	     generate.pl.in \
+	     m4/audiofile.m4 \
 	     make-perl.c \
 	     tape_accessors.pl \
 	     tape_accessors.txt \

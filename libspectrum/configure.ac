@@ -21,13 +21,48 @@ dnl Author contact information:
 dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
-AC_INIT(libspectrum.c)
-AM_CONFIG_HEADER(config.h)
+dnl Package version
+m4_define([libspectrum_version], [1.0.0])
 
-define(LIBSPECTRUM_VERSION, [1.0.0])
+dnl Product full version
+m4_define([libspectrum_major_version], [1])
+m4_define([libspectrum_minor_version], [0])
+m4_define([libspectrum_micro_version], [0])
+m4_define([libspectrum_nano_version],  [0])
+m4_define([libspectrum_full_version],
+          [libspectrum_major_version.libspectrum_minor_version.libspectrum_micro_version.libspectrum_nano_version])
+m4_define([libspectrum_rc_version],
+          [libspectrum_major_version,libspectrum_minor_version,libspectrum_micro_version,libspectrum_nano_version])
+
+dnl Package info
+m4_define([libspectrum_copyright], ["(c) 1999-2012 Philip Kendall and others"])
+m4_define([libspectrum_url],
+          [http://fuse-emulator.sourceforge.net/libspectrum.php])
+m4_define([libspectrum_bugreport],
+          [http://sourceforge.net/tracker/?group_id=91293&atid=596648])
+
+AC_INIT([libspectrum],[libspectrum_version],[libspectrum_bugreport],
+        [libspectrum],[libspectrum_url])
+AC_CONFIG_SRCDIR([libspectrum.c])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_HEADERS([config.h])
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(libspectrum, LIBSPECTRUM_VERSION)
+AM_INIT_AUTOMAKE
+
+dnl Substitutions for .in files
+LIBSPECTRUM_FULL_VERSION=libspectrum_full_version
+LIBSPECTRUM_COPYRIGHT=libspectrum_copyright
+LIBSPECTRUM_URL=libspectrum_url
+AC_SUBST(LIBSPECTRUM_FULL_VERSION)
+AC_SUBST(LIBSPECTRUM_COPYRIGHT)
+AC_SUBST(LIBSPECTRUM_URL)
+
+dnl Definitions for config.h
+AC_DEFINE([LIBSPECTRUM_RC_VERSION], [libspectrum_rc_version],
+          [Define version information for win32 dll library])
+AC_DEFINE([LIBSPECTRUM_COPYRIGHT], [libspectrum_copyright],
+          [Define copyright of libspectrum])
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -42,7 +77,7 @@ fi
 AC_MSG_RESULT([$CC_FOR_BUILD])
 AC_SUBST(CC_FOR_BUILD)
 
-AM_PROG_LIBTOOL
+LT_INIT
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
 
@@ -66,11 +101,6 @@ if test "$windres" = yes; then
   if test "$WINDRES" != no; then
     WINDRES_OBJ="windres.o"
     WINDRES_LDFLAGS="-Xlinker windres.o"
-    define(LIBSPECTRUM_FULL_VERSION,
-           [ifelse(translit(LIBSPECTRUM_VERSION, [0-9]), [.], [LIBSPECTRUM_VERSION[.0.0]],
-                   translit(LIBSPECTRUM_VERSION, [0-9]), [..], [LIBSPECTRUM_VERSION[.0]],
-                   [LIBSPECTRUM_VERSION])])dnl
-    AC_DEFINE([VERSION_WIN32], [translit(LIBSPECTRUM_FULL_VERSION, [.], [,])], [Define version information for win32 dll library])
   fi
 fi
 AC_SUBST(WINDRES_OBJ)
@@ -187,7 +217,9 @@ if test "$libaudiofile" = yes; then
   fi
 fi
 
-AC_OUTPUT(
+AC_CONFIG_FILES([
   Makefile
   libspectrum.qpg
-)
+])
+
+AC_OUTPUT

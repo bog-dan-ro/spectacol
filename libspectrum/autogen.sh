@@ -26,7 +26,7 @@
 # Exit on errors
 set -e
 
-aclocal
+aclocal -I m4
 autoheader
 libtoolize --automake
 automake --add-missing

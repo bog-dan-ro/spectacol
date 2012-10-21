@@ -30,8 +30,8 @@
 
 /* VERSIONINFO specs: http://msdn.microsoft.com/en-us/library/aa381058%28VS.85%29.aspx */
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION    	VERSION_WIN32
-PRODUCTVERSION 	VERSION_WIN32
+FILEVERSION    	LIBSPECTRUM_RC_VERSION
+PRODUCTVERSION 	LIBSPECTRUM_RC_VERSION
 FILEFLAGSMASK  	VS_FFI_FILEFLAGSMASK
 FILEFLAGS      	0x0L
 FILEOS         	VOS__WINDOWS32
@@ -46,7 +46,7 @@ BEGIN
       VALUE "FileDescription",  "libspectrum\0"
       VALUE "FileVersion",      VERSION##"\0"
       VALUE "InternalName",     "libspectrum\0"
-      VALUE "LegalCopyright",   "Copyright (c) 1999-2009 Philip Kendall and others; see the file 'AUTHORS' for more details.\0"
+      VALUE "LegalCopyright",   LIBSPECTRUM_COPYRIGHT##"; see the file 'AUTHORS' for more details.\0"
       VALUE "License",          "libspectrum is licensed under the GNU General Public License\0"
       VALUE "OriginalFilename", "libspectrum.dll\0"
       VALUE "ProductName",      "libspectrum - emulator support library\0"

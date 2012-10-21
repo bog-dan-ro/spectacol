@@ -887,5 +887,8 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          releasing (part of bug #3515269) (Sergio Baldoví).
 20120916 Makefile.am: allow custom build flags for make-perl to address warning
          from the debian build system (bug #3567469) (Sergio Baldoví).
-201200928 szx.c: read all possible RAM pages from the snap (thanks, ketmar)
+20120928 szx.c: read all possible RAM pages from the snap (thanks, ketmar)
          (Fred).
+20121021 Makefile.am,acinclude.m4,autogen.sh,configure.ac,configure.in,
+         m4/audiofile.m4,windres.rc: modernise autoconf support (more from patch
+         #3575831) (Sergio).
