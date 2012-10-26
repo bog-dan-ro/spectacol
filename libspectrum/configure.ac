@@ -207,7 +207,8 @@ if test "$libaudiofile" = yes; then
   PKG_CHECK_MODULES(
     AUDIOFILE,
     audiofile,
-    AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile]), []
+    AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile]),
+    [true]
   )
   if test -z "$AUDIOFILE_LIBS"; then
     AM_PATH_AUDIOFILE(

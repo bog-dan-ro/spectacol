@@ -892,3 +892,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20121021 Makefile.am,acinclude.m4,autogen.sh,configure.ac,configure.in,
          m4/audiofile.m4,windres.rc: modernise autoconf support (more from patch
          #3575831) (Sergio).
+20121026 configure.ac: fix the build when libaudiofile is not found and we are
+         using an old pkg-config/autoconf (bug #3579244) (Sergio).
