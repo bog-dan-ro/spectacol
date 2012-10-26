@@ -69,7 +69,7 @@ Offset   Length   Contents
 #define WAV_POS_SAMPLES 46L
 
 int
-snd_write_wavheader()
+snd_write_wavheader( void )
 {
   libspectrum_byte buff[4];
   int tmp;
@@ -109,7 +109,7 @@ snd_write_wavheader()
 }
 
 int
-snd_write_wav()
+snd_write_wav( void )
 {
   int err;
 
@@ -125,7 +125,7 @@ snd_write_wav()
 }
 
 void
-snd_finalize_wav()
+snd_finalize_wav( void )
 {
   libspectrum_byte buff[4];
   long pos = ftell( snd );

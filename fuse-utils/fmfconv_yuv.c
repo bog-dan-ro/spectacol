@@ -50,7 +50,7 @@ static libspectrum_byte pix_uv[2][40 * 8 * 240 * 2];	/* bpp = 2; w = 40*8 h = 24
 */
 
 static void
-uv_subsample()
+uv_subsample( void )
 {
   libspectrum_byte *u, *v, *u_out, *v_out;
   int i, j;
@@ -202,9 +202,9 @@ uv_subsample()
 
 
 int
-out_write_yuvheader()
+out_write_yuvheader( void )
 {
-  char *yuv4mpeg2[] = {
+  const char *yuv4mpeg2[] = {
     "444", "422", "420jpeg", "420mpeg2", "420", "410"
   };
 
@@ -221,7 +221,7 @@ out_write_yuvheader()
 }
 
 int
-out_write_yuv()
+out_write_yuv( void )
 {
   int err;
 

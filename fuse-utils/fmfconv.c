@@ -95,13 +95,13 @@ FILE *inp = NULL, *out = NULL, *snd = NULL;
 
 type_t inp_t = TYPE_UNSET, out_t = TYPE_UNSET, snd_t = TYPE_UNSET, scr_t = TYPE_UNSET, prg_t = TYPE_NONE;
 
-char *inp_name = NULL;
-char *out_name = NULL;
-char *snd_name = NULL;
+const char *inp_name = NULL;
+const char *out_name = NULL;
+const char *snd_name = NULL;
 
 char out_tmpl[16];		/* multiple out filename number template */
-char *out_orig = NULL;		/* multiple out original filename/template */
-char *out_pfix = NULL;		/* after number */
+const char *out_orig = NULL;		/* multiple out original filename/template */
+const char *out_pfix = NULL;		/* after number */
 char *out_nmbr = NULL;		/* start of number */
 char *out_next = NULL;		/* multiple out filename next name */
 
@@ -129,7 +129,7 @@ int machine_ftime[] = {
   19968, 19992, 16635, 20000, 16764
 };
 
-char *machine_name[] = {
+const char *machine_name[] = {
  "ZX Spectrum 16K/48K, Timex TC2048/2068, Scorpion, Spectrum SE",
  "ZX Spectrum 128K/+2/+2A/+3/+3E",
  "Timex TS2068", "Pentagon 128K/256K/512K"
@@ -210,13 +210,13 @@ void close_out( void );
 
 #define FBUFF_SIZE 32
 libspectrum_byte fbuff[FBUFF_SIZE];		/* file buffer used for check file type... */
-int fbuff_size = 0;
+size_t fbuff_size = 0;
 
 #define INTO_BUFF 0
 #define FROM_BUFF 1
 
 size_t
-fread_buff( void *ptr, size_t size, int how )	/* read from inp, how -> into buff or buff + file */
+fread_buff( libspectrum_byte *ptr, size_t size, int how )	/* read from inp, how -> into buff or buff + file */
 {
   size_t s;
   size_t n;
@@ -354,7 +354,7 @@ alloc_sound_buff( size_t len )
 }
 
 int
-law_2_pcm()
+law_2_pcm( void )
 {
   int err;
   libspectrum_signed_byte *s;
@@ -383,7 +383,7 @@ law_2_pcm()
 }
 
 void
-pcm_swap_endian()	/* buff == sound */
+pcm_swap_endian( void )	/* buff == sound */
 {
   libspectrum_word *s;
   int len = snd_len / 2;
@@ -399,7 +399,7 @@ pcm_swap_endian()	/* buff == sound */
   [1][2][3][4][5] -> [1][2][3][4][5][ ][ ][ ][5][5][6][6] ->  [1][1][2][2][3][3][4][4][5][5][6][6]
 */
 int
-mono_2_stereo()
+mono_2_stereo( void )
 {
   int err;
 
@@ -435,7 +435,7 @@ mono_2_stereo()
   [1][1][2][2][3][3][4][4][5][5][6][6] -> [1][2][3][4][5][ ][ ][ ][5][5][6][6] -> [1][2][3][4][5]
 */
 int
-stereo_2_mono()
+stereo_2_mono( void )
 {
   void *buff_end;
 
@@ -469,7 +469,7 @@ stereo_2_mono()
    [-/^^^^\______/-] ->
 
 int
-resample_sound()
+resample_sound( void )
 {
   return 0;
 }
@@ -477,7 +477,7 @@ resample_sound()
 */
 
 char *
-find_filename_ext( char *filename )
+find_filename_ext( const char *filename )
 {
   char *extension = NULL;
 
@@ -564,9 +564,9 @@ inp_get_next_cut( void )
 */
 
 int
-parse_outname()
+parse_outname( void )
 {
-  char *f = out_name, *perc;
+  const char *f = out_name, *perc;
   char c1[2], c2[2];
   int n, len;
 
@@ -626,7 +626,7 @@ parse_outname()
 }
 
 int
-next_outname()
+next_outname( void )
 {
   int err;
 
@@ -642,12 +642,12 @@ next_outname()
 }
 
 int
-open_out()
+open_out( void )
 {
   char *ext;
   typedef struct {
     type_t type;
-    char *extension;
+    const char *extension;
   } ext_t;
 
   int i, err;
@@ -666,7 +666,7 @@ open_out()
     { TYPE_FFMPEG,"mkv" },
     { 0, NULL }
   };
-  char *out_tstr[] = {
+  const char *out_tstr[] = {
     "SCR - ZX Spectrum screenshot file",
     "PPM - Portable PixMap", "PNG - Portable Network Graphics",
     "JPEG - Joint Photographic Experts Group file format",
@@ -739,12 +739,12 @@ open_out()
 }
 
 int
-open_snd()
+open_snd( void )
 {
   char *ext;
   typedef struct {
     type_t type;
-    char *extension;
+    const char *extension;
   } ext_t;
 
   int i;
@@ -763,7 +763,7 @@ open_snd()
     { 0, NULL }
   };
 
-  char *snd_tstr[] = {
+  const char *snd_tstr[] = {
     "FFMPEG - ffmpeg file format",
     "WAV - MS Wave format",
     "AU - SUN OS audio file format",
@@ -800,7 +800,7 @@ open_snd()
 }
 
 int
-open_inp()
+open_inp( void )
 {
   if( inp ) {				/* we have to close before last */
     if( inp != stdin ) {
@@ -847,7 +847,7 @@ open_inp()
 }
 
 void
-setup_frame_wh()
+setup_frame_wh( void )
 {
   if( ( scr_t = fhead[5] ) == TYPE_HRE ) {	/* screen type => $ R C X */
     if( frm_w != 640 ) {
@@ -866,7 +866,7 @@ setup_frame_wh()
 }
 
 int
-check_fmf_head()
+check_fmf_head( void )
 {
   if( memcmp( fhead, "FMF_", 4 ) ) {
     printe( "Not a Fuse Movie File '%s'\n", inp_name );
@@ -944,14 +944,14 @@ check_fmf_head()
 }
 
 int
-fmf_read_head()
+fmf_read_head( void )
 {
   fread_buff( fhead, 4, FROM_BUFF );
   return check_fmf_head();
 }
 
 int
-fmf_read_frame_head()
+fmf_read_frame_head( void )
 {
   if( fread_compr( fhead, 3, 1, inp ) != 1 ) {
     printe( "\n\nfmf_read_frame_head(): Corrupt input file (N) @0x%08lx.\n",
@@ -993,7 +993,7 @@ fmf_read_frame_head()
 }
 
 int
-fmf_read_chunk_head()
+fmf_read_chunk_head( void )
 {
   if( fread_compr( fhead, 1, 1, inp ) != 1 ) {	/* */
     printe( "Unexpected end of input file @0x%08lx.\n",
@@ -1011,7 +1011,7 @@ fmf_read_chunk_head()
 }
 
 int
-fmf_read_init()		/* read first N */
+fmf_read_init( void )		/* read first N */
 {
   int err;
   if( ( err = fmf_read_chunk_head() ) ) return err;
@@ -1024,7 +1024,7 @@ fmf_read_init()		/* read first N */
 }
 
 int
-fmf_read_sound()
+fmf_read_sound( void )
 {
   int err;
   int len;
@@ -1083,7 +1083,7 @@ fmf_read_sound()
 }
 
 int
-snd_write_sound()
+snd_write_sound( void )
 {
   int err;
 
@@ -1110,7 +1110,7 @@ snd_write_sound()
 }
 
 int
-fmf_gen_sound()
+fmf_gen_sound( void )
 {
   int err;
   static libspectrum_word len_frag = 0;
@@ -1137,7 +1137,7 @@ fmf_gen_sound()
 }
 
 void
-close_snd()
+close_snd( void )
 {
   snd_write_sound(); /* write pending sound data */
   if( snd_t == TYPE_WAV )
@@ -1189,7 +1189,7 @@ fmf_read_slice_blokk( libspectrum_byte *scrl, int w, int h )
 }
 
 int
-fmf_read_screen()
+fmf_read_screen( void )
 {
   int err;
 
@@ -1238,7 +1238,7 @@ fmf_read_screen()
 }
 
 int
-fmf_read_slice()
+fmf_read_slice( void )
 {
   int err = 0;
   if( ( err = fmf_read_chunk_head() ) ) return err;
@@ -1273,13 +1273,13 @@ we have to handle cut here
 }
 
 int
-scr_read_scr()
+scr_read_scr( void )
 {
   return 0;
 }
 
 void
-out_2_yuv()
+out_2_yuv( void )
 {
 
   libspectrum_byte *bitmap, *attr;
@@ -1323,7 +1323,7 @@ out_2_yuv()
 }
 
 void
-out_2_rgb()
+out_2_rgb( void )
 {
   libspectrum_byte *bitmap, *attr;
   int i, w, idx;
@@ -1369,7 +1369,7 @@ out_2_rgb()
 }
 
 int
-out_write_frame()
+out_write_frame( void )
 {
   int err;
   int add_frame = 0;
@@ -1422,7 +1422,7 @@ out_write_frame()
 }
 
 void
-close_out()
+close_out( void )
 {
 #ifdef USE_FFMPEG
   if( out_t == TYPE_FFMPEG )
@@ -1436,7 +1436,7 @@ close_out()
 
 
 int
-prepare_next_file()		/* multiple input file */
+prepare_next_file( void )		/* multiple input file */
 {
   if( input_no > input_last_no )
     do_now = DO_EOP;		/* no more file */
@@ -1446,7 +1446,7 @@ prepare_next_file()		/* multiple input file */
 }
 
 void
-print_help ()
+print_help( void )
 {
   printf ("\n"
 	  "Usage: fmfconv [options] [infile [outfile [soundfile]]]\n"
@@ -1536,8 +1536,8 @@ print_progress( int force )
   long int npos;
   int perc;
   static int last_perc = -1;
-  char *bar = "##############################################################################";
-  char *spc = "                                                                              ";
+  const char *bar = "##############################################################################";
+  const char *spc = "                                                                              ";
 
   if( !inp_ftell ) return;
 

@@ -107,10 +107,10 @@ static void crunch_z80 (libspectrum_byte *BufferIn, libspectrum_word BlLength, l
 /**********************************************************************************************************************************/
 
 {
-  libspectrum_word register IndexIn;
-  libspectrum_word register IndexOut       = 0;
+  register libspectrum_word IndexIn;
+  register libspectrum_word IndexOut       = 0;
   libspectrum_word          LengthOut;
-  libspectrum_word register RunTimeLength;
+  register libspectrum_word RunTimeLength;
   int          CrunchIt       = 0;
   libspectrum_byte          RepeatedCode;
   libspectrum_byte          PrevByte       = 0x00;
@@ -246,7 +246,7 @@ test_rev_decz80( libspectrum_byte *source, int final_len, int source_len )
 
 static void reverse_block (libspectrum_byte *BufferOut, libspectrum_byte *BufferIn)
 {
-  libspectrum_word register  Cnt;
+  register libspectrum_word Cnt;
   libspectrum_byte          *BIn;
   libspectrum_byte          *BOut;
 
@@ -858,7 +858,7 @@ static const libspectrum_byte loader_data[ 0x300 ] =
 static libspectrum_byte
 calc_checksum( libspectrum_byte *data, size_t length )
 {
-  int i;
+  size_t i;
   libspectrum_byte checksum;
 
   for( i=0, checksum = 0; i < length; i++, data++ ) checksum ^= *data;
@@ -1159,7 +1159,7 @@ get_loading_screen( libspectrum_byte *screen, const char *filename )
 
   count = fread( screen, 1, 6912, f );
   if( count != 6912 ) {
-    if( count == -1 ) {
+    if( count == 0 ) {
       print_error( "error reading from '%s: %s", filename, strerror( errno ) );
     } else {
       print_error( "could read only %lu bytes from '%s'", (unsigned long)count,
@@ -1458,7 +1458,7 @@ write_tape( libspectrum_tape *tape, const char *filename )
 
   written = fwrite( buffer, 1, length, f );
   if( written != length ) {
-    if( written == -1 ) {
+    if( written == 0 ) {
       print_error( "error writing to '%s': %s", filename, strerror( errno ) );
     } else {
       print_error( "could write only %lu of %lu bytes to '%s'",

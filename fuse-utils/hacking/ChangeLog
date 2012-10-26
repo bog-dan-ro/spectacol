@@ -353,3 +353,6 @@
          compat/unix/Makefile.am,compat/win32/Makefile.am,configure.[ac|in],
          m4/{audiofile.m4,m4/glib-1.0.m4,m4/glib-2.0.m4,m4/iconv.m4}:
          modernise autoconf support (more from patch #3575831) (Sergio).
+20121026 compat/win32/osname.c,fmfconv.[ch],fmfconv_aiff.c,fmfconv_au.c,
+         fmfconv_ff.c,fmfconv_ppm.c,fmfconv_scr.c,fmfconv_wav.c,fmfconv_yuv.c,
+         snap2tzx.c: fix various warnings (patch #3579248) (Sergio).

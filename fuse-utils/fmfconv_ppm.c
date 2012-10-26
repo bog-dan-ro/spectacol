@@ -32,7 +32,7 @@
 
 
 int
-out_write_ppm()
+out_write_ppm( void )
 {
   fprintf( out, "P6\n#ZX Spectrum screenshot created by fmfconv "
 		"(http://fuse-emulator.sourceforge.net) "

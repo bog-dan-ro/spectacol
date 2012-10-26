@@ -80,7 +80,7 @@ static int attrb_start[24] = {
   24	240 line every screen
 */
 int
-out_write_scr()
+out_write_scr( void )
 {
   int i;
 

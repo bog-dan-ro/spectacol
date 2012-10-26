@@ -71,10 +71,10 @@ int ffmpeg_arate = 0;		/* audio bitrate */
 int ffmpeg_vrate = 0;		/* video bitrate */
 AVRational ffmpeg_aspect = { 1, 1 };
 int ffmpeg_libx264 = 0;
-char *ffmpeg_frate = NULL;
-char *ffmpeg_format = NULL;
-char *ffmpeg_vcodec = NULL;
-char *ffmpeg_acodec = NULL;
+const char *ffmpeg_frate = NULL;
+const char *ffmpeg_format = NULL;
+const char *ffmpeg_vcodec = NULL;
+const char *ffmpeg_acodec = NULL;
 type_t ffmpeg_rescale = TYPE_NONE;
 int ffmpeg_list = -1;
 
@@ -109,7 +109,7 @@ static enum PixelFormat out_pix_fmt = PIX_FMT_NONE;
 static int res_rte = -1;
 
 int
-ffmpeg_resample_audio()
+ffmpeg_resample_audio( void )
 {
   int len;
 
@@ -156,7 +156,7 @@ ffmpeg_resample_audio()
 static int res_w = -1, res_h;
 
 int
-ffmpeg_rescale_video()
+ffmpeg_rescale_video( void )
 {
   if( video_resize_ctx && ( frm_w != res_w || frm_h != res_h ) ) {
     sws_freeContext( video_resize_ctx );
@@ -235,7 +235,7 @@ add_audio_stream( enum CodecID codec_id, int freq, int stereo )
 }
 
 static int
-open_audio()
+open_audio( void )
 {
   AVCodecContext *c;
   AVCodec *codec;
@@ -358,7 +358,7 @@ ffmpeg_add_sound_ffmpeg( int len )
 }
 
 int
-snd_write_ffmpeg()
+snd_write_ffmpeg( void )
 {
 
 /*  if( !snd_header_ok && ( err = snd_write_ffmpegheader() ) ) return err; */
@@ -387,7 +387,7 @@ snd_write_ffmpeg()
 }
 
 static void
-close_audio()
+close_audio( void )
 {
   if( audio_st ) avcodec_close( audio_st->codec );
   if( audio_outbuf ) av_free( audio_outbuf );
@@ -490,7 +490,7 @@ alloc_picture( enum PixelFormat pix_fmt, int width, int height, void *fmf_pict )
 }
 
 static int
-open_video()
+open_video( void )
 {
   AVCodec *codec;
   AVCodecContext *c;
@@ -557,7 +557,7 @@ open_video()
 }
 
 void
-ffmpeg_add_frame_ffmpeg()
+ffmpeg_add_frame_ffmpeg( void )
 {
   int out_size, ret;
   AVCodecContext *c;
@@ -607,7 +607,7 @@ ffmpeg_add_frame_ffmpeg()
 }
 
 static void
-close_video()
+close_video( void )
 {
   if( video_st )
     avcodec_close( video_st->codec );
@@ -628,7 +628,7 @@ close_video()
 /* init lavc and open output file... */
 
 int
-out_write_ffmpegheader()
+out_write_ffmpegheader( void )
 {
 
   AVCodec *c;
@@ -769,7 +769,7 @@ out_write_ffmpegheader()
 }
 
 int
-out_write_ffmpeg()
+out_write_ffmpeg( void )
 {
   int err;
 
@@ -784,9 +784,9 @@ out_write_ffmpeg()
 
 
 void
-out_finalize_ffmpeg()
+out_finalize_ffmpeg( void )
 {
-  int i;
+  unsigned int i;
     /* write the trailer, if any.  the trailer must be written
      * before you close the CodecContexts open when you wrote the
      * header; otherwise write_trailer may try to use memory that
@@ -821,7 +821,7 @@ out_finalize_ffmpeg()
 
 /* util functions */
 static void
-show_formats()
+show_formats( void )
 {
   AVInputFormat *ifmt = NULL;
   AVOutputFormat *ofmt = NULL;
@@ -915,7 +915,7 @@ show_codecs( int what )
 }
 
 void
-ffmpeg_print_idents()
+ffmpeg_print_idents( void )
 {
   if( verbose > 0 ) {
     printf( "FFmpeg libraries:\n" );

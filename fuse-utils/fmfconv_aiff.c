@@ -94,7 +94,7 @@ aiff_int_2_80bitfloat( libspectrum_byte head[], libspectrum_word num )
 }
 
 int
-snd_write_aiffheader()
+snd_write_aiffheader( void )
 {
   libspectrum_byte buff[10];
 
@@ -139,7 +139,7 @@ snd_write_aiffheader()
 }
 
 int
-snd_write_aiff()
+snd_write_aiff( void )
 {
   int err;
 
@@ -155,7 +155,7 @@ snd_write_aiff()
 }
 
 void
-snd_finalize_aiff()
+snd_finalize_aiff( void )
 {
   libspectrum_byte buff[4];
   long pos = ftell( snd );

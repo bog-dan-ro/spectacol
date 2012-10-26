@@ -32,7 +32,7 @@ extern char *progname;
 int compat_osname( char *osname, size_t length )
 {
   OSVERSIONINFO buf;
-  char *windows_name;
+  const char *windows_name;
   int error;
 
   buf.dwOSVersionInfoSize = sizeof( buf );

@@ -117,7 +117,7 @@ extern int frm_fps, frm_mch;
 
 extern type_t scr_t, yuv_t, out_t, snd_t;
 
-extern char *out_name;
+extern const char *out_name;
 extern int out_w, out_h;
 extern int out_fps;			/* desired output frame rate */
 extern int out_header_ok;			/* output header ok? */
@@ -163,10 +163,10 @@ extern int ffmpeg_arate;		/* audio bitrate */
 extern int ffmpeg_vrate;		/* video bitrate */
 extern AVRational ffmpeg_aspect;
 extern int ffmpeg_libx264;
-extern char *ffmpeg_frate;
-extern char *ffmpeg_format;
-extern char *ffmpeg_vcodec;
-extern char *ffmpeg_acodec;
+extern const char *ffmpeg_frate;
+extern const char *ffmpeg_format;
+extern const char *ffmpeg_vcodec;
+extern const char *ffmpeg_acodec;
 extern type_t ffmpeg_rescale;
 extern int ffmpeg_list;
 

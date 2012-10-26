@@ -32,7 +32,7 @@
 
 
 int
-snd_write_auheader()
+snd_write_auheader( void )
 {
   libspectrum_dword buff[6];
 
@@ -60,7 +60,7 @@ snd_write_auheader()
 }
 
 int
-snd_write_au()
+snd_write_au( void )
 {
   int err;
 
@@ -76,7 +76,7 @@ snd_write_au()
 }
 
 void
-snd_finalize_au()
+snd_finalize_au( void )
 {
   libspectrum_dword len;
   long pos = ftell( snd );
