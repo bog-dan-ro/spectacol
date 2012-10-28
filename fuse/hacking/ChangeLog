@@ -4254,3 +4254,4 @@
          (Sergio).
 20121016 Makefile.am: distribute m4 directory and contents with the release
          tarball (Fred).
+20121028 sound/coreaudiosound.c: migrate away from some deprecated APIs (Fred).

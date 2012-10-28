@@ -22,9 +22,11 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include <AssertMacros.h>
+
+#include <AudioUnit/AudioComponent.h>
 #include <AudioUnit/AudioUnit.h>
 #include <CoreAudio/AudioHardware.h>
-#include <CoreServices/CoreServices.h>
 
 #include "settings.h"
 #include "sfifo.h"
@@ -135,22 +137,22 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
   deviceFormat.mChannelsPerFrame = *stereoptr ? 2 : 1;
 
   /* Open the default output unit */
-  ComponentDescription desc;
+  AudioComponentDescription desc;
   desc.componentType = kAudioUnitType_Output;
   desc.componentSubType = kAudioUnitSubType_DefaultOutput;
   desc.componentManufacturer = kAudioUnitManufacturer_Apple;
   desc.componentFlags = 0;
   desc.componentFlagsMask = 0;
 
-  Component comp = FindNextComponent( NULL, &desc );
+  AudioComponent comp = AudioComponentFindNext( NULL, &desc );
   if( comp == NULL ) {
-    ui_error( UI_ERROR_ERROR, "FindNextComponent" );
+    ui_error( UI_ERROR_ERROR, "AudioComponentFindNext" );
     return 1;
   }
 
-  err = OpenAComponent( comp, &gOutputUnit );
+  err = AudioComponentInstanceNew( comp, &gOutputUnit );
   if( comp == NULL ) {
-    ui_error( UI_ERROR_ERROR, "OpenAComponent=%ld", (long)err );
+    ui_error( UI_ERROR_ERROR, "AudioComponentInstanceNew=%ld", (long)err );
     return 1;
   }
 
@@ -225,10 +227,13 @@ sound_lowlevel_end( void )
 
   err = AudioUnitUninitialize( gOutputUnit );
   if( err ) {
-    printf( "AudioUnitUninitialize=%ld", (long)err );
+    ui_error( UI_ERROR_ERROR, "AudioUnitUninitialize=%ld", (long)err );
   }
 
-  CloseComponent( gOutputUnit );
+  err = AudioComponentInstanceDispose( gOutputUnit );
+  if( err ) {
+    ui_error( UI_ERROR_ERROR, "AudioComponentInstanceDispose=%ld", (long)err );
+  }
 
   sfifo_flush( &sound_fifo );
   sfifo_close( &sound_fifo );
