@@ -3096,7 +3096,7 @@ write_b128_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   *(*ptr)++ = libspectrum_snap_beta_data  ( snap );
   *(*ptr)++ = libspectrum_snap_beta_status( snap );
 
-  if( libspectrum_snap_beta_custom_rom( snap ) ) {
+  if( libspectrum_snap_beta_custom_rom( snap ) && rom_data ) {
     memcpy( *ptr, rom_data, beta_rom_length ); *ptr += beta_rom_length;
   }
 
@@ -3179,7 +3179,7 @@ write_if1_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   *ptr += sizeof(libspectrum_dword) * 8;	/* Skip 'reserved' data */
   libspectrum_write_word( ptr, uncompressed_rom_length );
 
-  if( libspectrum_snap_interface1_custom_rom( snap ) ) {
+  if( libspectrum_snap_interface1_custom_rom( snap ) && disk_rom_length ) {
     memcpy( *ptr, rom_data, disk_rom_length ); *ptr += disk_rom_length;
   }
 
@@ -3545,6 +3545,11 @@ write_dide_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   int use_compression = 0;
 
   eprom_data = libspectrum_snap_divide_eprom( snap, 0 );
+  if( !eprom_data ) {
+    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+                             "DivIDE EPROM data is missing" );
+    return LIBSPECTRUM_ERROR_LOGIC;
+  }
   uncompressed_eprom_length = divide_eprom_length = 0x2000;
 
 #ifdef HAVE_ZLIB_H
