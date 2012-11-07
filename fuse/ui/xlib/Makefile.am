@@ -40,7 +40,7 @@ keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl x $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
 xpixmaps.c: xstatusbar.pl $(srcdir)/../gtk/pixmaps.c
-	@PERL@ -I$(srcdir)/../../perl xstatusbar.pl > $@.tmp && mv $@.tmp $@
+	@PERL@ -I$(srcdir)/../../perl $(srcdir)/xstatusbar.pl $(srcdir)/../gtk/pixmaps.c > $@.tmp && mv $@.tmp $@
 
 AM_CPPFLAGS += @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 

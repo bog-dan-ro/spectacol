@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+die "usage: $0 <file>" unless @ARGV >= 1;
+
 my $maxh = 0;
 my $o = 0;
 my $stat = 0;
@@ -14,10 +16,12 @@ my $do_icon = 0;
 print "/*\n This file generated from ../gtk/pixmaps.c with xstatusbar.pl\n" .
       "*/\n\n";
 
+my $pixmaps = shift;
+
 #xpm_read('abc_pixmap.dat', 'abc');
 
 $do_icon = 1;
-xpm_read('../gtk/pixmaps.c', 'icon');
+xpm_read($pixmaps, 'icon');
 foreach( sort keys %pxm ) {
   print $pxm{$_} . "\n";
   push @pxm, $_ if($_ !~ /_mask$/);
