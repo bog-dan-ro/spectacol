@@ -896,5 +896,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          using an old pkg-config/autoconf (bug #3579244) (Sergio).
 20121107 Makefile.am: fix the build when source and build trees are different
          (VPATH) (bug #3584527) (Sergio).
-20120203 szx.c: fix potential calls to memcpy with a null pointer argument
+20121107 szx.c: fix potential calls to memcpy with a null pointer argument
          (thanks, clang 4.1) (Fred).
+20121107 libspectrum.c: fix potential leak of memory pointed to by
+         'new_filename' (thanks, clang 4.1) (Fred).

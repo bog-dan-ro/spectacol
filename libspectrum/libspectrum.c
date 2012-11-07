@@ -472,9 +472,11 @@ libspectrum_identify_file_with_class(
   error = libspectrum_identify_file_with_class( type, libspectrum_class,
 						new_filename, new_buffer,
 						new_length );
-  if( error ) return error;
 
+  /* new_filename or buffer will be allocated in libspectrum_uncompress_file */
   libspectrum_free( new_filename ); libspectrum_free( new_buffer );
+
+  if( error ) return error;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
