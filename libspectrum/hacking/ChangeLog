@@ -894,3 +894,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          #3575831) (Sergio).
 20121026 configure.ac: fix the build when libaudiofile is not found and we are
          using an old pkg-config/autoconf (bug #3579244) (Sergio).
+20121107 Makefile.am: fix the build when source and build trees are different
+         (VPATH) (bug #3584527) (Sergio).

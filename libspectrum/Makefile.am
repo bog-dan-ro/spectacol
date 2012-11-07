@@ -99,7 +99,7 @@ tape_set.c: tape_set.pl tape_accessors.txt
 	@PERL@ $(srcdir)/tape_set.pl $(srcdir)/tape_accessors.txt > $@.tmp && mv $@.tmp $@
 
 windres.o: windres.rc
-	@WINDRES@ $(srcdir)/windres.rc windres.o
+	@WINDRES@ -I. $(srcdir)/windres.rc windres.o
 
 AM_CPPFLAGS = @GLIB_CFLAGS@ @AUDIOFILE_CFLAGS@
 
