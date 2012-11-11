@@ -4257,3 +4257,5 @@
 20121028 sound/coreaudiosound.c: migrate away from some deprecated APIs (Fred).
 20121107 ui/xlib/{Makefile.am,xstatusbar.pl}: fix the build when source and
          build trees are different (VPATH) (bug #3584527) (Sergio).
+20121111 Makefile.am,configure.ac,ui/win32/installer/fuse.nsi.in: enhance win32
+         installation and distribution (patch #3580843) (Sergio).

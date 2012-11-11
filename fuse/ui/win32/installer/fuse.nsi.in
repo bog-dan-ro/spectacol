@@ -24,7 +24,7 @@
 !define FUSE_VERSION "@PACKAGE_VERSION@" ; could have letters like -RC1
 !define FUSE_FULL_VERSION "@FUSE_FULL_VERSION@" ; must have four numeric tokens
 !define DISPLAY_NAME "Free Unix Spectrum Emulator (Fuse) ${FUSE_VERSION}"
-!define SETUP_FILENAME "fuse-${FUSE_VERSION}-setup"
+!define SETUP_FILENAME "@PACKAGE@-${FUSE_VERSION}-win32-setup"
 !define SETUP_FILE "${SETUP_FILENAME}.exe"
 !define HKLM_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse"
 !define PROG_ID "Fuse.Files.1"
@@ -56,7 +56,7 @@ SetCompressor lzma
 ;--------------------------------
 ;Pages
 
-  !insertmacro MUI_PAGE_LICENSE "COPYING"
+  !insertmacro MUI_PAGE_LICENSE "COPYING.txt"
   !define MUI_COMPONENTSPAGE_SMALLDESC
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
@@ -245,10 +245,11 @@ section "!Fuse Core Files (required)" SecCore
     setOutPath "$INSTDIR"
 
     ; Installation files
-    File "AUTHORS"
-    File "COPYING"
+    File "AUTHORS.txt"
+    File "COPYING.txt"
     File "fuse.exe"
     File "fuse.html"
+    File "README.txt"
     File "*.dll"
     SetOutPath $INSTDIR\lib
     File "lib\*"
@@ -277,6 +278,7 @@ section "Start Menu and Desktop links" SecShortcuts
     CreateDirectory "$SMPROGRAMS\Fuse"
     CreateShortCut "$SMPROGRAMS\Fuse\Fuse.lnk" "$INSTDIR\fuse.exe"
     CreateShortCut "$SMPROGRAMS\Fuse\Manual.lnk" "$INSTDIR\fuse.html"
+    CreateShortCut "$SMPROGRAMS\Fuse\Readme.lnk" "$INSTDIR\README.txt"
     CreateShortCut "$SMPROGRAMS\Fuse\Uninstall.lnk" "$INSTDIR\uninstall.exe"
     CreateShortCut "$DESKTOP\Fuse.lnk" "$INSTDIR\fuse.exe"
 
@@ -348,6 +350,7 @@ section "uninstall"
     DetailPrint "Deleting Shortcuts..."
     Delete "$SMPROGRAMS\Fuse\Fuse.lnk"
     Delete "$SMPROGRAMS\Fuse\Manual.lnk"
+    Delete "$SMPROGRAMS\Fuse\Readme.lnk"
     Delete "$SMPROGRAMS\Fuse\Uninstall.lnk"
     RMDir  "$SMPROGRAMS\Fuse"
     Delete "$DESKTOP\Fuse.lnk"
@@ -358,10 +361,11 @@ section "uninstall"
     RMDir  "$INSTDIR\lib"
     Delete "$INSTDIR\roms\*"
     RMDir  "$INSTDIR\roms"
-    Delete "$INSTDIR\AUTHORS"
-    Delete "$INSTDIR\COPYING"
+    Delete "$INSTDIR\AUTHORS.txt"
+    Delete "$INSTDIR\COPYING.txt"
     Delete "$INSTDIR\fuse.exe"
     Delete "$INSTDIR\fuse.html"
+    Delete "$INSTDIR\README.txt"
     Delete "$INSTDIR\*.dll"
     RMDir "$INSTDIR"
 

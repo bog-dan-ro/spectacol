@@ -768,6 +768,9 @@ case "$host_os" in
     ;;
   mingw32*)
     COMPAT_OSNAME='win32'
+    AC_CHECK_PROGS([MAN2HTML], [man2html])
+    AC_CHECK_PROGS([GROFF], [groff])
+    AC_CHECK_PROGS([UNIX2DOS], [unix2dos])
     ;;
   wii)
     COMPAT_OSNAME='wii'
@@ -780,6 +783,7 @@ AC_MSG_RESULT($COMPAT_OSNAME)
 COMPAT_SUBDIR="compat/$COMPAT_OSNAME"
 AC_SUBST(COMPAT_SUBDIR)
 AC_SUBST(COMPAT_OSNAME)
+AM_CONDITIONAL(COMPAT_WIN32, test "$COMPAT_OSNAME" = 'win32')
 
 dnl Decide whether to install desktop and mime files
 AC_ARG_ENABLE(desktop-integration,
