@@ -356,3 +356,5 @@
 20121026 compat/win32/osname.c,fmfconv.[ch],fmfconv_aiff.c,fmfconv_au.c,
          fmfconv_ff.c,fmfconv_ppm.c,fmfconv_scr.c,fmfconv_wav.c,fmfconv_yuv.c,
          snap2tzx.c: fix various warnings (patch #3579248) (Sergio).
+20121111 Makefile.am,configure.ac: enhance win32 installation and distribution
+         (patch #3580843) (Sergio).

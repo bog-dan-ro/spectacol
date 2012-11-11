@@ -222,6 +222,9 @@ case "$host_os" in
   mingw32*)
     COMPAT_OSNAME='win32'
     CXXFLAGS="$CXXFLAGS -static-libgcc -static-libstdc++"
+    AC_CHECK_PROGS([MAN2HTML], [man2html])
+    AC_CHECK_PROGS([GROFF], [groff])
+    AC_CHECK_PROGS([UNIX2DOS], [unix2dos])
     ;;
   *)
     COMPAT_OSNAME='unix'
@@ -231,6 +234,7 @@ AC_MSG_RESULT($COMPAT_OSNAME)
 COMPAT_SUBDIR="compat/$COMPAT_OSNAME"
 AC_SUBST(COMPAT_SUBDIR)
 AC_SUBST(COMPAT_OSNAME)
+AM_CONDITIONAL(COMPAT_WIN32, test "$COMPAT_OSNAME" = 'win32')
 
 if test "$ac_cv_func_getopt_long" = no; then
   case "$host_os" in
