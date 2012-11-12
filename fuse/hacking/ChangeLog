@@ -4259,3 +4259,5 @@
          build trees are different (VPATH) (bug #3584527) (Sergio).
 20121111 Makefile.am,configure.ac,ui/win32/installer/fuse.nsi.in: enhance win32
          installation and distribution (patch #3580843) (Sergio).
+20121112 README,fuse.c: enhance win32 installation instructions (more from
+         patch #3580843) (Sergio).
