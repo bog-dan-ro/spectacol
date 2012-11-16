@@ -199,6 +199,7 @@ noinst_HEADERS = bitmap.h \
 	profile.h
 
 EXTRA_DIST = AUTHORS \
+	     INSTALL \
 	     README \
 	     THANKS \
 	     keysyms.dat \

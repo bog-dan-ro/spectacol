@@ -4263,3 +4263,4 @@
          patch #3580843) (Sergio).
 20121116 INSTALL,README: move installation instructions to INSTALL file (more
          from patch #3580843) (Sergio).
+20121116 Makefile.am: distribute INSTALL with distribution (Fred).
