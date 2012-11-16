@@ -4261,3 +4261,5 @@
          installation and distribution (patch #3580843) (Sergio).
 20121112 README,fuse.c: enhance win32 installation instructions (more from
          patch #3580843) (Sergio).
+20121116 INSTALL,README: move installation instructions to INSTALL file (more
+         from patch #3580843) (Sergio).
