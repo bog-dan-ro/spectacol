@@ -4266,3 +4266,5 @@
 20121116 Makefile.am: distribute INSTALL with distribution (Fred).
 20121118 Makefile.am: use proper automake comment rather than m4 comment
          (Sergio).
+20121118 configure.ac: don't double check for zlib header (bug #3586255)
+         (Sergio).

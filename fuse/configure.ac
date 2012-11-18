@@ -97,8 +97,7 @@ AC_CHECK_HEADERS(
   strings.h \
   sys/soundcard.h \
   sys/audio.h \
-  sys/audioio.h \
-  zlib.h
+  sys/audioio.h
 )
 
 dnl Checks for typedefs, structures, and compiler characteristics.
