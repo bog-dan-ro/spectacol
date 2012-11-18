@@ -34,9 +34,9 @@
 #include <unistd.h>
 #include <errno.h>
 
-#ifdef HAVE_LIBGCRYPT
+#ifdef HAVE_GCRYPT_H
 #include <gcrypt.h>
-#endif				/* #ifdef HAVE_LIBGCRYPT */
+#endif				/* #ifdef HAVE_GCRYPT_H */
 
 #include <libspectrum.h>
 
@@ -319,10 +319,10 @@ static int
 read_sign_end_block( unsigned char **ptr, unsigned char *end )
 {
   size_t length;
-#ifdef HAVE_LIBGCRYPT
+#ifdef HAVE_GCRYPT_H
   gcry_mpi_t a; int error; size_t length2;
   unsigned char *buffer;
-#endif				/* #ifdef HAVE_LIBGCRYPT */
+#endif				/* #ifdef HAVE_GCRYPT_H */
 
   if( end - *ptr < 4 ) {
     fprintf( stderr, "%s: not enough bytes for sign end block\n", progname );
@@ -341,7 +341,7 @@ read_sign_end_block( unsigned char **ptr, unsigned char *end )
     return 1;
   }
 
-#ifdef HAVE_LIBGCRYPT
+#ifdef HAVE_GCRYPT_H
 
   error = gcry_mpi_scan( &a, GCRYMPI_FMT_PGP, *ptr, length, &length2 );
   if( error ) {
@@ -367,7 +367,7 @@ read_sign_end_block( unsigned char **ptr, unsigned char *end )
   printf( "  s: %s\n", buffer );
   free( buffer ); gcry_mpi_release( a );
 
-#endif
+#endif				/* #ifdef HAVE_GCRYPT_H */
 
   (*ptr) += length;
 

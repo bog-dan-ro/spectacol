@@ -35,7 +35,7 @@
 20030821 rzxtool.c: free any snapshot we're using at program exit.
 20030822 rzxcheck.c: free signature memory.
 20030824 rzxtool.c: free snapshot after writing it rather than before.
-20030901 Build rzxcheck iff libgcrypt is present.
+20030901 Build rzxcheck if libgcrypt is present.
 20030901 Remove the find an <n>-bit type stuff as that's now done by
 	 libspectrum.
 20030912 man/: update man pages for the 0.6.1 release.
@@ -351,10 +351,12 @@
 20120923 tapeconv.c: remove potential memory leak (Fred).
 20121021 Makefile.am,acinclude.m4,autogen.sh,compat/amiga/Makefile.am,
          compat/unix/Makefile.am,compat/win32/Makefile.am,configure.[ac|in],
-         m4/{audiofile.m4,m4/glib-1.0.m4,m4/glib-2.0.m4,m4/iconv.m4}:
-         modernise autoconf support (more from patch #3575831) (Sergio).
+         m4/{audiofile.m4,glib-1.0.m4,glib-2.0.m4,iconv.m4}: modernise autoconf
+         support (more from patch #3575831) (Sergio).
 20121026 compat/win32/osname.c,fmfconv.[ch],fmfconv_aiff.c,fmfconv_au.c,
          fmfconv_ff.c,fmfconv_ppm.c,fmfconv_scr.c,fmfconv_wav.c,fmfconv_yuv.c,
          snap2tzx.c: fix various warnings (patch #3579248) (Sergio).
 20121111 Makefile.am,configure.ac: enhance win32 installation and distribution
          (patch #3580843) (Sergio).
+20121118 configure.ac,rzxdump.c: fix the build of rzxcheck and enable some bits
+         of rzxdump if libgcrypt is present (bug #3582043) (Sergio).

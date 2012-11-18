@@ -112,10 +112,9 @@ if test "$withval" = no; then libgcrypt=no; else libgcrypt=yes; fi,
 libgcrypt=yes)
 AC_MSG_RESULT($libgcrypt)
 if test "$libgcrypt" = yes; then
-  AC_CHECK_HEADERS(gcrypt.h,LIBS="$LIBS -lgcrypt")
+  AC_CHECK_HEADERS(gcrypt.h,LIBS="$LIBS -lgcrypt",libgcrypt=no)
 fi
-AC_SUBST(GCRYPT_LIBS)
-AM_CONDITIONAL(BUILD_RZXCHECK, test "$gcrypt" = yes)
+AM_CONDITIONAL(BUILD_RZXCHECK, test "$libgcrypt" = yes)
 
 dnl Do we want lots of warning messages?
 AC_MSG_CHECKING(whether lots of warnings requested)
