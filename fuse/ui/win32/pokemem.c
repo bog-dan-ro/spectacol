@@ -565,7 +565,7 @@ pokemem_update_trainer( int index )
   if( selected ) {
     pokemem_trainer_activate( trainer );
   } else {
-    pokemem_trainer_desactivate( trainer );
+    pokemem_trainer_deactivate( trainer );
   }
 }
 

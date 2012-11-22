@@ -64,6 +64,6 @@ trainer_t *pokemem_trainer_list_add( libspectrum_byte bank,
                                      libspectrum_word value );
 
 int pokemem_trainer_activate( trainer_t *trainer );
-int pokemem_trainer_desactivate( trainer_t *trainer );
+int pokemem_trainer_deactivate( trainer_t *trainer );
 
 #endif

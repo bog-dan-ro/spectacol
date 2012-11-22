@@ -382,7 +382,7 @@ widget_pokemem_apply_pokes( void )
     if( entry->checked ) {
       pokemem_trainer_activate( trainer );
     } else {
-      pokemem_trainer_desactivate( trainer );
+      pokemem_trainer_deactivate( trainer );
     }
   }
 }

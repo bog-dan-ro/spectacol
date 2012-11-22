@@ -320,7 +320,7 @@ pokemem_update_trainer( GtkTreeModel *model, GtkTreePath *path GCC_UNUSED,
   if( selected ) {
     pokemem_trainer_activate( trainer );
   } else {
-    pokemem_trainer_desactivate( trainer );
+    pokemem_trainer_deactivate( trainer );
   }
 
   return FALSE;

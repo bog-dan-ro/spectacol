@@ -61,7 +61,7 @@ poke_t *pokemem_poke_add( trainer_t *trainer, int bank, int address,
                           int value, int restore );
 
 static void pokemem_poke_activate( gpointer data, gpointer user_data );
-static void pokemem_poke_desactivate( gpointer data, gpointer user_data );
+static void pokemem_poke_deactivate( gpointer data, gpointer user_data );
 
 libspectrum_byte pokemem_mem_value( libspectrum_word bank,
                                     libspectrum_word address );
@@ -438,12 +438,12 @@ pokemem_poke_activate( gpointer data, gpointer user_data )
 }
 
 int
-pokemem_trainer_desactivate( trainer_t *trainer )
+pokemem_trainer_deactivate( trainer_t *trainer )
 {
   if( !trainer || trainer->disabled || !trainer->poke_list ) return 1;
 
   if( trainer->active && trainer->poke_list ) {
-    g_slist_foreach( trainer->poke_list, pokemem_poke_desactivate, trainer );
+    g_slist_foreach( trainer->poke_list, pokemem_poke_deactivate, trainer );
     trainer->active = 0;
   }
 
@@ -451,7 +451,7 @@ pokemem_trainer_desactivate( trainer_t *trainer )
 }
 
 static void
-pokemem_poke_desactivate( gpointer data, gpointer user_data GCC_UNUSED )
+pokemem_poke_deactivate( gpointer data, gpointer user_data GCC_UNUSED )
 {
   poke_t *poke = data;
   libspectrum_word bank = poke->bank;
