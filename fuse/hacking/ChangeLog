@@ -4268,3 +4268,4 @@
          (Sergio).
 20121118 configure.ac: don't double check for zlib header (bug #3586255)
          (Sergio).
+20121122 sound.c: correct feedback in AY noise generator (Patrik Rak).

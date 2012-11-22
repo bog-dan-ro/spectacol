@@ -1,6 +1,6 @@
 /* sound.c: Sound support
-   Copyright (c) 2000-2011 Russell Marks, Matan Ziv-Av, Philip Kendall,
-                           Fredrick Meunier
+   Copyright (c) 2000-2012 Russell Marks, Matan Ziv-Av, Philip Kendall,
+                           Fredrick Meunier, Patrik Rak
 
    $Id$
 
@@ -581,9 +581,11 @@ sound_ay_overlay( void )
         noise_toggle = !noise_toggle;
 
       /* rng is 17-bit shift reg, bit 0 is output.
-       * input is bit 0 xor bit 2.
+       * input is bit 0 xor bit 3.
        */
-      rng |= ( ( rng & 1 ) ^ ( ( rng & 4 ) ? 1 : 0 ) ) ? 0x20000 : 0;
+      if( rng & 1 ) {
+        rng ^= 0x24000;
+      }
       rng >>= 1;
 
       /* don't keep trying if period is zero */
