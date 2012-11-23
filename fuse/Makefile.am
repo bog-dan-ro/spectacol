@@ -86,8 +86,7 @@ fuse_SOURCES = display.c \
 	tape.c \
 	ui.c \
 	uidisplay.c \
-	utils.c \
-	windres.rc
+	utils.c
 
 if COMPAT_DIRNAME
 fuse_SOURCES += compat/dirname.c
@@ -99,6 +98,10 @@ endif
 
 if COMPAT_MKSTEMP
 fuse_SOURCES += compat/mkstemp.c
+endif
+
+if COMPAT_WIN32
+fuse_SOURCES += windres.rc
 endif
 
 EXTRA_fuse_SOURCES = windres.rc

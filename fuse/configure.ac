@@ -66,20 +66,19 @@ AM_PROG_LEX
 AC_PROG_YACC
 LT_INIT
 
-dnl Check for Win32 resource tool
-AC_MSG_CHECKING(whether to use windres)
-AC_ARG_WITH(windres,
-[  --without-windres       don't use windres],
-if test "$withval" = no; then windres=no; else windres=yes; fi,
-windres=yes)
-AC_MSG_RESULT($windres)
-if test "$windres" = yes; then
-  AC_CHECK_TOOL(WINDRES, windres, no)
-  AC_SUBST(WINDRES)
-  if test "$WINDRES" != no; then
-    WINDRES_OBJ="windres.o"
-  fi
-fi
+dnl Check for host specific programs
+WINDRES_OBJ=
+case "$host_os" in
+  mingw32*)
+    AC_CHECK_TOOL([WINDRES], [windres], [no])
+    if test "$WINDRES" != no; then
+      WINDRES_OBJ="windres.o"
+    fi
+    AC_CHECK_PROGS([MAN2HTML], [man2html])
+    AC_CHECK_PROGS([GROFF], [groff])
+    AC_CHECK_PROGS([UNIX2DOS], [unix2dos])
+    ;;
+esac
 AC_SUBST(WINDRES_OBJ)
 
 dnl Generate commandy.h
@@ -767,9 +766,6 @@ case "$host_os" in
     ;;
   mingw32*)
     COMPAT_OSNAME='win32'
-    AC_CHECK_PROGS([MAN2HTML], [man2html])
-    AC_CHECK_PROGS([GROFF], [groff])
-    AC_CHECK_PROGS([UNIX2DOS], [unix2dos])
     ;;
   wii)
     COMPAT_OSNAME='wii'

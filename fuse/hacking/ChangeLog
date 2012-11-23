@@ -4272,3 +4272,7 @@
 20121122 pokefinder/{pokemem.[ch]},ui/gtk/pokemem.c,ui/widget/pokemem.c,
          ui/win32/pokemem.c: fix presumed typo in pokemem_trainer_deactivate
          (Fred).
+20121123 Makefile.am,configure.ac: Don't interrupt COMPAT_OSNAME log with other
+         checks. Avoid searching for windres when not building for Windows.
+         Remove --without-windres flag, previously used as a workaround
+         (Sergio).
