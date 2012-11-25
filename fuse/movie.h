@@ -30,7 +30,7 @@
 extern int movie_recording;
 
 void movie_init( void );
-void movie_start( char *name );
+void movie_start( const char *name );
 void movie_stop( void );
 void movie_pause( void );
 void movie_add_area( int x, int y, int w, int h );

@@ -296,7 +296,7 @@ movie_add_area( int x, int y, int w, int h )
 }
 
 static void
-movie_start_fmf( char *name )
+movie_start_fmf( const char *name )
 {
   if( ( of = fopen(name, "wb") ) == NULL ) {  /* trunc old file ? or append ? */
     ui_error( UI_ERROR_ERROR, "error opening movie file '%s': %s", name,
@@ -342,7 +342,7 @@ movie_start_fmf( char *name )
 }
 
 void
-movie_start( char *name )	/* some init, open file (name)*/
+movie_start( const char *name )	/* some init, open file (name)*/
 {
   frame_no = slice_no = 0;
   if( name == NULL || *name == '\0' )

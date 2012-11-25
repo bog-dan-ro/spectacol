@@ -4276,3 +4276,4 @@
          checks. Avoid searching for windres when not building for Windows.
          Remove --without-windres flag, previously used as a workaround
          (Sergio).
+20121125 movie.[ch]: make movie_start take a const char* filename (Fred).
