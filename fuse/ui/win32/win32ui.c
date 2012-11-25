@@ -741,8 +741,13 @@ int
 win32ui_get_monospaced_font( HFONT *font )
 {
   if( ! monospaced_font ) {
-    *font = CreateFont( -11, 0, 0, 0, 400, FALSE, FALSE, FALSE, 0, 400, 2,
-                            1, 1, TEXT( "Courier New" ) );
+    /* Get font height in pixels for current DPI resolution */
+    HDC hdc = GetDC( NULL );
+    long font_height = -MulDiv( 8, GetDeviceCaps( hdc, LOGPIXELSY ), 72 );
+    ReleaseDC( NULL, hdc );
+
+    *font = CreateFont( font_height, 0, 0, 0, 400, FALSE, FALSE, FALSE, 0,
+                        400, 2, 1, 1, TEXT( "Courier New" ) );
     if( !font ) {
       ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
       return 1;

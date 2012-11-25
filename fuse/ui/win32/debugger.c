@@ -400,22 +400,24 @@ create_disassembly( HFONT font )
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC,
                       LVM_SETEXTENDEDLISTVIEWSTYLE, 0, lv_ext_style ); 
 
+  win32ui_set_font( fuse_hDBGWnd, IDC_DBG_LV_PC, font );
+
   /* create columns */
   LVCOLUMN lvc;
-  lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
+  lvc.mask = LVCF_FMT | LVCF_TEXT;
   lvc.fmt = LVCFMT_LEFT;
 
   for( i = 0; i < 2; i++ ) {
-    if( i != 0 ) {
-      lvc.mask |= LVCF_SUBITEM;
-    }
-    lvc.cx = ( i == 0 ) ? 65 : 125;
+    if( i != 0 ) lvc.mask |= LVCF_SUBITEM;
     lvc.pszText = disassembly_titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }
-  
-  win32ui_set_font( fuse_hDBGWnd, IDC_DBG_LV_PC, font );
+
+  /* Set columns width */
+  HWND hwnd_list = GetDlgItem( fuse_hDBGWnd, IDC_DBG_LV_PC );
+  ListView_SetColumnWidth( hwnd_list, 0, LVSCW_AUTOSIZE_USEHEADER );
+  ListView_SetColumnWidth( hwnd_list, 1, LVSCW_AUTOSIZE_USEHEADER );
 
   /* Recalculate visible rows, Visual Styles could change rows height */
   disassembly_page = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC,
@@ -450,22 +452,24 @@ create_stack_display( HFONT font )
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_STACK,
                       LVM_SETEXTENDEDLISTVIEWSTYLE, 0, lv_ext_style ); 
 
+  win32ui_set_font( fuse_hDBGWnd, IDC_DBG_LV_STACK, font );
+
   /* create columns */
   LVCOLUMN lvc;
-  lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
+  lvc.mask = LVCF_FMT | LVCF_TEXT;
   lvc.fmt = LVCFMT_LEFT;
 
   for( i = 0; i < 2; i++ ) {
-    if( i != 0 )
-      lvc.mask |= LVCF_SUBITEM;
-    lvc.cx = ( i == 0 ) ? 65 : 55;
-
+    if( i != 0 ) lvc.mask |= LVCF_SUBITEM;
     lvc.pszText = stack_titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_STACK, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }
-  
-  win32ui_set_font( fuse_hDBGWnd, IDC_DBG_LV_STACK, font );
+
+  /* Set columns width */
+  HWND hwnd_list = GetDlgItem( fuse_hDBGWnd, IDC_DBG_LV_STACK );
+  ListView_SetColumnWidth( hwnd_list, 0, LVSCW_AUTOSIZE_USEHEADER );
+  ListView_SetColumnWidth( hwnd_list, 1, LVSCW_AUTOSIZE_USEHEADER );
 
   return 0;
 }
@@ -510,18 +514,21 @@ create_events()
 
   /* create columns */
   LVCOLUMN lvc;
-  lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
+  lvc.mask = LVCF_FMT | LVCF_TEXT;
   lvc.fmt = LVCFMT_LEFT;
 
   for( i = 0; i < 2; i++ ) {
-    if( i != 0 )
-      lvc.mask |= LVCF_SUBITEM;
-    lvc.cx = ( i == 0 )? 40 : 75;
+    if( i != 0 ) lvc.mask |= LVCF_SUBITEM;
     lvc.pszText = titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_EVENTS, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }
-  
+
+  /* Set columns width */
+  HWND hwnd_list = GetDlgItem( fuse_hDBGWnd, IDC_DBG_LV_EVENTS );
+  ListView_SetColumnWidth( hwnd_list, 0, LVSCW_AUTOSIZE_USEHEADER );
+  ListView_SetColumnWidth( hwnd_list, 1, LVSCW_AUTOSIZE_USEHEADER );
+
   return 0;
 }
 

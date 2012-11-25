@@ -4277,3 +4277,6 @@
          Remove --without-windres flag, previously used as a workaround
          (Sergio).
 20121125 movie.[ch]: make movie_start take a const char* filename (Fred).
+20121125 ui/win32/{debugger.c,win32ui.c}: Properly resize monospaced font with
+         high DPI settings. Dynamically set initial width of some columns in the
+         debugger on win32 UI (patch 3488036) (Sergio).
