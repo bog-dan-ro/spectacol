@@ -31,6 +31,7 @@
 */
 
 #include <libspectrum.h>
+#include <stdlib.h>
 #include <tchar.h>
 #include <windows.h>
  
@@ -477,19 +478,29 @@ create_stack_display( HFONT font )
 static void
 stack_click( LPNMITEMACTIVATE lpnmitem )
 {
-  libspectrum_word address, destination;
-  int error, row;
+  libspectrum_word destination;
+  int retval, error, row;
+  char *stopstring;
+  TCHAR buffer[255];
+  LVITEM li;
 
   row = lpnmitem->iItem;
   if( row < 0 ) return;
 
-  address = SP + ( 19 - row ) * 2;
+  li.iSubItem = 1;
+  li.pszText = buffer;
+  li.cchTextMax = 255;
+  retval = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_STACK,
+                                 LVM_GETITEMTEXT, row, ( LPARAM ) &li );
+  if( !retval ) {
+    ui_error( UI_ERROR_ERROR, "couldn't get text for row %d", row );
+    return;
+  }
 
-  destination =
-    readbyte_internal( address ) + readbyte_internal( address + 1 ) * 0x100;
+  destination = strtoul( buffer, &stopstring, 16 );
 
   error = debugger_breakpoint_add_address(
-    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, memory_source_any, 0, address, 0,
+    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, memory_source_any, 0, destination, 0,
     DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
   );
   if( error ) return;

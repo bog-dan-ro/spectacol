@@ -4272,11 +4272,14 @@
 20121122 pokefinder/{pokemem.[ch]},ui/gtk/pokemem.c,ui/widget/pokemem.c,
          ui/win32/pokemem.c: fix presumed typo in pokemem_trainer_deactivate
          (Fred).
-20121123 Makefile.am,configure.ac: Don't interrupt COMPAT_OSNAME log with other
+20121123 Makefile.am,configure.ac: don't interrupt COMPAT_OSNAME log with other
          checks. Avoid searching for windres when not building for Windows.
          Remove --without-windres flag, previously used as a workaround
          (Sergio).
 20121125 movie.[ch]: make movie_start take a const char* filename (Fred).
-20121125 ui/win32/{debugger.c,win32ui.c}: Properly resize monospaced font with
+20121125 ui/win32/{debugger.c,win32ui.c}: properly resize monospaced font with
          high DPI settings. Dynamically set initial width of some columns in the
          debugger on win32 UI (patch 3488036) (Sergio).
+20121125 ui/win32/debugger.c: fix value used for breaking down the emulation
+         when double-clicking the stack pane in the debugger on win32 UI
+         (Sergio).
