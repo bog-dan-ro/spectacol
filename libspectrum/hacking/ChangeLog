@@ -900,3 +900,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (thanks, clang 4.1) (Fred).
 20121107 libspectrum.c: fix potential leak of memory pointed to by
          'new_filename' (thanks, clang 4.1) (Fred).
+20121126 memory.c,myglib/garray.c,windres.rc: fix harcoded Id tags and add
+         missing properties (Sergio).
