@@ -1,7 +1,7 @@
 /* audio2tape.h: Convert audio files (wav, voc, etc.) to tape files (.tzx,.csw)
    Copyright (c) 2008 Fredrick Meunier
 
-   $Id: audio2tape.c 3711 2008-07-01 20:25:37Z fredm $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
