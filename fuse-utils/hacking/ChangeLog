@@ -360,3 +360,9 @@
          (patch #3580843) (Sergio).
 20121118 configure.ac,rzxdump.c: fix the build of rzxcheck and enable some bits
          of rzxdump if libgcrypt is present (bug #3582043) (Sergio).
+20121127 compat/amiga/Makefile.am,compat/unix/Makefile.am,fmfconv.[ch],
+         fmfconv_aiff.c,fmfconv_au.c,fmfconv_ff.c,fmfconv_ppm.c,fmfconv_scr.c,
+         fmfconv_wav.c,fmfconv_yuv.c,movie_tables.h,profile2map.c: update FSF 
+         address in GPL notices, change Phil e-mail address to @shadowmagic and 
+         remove postal address, fix harcoded Id tags, and add missing properties
+         (Sergio).
