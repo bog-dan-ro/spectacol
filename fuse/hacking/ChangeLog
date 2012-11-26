@@ -4283,3 +4283,12 @@
 20121125 ui/win32/debugger.c: fix value used for breaking down the emulation
          when double-clicking the stack pane in the debugger on win32 UI
          (Sergio).
+20121126 compat/win32/socket.c,compat/unix/socket.c,machines/machines_periph.h,
+         movie_tables.h,movie.[ch],peripherals/Makefile.am,
+         peripherals/disk/opus.h,peripherals/flash/{Makefile.am,am29f010.[ch]},
+         peripherals/nic/{Makefile.am,enc28j60.h,w5100.c,w5100.h,
+         w5100_internals.h,w5100_socket.c},peripherals/speccyboot.h,
+         peripherals/specdrum.h,peripherals/spectranet.[ch],
+         ui/win32/installer/fuse.nsi.in: update FSF address in GPL notices,
+         change Phil e-mail address to @shadowmagic and remove postal address,
+         fix harcoded Id tags, and add missing properties (Sergio).
