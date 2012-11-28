@@ -46,6 +46,7 @@ AC_INIT([libspectrum],[libspectrum_version],[libspectrum_bugreport],
 AC_CONFIG_SRCDIR([libspectrum.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
+AC_CANONICAL_HOST
 
 dnl Use automake to produce `Makefile.in'
 AM_INIT_AUTOMAKE
@@ -68,12 +69,12 @@ dnl Checks for programs.
 AC_PROG_CC
 
 dnl Setup for compiling build tools (make-perl)
-AC_MSG_CHECKING([for a C compiler for build tools])
 if test $cross_compiling = yes; then
   AC_CHECK_PROGS(CC_FOR_BUILD, gcc cc)
 else
   CC_FOR_BUILD=$CC
 fi
+AC_MSG_CHECKING([for a C compiler for build tools])
 AC_MSG_RESULT([$CC_FOR_BUILD])
 AC_SUBST(CC_FOR_BUILD)
 
@@ -88,21 +89,18 @@ AC_CHECK_HEADERS(stdint.h strings.h unistd.h)
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
-dnl Check whether to use Windows resource file utility
-AC_MSG_CHECKING(whether to use windres)
-AC_ARG_WITH(windres,
-[  --without-windres       don't use windres],
-if test "$withval" = no; then windres=no; else windres=yes; fi,
-windres=yes)
-AC_MSG_RESULT($windres)
-if test "$windres" = yes; then
-  AC_CHECK_TOOL(WINDRES, windres, no)
-  AC_SUBST(WINDRES)
-  if test "$WINDRES" != no; then
-    WINDRES_OBJ="windres.o"
-    WINDRES_LDFLAGS="-Xlinker windres.o"
-  fi
-fi
+dnl Check for host specific programs
+WINDRES_OBJ=
+WINDRES_LDFLAGS=
+case "$host_os" in
+  mingw32*)
+    AC_CHECK_TOOL([WINDRES], [windres], [no])
+    if test "$WINDRES" != no; then
+      WINDRES_OBJ="windres.o"
+      WINDRES_LDFLAGS="-Xlinker windres.o"
+    fi
+    ;;
+esac
 AC_SUBST(WINDRES_OBJ)
 AC_SUBST(WINDRES_LDFLAGS)
 
