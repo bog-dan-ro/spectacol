@@ -1914,9 +1914,8 @@ read_snet_memory( libspectrum_snap *snap, const libspectrum_byte **buffer,
   int compressed, size_t *data_remaining,
   void (*setter)(libspectrum_snap*, int, libspectrum_byte*) )
 {
-  size_t data_length, uncompressed_length = 0;
-  libspectrum_error error;
-  libspectrum_byte *data_out, *uncompressed_data;
+  size_t data_length;
+  libspectrum_byte *data_out;
   const libspectrum_byte *data;
 
   if( *data_remaining < 4 ) {
@@ -1938,6 +1937,9 @@ read_snet_memory( libspectrum_snap *snap, const libspectrum_byte **buffer,
   if( compressed ) {
 
 #ifdef HAVE_ZLIB_H
+    libspectrum_error error;
+    size_t uncompressed_length = 0;
+    libspectrum_byte *uncompressed_data;
 
     error = libspectrum_zlib_inflate( *buffer, data_length, &uncompressed_data,
         &uncompressed_length );

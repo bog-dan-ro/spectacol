@@ -905,3 +905,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20121129 configure.ac: don't check for windres when not building for Windows
          hosts. Remove --without-windres option, previously used as a workaround
          (Sergio).
+20121129 csw.c,rzx.c,szx.c: remove unused variables when not linking against
+         external libraries (Sergio).

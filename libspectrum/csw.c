@@ -39,7 +39,6 @@ libspectrum_csw_read( libspectrum_tape *tape,
 {
   libspectrum_tape_block *block = NULL;
   libspectrum_tape_rle_pulse_block *csw_block;
-  libspectrum_error error;
 
   int compressed;
 
@@ -112,6 +111,8 @@ libspectrum_csw_read( libspectrum_tape *tape,
   if( compressed ) {
     /* Compressed data... */
 #ifdef HAVE_ZLIB_H
+    libspectrum_error error;
+
     csw_block->data = NULL;
     csw_block->length = 0;
     error = libspectrum_zlib_inflate( buffer, length, &csw_block->data,

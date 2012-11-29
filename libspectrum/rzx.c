@@ -194,7 +194,9 @@ block_free( rzx_block_t *block )
 {
   size_t i;
   input_block_t *input;
+#ifdef HAVE_GCRYPT_H
   signature_block_t *signature;
+#endif				/* #ifdef HAVE_GCRYPT_H */
 
   switch( block->type ) {
 
@@ -216,9 +218,8 @@ block_free( rzx_block_t *block )
     return LIBSPECTRUM_ERROR_NONE;
 
   case LIBSPECTRUM_RZX_SIGN_END_BLOCK:
-    signature = &( block->types.signature );
-
 #ifdef HAVE_GCRYPT_H
+    signature = &( block->types.signature );
     gcry_mpi_release( signature->r );
     gcry_mpi_release( signature->s );
 #endif				/* #ifdef HAVE_GCRYPT_H */
@@ -1448,7 +1449,6 @@ static libspectrum_error
 rzx_write_input( input_block_t *block, libspectrum_byte **buffer,
 		 libspectrum_byte **ptr, size_t *length, int compress )
 {
-  libspectrum_error error;
   size_t i, size;
   size_t length_offset, data_offset, flags_offset;
   libspectrum_byte *length_ptr; 
@@ -1512,6 +1512,7 @@ rzx_write_input( input_block_t *block, libspectrum_byte **buffer,
     /* Compress the data the simple way. Really, we should stream the data */
     libspectrum_byte *gzsnap = NULL; size_t gzlength;
     libspectrum_byte *data_ptr = *buffer + data_offset;
+    libspectrum_error error;
 
     error = libspectrum_zlib_compress( data_ptr, *ptr - data_ptr,
 				       &gzsnap, &gzlength );
