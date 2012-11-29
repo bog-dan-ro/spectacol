@@ -4291,4 +4291,9 @@
          peripherals/specdrum.h,peripherals/spectranet.[ch],
          ui/win32/installer/fuse.nsi.in: update FSF address in GPL notices,
          change Phil e-mail address to @shadowmagic and remove postal address,
-         fix harcoded Id tags, and add missing properties (Sergio).
+         fix hard-coded Id tags, and add missing properties (Sergio).
+20121129 compat/{linux/Makefile.am,unix/Makefile.am,win32/Makefile.am},
+         configure.ac,m4/ax_pthread.m4,peripherals/nic/Makefile.am,
+         peripherals/spectranet.c,ui/options.dat,utils.c: allow the disabling of
+         Spectranet code if required libraries are not present (patch #3589476)
+         (Sergio).

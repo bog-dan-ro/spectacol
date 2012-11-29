@@ -39,8 +39,10 @@ Checkbox, In(t)erface II, interface2, INPUT_KEY_t
 Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
 Checkbox, Speccy(B)oot interface, speccyboot, INPUT_KEY_b
 Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
+#ifdef BUILD_SPECTRANET
 Checkbox, Spectra(n)et, spectranet, INPUT_KEY_n
 Checkbox, Spe(c)tranet disable, spectranet_disable, INPUT_KEY_c
+#endif
 Posthook, periph_update
 
 peripherals_disk

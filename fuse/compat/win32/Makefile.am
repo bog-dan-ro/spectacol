@@ -31,8 +31,11 @@ libcompatos_a_SOURCES = ../unix/dir.c \
 			../unix/file.c \
 			osname.c \
 			paths.c \
-                        socket.c \
 			timer.c \
                         ../unix/tuntap.c
+
+if HAVE_SOCKETS
+libcompatos_a_SOURCES += socket.c
+endif
 
 AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@

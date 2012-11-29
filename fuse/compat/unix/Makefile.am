@@ -31,9 +31,12 @@ libcompatos_a_SOURCES = dir.c \
 			file.c \
 			osname.c \
 			paths.c \
-                        socket.c \
 			timer.c \
                         tuntap.c
+
+if HAVE_SOCKETS
+libcompatos_a_SOURCES += socket.c
+endif
 
 AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
 -DFUSEDATADIR="\"${pkgdatadir}\""

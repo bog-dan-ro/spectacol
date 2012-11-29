@@ -130,7 +130,7 @@ win32=no)
 AC_MSG_RESULT($win32)
 if test "$win32" = yes; then
   AC_CHECK_HEADER(windows.h,
-                  LIBS="$LIBS -mwindows -lcomctl32 -lwinmm -lpthread -lws2_32";
+                  LIBS="$LIBS -mwindows -lcomctl32 -lwinmm";
                   AC_DEFINE([UI_WIN32], 1, [Defined if Win32 UI in use])
                   AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
                   AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
@@ -703,6 +703,47 @@ else
   AC_MSG_RESULT(native)
 fi
 AC_SUBST(TIMER_LIBADD)
+
+dnl See if sockets are supported
+AC_MSG_CHECKING([whether sockets support requested])
+AC_ARG_ENABLE(sockets,
+AS_HELP_STRING([--disable-sockets], [do not use sockets]),
+if test "$enableval" = yes; then sockets=yes; else sockets=no; fi,
+sockets=yes)
+AC_MSG_RESULT($sockets)
+if test "$sockets" = yes; then
+case "$host_os" in
+  mingw32*)
+    AC_CHECK_HEADER([winsock2.h], [LIBS="$LIBS -lws2_32"], [sockets=no])
+    ;;
+  *)
+    AC_CHECK_HEADER([sys/socket.h],, [sockets=no])
+    ;;
+esac
+fi
+AM_CONDITIONAL(HAVE_SOCKETS, test "$sockets" = yes)
+
+dnl See if POSIX threads are supported
+AC_MSG_CHECKING([whether pthread support requested])
+AC_ARG_WITH(pthread,
+AS_HELP_STRING([--without-pthread],[do not use POSIX threads]),
+if test "$withval" = no; then pthread=no; else pthread=yes; fi,
+pthread=yes)
+AC_MSG_RESULT($pthread)
+if test "$pthread" = yes; then
+  AX_PTHREAD([LIBS="$PTHREAD_LIBS $LIBS"
+              CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+              CC="$PTHREAD_CC"],
+             [AC_MSG_WARN(POSIX threads not found - some peripherals disabled)
+              pthread=no])
+fi
+if test "$pthread" = yes -a "$sockets" = yes; then
+  build_spectranet=yes
+  AC_DEFINE([BUILD_SPECTRANET], 1, [Defined if we support spectranet])
+else
+  build_spectranet=no
+fi
+AM_CONDITIONAL(BUILD_SPECTRANET, test "$build_spectranet" = yes)
 
 dnl See if Linux TAP devices are supported
 AC_MSG_CHECKING(whether Linux TAP devices are supported)

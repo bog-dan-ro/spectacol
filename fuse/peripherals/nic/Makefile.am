@@ -30,9 +30,12 @@ noinst_LIBRARIES = libnic.a
 AM_CPPFLAGS += @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
 libnic_a_SOURCES = \
-  enc28j60.c \
-  w5100.c \
+  enc28j60.c
+
+if BUILD_SPECTRANET
+libnic_a_SOURCES += w5100.c \
   w5100_socket.c
+endif
 
 noinst_HEADERS = \
   enc28j60.h \

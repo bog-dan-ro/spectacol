@@ -39,6 +39,8 @@
 #include "settings.h"
 #include "ui/ui.h"
 
+#ifdef BUILD_SPECTRANET
+
 #define SPECTRANET_PAGES 256
 #define SPECTRANET_PAGE_LENGTH 0x1000
 
@@ -60,6 +62,8 @@ static int spectranet_memory_allocated = 0;
 static nic_w5100_t *w5100;
 static flash_am29f010_t *flash_rom;
 
+#endif
+
 int spectranet_available = 0;
 int spectranet_paged;
 int spectranet_paged_via_io;
@@ -70,6 +74,8 @@ int spectranet_programmable_trap_active;
 
 /* Where the programmable trap will trigger if active */
 libspectrum_word spectranet_programmable_trap;
+
+#ifdef BUILD_SPECTRANET
 
 /* True if the next write to 0x023b will set the MSB of the programmable trap */
 static int trap_write_msb;
@@ -462,3 +468,49 @@ spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b )
     flash_am29f010_write( flash_rom, flash_page, flash_address, b );
   }
 }
+
+#else			/* #ifdef BUILD_SPECTRANET */
+
+/* No spectranet support */
+
+void
+spectranet_init( void )
+{
+}
+
+void
+spectranet_end( void )
+{
+}
+
+void
+spectranet_page( int via_io )
+{
+}
+
+void
+spectranet_unpage( void )
+{
+}
+
+libspectrum_byte
+spectranet_w5100_read( memory_page *page GCC_UNUSED,
+                       libspectrum_word address GCC_UNUSED )
+{
+  return 0xff;
+}
+
+void
+spectranet_w5100_write( memory_page *page GCC_UNUSED, 
+                        libspectrum_word address GCC_UNUSED,
+                        libspectrum_byte b GCC_UNUSED )
+{
+}
+
+void
+spectranet_flash_rom_write( libspectrum_word address GCC_UNUSED,
+                            libspectrum_byte b GCC_UNUSED )
+{
+}
+
+#endif			/* #ifdef BUILD_SPECTRANET */
