@@ -33,6 +33,15 @@ AC_PROG_CC
 AC_PROG_CXX
 LT_INIT
 
+dnl Check for host specific programs.
+case "$host_os" in
+  mingw32*)
+    AC_CHECK_PROGS([MAN2HTML], [man2html])
+    AC_CHECK_PROGS([GROFF], [groff])
+    AC_CHECK_PROGS([UNIX2DOS], [unix2dos])
+    ;;
+esac
+
 dnl Check for big endianness
 AC_C_BIGENDIAN
 
@@ -187,12 +196,14 @@ if test "$audiofile" = yes; then
   PKG_CHECK_MODULES(
     AUDIOFILE,
     audiofile,
-    AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile]), []
+    AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile]),
+    true
   )
   if test -z "$AUDIOFILE_LIBS"; then
     AM_PATH_AUDIOFILE(
       0.2.3,
-      AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile])
+      AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile]),
+      audiofile=no
     )
   fi
 fi
@@ -221,9 +232,6 @@ case "$host_os" in
   mingw32*)
     COMPAT_OSNAME='win32'
     CXXFLAGS="$CXXFLAGS -static-libgcc -static-libstdc++"
-    AC_CHECK_PROGS([MAN2HTML], [man2html])
-    AC_CHECK_PROGS([GROFF], [groff])
-    AC_CHECK_PROGS([UNIX2DOS], [unix2dos])
     ;;
   *)
     COMPAT_OSNAME='unix'

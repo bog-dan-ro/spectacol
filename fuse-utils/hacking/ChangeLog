@@ -368,5 +368,8 @@
          (Sergio).
 20121127 audio2tape.h,compat/amiga/Makefile.am,compat/unix/Makefile.am,
          fmfconv.[ch],fmfconv_aiff.c,fmfconv_au.c,fmfconv_ff.c,fmfconv_ppm.c,
-         fmfconv_scr.c,fmfconv_wav.c,fmfconv_yuv.c: fix harcoded Id tags and add
-         missing properties (Sergio).
+         fmfconv_scr.c,fmfconv_wav.c,fmfconv_yuv.c: fix hard-coded Id tags and
+         add missing properties (Sergio).
+20121201 configure.ac: fix the build when libaudiofile is not found and we are
+         using an old pkg-config/autoconf. Don't interrupt COMPAT_OSNAME output
+         with other checks (Sergio).
