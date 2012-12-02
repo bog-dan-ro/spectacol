@@ -907,3 +907,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (Sergio).
 20121129 csw.c,rzx.c,szx.c: remove unused variables when not linking against
          external libraries (Sergio).
+20121202 configure.ac: fix the macro expansion of PKG_CHECK_MODULES when using
+         both --without-glib and --with-libaudiofile options (Sergio).

@@ -164,14 +164,14 @@ AC_ARG_WITH(glib,
 if test "$withval" = no; then glib=no; else glib=yes; fi,
 glib=yes)
 AC_MSG_RESULT($glib)
-if test "$glib" = yes; then
+AS_IF([test "$glib" = yes], [
   PKG_CHECK_MODULES(
     GLIB,
     glib-2.0,
     AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib]),
     glib="no"
   )
-fi
+])
 
 AM_CONDITIONAL(USE_MYGLIB, test "$glib" = no)
 
@@ -201,7 +201,7 @@ AC_ARG_WITH(libaudiofile,
 if test "$withval" = no; then libaudiofile=no; else libaudiofile=yes; fi,
 libaudiofile=yes)
 AC_MSG_RESULT($libaudiofile)
-if test "$libaudiofile" = yes; then
+AS_IF([test "$libaudiofile" = yes], [
   PKG_CHECK_MODULES(
     AUDIOFILE,
     audiofile,
@@ -214,7 +214,7 @@ if test "$libaudiofile" = yes; then
       AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile])
     )
   fi
-fi
+])
 
 AC_CONFIG_FILES([
   Makefile
