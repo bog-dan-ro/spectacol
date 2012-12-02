@@ -290,7 +290,8 @@ dist-win32-exe: dist-win32-dir
 	@test `find $(top_win32dir) -type f -name \*.dll -print | wc -l` -ne 0 || \
 	{ echo "ERROR: external libraries not found in $(top_win32dir). Please, manually copy them."; exit 1; }
 #	Locate NSIS in system path, MSYS drive or Cygwin drive
-	@if makensis -VERSION > /dev/null 2>&1; then \
+	@NSISFILE="$(abs_top_builddir)/ui/win32/installer/fuse.nsi"; \
+	if makensis -VERSION > /dev/null 2>&1; then \
 	  MAKENSIS="makensis"; \
 	elif [ -x "/c/Program Files/NSIS/makensis" ]; then \
 	  MAKENSIS="/c/Program\ Files/NSIS/makensis"; \
@@ -299,8 +300,11 @@ dist-win32-exe: dist-win32-dir
 	else \
 	  echo 'ERROR: cannot locate makensis tool'; exit 1; \
 	fi; \
+	case "`uname -s`" in \
+	  CYGWIN*) NSISFILE=`cygpath -m $$NSISFILE`;; \
+	esac; \
 	cd $(top_win32dir); \
-	eval "$$MAKENSIS -V2 -NOCD $(abs_top_builddir)/ui/win32/installer/fuse.nsi"
+	eval "$$MAKENSIS -V2 -NOCD $$NSISFILE"
 	mv $(top_win32dir)/$(package_win32)-setup.exe $(top_builddir)
 	-sha1sum $(top_builddir)/$(package_win32)-setup.exe > $(top_builddir)/$(package_win32)-setup.exe.sha1 && \
 	{ test -z "$(UNIX2DOS)" || $(UNIX2DOS) $(top_builddir)/$(package_win32)-setup.exe.sha1; }

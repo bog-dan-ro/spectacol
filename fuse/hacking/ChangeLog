@@ -4297,3 +4297,5 @@
          peripherals/spectranet.c,ui/options.dat,utils.c: allow the disabling of
          Spectranet code if required libraries are not present (patch #3589476)
          (Sergio).
+20121202 Makefile.am: translate path used for makensis on cygwin (win32 port)
+         (Sergio).
