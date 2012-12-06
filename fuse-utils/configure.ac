@@ -231,7 +231,6 @@ case "$host_os" in
     ;;
   mingw32*)
     COMPAT_OSNAME='win32'
-    CXXFLAGS="$CXXFLAGS -static-libgcc -static-libstdc++"
     ;;
   *)
     COMPAT_OSNAME='unix'

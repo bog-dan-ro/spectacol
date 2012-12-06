@@ -373,3 +373,5 @@
 20121201 configure.ac: fix the build when libaudiofile is not found and we are
          using an old pkg-config/autoconf. Don't interrupt COMPAT_OSNAME output
          with other checks (Sergio).
+20121206 configure.ac: allow dynamic linking against system libraries for
+         audio2tape on Windows to fix the build with libaudiofile 0.3 (Sergio).
