@@ -134,6 +134,7 @@ if test "$win32" = yes; then
                   AC_DEFINE([UI_WIN32], 1, [Defined if Win32 UI in use])
                   AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
                   AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
+                  AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Exclude rarely used stuff from Windows headers <windows.h>])
                   UI=win32; UI_LIBS="ui/win32/libuiwin32.a",
                   AC_MSG_ERROR([Win32 UI not found]))
 fi
@@ -531,7 +532,9 @@ AC_CHECK_HEADER(
   dsound.h,
   [dxsound_available=yes],
   [AC_MSG_WARN(dsound.h not found - no DirectSound output)],
-  [#define DIRECTSOUND_VERSION 0x0700]
+  [#define DIRECTSOUND_VERSION 0x0700
+   #include <windows.h>
+   #include <mmsystem.h>]
 )
 
 dnl Check if MS Windows Multimedia API sound is available

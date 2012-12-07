@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include <windows.h>
+#include <mmsystem.h>
 
 #include "settings.h"
 #include "sound.h"
@@ -50,7 +51,8 @@ static void
 sound_display_mmresult( char *func, MMRESULT result );
 
 static void CALLBACK
-sound_callback( HWAVEOUT hwo,UINT uMsg,DWORD dwInstance,DWORD dwParam1,DWORD dwParam2 );
+sound_callback( HWAVEOUT hwo, UINT uMsg, DWORD_PTR dwInstance,
+                DWORD_PTR dwParam1, DWORD_PTR dwParam2 );
 
 int
 sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )

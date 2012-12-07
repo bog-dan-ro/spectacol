@@ -23,8 +23,6 @@
 
 */
 
-#include <windows.h>
-
 #include "debugger.h"
 		
 IDD_DBG DIALOGEX DISCARDABLE 6, 5, 555, 279

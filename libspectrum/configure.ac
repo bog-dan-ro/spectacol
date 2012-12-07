@@ -99,6 +99,7 @@ case "$host_os" in
       WINDRES_OBJ="windres.o"
       WINDRES_LDFLAGS="-Xlinker windres.o"
     fi
+    AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Exclude rarely used stuff from Windows headers <windows.h>])
     ;;
 esac
 AC_SUBST(WINDRES_OBJ)

@@ -23,8 +23,6 @@
 
 */
 
-#include <windows.h>
-
 #include "browse.h"
 
 IDD_BROWSE DIALOGEX 0,0,230,153

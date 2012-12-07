@@ -22,6 +22,8 @@
  
 */
 
+#include <config.h>
+
 #include <string.h>
 
 #include "am29f010.h"

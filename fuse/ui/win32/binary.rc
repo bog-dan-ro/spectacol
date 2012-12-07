@@ -23,8 +23,6 @@
 
 */
 
-#include <windows.h>
-
 #include "binary.h"
 
 IDD_BINARY DIALOGEX 0,0,396,85

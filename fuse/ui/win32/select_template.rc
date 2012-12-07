@@ -21,8 +21,6 @@
 
 */
 
-#include <windows.h>
-
 #include "select_template.h"
 
 IDD_SELECT_DIALOG DIALOGEX 0,0,177,247

@@ -23,8 +23,6 @@
 
 */
 
-#include <windows.h>
-
 #include "picture.h"
 
 IDD_PICTURE     DIALOG DISCARDABLE 16, 16, 160, 138

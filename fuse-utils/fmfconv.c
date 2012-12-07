@@ -91,7 +91,7 @@ int verbose = 0;
 int do_info = 0;	/* no output and verbose 2 */
 do_t do_now = DO_FILE;
 
-FILE *inp = NULL, *out = NULL, *snd = NULL;
+FILE *inp_file = NULL, *out = NULL, *snd = NULL;
 
 type_t inp_t = TYPE_UNSET, out_t = TYPE_UNSET, snd_t = TYPE_UNSET, scr_t = TYPE_UNSET, prg_t = TYPE_NONE;
 
@@ -224,14 +224,14 @@ fread_buff( libspectrum_byte *ptr, size_t size, int how )	/* read from inp, how 
   if( how == INTO_BUFF ) {
     n = size > FBUFF_SIZE ? FBUFF_SIZE : size;
 
-    s = fread( fbuff, n, 1, inp );
+    s = fread( fbuff, n, 1, inp_file );
     if( s != 1 ) return s;
     fbuff_size = n;
     memcpy( ptr, fbuff, n );
     if( size > FBUFF_SIZE ) {
       ptr += n;
       n = size - FBUFF_SIZE;
-      return fread( ptr, n, 1, inp );
+      return fread( ptr, n, 1, inp_file );
     }
   } else {
     n = size <= fbuff_size ? size : fbuff_size;
@@ -245,7 +245,7 @@ fread_buff( libspectrum_byte *ptr, size_t size, int how )	/* read from inp, how 
       ptr += n;
     }
     if( size > 0 ) {
-      return fread( ptr, size, 1, inp );
+      return fread( ptr, size, 1, inp_file );
     }
   }
   return 1;
@@ -280,7 +280,7 @@ fgetc_compr( FILE *f )
       zstream.next_out = zbuf_o;
       do {
 	if( zstream.avail_in == 0 && !fmf_compr_feof ) {
-	  zstream.avail_in = fread( zbuf_i, 1, ZBUF_INP_SIZE, inp );
+	  zstream.avail_in = fread( zbuf_i, 1, ZBUF_INP_SIZE, inp_file );
 	  zstream.next_in = zbuf_i;
 	  if( zstream.avail_in == 0 )
 	    fmf_compr_feof = 1;
@@ -802,16 +802,16 @@ open_snd( void )
 int
 open_inp( void )
 {
-  if( inp ) {				/* we have to close before last */
-    if( inp != stdin ) {
-      fclose( inp );
+  if( inp_file ) {				/* we have to close before last */
+    if( inp_file != stdin ) {
+      fclose( inp_file );
     } else {			/* reopen stdin???? */
       do_now = DO_EOP;
       return 0;
     }
   }
   if( inp_name ) {
-    if( ( inp = fopen( inp_name, "rb" ) ) == NULL ) {
+    if( ( inp_file = fopen( inp_name, "rb" ) ) == NULL ) {
       printe( "Cannot open input file '%s'...\n", inp_name );
       return ERR_OPEN_INP;
     }
@@ -819,18 +819,18 @@ open_inp( void )
     snd_t = TYPE_FFMPEG;
     return 0;
   } else {
-    inp = stdin;
+    inp_file = stdin;
     inp_name = "(-=stdin=-)";
   }
-  if( fseek( inp, 0, SEEK_END ) == -1 ) {
+  if( fseek( inp_file, 0, SEEK_END ) == -1 ) {
     printi( 4, "open_inp(): cannot seek to the end of the input file (not seekable).\n" );
     inp_ftell = 0;
-  } else if( ( inp_ftell = ftell( inp ) ) == -1 ) {
+  } else if( ( inp_ftell = ftell( inp_file ) ) == -1 ) {
     printi( 4, "open_inp(): cannot ftell input file??.\n" );
-    fseek( inp, 0, SEEK_SET );
+    fseek( inp_file, 0, SEEK_SET );
     inp_ftell = 0;
   } else {
-    fseek( inp, 0, SEEK_SET );
+    fseek( inp_file, 0, SEEK_SET );
   }
 
   if( inp_t == TYPE_UNSET ) {	/* try to identify the file type */
@@ -953,9 +953,9 @@ fmf_read_head( void )
 int
 fmf_read_frame_head( void )
 {
-  if( fread_compr( fhead, 3, 1, inp ) != 1 ) {
+  if( fread_compr( fhead, 3, 1, inp_file ) != 1 ) {
     printe( "\n\nfmf_read_frame_head(): Corrupt input file (N) @0x%08lx.\n",
-            (unsigned long)ftell( inp ) );
+            (unsigned long)ftell( inp_file ) );
     return ERR_CORRUPT_INP;
   }
   if( fhead[0] < 1 ) {
@@ -995,9 +995,9 @@ fmf_read_frame_head( void )
 int
 fmf_read_chunk_head( void )
 {
-  if( fread_compr( fhead, 1, 1, inp ) != 1 ) {	/* */
+  if( fread_compr( fhead, 1, 1, inp_file ) != 1 ) {	/* */
     printe( "Unexpected end of input file @0x%08lx.\n",
-            (unsigned long)ftell( inp )  );
+            (unsigned long)ftell( inp_file )  );
     return ERR_ENDOFFILE;
   }
   if( fhead[0] != 'N' && fhead[0] != '$' && fhead[0] != 'S' && fhead[0] != 'X' ) {
@@ -1017,7 +1017,7 @@ fmf_read_init( void )		/* read first N */
   if( ( err = fmf_read_chunk_head() ) ) return err;
 
   if( fhead[0] != 'N' ) {				/* end of record... */
-    printe( "\n\nfmf_read_init(): Corrupt input file (N) @0x%08lx.\n", (unsigned long)ftell( inp ) );
+    printe( "\n\nfmf_read_init(): Corrupt input file (N) @0x%08lx.\n", (unsigned long)ftell( inp_file ) );
     return ERR_CORRUPT_INP;
   }
   return fmf_read_frame_head();
@@ -1030,8 +1030,8 @@ fmf_read_sound( void )
   int len;
   static int fmf_snd_head_read = 0;
 
-  if( !fmf_snd_head_read && fread_compr( fhead, 6, 1, inp ) != 1 ) {
-    printe( "\n\nCorrupt input file (S) @0x%08lx.\n", (unsigned long)ftell( inp ) );
+  if( !fmf_snd_head_read && fread_compr( fhead, 6, 1, inp_file ) != 1 ) {
+    printe( "\n\nCorrupt input file (S) @0x%08lx.\n", (unsigned long)ftell( inp_file ) );
     return ERR_CORRUPT_INP;
   }
 
@@ -1066,8 +1066,8 @@ fmf_read_sound( void )
 
   if( sound_stereo == -1 ) out_chn = snd_chn;
   if( ( err = alloc_sound_buff( snd_len + len ) ) ) return err;
-  if( fread_compr( (void *)( sound8 + snd_len ), len, 1, inp ) != 1 ) {
-    printe( "\n\nCorrupt input file (S) @0x%08lx.\n", (unsigned long)ftell( inp ) );
+  if( fread_compr( (void *)( sound8 + snd_len ), len, 1, inp_file ) != 1 ) {
+    printe( "\n\nCorrupt input file (S) @0x%08lx.\n", (unsigned long)ftell( inp_file ) );
     return ERR_CORRUPT_INP;
   }
   fmf_sound_no++;
@@ -1163,13 +1163,13 @@ fmf_read_slice_blokk( libspectrum_byte *scrl, int w, int h )
     w = width;			/* restore width */
     while( w > 0 ) {
       if( len == 0 ) {
-        if( ( d = fgetc_compr( inp ) ) == -1 ) {
-          printe( "\n\nCorrupt input file ($) @0x%08lx.\n", (unsigned long)ftell( inp ) );
+        if( ( d = fgetc_compr( inp_file ) ) == -1 ) {
+          printe( "\n\nCorrupt input file ($) @0x%08lx.\n", (unsigned long)ftell( inp_file ) );
           return ERR_CORRUPT_INP;	/* read a byte */
         }
         if( d == last ) {	/* compressed chunk... */
-	  if( ( len = fgetc_compr( inp ) ) == -1 ) {
-	    printe( "\n\nCorrupt input file ($) @0x%08lx.\n", (unsigned long)ftell( inp ) );
+	  if( ( len = fgetc_compr( inp_file ) ) == -1 ) {
+	    printe( "\n\nCorrupt input file ($) @0x%08lx.\n", (unsigned long)ftell( inp_file ) );
 	    return ERR_CORRUPT_INP;	/* read a byte */
 	  }
 	  len++;
@@ -1193,8 +1193,8 @@ fmf_read_screen( void )
 {
   int err;
 
-  if( fread_compr( fhead, 6, 1, inp ) != 1 ) {
-    printe( "\n\nCorrupt input file ($) @0x%08lx.\n", (unsigned long)ftell( inp ) );
+  if( fread_compr( fhead, 6, 1, inp_file ) != 1 ) {
+    printe( "\n\nCorrupt input file ($) @0x%08lx.\n", (unsigned long)ftell( inp_file ) );
     return ERR_CORRUPT_INP;
   }
   if( fhead[0] > 39 ) {
@@ -1541,7 +1541,7 @@ print_progress( int force )
 
   if( !inp_ftell ) return;
 
-  npos = ftell( inp );
+  npos = ftell( inp_file );
   if( npos <= fpos ) return;
 
   perc = (libspectrum_signed_qword)npos * 1009 / inp_ftell / 10;
@@ -1969,7 +1969,7 @@ main( int argc, char *argv[] )
       if( inp_t == TYPE_FMF ) {
         if( do_now == DO_LAST_FRAME ) {
           fread_buff( fhead, 1, INTO_BUFF );	/* check concatenation */
-          if( feof_compr( inp ) )
+          if( feof_compr( inp_file ) )
             do_now = DO_FILE;
           else
             do_now = DO_HEAD;

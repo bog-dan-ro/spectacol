@@ -24,6 +24,7 @@
 */
 
 #include <config.h>
+
 #include <tchar.h>
 #include <windows.h>
 
@@ -126,7 +127,7 @@ win32ui_pokemem_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
               /* Prevent the check of disabled trainers */
               if( new_state != old_state && trainer->disabled )
               {
-                SetWindowLongPtr( hWnd, DWL_MSGRESULT, TRUE );
+                SetWindowLongPtr( hWnd, DWLP_MSGRESULT, TRUE );
                 return TRUE;
               }
             }
@@ -170,7 +171,7 @@ listview_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     case WM_DESTROY:
     {
       WNDPROC orig_proc = (WNDPROC) GetProp( hWnd, "original_proc" );
-      SetWindowLongPtr( hWnd, GWL_WNDPROC, (LONG) orig_proc );
+      SetWindowLongPtr( hWnd, GWLP_WNDPROC, (LONG_PTR) orig_proc );
       RemoveProp( hWnd, "original_proc" );
       break;
     }
@@ -284,7 +285,7 @@ edit_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     case WM_DESTROY:
     {
       WNDPROC orig_proc = (WNDPROC) GetProp( hWnd, "original_proc" );
-      SetWindowLongPtr( hWnd, GWL_WNDPROC, (LONG) orig_proc );
+      SetWindowLongPtr( hWnd, GWLP_WNDPROC, (LONG_PTR) orig_proc );
       RemoveProp( hWnd, "original_proc" );
       hwnd_edit = NULL;
       break;
@@ -357,9 +358,9 @@ initialize_dialog( HWND hwnd_dialog )
   hwnd_list = GetDlgItem( hwnd_dialog, IDC_PM_LIST );
 
   /* Replace message handler */
-  WNDPROC orig_proc = (WNDPROC) GetWindowLongPtr( hwnd_list, GWL_WNDPROC );
+  WNDPROC orig_proc = (WNDPROC) GetWindowLongPtr( hwnd_list, GWLP_WNDPROC );
   SetProp( hwnd_list, "original_proc", (HANDLE) orig_proc );
-  SetWindowLongPtr( hwnd_list, GWL_WNDPROC, (LONG) (WNDPROC) listview_proc );
+  SetWindowLongPtr( hwnd_list, GWLP_WNDPROC, (LONG_PTR) (WNDPROC) listview_proc );
 
   /* Set text limits */
   SendDlgItemMessage( hwnd_dialog, IDC_PM_BANK_EDIT,  EM_LIMITTEXT, 1, 0 );
@@ -477,9 +478,9 @@ create_custom_edit( HWND parent, int item, int subitem )
   if( !hwnd_edit ) return;
  
   /* Replace message handler */
-  WNDPROC orig_proc = (WNDPROC) GetWindowLongPtr( hwnd_edit, GWL_WNDPROC );
+  WNDPROC orig_proc = (WNDPROC) GetWindowLongPtr( hwnd_edit, GWLP_WNDPROC );
   SetProp( hwnd_edit, "original_proc", (HANDLE) orig_proc );
-  SetWindowLongPtr( hwnd_edit, GWL_WNDPROC, (LONG) (WNDPROC) edit_proc );
+  SetWindowLongPtr( hwnd_edit, GWLP_WNDPROC, (LONG_PTR) (WNDPROC) edit_proc );
 
   /* Set proper font custom edit */
   HFONT hFont = (HFONT) SendMessage( parent, WM_GETFONT, 0, 0 );

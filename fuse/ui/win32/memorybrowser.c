@@ -253,7 +253,7 @@ memory_listview_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     case WM_DESTROY:
     {
       WNDPROC orig_proc = (WNDPROC) GetProp( hWnd, "original_proc" );
-      SetWindowLongPtr( hWnd, GWL_WNDPROC, (LONG) orig_proc );
+      SetWindowLongPtr( hWnd, GWLP_WNDPROC, (LONG_PTR) orig_proc );
       RemoveProp( hWnd, "original_proc" );
       break;
     }
@@ -326,10 +326,10 @@ memorybrowser_init( HWND hwndDlg )
 
   /* subclass listview to catch keydown and mousewheel messages */
   HWND hwnd_list = GetDlgItem( hwndDlg, IDC_MEM_LV );
-  WNDPROC orig_proc = (WNDPROC) GetWindowLongPtr( hwnd_list, GWL_WNDPROC );
+  WNDPROC orig_proc = (WNDPROC) GetWindowLongPtr( hwnd_list, GWLP_WNDPROC );
   SetProp( hwnd_list, "original_proc", (HANDLE) orig_proc );
-  SetWindowLongPtr( hwnd_list, GWL_WNDPROC, 
-                    (LONG) (WNDPROC) memory_listview_proc );
+  SetWindowLongPtr( hwnd_list, GWLP_WNDPROC, 
+                    (LONG_PTR) (WNDPROC) memory_listview_proc );
 
   /* set extended listview style to select full row, when an item is selected */
   DWORD lv_ext_style;
@@ -349,7 +349,7 @@ memorybrowser_init( HWND hwndDlg )
     if( i != 0 )
       lvc.mask |= LVCF_SUBITEM;
     lvc.cx = column_widths[i];
-    lvc.pszText = titles[i];
+    lvc.pszText = (TCHAR *)titles[i];
     SendDlgItemMessage( hwndDlg, IDC_MEM_LV, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }

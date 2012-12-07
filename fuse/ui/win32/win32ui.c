@@ -867,7 +867,7 @@ selector_dialog_build( HWND hwndDlg, win32ui_select_info *items )
     CreateWindow( TEXT( "BUTTON" ), items->labels[i],
                   dwStyle,
                   or.left, or.top, or.right, or.bottom,
-                  hwndDlg, (HMENU) ( IDC_SELECT_OFFSET + i ), fuse_hInstance, 0 );
+                  hwndDlg, (HMENU) (LONG_PTR) ( IDC_SELECT_OFFSET + i ), fuse_hInstance, 0 );
     SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), WM_SETFONT,
                         (WPARAM) h_ms_font, FALSE );
 

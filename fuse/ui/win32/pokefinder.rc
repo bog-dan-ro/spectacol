@@ -23,7 +23,6 @@
 
 */
 
-#include <windows.h>
 #include "pokefinder.h"
 
 IDD_POKEFINDER DIALOGEX DISCARDABLE 6,6,330,49

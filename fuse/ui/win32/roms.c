@@ -36,7 +36,7 @@
 
 static void add_rom( HWND hwndDlg, size_t start, size_t row );
 static void select_new_rom( HWND hedit );
-static void roms_done( HWND hwndDlg, LONG lParam );
+static void roms_done( HWND hwndDlg, LONG_PTR lParam );
 static INT_PTR CALLBACK roms_proc( HWND hwndDlg, UINT uMsg,
                                    WPARAM wParam, LPARAM lParam );
 static void roms_init( HWND hwndDlg, LPARAM lParam );
@@ -86,14 +86,14 @@ roms_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
     case WM_INITDIALOG:
       roms_init( hwndDlg, lParam );
       /* save callback_info in userdata of this dialog */
-      SetWindowLong( hwndDlg, GWL_USERDATA, ( LONG ) lParam );
+      SetWindowLongPtr( hwndDlg, GWLP_USERDATA, ( LONG_PTR ) lParam );
       return FALSE;
 
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
 
         case IDOK:
-          roms_done( hwndDlg, GetWindowLong( ( HWND ) hwndDlg, GWL_USERDATA ) );
+          roms_done( hwndDlg, GetWindowLongPtr( ( HWND ) hwndDlg, GWLP_USERDATA ) );
           EndDialog( hwndDlg, 0 );
           return 0;
 
@@ -103,7 +103,7 @@ roms_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
           
         default:
           if( HIWORD( wParam ) == BN_CLICKED ) {
-            hedit = ( HWND ) GetWindowLong( ( HWND ) lParam, GWL_USERDATA );
+            hedit = ( HWND ) GetWindowLongPtr( ( HWND ) lParam, GWLP_USERDATA );
             if( hedit > 0 ) {
               select_new_rom( hedit );
               return 0;
@@ -225,7 +225,7 @@ add_rom( HWND hwndDlg, size_t start, size_t row )
   SendMessage( hbutton, WM_SETFONT, ( WPARAM ) font, FALSE );
   
   /* associate handle to the edit box with each Select button as user data */
-  SetWindowLong( hbutton, GWL_USERDATA, ( LONG ) hedit );
+  SetWindowLongPtr( hbutton, GWLP_USERDATA, ( LONG_PTR ) hedit );
 }
 
 static void
@@ -240,7 +240,7 @@ select_new_rom( HWND hedit )
 }
 
 static void
-roms_done( HWND hwndDlg, LONG lParam )
+roms_done( HWND hwndDlg, LONG_PTR lParam )
 {
   size_t i;
   

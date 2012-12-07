@@ -22,6 +22,9 @@
    E-mail: philip-fuse@shadowmagic.org.uk
 
 */
+
+#include <config.h>
+
 #include <ctype.h>
 #include <string.h>
 

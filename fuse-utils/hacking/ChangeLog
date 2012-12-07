@@ -375,3 +375,5 @@
          with other checks (Sergio).
 20121206 configure.ac: allow dynamic linking against system libraries for
          audio2tape on Windows to fix the build with libaudiofile 0.3 (Sergio).
+20121208 fmfconv.c: preliminary support for 64-bits binaries for Windows (patch
+         #3591613) (Sergio).

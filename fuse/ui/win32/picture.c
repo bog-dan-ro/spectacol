@@ -23,6 +23,8 @@
 
 */
 
+#include <config.h>
+
 #include "display.h"
 #include "picture.h"
 #include "ui/ui.h"

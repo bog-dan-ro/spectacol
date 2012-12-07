@@ -23,7 +23,6 @@
 
 */
 
-#include <windows.h>
 #include "pokemem.h"
 
 IDD_POKEMEM DIALOGEX DISCARDABLE 6,6,314,171

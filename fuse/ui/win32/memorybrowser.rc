@@ -23,8 +23,6 @@
 
 */
 
-#include <windows.h>
-
 #include "memorybrowser.h"
 
 IDD_MEM DIALOGEX DISCARDABLE 0,0,371,264

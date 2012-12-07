@@ -191,7 +191,7 @@ static void
 create_fire_button_selector( const TCHAR *title, struct button_info *info,
                              HWND hwndDlg );
 static void set_key_text( HWND hlabel, keyboard_key_name key );
-static void joystick_done( LONG user_data );
+static void joystick_done( LONG_PTR user_data );
 static void show_key_selection_popoup( HWND hwndDlg, LPARAM lParam );
 
 void
@@ -215,7 +215,7 @@ dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
   switch( uMsg ) {
 
     case WM_INITDIALOG:
-      SetWindowLong( hwndDlg, GWL_USERDATA, lParam );
+      SetWindowLongPtr( hwndDlg, GWLP_USERDATA, lParam );
       dialog_init( hwndDlg, ( struct joystick_info * ) lParam );
       return FALSE;
 
@@ -235,7 +235,7 @@ dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
           return 0;
           
         case IDOK:
-          joystick_done( GetWindowLong( hwndDlg, GWL_USERDATA ) );
+          joystick_done( GetWindowLongPtr( hwndDlg, GWLP_USERDATA ) );
           EndDialog( hwndDlg, 0 );
           return 0;
 
@@ -388,7 +388,7 @@ create_fire_button_selector( const TCHAR *title, struct button_info *info,
   set_key_text( info->label, info->key );
   set_key_text( info->static_label, info->key );
 
-  SetWindowLong( info->label, GWL_USERDATA, ( LONG ) info );
+  SetWindowLongPtr( info->label, GWLP_USERDATA, ( LONG_PTR ) info );
 }
 
 static void
@@ -405,7 +405,7 @@ set_key_text( HWND hlabel, keyboard_key_name key )
 }
 
 static void
-joystick_done( LONG user_data )
+joystick_done( LONG_PTR user_data )
 {
   struct joystick_info *info = ( struct joystick_info * ) user_data;
 
@@ -432,8 +432,8 @@ show_key_selection_popoup( HWND hwndDlg, LPARAM lParam )
   struct button_info *info;
   BOOL menu_id;
   
-  info = ( struct button_info * ) GetWindowLong( ( HWND ) lParam,
-                                                 GWL_USERDATA );
+  info = ( struct button_info * ) GetWindowLongPtr( ( HWND ) lParam,
+                                                    GWLP_USERDATA );
   /* create a popup right over the button that has been clicked */
   GetWindowRect( ( HWND ) lParam, &rect );
   hpopup = GetSubMenu( LoadMenu( fuse_hInstance,

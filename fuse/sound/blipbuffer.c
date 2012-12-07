@@ -18,6 +18,8 @@ partially reimplemented in C by Gergely Szasz for FUSE
 
 */
 
+#include <config.h>
+
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
