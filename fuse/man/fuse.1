@@ -643,13 +643,19 @@ option.
 .PP
 .I \-\-movie-compr level
 .RS
-If Fuse was compiled with Zlib support, this option sets the compression level
-used when creating movies. Valid values are 0 (no compression) and 1 (least
-compression) through 9 (most compression).
-.br
+This option sets the compression level used when creating movies. Same as the
+Movie Options dialog's
+.I "Movie compression"
+option. The available options are
+.IR None ,
+.IR Lossless ,
+and
+.IR High
+(lossy). The default option is 
+.IR Lossless .
 See also the
 .B "MOVIE RECORDING"
-section
+section.
 .RE
 .PP
 .I \-\-movie-start filename
@@ -657,29 +663,20 @@ section
 With this command line option, Fuse will start movie recording as soon as the
 emulator is started. See also the
 .B "MOVIE RECORDING"
-section
+section.
 .RE
 .PP
 .I \-\-movie-stop-after-rzx
 .RS
 With this command line option, Fuse will stop movie recording when RZX playback
-or RZX recording ends.  (Enabled by default, but you can use
+or RZX recording ends. Same as the Movie Options dialog's
+.I "Stop recording after RZX ends"
+option. (Enabled by default, but you can use
 .RI ` \-\-no\-movie-stop-after-rzx'
 to disable).
 See also the
 .B "MOVIE RECORDING"
-section
-.RE
-.PP
-.I \-\-movie-sound type
-.RS
-Set sound encoding in recorded movie file. Type can be 0, 1 or 2.
-0 means signed 16 bit PCM encoding. 1 means u-Law and 2 means a-Law
-encoding scheme.
-.br
-See also the
-.B "MOVIE RECORDING"
-section
+section.
 .RE
 .PP
 .I \-\-opus
@@ -916,12 +913,18 @@ to disable). Same as the RZX Options dialog's "Create autosaves" option;
 see there for more details.
 .RE
 .PP
-.I \-\-separation
+.I \-\-separation type
 .RS
 Give stereo separation of the 128's AY sound channels. Same as the
 General Options dialog's
 .I "AY stereo separation"
-option.
+option. The available options are
+.IR None ,
+.IR ACB ,
+and
+.IR ABC .
+The default option is 
+.IR None .
 .RE
 .PP
 .I \-\-simpleide
@@ -1276,7 +1279,7 @@ option.
 .I "\-\-statusbar"
 .RS
 For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
-SDL UI, enables the status icons showing whether the disk and tape are
+Xlib and SDL UI, enables the status icons showing whether the disk and tape are
 being accessed. Same as the General Options dialog's
 .I "Show statusbar"
 option.
@@ -4046,13 +4049,6 @@ causes Fuse to exit. If this is a problem, compile Fuse with the
 option.
 .PP
 The poke finder can't search outside `normal' RAM.
-.PP
-Using the 
-.I "Options, Joysticks, Joystick 1..."
-or
-.I "Options, Joysticks, Joystick 2..."
-options under GTK+ 2.x produces a large number of GTK+ critical
-warnings. This is a GTK+ bug (#144427), which is fixed in GTK+ 2.4.4.
 .PP
 The libao file output devices not work properly with the GTK+ UI.
 No error reporting, but the created file does not contain any sound data.
