@@ -4309,3 +4309,4 @@
 20121208 man/fuse.1: Update man page for movie, stereo separation and statusbar
          options. Remove reference to fixed issue in joystick dialog on GTK+ UI
          (Sergio).
+20121208 man/fuse.1: document support for reading PZX files (Sergio).

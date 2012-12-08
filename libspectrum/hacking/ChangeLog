@@ -911,3 +911,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          both --without-glib and --with-libaudiofile options (Sergio).
 20121208 configure.ac,libspectrum.h.in: preliminary support for 64-bits binaries
          for Windows (patch #3591613) (Sergio).
+20121208 README: document support for reading PZX files (Sergio).

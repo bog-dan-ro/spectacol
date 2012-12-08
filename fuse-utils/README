@@ -22,7 +22,7 @@ The available utilities are:
 * snapconv: convert between snapshot formats.
 * tape2wav: convert a tape file to .wav audio format.
 * tapeconv: convert between .tzx and .tap files.
-* tzxlist: list the contents of a TZX file.
+* tzxlist: list the contents of a TZX, TAP, PZX or Warajevo TAP file.
 
 In order to use the utilities, you'll need `libspectrum' installed;
 this is available from:

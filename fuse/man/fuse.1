@@ -50,7 +50,7 @@ sound.
 .PP
 The emulator can load any of the formats supported by
 .IR libspectrum (3)
-\- this includes Z80, SNA and SZX snapshots, and TAP and TZX
+\- this includes Z80, SNA and SZX snapshots, and PZX, TAP and TZX
 virtual-tape files. Saving to SZX, Z80 and SNA snapshots and TZX and
 TAP tape files is supported. The SLT extension to the Z80 format is
 partly supported (enough for multi-load games); however, loading of
@@ -1345,7 +1345,7 @@ try a different option or say `\-\-fbmode 640'.
 .br
 .I "\-\-tape file"
 .RS
-Specify a virtual tape file to use. It must be in TAP or TZX format.
+Specify a virtual tape file to use. It must be in PZX, TAP or TZX format.
 .RE
 .PP
 .I "\-\-textfile file"
@@ -1858,8 +1858,8 @@ option is disabled, Fuse will not make any sound.
 .PP
 .I "Loading sound"
 .RS
-Normally, Fuse emulates tape-loading noise when loading from TAPs or
-TZXs in real-time, albeit at a deliberately lower volume than on a
+Normally, Fuse emulates tape-loading noise when loading from PZXs, TAPs
+or TZXs in real-time, albeit at a deliberately lower volume than on a
 real Spectrum. You can disable this option to eliminate the loading
 noise entirely.
 .RE
@@ -2462,7 +2462,7 @@ NMI menu correctly.  This bug is not present in G+DOS on the +D.
 .br
 .I "Media, Tape, Open..."
 .RS
-Choose a TAP or TZX virtual-tape file to load from. See the
+Choose a PZX, TAP or TZX virtual-tape file to load from. See the
 .B "FILE SELECTION"
 section below for details on how to choose the file. If
 .I "Auto-load media"
@@ -2491,7 +2491,7 @@ might want to try it that way first.
 .br
 .I "Media, Tape, Play"
 .RS
-Start playing the TAP or TZX file, if required. (Choosing the option
+Start playing the PZX, TAP or TZX file, if required. (Choosing the option
 (or pressing
 .IR F8 )
 again pauses playback, and a further press resumes). To explain \- if

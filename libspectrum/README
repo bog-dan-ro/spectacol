@@ -11,7 +11,7 @@ Currently supported are:
 * Snapshots: .z80, .szx, .sna (all read/write), .zxs, .sp., .snp and
   +D snapshots (read only).
 * Tape images: .tzx, .tap, .spc, .sta and .ltp (read/write) and
-  Warajevo .tap, Z80Em and CSW version 1 (read only).
+  .pzx, Warajevo .tap, Z80Em and CSW version 1 (read only).
 * Input recordings: .rzx (read/write).
 * Disk images: .dsk (both plain and extended), .fdi, .sad, .scl, .td0,
   .trd and .udi (identification only).
