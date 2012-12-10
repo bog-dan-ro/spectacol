@@ -4310,3 +4310,4 @@
          options. Remove reference to fixed issue in joystick dialog on GTK+ UI
          (Sergio).
 20121208 man/fuse.1: document support for reading PZX files (Sergio).
+20121210 man/fuse.1: fix a couple of typos (Fred).
