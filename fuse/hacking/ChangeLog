@@ -4311,3 +4311,4 @@
          (Sergio).
 20121208 man/fuse.1: document support for reading PZX files (Sergio).
 20121210 man/fuse.1: fix a couple of typos (Fred).
+20121222 hacking/spectranet.txt: add reference to precompiled installers (Fred).

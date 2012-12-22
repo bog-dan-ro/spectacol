@@ -7,11 +7,11 @@ DHCP. These instructions are correct as of 2012-01-26 - if you're using
 a later firmware than this, things may have changed slightly.
 
 The first thing you will need to do is to obtain a copy of the
-Spectranet installer as a .tap file (or similar). This may in fact be
-the hardest step - see below for instructions for building the installer
-from source if you really can't find a copy. A number of
-Spectranet-enabled folks hang out in the #zx channel on the Coldfront
-IRC network (irc.coldfront.net) - try asking in there.
+Spectranet installer as a .tap file (or similar). You can find installers
+at http://spectrum.alioth.net/doc/index.php in the Downloads section, or
+you can see below for instructions for building the installer from
+source. A number of Spectranet-enabled folks hang out in the #zx channel
+on the Coldfront IRC network (irc.coldfront.net) - try asking in there.
 
 Once you have a copy of the installer, start Fuse and tick the
 "Spectranet" and "Spectranet disable" options from the Options /
