@@ -105,6 +105,7 @@ AC_C_INLINE
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(dirname geteuid getopt_long mkstemp fsync)
+AC_CHECK_LIB([m],[cos])
 
 dnl Allow the user to say that various libraries are in one place
 AC_ARG_WITH(local-prefix,

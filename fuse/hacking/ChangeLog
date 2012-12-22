@@ -4314,3 +4314,6 @@
 20121222 hacking/spectranet.txt: add reference to precompiled installers (Fred).
 20121222 man/fuse.1: add information on SpecDrum settings and Spectranet
          (bug #3495082) (Fred).
+20121222 configure.ac: link explicitly against the math library. This is
+         necessary for the binutils gold linker (patch #3596551) (Alberto
+         Garcia).
