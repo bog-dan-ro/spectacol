@@ -199,8 +199,12 @@ static const libspectrum_word ZXSTSNET_PROGRAMMABLE_TRAP_MSB = 8;
 static const libspectrum_word ZXSTSNET_ALL_DISABLED = 16;
 static const libspectrum_word ZXSTSNET_RST8_DISABLED = 32;
 static const libspectrum_word ZXSTSNET_DENY_DOWNSTREAM_A15 = 64;
-static const libspectrum_word ZXSTSNET_FLASH_COMPRESSED = 128;
-static const libspectrum_word ZXSTSNET_RAM_COMPRESSED = 256;
+
+#define ZXSTBID_SPECTRANETFLASHPAGE "SNEF"
+static const libspectrum_byte ZXSTSNEF_FLASH_COMPRESSED = 1;
+
+#define ZXSTBID_SPECTRANETRAMPAGE "SNER"
+static const libspectrum_byte ZXSTSNER_RAM_COMPRESSED = 1;
 
 static libspectrum_error
 read_chunk( libspectrum_snap *snap, libspectrum_word version,
@@ -291,6 +295,12 @@ write_drum_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap );
 static libspectrum_error
 write_snet_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, libspectrum_snap *snap, int compress );
+static libspectrum_error
+write_snef_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, libspectrum_snap *snap, int compress );
+static libspectrum_error
+write_sner_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress );
 
 #ifdef HAVE_ZLIB_H
@@ -1991,12 +2001,9 @@ read_snet_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
                  szx_context *ctx GCC_UNUSED )
 {
   libspectrum_word flags;
-  int flash_compressed, ram_compressed;
-  libspectrum_error error;
   libspectrum_byte *w5100;
-  size_t data_remaining;
 
-  if( data_length < 62 ) {
+  if( data_length < 54 ) {
     libspectrum_print_error(
       LIBSPECTRUM_ERROR_UNKNOWN,
       "read_snet_chunk: length %lu too short", (unsigned long)data_length
@@ -2016,8 +2023,6 @@ read_snet_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_snap_set_spectranet_all_traps_disabled( snap, flags & ZXSTSNET_ALL_DISABLED );
   libspectrum_snap_set_spectranet_rst8_trap_disabled( snap, flags & ZXSTSNET_RST8_DISABLED );
   libspectrum_snap_set_spectranet_deny_downstream_a15( snap, flags & ZXSTSNET_DENY_DOWNSTREAM_A15 );
-  flash_compressed = flags & ZXSTSNET_FLASH_COMPRESSED;
-  ram_compressed = flags & ZXSTSNET_RAM_COMPRESSED;
 
   libspectrum_snap_set_spectranet_page_a( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_spectranet_page_b( snap, **buffer ); (*buffer)++;
@@ -2030,12 +2035,64 @@ read_snet_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   memcpy( w5100, *buffer, 0x30 );
   (*buffer) += 0x30;
 
-  data_remaining = data_length - 54;
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+read_snef_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
+		 const libspectrum_byte **buffer,
+		 const libspectrum_byte *end GCC_UNUSED, size_t data_length,
+                 szx_context *ctx GCC_UNUSED )
+{
+  libspectrum_byte flags;
+  int flash_compressed;
+  libspectrum_error error;
+  size_t data_remaining;
+
+  if( data_length < 5 ) {
+    libspectrum_print_error(
+      LIBSPECTRUM_ERROR_UNKNOWN,
+      "read_snef_chunk: length %lu too short", (unsigned long)data_length
+    );
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+  }
+
+  flags = **buffer; (*buffer)++;
+  flash_compressed = flags & ZXSTSNEF_FLASH_COMPRESSED;
+
+  data_remaining = data_length - 1;
 
   error = read_snet_memory( snap, buffer, flash_compressed, &data_remaining,
     libspectrum_snap_set_spectranet_flash );
   if( error )
     return error;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+read_sner_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
+		 const libspectrum_byte **buffer,
+		 const libspectrum_byte *end GCC_UNUSED, size_t data_length,
+                 szx_context *ctx GCC_UNUSED )
+{
+  libspectrum_byte flags;
+  int ram_compressed;
+  libspectrum_error error;
+  size_t data_remaining;
+
+  if( data_length < 5 ) {
+    libspectrum_print_error(
+      LIBSPECTRUM_ERROR_UNKNOWN,
+      "read_sner_chunk: length %lu too short", (unsigned long)data_length
+    );
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+  }
+
+  flags = **buffer; (*buffer)++;
+  ram_compressed = flags & ZXSTSNER_RAM_COMPRESSED;
+
+  data_remaining = data_length - 1;
 
   error = read_snet_memory( snap, buffer, ram_compressed, &data_remaining,
     libspectrum_snap_set_spectranet_ram );
@@ -2066,44 +2123,46 @@ struct read_chunk_t {
 
 static struct read_chunk_t read_chunks[] = {
 
-  { ZXSTBID_AY,		    read_ay_chunk   },
-  { ZXSTBID_BETA128,	    read_b128_chunk },
-  { ZXSTBID_BETADISK,	    skip_chunk      },
-  { ZXSTBID_COVOX,	    skip_chunk      },
-  { ZXSTBID_CREATOR,	    read_crtr_chunk },
-  { ZXSTBID_DIVIDE,	    read_dide_chunk },
-  { ZXSTBID_DIVIDERAMPAGE,  read_dirp_chunk },
-  { ZXSTBID_DOCK,	    read_dock_chunk },
-  { ZXSTBID_DSKFILE,	    skip_chunk      },
-  { ZXSTBID_GS,		    skip_chunk      },
-  { ZXSTBID_GSRAMPAGE,	    skip_chunk      },
-  { ZXSTBID_IF1,	    read_if1_chunk  },
-  { ZXSTBID_IF2ROM,	    read_if2r_chunk },
-  { ZXSTBID_JOYSTICK,	    read_joy_chunk  },
-  { ZXSTBID_KEYBOARD,	    read_keyb_chunk },
-  { ZXSTBID_MICRODRIVE,	    skip_chunk      },
-  { ZXSTBID_MOUSE,	    read_amxm_chunk },
-  { ZXSTBID_MULTIFACE,	    skip_chunk      },
-  { ZXSTBID_OPUS,	    read_opus_chunk },
-  { ZXSTBID_OPUSDISK,	    skip_chunk      },
-  { ZXSTBID_PLUS3DISK,	    skip_chunk      },
-  { ZXSTBID_PLUSD,	    read_plsd_chunk },
-  { ZXSTBID_PLUSDDISK,	    skip_chunk      },
-  { ZXSTBID_RAMPAGE,	    read_ramp_chunk },
-  { ZXSTBID_ROM,	    read_rom_chunk  },
-  { ZXSTBID_SIMPLEIDE,	    read_side_chunk },
-  { ZXSTBID_SPECDRUM,	    read_drum_chunk },
-  { ZXSTBID_SPECREGS,	    read_spcr_chunk },
-  { ZXSTBID_SPECTRANET,     read_snet_chunk },
-  { ZXSTBID_TIMEXREGS,	    read_scld_chunk },
-  { ZXSTBID_USPEECH,	    skip_chunk      },
-  { ZXSTBID_Z80REGS,	    read_z80r_chunk },
-  { ZXSTBID_ZXATASPRAMPAGE, read_atrp_chunk },
-  { ZXSTBID_ZXATASP,	    read_zxat_chunk },
-  { ZXSTBID_ZXCF,	    read_zxcf_chunk },
-  { ZXSTBID_ZXCFRAMPAGE,    read_cfrp_chunk },
-  { ZXSTBID_ZXPRINTER,	    skip_chunk      },
-  { ZXSTBID_ZXTAPE,	    skip_chunk      },
+  { ZXSTBID_AY,		         read_ay_chunk   },
+  { ZXSTBID_BETA128,	         read_b128_chunk },
+  { ZXSTBID_BETADISK,	         skip_chunk      },
+  { ZXSTBID_COVOX,	         skip_chunk      },
+  { ZXSTBID_CREATOR,	         read_crtr_chunk },
+  { ZXSTBID_DIVIDE,	         read_dide_chunk },
+  { ZXSTBID_DIVIDERAMPAGE,       read_dirp_chunk },
+  { ZXSTBID_DOCK,	         read_dock_chunk },
+  { ZXSTBID_DSKFILE,	         skip_chunk      },
+  { ZXSTBID_GS,		         skip_chunk      },
+  { ZXSTBID_GSRAMPAGE,	         skip_chunk      },
+  { ZXSTBID_IF1,	         read_if1_chunk  },
+  { ZXSTBID_IF2ROM,	         read_if2r_chunk },
+  { ZXSTBID_JOYSTICK,	         read_joy_chunk  },
+  { ZXSTBID_KEYBOARD,	         read_keyb_chunk },
+  { ZXSTBID_MICRODRIVE,	         skip_chunk      },
+  { ZXSTBID_MOUSE,	         read_amxm_chunk },
+  { ZXSTBID_MULTIFACE,	         skip_chunk      },
+  { ZXSTBID_OPUS,	         read_opus_chunk },
+  { ZXSTBID_OPUSDISK,	         skip_chunk      },
+  { ZXSTBID_PLUS3DISK,	         skip_chunk      },
+  { ZXSTBID_PLUSD,	         read_plsd_chunk },
+  { ZXSTBID_PLUSDDISK,	         skip_chunk      },
+  { ZXSTBID_RAMPAGE,	         read_ramp_chunk },
+  { ZXSTBID_ROM,	         read_rom_chunk  },
+  { ZXSTBID_SIMPLEIDE,	         read_side_chunk },
+  { ZXSTBID_SPECDRUM,	         read_drum_chunk },
+  { ZXSTBID_SPECREGS,	         read_spcr_chunk },
+  { ZXSTBID_SPECTRANET,          read_snet_chunk },
+  { ZXSTBID_SPECTRANETFLASHPAGE, read_snef_chunk },
+  { ZXSTBID_SPECTRANETRAMPAGE,   read_sner_chunk },
+  { ZXSTBID_TIMEXREGS,	         read_scld_chunk },
+  { ZXSTBID_USPEECH,	         skip_chunk      },
+  { ZXSTBID_Z80REGS,	         read_z80r_chunk },
+  { ZXSTBID_ZXATASPRAMPAGE,      read_atrp_chunk },
+  { ZXSTBID_ZXATASP,	         read_zxat_chunk },
+  { ZXSTBID_ZXCF,	         read_zxcf_chunk },
+  { ZXSTBID_ZXCFRAMPAGE,         read_cfrp_chunk },
+  { ZXSTBID_ZXPRINTER,	         skip_chunk      },
+  { ZXSTBID_ZXTAPE,	         skip_chunk      },
 
 };
 
@@ -2448,6 +2507,10 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
 
   if( libspectrum_snap_spectranet_active( snap ) ) {
     error = write_snet_chunk( buffer, &ptr, length, snap, compress );
+    if( error ) return error;
+    error = write_snef_chunk( buffer, &ptr, length, snap, compress );
+    if( error ) return error;
+    error = write_sner_chunk( buffer, &ptr, length, snap, compress );
     if( error ) return error;
   }
 
@@ -3617,60 +3680,8 @@ static libspectrum_error
 write_snet_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress )
 {
-#ifdef HAVE_ZLIB_H
-  libspectrum_error error;
-#endif
-
-  size_t flash_length;
-  libspectrum_byte *flash_data;
-  libspectrum_byte *compressed_flash_data = NULL;
-  int flash_compressed = 0;
-
-  size_t ram_length;
-  libspectrum_byte *ram_data;
-  libspectrum_byte *compressed_ram_data = NULL;
-  int ram_compressed = 0;
-
-  size_t block_size;
+  size_t block_size = 54;
   libspectrum_word flags = 0;
-
-  flash_data = libspectrum_snap_spectranet_flash( snap, 0 );
-  flash_length = 0x20000;
-
-  ram_data = libspectrum_snap_spectranet_ram( snap, 0 );
-  ram_length = 0x20000;
-
-#ifdef HAVE_ZLIB_H
-
-  if( compress ) {
-    size_t compressed_length;
-
-    error = libspectrum_zlib_compress( flash_data, flash_length,
-      &compressed_flash_data, &compressed_length );
-    if( error ) return error;
-
-    if( compress & LIBSPECTRUM_FLAG_SNAPSHOT_ALWAYS_COMPRESS ||
-      compressed_length < flash_length ) {
-      flash_compressed = 1;
-      flash_data = compressed_flash_data;
-      flash_length = compressed_length;
-    }
-
-    error = libspectrum_zlib_compress( ram_data, ram_length,
-      &compressed_ram_data, &compressed_length );
-    if( error ) return error;
-
-    if( compress & LIBSPECTRUM_FLAG_SNAPSHOT_ALWAYS_COMPRESS ||
-      compressed_length < flash_length ) {
-      ram_compressed = 1;
-      ram_data = compressed_ram_data;
-      ram_length = compressed_length;
-    }
-  }
-
-#endif
-
-  block_size = 62 + flash_length + ram_length;
 
   write_chunk_header( buffer, ptr, length, ZXSTBID_SPECTRANET, block_size );
 
@@ -3688,10 +3699,6 @@ write_snet_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
     flags |= ZXSTSNET_RST8_DISABLED;
   if( libspectrum_snap_spectranet_deny_downstream_a15( snap ) )
     flags |= ZXSTSNET_DENY_DOWNSTREAM_A15;
-  if( flash_compressed )
-    flags |= ZXSTSNET_FLASH_COMPRESSED;
-  if( ram_compressed )
-    flags |= ZXSTSNET_RAM_COMPRESSED;
   libspectrum_write_word( ptr, flags );
 
   *(*ptr)++ = libspectrum_snap_spectranet_page_a( snap );
@@ -3703,14 +3710,114 @@ write_snet_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   memcpy( *ptr, libspectrum_snap_spectranet_w5100( snap, 0 ), 0x30 );
   (*ptr) += 0x30;
 
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+write_snef_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, libspectrum_snap *snap, int compress )
+{
+#ifdef HAVE_ZLIB_H
+  libspectrum_error error;
+#endif
+
+  size_t flash_length;
+  libspectrum_byte *flash_data;
+  libspectrum_byte *compressed_flash_data = NULL;
+  int flash_compressed = 0;
+
+  size_t block_size;
+  libspectrum_byte flags = 0;
+
+  flash_data = libspectrum_snap_spectranet_flash( snap, 0 );
+  flash_length = 0x20000;
+
+#ifdef HAVE_ZLIB_H
+
+  if( compress ) {
+    size_t compressed_length;
+
+    error = libspectrum_zlib_compress( flash_data, flash_length,
+      &compressed_flash_data, &compressed_length );
+    if( error ) return error;
+
+    if( compress & LIBSPECTRUM_FLAG_SNAPSHOT_ALWAYS_COMPRESS ||
+      compressed_length < flash_length ) {
+      flash_compressed = 1;
+      flash_data = compressed_flash_data;
+      flash_length = compressed_length;
+    }
+  }
+
+#endif
+
+  block_size = 5 + flash_length;
+
+  write_chunk_header( buffer, ptr, length, ZXSTBID_SPECTRANETFLASHPAGE,
+                      block_size );
+
+  if( flash_compressed )
+    flags |= ZXSTSNEF_FLASH_COMPRESSED;
+  *(*ptr)++ = flags;
+
   libspectrum_write_dword( ptr, flash_length );
   memcpy( *ptr, flash_data, flash_length ); *ptr += flash_length;
 
-  libspectrum_write_dword( ptr, ram_length );
-  memcpy( *ptr, ram_data, ram_length ); *ptr += ram_length;
-
   if( flash_compressed )
     libspectrum_free( compressed_flash_data );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+write_sner_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, libspectrum_snap *snap, int compress )
+{
+#ifdef HAVE_ZLIB_H
+  libspectrum_error error;
+#endif
+
+  size_t ram_length;
+  libspectrum_byte *ram_data;
+  libspectrum_byte *compressed_ram_data = NULL;
+  int ram_compressed = 0;
+
+  size_t block_size;
+  libspectrum_byte flags = 0;
+
+  ram_data = libspectrum_snap_spectranet_ram( snap, 0 );
+  ram_length = 0x20000;
+
+#ifdef HAVE_ZLIB_H
+
+  if( compress ) {
+    size_t compressed_length;
+
+    error = libspectrum_zlib_compress( ram_data, ram_length,
+      &compressed_ram_data, &compressed_length );
+    if( error ) return error;
+
+    if( compress & LIBSPECTRUM_FLAG_SNAPSHOT_ALWAYS_COMPRESS ||
+      compressed_length < ram_length ) {
+      ram_compressed = 1;
+      ram_data = compressed_ram_data;
+      ram_length = compressed_length;
+    }
+  }
+
+#endif
+
+  block_size = 5 + ram_length;
+
+  write_chunk_header( buffer, ptr, length, ZXSTBID_SPECTRANETRAMPAGE,
+                      block_size );
+
+  if( ram_compressed )
+    flags |= ZXSTSNER_RAM_COMPRESSED;
+  *(*ptr)++ = flags;
+
+  libspectrum_write_dword( ptr, ram_length );
+  memcpy( *ptr, ram_data, ram_length ); *ptr += ram_length;
 
   if( ram_compressed )
     libspectrum_free( compressed_ram_data );
