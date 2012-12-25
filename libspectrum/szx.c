@@ -57,11 +57,14 @@ typedef enum szx_machine_type {
   SZX_MACHINE_PENTAGON512,
   SZX_MACHINE_PENTAGON1024,
   SZX_MACHINE_48_NTSC,
+  SZX_MACHINE_128KE,
 
 } szx_machine_type;
 
 static const char *signature = "ZXST";
 static const size_t signature_length = 4;
+
+static const libspectrum_byte ZXSTMF_ALTERNATETIMINGS = 1;
 
 static const char *libspectrum_string = "libspectrum: ";
 
@@ -75,6 +78,7 @@ static const libspectrum_byte SZX_VERSION_MINOR = 5;
 #define ZXSTBID_Z80REGS "Z80R"
 static const libspectrum_byte ZXSTZF_EILAST = 1;
 static const libspectrum_byte ZXSTZF_HALTED = 2;
+static const libspectrum_byte ZXSTZF_FSET = 4;
 
 #define ZXSTBID_SPECREGS "SPCR"
 
@@ -133,6 +137,12 @@ static const libspectrum_word ZXSTIF1F_PAGED = 4;
 #define ZXSTBID_MICRODRIVE "MDRV"
 #define ZXSTBID_PLUS3DISK "+3\0\0"
 #define ZXSTBID_DSKFILE "DSK\0"
+#define ZXSTBID_LEC "LEC\0"
+static const libspectrum_word ZXSTLECF_PAGED = 1;
+
+#define ZXSTBID_LECRAMPAGE "LCRP"
+static const libspectrum_word ZXSTLCRPF_COMPRESSED = 1;
+
 #define ZXSTBID_TIMEXREGS "SCLD"
 
 #define ZXSTBID_BETA128 "B128"
@@ -1372,8 +1382,10 @@ read_z80r_chunk( libspectrum_snap *snap, libspectrum_word version,
   if( version >= 0x0101 ) {
     (*buffer)++;		/* Skip dwHoldIntReqCycles */
     
-    /* Flags; ignore the 'last instruction EI' flag for now */
+    /* Flags */
+    libspectrum_snap_set_last_instruction_ei( snap, **buffer & ZXSTZF_EILAST );
     libspectrum_snap_set_halted( snap, **buffer & ZXSTZF_HALTED );
+    libspectrum_snap_set_last_instruction_set_f( snap, **buffer & ZXSTZF_FSET );
     (*buffer)++;
 
     (*buffer)++;		/* Skip the hidden register */
@@ -2132,6 +2144,8 @@ static struct read_chunk_t read_chunks[] = {
   { ZXSTBID_DIVIDERAMPAGE,       read_dirp_chunk },
   { ZXSTBID_DOCK,	         read_dock_chunk },
   { ZXSTBID_DSKFILE,	         skip_chunk      },
+  { ZXSTBID_LEC,                 skip_chunk      },
+  { ZXSTBID_LECRAMPAGE,          skip_chunk      },
   { ZXSTBID_GS,		         skip_chunk      },
   { ZXSTBID_GSRAMPAGE,	         skip_chunk      },
   { ZXSTBID_IF1,	         read_if1_chunk  },
@@ -2236,6 +2250,8 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
 		      size_t length )
 {
   libspectrum_word version;
+  libspectrum_byte machine;
+  libspectrum_byte flags;
 
   libspectrum_error error;
   const libspectrum_byte *end = buffer + length;
@@ -2260,7 +2276,9 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
 
   version = (*buffer++) << 8; version |= *buffer++;
 
-  switch( *buffer ) {
+  machine = *buffer++;
+
+  switch( machine ) {
 
   case SZX_MACHINE_16:
     libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_16 );
@@ -2326,6 +2344,10 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
     libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_PENT1024 );
     break;
 
+  case SZX_MACHINE_128KE:
+    libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_128E );
+    break;
+
   default:
     libspectrum_print_error(
       LIBSPECTRUM_ERROR_UNKNOWN,
@@ -2334,8 +2356,20 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
 
-  /* Skip to the end of the header */
-  buffer += 2;
+  flags = *buffer++;
+
+  switch( machine ) {
+
+  case SZX_MACHINE_16:
+  case SZX_MACHINE_48:
+  case SZX_MACHINE_48_NTSC:
+  case SZX_MACHINE_128:
+    libspectrum_snap_set_late_timings( snap, flags & ZXSTMF_ALTERNATETIMINGS );
+    break;
+
+  default:
+    break;
+  }
 
   ctx = libspectrum_malloc( sizeof( *ctx ) );
   ctx->swap_af = 0;
@@ -2524,6 +2558,8 @@ static libspectrum_error
 write_file_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		   size_t *length, int *out_flags, libspectrum_snap *snap )
 {
+  libspectrum_byte flags;
+
   libspectrum_make_room( buffer, 8, ptr, length );
 
   memcpy( *ptr, signature, 4 ); *ptr += 4;
@@ -2536,6 +2572,7 @@ write_file_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
   case LIBSPECTRUM_MACHINE_48:     **ptr = SZX_MACHINE_48; break;
   case LIBSPECTRUM_MACHINE_48_NTSC: **ptr = SZX_MACHINE_48_NTSC; break;
   case LIBSPECTRUM_MACHINE_128:    **ptr = SZX_MACHINE_128; break;
+  case LIBSPECTRUM_MACHINE_128E:    **ptr = SZX_MACHINE_128KE; break;
   case LIBSPECTRUM_MACHINE_PLUS2:  **ptr = SZX_MACHINE_PLUS2; break;
   case LIBSPECTRUM_MACHINE_PLUS2A: **ptr = SZX_MACHINE_PLUS2A; break;
   case LIBSPECTRUM_MACHINE_PLUS3:  **ptr = SZX_MACHINE_PLUS3; break;
@@ -2556,8 +2593,10 @@ write_file_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
   }
   (*ptr)++;
 
-  /* Reserved byte */
-  *(*ptr)++ = '\0';
+  /* Flags byte */
+  flags = 0;
+  if( libspectrum_snap_late_timings( snap ) ) flags |= ZXSTMF_ALTERNATETIMINGS;
+  *(*ptr)++ = flags;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -2630,6 +2669,7 @@ write_z80r_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   flags = '\0';
   if( libspectrum_snap_last_instruction_ei( snap ) ) flags |= ZXSTZF_EILAST;
   if( libspectrum_snap_halted( snap ) ) flags |= ZXSTZF_HALTED;
+  if( libspectrum_snap_last_instruction_set_f( snap ) ) flags |= ZXSTZF_FSET;
   *(*ptr)++ = flags;
 
   /* Hidden register not supported */
@@ -2820,6 +2860,7 @@ write_rom_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr, size_t *leng
     }
     break;
   case LIBSPECTRUM_MACHINE_128:
+  case LIBSPECTRUM_MACHINE_128E:
   case LIBSPECTRUM_MACHINE_PENT:
   case LIBSPECTRUM_MACHINE_PLUS2:
   case LIBSPECTRUM_MACHINE_SE:

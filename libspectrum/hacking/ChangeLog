@@ -914,3 +914,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20121208 README: document support for reading PZX files (Sergio).
 20121222 szx.c: split SNET block into SNET, SNEF and SNER so that flash could
          theoretically be saved separately (patch #3596469) (Fred).
+20121225 accessor.pl,libspectrum.h.in,sna.c,snap_accessors.txt,snapshot.c,szx.c,
+         z80.c: extend SZX support to version 1.5 draft specs (Fred).

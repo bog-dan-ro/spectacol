@@ -73,6 +73,7 @@ struct libspectrum_snap {
 
   int halted;			/* Is the Z80 currently HALTed? */
   int last_instruction_ei;	/* Was the last instruction an EI? */
+  int last_instruction_set_f;	/* Did the last instruction set Flags? */
 
   /* Custom ROM */
   int custom_rom;
@@ -232,6 +233,9 @@ struct libspectrum_snap {
   libspectrum_byte *spectranet_w5100[1];
   libspectrum_byte *spectranet_flash[1];
   libspectrum_byte *spectranet_ram[1];
+
+  /* Timings emulation */
+  int late_timings;
 };
 
 /* Initialise a libspectrum_snap structure */

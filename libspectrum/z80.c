@@ -1125,10 +1125,17 @@ libspectrum_z80_write2( libspectrum_byte **buffer, size_t *length,
 
   *out_flags = 0;
 
-  /* .z80 format doesn't store the 'last instruction EI' or 'halted' state */
+  /* .z80 format doesn't store the 'last instruction EI', 'halted' state  or
+     the 'last instruction set Flags' */
   if( libspectrum_snap_last_instruction_ei( snap ) ) 
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS;
   if( libspectrum_snap_halted( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS;
+  if( libspectrum_snap_last_instruction_set_f( snap ) ) 
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS;
+
+  /* .z80 format doesn't store the 'late timings' state */
+  if( libspectrum_snap_late_timings( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS;
 
   /* .z80 format doesn't store +D info well */
@@ -1169,6 +1176,10 @@ libspectrum_z80_write2( libspectrum_byte **buffer, size_t *length,
 
   /* .z80 format doesn't save the Specdrum state at all */
   if( libspectrum_snap_specdrum_active( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+
+  /* .z80 format doesn't save the Spectranet state at all */
+  if( libspectrum_snap_spectranet_active( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
 
   error = write_header( buffer, &ptr, length, out_flags, snap );
@@ -1297,6 +1308,7 @@ write_extended_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
     }
     break;
   case LIBSPECTRUM_MACHINE_SE:
+  case LIBSPECTRUM_MACHINE_128E:
     *flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
     /* fall through */
   case LIBSPECTRUM_MACHINE_128:

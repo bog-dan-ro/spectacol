@@ -331,6 +331,10 @@ libspectrum_sna_write( libspectrum_byte **buffer, size_t *length,
   if( libspectrum_snap_specdrum_active( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
 
+  /* We don't save the Spectranet state at all */
+  if( libspectrum_snap_spectranet_active( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+
   ptr = *buffer;
 
   write_header( buffer, &ptr, length, snap );
@@ -349,6 +353,7 @@ libspectrum_sna_write( libspectrum_byte **buffer, size_t *length,
     break;
     
   case LIBSPECTRUM_MACHINE_128:
+  case LIBSPECTRUM_MACHINE_128E:
   case LIBSPECTRUM_MACHINE_PENT512:
   case LIBSPECTRUM_MACHINE_PENT1024:
   case LIBSPECTRUM_MACHINE_PLUS2:

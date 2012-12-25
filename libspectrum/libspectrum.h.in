@@ -312,6 +312,8 @@ typedef enum libspectrum_machine {
 
   LIBSPECTRUM_MACHINE_48_NTSC,
 
+  LIBSPECTRUM_MACHINE_128E,
+
 } libspectrum_machine;
 
 WIN32_DLL const char* libspectrum_machine_name( libspectrum_machine type );

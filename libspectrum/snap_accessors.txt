@@ -47,6 +47,7 @@ libspectrum_dword tstates
 
 int halted
 int last_instruction_ei
+int last_instruction_set_f
 
 libspectrum_byte out_ula
 
@@ -187,3 +188,5 @@ libspectrum_word spectranet_programmable_trap
 libspectrum_byte* spectranet_w5100 1
 libspectrum_byte* spectranet_flash 1
 libspectrum_byte* spectranet_ram 1
+
+int late_timings

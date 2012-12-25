@@ -71,6 +71,7 @@ libspectrum_snap_alloc( void )
 
   libspectrum_snap_set_halted( snap, 0 );
   libspectrum_snap_set_last_instruction_ei( snap, 0 );
+  libspectrum_snap_set_last_instruction_set_f( snap, 0 );
 
   libspectrum_snap_set_custom_rom( snap, 0 );
   libspectrum_snap_set_custom_rom_pages( snap, 0 );
@@ -217,6 +218,8 @@ libspectrum_snap_alloc( void )
   libspectrum_snap_set_spectranet_flash( snap, 0, NULL );
   libspectrum_snap_set_spectranet_ram( snap, 0, NULL );
   
+  libspectrum_snap_set_late_timings( snap, 0 );
+
   return snap;
 }
 
