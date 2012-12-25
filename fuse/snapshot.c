@@ -31,6 +31,7 @@
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
+#include "settings.h"
 #include "snapshot.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -88,6 +89,8 @@ snapshot_copy_from( libspectrum_snap *snap )
   module_snapshot_enabled( snap );
 
   machine = libspectrum_snap_machine( snap );
+
+  settings_current.late_timings = libspectrum_snap_late_timings( snap );
 
   if( machine != machine_current->machine ) {
     error = machine_select( machine );
@@ -168,6 +171,7 @@ int
 snapshot_copy_to( libspectrum_snap *snap )
 {
   libspectrum_snap_set_machine( snap, machine_current->machine );
+  libspectrum_snap_set_late_timings( snap, settings_current.late_timings );
 
   module_snapshot_to( snap );
 

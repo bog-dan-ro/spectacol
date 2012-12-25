@@ -4317,3 +4317,4 @@
 20121222 configure.ac: link explicitly against the math library. This is
          necessary for the binutils gold linker (patch #3596551) (Alberto
          Garcia).
+20121225 snapshot.c: support setting late timings from snapshots (Fred).
