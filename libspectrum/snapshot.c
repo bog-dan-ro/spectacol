@@ -64,6 +64,7 @@ libspectrum_snap_alloc( void )
   libspectrum_snap_set_r   ( snap, 0x00 );
   libspectrum_snap_set_sp  ( snap, 0x0000 );
   libspectrum_snap_set_pc  ( snap, 0x0000 );
+  libspectrum_snap_set_memptr( snap, 0x0000 );
 
   libspectrum_snap_set_iff1( snap, 1 );
   libspectrum_snap_set_iff2( snap, 1 );

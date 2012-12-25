@@ -67,7 +67,7 @@ struct libspectrum_snap {
   libspectrum_byte a_, f_; libspectrum_word bc_, de_, hl_;
 
   libspectrum_word ix, iy; libspectrum_byte i, r;
-  libspectrum_word sp, pc;
+  libspectrum_word sp, pc, memptr;
 
   libspectrum_byte iff1, iff2, im;
 

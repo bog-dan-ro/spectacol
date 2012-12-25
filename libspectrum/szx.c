@@ -1380,7 +1380,7 @@ read_z80r_chunk( libspectrum_snap *snap, libspectrum_word version,
   libspectrum_snap_set_tstates( snap, libspectrum_read_dword( buffer ) );
 
   if( version >= 0x0101 ) {
-    (*buffer)++;		/* Skip dwHoldIntReqCycles */
+    (*buffer)++;		/* Skip chHoldIntReqCycles */
     
     /* Flags */
     libspectrum_snap_set_last_instruction_ei( snap, **buffer & ZXSTZF_EILAST );
@@ -1388,8 +1388,12 @@ read_z80r_chunk( libspectrum_snap *snap, libspectrum_word version,
     libspectrum_snap_set_last_instruction_set_f( snap, **buffer & ZXSTZF_FSET );
     (*buffer)++;
 
-    (*buffer)++;		/* Skip the hidden register */
-    (*buffer)++;		/* Skip the reserved byte */
+    if( version >= 0x0104 ) {
+      libspectrum_snap_set_memptr( snap, libspectrum_read_word( buffer ) );
+    } else {
+      (*buffer)++;		/* Skip the hidden register */
+      (*buffer)++;		/* Skip the reserved byte */
+    }
 
   } else {
     *buffer += 4;		/* Skip the reserved dword */
@@ -2672,11 +2676,7 @@ write_z80r_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   if( libspectrum_snap_last_instruction_set_f( snap ) ) flags |= ZXSTZF_FSET;
   *(*ptr)++ = flags;
 
-  /* Hidden register not supported */
-  *(*ptr)++ = '\0';
-
-  /* Reserved byte */
-  *(*ptr)++ = '\0';
+  libspectrum_write_word( ptr, libspectrum_snap_memptr( snap ) );
 
   return LIBSPECTRUM_ERROR_NONE;
 }

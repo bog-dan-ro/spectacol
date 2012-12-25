@@ -39,6 +39,7 @@ libspectrum_byte i
 libspectrum_byte r
 libspectrum_word sp
 libspectrum_word pc
+libspectrum_word memptr
 libspectrum_byte iff1
 libspectrum_byte iff2
 libspectrum_byte im
