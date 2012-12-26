@@ -336,7 +336,7 @@ int main(void)
 #endif				/* #ifdef HAVE_LIBBZ2 */
 
 #ifdef HAVE_LIB_AUDIOFILE
-  printf( "\n/* we support files wav files */\n" );
+  printf( "\n/* we support wav files */\n" );
   printf( "#define	LIBSPECTRUM_SUPPORTS_AUDIOFILE	(1)\n\n" );
 #endif				/* #ifdef HAVE_LIB_AUDIOFILE */
 

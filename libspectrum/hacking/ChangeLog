@@ -918,3 +918,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          z80.c: extend SZX support to version 1.5 draft specs (Fred).
 20121226 accessor.pl,snap_accessors.txt,snapshot.c,szx.c: MEMPTR is also in v1.4
          SZX files (Fred).
+20121226 make-perl.c: fix typo in comment (Fred).
