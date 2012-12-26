@@ -919,3 +919,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20121226 accessor.pl,snap_accessors.txt,snapshot.c,szx.c: MEMPTR is also in v1.4
          SZX files (Fred).
 20121226 make-perl.c: fix typo in comment (Fred).
+20121226 szx.c: inline constant in write_snet_chunk() (Fred).

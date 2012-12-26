@@ -3721,10 +3721,9 @@ static libspectrum_error
 write_snet_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int compress )
 {
-  size_t block_size = 54;
   libspectrum_word flags = 0;
 
-  write_chunk_header( buffer, ptr, length, ZXSTBID_SPECTRANET, block_size );
+  write_chunk_header( buffer, ptr, length, ZXSTBID_SPECTRANET, 54 );
 
   if( libspectrum_snap_spectranet_paged( snap ) )
     flags |= ZXSTSNET_PAGED;
