@@ -1,3 +1,26 @@
+201?-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * libspectrum 1.1.0 released.
+
+        * Support for Spectranet in snapshots (Philip Kendall).
+
+        * Support for Cheetah SpecDrum in snapshots (Fredrick Meunier).
+
+        * Support reading PZX files (Fredrick Meunier).
+
+        * Support for the TZX set signal level block (Fredrick Meunier).
+
+        * Various minor bug fixes/improvements:
+          * Add support for detecting POK files (Sergio Baldoví).
+          * Advertise support for bzip2 compressed and wav files (Sergio
+            Baldoví).
+          * Drop support for GLib version 1.x (Alberto Garcia).
+          * Add support for audiofile 0.3.x (Alberto Garcia).
+          * Load all snapshot RAM pages for machines with more than 128k 
+            (Fredrick Meunier; thanks, ketmar).
+          * Support more SZX 1.5 features (Fredrick Meunier).
+          * Modernise autoconf support (Sergio Baldoví).
+
 2010-12-16  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * libspectrum 1.0.0 released.
