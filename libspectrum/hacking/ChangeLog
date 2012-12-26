@@ -922,3 +922,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20121226 szx.c: inline constant in write_snet_chunk() (Fred).
 20121226 doc/libspectrum.txt: add some text about changes to the interface
          (Fred).
+20121226 configure.ac: bump version number to 1.1.0 (Fred).

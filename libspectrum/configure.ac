@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-dnl Copyright (c) 1999-2008 Philip Kendall
+dnl Copyright (c) 1999-2012 Philip Kendall
 
 dnl $Id$
 
@@ -22,11 +22,11 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([libspectrum_version], [1.0.0])
+m4_define([libspectrum_version], [1.1.0])
 
 dnl Product full version
 m4_define([libspectrum_major_version], [1])
-m4_define([libspectrum_minor_version], [0])
+m4_define([libspectrum_minor_version], [1])
 m4_define([libspectrum_micro_version], [0])
 m4_define([libspectrum_nano_version],  [0])
 m4_define([libspectrum_full_version],
