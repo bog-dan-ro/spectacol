@@ -8,7 +8,7 @@ handles:
 * Snapshots: .z80, .szx, .sna (all read/write), .zxs, .sp., .snp and
   +D snapshots (read only).
 * Tape images: .tzx, .tap, .spc, .sta and .ltp (read/write) and
-  Warajevo .tap, Z80Em and CSW version 1 (read only). 
+  PZX, Warajevo .tap, Z80Em and CSW version 1 (read only). 
 * Input recordings: .rzx (read/write).
 * Disk images: .dsk (both plain and extended), .fdi, .sad, .scl, .td0,
   .trd and .udi (identification only).
@@ -42,6 +42,9 @@ SZX snapshots), then then the constant
 LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION will be defined and non-zero. If
 the library does not support zlib compression, then the constant will
 not be defined.
+
+Bzip2 compression is similarly covered by LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION
+and WAV file support is covered by LIBSPECTRUM_SUPPORTS_AUDIOFILE.
 
 Defined types
 =============
@@ -168,6 +171,7 @@ LIBSPECTRUM_MACHINE_16		16K Spectrum
 LIBSPECTRUM_MACHINE_48		48K Spectrum
 LIBSPECTRUM_MACHINE_48_NTSC     NTSC version of 48K Spectrum
 LIBSPECTRUM_MACHINE_128		(Original) 128K Spectrum
+LIBSPECTRUM_MACHINE_128E	Spectrum 128Ke
 LIBSPECTRUM_MACHINE_PLUS2	Spectrum +2 (the grey one)
 LIBSPECTRUM_MACHINE_PLUS2A	Spectrum +2A (the black one)
 LIBSPECTRUM_MACHINE_PLUS3	Spectrum +3
@@ -552,6 +556,7 @@ The available properties (along with their types) are:
 * libspectrum_byte r
 * libspectrum_word sp
 * libspectrum_word pc
+* libspectrum_word memptr
 * libspectrum_byte iff1
 * libspectrum_byte iff2
 * libspectrum_byte im
@@ -560,6 +565,7 @@ The available properties (along with their types) are:
 
 * int halted
 * int last_instruction_ei
+* int last_instruction_set_f
 
 * libspectrum_byte out_ula
 
@@ -682,6 +688,23 @@ The available properties (along with their types) are:
 * int specdrum_active
 * libspectrum_signed_byte specdrum_dac
 
+* int spectranet_active
+* int spectranet_paged
+* int spectranet_paged_via_io
+* int spectranet_programmable_trap_active
+* int spectranet_programmable_trap_msb
+* int spectranet_all_traps_disabled
+* int spectranet_rst8_trap_disabled
+* int spectranet_deny_downstream_a15
+* int spectranet_page_a
+* int spectranet_page_b
+* libspectrum_word spectranet_programmable_trap
+* libspectrum_byte* spectranet_w5100[1]
+* libspectrum_byte* spectranet_flash[1]
+* libspectrum_byte* spectranet_ram[1]
+
+* int late_timings
+
 Most of those should be fairly self-explanatory; those which may not
 be are:
 
@@ -696,8 +719,15 @@ be are:
   previously executed was an EI and thus interrupts should not be
   accepted at this point, but will be after the next opcode.
 
+* `last_instruction_set_f' being non-zero signals that the opcode
+  previously executed affected the F register.
+
 * `out_plus3_memoryport' should also be used to save the state of
   the Scorpion's secondary memory control port (0x1ffd).
+
+* `late_timings' being non-zero signals that the emulated Spectrum
+  should use timings 1 t-state later than usual as in some machines
+  that have warmed up.
 
 * The `beta_*' functions represent the Betadisk
   interface. `beta_paged' is non-zero if the Betadisk ROM is currently
@@ -714,6 +744,8 @@ be are:
 
 * `exrom_ram' and `dock_ram' are non-zero if the corresponding 8K page
   of the Timex EXROM or DOCK are writable.
+
+* The `spectranet_*' functions represent the Spectranet interface.
 
 * `joystick_active_count' is the number of joysticks connected to the emulated
   Spectrum. `joystick_list' gives the type of the joysticks and

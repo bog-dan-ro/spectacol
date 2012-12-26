@@ -920,3 +920,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          SZX files (Fred).
 20121226 make-perl.c: fix typo in comment (Fred).
 20121226 szx.c: inline constant in write_snet_chunk() (Fred).
+20121226 doc/libspectrum.txt: add some text about changes to the interface
+         (Fred).
