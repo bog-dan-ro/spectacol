@@ -237,6 +237,7 @@ libspectrum_machine_name( libspectrum_machine type )
   case LIBSPECTRUM_MACHINE_TC2068:   return "Timex TC2068";
   case LIBSPECTRUM_MACHINE_TS2068:   return "Timex TS2068";
   case LIBSPECTRUM_MACHINE_128:      return "Spectrum 128K";
+  case LIBSPECTRUM_MACHINE_128E:     return "Spectrum 128Ke";
   case LIBSPECTRUM_MACHINE_PLUS2:    return "Spectrum +2";
   case LIBSPECTRUM_MACHINE_PENT:     return "Pentagon 128K";
   case LIBSPECTRUM_MACHINE_PENT512:  return "Pentagon 512K";
