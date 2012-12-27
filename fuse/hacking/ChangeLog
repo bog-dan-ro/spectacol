@@ -4322,4 +4322,5 @@
          confirm-actions option. Fix dashes (Sergio).
 20121227 configure.ac: bump version number to 1.1.0 (Fred).
 20121227 ChangeLog,README: first updates for a "1.1.0" release (Fred).
-20121227 man/fuse.1: Fix spelling, capitalisation, dashes and quotes (Stuart).
+20121227 man/fuse.1: fix spelling, capitalisation, dashes, quotes and
+         whitespace (Stuart).

@@ -244,7 +244,7 @@ double sided disk in drive. This means that if we open
 B.dsk' too. Now, we can just `flip' the disk if Golden Axe asks for `Side B'.
 The available options are
 .IR Never ,
-.IR "With single\-sided drives" 
+.IR "With single-sided drives" 
 and
 .IR Always .
 .RE
@@ -908,7 +908,9 @@ Specify that, while recording an RZX file, Fuse should automatically add
 a snapshot to the recording stream every 5 seconds. (Default to on, but
 you can use
 .RI ` \-\-no\-rzx\-autosaves '
-to disable). Same as the RZX Options dialog's "Create autosaves" option;
+to disable). Same as the RZX Options dialog's
+.I "Create autosaves"
+option;
 see there for more details.
 .RE
 .PP
@@ -2121,7 +2123,7 @@ section for more details.
 .I "DISCiPLE interface"
 .RS
 If this option is selected, Fuse will emulate the DISCiPLE interface.  See the
-.B "DISCiPLE EMULATION"
+.B "DISCIPLE EMULATION"
 section for more details.
 .RE
 .PP
@@ -2504,7 +2506,7 @@ emulated, this is used to access the +D (or DISCiPLE)'s screenshot and
 snapshot features (see the
 .B "+D EMULATION"
 and
-.B "DISCiPLE EMULATION"
+.B "DISCIPLE EMULATION"
 sections below).  Note that GDOS on the DISCiPLE contains a bug which
 causes corruption of saved snapshots, and a failure to return from the
 NMI menu correctly.  This bug is not present in G+DOS on the +D.
@@ -2702,7 +2704,7 @@ the chosen interface is selected. (See
 .B "OPUS DISCOVERY EMULATION"
 .B "+D EMULATION"
 and
-.B "DISCiPLE EMULATION"
+.B "DISCIPLE EMULATION"
 sections below for notes on the file formats supported).
 .PP
 Once again, any changes made to a disk image will not affect the file
@@ -3131,7 +3133,7 @@ is a single-sizing filter for Timex machines (note that this means TV 2X
 and Timex TV produce the same size output).
 .RE
 .PP
-.IR "PAL TV" ( paltv )
+.IR "PAL TV " ( paltv )
 .br
 .IR "PAL TV 2x " ( paltv2x )
 .br
@@ -4001,7 +4003,7 @@ if printer emulation is enabled.
 .\"
 .\"------------------------------------------------------------------
 .\"
-.SH DISCiPLE EMULATION
+.SH DISCIPLE EMULATION
 .PP
 Fuse supports emulating the DISCiPLE disk and printer interface, although
 it does not currently support emulation of the Sinclair Network, or
@@ -4052,7 +4054,7 @@ This is the only image format which can store all the relevant information
 of the recorded data on a magnetic disk, so it can be used for any
 .I non standard
 disk format. Fuse can read all extended track types too (mixed FM/MFM, or
-tracks with 'WEAK' data or even compressed tracks too).
+tracks with `WEAK' data or even compressed tracks too).
 .RE
 .PP
 .I .FDI
