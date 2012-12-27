@@ -1,3 +1,60 @@
+201?-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.1.0 released.
+
+        * Remove ROMs that there is no formal permission to distribute.
+
+        * New features:
+          * Add Spectranet ethernet interface emulation (Philip Kendall).
+          * Add SpeccyBoot ethernet interface emulation (Patrik Persson).
+          * Add SpecDrum sound interface emulation (Jon Mitchell).
+          * Add DISCiPLE disk interface emulation (Stuart Brady).
+          * Support reading PZX files (Fredrick Meunier).
+          * Add support for POK files (Sergio Baldoví).
+          * Add recording of movies to FMF files (Gergely Szasz).
+          * Add GTK+ 3 compatibility (Sergio Baldoví).
+
+        * Emulation core improvements:
+          * Add support for ABC AY stereo (Stuart Brady).
+          * Correct feedback in AY noise generator (Patrik Rak).
+          * MIC bit only isn't enough to drive the speaker (Fredrick Meunier).
+          * Mirror Interface 1 ROM to the second 8Kb of ROM as in the real
+            interface (Fredrick Meunier, with thanks to mcleod_ideafix and
+            zx81).
+          * Support the Beta interface setting to not auto-boot the interface
+            on 48K machines (ketmar).
+
+        * Machine specific improvements:
+          * Read and write all potential 1024k worth of memory pages from a
+            snap (ketmar and Fredrick Meunier).
+          * Initialise the Pentagon 1024k memory ports from a snapshot (ketmar
+            and Fredrick Meunier).
+          * Restore the paged state of the Beta ROM when loading Pentagon
+            128k/512k/1024k snapshots (ketmar and Fredrick Meunier).
+
+        * Debugger improvements:
+          * Disassemble ED 4D as RETI (Simon Owen).
+          * Add IM, IFF1 and IFF2 setting and getting to the debugger (Alex
+            Badea).
+
+        * Miscellaneous improvements:
+          * Many improvements to Win32 UI and installer (Sergio Baldoví).
+          * Allow the use of the SDL joystick code in the GTK+ and Xlib UIs
+            (Sergio Baldoví).
+          * Add current machine name to GTK+ and Win32 statusbars (Sergio
+            Baldoví).
+          * Allow the drag and drop of files from KDE (Dolphin/Konqueror)
+            (Sergio Baldoví, with thanks to Diondeville).
+          * Add a statusbar for the xlib UI (Gergely Szasz).
+          * Extend supported symbol characters on SDL and xlib UIs (Sergio
+            Baldoví).
+          * Support for the TZX set signal level block (Fredrick Meunier).
+          * Drop support for GLib and GTK+ version 1.x (Alberto Garcia and
+            Sergio Baldoví).
+          * Support setting late timings from snapshots (Fredrick Meunier).
+
+        * Various other minor bugfixes.
+
 2010-12-16  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.0.0 released.
