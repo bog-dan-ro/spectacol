@@ -192,8 +192,7 @@ Specify whether `dangerous' actions (those which could cause data
 loss, for example resetting the Spectrum) require confirmation before
 occurring. (Enabled by default, but you can use
 .RI ` \-\-no\-confirm\-actions '
-to disable). This option is effective under the GTK+ and Win32 UIs, and is the
-same as the General Options dialog's
+to disable). This option is the same as the General Options dialog's
 .I "Confirm actions"
 option.
 .RE
@@ -641,7 +640,7 @@ same as the General Peripherals dialog's
 option.
 .RE
 .PP
-.I \-\-movie-compr level
+.I \-\-movie\-compr level
 .RS
 This option sets the compression level used when creating movies. Same as the
 Movie Options dialog's
@@ -658,7 +657,7 @@ See also the
 section.
 .RE
 .PP
-.I \-\-movie-start filename
+.I \-\-movie\-start filename
 .RS
 With this command line option, Fuse will start movie recording as soon as the
 emulator is started. See also the
@@ -666,13 +665,13 @@ emulator is started. See also the
 section.
 .RE
 .PP
-.I \-\-movie-stop-after-rzx
+.I \-\-movie\-stop\-after\-rzx
 .RS
 With this command line option, Fuse will stop movie recording when RZX playback
 or RZX recording ends. Same as the Movie Options dialog's
 .I "Stop recording after RZX ends"
 option. (Enabled by default, but you can use
-.RI ` \-\-no\-movie-stop-after-rzx'
+.RI ` \-\-no\-movie\-stop\-after\-rzx '
 to disable).
 See also the
 .B "MOVIE RECORDING"
@@ -713,7 +712,7 @@ Insert the specified file into the emulated +3's A: drive; also select
 the +3 on startup if available.
 .RE
 .PP
-.I "\-\-plus3-detect-speedlock"
+.I "\-\-plus3\-detect\-speedlock"
 .RS
 Specify whether the +3 drives try to detect Speedlock protected disks,
 and emulate 'weak' sectors.
@@ -876,7 +875,7 @@ the +D ROM
 the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
 .RI ( trdos.rom ),
 and the SpeccyBoot ROM
-.RI ( speccyboot-1.4.rom ).
+.RI ( speccyboot\-1.4.rom ).
 The names in brackets denote the defaults. Note that not all these ROMs
 are supplied with Fuse - you must supply your own copies of those which
 are not.
@@ -903,12 +902,12 @@ Interface I RS-232 emulation as RxD and TxD wire. See also the
 options.
 .RE
 .PP
-.I \-\-rzx-autosaves
+.I \-\-rzx\-autosaves
 .RS
 Specify that, while recording an RZX file, Fuse should automatically add
 a snapshot to the recording stream every 5 seconds. (Default to on, but
 you can use
-.RI ` \-\-no-rzx-autosaves '
+.RI ` \-\-no\-rzx\-autosaves '
 to disable). Same as the RZX Options dialog's "Create autosaves" option;
 see there for more details.
 .RE
@@ -2006,9 +2005,9 @@ section for more details.
 .PP
 .I "SpeccyBoot interface"
 .RS
-If this option is selected, Fuse will emulate a Fuller Box AY sound and
-joystick interface. This emulation is only available for the 16k, 48k and
-TC2048 machines.
+If this option is selected, Fuse will emulate a SpeccyBoot interface which
+allows booting a ZX Spectrum over an Ethernet network. See the SpeccyBoot
+web page at http://speccyboot.sourceforge.net/ for more details.
 .RE
 .PP
 .I "SpecDrum inteface"
@@ -4193,7 +4192,8 @@ to convert recorded movie file into a standard video file.
 .PP
 .B Examples
 .PP
-.B fuse --movie-start --rate 2 --sound-freq 44100 --separation enigma.fmf
+.B fuse \-\-movie\-start \-\-rate 2 \-\-sound\-freq 44100 \-\-separation
+.B enigma.fmf
 .PP
 start video recording about 25/s video frame rate and 44100Hz sampling
 frequency stereo sound default compression level.
