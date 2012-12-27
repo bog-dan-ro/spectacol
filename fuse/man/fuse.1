@@ -219,19 +219,19 @@ option.
 .PP
 .I \-\-disk\-ask\-merge
 .RS
-Prompt the user to confirm whether Fuse should try to merge the 'B' side of a
+Prompt the user to confirm whether Fuse should try to merge the `B' side of a
 disk image from a separate file when opening a new single-sided disk image.
 .RE
 .PP
 .I "\-\-disk\-try\-merge mode"
 .RS
-Select whether Fuse should try to merge a separate file for the 'B' side of a
+Select whether Fuse should try to merge a separate file for the `B' side of a
 disk image separate file when opening a new disk image. Most double sided disk 
 images are dumped as two single sided disk images e.g.  
-`Golden Axe - Side A.dsk' and `Golden Axe - Side B.dsk'. So, if we want to play
-Golden Axe, first we have to insert the first disk image and when the game asks to 
-insert side B, we have to find and open the second disk image, instead just
-of just 'flip'-ing the disk inside the drive. If enabled, Fuse will try to open
+`Golden Axe \- Side A.dsk' and `Golden Axe \- Side B.dsk'. So, if we want to
+play Golden Axe, first we have to insert the first disk image and when the game
+asks to insert side B, we have to find and open the second disk image, instead
+of just `flip'-ing the disk inside the drive. If enabled, Fuse will try to open
 the second image too and create a double sided disk image (merging the two one
 sided disk images) and insert this merged virtual disk into the disk drive. The
 function detects whether the file is one side of a double-sided image if the
@@ -240,9 +240,9 @@ disk that is being opened. If found, Fuse will try to open the other side of
 the disk too substituting the appropriate characters in the filename e.g. 1->2,
 a->b, A->B. If successful then it will merge the two images and now we have a
 double sided disk in drive. This means that if we open
-`Golden Axe - Side A.dsk', then Fuse will try to open `Golden Axe - Side B.dsk'
-too. Now, we can just 'flip' the disk if Golden Axe asks for 'Side B'. The
-available options are
+`Golden Axe \- Side A.dsk', then Fuse will try to open `Golden Axe \- Side
+B.dsk' too. Now, we can just `flip' the disk if Golden Axe asks for `Side B'.
+The available options are
 .IR Never ,
 .IR "With single\-sided drives" 
 and
@@ -607,7 +607,7 @@ and
 .PP
 .I "\-\-melodik"
 .RS
-Emulate a Melodik AY interface for 16/48k Spectums. Same as the Peripherals
+Emulate a Melodik AY interface for 16/48k Spectrums. Same as the Peripherals
 Options dialog's
 .I "Melodik"
 option.
@@ -715,7 +715,7 @@ the +3 on startup if available.
 .I "\-\-plus3\-detect\-speedlock"
 .RS
 Specify whether the +3 drives try to detect Speedlock protected disks,
-and emulate 'weak' sectors.
+and emulate `weak' sectors.
 If the disk image file (EDSK or UDI) contains weak sector data, than
 Speedlock detection is automatically omitted.
 See also the
@@ -1008,7 +1008,7 @@ option. See the SpeccyBoot web page at http://speccyboot.sourceforge.net/ for
 full details on the SpeccyBoot.
 .RE
 .PP
-.I "\-\-speccyboot-tap device"
+.I "\-\-speccyboot\-tap device"
 .RS
 Specify the TAP device to use for SpeccyBoot emulation.
 .RE
@@ -2010,7 +2010,7 @@ allows booting a ZX Spectrum over an Ethernet network. See the SpeccyBoot
 web page at http://speccyboot.sourceforge.net/ for more details.
 .RE
 .PP
-.I "SpecDrum inteface"
+.I "SpecDrum interface"
 .RS
 If this option is selected, Fuse will emulate a Cheetah SpecDrum sound 
 interface.  See the World of Spectrum Infoseek web page at 
@@ -2022,7 +2022,7 @@ TC2048 machines.
 .I "Spectranet"
 .RS
 If this option is selected, Fuse will emulate the Spectranet interface, 
-which provides an ethernet interface for the Spectrum. See the 
+which provides an Ethernet interface for the Spectrum. See the 
 .B "SPECTRANET EMULATION"
 section for more details.
 .RE
@@ -3277,7 +3277,7 @@ the firmwares available from the DivIDE homepage.
 .\"------------------------------------------------------------------
 .\"
 .SH "SPECTRANET EMULATION"
-The Spectranet is an ethernet network interface for the ZX Spectrum 
+The Spectranet is an Ethernet network interface for the ZX Spectrum 
 by Dylan Thomas. The interface can be activated via the Spectranet 
 option on the Peripherals preferences dialog, and the state of its 
 automatic page-in (disable) jumper controlled via the Spectranet 
@@ -3904,7 +3904,7 @@ dialog. We note that we currently have 6 lives, so enter `6' into the
 possible locations to around 931 (you may get a slightly different
 number depending on exactly when you paused the game). Play along a
 bit and then (deliberately) lose a life. Pause the game again. As we
-now have 5 lives, replace the `6' in the 'Search for' field with a `5'
+now have 5 lives, replace the `6' in the `Search for' field with a `5'
 and click `Search' again. This then reduces the list of possible
 locations to just one: page 2, offset 0x00BC. This is the only
 location in memory which stored `6' when we had 6 lives and `5' when
@@ -4076,7 +4076,7 @@ Note that SAM Coup\('e `.DSK' images share the same format as `.MGT'.
 .I .TRD
 .RS
 TR-DOS disk image; for detailed information please see
-.I http://www.retroplay.com/Mecenate/ramsoft/tr-info.zip
+.I http://www.retroplay.com/Mecenate/ramsoft/tr\-info.zip
 .RE
 .PP
 .I .SCL
@@ -4099,7 +4099,7 @@ CPC disk image format; Fuse supports the plain old and the new
 extended CPC format too. Further information please see the
 .B "THE .DSK FORMAT"
 section and the CPCEMU manual section 7.7.1
-.I http://www.cpc-emu.org/linux/cpcemu_e.txt
+.I http://www.cpc\-emu.org/linux/cpcemu_e.txt
 or the
 .I http://www.kjthacker.f2s.com/docs/extdsk.html
 .RE
@@ -4135,7 +4135,7 @@ sector length).
 .\"
 .SH WEAK DISK DATA
 .PP
-Some copy protections have what is described as 'weak/random' data.
+Some copy protections have what is described as `weak/random' data.
 Each time the sector is read one or more bytes will change,
 the value may be random between consecutive reads of the same sector.
 Two disk image formats (Extended DSK and UDI) can store this type
