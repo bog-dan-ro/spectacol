@@ -1,4 +1,4 @@
-The Fuse utilities version 1.0.0
+The Fuse utilities version 1.1.0
 ================================
 
 The Fuse utilities are a few tools which may be of occasional use when
@@ -10,6 +10,7 @@ The available utilities are:
 
 * audio2tape: convert an audio file to tape format.
 * createhdf: create an empty .hdf IDE hard disk image.
+* fmfconv: converter tool for FMF movie files.
 * listbasic: list the BASIC in a snapshot or tape file.
 * profile2map: convert Fuse profiler output to Z80-style map format.
 * raw2hdf: create a .hdf IDE hard disk image from another file.
@@ -60,6 +61,6 @@ of the released tarballs, you'll need to run `autogen.sh' before
 running 'configure' for the first time.
 
 Philip Kendall <philip-fuse@shadowmagic.org.uk>
-16 December 2010
+?? ????? 201?
 
 $Id$

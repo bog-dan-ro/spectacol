@@ -380,3 +380,4 @@
 20121208 README: document support for reading PZX files (Sergio).
 20121227 man/fuse-utils.1: mention fmfconv (Fred).
 20121227 configure.ac: bump version number to 1.1.0 (Fred).
+20121227 ChangeLog,README: first updates for a "1.1.0" release (Fred).
