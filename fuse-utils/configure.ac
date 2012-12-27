@@ -19,7 +19,7 @@ dnl Author contact information:
 dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
-AC_INIT([fuse-utils],[1.0.0])
+AC_INIT([fuse-utils],[1.1.0])
 AC_CONFIG_SRCDIR([tzxlist.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
