@@ -4320,3 +4320,4 @@
 20121225 snapshot.c: support setting late timings from snapshots (Fred).
 20121227 man/fuse.1: update descriptions for SpeccyBoot interface and
          confirm-actions option. Fix dashes (Sergio).
+20121227 configure.ac: bump version number to 1.1.0 (Fred).
