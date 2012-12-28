@@ -584,6 +584,13 @@ trap_check_rom( void )
     return( ! machine_current->ram.special &&
 	    machine_current->ram.current_rom == 3 );
 
+  case LIBSPECTRUM_MACHINE_128E:
+    /* OK if we're not in a 64Kb RAM configuration and we're in
+       either ROM 1 or ROM 3 (which are the same) */
+    return( ! machine_current->ram.special &&
+	    ( machine_current->ram.current_rom == 1 ||
+              machine_current->ram.current_rom == 3    ));
+
   case LIBSPECTRUM_MACHINE_PENT:
   case LIBSPECTRUM_MACHINE_PENT512:
   case LIBSPECTRUM_MACHINE_PENT1024:

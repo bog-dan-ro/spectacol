@@ -672,6 +672,7 @@ paging_test( void )
     case LIBSPECTRUM_MACHINE_PLUS2A:
     case LIBSPECTRUM_MACHINE_PLUS3:
     case LIBSPECTRUM_MACHINE_PLUS3E:
+    case LIBSPECTRUM_MACHINE_128E:
       r += paging_test_plus3();
       break;
     case LIBSPECTRUM_MACHINE_SCORP:

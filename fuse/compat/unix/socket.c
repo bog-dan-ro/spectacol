@@ -114,7 +114,5 @@ void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self )
 void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )
 {
   char bitbucket;
-  ssize_t bytes_read;
-
-  bytes_read = read( self->read_fd, &bitbucket, 1 );
+  read( self->read_fd, &bitbucket, 1 );
 }
