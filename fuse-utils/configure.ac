@@ -63,6 +63,18 @@ if test "$zlib" = yes; then
   )
 fi
 
+dnl Allow the user to say that various libraries are in one place
+AC_ARG_WITH(local-prefix,
+[  --with-local-prefix=PFX local libraries installed in PFX (optional)],
+CPPFLAGS="$CPPFLAGS -I$withval/include";
+CXXFLAGS="$CXXFLAGS -I$withval/include";
+LDFLAGS="$LDFLAGS -L$withval/lib",
+if test "$prefix" != "NONE"; then
+  CPPFLAGS="$CPPLAGS -I$prefix/include";
+  CXXFLAGS="$CXXFLAGS -I$prefix/include";
+  LDFLAGS="$LDFLAGS -L$prefix/lib"
+fi)
+
 dnl Check for ffmpeg libs
 AC_MSG_CHECKING(whether ffmpeg movie recording requested)
 AC_ARG_WITH(ffmpeg,
@@ -100,18 +112,6 @@ dnl AC_CHECK_LIB(avcore, av_get_bytes_per_sample,
     )
   fi
 fi
-
-dnl Allow the user to say that various libraries are in one place
-AC_ARG_WITH(local-prefix,
-[  --with-local-prefix=PFX local libraries installed in PFX (optional)],
-CPPFLAGS="$CPPFLAGS -I$withval/include";
-CXXFLAGS="$CXXFLAGS -I$withval/include";
-LDFLAGS="$LDFLAGS -L$withval/lib",
-if test "$prefix" != "NONE"; then
-  CPPFLAGS="$CPPLAGS -I$prefix/include";
-  CXXFLAGS="$CXXFLAGS -I$prefix/include";
-  LDFLAGS="$LDFLAGS -L$prefix/lib"
-fi)
 
 dnl Check whether to use libgcrypt
 AC_MSG_CHECKING(whether to use libgcrypt)

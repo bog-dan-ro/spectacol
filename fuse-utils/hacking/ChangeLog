@@ -383,3 +383,4 @@
 20121227 ChangeLog,README: first updates for a "1.1.0" release (Fred).
 20121228 man/fmfconv.1: add some more details on command line arguments (Fred).
 20121228 fmfconv.c: tweak help text (Fred).
+20121228 configure.ac: allow ffmpeg detection to use local-prefix (Fred).
