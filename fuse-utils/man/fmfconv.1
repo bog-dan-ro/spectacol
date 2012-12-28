@@ -22,7 +22,7 @@
 .\" E-mail: szaszg@hu.inter.net
 .\"
 .\"
-.TH fmfconv 1 "10th September, 2010" "Version 0.10.0.2" "Emulators"
+.TH fmfconv 1 "??th ?????, 201?" "Version 1.1.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -32,8 +32,6 @@ fmfconv \- Fuse movie file converter
 .\"------------------------------------------------------------------
 .\"
 .SH SYNOPSIS
-.\" the trend for long-option-using programs is to give a largely
-.\" generic synopsis, so...
 .PD 0
 .B fmfconv
 .RI [ options ]
@@ -44,31 +42,166 @@ fmfconv \- Fuse movie file converter
 .\"
 .SH DESCRIPTION
 fmfconv is a Fuse movie file converter. It can convert .fmf files to
-any video file format know by FFMPEG.
+any video file format known by FFMPEG.
 ...
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH OPTIONS
-.\" dual short/long option listings here reflect the GNU approach,
-.\" as used in info files. It does mean using RS/RE, though,
-.\" so this is used for all options (for consistency).
-.\"
-.\" the options list is in alphabetical order by long option name (or
-.\" short option name if none).
-.\"
-.I \-h
+.RI \-\-aifc
+.RS
+Force AIFF-C output if sound format is AIFF
+.RE
+.PP
+.RI \-u
 .br
-.I \-\-help
+.RI \-\-au
+.RS
+Save sound to Sun Audio (au) file
+.RE
+.PP
+.RI \-m
+.br
+.RI \-\-aiff
+.RS
+Save sound to Apple Computer audio (aiff/aiff-c) file
+.RE
+.PP
+.RI "\-f "timing
+.br
+.RI "\-\-frate "timing
+.RS
+Set output frame rate. 'timing' is 'pal', 'ntsc', 'movie' or a
+number with maximum 3 digit after decimal point, or a #/# (e.g.: 
+-f 29.97 or -f 30000/1001)
+.RE
+.PP
+.RI \-h
+.br
+.RI \-\-help
 .RS
 Give brief usage help, listing available options.
 .RE
 .PP
-...
+.RI \-\-info
+.RS
+Scan input file(s) and print information.
+.RE
+.PP
+.RI "\-i "filename
+.br
+.RI "\-\-input "filename
+.RS
+Input file
+.RE
+.PP
+.RI \-\-mono
+.RS
+Convert sound to mono (by default sound is converted to stereo)
+.RE
+.PP
+.RI "\-C "cut
+.br
+.RI "\-\-out\-cut "cut
+.RS
+Leave out the comma delimited 'cut' ranges e.g.: 100-200,300,500,1:11-2:22 
+cut the frames 100-200, 300, 500 and frames from 1 min 11 sec to 2 min 22 sec 
+(in the given timing see: \-f/\-\-frate)
+.RE
+.PP
+.RI "\-o "filename
+.br
+.RI "\-\-output "filename
+.RS
+Output file
+.RE
+.PP
+.RI \-P
+.br
+.RI \-\-ppm
+.RS
+Save video as PPM screenshots
+.RE
+.PP
+.RI "\-g "form
+.br
+.RI "\-\-progress "form
+.RS
+Show progress, where <form> is one of '%', 'bar', 'frame' or 'time'. frame and 
+time are similar to bar and show movie seconds or frame number as well.
+.RE
+.PP
+.RI \-q
+.br
+.RI \-\-quiet
+.RS
+Decrease the verbosity level by one.
+.RE
+.PP
+.RI \-\-raw\-sound
+.RS
+Do not convert sound to 16 bit signed PCM and STEREO or MONO. This is an 
+advanced option. If stereo/mono or audio encoding change through 'fmf' file, 
+your sound will be crappy.
+.RE
+.PP
+.RI \-S
+.br
+.RI \-\-scr
+.RS
+Save video as SCR screenshots
+.RE
+.PP
+.RI "\-s "filename
+.br
+.RI "\-\-sound "filename
+.RS
+Output sound file
+.RE
+.PP
+.RI \-\-sound\-only
+.RS
+Process only the sound from an 'fmf' file
+.RE
+.PP
+.RI \-v
+.br
+.RI \-\-verbose
+.RS
+Increase the verbosity level by one.
+.RE
+.PP
+.RI \-V
+.br
+.RI \-\-version
+.RS
+Print the version number and exit.
+.RE
+.PP
+.RI \-w
+.br
+.RI \-\-wav
+.RS
+Save sound to Microsoft audio (wav) file
+.RE
+.PP
+.RI \-Y
+.br
+.RI \-\-yuv
+.RS
+Save video as yuv4mpeg2.
+.RE
+.PP
+.RI "\-\-yuv\-format "frm
+.RS
+Set yuv4mpeg2 file frame format to 'frm', where 'frm' is one of '444', '422', '420j', '420m', '420' or '410'.
+.RE
+.PP
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
+None known.
 .\"
 .\"------------------------------------------------------------------
 .\"

@@ -381,3 +381,4 @@
 20121227 man/fuse-utils.1: mention fmfconv (Fred).
 20121227 configure.ac: bump version number to 1.1.0 (Fred).
 20121227 ChangeLog,README: first updates for a "1.1.0" release (Fred).
+20121228 man/fmfconv.1: add some more details on command line arguments (Fred).
