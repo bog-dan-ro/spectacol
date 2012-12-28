@@ -54,9 +54,9 @@ The emulator can load any of the formats supported by
 virtual-tape files. Saving to SZX, Z80 and SNA snapshots and TZX and
 TAP tape files is supported. The SLT extension to the Z80 format is
 partly supported (enough for multi-load games); however, loading of
-the old DAT-file variant is not. DSK, UDI, FDI, TR0, SDF, MGT, IMG, 
+the old DAT-file variant is not. DSK, UDI, FDI, TR0, SDF, MGT, IMG,
 SAD, TRD, SCL and OPD disk images are supported when a disk interface
-is being emulated, including the integrated disk drives on +3, 
+is being emulated, including the integrated disk drives on +3,
 Pentagon or Scorpion machines as well as the +D, DISCiPLE,
 Opus Discovery and Beta 128 interfaces. DCK cartridge images are
 supported when emulating a Timex 2068 variant. Interface II ROM
@@ -226,8 +226,8 @@ disk image from a separate file when opening a new single-sided disk image.
 .I "\-\-disk\-try\-merge mode"
 .RS
 Select whether Fuse should try to merge a separate file for the `B' side of a
-disk image separate file when opening a new disk image. Most double sided disk 
-images are dumped as two single sided disk images e.g.  
+disk image separate file when opening a new disk image. Most double sided disk
+images are dumped as two single sided disk images e.g.
 `Golden Axe \- Side A.dsk' and `Golden Axe \- Side B.dsk'. So, if we want to
 play Golden Axe, first we have to insert the first disk image and when the game
 asks to insert side B, we have to find and open the second disk image, instead
@@ -244,7 +244,7 @@ now we have a double sided disk in drive. This means that if we open
 B.dsk' too. Now, we can just `flip' the disk if Golden Axe asks for `Side B'.
 The available options are
 .IR Never ,
-.IR "With single-sided drives" 
+.IR "With single-sided drives"
 and
 .IR Always .
 .RE
@@ -442,20 +442,20 @@ Select which joystick interface to attach for the first two real
 joysticks and the keyboard joystick. The default is
 .IR 0 ,
 which is no output. The available options are
-.IR 1 
+.IR 1
 (cursor),
-.IR 2 
+.IR 2
 (kempston),
-.IR 3 
+.IR 3
 (Sinclair 1),
-.IR 4 
+.IR 4
 (Sinclair 2),
-.IR 5 
+.IR 5
 (Timex 1),
-.IR 6 
+.IR 6
 (Timex 2),
 and
-.IR 7 
+.IR 7
 (Fuller). Same as the Joysticks Options dialog's
 .I "Joystick type"
 option.
@@ -503,8 +503,8 @@ option.
 .RS
 Select which Fuse key code should be triggered by the applicable
 real joystick button press. The codes are the Fuse keyboard codes
-corresponding to the keys. The default value is 
-.IR 4096 
+corresponding to the keys. The default value is
+.IR 4096
 which corresponds to the virtual joystick fire button. Same as the
 Joysticks Options dialog's
 .I "Joystick fire"
@@ -521,15 +521,15 @@ options.
 .br
 .I "\-\-joystick\-keyboard\-fire code"
 .RS
-Select which Fuse key code should correspond with each direction and 
+Select which Fuse key code should correspond with each direction and
 fire for the keyboard virtual joystick. The same as the Keyboard
 Joysticks Options dialog's
 .IR "Button for UP" ,
 .IR "Button for DOWN" ,
 .IR "Button for LEFT" ,
-.I "Button for RIGHT" 
+.I "Button for RIGHT"
 and
-.I "Button for FIRE" 
+.I "Button for FIRE"
 options respectively.
 .RE
 .PP
@@ -632,7 +632,7 @@ Specify Interface I Microdrive cartridge files to open.
 .I \-\-mouse\-swap\-buttons
 .RS
 Swap the left and right mouse buttons when emulating the Kempston mouse. The
-same as the General Peripherals dialog's 
+same as the General Peripherals dialog's
 .I Swap mouse buttons
 option.
 .RE
@@ -647,7 +647,7 @@ option. The available options are
 .IR Lossless ,
 and
 .IR High
-(lossy). The default option is 
+(lossy). The default option is
 .IR Lossless .
 See also the
 .B "MOVIE RECORDING"
@@ -921,7 +921,7 @@ option. The available options are
 .IR ACB ,
 and
 .IR ABC .
-The default option is 
+The default option is
 .IR None .
 .RE
 .PP
@@ -994,7 +994,7 @@ option.
 .RS
 Emulate a SpecDrum interface. Same as the Peripherals Options dialog's
 .I "SpecDrum"
-option. See the World of Spectrum Infoseek web page at 
+option. See the World of Spectrum Infoseek web page at
 http://www.worldofspectrum.org/infoseekid.cgi?id=1000062 for
 manuals, software and more.
 .RE
@@ -1245,7 +1245,7 @@ actual sound frequency.
 If you use some special plugin for your pcm device (e.g.: dmix) or your
 card not support some needed parameter (e.g. cannot play other only 48\ kHz
 stereo sound like some AC97 sound card) may cause Fuse unable to set the
-needed buffer size, appropriate sound frequency, channels and so on, therefore 
+needed buffer size, appropriate sound frequency, channels and so on, therefore
 you cannot get optimal result or not hear the sound at all. In this case try
 the
 .IR plughw:# ", (where # mean your card number counted from 0)"
@@ -1296,7 +1296,7 @@ option.
 .RS
 For the GTK+ UI, use stricter limits for the aspect ratio limits set
 by the
-.RI ` \-\-aspect\-hint ' 
+.RI ` \-\-aspect\-hint '
 option. This can cause some window managers (for example,
 .IR metacity (1))
 to not allow the window to be resized and moved, but is necessary to
@@ -1968,7 +1968,7 @@ TC2048 machines.
 .PP
 .I "Melodik"
 .RS
-If this option is selected, Fuse will emulate a Melodik AY sound interface. 
+If this option is selected, Fuse will emulate a Melodik AY sound interface.
 These interfaces and many similar ones were produced to make the 48K Spectrum
 compatible with the same AY music as the 128K Spectrum. This emulation is only
 available for the 16k, 48k and TC2048 machines.
@@ -2011,17 +2011,17 @@ web page at http://speccyboot.sourceforge.net/ for more details.
 .PP
 .I "SpecDrum interface"
 .RS
-If this option is selected, Fuse will emulate a Cheetah SpecDrum sound 
-interface.  See the World of Spectrum Infoseek web page at 
-http://www.worldofspectrum.org/infoseekid.cgi?id=1000062 for manuals, 
+If this option is selected, Fuse will emulate a Cheetah SpecDrum sound
+interface.  See the World of Spectrum Infoseek web page at
+http://www.worldofspectrum.org/infoseekid.cgi?id=1000062 for manuals,
 software and more. This emulation is only available for the 48k, 128k and
 TC2048 machines.
 .RE
 .PP
 .I "Spectranet"
 .RS
-If this option is selected, Fuse will emulate the Spectranet interface, 
-which provides an Ethernet interface for the Spectrum. See the 
+If this option is selected, Fuse will emulate the Spectranet interface,
+which provides an Ethernet interface for the Spectrum. See the
 .B "SPECTRANET EMULATION"
 section for more details.
 .RE
@@ -2029,7 +2029,7 @@ section for more details.
 .I "Spectranet disable"
 .RS
 This option controls the state of the Spectranet automatic page-in jumper
-(J2). See the 
+(J2). See the
 .B "SPECTRANET EMULATION"
 section for more details.
 .RE
@@ -2387,7 +2387,7 @@ of RAM respectively.
 .PP
 .I "Spectrum 48K (NTSC)"
 .RS
-The NTSC 48K machine released in limited numbers in parts of South 
+The NTSC 48K machine released in limited numbers in parts of South
 America.
 .RE
 .PP
@@ -2497,7 +2497,7 @@ you close the window.
 .I "Machine, NMI"
 .RS
 Sends a non-maskable interrupt to the emulated Spectrum. Due to a typo
-in the standard 48K ROM, this will cause a reset, but modified ROMs are 
+in the standard 48K ROM, this will cause a reset, but modified ROMs are
 available which make use of this feature. When the +D (or DISCiPLE) is
 emulated, this is used to access the +D (or DISCiPLE)'s screenshot and
 snapshot features (see the
@@ -2647,7 +2647,7 @@ Save the Microdrive image in Microdrive 1.
 .PP
 .I "Media, Interface I, Microdrive 1, Save as..."
 .RS
-Write the Microdrive image in Microdrive 1 to a file. You will be 
+Write the Microdrive image in Microdrive 1 to a file. You will be
 prompted for a filename.
 .RE
 .PP
@@ -2730,7 +2730,7 @@ Save the disk image currently in the +3's drive A:.
 .PP
 .I "Media, Disk, +3, Drive A:, Save as..."
 .RS
-Save the current state of the disk image currently in the +3's 
+Save the current state of the disk image currently in the +3's
 drive A: to a file. You will be prompted for a filename.
 .RE
 .PP
@@ -3262,7 +3262,7 @@ for more details.
 .\"
 .SH "DIVIDE"
 The DivIDE is another IDE interface for the Spectrum, of which full
-details can be found at 
+details can be found at
 .IR "http://baze.au.com/divide/" .
 The interface can be activated via the
 .I "DivIDE interface"
@@ -3276,35 +3276,35 @@ the firmwares available from the DivIDE homepage.
 .\"------------------------------------------------------------------
 .\"
 .SH "SPECTRANET EMULATION"
-The Spectranet is an Ethernet network interface for the ZX Spectrum 
-by Dylan Thomas. The interface can be activated via the Spectranet 
-option on the Peripherals preferences dialog, and the state of its 
-automatic page-in (disable) jumper controlled via the Spectranet 
-disable option. If you're going to be using the Spectranet, you'll 
-probably want one of the firmwares available from the Spectranet 
-homepage (http://spectrum.alioth.net/doc/index.php) which is also 
+The Spectranet is an Ethernet network interface for the ZX Spectrum
+by Dylan Thomas. The interface can be activated via the Spectranet
+option on the Peripherals preferences dialog, and the state of its
+automatic page-in (disable) jumper controlled via the Spectranet
+disable option. If you're going to be using the Spectranet, you'll
+probably want one of the firmwares available from the Spectranet
+homepage (http://spectrum.alioth.net/doc/index.php) which is also
 where you can find more information on using the interface.
 .PP
-Installing the Spectranet firmware on Fuse is slightly more 
-complicated than on a real machine, mostly because Fuse's emulation 
-doesn't support DHCP. These instructions are correct as of 2012-01-26 
-- if you're using a later firmware than this, things may have changed 
+Installing the Spectranet firmware on Fuse is slightly more
+complicated than on a real machine, mostly because Fuse's emulation
+doesn't support DHCP. These instructions are correct as of 2012-01-26
+- if you're using a later firmware than this, things may have changed
 slightly.
 .PP
-The first thing you will need to do is to obtain a copy of the 
-Spectranet installer as a .tap file (or similar). The installer is 
+The first thing you will need to do is to obtain a copy of the
+Spectranet installer as a .tap file (or similar). The installer is
 also available at the Spectranet site above.
 
-Once you have a copy of the installer, start Fuse and tick the 
+Once you have a copy of the installer, start Fuse and tick the
 .I "Spectranet"
 option from the
 .I "Options, Peripherals, General..."
 dialog, and the state of its write protect jumper controlled via the
-.IR "Spectranet disable" 
-option. Once that's done, open the installer file (use the 
+.IR "Spectranet disable"
+option. Once that's done, open the installer file (use the
 .I "Media, Tape, Open..."
-command rather than 
-.I "File, Open..." 
+command rather than
+.I "File, Open..."
 to prevent autoloading) and enter the following commands from BASIC:
 .PP
 CLEAR 26999
@@ -3313,51 +3313,51 @@ LOAD "" CODE
 .br
 RANDOMIZE USR 27000
 .PP
-The screen should turn blue and you'll see around 20 lines of message 
-appearing as the firmware is installed, starting with \(lqErasing sector 
-0\(rq and finishing with \(lqRestoring page B\(rq, and you'll get the familiar 
+The screen should turn blue and you'll see around 20 lines of message
+appearing as the firmware is installed, starting with \(lqErasing sector
+0\(rq and finishing with \(lqRestoring page B\(rq, and you'll get the familiar
 0 OK, 0: 1 at the bottom of the screen.
 .PP
-Now untick the 
-.IR "Spectranet disable" 
+Now untick the
+.IR "Spectranet disable"
 option from the
 .I "Options, Peripherals, General..."
-dialog and reset the Spectrum. You should see a very brief blue status 
-screen, before the regular copyright screen appears with some 
-Spectranet information at the top \(em there should be four status lines, 
-starting with \(lqAlioth Spectranet\(rq and ending with the Spectranet's IP 
+dialog and reset the Spectrum. You should see a very brief blue status
+screen, before the regular copyright screen appears with some
+Spectranet information at the top \(em there should be four status lines,
+starting with \(lqAlioth Spectranet\(rq and ending with the Spectranet's IP
 address (which will be 255.255.255.255 at this stage).
 .PP
-If you see all that, trigger an NMI (the Machine / NMI menu option) 
-and you should get a white on blue Spectranet NMI menu with five 
+If you see all that, trigger an NMI (the Machine / NMI menu option)
+and you should get a white on blue Spectranet NMI menu with five
 options.
 .PP
-Select [A] Configure network settings \(em this should lead you to 
-another menu, which will scroll of the top of the screen; don't worry 
+Select [A] Configure network settings \(em this should lead you to
+another menu, which will scroll of the top of the screen; don't worry
 about this for now.
 .PP
 You'll now need to set various options:
 .PP
 [A] Enable/disable DHCP \(em select N
 .br
-[B] Change IP address \(em enter the IP address of the machine you are 
+[B] Change IP address \(em enter the IP address of the machine you are
 running Fuse on.
 .br
-[C] Change netmask \(em enter the appropriate netmask for the IP address 
-you selected above. If that doesn't mean anything to you, try 
+[C] Change netmask \(em enter the appropriate netmask for the IP address
+you selected above. If that doesn't mean anything to you, try
 255.255.255.0
 .br
-[D] Change default gateway \(em enter the appropriate gateway address. 
+[D] Change default gateway \(em enter the appropriate gateway address.
 If you don't know any better, enter the IP address of your router.
 .br
-[E] Change primary DNS \(em enter the address of your DNS server. If you 
+[E] Change primary DNS \(em enter the address of your DNS server. If you
 don't know any better, use Google's public DNS server, 8.8.8.8.
 .PP
 There is no need to change options [F] or [G], but do select:
 .PP
-[H] Change hostname \(em enter a hostname for the Spectranet-enabled 
-machine. It doesn't really matter what you enter here \(em it's mostly 
-useful just to replace the junk default name so you can see what you've 
+[H] Change hostname \(em enter a hostname for the Spectranet-enabled
+machine. It doesn't really matter what you enter here \(em it's mostly
+useful just to replace the junk default name so you can see what you've
 entered for the other settings.
 .PP
 Your screen should now look something like this:
@@ -3385,15 +3385,15 @@ Hostname         : fuse
 .br
 <menu options>
 .PP
-If everything looks correct, select [I] Save changes and exit (you'll 
-see a brief \(lqSaving configuration...\(rq message) followed by [E] Exit, 
-at which point you'll be returned to BASIC. Reset the Spectrum again 
-and you'll see the same four line status display, but this time with 
+If everything looks correct, select [I] Save changes and exit (you'll
+see a brief \(lqSaving configuration...\(rq message) followed by [E] Exit,
+at which point you'll be returned to BASIC. Reset the Spectrum again
+and you'll see the same four line status display, but this time with
 your IP address on the last line.
 .PP
-Congratulations! You have now installed the Spectranet firmware. To 
-save having to go through all that every time you start Fuse, save a 
-.szx snapshot at this point, and load that in every time you want to 
+Congratulations! You have now installed the Spectranet firmware. To
+save having to go through all that every time you start Fuse, save a
+.szx snapshot at this point, and load that in every time you want to
 use the Spectranet.
 .\"
 .\"------------------------------------------------------------------
@@ -3644,7 +3644,7 @@ to catch all events from that area.
 cl{ear}
 .RI [ address ]
 .RS
-Remove all breakpoints at 
+Remove all breakpoints at
 .I address
 or the current value of PC if
 .I address
@@ -3781,7 +3781,7 @@ Set the interrupt mode or interrupt flip flops
 .I register
 to
 .IR value .
-If the im mode is not 0, 1 or 2 it will be ignored, while non-zero iff values 
+If the im mode is not 0, 1 or 2 it will be ignored, while non-zero iff values
 will be converted to one.
 .RE
 .PP
@@ -3963,7 +3963,7 @@ See the
 .B "DISK FILE FORMATS"
 section for mode details on supported disk file formats. The Opus
 Discovery's printer port is also emulated for output only. (See the
-.B "PRINTER EMULATION"                                             
+.B "PRINTER EMULATION"
 section for more details.) The Opus Discovery may only be
 used with 16K, 48K, 128K, TC2048 and +2 (not +2A) emulation.  To access disks,
 use the same syntax as Interface I and Microdrives.
@@ -3976,7 +3976,7 @@ Fuse supports emulating the +D disk and printer interface. See the
 .B "DISK FILE FORMATS"
 section for mode details on supported disk file formats. The +D's
 printer port is emulated. (See the
-.B "PRINTER EMULATION"                                             
+.B "PRINTER EMULATION"
 section for more details.) The +D may only be
 used with 48K, 128K and +2 (not +2A) emulation.  To access disks, you will first
 need to load G+DOS, by inserting a disk containing the DOS file (+SYS) and
@@ -4009,7 +4009,7 @@ support emulation of a DISCiPLE attached to a 128K machine. See the
 section for mode details on supported disk file formats, which are the
 same as for +D emulation as described above. The DISCiPLE's
 printer port is emulated. (See the
-.B "PRINTER EMULATION"                                             
+.B "PRINTER EMULATION"
 section for more details.) The DISCiPLE may only be
 used with 48K emulation at present.  To access disks, you will first
 need to load GDOS, by inserting a disk containing the DOS file (SYS) and
@@ -4042,7 +4042,7 @@ For reading:
 .PP
 .I .UDI
 .RS
-Ultra Disk Image; for specification please see 
+Ultra Disk Image; for specification please see
 .I http://scratchpad.wikia.com/wiki/Spectrum_emulator_file_format:_udi
 or
 .I http://zxmak.narod.ru/docs.htm
@@ -4125,7 +4125,7 @@ There is a
 .I .LOG
 ` image ' format for debugging purpose. This is a plain text file
 contains three dump of the loaded disk image at different details.
-Not all image formats can store all disk images. 
+Not all image formats can store all disk images.
 You cannot save a disk image with an inappropriate format
 that loses some information (e.g. variable track length or
 sector length).
@@ -4160,7 +4160,7 @@ problems, you can try to set compression to None.
 .PP
 Fuse records every displayed frame, so by default the recorded file has about
 50 video frame per second. A standard video has about 24\(en30/s framerate, so
-if you set 
+if you set
 .I "Options/General/Frame rate 1:n"
 or the equivalent
 .I \-\-rate
