@@ -4328,3 +4328,4 @@
 20121228 man/fuse.1: make better use of named glyphs (Stuart).
 20121228 man/fuse.1: remove trailing spaces (Stuart).
 20121228 compat/unix/socket.c,tape.c,unittests.c: fix warnings.
+20121228 man/fuse.1: whitespace and italics fixes (Stuart).

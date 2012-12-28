@@ -586,7 +586,7 @@ Specify machine type to emulate initially. The default is
 a 48K Spectrum. The available options are
 .IR 16 ,
 .IR 48 ,
-.IR 48_ntsc,
+.IR 48_ntsc ,
 .IR 128 ,
 .IR plus2 ,
 .IR plus2a ,
@@ -1760,7 +1760,9 @@ got a program in you want to load and run. If this option is selected,
 this will automatically happen for you when you open one of these
 files using the
 .I File, Open...
-menu option \(em you must then use the Media menu to use
+menu option \(em you must then use the
+.I Media
+menu to use
 tapes or disks for saving data to, or for loading data into an already
 running program.
 .RE
@@ -3277,10 +3279,12 @@ the firmwares available from the DivIDE homepage.
 .\"
 .SH "SPECTRANET EMULATION"
 The Spectranet is an Ethernet network interface for the ZX Spectrum
-by Dylan Thomas. The interface can be activated via the Spectranet
+by Dylan Thomas. The interface can be activated via the
+.I Spectranet
 option on the Peripherals preferences dialog, and the state of its
-automatic page-in (disable) jumper controlled via the Spectranet
-disable option. If you're going to be using the Spectranet, you'll
+automatic page-in (disable) jumper controlled via the
+.I "Spectranet disable"
+option. If you're going to be using the Spectranet, you'll
 probably want one of the firmwares available from the Spectranet
 homepage (http://spectrum.alioth.net/doc/index.php) which is also
 where you can find more information on using the interface.
@@ -3471,7 +3475,7 @@ through execution or continue.
 If you are using the GTK+ user interface, Fuse features a moderately
 powerful, completely transparent monitor/debugger, which can be
 activated via the
-.I "Machine, Debugger ..."
+.I "Machine, Debugger..."
 menu option. A debugger window will appear, showing the current state
 of the emulated machine: the top-left `pane' shows the current state
 of the Z80 and the last bytes written to any emulated peripherals. The
@@ -3990,7 +3994,9 @@ is the number of the drive in use.  For example,
 would load the file named `myfile' from the emulated drive 1.
 Microdrive syntax may also be used.
 .PP
-To save a snapshot, choose the `Machine, NMI' menu option, and then
+To save a snapshot, choose the
+.I "Machine, NMI"
+menu option, and then
 press `4' to save a 48K snapshot, or `5' to save a 128K snapshot.
 When saving a 128K snapshot, you must then press Y or N to indicate
 whether the screen changed while saving the snapshot, to finish
