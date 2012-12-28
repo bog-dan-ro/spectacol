@@ -4325,3 +4325,4 @@
 20121227 man/fuse.1: fix spelling, capitalisation, dashes, quotes and
          whitespace (Stuart).
 20121228 man/fuse.1: fix whitespace and grammar issues (Stuart).
+20121228 man/fuse.1: make better use of named glyphs (Stuart).

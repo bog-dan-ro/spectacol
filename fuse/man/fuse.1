@@ -28,7 +28,7 @@
 .\"------------------------------------------------------------------
 .\"
 .SH NAME
-fuse \- Sinclair ZX Spectrum emulator
+fuse \(em Sinclair ZX Spectrum emulator
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -50,7 +50,7 @@ sound.
 .PP
 The emulator can load any of the formats supported by
 .IR libspectrum (3)
-\- this includes Z80, SNA and SZX snapshots, and PZX, TAP and TZX
+\(em this includes Z80, SNA and SZX snapshots, and PZX, TAP and TZX
 virtual-tape files. Saving to SZX, Z80 and SNA snapshots and TZX and
 TAP tape files is supported. The SLT extension to the Z80 format is
 partly supported (enough for multi-load games); however, loading of
@@ -84,8 +84,8 @@ or
 .\"
 .I \-\-accelerate\-loader
 .RS
-Specify whether Fuse should attempt to accelerate tape loaders by "short
-circuiting" the loading loop. This will in general speed up loading, but
+Specify whether Fuse should attempt to accelerate tape loaders by \(lqshort
+circuiting\(rq the loading loop. This will in general speed up loading, but
 may cause some loaders to fail. (Enabled by default, but you can use
 .RI ` \-\-no\-accelerate\-loader '
 to disable). The same as the General Options dialog's
@@ -237,9 +237,9 @@ sided disk images) and insert this merged virtual disk into the disk drive. The
 function detects whether the file is one side of a double-sided image if the
 filename matches a pattern like [Ss]ide[ _][abAB12][ _.] in the file name of a
 disk that is being opened. If found, Fuse will try to open the other side of
-the disk too substituting the appropriate characters in the filename e.g. 1->2,
-a->b, A->B. If successful then it will merge the two images and now we have a
-double sided disk in drive. This means that if we open
+the disk too substituting the appropriate characters in the filename e.g.
+1\(->2, a\(->b, A\(->B. If successful then it will merge the two images and
+now we have a double sided disk in drive. This means that if we open
 `Golden Axe \- Side A.dsk', then Fuse will try to open `Golden Axe \- Side
 B.dsk' too. Now, we can just `flip' the disk if Golden Axe asks for `Side B'.
 The available options are
@@ -874,7 +874,7 @@ the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
 and the SpeccyBoot ROM
 .RI ( speccyboot\-1.4.rom ).
 The names in brackets denote the defaults. Note that not all these ROMs
-are supplied with Fuse - you must supply your own copies of those which
+are supplied with Fuse \(em you must supply your own copies of those which
 are not.
 .RE
 .PP
@@ -1311,8 +1311,8 @@ from being able resize the window away from square.
 .RS
 Specify which mode to use for the FB UI. Available values for
 .I mode
-are `320' (which corresponds to a 320x240x256 mode), the default and
-`640' (a 640x480x256 mode).
+are `320' (which corresponds to a 320\(mu240\(mu256 mode), the default and
+`640' (a 640\(mu480\(mu256 mode).
 .RE
 .PP
 .I "\-\-svga\-modes mode1,mode2,mode3"
@@ -1326,7 +1326,7 @@ command line option.
 When user select a not available mode for a size, Fuse just ignore
 and try to find the best mode for it. e.g. with
 .I "\-\-svga\-modes 0,0,12"
-Fuse use the specified 1024x768@256 SVGA mode for triple size filters,
+Fuse use the specified 1024\(mu768\(mu256 SVGA mode for triple size filters,
 but select SVGA modes automatically for normal or double size filters.
 The above mode number is just an example, and mode numbers and their
 meanings may vary graphics card by graphics card.
@@ -1339,10 +1339,10 @@ meanings may vary graphics card by graphics card.
 Specify whether to use doublescan modes in the FB UI.
 Available values for
 .I mode
-are 0, 1 and 2. 0 means `never doublescan' (use 640x480 at either 72\ Hz or
+are 0, 1 and 2. 0 means `never doublescan' (use 640\(mu480 at either 72\ Hz or
 60\ Hz), whereas 1 and 2 both mean `try to use doublescan' and will fall back
-on the 640x480 modes. 1 selects 72\ Hz modes (the same size and shape as your
-typical 640x480), and 2 selects 60\ Hz modes (overscan).
+on the 640\(mu480 modes. 1 selects 72\ Hz modes (the same size and shape as
+your typical 640\(mu480), and 2 selects 60\ Hz modes (overscan).
 .br
 If your monitor displays a blank screen when using 1 or 2, press F10 then
 try a different option or say `\-\-fbmode 640'.
@@ -1383,14 +1383,14 @@ Show which version of Fuse is being used.
 .I "\-\-volume\-ay volume"
 .RS
 Sets the relative volume of the AY-3-8912 chip from a range of
-0-100%. Same as the Sound Options dialog's
+0\(en100%. Same as the Sound Options dialog's
 .I "AY volume"
 option.
 .RE
 .PP
 .I "\-\-volume\-beeper volume"
 .RS
-Sets the relative volume of the beeper from a range of 0-100%.
+Sets the relative volume of the beeper from a range of 0\(en100%.
 Same as the Sound Options dialog's
 .I "Beeper volume"
 option.
@@ -1398,7 +1398,7 @@ option.
 .PP
 .I "\-\-volume\-specdrum volume"
 .RS
-Sets the relative volume of the SpecDrum from a range of 0-100%.
+Sets the relative volume of the SpecDrum from a range of 0\(en100%.
 Same as the Sound Options dialog's
 .I "SpecDrum volume"
 option.
@@ -1478,7 +1478,7 @@ For example, the opposite of
 is
 .RI ` \-\-no\-issue2 '.
 These options can also be modified while the emulator is running,
-using the options dialogs \- see the documentation for the
+using the options dialogs \(em see the documentation for the
 .I Options
 menu in the
 .B "MENUS AND KEYS"
@@ -1760,7 +1760,7 @@ got a program in you want to load and run. If this option is selected,
 this will automatically happen for you when you open one of these
 files using the
 .I File, Open...
-menu option \- you must then use the Media menu to use
+menu option \(em you must then use the Media menu to use
 tapes or disks for saving data to, or for loading data into an already
 running program.
 .RE
@@ -1849,7 +1849,7 @@ already matches your current configuration.
 .RS
 If selected, Fuse will cause all screen-related timings (for example,
 when the screen is rendered and when memory contention occurs) to be
-one tstate later than "normal", an effect which is present on some real
+one tstate later than \(lqnormal\(rq, an effect which is present on some real
 hardware.
 .RE
 .RE
@@ -1900,19 +1900,19 @@ this option unless you have a specific need for it.
 This option allows the emulation of the sound output system to be
 modified. Different choices of speaker limit the bass and treble
 response that can be produced from the machine. Choose between a
-"TV" type speaker and a small beeper type speaker that significantly
-limits bass and treble response. Choose "Unfiltered" to get
+\(lqTV\(rq type speaker and a small beeper type speaker that significantly
+limits bass and treble response. Choose \(lqUnfiltered\(rq to get
 unmodified (but less accurate) sound output.
 .RE
 .PP
 .I "AY volume"
 .RS
-Sets the relative volume of the AY-3-8912 chip from a range of 0-100%.
+Sets the relative volume of the AY-3-8912 chip from a range of 0\(en100%.
 .RE
 .PP
 .I "Beeper volume"
 .RS
-Sets the relative volume of the beeper from a range of 0-100%.
+Sets the relative volume of the beeper from a range of 0\(en100%.
 .RE
 .RE
 .PP
@@ -2154,7 +2154,7 @@ snapshots into the stream. Older snapshots will be pruned from the
 stream to keep the file size and number of snapshots down: each snapshot
 up to 15 seconds will be kept, then one snapshot every 15 seconds until
 one minute, then one snapshot every minute until 5 minutes, and then one
-snapshot every 5 minutes. Note that this "pruning" applies only to
+snapshot every 5 minutes. Note that this \(lqpruning\(rq applies only to
 automatically inserted snapshots: snapshots manually inserted into the
 stream will never be pruned.
 .RE
@@ -2407,7 +2407,7 @@ point of view, the +2 is virtually identical to the 128K.
 .I "Spectrum +3"
 .RS
 The two machines released by Amstrad in 1988. Technically very similar
-to each other, except that the +3 features a 3" disk drive while the
+to each other, except that the +3 features a 3\(sd disk drive while the
 +2A does not.
 .RE
 .PP
@@ -2448,7 +2448,7 @@ at
 .I "Pentagon 1024K"
 .RS
 Newer versions of the Pentagon Russian Spectrum clones which
-incorporate more memory and the "Mr Gluk Reset Service" ROM
+incorporate more memory and the \(lqMr Gluk Reset Service\(rq ROM
 offering a more powerful firmware.
 .RE
 .PP
@@ -2457,7 +2457,7 @@ offering a more powerful firmware.
 Another Russian clone of the Spectrum. Some details can be found
 at
 .IR "http://www.worldofspectrum.org/rusfaq/index.html" .
-Like all the Russian clones, they have built in 3.5" disk drives,
+Like all the Russian clones, they have built in 3.5\(sd disk drives,
 accessed via the Beta 128 disk interface and TR-DOS (the Technology
 Research Disk Operating System). The most important distinction from
 the Pentagon 128k and similar machines is the display timing details.
@@ -2545,7 +2545,7 @@ might want to try it that way first.
 Start playing the PZX, TAP or TZX file, if required. (Choosing the option
 (or pressing
 .IR F8 )
-again pauses playback, and a further press resumes). To explain \- if
+again pauses playback, and a further press resumes). To explain \(em if
 tape-loading traps have been disabled (in the General Options dialog),
 starting the loading process in the emulated machine isn't enough. You
 also have to `press play', so to speak :\-), and this is how you do
@@ -2718,7 +2718,7 @@ A:.
 .PP
 .I "Media, Disk, +3, Drive A:, Eject"
 .RS
-Eject the disk image currently in the +3's emulated drive A: \- or
+Eject the disk image currently in the +3's emulated drive A: \(em or
 from the emulated machine's perspective, eject it. Note that any
 changes made to the image will not be saved.
 .RE
@@ -2737,7 +2737,7 @@ drive A: to a file. You will be prompted for a filename.
 .I "Media, Disk, +3, Drive B:, Insert..."
 .RS
 As above, but for the +3's drive B:. Fuse emulates drive B: as a
-second 3" drive.
+second 3\(sd drive.
 .RE
 .PP
 .I "Media, Disk, +3, Drive B:, Eject"
@@ -2984,22 +2984,22 @@ emulated as Symbol Shift (most other modifiers are also mapped to
 this)
 .TP
 .I Backspace
-emulated as Caps-0 (Delete)
+emulated as Caps\(en0 (Delete)
 .TP
 .I Esc
-emulated as Caps-1 (Edit)
+emulated as Caps\(en1 (Edit)
 .TP
 .I Caps Lock
-emulated as Caps-2
+emulated as Caps\(en2
 .TP
 .I Cursor keys
-emulated as Caps-5/6/7/8 (as appropriate)
+emulated as Caps\(en5/6/7/8 (as appropriate)
 .TP
 .I Tab
-emulated as Caps Shift-Symbol Shift (Extended Mode)
+emulated as Caps Shift\(enSymbol Shift (Extended Mode)
 .PP
 Some further punctuation keys are supported, if they exist on your
-keyboard \-
+keyboard \(em
 .RI ` , ',
 .RI ` . ',
 .RI ` / ',
@@ -3151,7 +3151,7 @@ display.
 .IR "Timex 1.5x " ( timex15x )
 .RS
 An interpolating Timex-specific filter which scales the Timex screen
-up to 1.5x its usual size (which is therefore 3x the size of a
+up to 1.5\(mu its usual size (which is therefore 3\(mu the size of a
 `normal' Spectrum screen). Available only for the GTK+, Win32 and SDL
 user interfaces or when saving screenshots.
 .\"
@@ -3193,7 +3193,7 @@ emulation is enabled, text-only emulation of the disk interface's
 parallel printer interface is provided.
 .PP
 Any printout is appended to one (or both) of two files, depending on
-the printer \- these default to
+the printer \(em these default to
 .I printout.txt
 for text output, and
 .I printout.pbm
@@ -3314,8 +3314,8 @@ LOAD "" CODE
 RANDOMIZE USR 27000
 .PP
 The screen should turn blue and you'll see around 20 lines of message 
-appearing as the firmware is installed, starting with "Erasing sector 
-0" and finishing with "Restoring page B", and you'll get the familiar 
+appearing as the firmware is installed, starting with \(lqErasing sector 
+0\(rq and finishing with \(lqRestoring page B\(rq, and you'll get the familiar 
 0 OK, 0: 1 at the bottom of the screen.
 .PP
 Now untick the 
@@ -3324,39 +3324,39 @@ option from the
 .I "Options, Peripherals, General..."
 dialog and reset the Spectrum. You should see a very brief blue status 
 screen, before the regular copyright screen appears with some 
-Spectranet information at the top - there should be four status lines, 
-starting with "Alioth Spectranet" and ending with the Spectranet's IP 
+Spectranet information at the top \(em there should be four status lines, 
+starting with \(lqAlioth Spectranet\(rq and ending with the Spectranet's IP 
 address (which will be 255.255.255.255 at this stage).
 .PP
 If you see all that, trigger an NMI (the Machine / NMI menu option) 
 and you should get a white on blue Spectranet NMI menu with five 
 options.
 .PP
-Select [A] Configure network settings - this should lead you to 
+Select [A] Configure network settings \(em this should lead you to 
 another menu, which will scroll of the top of the screen; don't worry 
 about this for now.
 .PP
 You'll now need to set various options:
 .PP
-[A] Enable/disable DHCP - select N
+[A] Enable/disable DHCP \(em select N
 .br
-[B] Change IP address - enter the IP address of the machine you are 
+[B] Change IP address \(em enter the IP address of the machine you are 
 running Fuse on.
 .br
-[C] Change netmask - enter the appropriate netmask for the IP address 
+[C] Change netmask \(em enter the appropriate netmask for the IP address 
 you selected above. If that doesn't mean anything to you, try 
 255.255.255.0
 .br
-[D] Change default gateway - enter the appropriate gateway address. 
+[D] Change default gateway \(em enter the appropriate gateway address. 
 If you don't know any better, enter the IP address of your router.
 .br
-[E] Change primary DNS - enter the address of your DNS server. If you 
+[E] Change primary DNS \(em enter the address of your DNS server. If you 
 don't know any better, use Google's public DNS server, 8.8.8.8.
 .PP
 There is no need to change options [F] or [G], but do select:
 .PP
-[H] Change hostname - enter a hostname for the Spectranet-enabled 
-machine. It doesn't really matter what you enter here - it's mostly 
+[H] Change hostname \(em enter a hostname for the Spectranet-enabled 
+machine. It doesn't really matter what you enter here \(em it's mostly 
 useful just to replace the junk default name so you can see what you've 
 entered for the other settings.
 .PP
@@ -3386,7 +3386,7 @@ Hostname         : fuse
 <menu options>
 .PP
 If everything looks correct, select [I] Save changes and exit (you'll 
-see a brief "Saving configuration..." message) followed by [E] Exit, 
+see a brief \(lqSaving configuration...\(rq message) followed by [E] Exit, 
 at which point you'll be returned to BASIC. Reset the Spectrum again 
 and you'll see the same four line status display, but this time with 
 your IP address on the last line.
@@ -3407,7 +3407,7 @@ The selector shows the directories and files in the current directory
 in two separate subwindows. If either list is too big to fit in the
 window, you can use the scrollbar to see the rest (by dragging the
 slider, for example), or you can use
-.I Shift-Tab
+.I Shift\(enTab
 (to move the keyboard focus to a subwindow) and use the cursor keys.
 To change directory, double-click it.
 .PP
@@ -3421,7 +3421,7 @@ to abort.
 If you're using the keyboard, probably the easiest way to use the
 selector is to just ignore it and type in the name. This isn't as
 irksome as it sounds, since the filename input box has filename
-completion \- type part of a directory or file name, then press
+completion \(em type part of a directory or file name, then press
 .IR Tab .
 It should complete it. If it was a directory, it moves to that
 directory; if the completion was ambiguous, it completes as much as
@@ -3432,10 +3432,10 @@ when you've finished typing the filename, or
 .I Esc
 to abort.
 .PP
-Now, if you're using the widget UI \- the one using the Spectrum font \-
+Now, if you're using the widget UI \(em the one using the Spectrum font \(em
 the selector works a bit differently. The files and directories are
 all listed in a single two-column-wide window (the directories are
-shown at the top, ending in `/') \- the names may be truncated onscreen
+shown at the top, ending in `/') \(em the names may be truncated onscreen
 if they're too long to fit.
 .PP
 To move the cursor, you can either use the cursor keys, or the
@@ -3980,7 +3980,7 @@ printer port is emulated. (See the
 section for more details.) The +D may only be
 used with 48K, 128K and +2 (not +2A) emulation.  To access disks, you will first
 need to load G+DOS, by inserting a disk containing the DOS file (+SYS) and
-entering "RUN".  Once DOS is loaded, you can load to/from +D disks
+entering \(lqRUN\(rq.  Once DOS is loaded, you can load to/from +D disks
 by prefixing filenames with
 .RI `d n '
 where
@@ -4013,7 +4013,7 @@ printer port is emulated. (See the
 section for more details.) The DISCiPLE may only be
 used with 48K emulation at present.  To access disks, you will first
 need to load GDOS, by inserting a disk containing the DOS file (SYS) and
-entering "RUN".  Once DOS is loaded, you can load to/from DISCiPLE disks
+entering \(lqRUN\(rq.  Once DOS is loaded, you can load to/from DISCiPLE disks
 by prefixing filenames with
 .RI `d n '
 where
@@ -4086,7 +4086,7 @@ A simple archive format for TR-DOS disk files.
 .I .TD0
 .RS
 Teledisk image format; Fuse supports only files which do not use the
-"Advanced Compression" option. Detailed description found in
+\(lqAdvanced Compression\(rq option. Detailed description found in
 .I http://www.classiccmp.org/dunfield/img/td0notes.txt
 and
 .I http://www.fpns.net/willy/wteledsk.htm
@@ -4159,7 +4159,7 @@ Recording a movie may slow down emulation, if you experience performance
 problems, you can try to set compression to None.
 .PP
 Fuse records every displayed frame, so by default the recorded file has about
-50 video frame per second. A standard video has about 24-30/s framerate, so
+50 video frame per second. A standard video has about 24\(en30/s framerate, so
 if you set 
 .I "Options/General/Frame rate 1:n"
 or the equivalent
@@ -4168,9 +4168,9 @@ command line option to 2 than recording frame rate reduces about 25/s. The
 exact frame rate depends on the Z80 clock frequency which varies depending on
 the specific emulated machine.
 .br
-Note: You can see all of the "gfx" effects only if the Fuse frame rate option
-is set to 1, but in most cases you can safely use 2. Also, movie recording
-stops if the emulated machine is changed.
+Note: You can see all of the \(lqgfx\(rq effects only if the Fuse frame rate
+option is set to 1, but in most cases you can safely use 2. Also, movie
+recording stops if the emulated machine is changed.
 .PP
 The recorded sound sampling rate and the channel number is equal with the
 Fuse generated sound sampling rate (32000 Hz by default) and channel
@@ -4306,7 +4306,7 @@ emulations.
 .PP
 Gergely Szasz wrote the Interface I and Microdrive emulation, the PAL
 TV scalers, the TV 3x scaler, the movie logging code, the libao sound
-code, the upd765 disk controller used in the +3 and made many
+code, the \(mcPD765 disk controller used in the +3 and made many
 improvements to the widget code.
 .PP
 Michael D Wynne wrote the original Opus disk interface emulation
