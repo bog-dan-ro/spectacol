@@ -4332,3 +4332,6 @@
 20121228 man/fuse.1: add missing 'SpecDrum volume' section (Stuart).
 20121228 man/fuse.1: restore spacing between synopsis and description and
          use default paragraph spacing for the entire man page (Stuart).
+20121228 man/fuse.1: use 'tbl' syntax for example of Spectranet current
+         configuration screen (Stuart).
+         
