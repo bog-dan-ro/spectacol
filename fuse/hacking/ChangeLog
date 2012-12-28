@@ -4324,3 +4324,4 @@
 20121227 ChangeLog,README: first updates for a "1.1.0" release (Fred).
 20121227 man/fuse.1: fix spelling, capitalisation, dashes, quotes and
          whitespace (Stuart).
+20121228 man/fuse.1: fix whitespace and grammar issues (Stuart).

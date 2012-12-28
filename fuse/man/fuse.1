@@ -524,12 +524,9 @@ options.
 Select which Fuse key code should correspond with each direction and 
 fire for the keyboard virtual joystick. The same as the Keyboard
 Joysticks Options dialog's
-.I "Button for UP"
-,
-.I "Button for DOWN"
-,
-.I "Button for LEFT"
-,
+.IR "Button for UP" ,
+.IR "Button for DOWN" ,
+.IR "Button for LEFT" ,
 .I "Button for RIGHT" 
 and
 .I "Button for FIRE" 
@@ -1046,8 +1043,8 @@ parameter has the form
 .IR driver[:param[=value][,param[=value][,...]] .
 .I "driver"
 selects the libao driver to be used, either one of the `live' drivers
-.RI ( aixs ", " alsa ", " alsa09 ", " arts ", " esd ", " irix
-.RI  ", " macosx ", " nas ", " oss " or " sun )
+.RI ( aixs ", " alsa ", " alsa09 ", " arts ", " esd ", " irix ,
+.IR macosx ", " nas ", " oss " or " sun )
 or a file driver
 .RI ( au ", " raw ", " wav " or " null ).
 The available parameter and value pairs for each device are:
@@ -1808,7 +1805,7 @@ If the value smaller than 4 or greater than 254 Fuse assumes 4 or 254.
 If you turn this option off, Fuse assumes the RS-232 line other end is
 live when you connect the communication channels.
 See also the
-.RI ` \-\-rs232\-rx \-\-rs232\-tx '
+.RI ` \-\-rs232\-rx "' and `" \-\-rs232\-tx '
 options.
 .RE
 .PP
