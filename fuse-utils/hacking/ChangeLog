@@ -384,3 +384,4 @@
 20121228 man/fmfconv.1: add some more details on command line arguments (Fred).
 20121228 fmfconv.c: tweak help text (Fred).
 20121228 configure.ac: allow ffmpeg detection to use local-prefix (Fred).
+20121229 man/*.1: fix quotes, dashes and spacing (Stuart).

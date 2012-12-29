@@ -27,12 +27,11 @@
 .\"------------------------------------------------------------------
 .\"
 .SH NAME
-rzxtool \- Modify Sinclair ZX Spectrum input recording files
+rzxtool \(em Modify Sinclair ZX Spectrum input recording files
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH SYNOPSIS
-.PD 0
 .B rzxtool
 .RI [\-d "block number" ]
 .RI [\-e "block number" , filename ]
@@ -41,7 +40,6 @@ rzxtool \- Modify Sinclair ZX Spectrum input recording files
 .I rzxfile
 .RI [ outfile ]
 .P
-.PD 1
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -56,7 +54,7 @@ or snapshots can be inserted into the file. The file can also be uncompressed.
 .RI \-d "block number"
 .RS
 The block number specified will be deleted from the file. Block
-numbers start at zero and ignore any "creator information" blocks in
+numbers start at zero and ignore any \(lqcreator information\(rq blocks in
 the file. The modified file will be written to
 .IR outfile .
 .RE

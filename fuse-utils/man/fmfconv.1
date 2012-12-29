@@ -27,16 +27,14 @@
 .\"------------------------------------------------------------------
 .\"
 .SH NAME
-fmfconv \- Fuse movie file converter
+fmfconv \(em Fuse movie file converter
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH SYNOPSIS
-.PD 0
 .B fmfconv
 .RI [ options ]
 .P
-.PD 1
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -71,9 +69,9 @@ Save sound to Apple Computer audio (aiff/aiff-c) file
 .br
 .RI "\-\-frate "timing
 .RS
-Set output frame rate. 'timing' is 'pal', 'ntsc', 'movie' or a
+Set output frame rate. `timing' is `pal', `ntsc', `movie' or a
 number with maximum 3 digit after decimal point, or a #/# (e.g.: 
--f 29.97 or -f 30000/1001)
+\-f 29.97 or \-f 30000/1001)
 .RE
 .PP
 .RI \-h
@@ -104,8 +102,8 @@ Convert sound to mono (by default sound is converted to stereo)
 .br
 .RI "\-\-out\-cut "cut
 .RS
-Leave out the comma delimited 'cut' ranges e.g.: 100-200,300,500,1:11-2:22 
-cut the frames 100-200, 300, 500 and frames from 1 min 11 sec to 2 min 22 sec 
+Leave out the comma delimited `cut' ranges e.g.: 100\-200,300,500,1:11\-2:22 
+cut the frames 100\(en200, 300, 500 and frames from 1 min 11 sec to 2 min 22 sec 
 (in the given timing see: \-f/\-\-frate)
 .RE
 .PP
@@ -127,7 +125,7 @@ Save video as PPM screenshots
 .br
 .RI "\-\-progress "form
 .RS
-Show progress, where <form> is one of '%', 'bar', 'frame' or 'time'. frame and 
+Show progress, where <form> is one of `%', `bar', `frame' or `time'. frame and 
 time are similar to bar and show movie seconds or frame number as well.
 .RE
 .PP
@@ -140,8 +138,8 @@ Decrease the verbosity level by one.
 .PP
 .RI \-\-raw\-sound
 .RS
-Do not convert sound to 16 bit signed PCM and STEREO or MONO. This is an 
-advanced option. If stereo/mono or audio encoding change through 'fmf' file, 
+Do not convert sound to 16-bit signed PCM and STEREO or MONO. This is an 
+advanced option. If stereo/mono or audio encoding change through `fmf' file, 
 your sound will be crappy.
 .RE
 .PP
@@ -161,7 +159,7 @@ Output sound file
 .PP
 .RI \-\-sound\-only
 .RS
-Process only the sound from an 'fmf' file
+Process only the sound from an `fmf' file
 .RE
 .PP
 .RI \-v
@@ -194,7 +192,7 @@ Save video as yuv4mpeg2.
 .PP
 .RI "\-\-yuv\-format "frm
 .RS
-Set yuv4mpeg2 file frame format to 'frm', where 'frm' is one of '444', '422', '420j', '420m', '420' or '410'.
+Set yuv4mpeg2 file frame format to `frm', where `frm' is one of `444', `422', `420j', `420m', `420' or `410'.
 .RE
 .PP
 .\"

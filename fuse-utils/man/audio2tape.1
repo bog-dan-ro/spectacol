@@ -27,12 +27,11 @@
 .\"------------------------------------------------------------------
 .\"
 .SH NAME
-audio2tape \- Sinclair ZX Spectrum audio to tape file converter
+audio2tape \(em Sinclair ZX Spectrum audio to tape file converter
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH SYNOPSIS
-.PD 0
 .B audio2tape
 .RI "[\-t " type ]
 [\-s]
@@ -41,7 +40,6 @@ audio2tape \- Sinclair ZX Spectrum audio to tape file converter
 .RI "[\-z " level ]
 .RI "[\-c " level ]
 .I infile outfile
-.PD 1
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -63,7 +61,7 @@ the
 .I schmitt
 trigger implements a Schmitt trigger which outputs a less noisy signal, but
 requires a stronger signal to noise ratio than the simple trigger. The default
-trigger is "schmitt".
+trigger is \(lqschmitt\(rq.
 .TP
 \-s
 causes the display of a frequency graph showing the sound levels present in the
@@ -83,13 +81,13 @@ causes
 .I level
 to be used as the zero point in the supplied audio file, it allows adjustment
 for a DC offset in the audio file. The default level is 127 from a range of
-0-255.
+0\(en255.
 .TP
 .RI "\-c " level
 causes
 .I level
 to be used as the Schmitt trigger noise threshold, this reduces the sensitivity
-to noise in the provided file. The default level is 8 from a range of 0-127.
+to noise in the provided file. The default level is 8 from a range of 0\(en127.
 .TP
 .I infile
 specifies the audio file to be converted. This file can be in any of the
