@@ -4334,4 +4334,5 @@
          use default paragraph spacing for the entire man page (Stuart).
 20121228 man/fuse.1: use 'tbl' syntax for example of Spectranet current
          configuration screen (Stuart).
-         
+20121229 unittests/unittests.c: make unit tests pass for 16K and Timex
+         machines.

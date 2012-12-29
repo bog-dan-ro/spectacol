@@ -626,6 +626,12 @@ paging_test_timex( int ram8000, int dock_source, int exrom_source )
   r += unittests_assert_8k_page( 0xc000, exrom_source, 6 );
   r += unittests_assert_8k_page( 0xe000, exrom_source, 7 );
   
+  writeport_internal( 0x00f4, 0x00 );
+  r += assert_16k_rom_page( 0x0000, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, ram8000 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
   return r;
 }
 
@@ -699,9 +705,11 @@ paging_test( void )
       break;
   }
 
-  /* We don't run the peripheral unit tests with the Spectrum SE so as to avoid
-     the problem with it having a different RAM page at 0x8000 */
-  if( machine_current->machine != LIBSPECTRUM_MACHINE_SE )
+  /* We don't run the peripheral unit tests with the 16K machine or the
+     Spectrum SE so as to avoid the problem with them having different RAM
+     pages at 0x8000 and/or 0xc000 */
+  if( machine_current->machine != LIBSPECTRUM_MACHINE_16 &&
+      machine_current->machine != LIBSPECTRUM_MACHINE_SE    )
   {
     r += if1_unittest();
     r += if2_unittest();
