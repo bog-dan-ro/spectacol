@@ -1208,7 +1208,7 @@ See the `DEVICE' section of
 .I ogg123(1)
 for up to date information of devices and options (except for the
 `file' option which is provided by Fuse itself).
-.br
+.PP
 If you are using
 .IR libasound " or " ALSA
 for sound output, the
@@ -1225,7 +1225,7 @@ parameter has the form
 .IR "devstr" :
 selects the ALSA device used, it can be any complex or simple ALSA
 device name. e.g.:
-.IR default " or " hw:0 " or " tee:plughw:0,\(aq/tmp/out.raw\(aq,raw
+.IR default " or " hw:0 " or " tee:plughw:0,\(aq/tmp/out.raw\(aq,raw .
 See the alsa-lib pcm api reference at
 http://www.alsa\-project.org/alsa\-doc/alsa\-lib/pcm.html for further
 explanation.
@@ -1239,7 +1239,8 @@ set the ALSA buffer in frames, smaller value cause smaller sound delay but may
 more buffer underrun (pops and clicks), larger value cause longer delay
 but fewer underrun. By default Fuse determine the buffer size based on the
 actual sound frequency.
-.br
+.PP
+.RS
 If you use some special plugin for your pcm device (e.g.: dmix) or your
 card not support some needed parameter (e.g. cannot play other only 48\ kHz
 stereo sound like some AC97 sound card) may cause Fuse unable to set the
@@ -1248,11 +1249,12 @@ you cannot get optimal result or not hear the sound at all. In this case try
 the
 .IR plughw:# ", (where # mean your card number counted from 0)"
 for ALSA device.
+.RE
 .br
 .IP \[bu]
 .IR verbose " :
 if given, fuse report ALSA buffer underruns to
-.I stderr
+.IR stderr .
 .br
 .RE
 .PP
@@ -1341,7 +1343,7 @@ are 0, 1 and 2. 0 means `never doublescan' (use 640\(mu480 at either 72\ Hz or
 60\ Hz), whereas 1 and 2 both mean `try to use doublescan' and will fall back
 on the 640\(mu480 modes. 1 selects 72\ Hz modes (the same size and shape as
 your typical 640\(mu480), and 2 selects 60\ Hz modes (overscan).
-.br
+.PP
 If your monitor displays a blank screen when using 1 or 2, press F10 then
 try a different option or say `\-\-fbmode 640'.
 .RE
@@ -3183,6 +3185,7 @@ displayed.
 The various models of Spectrum supported a range of ways to connect
 printers, three of which are supported by Fuse. Different printers are
 made available for the different models:
+.PP
 .TP
 .IR 16 ", " 48 ", " TC2048 ", " TC2068 ", " TS2068
 ZX Printer
@@ -3295,7 +3298,7 @@ where you can find more information on using the interface.
 Installing the Spectranet firmware on Fuse is slightly more
 complicated than on a real machine, mostly because Fuse's emulation
 doesn't support DHCP. These instructions are correct as of 2012-01-26
-- if you're using a later firmware than this, things may have changed
+\(em if you're using a later firmware than this, things may have changed
 slightly.
 .PP
 The first thing you will need to do is to obtain a copy of the
@@ -3870,6 +3873,7 @@ act as follows:
 Remove from the list of possible locations all addresses which have
 not been incremented since the last search.
 .RE
+.PP
 .I Decremented
 .RS
 Remove from the list of possible locations all addresses which have
@@ -4050,7 +4054,7 @@ Ultra Disk Image; for specification please see
 .I http://scratchpad.wikia.com/wiki/Spectrum_emulator_file_format:_udi
 or
 .I http://zxmak.narod.ru/docs.htm
-.br
+.PP
 This is the only image format which can store all the relevant information
 of the recorded data on a magnetic disk, so it can be used for any
 .I non standard
@@ -4116,10 +4120,10 @@ Opus Discovery file formats.
 Fuse supports most of the above formats for writing:
 .I .UDI .FDI .MGT .IMG .SAD .TRD .SCL .OPD .OPU .DSK
 (only the old CPC format).
-.br
+.PP
 You can save disk images with any output
 format, just select the appropriate extension. (e.g.
-.I ` elite3.udi '
+.RI ` elite3.udi '
 to save as an UDI file). If the appropriate libraries were available
 when
 .IR libspectrum (3)
@@ -4127,7 +4131,7 @@ was compiled, than Fuse will try to create UDI images with compressed
 tracks to save disk space.
 There is a
 .I .LOG
-` image ' format for debugging purpose. This is a plain text file
+`image' format for debugging purpose. This is a plain text file
 contains three dump of the loaded disk image at different details.
 Not all image formats can store all disk images.
 You cannot save a disk image with an inappropriate format
@@ -4171,7 +4175,7 @@ or the equivalent
 command line option to 2 than recording frame rate reduces about 25/s. The
 exact frame rate depends on the Z80 clock frequency which varies depending on
 the specific emulated machine.
-.br
+.PP
 Note: You can see all of the \(lqgfx\(rq effects only if the Fuse frame rate
 option is set to 1, but in most cases you can safely use 2. Also, movie
 recording stops if the emulated machine is changed.
@@ -4182,7 +4186,7 @@ number (mono by default). The common sampling frequencies in
 standard video files are 44100 Hz and 48000 Hz. If you use
 .I \-\-sound\-freq
 command line option you can record sound on 44100Hz or even 48000Hz.
-.br
+.PP
 You can record stereo sound if you use
 .I "AY stereo separation"
 or the equivalent

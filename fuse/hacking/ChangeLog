@@ -4336,3 +4336,4 @@
          configuration screen (Stuart).
 20121229 unittests/unittests.c: make unit tests pass for 16K and Timex
          machines.
+20121229 man/fuse.1: whitespace and punctuation fixes (Stuart).
