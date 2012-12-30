@@ -80,18 +80,18 @@ or
 .\" the options list is in alphabetical order by long option name (or
 .\" short option name if none).
 .\"
-.I \-\-accelerate\-loader
+.B \-\-accelerate\-loader
 .RS
 Specify whether Fuse should attempt to accelerate tape loaders by \(lqshort
 circuiting\(rq the loading loop. This will in general speed up loading, but
 may cause some loaders to fail. (Enabled by default, but you can use
-.RI ` \-\-no\-accelerate\-loader '
+.RB ` \-\-no\-accelerate\-loader '
 to disable). The same as the General Options dialog's
 .I "Accelerate loaders"
 option.
 .RE
 .PP
-.I \-\-aspect\-hint
+.B \-\-aspect\-hint
 .RS
 Specify whether the GTK+ and Xlib user interfaces should `hint' to the
 window manager about the preferred aspect ratio for the graphics
@@ -100,13 +100,13 @@ Fuse not displaying correctly. This option has been observed to cause
 problems with some window managers when using the GTK+ UI which can
 prevent the window from being resized or moved at all. (Enabled by
 default, but you can use
-.RI ` \-\-no\-aspect\-hint '
+.RB ` \-\-no\-aspect\-hint '
 to disable). See also the
-.RI ` \-\-strict\-aspect\-hint '
+.RB ` \-\-strict\-aspect\-hint '
 option.
 .RE
 .PP
-.I \-\-autosave\-settings
+.B \-\-autosave\-settings
 .RS
 Specify whether Fuse's current settings should be automatically saved
 on exit. The same as the General Options dialog's
@@ -114,26 +114,26 @@ on exit. The same as the General Options dialog's
 option.
 .RE
 .PP
-.I \-\-auto\-load
+.B \-\-auto\-load
 .RS
 Specify whether tape and disk files should be automatically loaded
 when they are opened using the
 .I File, Open...
 menu option. (Enabled by default, but you can use
-.RI ` \-\-no\-auto\-load '
+.RB ` \-\-no\-auto\-load '
 to disable). Same as the General Options dialog's
 .I "Auto-load media"
 option.
 .RE
 .PP
-.I \-\-beta128
+.B \-\-beta128
 .RS
 Emulate a Beta 128 interface. Same as the Disk Peripherals Options dialog's
 .I "Beta 128 interface"
 option.
 .RE
 .PP
-.I \-\-beta128\-48boot
+.B \-\-beta128\-48boot
 .RS
 When a Beta 128 interface is used in 48K or TC2048 emulation the
 option additionally controls whether the machine boots directly into the TR-DOS
@@ -142,13 +142,14 @@ system. Same as the Disk Peripherals Options dialog's
 option.
 .RE
 .PP
-.I "\-\-betadisk file"
+.B \-\-betadisk
+.I file
 .RS
 Insert the specified file into the emulated Beta disk interface's drive A:
 and select Pentagon mode on startup.
 .RE
 .PP
-.I \-\-bw\-tv
+.B \-\-bw\-tv
 .RS
 Specify whether the display should simulate a colour or black and
 white television. This option is effective under the GTK+, Win32, Xlib
@@ -158,7 +159,8 @@ The same as the General Options dialog's
 option.
 .RE
 .PP
-.I "\-\-competition\-code code"
+.B \-\-competition\-code
+.I code
 .RS
 Specify the code to be written to competition mode RZX files. The same
 as the RZX Options dialog's
@@ -166,7 +168,7 @@ as the RZX Options dialog's
 option.
 .RE
 .PP
-.I \-\-competition\-mode
+.B \-\-competition\-mode
 .RS
 Specify whether input recordings should be made in `competition mode'.
 The same as the RZX Options dialog's
@@ -174,28 +176,29 @@ The same as the RZX Options dialog's
 option.
 .RE
 .PP
-.I \-\-compress\-rzx
+.B \-\-compress\-rzx
 .RS
 Specify whether RZX files should be written out compressed. (Enabled
 by default, but you can use
-.RI ` \-\-no\-compress\-rzx '
+.RB ` \-\-no\-compress\-rzx '
 to disable). Same as the RZX Options dialog's
 .I "Compress RZX data"
 option.
 .RE
 .PP
-.I "\-\-confirm\-actions"
+.B \-\-confirm\-actions
 .RS
 Specify whether `dangerous' actions (those which could cause data
 loss, for example resetting the Spectrum) require confirmation before
 occurring. (Enabled by default, but you can use
-.RI ` \-\-no\-confirm\-actions '
+.RB ` \-\-no\-confirm\-actions '
 to disable). This option is the same as the General Options dialog's
 .I "Confirm actions"
 option.
 .RE
 .PP
-.I "\-\-debugger\-command string"
+.B \-\-debugger\-command
+.I string
 .RS
 Specify a debugger command to be run before emulator startup. This can
 be used to set breakpoints or the like. Currently, this is the only
@@ -204,24 +207,25 @@ method to input multi-line debugger commands. (See the
 section for more information).
 .RE
 .PP
-.I "\-\-detect\-loader"
+.B \-\-detect\-loader
 .RS
 Specify whether Fuse should attempt to detect when the tape is being
 accessed and start and stop the virtual tape playing
 automatically. (Enabled by default, but you can use
-.RI ` \-\-no\-detect\-loader '
+.RB ` \-\-no\-detect\-loader '
 to disable). Same as the General Options dialog's
 .I "Detect loaders"
 option.
 .RE
 .PP
-.I \-\-disk\-ask\-merge
+.B \-\-disk\-ask\-merge
 .RS
 Prompt the user to confirm whether Fuse should try to merge the `B' side of a
 disk image from a separate file when opening a new single-sided disk image.
 .RE
 .PP
-.I "\-\-disk\-try\-merge mode"
+.B \-\-disk\-try\-merge
+.I mode
 .RS
 Select whether Fuse should try to merge a separate file for the `B' side of a
 disk image separate file when opening a new disk image. Most double sided disk
@@ -247,14 +251,14 @@ and
 .IR Always .
 .RE
 .PP
-.I \-\-disciple
+.B \-\-disciple
 .RS
 Emulate a DISCiPLE interface. Same as the Disk Peripherals Options dialog's
 .I "DISCiPLE interface"
 option.
 .RE
 .PP
-.I \-\-divide
+.B \-\-divide
 .RS
 Emulate the DivIDE interface. The same as the Disk Peripherals Options
 dialog's
@@ -262,15 +266,17 @@ dialog's
 option.
 .RE
 .PP
-.I "\-\-divide\-masterfile file"
+.B \-\-divide\-masterfile
+.I file
 .br
-.I "\-\-divide\-slavefile file"
+.B \-\-divide\-slavefile
+.I file
 .RS
 Specify an IDE image to be loaded into the DivIDE's emulated master
 and slave drives respectively.
 .RE
 .PP
-.I \-\-divide\-write\-protect
+.B \-\-divide\-write\-protect
 .RS
 Specify that the emulated DivIDE's write protect jumper should be
 considered set. The same as the Disk Peripherals Options dialog's
@@ -278,42 +284,45 @@ considered set. The same as the Disk Peripherals Options dialog's
 option.
 .RE
 .PP
-.I "\-\-dock file"
+.B \-\-dock
+.I file
 .RS
 Insert the specified file into the emulated Timex 2068 variant dock;
 also select the TC2068 on startup if available.
 .RE
 .PP
-.I "\-\-doublescan\-mode"
+.B \-\-doublescan\-mode
 .RS
 Specify that the framebuffer UI should attempt to use a double scan mode
 (where each line is displayed twice).
 .RE
 .PP
-.I "\-\-embed\-snapshot"
+.B \-\-embed\-snapshot
 .RS
 Specify whether a snapshot should be embedded in an RZX file when
 recording is started from an existing snapshot. (Enabled by default,
 but you can use
-.RI ` \-\-no\-embed\-snapshot '
+.RB ` \-\-no\-embed\-snapshot '
 to disable). Same as the RZX Options dialog's
 .I "Always embed snapshot"
 option.
 .RE
 .PP
-.I "\-\-fastload"
+.B \-\-fastload
 .RS
 Specify whether Fuse should run at the fastest possible speed when the
 virtual tape is playing. (Enabled by default, but you can use
-.RI ` \-\-no\-fastload '
+.RB ` \-\-no\-fastload '
 to disable). The same as the General Options dialog's
 .I "Fastloading"
 option.
 .RE
 .PP
-.I "\-f frequency"
+.B \-f
+.I frequency
 .br
-.I "\-\-sound\-freq frequency"
+.B \-\-sound\-freq
+.I frequency
 .RS
 Specify what frequency Fuse should use for the sound
 device, the default is 32\ kHz, but some devices only
@@ -321,22 +330,24 @@ support a single frequency or a limited range (e.g.
 48\ kHz or up to 22\ kHz).
 .RE
 .PP
-.I "\-\-fuller"
+.B \-\-fuller
 .RS
 Emulate a Fuller Box interface. Same as the Peripherals Options dialog's
 .I "Fuller Box"
 option.
 .RE
 .PP
-.I "\-\-full\-screen"
+.B \-\-full\-screen
 .RS
 Specify whether Fuse should run in full screen mode.
 This option is effective only under the SDL UI.
 .RE
 .PP
-.I "\-g filter"
+.B \-g
+.I filter
 .br
-.I "\-\-graphics\-filter mode"
+.B \-\-graphics\-filter
+.I mode
 .RS
 Specify which graphics filter to use if available. The default is
 .IR normal ,
@@ -364,7 +375,8 @@ See the
 section for more details.
 .RE
 .PP
-.I "\-\-graphicsfile file"
+.B \-\-graphicsfile
+.I file
 .RS
 Set the filename used for graphical output from the emulated ZX
 printer. See the
@@ -372,44 +384,47 @@ printer. See the
 section for more details.
 .RE
 .PP
-.I \-h
+.B \-h
 .br
-.I \-\-help
+.B \-\-help
 .RS
 Give brief usage help, listing available options.
 .RE
 .PP
-.I "\-\-if2cart file"
+.B \-\-if2cart
+.I file
 .RS
 Insert the specified file into the emulated Interface II.
 .RE
 .PP
-.I \-\-interface1
+.B \-\-interface1
 .RS
 Emulate a Sinclair Interface I. Same as the Peripherals Options dialog's
 .I "Interface I"
 option.
 .RE
 .PP
-.I \-\-interface2
+.B \-\-interface2
 .RS
 Emulate a Sinclair Interface II. (Enabled by default, but you can use
-.RI ` \-\-no\-interface2 '
+.RB ` \-\-no\-interface2 '
 to disable). Same as the Peripherals Options dialog's
 .I "Interface II"
 option.
 .RE
 .PP
-.I \-\-issue2
+.B \-\-issue2
 .RS
 Emulate an issue 2 keyboard. Same as the General Options dialog's
 .I "Issue 2 keyboard"
 option.
 .RE
 .PP
-.I "\-j device"
+.B \-j
+.I device
 .br
-.I "\-\-joystick\-1 device"
+.B \-\-joystick\-1
+.I device
 .RS
 Read from
 .I device
@@ -420,21 +435,25 @@ or
 by default.
 .RE
 .PP
-.I "\-\-joystick\-2 device"
+.B \-\-joystick\-2
+.I device
 .RS
 As for
-.I \-\-joystick\-1
+.B \-\-joystick\-1
 but for the second joystick; the default here is either
 .RI ` /dev/input/js1 '
 or
 .RI ` /dev/js1 "'."
 .RE
 .PP
-.I "\-\-joystick\-1\-output type"
+.B \-\-joystick\-1\-output
+.I type
 .br
-.I "\-\-joystick\-2\-output type"
+.B \-\-joystick\-2\-output
+.I type
 .br
-.I "\-\-joystick\-keyboard\-output type"
+.B \-\-joystick\-keyboard\-output
+.I type
 .RS
 Select which joystick interface to attach for the first two real
 joysticks and the keyboard joystick. The default is
@@ -459,45 +478,65 @@ and
 option.
 .RE
 .PP
-.I "\-\-joystick\-1\-fire\-1 code"
+.B \-\-joystick\-1\-fire\-1
+.I code
 .br
-.I "\-\-joystick\-1\-fire\-2 code"
+.B \-\-joystick\-1\-fire\-2
+.I code
 .br
-.I "\-\-joystick\-1\-fire\-3 code"
+.B \-\-joystick\-1\-fire\-3
+.I code
 .br
-.I "\-\-joystick\-1\-fire\-4 code"
+.B \-\-joystick\-1\-fire\-4
+.I code
 .br
-.I "\-\-joystick\-1\-fire\-5 code"
+.B \-\-joystick\-1\-fire\-5
+.I code
 .br
-.I "\-\-joystick\-1\-fire\-6 code"
+.B \-\-joystick\-1\-fire\-6
+.I code
 .br
-.I "\-\-joystick\-1\-fire\-7 code"
+.B \-\-joystick\-1\-fire\-7
+.I code
 .br
-.I "\-\-joystick\-1\-fire\-8 code"
+.B \-\-joystick\-1\-fire\-8
+.I code
 .br
-.I "\-\-joystick\-1\-fire\-9 code"
+.B \-\-joystick\-1\-fire\-9
+.I code
 .br
-.I "\-\-joystick\-1\-fire\-10 code"
+.B \-\-joystick\-1\-fire\-10
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-1 code"
+.B \-\-joystick\-2\-fire\-1
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-2 code"
+.B \-\-joystick\-2\-fire\-2
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-3 code"
+.B \-\-joystick\-2\-fire\-3
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-4 code"
+.B \-\-joystick\-2\-fire\-4
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-5 code"
+.B \-\-joystick\-2\-fire\-5
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-6 code"
+.B \-\-joystick\-2\-fire\-6
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-7 code"
+.B \-\-joystick\-2\-fire\-7
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-8 code"
+.B \-\-joystick\-2\-fire\-8
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-9 code"
+.B \-\-joystick\-2\-fire\-9
+.I code
 .br
-.I "\-\-joystick\-2\-fire\-10 code"
+.B \-\-joystick\-2\-fire\-10
+.I code
 .RS
 Select which Fuse key code should be triggered by the applicable
 real joystick button press. The codes are the Fuse keyboard codes
@@ -509,15 +548,20 @@ Joysticks Options dialog's
 options.
 .RE
 .PP
-.I "\-\-joystick\-keyboard\-up code"
+.B \-\-joystick\-keyboard\-up
+.I code
 .br
-.I "\-\-joystick\-keyboard\-down code"
+.B \-\-joystick\-keyboard\-down
+.I code
 .br
-.I "\-\-joystick\-keyboard\-left code"
+.B \-\-joystick\-keyboard\-left
+.I code
 .br
-.I "\-\-joystick\-keyboard\-right code"
+.B \-\-joystick\-keyboard\-right
+.I code
 .br
-.I "\-\-joystick\-keyboard\-fire code"
+.B \-\-joystick\-keyboard\-fire
+.I code
 .RS
 Select which Fuse key code should correspond with each direction and
 fire for the keyboard virtual joystick. The same as the Keyboard
@@ -531,7 +575,7 @@ and
 options respectively.
 .RE
 .PP
-.I \-\-joystick\-prompt
+.B \-\-joystick\-prompt
 .RS
 If this option is specified, then Fuse will prompt you which form of
 joystick emulation you wish to use when loading a snapshot. No prompt
@@ -541,21 +585,21 @@ are currently using. The same as the General Options dialog's
 option.
 .RE
 .PP
-.I \-\-kempston
+.B \-\-kempston
 .RS
 Emulate a Kempston joystick. Same as the Peripherals Options dialog's
 .I "Kempston joystick"
 option.
 .RE
 .PP
-.I \-\-kempston\-mouse
+.B \-\-kempston\-mouse
 .RS
 Emulate a Kempston mouse. Same as the Peripherals Options dialog's
 .I "Kempston mouse"
 option.
 .RE
 .PP
-.I \-\-late\-timings
+.B \-\-late\-timings
 .RS
 It has been observed that some real Spectrums run such that the screen
 is rendered one tstate later than on other real hardware. This option
@@ -565,19 +609,21 @@ Options dialog's
 option.
 .RE
 .PP
-.I \-\-loading\-sound
+.B \-\-loading\-sound
 .RS
 Specify whether the sound made while tapes are loading should be
 emulated. (Enabled by default, but you can use
-.RI ` \-\-no\-loading\-sound '
+.RB ` \-\-no\-loading\-sound '
 to disable). Same as the Sound Options dialog's
 .I "Loading sound"
 option.
 .RE
 .PP
-.I "\-m type"
+.B \-m
+.I type
 .br
-.I "\-\-machine type"
+.B \-\-machine
+.I type
 .RS
 Specify machine type to emulate initially. The default is
 .IR 48 ,
@@ -600,7 +646,7 @@ and
 .IR se .
 .RE
 .PP
-.I "\-\-melodik"
+.B \-\-melodik
 .RS
 Emulate a Melodik AY interface for 16/48k Spectrums. Same as the Peripherals
 Options dialog's
@@ -608,26 +654,34 @@ Options dialog's
 option.
 .RE
 .PP
-.I \-\-microdrive\-file file
+.B \-\-microdrive\-file
+.I file
 .br
-.I \-\-microdrive\-2\-file file
+.B \-\-microdrive\-2\-file
+.I file
 .br
-.I \-\-microdrive\-3\-file file
+.B \-\-microdrive\-3\-file
+.I file
 .br
-.I \-\-microdrive\-4\-file file
+.B \-\-microdrive\-4\-file
+.I file
 .br
-.I \-\-microdrive\-5\-file file
+.B \-\-microdrive\-5\-file
+.I file
 .br
-.I \-\-microdrive\-6\-file file
+.B \-\-microdrive\-6\-file
+.I file
 .br
-.I \-\-microdrive\-7\-file file
+.B \-\-microdrive\-7\-file
+.I file
 .br
-.I \-\-microdrive\-8\-file file
+.B \-\-microdrive\-8\-file
+.I file
 .RS
 Specify Interface I Microdrive cartridge files to open.
 .RE
 .PP
-.I \-\-mouse\-swap\-buttons
+.B \-\-mouse\-swap\-buttons
 .RS
 Swap the left and right mouse buttons when emulating the Kempston mouse. The
 same as the General Peripherals dialog's
@@ -635,7 +689,8 @@ same as the General Peripherals dialog's
 option.
 .RE
 .PP
-.I \-\-movie\-compr level
+.B \-\-movie\-compr
+.I level
 .RS
 This option sets the compression level used when creating movies. Same as the
 Movie Options dialog's
@@ -652,7 +707,8 @@ See also the
 section.
 .RE
 .PP
-.I \-\-movie\-start filename
+.B \-\-movie\-start
+.I filename
 .RS
 With this command line option, Fuse will start movie recording as soon as the
 emulator is started. See also the
@@ -660,39 +716,42 @@ emulator is started. See also the
 section.
 .RE
 .PP
-.I \-\-movie\-stop\-after\-rzx
+.B \-\-movie\-stop\-after\-rzx
 .RS
 With this command line option, Fuse will stop movie recording when RZX playback
 or RZX recording ends. Same as the Movie Options dialog's
 .I "Stop recording after RZX ends"
 option. (Enabled by default, but you can use
-.RI ` \-\-no\-movie\-stop\-after\-rzx '
+.RB ` \-\-no\-movie\-stop\-after\-rzx '
 to disable).
 See also the
 .B "MOVIE RECORDING"
 section.
 .RE
 .PP
-.I \-\-opus
+.B \-\-opus
 .RS
 Emulate a Opus Discovery interface. Same as the Disk Peripherals Options dialog's
 .I "Opus Discovery interface"
 option.
 .RE
 .PP
-.I "\-\-opusdisk file"
+.B \-\-opusdisk
+.I file
 .RS
 Insert the specified file into the emulated Opus Discovery's drive 1.
 .RE
 .PP
-.I "\-p file"
+.B \-p
+.I file
 .br
-.I "\-\-playback file"
+.B \-\-playback
+.I file
 .RS
 Specify an RZX file to begin playback from.
 .RE
 .PP
-.I \-\-paltv2x
+.B \-\-paltv2x
 .RS
 Specify whether the PAL TV 2x and PAL TV 3x scalers should also produce
 scanlines along the lines of the TV 2x and Timex TV scalers.
@@ -701,13 +760,14 @@ The same as the General Options dialog's
 option.
 .RE
 .PP
-.I "\-\-plus3disk file"
+.B \-\-plus3disk
+.I file
 .RS
 Insert the specified file into the emulated +3's A: drive; also select
 the +3 on startup if available.
 .RE
 .PP
-.I "\-\-plus3\-detect\-speedlock"
+.B \-\-plus3\-detect\-speedlock
 .RS
 Specify whether the +3 drives try to detect Speedlock protected disks,
 and emulate `weak' sectors.
@@ -721,19 +781,20 @@ Same as the Disk Options dialog's
 option.
 .RE
 .PP
-.I \-\-plusd
+.B \-\-plusd
 .RS
 Emulate a +D interface. Same as the Disk Peripherals Options dialog's
 .I "+D interface"
 option.
 .RE
 .PP
-.I "\-\-plusddisk file"
+.B \-\-plusddisk
+.I file
 .RS
 Insert the specified file into the emulated +D's drive 1.
 .RE
 .PP
-.I "\-\-printer"
+.B \-\-printer
 .RS
 Specify whether the emulation should include a printer. Same as the
 Peripherals Options dialog's
@@ -741,7 +802,8 @@ Peripherals Options dialog's
 option.
 .RE
 .PP
-.I "\-\-rate frame"
+.B \-\-rate
+.I frame
 .RS
 Specify the frame rate, the ratio of spectrum frame updates to real
 frame updates. Same as the General Options dialog's
@@ -749,90 +811,131 @@ frame updates. Same as the General Options dialog's
 option.
 .RE
 .PP
-.I "\-r file"
+.B \-r
+.I file
 .br
-.I "\-\-record file"
+.B \-\-record
+.I file
 .RS
 Specify an RZX file to begin recording to.
 .RE
 .PP
-.I "\-\-rom\-16 file"
+.B \-\-rom\-16
+.I file
 .br
-.I "\-\-rom\-48 file"
+.B \-\-rom\-48
+.I file
 .br
-.I "\-\-rom\-128\-0 file"
+.B \-\-rom\-128\-0
+.I file
 .br
-.I "\-\-rom\-128\-1 file"
+.B \-\-rom\-128\-1
+.I file
 .br
-.I "\-\-rom\-plus2\-0 file"
+.B \-\-rom\-plus2\-0
+.I file
 .br
-.I "\-\-rom\-plus2\-1 file"
+.B \-\-rom\-plus2\-1
+.I file
 .br
-.I "\-\-rom\-plus2a\-0 file"
+.B \-\-rom\-plus2a\-0
+.I file
 .br
-.I "\-\-rom\-plus2a\-1 file"
+.B \-\-rom\-plus2a\-1
+.I file
 .br
-.I "\-\-rom\-plus2a\-2 file"
+.B \-\-rom\-plus2a\-2
+.I file
 .br
-.I "\-\-rom\-plus2a\-3 file"
+.B \-\-rom\-plus2a\-3
+.I file
 .br
-.I "\-\-rom\-plus3\-0 file"
+.B \-\-rom\-plus3\-0
+.I file
 .br
-.I "\-\-rom\-plus3\-1 file"
+.B \-\-rom\-plus3\-1
+.I file
 .br
-.I "\-\-rom\-plus3\-2 file"
+.B \-\-rom\-plus3\-2
+.I file
 .br
-.I "\-\-rom\-plus3\-3 file"
+.B \-\-rom\-plus3\-3
+.I file
 .br
-.I "\-\-rom\-plus3e\-0 file"
+.B \-\-rom\-plus3e\-0
+.I file
 .br
-.I "\-\-rom\-plus3e\-1 file"
+.B \-\-rom\-plus3e\-1
+.I file
 .br
-.I "\-\-rom\-plus3e\-2 file"
+.B \-\-rom\-plus3e\-2
+.I file
 .br
-.I "\-\-rom\-plus3e\-3 file"
+.B \-\-rom\-plus3e\-3
+.I file
 .br
-.I "\-\-rom\-tc2048 file"
+.B \-\-rom\-tc2048
+.I file
 .br
-.I "\-\-rom\-tc2068\-0 file"
+.B \-\-rom\-tc2068\-0
+.I file
 .br
-.I "\-\-rom\-tc2068\-1 file"
+.B \-\-rom\-tc2068\-1
+.I file
 .br
-.I "\-\-rom\-ts2068\-0 file"
+.B \-\-rom\-ts2068\-0
+.I file
 .br
-.I "\-\-rom\-ts2068\-1 file"
+.B \-\-rom\-ts2068\-1
+.I file
 .br
-.I "\-\-rom\-pentagon\-0 file"
+.B \-\-rom\-pentagon\-0
+.I file
 .br
-.I "\-\-rom\-pentagon\-1 file"
+.B \-\-rom\-pentagon\-1
+.I file
 .br
-.I "\-\-rom\-pentagon\-2 file"
+.B \-\-rom\-pentagon\-2
+.I file
 .br
-.I "\-\-rom\-pentagon\-3 file"
+.B \-\-rom\-pentagon\-3
+.I file
 .br
-.I "\-\-rom\-scorpion\-0 file"
+.B \-\-rom\-scorpion\-0
+.I file
 .br
-.I "\-\-rom\-scorpion\-1 file"
+.B \-\-rom\-scorpion\-1
+.I file
 .br
-.I "\-\-rom\-scorpion\-2 file"
+.B \-\-rom\-scorpion\-2
+.I file
 .br
-.I "\-\-rom\-scorpion\-3 file"
+.B \-\-rom\-scorpion\-3
+.I file
 .br
-.I "\-\-rom\-spec\-se\-0 file"
+.B \-\-rom\-spec\-se\-0
+.I file
 .br
-.I "\-\-rom\-spec\-se\-1 file"
+.B \-\-rom\-spec\-se\-1
+.I file
 .br
-.I "\-\-rom\-interface\-1 file"
+.B \-\-rom\-interface\-1
+.I file
 .br
-.I "\-\-rom\-opus file"
+.B \-\-rom\-opus
+.I file
 .br
-.I "\-\-rom\-plusd file"
+.B \-\-rom\-plusd
+.I file
 .br
-.I "\-\-rom\-disciple file"
+.B \-\-rom\-disciple
+.I file
 .br
-.I "\-\-rom\-beta128 file"
+.B \-\-rom\-beta128
+.I file
 .br
-.I "\-\-rom\-speccyboot file"
+.B \-\-rom\-speccyboot
+.I file
 .RS
 Specify the file to be used for ROM(s) used for each machine. The
 options respectively refer to the 16K Spectrum
@@ -876,40 +979,41 @@ are supplied with Fuse \(em you must supply your own copies of those which
 are not.
 .RE
 .PP
-.I \-\-no\-rs232\-handshake
+.B \-\-no\-rs232\-handshake
 .RS
 This option makes Fuse's Interface I emulation assume that the RS-232
 line other end is live when you connect the communication channels.
 See also the
-.RI ` \-\-rs232\-rx '
+.RB ` \-\-rs232\-rx '
 and
-.RI ` \-\-rs232\-tx '
+.RB ` \-\-rs232\-tx '
 options.
 .RE
 .PP
-.I \-\-rs232\-rx
+.B \-\-rs232\-rx
 .br
-.I \-\-rs232\-tx
+.B \-\-rs232\-tx
 .RS
 Specify the communication channels (FIFO or file) to be used for
 Interface I RS-232 emulation as RxD and TxD wire. See also the
-.RI ` \-\-rs232\-handshake '
+.RB ` \-\-rs232\-handshake '
 options.
 .RE
 .PP
-.I \-\-rzx\-autosaves
+.B \-\-rzx\-autosaves
 .RS
 Specify that, while recording an RZX file, Fuse should automatically add
 a snapshot to the recording stream every 5 seconds. (Default to on, but
 you can use
-.RI ` \-\-no\-rzx\-autosaves '
+.RB ` \-\-no\-rzx\-autosaves '
 to disable). Same as the RZX Options dialog's
 .I "Create autosaves"
 option;
 see there for more details.
 .RE
 .PP
-.I \-\-separation type
+.B \-\-separation
+.I type
 .RS
 Give stereo separation of the 128's AY sound channels. Same as the
 General Options dialog's
@@ -923,7 +1027,7 @@ The default option is
 .IR None .
 .RE
 .PP
-.I \-\-simpleide
+.B \-\-simpleide
 .RS
 Specify whether Fuse will emulate the simple 8-bit IDE interface
 as used by the Spectrum +3e. Same as the Disk Peripherals
@@ -932,47 +1036,51 @@ Options dialog's
 option.
 .RE
 .PP
-.I \-\-simpleide\-masterfile file
+.B \-\-simpleide\-masterfile
+.I file
 .RS
 Specify a HDF file to connect to the emulated Simple 8-bit IDE
 interface's master channel.
 .RE
 .PP
-.I \-\-simpleide\-slavefile file
+.B \-\-simpleide\-slavefile
+.I file
 .RS
 Specify a HDF file to connect to the emulated Simple 8-bit IDE
 interface's slave channel.
 .RE
 .PP
-.I \-\-slt
+.B \-\-slt
 .RS
 Support the SLT trap instruction. (Enabled by default, but you can use
-.RI ` \-\-no\-slt '
+.RB ` \-\-no\-slt '
 to disable). Same as the General Options dialog's
 .I "Use .slt traps"
 option.
 .RE
 .PP
-.I "\-s file"
+.B \-s
+.I file
 .br
-.I "\-\-snapshot file"
+.B \-\-snapshot
+.I file
 .RS
 Specify a snapshot file to load. The file can be in any snapshot
 format supported by
 .IR libspectrum "(3)."
 .RE
 .PP
-.I \-\-sound
+.B \-\-sound
 .RS
 Specify whether Fuse should produce sound. (Enabled by default, but
 you can use
-.RI ` \-\-no\-sound '
+.RB ` \-\-no\-sound '
 to disable). Same as the Sound Options dialog's
 .I "Sound enabled"
 option.
 .RE
 .PP
-.I \-\-sound\-force\-8bit
+.B \-\-sound\-force\-8bit
 .RS
 Force the use of 8-bit sound, even if 16-bit is possible. Same as the
 Sound Options dialog's
@@ -980,7 +1088,8 @@ Sound Options dialog's
 option.
 .RE
 .PP
-.I "\-\-speaker\-type type"
+.B \-\-speaker\-type
+.I type
 .RS
 Select the output speaker emulation, type can be TV speaker, Beeper
 or Unfiltered. Same as the Sound Options dialog's
@@ -988,7 +1097,7 @@ or Unfiltered. Same as the Sound Options dialog's
 option.
 .RE
 .PP
-.I "\-\-specdrum"
+.B \-\-specdrum
 .RS
 Emulate a SpecDrum interface. Same as the Peripherals Options dialog's
 .I "SpecDrum"
@@ -997,7 +1106,7 @@ http://www.worldofspectrum.org/infoseekid.cgi?id=1000062 for
 manuals, software and more.
 .RE
 .PP
-.I "\-\-speccyboot"
+.B \-\-speccyboot
 .RS
 Emulate a SpeccyBoot Ethernet interface. Same as the Peripherals Options dialog's
 .I "SpeccyBoot"
@@ -1005,14 +1114,17 @@ option. See the SpeccyBoot web page at http://speccyboot.sourceforge.net/ for
 full details on the SpeccyBoot.
 .RE
 .PP
-.I "\-\-speccyboot\-tap device"
+.B \-\-speccyboot\-tap
+.I device
 .RS
 Specify the TAP device to use for SpeccyBoot emulation.
 .RE
 .PP
-.I "\-d device"
+.B \-d
+.I device
 .br
-.I "\-\-sound\-device device"
+.B \-\-sound\-device
+.I device
 .RS
 Specify the sound output device to use and any options to give that
 device. If you are not using the SDL UI or using
@@ -1195,11 +1307,11 @@ if it is not specified.
 .PP
 Some examples of use:
 .PP
-.I fuse \-d alsa09:dev=hw:1
+.B fuse \-d alsa09:dev=hw:1
 .PP
 causes Fuse to use ALSA 0.9+ output with the second (#1) sound card.
 .PP
-.I fuse \-d raw:byteorder=little,file=enigma.raw
+.B fuse \-d raw:byteorder=little,file=enigma.raw
 .PP
 causes Fuse to save little endian words to
 .RI ` enigma.raw "'."
@@ -1260,13 +1372,13 @@ if given, fuse report ALSA buffer underruns to
 .PP
 Some examples of use:
 .PP
-.I fuse \-d verbose,buffer=2000
+.B fuse \-d verbose,buffer=2000
 .PP
 causes Fuse to use the default ALSA device with 2000 frame length buffer and
 report ALSA buffer underruns on
 .IR stderr .
 .PP
-.I fuse \-d tee:plughw:0,\(aq/tmp/aufwm.raw\(aq,raw
+.B fuse \-d tee:plughw:0,\(aq/tmp/aufwm.raw\(aq,raw
 .PP
 causes Fuse to use the first card and parallel save the raw audio samples
 into
@@ -1274,7 +1386,8 @@ into
 .br
 .RE
 .PP
-.I "\-\-speed percentage"
+.B \-\-speed
+.I percentage
 .RS
 Specify the speed (as a percentage of real Spectrum speed) at which
 emulation should attempt to proceed. Same as the General Options
@@ -1283,7 +1396,7 @@ dialog's
 option.
 .RE
 .PP
-.I "\-\-statusbar"
+.B \-\-statusbar
 .RS
 For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
 Xlib and SDL UI, enables the status icons showing whether the disk and tape are
@@ -1292,11 +1405,11 @@ being accessed. Same as the General Options dialog's
 option.
 .RE
 .PP
-.I "\-\-strict\-aspect\-hint"
+.B \-\-strict\-aspect\-hint
 .RS
 For the GTK+ UI, use stricter limits for the aspect ratio limits set
 by the
-.RI ` \-\-aspect\-hint '
+.RB ` \-\-aspect\-hint '
 option. This can cause some window managers (for example,
 .IR metacity (1))
 to not allow the window to be resized and moved, but is necessary to
@@ -1305,9 +1418,11 @@ prevent others (for example,
 from being able resize the window away from square.
 .RE
 .PP
-.I "\-v mode"
+.B \-v
+.I mode
 .br
-.I "\-\-fbmode mode"
+.B \-\-fbmode
+.I mode
 .RS
 Specify which mode to use for the FB UI. Available values for
 .I mode
@@ -1315,26 +1430,30 @@ are `320' (which corresponds to a 320\(mu240\(mu256 mode), the default and
 `640' (a 640\(mu480\(mu256 mode).
 .RE
 .PP
-.I "\-\-svga\-modes mode1,mode2,mode3"
+.B \-\-svga\-modes
+.I mode1,mode2,mode3
 .RS
 Specify which SVGA mode to use for the SVGAlib UI at different screen
 sizes. Available values for
 .I mode1, mode2 and mode3
 are listed in a table, when Fuse called with
-.I "\-\-svga\-modes list"
+.B \-\-svga\-modes
+.I list
 command line option.
 When user select a not available mode for a size, Fuse just ignore
 and try to find the best mode for it. e.g. with
-.I "\-\-svga\-modes 0,0,12"
+.B "\-\-svga\-modes 0,0,12"
 Fuse use the specified 1024\(mu768\(mu256 SVGA mode for triple size filters,
 but select SVGA modes automatically for normal or double size filters.
 The above mode number is just an example, and mode numbers and their
 meanings may vary graphics card by graphics card.
 .RE
 .PP
-.I "\-D mode"
+.B \-D
+.I mode
 .br
-.I "\-\-doublescan\-mode mode"
+.B \-\-doublescan\-mode
+.I mode
 .RS
 Specify whether to use doublescan modes in the FB UI.
 Available values for
@@ -1348,14 +1467,17 @@ If your monitor displays a blank screen when using 1 or 2, press F10 then
 try a different option or say `\-\-fbmode 640'.
 .RE
 .PP
-.I "\-t file"
+.B \-t
+.I file
 .br
-.I "\-\-tape file"
+.B \-\-tape
+.I file
 .RS
 Specify a virtual tape file to use. It must be in PZX, TAP or TZX format.
 .RE
 .PP
-.I "\-\-textfile file"
+.B \-\-textfile
+.I file
 .RS
 Set the filename used for text output from the emulated printers. See
 the
@@ -1363,24 +1485,25 @@ the
 section below for more details.
 .RE
 .PP
-.I \-\-traps
+.B \-\-traps
 .RS
 Support traps for ROM tape loading/saving. (Enabled by default, but
 you can use
-.RI ` \-\-no\-traps '
+.RB ` \-\-no\-traps '
 to disable). Same as the General Options dialog's
 .I "Use tape traps"
 option.
 .RE
 .PP
-.I \-V
+.B \-V
 .br
-.I \-\-version
+.B \-\-version
 .RS
 Show which version of Fuse is being used.
 .RE
 .PP
-.I "\-\-volume\-ay volume"
+.B \-\-volume\-ay
+.I volume
 .RS
 Sets the relative volume of the AY-3-8912 chip from a range of
 0\(en100%. Same as the Sound Options dialog's
@@ -1388,7 +1511,8 @@ Sets the relative volume of the AY-3-8912 chip from a range of
 option.
 .RE
 .PP
-.I "\-\-volume\-beeper volume"
+.B \-\-volume\-beeper
+.I volume
 .RS
 Sets the relative volume of the beeper from a range of 0\(en100%.
 Same as the Sound Options dialog's
@@ -1396,7 +1520,8 @@ Same as the Sound Options dialog's
 option.
 .RE
 .PP
-.I "\-\-volume\-specdrum volume"
+.B \-\-volume\-specdrum
+.I volume
 .RS
 Sets the relative volume of the SpecDrum from a range of 0\(en100%.
 Same as the Sound Options dialog's
@@ -1404,7 +1529,7 @@ Same as the Sound Options dialog's
 option.
 .RE
 .PP
-.I \-\-writable\-roms
+.B \-\-writable\-roms
 .RS
 Allow Spectrum programs to overwrite the ROM(s). The same as the
 General Options dialog's
@@ -1412,7 +1537,7 @@ General Options dialog's
 option.
 .RE
 .PP
-.I \-\-zxatasp
+.B \-\-zxatasp
 .RS
 Specify whether Fuse emulate the ZXATASP interface. Same as the
 Disk Peripherals Options dialog's
@@ -1420,7 +1545,7 @@ Disk Peripherals Options dialog's
 option.
 .RE
 .PP
-.I \-\-zxatasp\-upload
+.B \-\-zxatasp\-upload
 .RS
 Specify the state of the ZXATASP upload jumper. Same as the
 Disk Peripherals Options dialog's
@@ -1428,7 +1553,7 @@ Disk Peripherals Options dialog's
 option.
 .RE
 .PP
-.I \-\-zxatasp\-write\-protect
+.B \-\-zxatasp\-write\-protect
 .RS
 Specify the state of the ZXATASP write protect jumper. Same as the
 Disk Peripherals Options dialog's
@@ -1436,19 +1561,21 @@ Disk Peripherals Options dialog's
 option.
 .RE
 .PP
-.I \-\-zxatasp\-masterfile file
+.B \-\-zxatasp\-masterfile
+.I file
 .RS
 Specify a HDF file to connect to the emulated ZXATASP interface's
 master channel.
 .RE
 .PP
-.I \-\-zxatasp\-slavefile file
+.B \-\-zxatasp\-slavefile
+.I file
 .RS
 Specify a HDF file to connect to the emulated ZXATASP interface's
 slave channel.
 .RE
 .PP
-.I \-\-zxcf
+.B \-\-zxcf
 .RS
 Specify whether Fuse emulate the ZXCF interface. Same as the
 Disk Peripherals Options dialog's
@@ -1456,7 +1583,7 @@ Disk Peripherals Options dialog's
 option.
 .RE
 .PP
-.I \-\-zxcf\-upload
+.B \-\-zxcf\-upload
 .RS
 Specify the state of the ZXCF upload jumper. Same as the Disk Peripherals
 Options dialog's
@@ -1464,19 +1591,20 @@ Options dialog's
 option.
 .RE
 .PP
-.I \-\-zxcf\-cffile file
+.B \-\-zxcf\-cffile
+.I file
 .RS
 Specify a HDF file to connect to the emulated ZXCF interface.
 .RE
 .PP
 All long options which control on/off settings can be disabled using
-.RI ` \-\-no\-foo '
+.RB ` \-\-no\-foo '
 (for an option
-.RI ` \-\-foo ').
+.RB ` \-\-foo ').
 For example, the opposite of
-.RI ` \-\-issue2 '
+.RB ` \-\-issue2 '
 is
-.RI ` \-\-no\-issue2 '.
+.RB ` \-\-no\-issue2 '.
 These options can also be modified while the emulator is running,
 using the options dialogs \(em see the documentation for the
 .I Options
@@ -1807,7 +1935,7 @@ If the value smaller than 4 or greater than 254 Fuse assumes 4 or 254.
 If you turn this option off, Fuse assumes the RS-232 line other end is
 live when you connect the communication channels.
 See also the
-.RI ` \-\-rs232\-rx "' and `" \-\-rs232\-tx '
+.RB ` \-\-rs232\-rx "' and `" \-\-rs232\-tx '
 options.
 .RE
 .PP
@@ -3035,7 +3163,7 @@ and height of the original size before it actually scales up. Fuse
 attempts to keep the window `square', but with some window managers
 this can mean the window will never resize at all. If you experience
 this problem, the
-.RI ` \-\-no\-aspect\-hint '
+.RB ` \-\-no\-aspect\-hint '
 option may help.
 .PP
 If you're using the SDL UI under X11 or GTK+, the window will
@@ -3207,9 +3335,9 @@ for text output, and
 .I printout.pbm
 for graphics (PBM images are supported by most image viewers and
 converters). These names can be changed with the
-.I \-\-textfile
+.B \-\-textfile
 and
-.I \-\-graphicsfile
+.B \-\-graphicsfile
 options from the command line or configuration file. While the ZX
 Printer can
 .I only
@@ -4159,7 +4287,7 @@ This recording is very fast, and has a moderate size, but you need to use
 the fmfconv program in fuse-utils to convert into regular video and/or audio
 files.
 The
-.I \-\-movie\-compr
+.B \-\-movie\-compr
 option allows you to set the compression level to None, Lossless or High. If
 Zlib is not available, only None is valid. The default when Zlib is available
 is Lossless.
@@ -4171,7 +4299,7 @@ Fuse records every displayed frame, so by default the recorded file has about
 if you set
 .I "Options/General/Frame rate 1:n"
 or the equivalent
-.I \-\-rate
+.B \-\-rate
 command line option to 2 than recording frame rate reduces about 25/s. The
 exact frame rate depends on the Z80 clock frequency which varies depending on
 the specific emulated machine.
@@ -4184,13 +4312,13 @@ The recorded sound sampling rate and the channel number is equal with the
 Fuse generated sound sampling rate (32000 Hz by default) and channel
 number (mono by default). The common sampling frequencies in
 standard video files are 44100 Hz and 48000 Hz. If you use
-.I \-\-sound\-freq
+.B \-\-sound\-freq
 command line option you can record sound on 44100Hz or even 48000Hz.
 .PP
 You can record stereo sound if you use
 .I "AY stereo separation"
 or the equivalent
-.I \-\-separation
+.B \-\-separation
 command line switch.
 .PP
 You can use
@@ -4228,7 +4356,7 @@ other than SDL, Win32 and GTK+.
 .PP
 Changing virtual consoles when using SVGAlib for joystick support
 causes Fuse to exit. If this is a problem, compile Fuse with the
-.RI ` \-\-disable\-ui\-joystick '
+.RB ` \-\-disable\-ui\-joystick '
 option.
 .PP
 The poke finder can't search outside `normal' RAM.
