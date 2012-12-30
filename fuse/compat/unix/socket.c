@@ -1,5 +1,5 @@
 /* socket.c: Socket-related compatibility routines
-   Copyright (c) 2011 Philip Kendall
+   Copyright (c) 2011-2012 Philip Kendall
 
    $Id$
 
@@ -114,5 +114,14 @@ void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self )
 void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self )
 {
   char bitbucket;
-  read( self->read_fd, &bitbucket, 1 );
+  ssize_t bytes_read;
+
+  do {
+    bytes_read = read( self->read_fd, &bitbucket, 1 );
+    if( bytes_read == -1 && errno != EINTR ) {
+      ui_error( UI_ERROR_ERROR,
+                "%s: %d: unexpected error %d (%s) reading from pipe", __FILE__,
+                __LINE__, errno, strerror(errno) );
+    }
+  } while( bytes_read < 0 );
 }
