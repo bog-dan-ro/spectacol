@@ -928,3 +928,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20121227 libspectrum.c: set name for Spectrum 128Ke machine type (Sergio).
 20121229 doc/libspectrum.1: use an em dash (Stuart).
 20121230 timings.c: add timings for 128Ke, copied from those for 128K (Stuart).
+20121231 timings.c: 128Ke timings are intended to be based on +2A (Fred).
