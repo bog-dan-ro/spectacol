@@ -1102,16 +1102,17 @@ option.
 Emulate a SpecDrum interface. Same as the Peripherals Options dialog's
 .I "SpecDrum"
 option. See the World of Spectrum Infoseek web page at
-http://www.worldofspectrum.org/infoseekid.cgi?id=1000062 for
-manuals, software and more.
+.I http://www.worldofspectrum.org/infoseekid.cgi?id=1000062
+for manuals, software and more.
 .RE
 .PP
 .B \-\-speccyboot
 .RS
 Emulate a SpeccyBoot Ethernet interface. Same as the Peripherals Options dialog's
 .I "SpeccyBoot"
-option. See the SpeccyBoot web page at http://speccyboot.sourceforge.net/ for
-full details on the SpeccyBoot.
+option. See the SpeccyBoot web page at
+.I http://speccyboot.sourceforge.net/
+for full details on the SpeccyBoot.
 .RE
 .PP
 .B \-\-speccyboot\-tap
@@ -1339,8 +1340,8 @@ selects the ALSA device used, it can be any complex or simple ALSA
 device name. e.g.:
 .IR default " or " hw:0 " or " tee:plughw:0,\(aq/tmp/out.raw\(aq,raw .
 See the alsa-lib pcm api reference at
-http://www.alsa\-project.org/alsa\-doc/alsa\-lib/pcm.html for further
-explanation.
+.I http://www.alsa\-project.org/alsa\-doc/alsa\-lib/pcm.html
+for further explanation.
 .br
 .IP \[bu]
 .IR param " and " values :
@@ -1435,7 +1436,7 @@ are `320' (which corresponds to a 320\(mu240\(mu256 mode), the default and
 .RS
 Specify which SVGA mode to use for the SVGAlib UI at different screen
 sizes. Available values for
-.I mode1, mode2 and mode3
+.IR mode1 ", " mode2 " and " mode3
 are listed in a table, when Fuse called with
 .B \-\-svga\-modes
 .I list
@@ -2141,16 +2142,18 @@ section for more details.
 .RS
 If this option is selected, Fuse will emulate a SpeccyBoot interface which
 allows booting a ZX Spectrum over an Ethernet network. See the SpeccyBoot
-web page at http://speccyboot.sourceforge.net/ for more details.
+web page at
+.I http://speccyboot.sourceforge.net/
+for more details.
 .RE
 .PP
 .I "SpecDrum interface"
 .RS
 If this option is selected, Fuse will emulate a Cheetah SpecDrum sound
 interface.  See the World of Spectrum Infoseek web page at
-http://www.worldofspectrum.org/infoseekid.cgi?id=1000062 for manuals,
-software and more. This emulation is only available for the 48k, 128k and
-TC2048 machines.
+.I http://www.worldofspectrum.org/infoseekid.cgi?id=1000062
+for manuals, software and more. This emulation is only available for
+the 48k, 128k and TC2048 machines.
 .RE
 .PP
 .I "Spectranet"
@@ -3420,8 +3423,9 @@ automatic page-in (disable) jumper controlled via the
 .I "Spectranet disable"
 option. If you're going to be using the Spectranet, you'll
 probably want one of the firmwares available from the Spectranet
-homepage (http://spectrum.alioth.net/doc/index.php) which is also
-where you can find more information on using the interface.
+homepage
+.RI ( http://spectrum.alioth.net/doc/index.php )
+which is also where you can find more information on using the interface.
 .PP
 Installing the Spectranet firmware on Fuse is slightly more
 complicated than on a real machine, mostly because Fuse's emulation
@@ -3800,7 +3804,9 @@ automatically executed when breakpoint
 .I id
 is triggered. There is currently no user interface for entering
 multi-line debugger commands, so the only way to specify this command is
-on the command-line via the \-\-debugger\-command option.
+on the command-line via the
+.B \-\-debugger\-command
+option.
 .RE
 .PP
 cond{ition}
@@ -4063,7 +4069,8 @@ DSK format. However, this is actually a slight oversimplification;
 there are in fact
 .I two
 similar, but not identical, DSK formats. (The difference can be seen
-by doing `head \-1
+by doing
+.RB ` "head \-1"
 .IR dskfile ':
 one format will start `MV \- CPCEMU' and the other will start
 `EXTENDED').

@@ -4339,3 +4339,4 @@
 20121229 man/fuse.1: whitespace and punctuation fixes (Stuart).
 20121230 man/fuse.1: use bold font for command line option names (Stuart).
 20121230 compat/unix/socket.c: don't ignore the return code from read().
+20121230 man/fuse.1: formatting fixes (Stuart).
