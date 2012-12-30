@@ -926,3 +926,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20121226 doc/libspectrum.txt: tweak PZX text (Fred).
 20121226 ChangeLog,README: first updates for a "1.1.0" release (Fred).
 20121227 libspectrum.c: set name for Spectrum 128Ke machine type (Sergio).
+20121229 doc/libspectrum.1: use an em dash (Stuart).
