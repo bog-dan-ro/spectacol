@@ -64,7 +64,7 @@ Finally, there is also support for reading and writing the RZX input recording
 format.
 .PP
 See the
-.B COMPRESSED FILES
+.B "COMPRESSED FILES"
 section for details on reading files compressed with
 .IR bzip2 "(3)"
 or
@@ -118,7 +118,7 @@ option.
 .RS
 Specify whether tape and disk files should be automatically loaded
 when they are opened using the
-.I File, Open...
+.I "File, Open..."
 menu option. (Enabled by default, but you can use
 .RB ` \-\-no\-auto\-load '
 to disable). Same as the General Options dialog's
@@ -246,7 +246,7 @@ now we have a double sided disk in drive. This means that if we open
 B.dsk' too. Now, we can just `flip' the disk if Golden Axe asks for `Side B'.
 The available options are
 .IR Never ,
-.IR "With single-sided drives"
+.I "With single-sided drives"
 and
 .IR Always .
 .RE
@@ -459,20 +459,20 @@ Select which joystick interface to attach for the first two real
 joysticks and the keyboard joystick. The default is
 .IR 0 ,
 which is no output. The available options are
-.IR 1
+.I 1
 (cursor),
-.IR 2
+.I 2
 (kempston),
-.IR 3
+.I 3
 (Sinclair 1),
-.IR 4
+.I 4
 (Sinclair 2),
-.IR 5
+.I 5
 (Timex 1),
-.IR 6
+.I 6
 (Timex 2),
 and
-.IR 7
+.I 7
 (Fuller). Same as the Joysticks Options dialog's
 .I "Joystick type"
 option.
@@ -541,7 +541,7 @@ option.
 Select which Fuse key code should be triggered by the applicable
 real joystick button press. The codes are the Fuse keyboard codes
 corresponding to the keys. The default value is
-.IR 4096
+.I 4096
 which corresponds to the virtual joystick fire button. Same as the
 Joysticks Options dialog's
 .I "Joystick fire"
@@ -641,7 +641,7 @@ a 48K Spectrum. The available options are
 .IR pentagon ,
 .IR pentagon512 ,
 .IR pentagon1024 ,
-.IR scorpion
+.I scorpion
 and
 .IR se .
 .RE
@@ -685,7 +685,7 @@ Specify Interface I Microdrive cartridge files to open.
 .RS
 Swap the left and right mouse buttons when emulating the Kempston mouse. The
 same as the General Peripherals dialog's
-.I Swap mouse buttons
+.I "Swap mouse buttons"
 option.
 .RE
 .PP
@@ -699,7 +699,7 @@ option. The available options are
 .IR None ,
 .IR Lossless ,
 and
-.IR High
+.I High
 (lossy). The default option is
 .IR Lossless .
 See also the
@@ -774,7 +774,7 @@ and emulate `weak' sectors.
 If the disk image file (EDSK or UDI) contains weak sector data, than
 Speedlock detection is automatically omitted.
 See also the
-.B WEAK DISK DATA
+.B "WEAK DISK DATA"
 section.
 Same as the Disk Options dialog's
 .I "+3 Detect Speedlock"
@@ -1131,7 +1131,7 @@ Specify the sound output device to use and any options to give that
 device. If you are not using the SDL UI or using
 .I libao
 or
-.I libasound (ALSA)
+.I "libasound (ALSA)"
 for sound output,
 then the
 .I "device"
@@ -1308,11 +1308,11 @@ if it is not specified.
 .PP
 Some examples of use:
 .PP
-.B fuse \-d alsa09:dev=hw:1
+.B "fuse \-d alsa09:dev=hw:1"
 .PP
 causes Fuse to use ALSA 0.9+ output with the second (#1) sound card.
 .PP
-.B fuse \-d raw:byteorder=little,file=enigma.raw
+.B "fuse \-d raw:byteorder=little,file=enigma.raw"
 .PP
 causes Fuse to save little endian words to
 .RI ` enigma.raw "'."
@@ -1373,13 +1373,13 @@ if given, fuse report ALSA buffer underruns to
 .PP
 Some examples of use:
 .PP
-.B fuse \-d verbose,buffer=2000
+.B "fuse \-d verbose,buffer=2000"
 .PP
 causes Fuse to use the default ALSA device with 2000 frame length buffer and
 report ALSA buffer underruns on
 .IR stderr .
 .PP
-.B fuse \-d tee:plughw:0,\(aq/tmp/aufwm.raw\(aq,raw
+.B "fuse \-d tee:plughw:0,\(aq/tmp/aufwm.raw\(aq,raw"
 .PP
 causes Fuse to use the first card and parallel save the raw audio samples
 into
@@ -1888,7 +1888,7 @@ On many occasions when you open a tape or disk file, it's because it's
 got a program in you want to load and run. If this option is selected,
 this will automatically happen for you when you open one of these
 files using the
-.I File, Open...
+.I "File, Open..."
 menu option \(em you must then use the
 .I Media
 menu to use
@@ -2403,9 +2403,9 @@ A Kempston joystick, read from input port 31. Note that the
 option must also be set for the input to be recognised.
 .RE
 .PP
-.I Sinclair 1
+.I "Sinclair 1"
 .br
-.I Sinclair 2
+.I "Sinclair 2"
 .RS
 The `left' and `right' Sinclair joysticks, equivalent to pressing
 .IR 1 " (left),"
@@ -2424,9 +2424,9 @@ and
 respectively.
 .RE
 .PP
-.I Timex 1
+.I "Timex 1"
 .br
-.I Timex 2
+.I "Timex 2"
 .RS
 The `left' and `right' joysticks as attached to the Timex 2068 variant's
 built-in joystick interface.
@@ -3127,10 +3127,10 @@ emulated as Caps\(en0 (Delete)
 .I Esc
 emulated as Caps\(en1 (Edit)
 .TP
-.I Caps Lock
+.I "Caps Lock"
 emulated as Caps\(en2
 .TP
-.I Cursor keys
+.I "Cursor keys"
 emulated as Caps\(en5/6/7/8 (as appropriate)
 .TP
 .I Tab
@@ -3442,7 +3442,7 @@ Once you have a copy of the installer, start Fuse and tick the
 option from the
 .I "Options, Peripherals, General..."
 dialog, and the state of its write protect jumper controlled via the
-.IR "Spectranet disable"
+.I "Spectranet disable"
 option. Once that's done, open the installer file (use the
 .I "Media, Tape, Open..."
 command rather than
@@ -3461,7 +3461,7 @@ appearing as the firmware is installed, starting with \(lqErasing sector
 0 OK, 0: 1 at the bottom of the screen.
 .PP
 Now untick the
-.IR "Spectranet disable"
+.I "Spectranet disable"
 option from the
 .I "Options, Peripherals, General..."
 dialog and reset the Spectrum. You should see a very brief blue status
@@ -3789,11 +3789,11 @@ is omitted. Port read/write breakpoints are unaffected.
 .RE
 .PP
 com{mmands}
-.I id <newline>
+.I "id <newline>"
 .br
-.I <debugger command> <newline>
+.I "<debugger command> <newline>"
 .br
-.I <debugger command> <newline>
+.I "<debugger command> <newline>"
 .br
 .I ...
 .br
@@ -3862,7 +3862,7 @@ the `continue' command can be used to return to it.
 .RE
 .PP
 i{gnore}
-.I id count
+.I "id count"
 .RS
 Do not trigger the next
 .I count
@@ -3879,7 +3879,7 @@ opcode, so is not infallible.
 .RE
 .PP
 o{ut}
-.I port value
+.I "port value"
 .RS
 Write
 .I value
@@ -3896,7 +3896,7 @@ to standard output.
 .RE
 .PP
 se{t}
-.I address value
+.I "address value"
 .RS
 Poke
 .I value
@@ -3905,7 +3905,7 @@ into memory at
 .RE
 .PP
 se{t}
-.I register value
+.I "register value"
 .RS
 Set the value of the Z80 register
 .I register
@@ -3914,7 +3914,7 @@ to
 .RE
 .PP
 se{t}
-.I [im|iff1|iff2] value
+.I "[im|iff1|iff2] value"
 .RS
 Set the interrupt mode or interrupt flip flops
 .I register
@@ -4084,11 +4084,11 @@ Fuse supports both the `CPCEMU' and `EXTENDED' formats.
 Fuse supports Betadisk emulation in its Pentagon and Scorpion
 emulation, and also under 48K, TC2048, 128K and +2 (but not +2A)
 emulation if the
-.I Beta 128 interface
+.I "Beta 128 interface"
 option from the
 .I "Options, Disk Peripherals..."
 dialog is enabled. When that option is used in 48K or TC2048 emulation the
-.I Beta 128 auto-boot in 48K machines
+.I "Beta 128 auto-boot in 48K machines"
 option additionally controls whether the machine boots directly into the TR-DOS
 system. See the
 .B "DISK FILE FORMATS"
@@ -4192,7 +4192,7 @@ or
 .PP
 This is the only image format which can store all the relevant information
 of the recorded data on a magnetic disk, so it can be used for any
-.I non standard
+.I "non standard"
 disk format. Fuse can read all extended track types too (mixed FM/MFM, or
 tracks with `WEAK' data or even compressed tracks too).
 .RE
@@ -4253,7 +4253,7 @@ Opus Discovery file formats.
 .RE
 .PP
 Fuse supports most of the above formats for writing:
-.I .UDI .FDI .MGT .IMG .SAD .TRD .SCL .OPD .OPU .DSK
+.I ".UDI .FDI .MGT .IMG .SAD .TRD .SCL .OPD .OPU .DSK"
 (only the old CPC format).
 .PP
 You can save disk images with any output
@@ -4334,7 +4334,7 @@ to convert recorded movie file into a standard video file.
 .PP
 .B Examples
 .PP
-.B fuse \-\-movie\-start \-\-rate 2 \-\-sound\-freq 44100 \-\-separation
+.B "fuse \-\-movie\-start \-\-rate 2 \-\-sound\-freq 44100 \-\-separation"
 .B enigma.fmf
 .PP
 start video recording about 25/s video frame rate and 44100Hz sampling

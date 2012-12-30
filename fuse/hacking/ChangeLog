@@ -4342,3 +4342,4 @@
 20121230 man/fuse.1: formatting fixes (Stuart).
 20121230 man/fuse.1: fix typo (Fred).
 20121230 man/fuse.1: fix typo (thanks, Fred) (Stuart)
+20121230 man/fuse.1: use conformant and more consistent syntax (Stuart).
