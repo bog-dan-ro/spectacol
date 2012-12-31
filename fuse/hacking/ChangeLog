@@ -4346,3 +4346,4 @@
 20121231 AUTHORS,README,THANKS,fuse.c,man/fuse.1,menu.[ch],menu_data.dat,
          peripherals/if[12].[ch],ui.c,ui/options.dat: rename 'Interface I' and
          'Interface II' to 'Interface 1' and 'Interface 2' (Stuart).
+20121231 man/fuse.1: use non-breaking spaces where appropriate (Stuart).

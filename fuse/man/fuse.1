@@ -42,7 +42,7 @@ fuse \(em Sinclair ZX Spectrum emulator
 .\"------------------------------------------------------------------
 .\"
 .SH DESCRIPTION
-Fuse is a Sinclair ZX Spectrum emulator. It supports several models
+Fuse is a Sinclair ZX\ Spectrum emulator. It supports several models
 (including the 128), with quite faithful emulation of the display and
 sound.
 .PP
@@ -56,8 +56,8 @@ the old DAT-file variant is not. DSK, UDI, FDI, TR0, SDF, MGT, IMG,
 SAD, TRD, SCL and OPD disk images are supported when a disk interface
 is being emulated, including the integrated disk drives on +3,
 Pentagon or Scorpion machines as well as the +D, DISCiPLE,
-Opus Discovery and Beta 128 interfaces. DCK cartridge images are
-supported when emulating a Timex 2068 variant. Interface 2 ROM
+Opus Discovery and Beta\ 128 interfaces. DCK cartridge images are
+supported when emulating a Timex\ 2068 variant. Interface\ 2 ROM
 cartridges are also supported.
 .PP
 Finally, there is also support for reading and writing the RZX input recording
@@ -128,24 +128,24 @@ option.
 .PP
 .B \-\-beta128
 .RS
-Emulate a Beta 128 interface. Same as the Disk Peripherals Options dialog's
-.I "Beta 128 interface"
+Emulate a Beta\ 128 interface. Same as the Disk Peripherals Options dialog's
+.I "Beta\ 128 interface"
 option.
 .RE
 .PP
 .B \-\-beta128\-48boot
 .RS
-When a Beta 128 interface is used in 48K or TC2048 emulation the
+When a Beta\ 128 interface is used in 48K or TC2048 emulation the
 option additionally controls whether the machine boots directly into the TR-DOS
 system. Same as the Disk Peripherals Options dialog's
-.I "Beta 128 auto-boot in 48K machines"
+.I "Beta\ 128 auto-boot in 48K machines"
 option.
 .RE
 .PP
 .B \-\-betadisk
 .I file
 .RS
-Insert the specified file into the emulated Beta disk interface's drive A:
+Insert the specified file into the emulated Beta disk interface's drive\ A:
 and select Pentagon mode on startup.
 .RE
 .PP
@@ -230,9 +230,9 @@ disk image from a separate file when opening a new single-sided disk image.
 Select whether Fuse should try to merge a separate file for the `B' side of a
 disk image separate file when opening a new disk image. Most double sided disk
 images are dumped as two single sided disk images e.g.
-`Golden Axe \- Side A.dsk' and `Golden Axe \- Side B.dsk'. So, if we want to
+`Golden Axe \- Side\ A.dsk' and `Golden Axe \- Side\ B.dsk'. So, if we want to
 play Golden Axe, first we have to insert the first disk image and when the game
-asks to insert side B, we have to find and open the second disk image, instead
+asks to insert side\ B, we have to find and open the second disk image, instead
 of just `flip'-ing the disk inside the drive. If enabled, Fuse will try to open
 the second image too and create a double sided disk image (merging the two one
 sided disk images) and insert this merged virtual disk into the disk drive. The
@@ -242,8 +242,8 @@ disk that is being opened. If found, Fuse will try to open the other side of
 the disk too substituting the appropriate characters in the filename e.g.
 1\(->2, a\(->b, A\(->B. If successful then it will merge the two images and
 now we have a double sided disk in drive. This means that if we open
-`Golden Axe \- Side A.dsk', then Fuse will try to open `Golden Axe \- Side
-B.dsk' too. Now, we can just `flip' the disk if Golden Axe asks for `Side B'.
+`Golden Axe \- Side\ A.dsk', then Fuse will try to open `Golden Axe \- Side
+B.dsk' too. Now, we can just `flip' the disk if Golden Axe asks for `Side\ B'.
 The available options are
 .IR Never ,
 .I "With single-sided drives"
@@ -287,7 +287,7 @@ option.
 .B \-\-dock
 .I file
 .RS
-Insert the specified file into the emulated Timex 2068 variant dock;
+Insert the specified file into the emulated Timex\ 2068 variant dock;
 also select the TC2068 on startup if available.
 .RE
 .PP
@@ -378,8 +378,8 @@ section for more details.
 .B \-\-graphicsfile
 .I file
 .RS
-Set the filename used for graphical output from the emulated ZX
-printer. See the
+Set the filename used for graphical output from the emulated
+ZX\ Printer. See the
 .B "PRINTER EMULATION"
 section for more details.
 .RE
@@ -394,29 +394,29 @@ Give brief usage help, listing available options.
 .B \-\-if2cart
 .I file
 .RS
-Insert the specified file into the emulated Interface 2.
+Insert the specified file into the emulated Interface\ 2.
 .RE
 .PP
 .B \-\-interface1
 .RS
-Emulate a Sinclair Interface 1. Same as the Peripherals Options dialog's
-.I "Interface 1"
+Emulate a Sinclair Interface\ 1. Same as the Peripherals Options dialog's
+.I "Interface\ 1"
 option.
 .RE
 .PP
 .B \-\-interface2
 .RS
-Emulate a Sinclair Interface 2. (Enabled by default, but you can use
+Emulate a Sinclair Interface\ 2. (Enabled by default, but you can use
 .RB ` \-\-no\-interface2 '
 to disable). Same as the Peripherals Options dialog's
-.I "Interface 2"
+.I "Interface\ 2"
 option.
 .RE
 .PP
 .B \-\-issue2
 .RS
-Emulate an issue 2 keyboard. Same as the General Options dialog's
-.I "Issue 2 keyboard"
+Emulate an issue\ 2 keyboard. Same as the General Options dialog's
+.I "Issue\ 2 keyboard"
 option.
 .RE
 .PP
@@ -464,13 +464,13 @@ which is no output. The available options are
 .I 2
 (kempston),
 .I 3
-(Sinclair 1),
+(Sinclair\ 1),
 .I 4
-(Sinclair 2),
+(Sinclair\ 2),
 .I 5
-(Timex 1),
+(Timex\ 1),
 .I 6
-(Timex 2),
+(Timex\ 2),
 and
 .I 7
 (Fuller). Same as the Joysticks Options dialog's
@@ -627,7 +627,7 @@ option.
 .RS
 Specify machine type to emulate initially. The default is
 .IR 48 ,
-a 48K Spectrum. The available options are
+a 48K\ Spectrum. The available options are
 .IR 16 ,
 .IR 48 ,
 .IR 48_ntsc ,
@@ -648,7 +648,7 @@ and
 .PP
 .B \-\-melodik
 .RS
-Emulate a Melodik AY interface for 16/48k Spectrums. Same as the Peripherals
+Emulate a Melodik AY\ interface for 16/48k\ Spectrums. Same as the Peripherals
 Options dialog's
 .I "Melodik"
 option.
@@ -678,7 +678,7 @@ option.
 .B \-\-microdrive\-8\-file
 .I file
 .RS
-Specify Interface 1 Microdrive cartridge files to open.
+Specify Interface\ 1 Microdrive cartridge files to open.
 .RE
 .PP
 .B \-\-mouse\-swap\-buttons
@@ -739,7 +739,7 @@ option.
 .B \-\-opusdisk
 .I file
 .RS
-Insert the specified file into the emulated Opus Discovery's drive 1.
+Insert the specified file into the emulated Opus Discovery's drive\ 1.
 .RE
 .PP
 .B \-p
@@ -753,8 +753,8 @@ Specify an RZX file to begin playback from.
 .PP
 .B \-\-paltv2x
 .RS
-Specify whether the PAL TV 2x and PAL TV 3x scalers should also produce
-scanlines along the lines of the TV 2x and Timex TV scalers.
+Specify whether the PAL\ TV\ 2x and PAL\ TV\ 3x scalers should also produce
+scanlines along the lines of the TV\ 2x and Timex\ TV scalers.
 The same as the General Options dialog's
 .I "PAL-TV use TV2x effect"
 option.
@@ -763,7 +763,7 @@ option.
 .B \-\-plus3disk
 .I file
 .RS
-Insert the specified file into the emulated +3's A: drive; also select
+Insert the specified file into the emulated +3's A:\ drive; also select
 the +3 on startup if available.
 .RE
 .PP
@@ -791,7 +791,7 @@ option.
 .B \-\-plusddisk
 .I file
 .RS
-Insert the specified file into the emulated +D's drive 1.
+Insert the specified file into the emulated +D's drive\ 1.
 .RE
 .PP
 .B \-\-printer
@@ -938,11 +938,11 @@ Specify an RZX file to begin recording to.
 .I file
 .RS
 Specify the file to be used for ROM(s) used for each machine. The
-options respectively refer to the 16K Spectrum
+options respectively refer to the 16K\ Spectrum
 .RI ( 48.rom ),
-48K Spectrum
+48K\ Spectrum
 .RI ( 48.rom ),
-the two ROMs for the 128K Spectrum
+the two ROMs for the 128K\ Spectrum
 .RI ( 128\-0.rom " and " 128\-1.rom ),
 the two ROMs for the +2
 .RI ( plus2\-0.rom " and " plus2\-1.rom ),
@@ -962,7 +962,7 @@ the four ROMs for the Scorpion 256
 .RI ( 256s\-0.rom ", " 256s\-1.rom ", " 256s\-2.rom " and " 256s\-3.rom ),
 the two ROMs for the Spectrum SE
 .RI ( se\-0.rom " and " se\-1.rom ),
-the Interface 1 ROM
+the Interface\ 1 ROM
 .RI ( if1\-2.rom ),
 the Opus Discovery ROM
 .RI ( opus.rom ),
@@ -970,7 +970,7 @@ the DISCiPLE ROM
 .RI ( disciple.rom ),
 the +D ROM
 .RI ( plusd.rom ),
-the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
+the TR-DOS ROM for Beta\ 128 emulation with the 48K, TC2048, 128K or +2
 .RI ( trdos.rom ),
 and the SpeccyBoot ROM
 .RI ( speccyboot\-1.4.rom ).
@@ -981,7 +981,7 @@ are not.
 .PP
 .B \-\-no\-rs232\-handshake
 .RS
-This option makes Fuse's Interface 1 emulation assume that the RS-232
+This option makes Fuse's Interface\ 1 emulation assume that the RS-232
 line other end is live when you connect the communication channels.
 See also the
 .RB ` \-\-rs232\-rx '
@@ -995,7 +995,7 @@ options.
 .B \-\-rs232\-tx
 .RS
 Specify the communication channels (FIFO or file) to be used for
-Interface 1 RS-232 emulation as RxD and TxD wire. See also the
+Interface\ 1 RS-232 emulation as RxD and TxD wire. See also the
 .RB ` \-\-rs232\-handshake '
 options.
 .RE
@@ -1003,7 +1003,7 @@ options.
 .B \-\-rzx\-autosaves
 .RS
 Specify that, while recording an RZX file, Fuse should automatically add
-a snapshot to the recording stream every 5 seconds. (Default to on, but
+a snapshot to the recording stream every 5\ seconds. (Default to on, but
 you can use
 .RB ` \-\-no\-rzx\-autosaves '
 to disable). Same as the RZX Options dialog's
@@ -1030,7 +1030,7 @@ The default option is
 .B \-\-simpleide
 .RS
 Specify whether Fuse will emulate the simple 8-bit IDE interface
-as used by the Spectrum +3e. Same as the Disk Peripherals
+as used by the Spectrum\ +3e. Same as the Disk Peripherals
 Options dialog's
 .I "Simple 8-bit IDE"
 option.
@@ -1310,7 +1310,7 @@ Some examples of use:
 .PP
 .B "fuse \-d alsa09:dev=hw:1"
 .PP
-causes Fuse to use ALSA 0.9+ output with the second (#1) sound card.
+causes Fuse to use ALSA\ 0.9+ output with the second (#1) sound card.
 .PP
 .B "fuse \-d raw:byteorder=little,file=enigma.raw"
 .PP
@@ -1839,7 +1839,7 @@ frame updates. This is useful if your machine is having trouble keeping
 up with the spectrum screen updates.
 .RE
 .PP
-.I "Issue 2 keyboard"
+.I "Issue\ 2 keyboard"
 .RS
 Early versions of the Spectrum used a different value for unused bits
 on the keyboard input ports, and a few games depended on the old value
@@ -1909,7 +1909,7 @@ the trap or not.
 .RS
 If this option is selected, Fuse will happily allow programs to
 overwrite what would normally be ROM. This probably isn't very useful
-in most circumstances, especially as the 48K ROM overwrites parts of
+in most circumstances, especially as the 48K\ ROM overwrites parts of
 itself.
 .RE
 .PP
@@ -1949,8 +1949,8 @@ SDL user interfaces: the others will always simulate a colour TV.
 .PP
 .I "PAL-TV use TV2x effect"
 .RS
-This option allows you to choose whether the PAL TV 2x and higher scalers
-also reproduce scanlines in the same way as the TV 2x, 3x and Timex TV
+This option allows you to choose whether the PAL\ TV\ 2x and higher scalers
+also reproduce scanlines in the same way as the TV\ 2x, TV\ 3x and Timex\ TV
 scalers.
 .RE
 .PP
@@ -2070,7 +2070,7 @@ If this option is selected, Fuse will emulate a Kempston joystick
 interface (probably the most widely supported type on the Spectrum).
 Note that this option is basically equivalent to plugging the
 interface itself into a Spectrum, not to connecting a joystick; this
-affects how the Spectrum responds to a read of input port 31. To use a
+affects how the Spectrum responds to a read of input port\ 31. To use a
 Kempston joystick in a game, this option must be enabled, and you must
 also select a Kempston joystick the
 .I "Options, Joysticks"
@@ -2105,27 +2105,27 @@ TC2048 machines.
 .I "Melodik"
 .RS
 If this option is selected, Fuse will emulate a Melodik AY sound interface.
-These interfaces and many similar ones were produced to make the 48K Spectrum
-compatible with the same AY music as the 128K Spectrum. This emulation is only
+These interfaces and many similar ones were produced to make the 48K\ Spectrum
+compatible with the same AY music as the 128K\ Spectrum. This emulation is only
 available for the 16k, 48k and TC2048 machines.
 .RE
 .PP
-.I "Interface 1"
+.I "Interface\ 1"
 .RS
 If this option is selected, Fuse will emulate the simple Sinclair
-Interface 1, and allow Microdrive cartridges to be
+Interface\ 1, and allow Microdrive cartridges to be
 connected and disconnected via the
-.I "Media, Interface 1, Microdrive"
-menus. It also enables support for the Interface 1 RS-232 interface.
+.I "Media, Interface\ 1, Microdrive"
+menus. It also enables support for the Interface\ 1 RS-232 interface.
 .RE
 .PP
-.I "Interface 2"
+.I "Interface\ 2"
 .RS
 If this option is selected, Fuse will emulate a cartridge port as
-found on the Interface 2. Cartridges can then be inserted and removed
+found on the Interface\ 2. Cartridges can then be inserted and removed
 via the
-.I "Media, Cartridge, Interface 2"
-menu. Note that the Pentagon, Scorpion, Interface 2, ZXATASP and ZXCF
+.I "Media, Cartridge, Interface\ 2"
+menu. Note that the Pentagon, Scorpion, Interface\ 2, ZXATASP and ZXCF
 all use the same hardware mechanism for accessing some of their
 extended features, so only one of these should be selected at once or
 unpredictable behaviour will occur.
@@ -2141,7 +2141,7 @@ section for more details.
 .I "SpeccyBoot interface"
 .RS
 If this option is selected, Fuse will emulate a SpeccyBoot interface which
-allows booting a ZX Spectrum over an Ethernet network. See the SpeccyBoot
+allows booting a ZX\ Spectrum over an Ethernet network. See the SpeccyBoot
 web page at
 .I http://speccyboot.sourceforge.net/
 for more details.
@@ -2179,7 +2179,7 @@ section for more details.
 .I "Simple 8-bit IDE"
 .RS
 If this option is selected, Fuse will emulate the simple 8-bit IDE
-interface as used by the Spectrum +3e, and allow hard disks to be
+interface as used by the Spectrum\ +3e, and allow hard disks to be
 connected and disconnected via the
 .I "Media, IDE, Simple 8-bit"
 menu.
@@ -2262,12 +2262,12 @@ If this option is selected, Fuse will emulate the DISCiPLE interface.  See the
 section for more details.
 .RE
 .PP
-.I "Beta 128 interface"
+.I "Beta\ 128 interface"
 .RS
-If this option is selected, Fuse will emulate the Beta 128 interface.
+If this option is selected, Fuse will emulate the Beta\ 128 interface.
 See the
-.B "BETA 128 EMULATION"
-section for more details. Beta 128 emulation is enabled for the
+.B "BETA\ 128 EMULATION"
+section for more details. Beta\ 128 emulation is enabled for the
 Pentagon and Scorpion machines regardless of this option.
 .RE
 .RE
@@ -2286,13 +2286,13 @@ currently-running Fuse.
 .I "Create autosaves"
 .RS
 If this option is selected, Fuse will add a snapshot into the recording
-stream every 5 seconds while creating an RZX file, thus enabling the
+stream every 5\ seconds while creating an RZX file, thus enabling the
 rollback facilities to be used without having to explicitly add
 snapshots into the stream. Older snapshots will be pruned from the
 stream to keep the file size and number of snapshots down: each snapshot
-up to 15 seconds will be kept, then one snapshot every 15 seconds until
-one minute, then one snapshot every minute until 5 minutes, and then one
-snapshot every 5 minutes. Note that this \(lqpruning\(rq applies only to
+up to 15\ seconds will be kept, then one snapshot every 15\ seconds until
+one minute, then one snapshot every minute until 5\ minutes, and then one
+snapshot every 5\ minutes. Note that this \(lqpruning\(rq applies only to
 automatically inserted snapshots: snapshots manually inserted into the
 stream will never be pruned.
 .RE
@@ -2352,9 +2352,9 @@ Fuse can emulate many of the common types of joystick which were
 available for the Spectrum. The input for these emulated joysticks can
 be taken from real joysticks attached to the emulating machine
 (configured via the
-.I "Options, Joysticks, Joystick 1..."
+.I "Options, Joysticks, Joystick\ 1..."
 and
-.I "Options, Joysticks, Joystick 2..."
+.I "Options, Joysticks, Joystick\ 2..."
 options), or from the
 .IR q ,
 .IR a ,
@@ -2398,14 +2398,14 @@ and
 .PP
 .I Kempston
 .RS
-A Kempston joystick, read from input port 31. Note that the
+A Kempston joystick, read from input port\ 31. Note that the
 .I "Options, Peripherals, Kempston interface"
 option must also be set for the input to be recognised.
 .RE
 .PP
-.I "Sinclair 1"
+.I "Sinclair\ 1"
 .br
-.I "Sinclair 2"
+.I "Sinclair\ 2"
 .RS
 The `left' and `right' Sinclair joysticks, equivalent to pressing
 .IR 1 " (left),"
@@ -2426,9 +2426,9 @@ respectively.
 .PP
 .I "Timex 1"
 .br
-.I "Timex 2"
+.I "Timex\ 2"
 .RS
-The `left' and `right' joysticks as attached to the Timex 2068 variant's
+The `left' and `right' joysticks as attached to the Timex\ 2068 variant's
 built-in joystick interface.
 .RE
 .RE
@@ -2515,41 +2515,41 @@ while more technical information can be found at
 and
 .IR "http://www.worldofspectrum.org/faq/reference/tmxreference.htm" .
 .PP
-.I "Spectrum 16K"
+.I "Spectrum\ 16K"
 .br
-.I "Spectrum 48K"
+.I "Spectrum\ 48K"
 .RS
 The original machines as released by Sinclair in 1982 with 16 or 48K
 of RAM respectively.
 .RE
 .PP
-.I "Spectrum 48K (NTSC)"
+.I "Spectrum\ 48K (NTSC)"
 .RS
 The NTSC 48K machine released in limited numbers in parts of South
 America.
 .RE
 .PP
-.I "Spectrum 128K"
+.I "Spectrum\ 128K"
 .RS
-The 128K machine as released by Sinclair in 1985 (Spain) or 1986 (UK).
+The 128K machine as released by Sinclair in 1985\ (Spain) or 1986\ (UK).
 .RE
 .PP
-.I "Spectrum +2"
+.I "Spectrum\ +2"
 .RS
 The first machine released by Amstrad, in 1986. From an emulation
 point of view, the +2 is virtually identical to the 128K.
 .RE
 .PP
-.I "Spectrum +2A"
+.I "Spectrum\ +2A"
 .br
-.I "Spectrum +3"
+.I "Spectrum\ +3"
 .RS
 The two machines released by Amstrad in 1988. Technically very similar
 to each other, except that the +3 features a 3\(sd disk drive while the
 +2A does not.
 .RE
 .PP
-.I "Spectrum +3e"
+.I "Spectrum\ +3e"
 .RS
 A +3 with modified ROMs allowing access to IDE hard disks via the
 simple 8-bit interface, as activated from the
@@ -2570,35 +2570,35 @@ The variants of the Spectrum as released by Timex in Portugal.
 The variant of the Spectrum released by Timex in North America.
 .RE
 .PP
-.I "Pentagon 128K"
+.I "Pentagon\ 128K"
 .RS
 Russian clone of the Spectrum. There were many different machines
 called Pentagon from 1989 to 2006, this machine corresponds to a
 1991 era Pentagon-128K with the optional AY sound chip and the
-integrated Beta 128 disk interface, and is the version of the
+integrated Beta\ 128 disk interface, and is the version of the
 machine most often emulated. More technical details can be found
 at
 .IR "http://www.worldofspectrum.org/rusfaq/index.html" ,
 .RE
 .PP
-.I "Pentagon 512K"
+.I "Pentagon\ 512K"
 .br
-.I "Pentagon 1024K"
+.I "Pentagon\ 1024K"
 .RS
 Newer versions of the Pentagon Russian Spectrum clones which
 incorporate more memory and the \(lqMr Gluk Reset Service\(rq ROM
 offering a more powerful firmware.
 .RE
 .PP
-.I "Scorpion ZS 256"
+.I "Scorpion\ ZS\ 256"
 .RS
 Another Russian clone of the Spectrum. Some details can be found
 at
 .IR "http://www.worldofspectrum.org/rusfaq/index.html" .
 Like all the Russian clones, they have built in 3.5\(sd disk drives,
-accessed via the Beta 128 disk interface and TR-DOS (the Technology
+accessed via the Beta\ 128 disk interface and TR-DOS (the Technology
 Research Disk Operating System). The most important distinction from
-the Pentagon 128k and similar machines is the display timing details.
+the Pentagon\ 128k and similar machines is the display timing details.
 .RE
 .PP
 .I "Spectrum SE"
@@ -2751,78 +2751,78 @@ Stops the direct recording and places the new recording into the
 virtual-tape.
 .RE
 .PP
-.I "Media, Interface 1"
+.I "Media, Interface\ 1"
 .RS
-Virtual Microdrive images are accessible only when the Interface 1 is
+Virtual Microdrive images are accessible only when the Interface\ 1 is
 active from the
 .I "Options, Peripherals"
 menu. Note that any changes to the Microdrive image will not be
 written to the file on disk until the appropriate save option is used.
 .RE
 .PP
-.I "Media, Interface 1, Microdrive 1, Insert New"
+.I "Media, Interface\ 1, Microdrive\ 1, Insert New"
 .RS
 Insert a new (unformatted) Microdrive cartridge into emulated
-Microdrive 1.
+Microdrive\ 1.
 .RE
 .PP
-.I "Media, Interface 1, Microdrive 1, Insert..."
+.I "Media, Interface\ 1, Microdrive\ 1, Insert..."
 .RS
 Insert an existing Microdrive cartridge image into emulated Microdrive
 1. You will be prompted for a filename.
 .RE
 .PP
-.I "Media, Interface 1, Microdrive 1, Eject"
+.I "Media, Interface\ 1, Microdrive\ 1, Eject"
 .RS
-Eject the Microdrive image in Microdrive 1. If the image has been
+Eject the Microdrive image in Microdrive\ 1. If the image has been
 modified, you will be asked as to whether you want any changes saved.
 .RE
 .PP
-.I "Media, Interface 1, Microdrive 1, Save"
+.I "Media, Interface\ 1, Microdrive\ 1, Save"
 .RS
-Save the Microdrive image in Microdrive 1.
+Save the Microdrive image in Microdrive\ 1.
 .RE
 .PP
-.I "Media, Interface 1, Microdrive 1, Save as..."
+.I "Media, Interface\ 1, Microdrive\ 1, Save as..."
 .RS
-Write the Microdrive image in Microdrive 1 to a file. You will be
+Write the Microdrive image in Microdrive\ 1 to a file. You will be
 prompted for a filename.
 .RE
 .PP
-.I "Media, Interface 1, Microdrive 1, Write protect, Enable"
+.I "Media, Interface\ 1, Microdrive\ 1, Write protect, Enable"
 .RS
-Enable the write protect tab for the image in Microdrive 1.
+Enable the write protect tab for the image in Microdrive\ 1.
 .RE
 .PP
-.I "Media, Interface 1, Microdrive 1, Write protect, Disable"
+.I "Media, Interface\ 1, Microdrive\ 1, Write protect, Disable"
 .RS
-Disable the write protect tab for the image in Microdrive 1.
+Disable the write protect tab for the image in Microdrive\ 1.
 .RE
 .PP
-.I "Media, Interface 1, Microdrive 2, ..."
+.I "Media, Interface\ 1, Microdrive\ 2, ..."
 .br
-.I "Media, Interface 1, Microdrive 3, ..."
+.I "Media, Interface\ 1, Microdrive\ 3, ..."
 .br
-.I "Media, Interface 1, Microdrive 4, ..."
+.I "Media, Interface\ 1, Microdrive\ 4, ..."
 .br
-.I "Media, Interface 1, Microdrive 5, ..."
+.I "Media, Interface\ 1, Microdrive\ 5, ..."
 .br
-.I "Media, Interface 1, Microdrive 6, ..."
+.I "Media, Interface\ 1, Microdrive\ 6, ..."
 .br
-.I "Media, Interface 1, Microdrive 7, ..."
+.I "Media, Interface\ 1, Microdrive\ 7, ..."
 .br
-.I "Media, Interface 1, Microdrive 8, ..."
+.I "Media, Interface\ 1, Microdrive\ 8, ..."
 .RS
 Equivalent options for the other emulated Microdrives.
 .RE
 .PP
-.I "Media, Interface 1, RS232, Plug RxD"
+.I "Media, Interface\ 1, RS232, Plug RxD"
 .br
-.I "Media, Interface 1, RS232, Unplug RxD"
+.I "Media, Interface\ 1, RS232, Unplug RxD"
 .br
-.I "Media, Interface 1, RS232, Plug TxD"
+.I "Media, Interface\ 1, RS232, Plug TxD"
 .br
-.I "Media, Interface 1, RS232, Unplug TxD"
+.I "Media, Interface\ 1, RS232, Unplug TxD"
 .RS
 Connect or disconnect a communication channels (FIFO or file) to use
 as the RS-232 TxD or RxD wire.
@@ -2831,11 +2831,11 @@ as the RS-232 TxD or RxD wire.
 .I "Media, Disk"
 .RS
 Virtual floppy disk images are accessible when emulating a +3, +3e,
-Pentagon or Scorpion, or when the Beta 128, Opus Discovery, +D or
+Pentagon or Scorpion, or when the Beta\ 128, Opus Discovery, +D or
 DISCiPLE interface options are enabled and a machine compatible with
 the chosen interface is selected. (See
 .BR "THE .DSK FORMAT" ,
-.B "BETA 128 EMULATION"
+.B "BETA\ 128 EMULATION"
 .B "OPUS DISCOVERY EMULATION"
 .B "+D EMULATION"
 and
@@ -2848,165 +2848,165 @@ changes, use the appropriate `eject and write' option before exiting
 Fuse.
 .RE
 .PP
-.I "Media, Disk, +3, Drive A:, Insert..."
+.I "Media, Disk, +3, Drive\ A:, Insert..."
 .RS
 Insert a disk-image file to read/write in the +3's emulated drive
 A:.
 .RE
 .PP
-.I "Media, Disk, +3, Drive A:, Eject"
+.I "Media, Disk, +3, Drive\ A:, Eject"
 .RS
-Eject the disk image currently in the +3's emulated drive A: \(em or
+Eject the disk image currently in the +3's emulated drive\ A: \(em or
 from the emulated machine's perspective, eject it. Note that any
 changes made to the image will not be saved.
 .RE
 .PP
-.I "Media, Disk, +3, Drive A:, Save"
+.I "Media, Disk, +3, Drive\ A:, Save"
 .RS
-Save the disk image currently in the +3's drive A:.
+Save the disk image currently in the +3's drive\ A:.
 .RE
 .PP
-.I "Media, Disk, +3, Drive A:, Save as..."
+.I "Media, Disk, +3, Drive\ A:, Save as..."
 .RS
 Save the current state of the disk image currently in the +3's
-drive A: to a file. You will be prompted for a filename.
+drive\ A: to a file. You will be prompted for a filename.
 .RE
 .PP
-.I "Media, Disk, +3, Drive B:, Insert..."
+.I "Media, Disk, +3, Drive\ B:, Insert..."
 .RS
-As above, but for the +3's drive B:. Fuse emulates drive B: as a
+As above, but for the +3's drive\ B:. Fuse emulates drive\ B: as a
 second 3\(sd drive.
 .RE
 .PP
-.I "Media, Disk, +3, Drive B:, Eject"
+.I "Media, Disk, +3, Drive\ B:, Eject"
 .RS
-As above, but for drive B:.
+As above, but for drive\ B:.
 .RE
 .PP
-.I "Media, Disk, +3, Drive B:, Save"
+.I "Media, Disk, +3, Drive\ B:, Save"
 .RS
-As above, but for drive B:.
+As above, but for drive\ B:.
 .RE
 .PP
-.I "Media, Disk, +3, Drive B:, Save as..."
+.I "Media, Disk, +3, Drive\ B:, Save as..."
 .RS
-As above, but for drive B:.
+As above, but for drive\ B:.
 .RE
 .PP
-.I "Media, Disk, Beta, Drive A:, Insert New"
+.I "Media, Disk, Beta, Drive\ A:, Insert New"
 .RS
-Insert a new (unformatted) disk into the emulated Beta drive A:.
+Insert a new (unformatted) disk into the emulated Beta drive\ A:.
 .RE
 .PP
-.I "Media, Disk, Beta, Drive A:, Insert..."
+.I "Media, Disk, Beta, Drive\ A:, Insert..."
 .br
-.I "Media, Disk, Beta, Drive A:, Eject"
+.I "Media, Disk, Beta, Drive\ A:, Eject"
 .br
-.I "Media, Disk, Beta, Drive A:, Save"
+.I "Media, Disk, Beta, Drive\ A:, Save"
 .br
-.I "Media, Disk, Beta, Drive A:, Save as..."
+.I "Media, Disk, Beta, Drive\ A:, Save as..."
 .RS
-As above, but for the emulated Beta disk drive A:.
+As above, but for the emulated Beta disk drive\ A:.
 .RE
 .PP
-.I "Media, Disk, Beta, Drive A:, Write protect, Enable"
+.I "Media, Disk, Beta, Drive\ A:, Write protect, Enable"
 .RS
-Enable the write protect tab for the image in Beta drive A:.
+Enable the write protect tab for the image in Beta drive\ A:.
 .RE
 .PP
-.I "Media, Disk, Beta, Drive A:, Write protect, Disable"
+.I "Media, Disk, Beta, Drive\ A:, Write protect, Disable"
 .RS
-Disable the write protect tab for the image in Beta drive A:.
+Disable the write protect tab for the image in Beta drive\ A:.
 .RE
 .PP
-.I "Media, Disk, Beta, Drive B:, ..."
+.I "Media, Disk, Beta, Drive\ B:, ..."
 .br
-.I "Media, Disk, Beta, Drive C:, ..."
+.I "Media, Disk, Beta, Drive\ C:, ..."
 .br
-.I "Media, Disk, Beta, Drive D:, ..."
+.I "Media, Disk, Beta, Drive\ D:, ..."
 .RS
 As above, but for the remaining emulated Beta disk interface drives.
 .RE
 .PP
-.I "Media, Disk, Opus, Drive 1, Insert New"
+.I "Media, Disk, Opus, Drive\ 1, Insert New"
 .br
-.I "Media, Disk, Opus, Drive 1, Insert..."
+.I "Media, Disk, Opus, Drive\ 1, Insert..."
 .br
-.I "Media, Disk, Opus, Drive 1, Eject"
+.I "Media, Disk, Opus, Drive\ 1, Eject"
 .br
-.I "Media, Disk, Opus, Drive 1, Save"
+.I "Media, Disk, Opus, Drive\ 1, Save"
 .br
-.I "Media, Disk, Opus, Drive 1, Save as..."
+.I "Media, Disk, Opus, Drive\ 1, Save as..."
 .br
-.I "Media, Disk, Opus, Drive 1, Write protect, Enable"
+.I "Media, Disk, Opus, Drive\ 1, Write protect, Enable"
 .br
-.I "Media, Disk, Opus, Drive 1, Write protect, Disable"
+.I "Media, Disk, Opus, Drive\ 1, Write protect, Disable"
 .br
-.I "Media, Disk, Opus, Drive 2, ..."
+.I "Media, Disk, Opus, Drive\ 2, ..."
 .RS
 As above, but for the emulated Opus Discovery drives.
 .RE
 .PP
-.I "Media, Disk, +D, Drive 1, Insert New"
+.I "Media, Disk, +D, Drive\ 1, Insert New"
 .br
-.I "Media, Disk, +D, Drive 1, Insert..."
+.I "Media, Disk, +D, Drive\ 1, Insert..."
 .br
-.I "Media, Disk, +D, Drive 1, Eject"
+.I "Media, Disk, +D, Drive\ 1, Eject"
 .br
-.I "Media, Disk, +D, Drive 1, Save"
+.I "Media, Disk, +D, Drive\ 1, Save"
 .br
-.I "Media, Disk, +D, Drive 1, Save as..."
+.I "Media, Disk, +D, Drive\ 1, Save as..."
 .br
-.I "Media, Disk, +D, Drive 1, Write protect, Enable"
+.I "Media, Disk, +D, Drive\ 1, Write protect, Enable"
 .br
-.I "Media, Disk, +D, Drive 1, Write protect, Disable"
+.I "Media, Disk, +D, Drive\ 1, Write protect, Disable"
 .br
-.I "Media, Disk, +D, Drive 2, ..."
+.I "Media, Disk, +D, Drive\ 2, ..."
 .RS
 As above, but for the emulated +D drives.
 .RE
 .PP
-.I "Media, Disk, DISCiPLE, Drive 1, Insert New"
+.I "Media, Disk, DISCiPLE, Drive\ 1, Insert New"
 .br
-.I "Media, Disk, DISCiPLE, Drive 1, Insert..."
+.I "Media, Disk, DISCiPLE, Drive\ 1, Insert..."
 .br
-.I "Media, Disk, DISCiPLE, Drive 1, Eject"
+.I "Media, Disk, DISCiPLE, Drive\ 1, Eject"
 .br
-.I "Media, Disk, DISCiPLE, Drive 1, Save"
+.I "Media, Disk, DISCiPLE, Drive\ 1, Save"
 .br
-.I "Media, Disk, DISCiPLE, Drive 1, Save as..."
+.I "Media, Disk, DISCiPLE, Drive\ 1, Save as..."
 .br
-.I "Media, Disk, DISCiPLE, Drive 1, Write protect, Enable"
+.I "Media, Disk, DISCiPLE, Drive\ 1, Write protect, Enable"
 .br
-.I "Media, Disk, DISCiPLE, Drive 1, Write protect, Disable"
+.I "Media, Disk, DISCiPLE, Drive\ 1, Write protect, Disable"
 .br
-.I "Media, Disk, DISCiPLE, Drive 2, ..."
+.I "Media, Disk, DISCiPLE, Drive\ 2, ..."
 .RS
 As above, but for the emulated DISCiPLE drives.
 .RE
 .PP
 .I "Media, Cartridge, Timex Dock, Insert..."
 .RS
-Insert a cartridge into the Timex 2068 dock. This will cause the
+Insert a cartridge into the Timex\ 2068 dock. This will cause the
 emulated machine to be changed to the TC2068 (if it wasn't already
 a 2068 variant) and reset.
 .RE
 .PP
 .I "Media, Cartridge, Timex Dock, Eject"
 .RS
-Remove the cartridge from the Timex 2068 dock. This will cause the
+Remove the cartridge from the Timex\ 2068 dock. This will cause the
 emulated machine to be reset.
 .RE
 .PP
-.I "Media, Cartridge, Interface 2, Insert..."
+.I "Media, Cartridge, Interface\ 2, Insert..."
 .RS
-Insert a cartridge into the Interface 2 cartridge slot. This will
+Insert a cartridge into the Interface\ 2 cartridge slot. This will
 cause the emulated machine to be reset and the cartridge loaded.
 .RE
 .PP
-.I "Media, Cartridge, Interface 2, Eject..."
+.I "Media, Cartridge, Interface\ 2, Eject..."
 .RS
-Remove the cartridge from the Interface 2 cartridge slot. This will
+Remove the cartridge from the Interface\ 2 cartridge slot. This will
 cause the emulated machine to be reset.
 .RE
 .PP
@@ -3184,7 +3184,7 @@ possibilities. Support for graphics filters varies between the
 different user interfaces, but there are two general classes: the GTK+,
 Win32, Xlib, SVGAlib and SDL user interfaces (and the saving of .png
 screenshots) support `interpolating' filters which use a palette larger
-than the Spectrum's 16 colours, while the framebuffer user interface
+than the Spectrum's 16\ colours, while the framebuffer user interface
 currently does not support filters at all.
 .PP
 A further complication arises due to the fact that the Timex machines
@@ -3255,24 +3255,24 @@ only with the GTK+, Win32, Xlib and SDL user interfaces or when saving
 screenshots of non-Timex machines.
 .RE
 .PP
-.IR "TV 2x " ( tv2x )
+.IR "TV\ 2x " ( tv2x )
 .br
-.IR "TV 3x " ( tv3x )
+.IR "TV\ 3x " ( tv3x )
 .br
-.IR "Timex TV " ( timextv )
+.IR "Timex\ TV " ( timextv )
 .RS
 Three filters which attempt to emulate the effect of television
 scanlines. The first is a double-sizing filter for non-Timex
 machines, the second is a similar triple-sizing filter, while the last
-is a single-sizing filter for Timex machines (note that this means TV 2X
-and Timex TV produce the same size output).
+is a single-sizing filter for Timex machines (note that this means TV\ 2X
+and Timex\ TV produce the same size output).
 .RE
 .PP
-.IR "PAL TV " ( paltv )
+.IR "PAL\ TV " ( paltv )
 .br
-.IR "PAL TV 2x " ( paltv2x )
+.IR "PAL\ TV\ 2x " ( paltv2x )
 .br
-.IR "PAL TV 3x " ( paltv3x )
+.IR "PAL\ TV\ 3x " ( paltv3x )
 .RS
 Three filters which attempt to emulate the effect of the PAL TV system
 which layers a lower-resolution colour image over the top of a
@@ -3286,7 +3286,7 @@ A double-sizing filter which emulates the effect of a dot-matrix
 display.
 .RE
 .PP
-.IR "Timex 1.5x " ( timex15x )
+.IR "Timex\ 1.5x " ( timex15x )
 .RS
 An interpolating Timex-specific filter which scales the Timex screen
 up to 1.5\(mu its usual size (which is therefore 3\(mu the size of a
@@ -3296,8 +3296,8 @@ user interfaces or when saving screenshots.
 .\"------------------------------------------------------------------
 .\"
 .SH "THE EMULATED SPECTRUM"
-The emulated Spectrum is, by default, an unmodified 48K Spectrum with
-a tape player and ZX Printer attached. Oh, and apparently some magical
+The emulated Spectrum is, by default, an unmodified 48K\ Spectrum with
+a tape player and ZX\ Printer attached. Oh, and apparently some magical
 snapshot load/save machine which is probably best glossed over for the
 sake of the analogy. :\-)
 .PP
@@ -3319,7 +3319,7 @@ made available for the different models:
 .PP
 .TP
 .IR 16 ", " 48 ", " TC2048 ", " TC2068 ", " TS2068
-ZX Printer
+ZX\ Printer
 .TP
 .IR 128 / +2 / Pentagon
 Serial printer (text-only)
@@ -3341,8 +3341,8 @@ converters). These names can be changed with the
 .B \-\-textfile
 and
 .B \-\-graphicsfile
-options from the command line or configuration file. While the ZX
-Printer can
+options from the command line or configuration file. While the
+ZX\ Printer can
 .I only
 output graphically, simulated text output is generated at the same
 time using a crude sort of OCR based on the current character set (a
@@ -3415,7 +3415,7 @@ the firmwares available from the DivIDE homepage.
 .\"------------------------------------------------------------------
 .\"
 .SH "SPECTRANET EMULATION"
-The Spectranet is an Ethernet network interface for the ZX Spectrum
+The Spectranet is an Ethernet network interface for the ZX\ Spectrum
 by Dylan Thomas. The interface can be activated via the
 .I Spectranet
 option on the Peripherals preferences dialog, and the state of its
@@ -3458,7 +3458,7 @@ RANDOMIZE USR 27000
 The screen should turn blue and you'll see around 20 lines of message
 appearing as the firmware is installed, starting with \(lqErasing sector
 0\(rq and finishing with \(lqRestoring page B\(rq, and you'll get the familiar
-0 OK, 0: 1 at the bottom of the screen.
+0\ OK,\ 0:\ 1 at the bottom of the screen.
 .PP
 Now untick the
 .I "Spectranet disable"
@@ -3744,7 +3744,7 @@ if1:page
 .br
 if1:unpage
 .RS
-The Interface 1 shadow ROM is paged into or out of memory
+The Interface\ 1 shadow ROM is paged into or out of memory
 .RE
 .br
 rzx:end
@@ -3970,7 +3970,7 @@ and
 .RI ` X '
 respectively. The 48K machines are treated as having a permanent
 mapping of page 5 at 0x4000, page 2 at 0x8000 and page 0 at 0xC000;
-the 16K Spectrum is treated as having page 5 at 0x4000 and no page at
+the 16K\ Spectrum is treated as having page 5 at 0x4000 and no page at
 0x8000 and 0xC000.
 .PP
 Anywhere the debugger is expecting a numeric value, except where it
@@ -4038,16 +4038,16 @@ written to.
 An example of how to use this may make things a bit clearer. We'll use
 the 128K version of Gryzor. Load the game, define keys to suit and
 start playing. Immediately pause the game and bring up the poke finder
-dialog. We note that we currently have 6 lives, so enter `6' into the
+dialog. We note that we currently have 6\ lives, so enter `6' into the
 `Search for' field and click `Search'. This reduces the number of
 possible locations to around 931 (you may get a slightly different
 number depending on exactly when you paused the game). Play along a
 bit and then (deliberately) lose a life. Pause the game again. As we
-now have 5 lives, replace the `6' in the `Search for' field with a `5'
+now have 5\ lives, replace the `6' in the `Search for' field with a `5'
 and click `Search' again. This then reduces the list of possible
-locations to just one: page 2, offset 0x00BC. This is the only
-location in memory which stored `6' when we had 6 lives and `5' when
-we had 5 lives, so its pretty likely that this is where the lives
+locations to just one: page\ 2, offset 0x00BC. This is the only
+location in memory which stored `6' when we had 6\ lives and `5' when
+we had 5\ lives, so its pretty likely that this is where the lives
 count is stored. Double-clicking on the `2:0x00BC' entry in the dialog
 will set the appropriate breakpoint (you may wish to open the debugger
 at this point to confirm this). Play along a bit more. When you next
@@ -4064,7 +4064,7 @@ lives.
 .\"
 .SH THE .DSK FORMAT
 .PP
-In general, disk images for the +3 Spectrum are thought of as being in
+In general, disk images for the +3\ Spectrum are thought of as being in
 DSK format. However, this is actually a slight oversimplification;
 there are in fact
 .I two
@@ -4079,16 +4079,16 @@ Fuse supports both the `CPCEMU' and `EXTENDED' formats.
 .\"
 .\"------------------------------------------------------------------
 .\"
-.SH BETA 128 EMULATION
+.SH BETA\ 128 EMULATION
 .PP
 Fuse supports Betadisk emulation in its Pentagon and Scorpion
 emulation, and also under 48K, TC2048, 128K and +2 (but not +2A)
 emulation if the
-.I "Beta 128 interface"
+.I "Beta\ 128 interface"
 option from the
 .I "Options, Disk Peripherals..."
 dialog is enabled. When that option is used in 48K or TC2048 emulation the
-.I "Beta 128 auto-boot in 48K machines"
+.I "Beta\ 128 auto-boot in 48K machines"
 option additionally controls whether the machine boots directly into the TR-DOS
 system. See the
 .B "DISK FILE FORMATS"
@@ -4099,7 +4099,7 @@ section for more details on supported disk file formats.
 .SH OPUS DISCOVERY EMULATION
 .PP
 By default, Fuse emulates the Opus Discovery interface with the optional 2k RAM
-expansion and a second 40 track single sided disk drive.
+expansion and a second 40\ track single sided disk drive.
 See the
 .B "DISK FILE FORMATS"
 section for more details on supported disk file formats. The Opus
@@ -4107,7 +4107,7 @@ Discovery's printer port is also emulated for output only. (See the
 .B "PRINTER EMULATION"
 section for more details.) The Opus Discovery may only be
 used with 16K, 48K, 128K, TC2048 and +2 (not +2A) emulation.  To access disks,
-use the same syntax as Interface 1 and Microdrives.
+use the same syntax as Interface\ 1 and Microdrives.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -4128,7 +4128,7 @@ where
 .RI ` n '
 is the number of the drive in use.  For example,
 .RI ` "LOAD d1\(dqmyfile\(dq" '
-would load the file named `myfile' from the emulated drive 1.
+would load the file named `myfile' from the emulated drive\ 1.
 Microdrive syntax may also be used.
 .PP
 To save a snapshot, choose the
@@ -4163,7 +4163,7 @@ where
 .RI ` n '
 is the number of the drive in use.  For example,
 .RI ` "LOAD d1\(dqmyfile\(dq" '
-would load the file named `myfile' from the emulated drive 1.
+would load the file named `myfile' from the emulated drive\ 1.
 Microdrive syntax may also be used.
 .PP
 Snapshots can be saved in the same manner as with the +D as described
@@ -4179,7 +4179,7 @@ should have been saved/restored.)
 .SH DISK FILE FORMATS
 .PP
 Fuse supports several disk image formats in its +D, DISCiPLE and
-Beta 128 emulation.
+Beta\ 128 emulation.
 .PP
 For reading:
 .PP
@@ -4316,11 +4316,11 @@ option is set to 1, but in most cases you can safely use 2. Also, movie
 recording stops if the emulated machine is changed.
 .PP
 The recorded sound sampling rate and the channel number is equal with the
-Fuse generated sound sampling rate (32000 Hz by default) and channel
+Fuse generated sound sampling rate (32000\ Hz by default) and channel
 number (mono by default). The common sampling frequencies in
-standard video files are 44100 Hz and 48000 Hz. If you use
+standard video files are 44100\ Hz and 48000\ Hz. If you use
 .B \-\-sound\-freq
-command line option you can record sound on 44100Hz or even 48000Hz.
+command line option you can record sound on 44100\ Hz or even 48000\ Hz.
 .PP
 You can record stereo sound if you use
 .I "AY stereo separation"
@@ -4337,7 +4337,7 @@ to convert recorded movie file into a standard video file.
 .B "fuse \-\-movie\-start \-\-rate 2 \-\-sound\-freq 44100 \-\-separation"
 .B enigma.fmf
 .PP
-start video recording about 25/s video frame rate and 44100Hz sampling
+start video recording about 25/s video frame rate and 44100\ Hz sampling
 frequency stereo sound default compression level.
 .\"
 .\"------------------------------------------------------------------
@@ -4415,7 +4415,7 @@ version of this man page.
 John Elliott's lib765 and libdsk libraries were used for the original
 +3 disk and disk image support.
 .PP
-Ian Collier wrote the ZX Printer emulation (for xz80).
+Ian Collier wrote the ZX\ Printer emulation (for xz80).
 .PP
 Darren Salt wrote the original versions of the code for +3 emulation,
 SLT support, MITSHM support (for the Xlib UI), TZX raw data blocks,
@@ -4447,8 +4447,8 @@ and the HP-UX sound code.
 Garry Lancaster wrote the 8-bit IDE, ZXATASP and ZXCF interface
 emulations.
 .PP
-Gergely Szasz wrote the Interface 1 and Microdrive emulation, the PAL
-TV scalers, the TV 3x scaler, the movie logging code, the libao sound
+Gergely Szasz wrote the Interface\ 1 and Microdrive emulation, the PAL
+TV scalers, the TV\ 3x scaler, the movie logging code, the libao sound
 code, the \(mcPD765 disk controller used in the +3 and made many
 improvements to the widget code.
 .PP
