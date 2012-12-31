@@ -4343,3 +4343,6 @@
 20121230 man/fuse.1: fix typo (Fred).
 20121230 man/fuse.1: fix typo (thanks, Fred) (Stuart)
 20121230 man/fuse.1: use conformant and more consistent syntax (Stuart).
+20121231 AUTHORS,README,THANKS,fuse.c,man/fuse.1,menu.[ch],menu_data.dat,
+         peripherals/if[12].[ch],ui.c,ui/options.dat: rename 'Interface I' and
+         'Interface II' to 'Interface 1' and 'Interface 2' (Stuart).

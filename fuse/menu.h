@@ -97,8 +97,8 @@ MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 );
 
 MENU_CALLBACK( menu_media_cartridge_timexdock_insert );
 MENU_CALLBACK( menu_media_cartridge_timexdock_eject );
-MENU_CALLBACK( menu_media_cartridge_interfaceii_insert );
-MENU_CALLBACK( menu_media_cartridge_interfaceii_eject );
+MENU_CALLBACK( menu_media_cartridge_interface2_insert );
+MENU_CALLBACK( menu_media_cartridge_interface2_eject );
 
 MENU_CALLBACK_WITH_ACTION( menu_media_ide_insert );
 MENU_CALLBACK_WITH_ACTION( menu_media_ide_commit );

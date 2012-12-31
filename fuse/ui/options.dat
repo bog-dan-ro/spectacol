@@ -34,8 +34,8 @@ Checkbox, Kempston (m)ouse, kempston_mouse, INPUT_KEY_m
 Checkbox, (S)wap mouse buttons, mouse_swap_buttons, INPUT_KEY_s
 Checkbox, (F)uller Box, fuller, INPUT_KEY_f
 Checkbox, M(e)lodik, melodik, INPUT_KEY_e
-Checkbox, (I)nterface I, interface1, INPUT_KEY_i
-Checkbox, In(t)erface II, interface2, INPUT_KEY_t
+Checkbox, (I)nterface 1, interface1, INPUT_KEY_i
+Checkbox, In(t)erface 2, interface2, INPUT_KEY_t
 Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
 Checkbox, Speccy(B)oot interface, speccyboot, INPUT_KEY_b
 Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d

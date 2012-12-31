@@ -24,7 +24,7 @@ What Fuse does have:
 * Emulation of some of the printers you could attach to a Spectrum.
 * Support for the RZX input recording file format, including
   rollback and 'competition mode'.
-* Emulation of the DivIDE, Interface I, Kempston mouse, Spectrum +3e,
+* Emulation of the DivIDE, Interface 1, Kempston mouse, Spectrum +3e,
   ZXATASP, ZXCF, Beta 128, Opus Discovery and +D interfaces.
 
 Help! <xyz> doesn't work

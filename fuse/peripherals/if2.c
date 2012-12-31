@@ -1,4 +1,4 @@
-/* if2.c: Interface II cartridge handling routines
+/* if2.c: Interface 2 cartridge handling routines
    Copyright (c) 2003-2011 Darren Salt, Fredrick Meunier, Philip Kendall
 
    $Id$
@@ -88,7 +88,7 @@ if2_insert( const char *filename )
 {
   if ( !periph_is_active( PERIPH_TYPE_INTERFACE2 ) ) {
     ui_error( UI_ERROR_ERROR,
-	      "This machine does not support the Interface II" );
+	      "This machine does not support the Interface 2" );
     return 1;
   }
 
@@ -104,7 +104,7 @@ if2_eject( void )
 {
   if ( !periph_is_active( PERIPH_TYPE_INTERFACE2 ) ) {
     ui_error( UI_ERROR_ERROR,
-	      "This machine does not support the Interface II" );
+	      "This machine does not support the Interface 2" );
     return;
   }
 

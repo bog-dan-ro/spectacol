@@ -1,4 +1,4 @@
-/* if1.c: Interface I handling routines
+/* if1.c: Interface 1 handling routines
    Copyright (c) 2004-2011 Gergely Szasz, Philip Kendall
 
    $Id$
@@ -377,7 +377,7 @@ if1_reset( int hard_reset GCC_UNUSED )
     return;
   }
 
-  /* Check for an Interface I ROM */
+  /* Check for an Interface 1 ROM */
   if( machine_load_rom_bank( if1_memory_map_romcs, 0,
 			     settings_current.rom_interface_i,
 			     settings_default.rom_interface_i,

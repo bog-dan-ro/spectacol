@@ -219,7 +219,7 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case 14: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,    34, 4 ); return;
   case 15: menu_select_roms( LIBSPECTRUM_MACHINE_SE,       38, 2 ); return;
 
-  case 16: menu_select_roms_with_title( "Interface I",     40, 1 ); return;
+  case 16: menu_select_roms_with_title( "Interface 1",     40, 1 ); return;
   case 17: menu_select_roms_with_title( "Beta 128",        41, 1 ); return;
   case 18: menu_select_roms_with_title( "+D",              42, 1 ); return;
   case 19: menu_select_roms_with_title( "SpeccyBoot",      43, 1 ); return;
@@ -605,13 +605,13 @@ MENU_CALLBACK( menu_media_cartridge_timexdock_eject )
   dck_eject();
 }
 
-MENU_CALLBACK( menu_media_cartridge_interfaceii_insert )
+MENU_CALLBACK( menu_media_cartridge_interface2_insert )
 {
   char *filename;
 
   fuse_emulation_pause();
 
-  filename = ui_get_open_filename( "Fuse - Insert Interface II Cartridge" );
+  filename = ui_get_open_filename( "Fuse - Insert Interface 2 Cartridge" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   if2_insert( filename );
@@ -621,7 +621,7 @@ MENU_CALLBACK( menu_media_cartridge_interfaceii_insert )
   fuse_emulation_unpause();
 }
 
-MENU_CALLBACK( menu_media_cartridge_interfaceii_eject )
+MENU_CALLBACK( menu_media_cartridge_interface2_eject )
 {
   ui_widget_finish();
   if2_eject();

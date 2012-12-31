@@ -96,7 +96,7 @@ Options/Select ROMs/Pe_ntagon 512K..., Item,, menu_options_selectroms_select,, 1
 Options/Select ROMs/Penta_gon 1024K..., Item,, menu_options_selectroms_select,, 13
 Options/Select ROMs/S_corpion ZS 256..., Item,, menu_options_selectroms_select,, 14
 Options/Select ROMs/Spectrum _SE..., Item,, menu_options_selectroms_select,, 15
-Options/Select ROMs/Interface _I..., Item,, menu_options_selectroms_select,, 16
+Options/Select ROMs/_Interface 1..., Item,, menu_options_selectroms_select,, 16
 Options/Select ROMs/_Beta 128..., Item,, menu_options_selectroms_select,, 17
 Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select,, 18
 Options/Select ROMs/Specc_yBoot..., Item,, menu_options_selectroms_select,, 19
@@ -144,98 +144,98 @@ Media/Tape/_Write..., Item, F6
 Media/Tape/R_ecord Start, Item
 Media/Tape/Recor_d Stop, Item
 
-Media/_Interface I, Branch
+Media/_Interface 1, Branch
 
-Media/Interface I/Microdrive _1, Branch
-Media/Interface I/Microdrive 1/Insert _New, Item,, menu_media_insert_new,, 0x31
-Media/Interface I/Microdrive 1/_Insert..., Item,, menu_media_insert,, 0x31
-Media/Interface I/Microdrive 1/_Eject, Item,, menu_media_eject,, 0x31
-Media/Interface I/Microdrive 1/_Save, Item,, menu_media_save,, 0x031
-Media/Interface I/Microdrive 1/Save _As..., Item,, menu_media_save,, 0x131
-Media/Interface I/Microdrive 1/Write _protect, Branch
-Media/Interface I/Microdrive 1/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x131
-Media/Interface I/Microdrive 1/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x031
+Media/Interface 1/Microdrive _1, Branch
+Media/Interface 1/Microdrive 1/Insert _New, Item,, menu_media_insert_new,, 0x31
+Media/Interface 1/Microdrive 1/_Insert..., Item,, menu_media_insert,, 0x31
+Media/Interface 1/Microdrive 1/_Eject, Item,, menu_media_eject,, 0x31
+Media/Interface 1/Microdrive 1/_Save, Item,, menu_media_save,, 0x031
+Media/Interface 1/Microdrive 1/Save _As..., Item,, menu_media_save,, 0x131
+Media/Interface 1/Microdrive 1/Write _protect, Branch
+Media/Interface 1/Microdrive 1/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x131
+Media/Interface 1/Microdrive 1/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x031
 
-Media/Interface I/Microdrive _2, Branch
-Media/Interface I/Microdrive 2/Insert _New, Item,, menu_media_insert_new,, 0x32
-Media/Interface I/Microdrive 2/_Insert..., Item,, menu_media_insert,, 0x32
-Media/Interface I/Microdrive 2/_Eject, Item,, menu_media_eject,, 0x32
-Media/Interface I/Microdrive 2/_Save, Item,, menu_media_save,, 0x032
-Media/Interface I/Microdrive 2/Save _As..., Item,, menu_media_save,, 0x132
-Media/Interface I/Microdrive 2/Write _protect, Branch
-Media/Interface I/Microdrive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x132
-Media/Interface I/Microdrive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x032
+Media/Interface 1/Microdrive _2, Branch
+Media/Interface 1/Microdrive 2/Insert _New, Item,, menu_media_insert_new,, 0x32
+Media/Interface 1/Microdrive 2/_Insert..., Item,, menu_media_insert,, 0x32
+Media/Interface 1/Microdrive 2/_Eject, Item,, menu_media_eject,, 0x32
+Media/Interface 1/Microdrive 2/_Save, Item,, menu_media_save,, 0x032
+Media/Interface 1/Microdrive 2/Save _As..., Item,, menu_media_save,, 0x132
+Media/Interface 1/Microdrive 2/Write _protect, Branch
+Media/Interface 1/Microdrive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x132
+Media/Interface 1/Microdrive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x032
 
-Media/Interface I/Microdrive _3, Branch
-Media/Interface I/Microdrive 3/Insert _New, Item,, menu_media_insert_new,, 0x33
-Media/Interface I/Microdrive 3/_Insert..., Item,, menu_media_insert,, 0x33
-Media/Interface I/Microdrive 3/_Eject, Item,, menu_media_eject,, 0x33
-Media/Interface I/Microdrive 3/_Save, Item,, menu_media_save,, 0x033
-Media/Interface I/Microdrive 3/Save _As..., Item,, menu_media_save,, 0x133
-Media/Interface I/Microdrive 3/Write _protect, Branch
-Media/Interface I/Microdrive 3/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x133
-Media/Interface I/Microdrive 3/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x033
+Media/Interface 1/Microdrive _3, Branch
+Media/Interface 1/Microdrive 3/Insert _New, Item,, menu_media_insert_new,, 0x33
+Media/Interface 1/Microdrive 3/_Insert..., Item,, menu_media_insert,, 0x33
+Media/Interface 1/Microdrive 3/_Eject, Item,, menu_media_eject,, 0x33
+Media/Interface 1/Microdrive 3/_Save, Item,, menu_media_save,, 0x033
+Media/Interface 1/Microdrive 3/Save _As..., Item,, menu_media_save,, 0x133
+Media/Interface 1/Microdrive 3/Write _protect, Branch
+Media/Interface 1/Microdrive 3/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x133
+Media/Interface 1/Microdrive 3/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x033
 
-Media/Interface I/Microdrive _4, Branch
-Media/Interface I/Microdrive 4/Insert _New, Item,, menu_media_insert_new,, 0x34
-Media/Interface I/Microdrive 4/_Insert..., Item,, menu_media_insert,, 0x34
-Media/Interface I/Microdrive 4/_Eject, Item,, menu_media_eject,, 0x34
-Media/Interface I/Microdrive 4/_Save, Item,, menu_media_save,, 0x034
-Media/Interface I/Microdrive 4/Save _As..., Item,, menu_media_save,, 0x134
-Media/Interface I/Microdrive 4/Write _protect, Branch
-Media/Interface I/Microdrive 4/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x134
-Media/Interface I/Microdrive 4/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x034
+Media/Interface 1/Microdrive _4, Branch
+Media/Interface 1/Microdrive 4/Insert _New, Item,, menu_media_insert_new,, 0x34
+Media/Interface 1/Microdrive 4/_Insert..., Item,, menu_media_insert,, 0x34
+Media/Interface 1/Microdrive 4/_Eject, Item,, menu_media_eject,, 0x34
+Media/Interface 1/Microdrive 4/_Save, Item,, menu_media_save,, 0x034
+Media/Interface 1/Microdrive 4/Save _As..., Item,, menu_media_save,, 0x134
+Media/Interface 1/Microdrive 4/Write _protect, Branch
+Media/Interface 1/Microdrive 4/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x134
+Media/Interface 1/Microdrive 4/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x034
 
-Media/Interface I/Microdrive _5, Branch
-Media/Interface I/Microdrive 5/Insert _New, Item,, menu_media_insert_new,, 0x35
-Media/Interface I/Microdrive 5/_Insert..., Item,, menu_media_insert,, 0x35
-Media/Interface I/Microdrive 5/_Eject, Item,, menu_media_eject,, 0x35
-Media/Interface I/Microdrive 5/_Save, Item,, menu_media_save,, 0x035
-Media/Interface I/Microdrive 5/Save _As..., Item,, menu_media_save,, 0x135
-Media/Interface I/Microdrive 5/Write _protect, Branch
-Media/Interface I/Microdrive 5/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x135
-Media/Interface I/Microdrive 5/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x035
+Media/Interface 1/Microdrive _5, Branch
+Media/Interface 1/Microdrive 5/Insert _New, Item,, menu_media_insert_new,, 0x35
+Media/Interface 1/Microdrive 5/_Insert..., Item,, menu_media_insert,, 0x35
+Media/Interface 1/Microdrive 5/_Eject, Item,, menu_media_eject,, 0x35
+Media/Interface 1/Microdrive 5/_Save, Item,, menu_media_save,, 0x035
+Media/Interface 1/Microdrive 5/Save _As..., Item,, menu_media_save,, 0x135
+Media/Interface 1/Microdrive 5/Write _protect, Branch
+Media/Interface 1/Microdrive 5/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x135
+Media/Interface 1/Microdrive 5/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x035
 
-Media/Interface I/Microdrive _6, Branch
-Media/Interface I/Microdrive 6/Insert _New, Item,, menu_media_insert_new,, 0x36
-Media/Interface I/Microdrive 6/_Insert..., Item,, menu_media_insert,, 0x36
-Media/Interface I/Microdrive 6/_Eject, Item,, menu_media_eject,, 0x36
-Media/Interface I/Microdrive 6/_Save, Item,, menu_media_save,, 0x036
-Media/Interface I/Microdrive 6/Save _As..., Item,, menu_media_save,, 0x136
-Media/Interface I/Microdrive 6/Write _protect, Branch
-Media/Interface I/Microdrive 6/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x136
-Media/Interface I/Microdrive 6/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x036
+Media/Interface 1/Microdrive _6, Branch
+Media/Interface 1/Microdrive 6/Insert _New, Item,, menu_media_insert_new,, 0x36
+Media/Interface 1/Microdrive 6/_Insert..., Item,, menu_media_insert,, 0x36
+Media/Interface 1/Microdrive 6/_Eject, Item,, menu_media_eject,, 0x36
+Media/Interface 1/Microdrive 6/_Save, Item,, menu_media_save,, 0x036
+Media/Interface 1/Microdrive 6/Save _As..., Item,, menu_media_save,, 0x136
+Media/Interface 1/Microdrive 6/Write _protect, Branch
+Media/Interface 1/Microdrive 6/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x136
+Media/Interface 1/Microdrive 6/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x036
 
-Media/Interface I/Microdrive _7, Branch
-Media/Interface I/Microdrive 7/Insert _New, Item,, menu_media_insert_new,, 0x37
-Media/Interface I/Microdrive 7/_Insert..., Item,, menu_media_insert,, 0x37
-Media/Interface I/Microdrive 7/_Eject, Item,, menu_media_eject,, 0x37
-Media/Interface I/Microdrive 7/_Save, Item,, menu_media_save,, 0x037
-Media/Interface I/Microdrive 7/Save _As..., Item,, menu_media_save,, 0x137
-Media/Interface I/Microdrive 7/Write _protect, Branch
-Media/Interface I/Microdrive 7/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x137
-Media/Interface I/Microdrive 7/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x037
+Media/Interface 1/Microdrive _7, Branch
+Media/Interface 1/Microdrive 7/Insert _New, Item,, menu_media_insert_new,, 0x37
+Media/Interface 1/Microdrive 7/_Insert..., Item,, menu_media_insert,, 0x37
+Media/Interface 1/Microdrive 7/_Eject, Item,, menu_media_eject,, 0x37
+Media/Interface 1/Microdrive 7/_Save, Item,, menu_media_save,, 0x037
+Media/Interface 1/Microdrive 7/Save _As..., Item,, menu_media_save,, 0x137
+Media/Interface 1/Microdrive 7/Write _protect, Branch
+Media/Interface 1/Microdrive 7/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x137
+Media/Interface 1/Microdrive 7/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x037
 
-Media/Interface I/Microdrive _8, Branch
-Media/Interface I/Microdrive 8/Insert _New, Item,, menu_media_insert_new,, 0x38
-Media/Interface I/Microdrive 8/_Insert..., Item,, menu_media_insert,, 0x38
-Media/Interface I/Microdrive 8/_Eject, Item,, menu_media_eject,, 0x38
-Media/Interface I/Microdrive 8/_Save, Item,, menu_media_save,, 0x038
-Media/Interface I/Microdrive 8/Save _As..., Item,, menu_media_save,, 0x138
-Media/Interface I/Microdrive 8/Write _protect, Branch
-Media/Interface I/Microdrive 8/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x138
-Media/Interface I/Microdrive 8/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x038
+Media/Interface 1/Microdrive _8, Branch
+Media/Interface 1/Microdrive 8/Insert _New, Item,, menu_media_insert_new,, 0x38
+Media/Interface 1/Microdrive 8/_Insert..., Item,, menu_media_insert,, 0x38
+Media/Interface 1/Microdrive 8/_Eject, Item,, menu_media_eject,, 0x38
+Media/Interface 1/Microdrive 8/_Save, Item,, menu_media_save,, 0x038
+Media/Interface 1/Microdrive 8/Save _As..., Item,, menu_media_save,, 0x138
+Media/Interface 1/Microdrive 8/Write _protect, Branch
+Media/Interface 1/Microdrive 8/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x138
+Media/Interface 1/Microdrive 8/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x038
 
-Media/Interface I/_RS232, Branch
-Media/Interface I/RS232/Plug _RxD, Item,, menu_media_if1_rs232,, 0x01
-Media/Interface I/RS232/_Unplug RxD, Item,, menu_media_if1_rs232,, 0x11
-Media/Interface I/RS232/Plug _TxD, Item,, menu_media_if1_rs232,, 0x02
-Media/Interface I/RS232/Un_plug TxD, Item,, menu_media_if1_rs232,, 0x12
+Media/Interface 1/_RS232, Branch
+Media/Interface 1/RS232/Plug _RxD, Item,, menu_media_if1_rs232,, 0x01
+Media/Interface 1/RS232/_Unplug RxD, Item,, menu_media_if1_rs232,, 0x11
+Media/Interface 1/RS232/Plug _TxD, Item,, menu_media_if1_rs232,, 0x02
+Media/Interface 1/RS232/Un_plug TxD, Item,, menu_media_if1_rs232,, 0x12
 
 #ifdef BUILD_WITH_SNET
-Media/Interface I/_Sinclair NET, Branch
-Media/Interface I/Sinclair NET/_Plug in, Item,, menu_media_if1_rs232,, 0x03
-Media/Interface I/Sinclair NET/_Unplug, Item,, menu_media_if1_rs232,, 0x13
+Media/Interface 1/_Sinclair NET, Branch
+Media/Interface 1/Sinclair NET/_Plug in, Item,, menu_media_if1_rs232,, 0x03
+Media/Interface 1/Sinclair NET/_Unplug, Item,, menu_media_if1_rs232,, 0x13
 #endif
 
 Media/_Disk, Branch
@@ -398,9 +398,9 @@ Media/_Cartridge, Branch
 Media/Cartridge/_Timex Dock, Branch
 Media/Cartridge/Timex Dock/_Insert..., Item
 Media/Cartridge/Timex Dock/_Eject, Item
-Media/Cartridge/_Interface II, Branch
-Media/Cartridge/Interface II/_Insert..., Item
-Media/Cartridge/Interface II/_Eject, Item
+Media/Cartridge/_Interface 2, Branch
+Media/Cartridge/Interface 2/_Insert..., Item
+Media/Cartridge/Interface 2/_Eject, Item
 
 Media/ID_E, Branch
 

@@ -1,4 +1,4 @@
-/* if2.h: Interface II cartridge handling routines
+/* if2.h: Interface 2 cartridge handling routines
    Copyright (c) 2004 Fredrick Meunier
 
    $Id$

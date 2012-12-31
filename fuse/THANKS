@@ -78,7 +78,7 @@ Some thanks (in alphabetical order):
   the code which is used as the graphics scalers. For ScummVM, check out
   http://www.scummvm.org/
 
-* Gergely Szasz: Interface I/microdrive emulation, the 'movie' code and the
+* Gergely Szasz: Interface 1/Microdrive emulation, the 'movie' code and the
   ao sound driver (see `AUTHORS')
 
 * Miklos Szeredi: his `SpectEmu' (http://www.inf.bme.hu/~mszeredi/spectemu/)

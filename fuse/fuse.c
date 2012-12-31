@@ -678,12 +678,12 @@ do_start_files( start_files_t *start_files )
     start_files->dock = NULL;
   }
 
-  /* Can't use disks and the Interface II simultaneously */
+  /* Can't use disks and the Interface 2 simultaneously */
   if( ( start_files->disk_plus3 || start_files->disk_beta ) &&
       start_files->if2                                          ) {
     ui_error(
       UI_ERROR_WARNING,
-      "can't use disks and the Interface II simultaneously; cartridge ignored"
+      "can't use disks and the Interface 2 simultaneously; cartridge ignored"
     );
     start_files->if2 = NULL;
   }
