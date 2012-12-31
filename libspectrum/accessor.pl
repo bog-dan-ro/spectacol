@@ -174,7 +174,7 @@ struct libspectrum_snap {
   size_t zxcf_pages;
   libspectrum_byte *zxcf_ram[ SNAPSHOT_ZXCF_PAGES ];
 
-  /* Interface II cartridge */
+  /* Interface 2 cartridge */
   int interface2_active;
   libspectrum_byte *interface2_rom[1];
 

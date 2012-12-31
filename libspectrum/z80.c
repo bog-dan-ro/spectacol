@@ -93,7 +93,7 @@ enum {
   Z80_MACHINE_FIRST_EXTENSION = Z80_MACHINE_PLUS3,
 };
 
-/* Constants representing a Sinclair Interface II port 1 joystick as a .z80
+/* Constants representing a Sinclair Interface 2 port 1 joystick as a .z80
    user defined joystick */
 static const libspectrum_word if2_left_map_l = 0x0f03;
 static const libspectrum_word if2_left_map_r = 0x0803;
@@ -1260,7 +1260,7 @@ write_base_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
     break;
   case LIBSPECTRUM_JOYSTICK_SINCLAIR_2:
     /* Write Z80_JOYSTICK_USER_DEFINED_V3 and custom key mapping corresponding
-       to Sinclair Interface II right port */
+       to Sinclair Interface 2 right port */
     joystick_flags = Z80_JOYSTICK_USER_DEFINED_V3;
     break;
 

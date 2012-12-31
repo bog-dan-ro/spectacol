@@ -277,7 +277,7 @@ the following values:
 LIBSPECTRUM_ID_UNKNOWN		Couldn't identify this file
 
 LIBSPECTRUM_ID_CARTRIDGE_DCK	A .dck Timex dock image
-LIBSPECTRUM_ID_CARTRIDGE_IF2	A .rom Interface II cartridge
+LIBSPECTRUM_ID_CARTRIDGE_IF2	A .rom Interface 2 cartridge
 
 LIBSPECTRUM_ID_COMPRESSED_BZ2	A bzip2 compressed file
 LIBSPECTRUM_ID_COMPRESSED_GZ	A gzip compressed file
@@ -350,7 +350,7 @@ which returns the type of file represented by the `type' parameter in
 LIBSPECTRUM_CLASS_UNKNOWN		An unknown file type
 
 LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX	A Timex dock cartridge
-LIBSPECTRUM_CLASS_CARTRIDGE_IF2		An Interface II cartridge
+LIBSPECTRUM_CLASS_CARTRIDGE_IF2		An Interface 2 cartridge
 LIBSPECTRUM_CLASS_DISK_GENERIC		A generic disk image
 LIBSPECTRUM_CLASS_DISK_PLUSD		An MGT/+D disk image
 LIBSPECTRUM_CLASS_DISK_PLUS3		A +3 disk image

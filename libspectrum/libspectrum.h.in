@@ -191,7 +191,7 @@ typedef enum libspectrum_id_t {
   /* Below here, present only in 0.2.2 and later */
 
   LIBSPECTRUM_ID_HARDDISK_HDF,		/* .hdf hard disk image */
-  LIBSPECTRUM_ID_CARTRIDGE_IF2,		/* .rom Interface II cartridge image */
+  LIBSPECTRUM_ID_CARTRIDGE_IF2,		/* .rom Interface 2 cartridge image */
 
   /* Below here, present only in 0.3.0 and later */
 
@@ -246,7 +246,7 @@ typedef enum libspectrum_class_t {
   /* Below here, present only in 0.2.2 and later */
 
   LIBSPECTRUM_CLASS_HARDDISK,		/* A hard disk image */
-  LIBSPECTRUM_CLASS_CARTRIDGE_IF2,	/* Interface II cartridges */
+  LIBSPECTRUM_CLASS_CARTRIDGE_IF2,	/* Interface 2 cartridges */
 
   /* Below here, present only in 0.3.0 and later */
 

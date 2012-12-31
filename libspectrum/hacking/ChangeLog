@@ -931,3 +931,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20121231 timings.c: 128Ke timings are intended to be based on +2A (Fred).
 20121231 libspectrum.c: add 128Ke capabilities as long as it is in the library
          (Fred).
+20121231 accessor.pl,doc/libspectrum.txt,libspectrum.h.in,sna.c,z80.c: rename
+         'Interface II' to 'Interface 2' in comments and documentation (Stuart).
