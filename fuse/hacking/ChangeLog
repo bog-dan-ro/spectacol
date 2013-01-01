@@ -4347,3 +4347,4 @@
          peripherals/if[12].[ch],ui.c,ui/options.dat: rename 'Interface I' and
          'Interface II' to 'Interface 1' and 'Interface 2' (Stuart).
 20121231 man/fuse.1: use non-breaking spaces where appropriate (Stuart).
+20130101 man/fuse.1: fix text in SPECTRANET EMULATION section (Fred).
