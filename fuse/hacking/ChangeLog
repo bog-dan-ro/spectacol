@@ -4352,3 +4352,5 @@
          add menu items for Opus Discovery and DISCiPLE ROM selection (Stuart).
 20130102 fuse.c,man/fuse.1,utils.c: wire up the --discipledisk option and
          document it (Stuart).
+20130102 hacking/peripheral_tests.txt: add instructions for testing the
+         DISCiPLE interface (Stuart).

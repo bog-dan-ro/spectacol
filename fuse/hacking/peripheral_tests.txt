@@ -13,6 +13,21 @@ Beta Disk
 * Uncompress lib/tests/success.mgt.bz2
 * Start fuse as
   ./fuse --plusd --plusddisk lib/tests/success.mgt PlusDSystemTape.tzx
+* Hit enter
+* Hit <Break>
+* Enter NEW
+* Enter LOAD d1"Success"
+* You should see "Congraturation! You sucsess!"
+
+DISCiPLE
+
+* Acquire the DISCiPLE system tape from
+  ftp://ftp.worldofspectrum.org/pub/sinclair/utils/DISCiPLESystemTapeV3d.tzx.zip
+* Uncompress lib/tests/success.mgt.bz2
+* Place a DISCiPLE ROM image in the 'roms' directory.
+* Start fuse as
+  ./fuse --disciple --discipledisk lib/tests/success.mgt DISCiPLESystemTapeV3d.tzx.zip
+* Hit enter
 * Hit <Break>
 * Enter NEW
 * Enter LOAD d1"Success"
