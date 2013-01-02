@@ -4354,3 +4354,5 @@
          document it (Stuart).
 20130102 hacking/peripheral_tests.txt: add instructions for testing the
          DISCiPLE interface (Stuart).
+20130103 configure.ac,fuse.c: make some URLs point to the new sourceforge forge
+         and update copyright date to 2013 (Sergio).

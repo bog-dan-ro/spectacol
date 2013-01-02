@@ -31,9 +31,9 @@ m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
 
 dnl Package info
-m4_define([fuse_copyright], ["(c) 1999-2012 Philip Kendall and others"])
+m4_define([fuse_copyright], ["(c) 1999-2013 Philip Kendall and others"])
 m4_define([fuse_url], [http://fuse-emulator.sourceforge.net])
-m4_define([fuse_bugreport], [http://sourceforge.net/tracker/?group_id=91293&atid=596648])
+m4_define([fuse_bugreport], [http://sourceforge.net/p/fuse-emulator/bugs])
 
 AC_INIT([fuse],[fuse_version],[fuse_bugreport],[fuse],[fuse_url])
 AC_CONFIG_SRCDIR(fuse.c)
