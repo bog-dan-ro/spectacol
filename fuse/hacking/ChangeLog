@@ -4348,3 +4348,5 @@
          'Interface II' to 'Interface 1' and 'Interface 2' (Stuart).
 20121231 man/fuse.1: use non-breaking spaces where appropriate (Stuart).
 20130101 man/fuse.1: fix text in SPECTRANET EMULATION section (Fred).
+20130102 menu.c,menu_data.dat,settings.{dat,pl}: fix command line options and
+	 add menu items for Opus Discovery and DISCiPLE ROM selection (Stuart).

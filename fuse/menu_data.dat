@@ -99,7 +99,9 @@ Options/Select ROMs/Spectrum _SE..., Item,, menu_options_selectroms_select,, 15
 Options/Select ROMs/_Interface 1..., Item,, menu_options_selectroms_select,, 16
 Options/Select ROMs/_Beta 128..., Item,, menu_options_selectroms_select,, 17
 Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select,, 18
-Options/Select ROMs/Specc_yBoot..., Item,, menu_options_selectroms_select,, 19
+Options/Select ROMs/DISCiP_LE..., Item,, menu_options_selectroms_select,, 19
+Options/Select ROMs/_Opus Discovery..., Item,, menu_options_selectroms_select,, 20
+Options/Select ROMs/Specc_yBoot..., Item,, menu_options_selectroms_select,, 21
 
 Options/_Filter..., Item,,, menu_filter_detail
 

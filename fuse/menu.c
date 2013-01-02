@@ -222,7 +222,9 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case 16: menu_select_roms_with_title( "Interface 1",     40, 1 ); return;
   case 17: menu_select_roms_with_title( "Beta 128",        41, 1 ); return;
   case 18: menu_select_roms_with_title( "+D",              42, 1 ); return;
-  case 19: menu_select_roms_with_title( "SpeccyBoot",      43, 1 ); return;
+  case 19: menu_select_roms_with_title( "DISCiPLE",        43, 1 ); return;
+  case 20: menu_select_roms_with_title( "Opus Discovery",  44, 1 ); return;
+  case 21: menu_select_roms_with_title( "SpeccyBoot",      45, 1 ); return;
 
   }
 

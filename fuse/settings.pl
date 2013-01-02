@@ -766,7 +766,9 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   case 40: return &( settings->rom_interface_i );
   case 41: return &( settings->rom_beta128 );
   case 42: return &( settings->rom_plusd );
-  case 43: return &( settings->rom_speccyboot );
+  case 43: return &( settings->rom_disciple );
+  case 44: return &( settings->rom_opus );
+  case 45: return &( settings->rom_speccyboot );
   default: return NULL;
   }
 }
