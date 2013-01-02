@@ -121,6 +121,7 @@ typedef struct start_files_t {
   const char *disk_opus;
   const char *disk_plusd;
   const char *disk_beta;
+  const char *disk_disciple;
   const char *dock;
   const char *if2;
   const char *playback;
@@ -480,6 +481,7 @@ setup_start_files( start_files_t *start_files )
   start_files->disk_plus3 = settings_current.plus3disk_file;
   start_files->disk_opus = settings_current.opusdisk_file;
   start_files->disk_plusd = settings_current.plusddisk_file;
+  start_files->disk_disciple = settings_current.discipledisk_file;
   start_files->disk_beta = settings_current.betadisk_file;
   start_files->dock = settings_current.dck_file;
   start_files->if2 = settings_current.if2_file;
@@ -579,7 +581,11 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
       start_files->disk_opus = filename; break;
 
     case LIBSPECTRUM_CLASS_DISK_PLUSD:
-      start_files->disk_plusd = filename; break;
+      if( periph_is_active( PERIPH_TYPE_DISCIPLE ) )
+        start_files->disk_disciple = filename;
+      else
+        start_files->disk_plusd = filename;
+      break;
 
     case LIBSPECTRUM_CLASS_DISK_TRDOS:
       start_files->disk_beta = filename; break;
@@ -598,6 +604,8 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
           start_files->disk_beta = filename; 
         else if( periph_is_active( PERIPH_TYPE_PLUSD ) )
           start_files->disk_plusd = filename;
+        else if( periph_is_active( PERIPH_TYPE_DISCIPLE ) )
+          start_files->disk_disciple = filename;
         else if( periph_is_active( PERIPH_TYPE_OPUS ) )
           start_files->disk_opus = filename;
       }
@@ -704,6 +712,11 @@ do_start_files( start_files_t *start_files )
 
   if( start_files->disk_plusd ) {
     error = utils_open_file( start_files->disk_plusd, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->disk_disciple ) {
+    error = utils_open_file( start_files->disk_disciple, autoload, NULL );
     if( error ) return error;
   }
 

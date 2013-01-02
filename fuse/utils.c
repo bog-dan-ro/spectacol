@@ -118,7 +118,10 @@ utils_open_file( const char *filename, int autoload,
 
   case LIBSPECTRUM_CLASS_DISK_PLUSD:
 
-    error = plusd_disk_insert( PLUSD_DRIVE_1, filename, autoload );
+    if( periph_is_active( PERIPH_TYPE_DISCIPLE ) )
+      error = disciple_disk_insert( DISCIPLE_DRIVE_1, filename, autoload );
+    else
+      error = plusd_disk_insert( PLUSD_DRIVE_1, filename, autoload );
     break;
 
   case LIBSPECTRUM_CLASS_DISK_OPUS:
@@ -149,6 +152,8 @@ utils_open_file( const char *filename, int autoload,
     else
       if( periph_is_active( PERIPH_TYPE_BETA128 ) )
         error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
+      else if( periph_is_active( PERIPH_TYPE_DISCIPLE ) )
+        error = disciple_disk_insert( DISCIPLE_DRIVE_1, filename, autoload );
       else if( periph_is_active( PERIPH_TYPE_PLUSD ) )
         error = plusd_disk_insert( PLUSD_DRIVE_1, filename, autoload );
     break;
