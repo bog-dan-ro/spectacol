@@ -360,9 +360,9 @@ disciple_joy_read( libspectrum_word port GCC_UNUSED, int *attached )
 
   /* bit 6 - printer busy */
   if( !settings_current.printer )
-    return 0xff; /* no printer attached */
+    return 0xbf; /* no printer attached */
 
-  return 0xbf;   /* never busy */
+  return 0xff;   /* never busy */
 }
 
 void

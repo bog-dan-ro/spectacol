@@ -3607,7 +3607,7 @@
          periph.h,peripherals/disk/{Makefile.am,disciple.[ch]},settings.dat,
          tape.c,ui.c,ui/{options.dat,ui.h},z80/{coretest.c,z80_checks.h,
          z80_ops.c}: DISCiPLE emulation (Stuart).
-20110414 disciple.c: avoid C++/C99 comments (Stuart).
+20110414 peripherals/disk/disciple.c: avoid C++/C99 comments (Stuart).
 20110415 ui/win32/win32ui.c: fix the disabling of menu entries below a
          separator, e.g., /File/Movie/Stop Movie Recording (patch #3286195)
          (Sergio Baldoví).
@@ -4358,3 +4358,4 @@
          and update copyright date to 2013 (Sergio).
 20130103 configure.ac,fuse.c,README: add trailing slashes to URLs where
          appropriate (Stuart).
+20130103 peripherals/disk/disciple.c: fix inverted printer busy logic (Stuart).
