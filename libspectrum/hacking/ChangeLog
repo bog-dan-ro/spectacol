@@ -935,3 +935,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          'Interface II' to 'Interface 2' in comments and documentation (Stuart).
 20130103 configure.ac: make some URLs point to the new sourceforge forge and
          update copyright date to 2013 (Sergio).
+20130103 configure.ac: add trailing slash to URL of bug tracker (Stuart).
