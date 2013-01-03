@@ -933,3 +933,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (Fred).
 20121231 accessor.pl,doc/libspectrum.txt,libspectrum.h.in,sna.c,z80.c: rename
          'Interface II' to 'Interface 2' in comments and documentation (Stuart).
+20130103 configure.ac: make some URLs point to the new sourceforge forge and
+         update copyright date to 2013 (Sergio).

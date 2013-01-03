@@ -35,11 +35,11 @@ m4_define([libspectrum_rc_version],
           [libspectrum_major_version,libspectrum_minor_version,libspectrum_micro_version,libspectrum_nano_version])
 
 dnl Package info
-m4_define([libspectrum_copyright], ["(c) 1999-2012 Philip Kendall and others"])
+m4_define([libspectrum_copyright], ["(c) 1999-2013 Philip Kendall and others"])
 m4_define([libspectrum_url],
           [http://fuse-emulator.sourceforge.net/libspectrum.php])
 m4_define([libspectrum_bugreport],
-          [http://sourceforge.net/tracker/?group_id=91293&atid=596648])
+          [http://sourceforge.net/p/fuse-emulator/bugs])
 
 AC_INIT([libspectrum],[libspectrum_version],[libspectrum_bugreport],
         [libspectrum],[libspectrum_url])
