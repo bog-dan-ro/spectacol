@@ -539,21 +539,19 @@ menu_get_scaler( scaler_available_fn selector )
 void
 menu_machine_pause( int action )
 {
-  int error;
-
   if( paused ) {
     paused = 0;
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED,
                          UI_STATUSBAR_STATE_INACTIVE );
     timer_estimate_reset();
     PostMessage( fuse_hWnd, WM_USER_EXIT_PROCESS_MESSAGES, 0, 0 );
+
+    /* Resume emulation */
+    fuse_emulation_unpause();
   } else {
 
-    /* Stop recording any competition mode RZX file */
-    if( rzx_recording && rzx_competition_mode ) {
-      ui_error( UI_ERROR_INFO, "Stopping competition mode RZX recording" );
-      error = rzx_stop_recording(); if( error ) return;
-    }
+    /* Stop emulation */
+    fuse_emulation_pause();
 
     paused = 1;
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED, UI_STATUSBAR_STATE_ACTIVE );

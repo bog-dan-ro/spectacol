@@ -4359,3 +4359,5 @@
 20130103 configure.ac,fuse.c,README: add trailing slashes to URLs where
          appropriate (Stuart).
 20130103 peripherals/disk/disciple.c: fix inverted printer busy logic (Stuart).
+20130104 ui/win32/win32ui.c: empty sound buffer when emulation is paused using a
+         shortcut key on Win32 UI (thanks, Lee Tonks) (Sergio).
