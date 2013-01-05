@@ -25,13 +25,14 @@ AUTOMAKE_OPTIONS = foreign
 
 ROMS =  128-0.rom 128-1.rom \
 	48.rom \
+	disciple.rom \
 	plus2-0.rom plus2-1.rom \
 	plus3-0.rom plus3-1.rom plus3-2.rom plus3-3.rom \
 	plus3e-0.rom plus3e-1.rom plus3e-2.rom plus3e-3.rom \
+	plusd.rom \
 	tc2048.rom \
 	tc2068-0.rom tc2068-1.rom \
 	se-0.rom se-1.rom \
-	plusd.rom \
         speccyboot-1.4.rom
 
 pkgdata_DATA = $(ROMS)

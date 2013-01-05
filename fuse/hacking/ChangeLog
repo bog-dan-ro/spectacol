@@ -4361,3 +4361,5 @@
 20130103 peripherals/disk/disciple.c: fix inverted printer busy logic (Stuart).
 20130104 ui/win32/win32ui.c: empty sound buffer when emulation is paused using a
          shortcut key on Win32 UI (thanks, Lee Tonks) (Sergio).
+20130105 roms/{Makefile.am,README.copyright,disciple.rom}: add DISCiPLE ROM 
+         with EPSON printer support (Fred).
