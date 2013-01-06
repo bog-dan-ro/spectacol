@@ -49,7 +49,6 @@ mkstemp (char *tmpl)
   int len;
   char *XXXXXX;
   static uint64_t value;
-  uint64_t random_time_bits;
   unsigned int count;
   int fd = -1;
   int save_errno = errno;

@@ -4363,3 +4363,4 @@
          shortcut key on Win32 UI (thanks, Lee Tonks) (Sergio).
 20130105 roms/{Makefile.am,README.copyright,disciple.rom}: add DISCiPLE ROM 
          with EPSON printer support (Fred).
+20130106 compat/mkstemp.c: remove unused variable (Sergio).
