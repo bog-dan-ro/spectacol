@@ -56,7 +56,7 @@ static int disciple_memory_source_rom;
 static int disciple_memory_source_ram;
 
 int disciple_memswap = 0;        /* Are the ROM and RAM pages swapped? */
-int disciple_rombank = 0;        /* ROM bank that is paged in */
+int disciple_rombank = 1;        /* ROM bank that is paged in */
 int disciple_inhibited;
 
 int disciple_available = 0;
@@ -242,7 +242,7 @@ disciple_reset( int hard_reset )
   disciple_index_pulse = 0;
 
   disciple_memswap = 0;
-  disciple_rombank = 0;
+  disciple_rombank = 1;
 
   if( hard_reset )
     memset( disciple_ram, 0, 0x2000 );
@@ -392,7 +392,7 @@ disciple_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 
   printer_parallel_strobe_write( b & 0x40 );
 
-  disciple_rombank = ( b & 0x08 ) ? 1 : 0;
+  disciple_rombank = ( b & 0x08 ) ? 0 : 1;
   machine_current->memory_map();
   if( b & 0x10 )
     disciple_inhibit();
