@@ -4365,3 +4365,5 @@
          with EPSON printer support (Fred).
 20130106 compat/mkstemp.c: remove unused variable (Sergio).
 20130106 peripherals/disk/disciple.c: swap order of ROM banks (Stuart).
+20130107 man/fuse.1: initial documentation of the drive emulation flags
+         (bug [#250]) (Fred).

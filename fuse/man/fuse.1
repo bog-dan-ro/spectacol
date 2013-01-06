@@ -303,6 +303,56 @@ Specify that the framebuffer UI should attempt to use a double scan mode
 (where each line is displayed twice).
 .RE
 .PP
+.B \-\-drive\-plus3a\-type
+.I type
+.br
+.B \-\-drive\-plus3b\-type
+.I type
+.br
+.B \-\-drive\-beta128a\-type
+.I type
+.br
+.B \-\-drive\-beta128b\-type
+.I type
+.br
+.B \-\-drive\-beta128c\-type
+.I type
+.br
+.B \-\-drive\-beta128d\-type
+.I type
+.br
+.B \-\-drive\-plusd1\-type
+.I type
+.br
+.B \-\-drive\-plusd2\-type
+.I type
+.br
+.B \-\-drive\-disciple1\-type
+.I type
+.br
+.B \-\-drive\-disciple2\-type
+.I type
+.br
+.B \-\-drive\-opus1\-type
+.I type
+.br
+.B \-\-drive\-opus2\-type
+.I type
+.RS
+Specify a disk drive type to emulate with the associated interface. 
+See the Disk Options dialog for more information.
+.RE
+.PP
+.B \-\-drive\-40\-max\-track
+.I count
+.br
+.B \-\-drive\-80\-max\-track
+.I count
+.RS
+Specify the maximum number of tracks for 40 and 80 track physical drives
+respectively.
+.RE
+.PP
 .B \-\-embed\-snapshot
 .RS
 Specify whether a snapshot should be embedded in an RZX file when
@@ -2462,6 +2512,129 @@ Spectrum for the change to take effect.
 Select the graphics filter currently in use. See the
 .B "GRAPHICS FILTERS"
 section for more details.
+.RE
+.PP
+.I "Options, Disk Options..."
+.RS
+When emulating disk drives, Fuse allows the specification of the 
+physical drive units attached to the emulated interface. Each drive 
+can be set to be one of the following types:
+.RS
+.PP
+.I Single\-sided 40 track
+.PP
+.I Double\-sided 40 track
+.PP
+.I Single\-sided 80 track
+.PP
+.I Double\-sided 80 track
+.RE
+.PP
+The available options that can be set are:
+.PP
+.I "+3 Drive A"
+.RS
+Defaults to a single-sided 40 track drive.
+.RE
+.PP
+.I "+3 Drive B"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "+3 Detect Speedlock"
+.RS
+Specify whether the +3 drives try to detect Speedlock protected disks,
+and emulate `weak' sectors.
+If the disk image file (EDSK or UDI) contains weak sector data, than
+Speedlock detection is automatically omitted.
+See also the
+.B "WEAK DISK DATA"
+section.
+.RE
+.PP
+.I "Beta 128 Drive A"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "Beta 128 Drive B"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "Beta 128 Drive C"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "Beta 128 Drive D"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "+D Drive 1"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "+D Drive 2"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "DISCiPLE Drive 1"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "DISCiPLE Drive 2"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "Opus Drive 1"
+.RS
+Defaults to a single-sided 40 track drive.
+.RE
+.PP
+.I "Opus Drive 2"
+.RS
+Defaults to a single-sided 40 track drive.
+.RE
+.PP
+.I "Try merge 'B' side of disks"
+.RS
+This option prompts the user to confirm whether Fuse should try to merge the 
+`B' side of a disk image from a separate file when opening a new single-sided 
+disk image.
+.RE
+.PP
+.I "Confirm merge disk sides"
+.RS
+Select whether Fuse should try to merge a separate file for the `B' side of a
+disk image separate file when opening a new disk image. Most double sided disk
+images are dumped as two single sided disk images e.g.
+`Golden Axe \- Side\ A.dsk' and `Golden Axe \- Side\ B.dsk'. So, if we want to
+play Golden Axe, first we have to insert the first disk image and when the game
+asks to insert side\ B, we have to find and open the second disk image, instead
+of just `flip'-ing the disk inside the drive. If enabled, Fuse will try to open
+the second image too and create a double sided disk image (merging the two one
+sided disk images) and insert this merged virtual disk into the disk drive. The
+function detects whether the file is one side of a double-sided image if the
+filename matches a pattern like [Ss]ide[ _][abAB12][ _.] in the file name of a
+disk that is being opened. If found, Fuse will try to open the other side of
+the disk too substituting the appropriate characters in the filename e.g.
+1\(->2, a\(->b, A\(->B. If successful then it will merge the two images and
+now we have a double sided disk in drive. This means that if we open
+`Golden Axe \- Side\ A.dsk', then Fuse will try to open `Golden Axe \- Side
+B.dsk' too. Now, we can just `flip' the disk if Golden Axe asks for `Side\ B'.
+The available options are
+.IR Never ,
+.I "With single-sided drives"
+and
+.IR Always .
+.RE
 .RE
 .PP
 .I F11
