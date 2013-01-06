@@ -34,6 +34,10 @@
 int
 snd_write_auheader( void )
 {
+  const char str[] =
+    "fmfconv created AU file (http://fuse-emulator.sourceforge.net)\n";
+  size_t len = sizeof(str); /* Includes the null terminator */
+  int padding = len % 8;
   libspectrum_dword buff[6];
 
 #ifdef WORDS_BIGENDIAN
@@ -52,7 +56,15 @@ snd_write_auheader( void )
   buff[5] = swap_endian_dword( snd_chn );
 #endif
   fwrite( buff, 24, 1, snd );
-  fwrite( "fmfconv created AU file (http://fuse-emulator.sourceforge.net)\n", 64, 1, snd );
+
+  fwrite( str, len, 1, snd );
+
+  /* Pad with zeroes until the next multiple of 8 */
+  if( padding ) {
+    const char zeros[7] = { 0 };
+    fwrite( zeros, 8 - padding, 1, snd );
+  }
+
   snd_header_ok = 1;
   printi( 1, "snd_write_auheader(): %dHz %c encoded %s\n", snd_rte, snd_enc,
 		 snd_chn == 2 ? "stereo" : "mono" );
