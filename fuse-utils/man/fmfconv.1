@@ -46,9 +46,30 @@ any video file format known by FFMPEG.
 .\"------------------------------------------------------------------
 .\"
 .SH OPTIONS
+.PP
+.RI "\-a "codec
+.br
+.RI "\-\-acodec "codec
+.RS
+Select audio codec for FFMPEG output (by default file format determine).
+.RE
+.PP
+.RI \-\-acodecs
+.RS
+List available FFMPEG audio codecs (see \-a/\-\-acodec).
+.RE
+.PP
 .RI \-\-aifc
 .RS
 Force AIFF-C output if sound format is AIFF
+.RE
+.PP
+.RI "\-A "rate
+.br
+.RI "\-\-arate "rate
+.RS
+Select audio bitrate for FFMPEG output (by default audio codec determine) 
+where `rate' is `default' or a number.
 .RE
 .PP
 .RI \-u
@@ -63,6 +84,19 @@ Save sound to Sun Audio (au) file
 .RI \-\-aiff
 .RS
 Save sound to Apple Computer audio (aiff/aiff-c) file
+.RE
+.PP
+.RI "\-F "format
+.br
+.RI "\-\-format "format
+.RS
+Select file format for FFMPEG output (by default the filename extension 
+determines the format)
+.RE
+.PP
+.RI \-\-formats
+.RS
+List available FFMPEG formats (see \-F/\-\-format).
 .RE
 .PP
 .RI "\-f "timing
@@ -121,6 +155,14 @@ Output file
 Save video as PPM screenshots
 .RE
 .PP
+.RI "\-p "profile
+.br
+.RI "\-\-profile "profile
+.RS
+Select the profile for FFMPEG output where <profile> is `youtube', `dvd', `svcd' 
+or `ipod'
+.RE
+.PP
 .RI "\-g "form
 .br
 .RI "\-\-progress "form
@@ -143,6 +185,15 @@ advanced option. If stereo/mono or audio encoding change through `fmf' file,
 your sound will be crappy.
 .RE
 .PP
+.RI "\-R "res
+.br
+.RI "\-\-resize "res
+.RS
+Resize video frame where `res' is `vga' for 640x480, `hvga' for 480x360, `qvga' 
+for 320x240, `pal' for 768x576 (this set frame rate to 25 also) or WxH, Sx, 
+N/Mx or W.
+.RE
+.PP
 .RI \-S
 .br
 .RI \-\-scr
@@ -162,11 +213,26 @@ Output sound file
 Process only the sound from an `fmf' file
 .RE
 .PP
+.RI "\-E "rate
+.br
+.RI "\-\-srate "rate
+.RS
+Resample audio to `rate' sampling rate where `rate' is `cd' for 44100 or `dat' 
+for 48000 or a number. (`cd' and `dat' set `stereo' as well).
+.RE
+.PP
 .RI \-v
 .br
 .RI \-\-verbose
 .RS
 Increase the verbosity level by one.
+.RE
+.PP
+.RI "\-c "codec
+.br
+.RI "\-\-vcodec "codec
+.RS
+Select video codec for FFMPEG output (by default file format determine).
 .RE
 .PP
 .RI \-V
@@ -176,11 +242,31 @@ Increase the verbosity level by one.
 Print the version number and exit.
 .RE
 .PP
+.RI "\-r "rate
+.br
+.RI "\-\-vrate "rate
+.RS
+Select video bitrate for FFMPEG output (by default audio codec determine) 
+where `rate' is `default', `ffdefault' or a number.
+.RE
+.PP
+.RI \-\-vcodecs
+.RS
+List available FFMPEG video codecs (see \-c/\-\-vcodec).
+.RE
+.PP
 .RI \-w
 .br
 .RI \-\-wav
 .RS
 Save sound to Microsoft audio (wav) file
+.RE
+.PP
+.RI \-X
+.br
+.RI \-\-ffmpeg
+.RS
+Save video and audio as FFMPEG file (default if FFMPEG is available).
 .RE
 .PP
 .RI \-Y
@@ -192,7 +278,8 @@ Save video as yuv4mpeg2.
 .PP
 .RI "\-\-yuv\-format "frm
 .RS
-Set yuv4mpeg2 file frame format to `frm', where `frm' is one of `444', `422', `420j', `420m', `420' or `410'.
+Set yuv4mpeg2 file frame format to `frm', where `frm' is one of `444', 
+`422', `420j', `420m', `420' or `410'.
 .RE
 .PP
 .\"

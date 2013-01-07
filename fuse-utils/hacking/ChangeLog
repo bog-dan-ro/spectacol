@@ -387,4 +387,4 @@
 20121229 man/*.1: fix quotes, dashes and spacing (Stuart).
 20130106 fmfconv_au.c: improve addition of annotation field to au format files
          (thanks, Stuart Brady) (Alberto Garcia).
-
+20130107 man/fmfconv.1: add some more details on command line arguments (Fred).
