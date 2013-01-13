@@ -1,5 +1,5 @@
 /* fmfconv_ff.c: Routines for converting movie with ffmpeg libs
-   Copyright (c) 2010 Gergely Szasz
+   Copyright (c) 2010-2013 Gergely Szasz
 
    $Id$
 
@@ -108,6 +108,8 @@ static enum PixelFormat out_pix_fmt = PIX_FMT_NONE;
 
 static int res_rte = -1;
 
+static void setup_x264_dict( AVDictionary **  pm );
+
 int
 ffmpeg_resample_audio( void )
 {
@@ -128,7 +130,8 @@ ffmpeg_resample_audio( void )
   if( !audio_resample_ctx ) {
     audio_resample_ctx = av_audio_resample_init( out_chn, snd_chn,
 						 out_rte, snd_rte,
-						 SAMPLE_FMT_S16, SAMPLE_FMT_S16,
+						 AV_SAMPLE_FMT_S16,
+                                                 AV_SAMPLE_FMT_S16,
 						 16, 8, 1, 1.0 );
     audio_tmp_inpbuf_size = (float)audio_outbuf_size * out_rte / snd_rte * (float)out_chn / snd_chn + 1.0;
     audio_tmp_inpbuf = av_malloc( audio_tmp_inpbuf_size );
@@ -219,7 +222,7 @@ add_audio_stream( enum CodecID codec_id, int freq, int stereo )
   c->codec_type = AVMEDIA_TYPE_AUDIO;
 
     /* put sample parameters */
-  c->sample_fmt = SAMPLE_FMT_S16;
+  c->sample_fmt = AV_SAMPLE_FMT_S16;
   if( ffmpeg_arate > 0 )
     c->bit_rate = ffmpeg_arate;
   audio_resample_ctx = NULL;
@@ -250,13 +253,13 @@ open_audio( void )
   }
 
     /* open it */
-  if( avcodec_open( c, codec ) < 0 ) {
+  if( avcodec_open2( c, codec, NULL ) < 0 ) {
     printe( "FFMPEG: could not open audio codec\n" );
     return 1;
   }
 
   if( codec->sample_fmts != NULL )
-    c->sample_fmt = codec->sample_fmts[0];
+    c->sample_fmt = AV_SAMPLE_FMT_S16;
 
 #ifdef HAVE_FFMPEG_BYTES_SAMPLE
   audio_oframe_size = ( av_get_bytes_per_sample( c->sample_fmt ) + 7 ) / 8 * out_chn;
@@ -442,21 +445,21 @@ add_video_stream( enum CodecID codec_id, int w, int h, int timing )
   c->gop_size = 25; /* emit one intra frame every twelve frames at most */
   video_st->sample_aspect_ratio = c->sample_aspect_ratio = ffmpeg_aspect;
   if( ffmpeg_libx264 ) {
-	c->profile = FF_PROFILE_H264_HIGH;
-        c->me_range = 16;
-        c->max_qdiff = 4;
-        c->qmin = 10;
-        c->qmax = 51;
-        c->qcompress = 0.0;
-        c->crf = 0;
-        c->cqp = -1;
-        c->me_method = 8;
-        c->trellis = 1;
+    c->profile = FF_PROFILE_H264_HIGH;
+    c->me_range = 16;
+    c->max_qdiff = 4;
+    c->qmin = 10;
+    c->qmax = 51;
+    c->qcompress = 0.0;
+    c->me_method = 8;
+    c->trellis = 1;
 /*
-        c->partitions = X264_PART_I4X4 | X264_PART_I8X8 | X264_PART_P8X8 | X264_PART_P4X4 | X264_PART_B8X8;
+    c->partitions = X264_PART_I4X4 | X264_PART_I8X8 | X264_PART_P8X8 | X264_PART_P4X4 | X264_PART_B8X8;
 */
-        c->flags2 |= CODEC_FLAG2_WPRED | CODEC_FLAG2_MIXED_REFS |
-			CODEC_FLAG2_8X8DCT | CODEC_FLAG2_FASTPSKIP;
+    c->flags2 |= 0;
+    
+    setup_x264_dict( c->priv_data );
+
   }
     /* some formats want stream headers to be separate */
   if( oc->oformat->flags & AVFMT_GLOBALHEADER )
@@ -525,8 +528,12 @@ open_video( void )
     }
   }
 
+  if( ffmpeg_libx264 ) {
+    setup_x264_dict( c->priv_data );
+  }
+
     /* open the codec */
-  if( avcodec_open( c, codec ) < 0 ) {
+  if( avcodec_open2( c, codec, NULL ) < 0 ) {
     printe( "FFMPEG: could not open video codec\n" );
     return 1;
   }
@@ -889,7 +896,7 @@ show_codecs( int what )
         encode = 0;
       }
       if( p2 && strcmp( p->name, p2->name ) == 0 ) {
-        if( p->encode ) encode=1;
+        if( p->encode2 ) encode=1;
       }
     }
     if( p2 == NULL ) break;
@@ -954,4 +961,18 @@ ffmpeg_list_ffmpeg( int what )
   ffmpeg_print_idents();
   putc('\n', stdout);
 }
+
+static void
+setup_x264_dict( AVDictionary ** dict )
+{
+  /* initialise private options if we will be using libx264 codecs */
+  av_dict_set( dict, "mixed-refs", "1", 0 );
+  av_dict_set( dict, "weightb", "1", 0 );
+  av_dict_set( dict, "8x8dct", "1", 0 );
+  av_dict_set( dict, "fast-pskip", "1", 0 );
+  av_dict_set( dict, "qp", "-1", 0 );
+  av_dict_set( dict, "crf", "0", 0 );
+  av_dict_set( dict, "preset", "medium", 0 );
+}
+
 #endif	/* ifdef USE_FFMPEG */
