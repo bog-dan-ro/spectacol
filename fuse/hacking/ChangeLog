@@ -4366,4 +4366,6 @@
 20130106 compat/mkstemp.c: remove unused variable (Sergio).
 20130106 peripherals/disk/disciple.c: swap order of ROM banks (Stuart).
 20130107 man/fuse.1: initial documentation of the drive emulation flags
-         (bug [#250]) (Fred).
+         (bug #250) (Fred).
+20130123 memory.c: correct restore of pentagon 1024 memory ports from snapshots
+         (bug #275) (rkd77).

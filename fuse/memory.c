@@ -486,7 +486,7 @@ memory_from_snapshot( libspectrum_snap *snap )
   size_t i;
   int capabilities = machine_current->capabilities;
 
-  if( capabilities & PERIPH_TYPE_PENTAGON1024_MEMORY ) {
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PENT1024_MEMORY ) {
     pentagon1024_memoryport_write( 0x7ffd,
 			      libspectrum_snap_out_128_memoryport( snap ) );
     pentagon1024_v22_memoryport_write( 0xeff7,
