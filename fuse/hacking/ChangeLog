@@ -4369,3 +4369,5 @@
          (bug #250) (Fred).
 20130123 memory.c: correct restore of pentagon 1024 memory ports from snapshots
          (bug #275) (rkd77).
+20130126 peripherals/nic/w5100_socket.c: make sure write_pending member of 
+         nic_w5100_socket_t is initialised (bug #275) (rkd77).

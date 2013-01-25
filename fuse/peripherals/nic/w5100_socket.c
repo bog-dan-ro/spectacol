@@ -2,7 +2,7 @@
    
    Emulates a minimal subset of the Wiznet W5100 TCP/IP controller.
 
-   Copyright (c) 2011 Philip Kendall
+   Copyright (c) 2011-2013 Philip Kendall
    
    $Id$
    
@@ -57,14 +57,21 @@ enum w5100_socket_command {
   W5100_SOCKET_COMMAND_RECV = 1 << 6,
 };
 
-void
-nic_w5100_socket_init( nic_w5100_socket_t *socket, int which )
+static void
+w5100_socket_init_common( nic_w5100_socket_t *socket )
 {
-  socket->id = which;
   socket->fd = compat_socket_invalid;
   socket->bind_count = 0;
   socket->socket_bound = 0;
   socket->ok_for_io = 0;
+  socket->write_pending = 0;
+}
+
+void
+nic_w5100_socket_init( nic_w5100_socket_t *socket, int which )
+{
+  socket->id = which;
+  w5100_socket_init_common( socket );
   pthread_mutex_init( &socket->lock, NULL );
 }
 
@@ -106,11 +113,7 @@ w5100_socket_clean( nic_w5100_socket_t *socket )
 
   if( socket->fd != compat_socket_invalid ) {
     compat_socket_close( socket->fd );
-    socket->fd = compat_socket_invalid;
-    socket->bind_count = 0;
-    socket->socket_bound = 0;
-    socket->ok_for_io = 0;
-    socket->write_pending = 0;
+    w5100_socket_init_common( socket );
   }
 }
 
