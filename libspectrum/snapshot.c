@@ -220,6 +220,8 @@ libspectrum_snap_alloc( void )
   libspectrum_snap_set_spectranet_ram( snap, 0, NULL );
   
   libspectrum_snap_set_late_timings( snap, 0 );
+  
+  libspectrum_snap_set_zx_printer_active( snap, 0 );
 
   return snap;
 }

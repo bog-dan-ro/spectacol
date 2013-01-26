@@ -128,6 +128,7 @@ typedef enum szx_mouse_type {
 #define ZXSTBID_ROM "ROM\0"
 
 #define ZXSTBID_ZXPRINTER "ZXPR"
+static const libspectrum_word ZXSTPRF_ENABLED = 1;
 
 #define ZXSTBID_IF1 "IF1\0"
 static const libspectrum_word ZXSTIF1F_ENABLED = 1;
@@ -333,6 +334,9 @@ static libspectrum_error
 write_dirp_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int page,
 		  int compress );
+static libspectrum_error
+write_zxpr_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, int *out_flags, libspectrum_snap *snap );
 
 static void
 write_chunk_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
@@ -1730,6 +1734,27 @@ read_rom_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 }
 
 static libspectrum_error
+read_zxpr_chunk( libspectrum_snap *snap, libspectrum_word version,
+		 const libspectrum_byte **buffer,
+		 const libspectrum_byte *end GCC_UNUSED, size_t data_length,
+                 szx_context *ctx GCC_UNUSED )
+{
+  libspectrum_word flags;
+
+  if( data_length != 2 ) {
+    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+			     "%s:read_zxpr_chunk: unknown length %lu",
+			     __FILE__, (unsigned long)data_length );
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+  }
+
+  flags = libspectrum_read_word( buffer );
+  libspectrum_snap_set_zx_printer_active( snap, flags & ZXSTPRF_ENABLED );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
 read_if2r_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 		 const libspectrum_byte **buffer,
 		 const libspectrum_byte *end GCC_UNUSED, size_t data_length,
@@ -2179,7 +2204,7 @@ static struct read_chunk_t read_chunks[] = {
   { ZXSTBID_ZXATASP,	         read_zxat_chunk },
   { ZXSTBID_ZXCF,	         read_zxcf_chunk },
   { ZXSTBID_ZXCFRAMPAGE,         read_cfrp_chunk },
-  { ZXSTBID_ZXPRINTER,	         skip_chunk      },
+  { ZXSTBID_ZXPRINTER,	         read_zxpr_chunk },
   { ZXSTBID_ZXTAPE,	         skip_chunk      },
 
 };
@@ -2552,6 +2577,9 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
     if( error ) return error;
   }
 
+  error = write_zxpr_chunk( buffer, &ptr, length, out_flags, snap );
+  if( error ) return error;
+
   /* Set length to be actual length, not allocated length */
   *length = ptr - *buffer;
 
@@ -2825,6 +2853,22 @@ write_keyb_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   libspectrum_write_dword( ptr, flags );
 
   write_joystick( ptr, out_flags, snap, LIBSPECTRUM_JOYSTICK_INPUT_KEYBOARD );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+  
+static libspectrum_error
+write_zxpr_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		  size_t *length, int *out_flags, libspectrum_snap *snap )
+{
+  libspectrum_word flags;
+
+  write_chunk_header( buffer, ptr, length, ZXSTBID_ZXPRINTER, 2 );
+
+  flags = 0;
+  if( libspectrum_snap_zx_printer_active( snap ) ) flags |= ZXSTPRF_ENABLED;
+
+  libspectrum_write_word( ptr, flags );
 
   return LIBSPECTRUM_ERROR_NONE;
 }

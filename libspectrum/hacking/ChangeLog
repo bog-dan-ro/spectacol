@@ -936,3 +936,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20130103 configure.ac: make some URLs point to the new sourceforge forge and
          update copyright date to 2013 (Sergio).
 20130103 configure.ac: add trailing slash to URL of bug tracker (Stuart).
+20130126 accessor.pl,doc/libspectrum.txt,snap_accessors.txt,snapshot.c,szx.c:
+         add support for storing ZX Printer state (bug #274) (Fred).

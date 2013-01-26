@@ -191,3 +191,5 @@ libspectrum_byte* spectranet_flash 1
 libspectrum_byte* spectranet_ram 1
 
 int late_timings
+
+int zx_printer_active

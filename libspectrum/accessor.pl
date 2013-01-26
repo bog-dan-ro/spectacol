@@ -236,6 +236,9 @@ struct libspectrum_snap {
 
   /* Timings emulation */
   int late_timings;
+
+  /* Printer emulation */
+  int zx_printer_active;
 };
 
 /* Initialise a libspectrum_snap structure */

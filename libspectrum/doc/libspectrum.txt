@@ -705,6 +705,8 @@ The available properties (along with their types) are:
 
 * int late_timings
 
+* int zx_printer_enabled
+
 Most of those should be fairly self-explanatory; those which may not
 be are:
 
@@ -728,6 +730,9 @@ be are:
 * `late_timings' being non-zero signals that the emulated Spectrum
   should use timings 1 t-state later than usual as in some machines
   that have warmed up.
+
+* `zx_printer_enabled' being non-zero signals that the emulated Spectrum
+  has a ZX Printer connected.
 
 * The `beta_*' functions represent the Betadisk
   interface. `beta_paged' is non-zero if the Betadisk ROM is currently
