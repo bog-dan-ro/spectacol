@@ -128,9 +128,8 @@ spec_se_reset( void )
   periph_set_present( PERIPH_TYPE_SCLD, PERIPH_PRESENT_ALWAYS );
 
   /* ZX Printer available */
-  periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE, PERIPH_PRESENT_OPTIONAL );
-
-  periph_update();
+  periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE,
+                      PERIPH_PRESENT_OPTIONAL );
 
   for( i = 0; i < 8; i++ ) {
 
@@ -170,6 +169,10 @@ spec_se_reset( void )
 
   memory_current_screen = 5;
   memory_screen_mask = 0xdfff;
+
+  /* Make sure SCLD and friends are enabled, calls memory_map() as a side
+     effect so we need memory related variables etc. to be initialised */
+  periph_update();
 
   scld_dec_write( 0x00ff, 0x80 );
   scld_dec_write( 0x00ff, 0x00 );

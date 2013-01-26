@@ -4371,3 +4371,5 @@
          (bug #275) (rkd77).
 20130126 peripherals/nic/w5100_socket.c: make sure write_pending member of 
          nic_w5100_socket_t is initialised (bug #275) (rkd77).
+20130126 machines/spec_se.c: make sure that RAM variables are initialised before
+         they are referenced (more from bug #275) (rkd77).
