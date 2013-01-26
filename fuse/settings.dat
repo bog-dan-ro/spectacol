@@ -80,6 +80,7 @@ speccyboot, boolean, 0
 specdrum, boolean, 0
 spectranet, boolean, 0
 spectranet_disable, boolean, 0
+zxprinter, boolean, 1
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1

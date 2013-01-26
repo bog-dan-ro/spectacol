@@ -72,12 +72,15 @@ static void printer_zxp_write( libspectrum_word port, libspectrum_byte b );
 static libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED,
 				              int *attached);
 
+static void zx_printer_from_snapshot( libspectrum_snap *snap );
+static void zx_printer_to_snapshot( libspectrum_snap *snap );
+
 static module_info_t printer_zxp_module_info = {
   printer_zxp_reset,
   NULL,
   NULL,
-  NULL,
-  NULL
+  zx_printer_from_snapshot,
+  zx_printer_to_snapshot,
 };
 
 static const periph_port_t printer_zxp_ports[] = {
@@ -86,7 +89,7 @@ static const periph_port_t printer_zxp_ports[] = {
 };
 
 static const periph_t printer_zxp_periph = {
-  &settings_current.printer,
+  &settings_current.zxprinter,
   printer_zxp_ports
 };
 
@@ -96,7 +99,7 @@ static const periph_port_t printer_zxp_ports_full_decode[] = {
 };
 
 static const periph_t printer_zxp_periph_full_decode = {
-  &settings_current.printer,
+  &settings_current.zxprinter,
   printer_zxp_ports_full_decode
 };
 
@@ -424,6 +427,8 @@ frames++;
 static libspectrum_byte printer_zxp_read(libspectrum_word port GCC_UNUSED,
 				         int *attached)
 {
+if(!settings_current.printer)
+  return(0xff);
 if(!printer_graphics_enabled)
   return(0xff);
 if(plusd_available)
@@ -470,8 +475,11 @@ else
 }
 
 
-static void printer_zxp_write(libspectrum_word port GCC_UNUSED,libspectrum_byte b)
+static void printer_zxp_write(libspectrum_word port GCC_UNUSED,
+                              libspectrum_byte b)
 {
+if(!settings_current.printer)
+  return;
 if(plusd_available)
   return;
 if(!zxpspeed)
@@ -704,4 +712,14 @@ void printer_end(void)
 {
 printer_text_end();
 printer_zxp_end();
+}
+
+static void zx_printer_from_snapshot( libspectrum_snap *snap )
+{
+  settings_current.zxprinter = libspectrum_snap_zx_printer_active( snap );
+}
+
+static void zx_printer_to_snapshot( libspectrum_snap *snap )
+{
+  libspectrum_snap_set_zx_printer_active( snap, settings_current.zxprinter );
 }
