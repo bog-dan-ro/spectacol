@@ -562,6 +562,7 @@ trap_check_rom( void )
   case LIBSPECTRUM_MACHINE_16:
   case LIBSPECTRUM_MACHINE_48:
   case LIBSPECTRUM_MACHINE_48_NTSC:
+  case LIBSPECTRUM_MACHINE_SE:
   case LIBSPECTRUM_MACHINE_TC2048:
     return 1;		/* Always OK here */
 
@@ -572,7 +573,6 @@ trap_check_rom( void )
 
   case LIBSPECTRUM_MACHINE_128:
   case LIBSPECTRUM_MACHINE_PLUS2:
-  case LIBSPECTRUM_MACHINE_SE:
     /* OK if we're in ROM 1 */
     return( machine_current->ram.current_rom == 1 );
 

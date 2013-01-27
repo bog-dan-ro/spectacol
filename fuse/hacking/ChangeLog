@@ -4377,3 +4377,6 @@
          add separate switch to enable ZX Printer emulation (bug #274) (Fred).
 20130127 machines/spec_se.c: fix SE writing dock and exrom pages to snapshots
          (Fred).
+20130127 lib/{compressed/tape_se.szx,uncompressed/tape_se.szx},man/fuse.1,
+         roms/{README.copyright,se-0.rom,se-1.rom},tape.c: update SE ROMs to
+         v4.04 (Fred).

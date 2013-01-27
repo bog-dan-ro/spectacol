@@ -38,8 +38,10 @@ modifications are copyright Garry Lancaster.
 se-0.rom
 se-1.rom
 
-These are derived from Amstrad code, so the above statement applies. The
-modifications are by Andrew Owen and are subject to the same conditions.
+These are copyright Nine Tiles Networks Ltd, with modifications and extensions 
+by Andrew Owen with code from the ZX81 ROM, ZX80 ROM, skeleton ROM (from The
+Messenger), SAM Coupe and SE Basic. Available under the GNU GPL v2 or later
+license.
 
 disciple.rom
 plusd.rom
