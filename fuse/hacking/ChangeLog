@@ -4375,3 +4375,5 @@
          they are referenced (more from bug #275) (rkd77).
 20130126 man/fuse.1,peripherals/printer.c,settings.dat,ui/options.dat:
          add separate switch to enable ZX Printer emulation (bug #274) (Fred).
+20130127 machines/spec_se.c: fix SE writing dock and exrom pages to snapshots
+         (Fred).

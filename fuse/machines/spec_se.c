@@ -46,7 +46,7 @@
 #include "tc2068.h"
 #include "ui/ui.h"
 
-static int dock_exrom_reset( void );
+static void dock_exrom_reset( void );
 static int spec_se_reset( void );
 static int spec_se_memory_map( void );
 
@@ -73,13 +73,11 @@ spec_se_init( fuse_machine_info *machine )
   return 0;
 }
 
-static int
+static void
 dock_exrom_reset( void )
 {
   /* The dock is always active on the SE */
   dck_active = 1;
-
-  return 0;
 }
 
 int
@@ -88,7 +86,7 @@ spec_se_reset( void )
   int error;
   size_t i, j;
 
-  error = dock_exrom_reset(); if( error ) return error;
+  dock_exrom_reset();
 
   error = machine_load_rom( 0, settings_current.rom_spec_se_0,
                             settings_default.rom_spec_se_0, 0x4000 );
@@ -144,12 +142,16 @@ spec_se_reset( void )
       timex_dock[page_num].offset = j * MEMORY_PAGE_SIZE;
       timex_dock[page_num].page_num = i;
       timex_dock[page_num].contended = 0;
+      timex_dock[page_num].writable = 1;
+      timex_dock[page_num].save_to_snapshot = 1;
       timex_dock[page_num].source = memory_source_dock;
 
       timex_exrom[page_num].page = exrom_ram + j * MEMORY_PAGE_SIZE;
       timex_exrom[page_num].offset = j * MEMORY_PAGE_SIZE;
       timex_exrom[page_num].page_num = i;
       timex_exrom[page_num].contended = 0;
+      timex_exrom[page_num].writable = 1;
+      timex_exrom[page_num].save_to_snapshot = 1;
       timex_exrom[page_num].source = memory_source_exrom;
     }
   }
