@@ -4384,3 +4384,5 @@
          peripherals/ide/divide.c,peripherals/{if1.c,if2.c,scld.c,speccyboot.c,
          spectranet.c}: make sure that an associated peripheral is enabled
          before running it's associated memory_map function (bug #276) (Fred).
+20130128 peripherals/nic/w5100_socket.c: ensure we don't read bogus data on
+         UDP writes (bug #271).

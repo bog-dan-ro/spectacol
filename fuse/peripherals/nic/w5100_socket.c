@@ -729,7 +729,7 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
         0x1f * sizeof(int) );
 
     socket->tx_rr += bytes_sent;
-    if( socket->tx_rr == socket->tx_wr ) {
+    if( socket->datagram_count == 0 ) {
       socket->write_pending = 0;
       socket->ir |= 1 << 4;
     }
