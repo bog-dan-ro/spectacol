@@ -131,7 +131,7 @@ beta_unpage( void )
 static void
 beta_memory_map( void )
 {
-  if( !beta_active ) return;
+  if( !settings_current.beta128 || !beta_active ) return;
 
   memory_map_romcs( beta_memory_map_romcs );
 }

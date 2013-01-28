@@ -433,7 +433,7 @@ if1_unpage( void )
 void
 if1_memory_map( void )
 {
-  if( !if1_active ) return;
+  if( !settings_current.interface1 || !if1_active ) return;
 
   memory_map_romcs_8k( 0x0000, if1_memory_map_romcs );
   memory_map_romcs_8k( 0x2000, if1_memory_map_romcs );

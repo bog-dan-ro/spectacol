@@ -369,7 +369,7 @@ divide_memory_map( void )
   int lower_page_writable, upper_page_writable;
   memory_page *lower_page, *upper_page;
 
-  if( !divide_active ) return;
+  if( !settings_current.divide_enabled || !divide_active ) return;
 
   /* low bits of divide_control register give page number to use in upper
      bank; only lowest two bits on original 32K model */

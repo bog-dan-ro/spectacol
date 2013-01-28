@@ -85,7 +85,7 @@ static memory_page speccyboot_memory_map_romcs[ MEMORY_PAGES_IN_8K ];
 static void
 speccyboot_memory_map( void )
 {
-  if ( !speccyboot_rom_active ) return;
+  if( !settings_current.speccyboot || !speccyboot_rom_active ) return;
 
   memory_map_romcs_8k( 0x0000, speccyboot_memory_map_romcs );
 }

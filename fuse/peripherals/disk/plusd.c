@@ -107,7 +107,7 @@ plusd_unpage( void )
 static void
 plusd_memory_map( void )
 {
-  if( !plusd_active ) return;
+  if( !settings_current.plusd || !plusd_active ) return;
 
   memory_map_romcs_8k( 0x0000, plusd_memory_map_romcs_rom );
   memory_map_romcs_8k( 0x2000, plusd_memory_map_romcs_ram );

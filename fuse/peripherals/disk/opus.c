@@ -123,7 +123,7 @@ opus_unpage( void )
 static void
 opus_memory_map( void )
 {
-  if( !opus_active ) return;
+  if( !settings_current.opus || !opus_active ) return;
 
   memory_map_romcs_8k( 0x0000, opus_memory_map_romcs_rom );
   memory_map_romcs_4k( 0x2000, opus_memory_map_romcs_ram );

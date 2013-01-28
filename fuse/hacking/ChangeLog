@@ -4380,3 +4380,7 @@
 20130127 lib/{compressed/tape_se.szx,uncompressed/tape_se.szx},man/fuse.1,
          roms/{README.copyright,se-0.rom,se-1.rom},tape.c: update SE ROMs to
          v4.04 (Fred).
+20130128 peripherals/disk/{beta.c,disciple.c,opus.c,plusd.c},
+         peripherals/ide/divide.c,peripherals/{if1.c,if2.c,scld.c,speccyboot.c,
+         spectranet.c}: make sure that an associated peripheral is enabled
+         before running it's associated memory_map function (bug #276) (Fred).

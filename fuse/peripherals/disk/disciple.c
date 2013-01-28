@@ -113,7 +113,7 @@ disciple_memory_map( void )
 {
   struct memory_page *rom_page, *lower_page, *upper_page;
 
-  if( !disciple_active ) return;
+  if( !settings_current.disciple || !disciple_active ) return;
 
   rom_page = disciple_memory_map_romcs_rom[ disciple_rombank ];
 
