@@ -4386,3 +4386,5 @@
          before running it's associated memory_map function (bug #276) (Fred).
 20130128 peripherals/nic/w5100_socket.c: ensure we don't read bogus data on
          UDP writes (bug #271).
+20130130 spectrum.c: changes to keep +2A/+3 contention correct after
+         libspectrum timing changes in r4866 (Fuse part of patch #305).

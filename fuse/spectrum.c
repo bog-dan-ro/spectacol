@@ -60,7 +60,7 @@ libspectrum_byte spectrum_last_ula;
 
 /* Contention patterns */
 static int contention_pattern_65432100[] = { 5, 4, 3, 2, 1, 0, 0, 6 };
-static int contention_pattern_76543210[] = { 0, 7, 6, 5, 4, 3, 2, 1 };
+static int contention_pattern_76543210[] = { 5, 4, 3, 2, 1, 0, 7, 6 };
 
 /* Event */
 int spectrum_frame_event;
@@ -127,7 +127,7 @@ spectrum_contend_delay_none( libspectrum_dword time )
 }
 
 static libspectrum_byte
-contend_delay_common( libspectrum_dword time, int* timings )
+contend_delay_common( libspectrum_dword time, int* timings, int offset )
 {
   int line, tstates_through_line;
 
@@ -148,12 +148,13 @@ contend_delay_common( libspectrum_dword time, int* timings )
       line >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT    ) return 0;
 
   /* Or in the left border */
-  if( tstates_through_line < machine_current->timings.left_border - 1 ) 
+  if( tstates_through_line < machine_current->timings.left_border - offset ) 
     return 0;
 
   /* Or the right border or retrace */
   if( tstates_through_line >= machine_current->timings.left_border +
-                              machine_current->timings.horizontal_screen - 1 )
+                              machine_current->timings.horizontal_screen -
+                              offset )
     return 0;
 
   /* We now know the ULA is reading the screen, so put in the appropriate
@@ -164,13 +165,13 @@ contend_delay_common( libspectrum_dword time, int* timings )
 libspectrum_byte
 spectrum_contend_delay_65432100( libspectrum_dword time )
 {
-  return contend_delay_common( time, contention_pattern_65432100 );
+  return contend_delay_common( time, contention_pattern_65432100, 1 );
 }
 
 libspectrum_byte
 spectrum_contend_delay_76543210( libspectrum_dword time )
 {
-  return contend_delay_common( time, contention_pattern_76543210 );
+  return contend_delay_common( time, contention_pattern_76543210, 4 );
 }
 
 /* What happens if we read from an unattached port? */
