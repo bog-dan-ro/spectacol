@@ -2822,6 +2822,13 @@ Start the `poke finder'. See the
 section for more information.
 .RE
 .PP
+.I "Machine, Poke Memory..."
+.RS
+Allow to use multiface POKEs for things such as infinite lives. See the
+.B "POKE MEMORY"
+section for more information.
+.RE
+.PP
 .I "Machine, Memory Browser..."
 .RS
 Start the memory browser. It should be fairly obvious what this does;
@@ -4256,6 +4263,46 @@ reduce the number of lives. We can now use the debugger to replace the
 decrement with a NOP (`set 0x91c9 0'), and playing the game some more
 after this reveals that this has worked and we now have infinite
 lives.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH THE POKE MEMORY
+.PP
+Fuse supports multiface POKEs, allowing to modify specific memory addresses
+in order to cheat (infinite lives, infinite ammo, etc.).
+.PP
+The `poke memory' dialog contains a list of recently loaded POKEs and some
+entry boxes for adding custom POKEs:
+.PP
+.I Bank
+.RS
+Sets the 128K memory bank (values `0' to `7') or the current memory mapping
+(value `8' or blank).
+.RE
+.PP
+.I Address
+.RS
+Memory address to modify. Values in range 16384 to 65535 for 48K memory mode
+or 0 to 65535 for 128K memory banks. GTK+ UI also accepts hex addresses.
+.RE
+.PP
+.I Value
+.RS
+New value for the former address, in range 0 to 255. Value 256 means \(lqPrompt
+to the user later\(rq.
+.RE
+.PP
+It is possible to load POKEs from an external file using the
+.I "File, Open..."
+menu option or the drag-and-drop functionality in the GTK+ and Win32 UIs.
+After loading a snapshot or tape, Fuse will try to automatically locate a
+POK file with the same file name. This means that if we open `GAME.TAP',
+then Fuse will try to open `GAME.POK' and `POKES/GAME.POK'. See
+.IR "http://www.worldofspectrum.org/POKformat.txt"
+for more details about this file format.
+.PP
+POKEs loaded in the list can be activated or deactivated as the user wants
+and will remain in memory until a machine reset.
 .\"
 .\"------------------------------------------------------------------
 .\"

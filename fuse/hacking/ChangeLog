@@ -4388,3 +4388,4 @@
          UDP writes (bug #271).
 20130130 spectrum.c: changes to keep +2A/+3 contention correct after
          libspectrum timing changes in r4866 (Fuse part of patch #305).
+20130131 man/fuse.1: document the Poke Memory dialog (Sergio).
