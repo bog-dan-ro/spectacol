@@ -1836,8 +1836,8 @@ filename to save the screenshot to.
 .PP
 .I "File, Movies, Record..."
 .RS
-Fuse can record movie (video and audio) into a file with special format.
-This file later converted to a common video file format with
+Fuse can record movie (video and audio) into a file with special format 
+which can be converted later to a common video file format with the
 .I fmfconv
 utility.
 You will be prompted for a filename to save video. Please see
@@ -2758,6 +2758,7 @@ for more details.
 .RS
 The variants of the Spectrum as released by Timex in Portugal.
 .RE
+.PP
 .I "Timex TS2068"
 .RS
 The variant of the Spectrum released by Timex in North America.
@@ -4578,8 +4579,8 @@ to convert recorded movie file into a standard video file.
 .PP
 .B Examples
 .PP
-.B "fuse \-\-movie\-start \-\-rate 2 \-\-sound\-freq 44100 \-\-separation"
-.B enigma.fmf
+.B "fuse \-\-movie\-start output.fmf \-\-rate 2 \-\-sound-\freq 44100"
+.B "\-\-separation ACB"
 .PP
 start video recording about 25/s video frame rate and 44100\ Hz sampling
 frequency stereo sound default compression level.
