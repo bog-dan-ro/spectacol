@@ -938,3 +938,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20130103 configure.ac: add trailing slash to URL of bug tracker (Stuart).
 20130126 accessor.pl,doc/libspectrum.txt,snap_accessors.txt,snapshot.c,szx.c:
          add support for storing ZX Printer state (bug #274) (Fred).
+20130130 timings.c: correct video timing for +2A/+3 etc machines (part of
+         patch #305).
