@@ -392,3 +392,4 @@
 20130202 fmfconv.c: fix a crash when input file not exists (Sergio).
 20130202 man/fmfconv.1: complete SYNOPSIS, SEE ALSO and AUTHOR sections. Remove
          FILES section. Punctuation fixes (Sergio).
+20130203 man/snapconv.1: complete SYNOPSIS (Fred).
