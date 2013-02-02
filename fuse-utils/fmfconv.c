@@ -1425,7 +1425,7 @@ void
 close_out( void )
 {
 #ifdef USE_FFMPEG
-  if( out_t == TYPE_FFMPEG )
+  if( out_t == TYPE_FFMPEG && out_header_ok )
     out_finalize_ffmpeg();
 #endif
 
