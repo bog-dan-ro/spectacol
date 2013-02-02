@@ -390,3 +390,5 @@
 20130107 man/fmfconv.1: add some more details on command line arguments (Fred).
 20130113 fmfconv_ff.c: migrate to ffmpeg 1.0.1 API (bug #272) (Fred and rkd77).
 20130202 fmfconv.c: fix a crash when input file not exists (Sergio).
+20130202 man/fmfconv.1: complete SYNOPSIS, SEE ALSO and AUTHOR sections. Remove
+         FILES section. Punctuation fixes (Sergio).

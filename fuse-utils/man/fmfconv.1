@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\"
 .\" fmfconv.1: fmfconv man page
-.\" Copyright (c) 2010 Gergely Szasz
+.\" Copyright (c) 2010-2013 Gergely Szasz
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -34,7 +34,9 @@ fmfconv \(em Fuse movie file converter
 .SH SYNOPSIS
 .B fmfconv
 .RI [ options ]
-.P
+.RI [ infile
+.RI [ outfile
+.RI [ soundfile ]]]
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -61,7 +63,7 @@ List available FFMPEG audio codecs (see \-a/\-\-acodec).
 .PP
 .RI \-\-aifc
 .RS
-Force AIFF-C output if sound format is AIFF
+Force AIFF-C output if sound format is AIFF.
 .RE
 .PP
 .RI "\-A "rate
@@ -76,14 +78,14 @@ where `rate' is `default' or a number.
 .br
 .RI \-\-au
 .RS
-Save sound to Sun Audio (au) file
+Save sound to Sun Audio (au) file.
 .RE
 .PP
 .RI \-m
 .br
 .RI \-\-aiff
 .RS
-Save sound to Apple Computer audio (aiff/aiff-c) file
+Save sound to Apple Computer audio (aiff/aiff-c) file.
 .RE
 .PP
 .RI "\-F "format
@@ -91,7 +93,7 @@ Save sound to Apple Computer audio (aiff/aiff-c) file
 .RI "\-\-format "format
 .RS
 Select file format for FFMPEG output (by default the filename extension 
-determines the format)
+determines the format).
 .RE
 .PP
 .RI \-\-formats
@@ -105,7 +107,7 @@ List available FFMPEG formats (see \-F/\-\-format).
 .RS
 Set output frame rate. `timing' is `pal', `ntsc', `movie' or a
 number with maximum 3 digit after decimal point, or a #/# (e.g.: 
-\-f 29.97 or \-f 30000/1001)
+\-f 29.97 or \-f 30000/1001).
 .RE
 .PP
 .RI \-h
@@ -124,12 +126,12 @@ Scan input file(s) and print information.
 .br
 .RI "\-\-input "filename
 .RS
-Input file
+Input file.
 .RE
 .PP
 .RI \-\-mono
 .RS
-Convert sound to mono (by default sound is converted to stereo)
+Convert sound to mono (by default sound is converted to stereo).
 .RE
 .PP
 .RI "\-C "cut
@@ -138,21 +140,21 @@ Convert sound to mono (by default sound is converted to stereo)
 .RS
 Leave out the comma delimited `cut' ranges e.g.: 100\-200,300,500,1:11\-2:22 
 cut the frames 100\(en200, 300, 500 and frames from 1 min 11 sec to 2 min 22 sec 
-(in the given timing see: \-f/\-\-frate)
+(in the given timing see: \-f/\-\-frate).
 .RE
 .PP
 .RI "\-o "filename
 .br
 .RI "\-\-output "filename
 .RS
-Output file
+Output file.
 .RE
 .PP
 .RI \-P
 .br
 .RI \-\-ppm
 .RS
-Save video as PPM screenshots
+Save video as PPM screenshots.
 .RE
 .PP
 .RI "\-p "profile
@@ -160,7 +162,7 @@ Save video as PPM screenshots
 .RI "\-\-profile "profile
 .RS
 Select the profile for FFMPEG output where <profile> is `youtube', `dvd', `svcd' 
-or `ipod'
+or `ipod'.
 .RE
 .PP
 .RI "\-g "form
@@ -198,19 +200,19 @@ N/Mx or W.
 .br
 .RI \-\-scr
 .RS
-Save video as SCR screenshots
+Save video as SCR screenshots.
 .RE
 .PP
 .RI "\-s "filename
 .br
 .RI "\-\-sound "filename
 .RS
-Output sound file
+Output sound file.
 .RE
 .PP
 .RI \-\-sound\-only
 .RS
-Process only the sound from an `fmf' file
+Process only the sound from an `fmf' file.
 .RE
 .PP
 .RI "\-E "rate
@@ -218,7 +220,7 @@ Process only the sound from an `fmf' file
 .RI "\-\-srate "rate
 .RS
 Resample audio to `rate' sampling rate where `rate' is `cd' for 44100 or `dat' 
-for 48000 or a number. (`cd' and `dat' set `stereo' as well).
+for 48000 or a number (`cd' and `dat' set `stereo' as well).
 .RE
 .PP
 .RI \-v
@@ -259,7 +261,7 @@ List available FFMPEG video codecs (see \-c/\-\-vcodec).
 .br
 .RI \-\-wav
 .RS
-Save sound to Microsoft audio (wav) file
+Save sound to Microsoft audio (wav) file.
 .RE
 .PP
 .RI \-X
@@ -290,13 +292,10 @@ None known.
 .\"
 .\"------------------------------------------------------------------
 .\"
-.SH FILES
-.\"
-.\"------------------------------------------------------------------
-.\"
 .SH SEE ALSO
+.IR ffmpeg "(1),"
 .IR fuse "(1),"
-.IR gzip "(3),"
+.IR fuse\-utils "(1)"
 .PP
 The comp.sys.sinclair Spectrum FAQ, at
 .br
@@ -305,3 +304,4 @@ The comp.sys.sinclair Spectrum FAQ, at
 .\"------------------------------------------------------------------
 .\"
 .SH AUTHOR
+Gergely Szasz.
