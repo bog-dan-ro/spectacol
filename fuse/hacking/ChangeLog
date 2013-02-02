@@ -4395,4 +4395,4 @@
          peripherals/ide/divide.c,peripherals/{if1.c,if2.c,scld.c,speccyboot.c,
          spectranet.c}: revert fix to bug #273, ensure that interfaces are
          disabled in the reset function unless the peripheral is enabled
-         (bug #273 #278) (thanks, Stuart Brady) (Fred).
+         (bug #276 #278) (thanks, Stuart Brady) (Fred).
