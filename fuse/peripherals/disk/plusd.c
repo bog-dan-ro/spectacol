@@ -107,7 +107,7 @@ plusd_unpage( void )
 static void
 plusd_memory_map( void )
 {
-  if( !settings_current.plusd || !plusd_active ) return;
+  if( !plusd_active ) return;
 
   memory_map_romcs_8k( 0x0000, plusd_memory_map_romcs_rom );
   memory_map_romcs_8k( 0x2000, plusd_memory_map_romcs_ram );
@@ -182,13 +182,13 @@ plusd_reset( int hard_reset )
   wd_fdc_drive *d;
   const fdd_params_t *dt;
 
-  plusd_active = 0;
-  plusd_available = 0;
-
   event_remove_type( index_event );
 
-  if( !periph_is_active( PERIPH_TYPE_PLUSD ) )
+  if( !periph_is_active( PERIPH_TYPE_PLUSD ) ) {
+    plusd_active = 0;
+    plusd_available = 0;
     return;
+  }
 
   if( machine_load_rom_bank( plusd_memory_map_romcs_rom, 0,
 			     settings_current.rom_plusd,

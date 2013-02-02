@@ -113,7 +113,7 @@ disciple_memory_map( void )
 {
   struct memory_page *rom_page, *lower_page, *upper_page;
 
-  if( !settings_current.disciple || !disciple_active ) return;
+  if( !disciple_active ) return;
 
   rom_page = disciple_memory_map_romcs_rom[ disciple_rombank ];
 
@@ -213,13 +213,13 @@ disciple_reset( int hard_reset )
   wd_fdc_drive *d;
   const fdd_params_t *dt;
 
-  disciple_active = 0;
-  disciple_available = 0;
-
   event_remove_type( index_event );
 
-  if( !periph_is_active( PERIPH_TYPE_DISCIPLE ) )
+  if( !periph_is_active( PERIPH_TYPE_DISCIPLE ) ) {
+    disciple_active = 0;
+    disciple_available = 0;
     return;
+  }
 
   if( machine_load_rom_bank( disciple_memory_map_romcs_rom[ 0 ], 0,
 			     settings_current.rom_disciple,

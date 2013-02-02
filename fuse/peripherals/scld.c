@@ -184,8 +184,6 @@ scld_memory_map( void )
   int i;
   memory_page *exrom_dock;
   
-  if( periph_is_active( PERIPH_TYPE_SCLD ) ) return;
-
   exrom_dock =
     scld_last_dec.name.altmembank ? timex_exrom : timex_dock;
 

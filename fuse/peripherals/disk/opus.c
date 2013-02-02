@@ -123,7 +123,7 @@ opus_unpage( void )
 static void
 opus_memory_map( void )
 {
-  if( !settings_current.opus || !opus_active ) return;
+  if( !opus_active ) return;
 
   memory_map_romcs_8k( 0x0000, opus_memory_map_romcs_rom );
   memory_map_romcs_4k( 0x2000, opus_memory_map_romcs_ram );
@@ -179,13 +179,13 @@ opus_reset( int hard_reset )
   wd_fdc_drive *d;
   const fdd_params_t *dt;
 
-  opus_active = 0;
-  opus_available = 0;
-
   event_remove_type( index_event );
 
-  if( !periph_is_active( PERIPH_TYPE_OPUS ) )
+  if( !periph_is_active( PERIPH_TYPE_OPUS ) ) {
+    opus_active = 0;
+    opus_available = 0;
     return;
+  }
 
   if( machine_load_rom_bank( opus_memory_map_romcs_rom, 0,
                              settings_current.rom_opus,

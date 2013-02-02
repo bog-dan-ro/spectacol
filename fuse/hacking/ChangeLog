@@ -4391,3 +4391,8 @@
 20130131 man/fuse.1: document the Poke Memory dialog (Sergio).
 20130131 man/fuse.1: fix bad syntax in the Fuse Movie File section. Add missing
          space before TS2068 machine (Sergio).
+20130203 peripherals/disk/{beta.c,disciple.c,opus.c,plusd.c},
+         peripherals/ide/divide.c,peripherals/{if1.c,if2.c,scld.c,speccyboot.c,
+         spectranet.c}: revert fix to bug #273, ensure that interfaces are
+         disabled in the reset function unless the peripheral is enabled
+         (bug #273 #278) (thanks, Stuart Brady) (Fred).

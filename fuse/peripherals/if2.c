@@ -146,7 +146,7 @@ if2_reset( int hard_reset GCC_UNUSED )
 static void
 if2_memory_map( void )
 {
-  if( !settings_current.interface2 || !if2_active ) return;
+  if( !if2_active ) return;
 
   memory_map_romcs( if2_memory_map_romcs );
 }

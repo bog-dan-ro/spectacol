@@ -62,7 +62,8 @@ static libspectrum_byte
 speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached );
 
 static void
-speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val );
+speccyboot_register_write( libspectrum_word port GCC_UNUSED,
+                           libspectrum_byte val );
 
 static const periph_port_t speccyboot_ports[] = {
   { 0x00e0, 0x0080, speccyboot_register_read, speccyboot_register_write },
@@ -85,7 +86,7 @@ static memory_page speccyboot_memory_map_romcs[ MEMORY_PAGES_IN_8K ];
 static void
 speccyboot_memory_map( void )
 {
-  if( !settings_current.speccyboot || !speccyboot_rom_active ) return;
+  if( !speccyboot_rom_active ) return;
 
   memory_map_romcs_8k( 0x0000, speccyboot_memory_map_romcs );
 }
@@ -95,9 +96,9 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
 {
   static int tap_opened = 0;
 
-  if ( machine_load_rom_bank( speccyboot_memory_map_romcs, 0,
-                              settings_current.rom_speccyboot,
-                              settings_default.rom_speccyboot, 0x2000 ) )
+  if( machine_load_rom_bank( speccyboot_memory_map_romcs, 0,
+                             settings_current.rom_speccyboot,
+                             settings_default.rom_speccyboot, 0x2000 ) )
     return;
 
   out_register_state = 0xff;  /* force transitions to low */
@@ -126,16 +127,17 @@ speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached )
 }
 
 static void
-speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
+speccyboot_register_write( libspectrum_word port GCC_UNUSED,
+                           libspectrum_byte val )
 {
   nic_enc28j60_poll( nic );
 
-  if ( GONE_LO( out_register_state, val, OUT_BIT_ETH_RST ) )
+  if( GONE_LO( out_register_state, val, OUT_BIT_ETH_RST ) )
     nic_enc28j60_reset( nic );
 
-  if ( !(val & OUT_BIT_ETH_CS) ) {
+  if( !(val & OUT_BIT_ETH_CS) ) {
 
-    if ( GONE_LO( out_register_state, val, OUT_BIT_ETH_CS ) )
+    if( GONE_LO( out_register_state, val, OUT_BIT_ETH_CS ) )
       nic_enc28j60_set_spi_state( nic, SPI_CMD );
 
     /*
@@ -152,18 +154,18 @@ speccyboot_register_write( libspectrum_word port GCC_UNUSED, libspectrum_byte va
      * The SpeccyBoot stack reads MISO just after setting SCK high, so
      * it works fine with this simplification.
      */
-    if ( GONE_HI( out_register_state, val, OUT_BIT_SPI_SCK ) ) {
+    if( GONE_HI( out_register_state, val, OUT_BIT_SPI_SCK ) ) {
       in_register_state = 0xfe | nic_enc28j60_spi_produce_bit( nic );
       nic_enc28j60_spi_consume_bit( nic, (out_register_state & OUT_BIT_SPI_MOSI) ? 1 : 0 );
     }
   }
    
   /* Update ROM paging status when the ROM_CS bit is cleared or set */
-  if ( GONE_LO( out_register_state, val, OUT_BIT_ROM_CS ) ) {
+  if( GONE_LO( out_register_state, val, OUT_BIT_ROM_CS ) ) {
     speccyboot_rom_active = 1;
     machine_current->ram.romcs = 1;
     machine_current->memory_map();
-  } else if ( GONE_HI( out_register_state, val, OUT_BIT_ROM_CS ) ) {
+  } else if( GONE_HI( out_register_state, val, OUT_BIT_ROM_CS ) ) {
     speccyboot_rom_active = 0;
     machine_current->ram.romcs = 0;
     machine_current->memory_map();

@@ -143,8 +143,11 @@ spectranet_hard_reset( void )
 static void
 spectranet_reset( int hard_reset )
 {
-  if( !periph_is_active( PERIPH_TYPE_SPECTRANET ) )
+  if( !periph_is_active( PERIPH_TYPE_SPECTRANET ) ) {
+    spectranet_available = 0;
+    spectranet_paged = 0;
     return;
+  }
 
   spectranet_available = 1;
   spectranet_paged = !settings_current.spectranet_disable;
@@ -163,7 +166,7 @@ spectranet_reset( int hard_reset )
 static void
 spectranet_memory_map( void )
 {
-  if( !settings_current.spectranet || !spectranet_paged ) return;
+  if( !spectranet_paged ) return;
 
   memory_map_romcs( spectranet_current_map );
 }
