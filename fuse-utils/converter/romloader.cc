@@ -206,7 +206,7 @@ romloader::end_block( double end_marker, double end_tstates )
   }
 
   if( num_bits != 0 ) {
-    std::cout << "Error have incomplete byte (" << (char)num_bits << " bits)\n";
+    std::cout << "Error have incomplete byte (" << num_bits << " bits)\n";
   }
 
   rom_block new_block;

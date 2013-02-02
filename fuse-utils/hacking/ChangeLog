@@ -393,3 +393,5 @@
 20130202 man/fmfconv.1: complete SYNOPSIS, SEE ALSO and AUTHOR sections. Remove
          FILES section. Punctuation fixes (Sergio).
 20130203 man/snapconv.1: complete SYNOPSIS (Fred).
+20130203 converter/romloader.cc: fix incomplete byte warning (thanks, Ivan
+         Shmakov) (Fred).
