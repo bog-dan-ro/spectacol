@@ -172,8 +172,6 @@ w5100_write_socket_mr( nic_w5100_socket_t *socket, libspectrum_byte b )
 static void
 w5100_socket_open( nic_w5100_socket_t *socket_obj )
 {
-  w5100_socket_acquire_lock( socket_obj );
-
   if( ( socket_obj->mode == W5100_SOCKET_MODE_UDP ||
       socket_obj->mode == W5100_SOCKET_MODE_TCP ) &&
     socket_obj->state == W5100_SOCKET_STATE_CLOSED ) {
@@ -195,7 +193,6 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
         "w5100: failed to open %s socket for socket %d; errno %d: %s\n",
         description, socket_obj->id, compat_socket_get_error(),
         compat_socket_get_strerror() );
-      w5100_socket_release_lock( socket_obj );
       return;
     }
 
@@ -213,8 +210,6 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
 
     nic_w5100_debug( "w5100: opened %s fd %d for socket %d\n", description, socket_obj->fd, socket_obj->id );
   }
-
-  w5100_socket_release_lock( socket_obj );
 }
 
 static int
@@ -249,28 +244,22 @@ static void
 w5100_socket_listen( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   if( socket->state == W5100_SOCKET_STATE_INIT ) {
-    w5100_socket_acquire_lock( socket );
 
     if( !socket->socket_bound )
-      if( w5100_socket_bind_port( self, socket ) ) {
-        w5100_socket_release_lock( socket );
+      if( w5100_socket_bind_port( self, socket ) )
         return;
-      }
 
     if( listen( socket->fd, 1 ) == -1 ) {
       nic_w5100_error( UI_ERROR_ERROR, 
                        "w5100: failed to listen on socket %d; errno %d: %s\n",
                        socket->id, compat_socket_get_error(),
                        compat_socket_get_strerror() );
-      w5100_socket_release_lock( socket );
       return;
     }
 
     socket->state = W5100_SOCKET_STATE_LISTEN;
 
     nic_w5100_debug( "w5100: listening on socket %d\n", socket->id );
-
-    w5100_socket_release_lock( socket );
 
     compat_socket_selfpipe_wake( self->selfpipe );
   }
@@ -282,12 +271,9 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
   if( socket->state == W5100_SOCKET_STATE_INIT ) {
     struct sockaddr_in sa;
     
-    w5100_socket_acquire_lock( socket );
     if( !socket->socket_bound )
-      if( w5100_socket_bind_port( self, socket ) ) {
-        w5100_socket_release_lock( socket );
+      if( w5100_socket_bind_port( self, socket ) )
         return;
-      }
 
     memset( &sa, 0, sizeof(sa) );
     sa.sin_family = AF_INET;
@@ -302,14 +288,11 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
 
       socket->ir |= 1 << 3;
       socket->state = W5100_SOCKET_STATE_CLOSED;
-      w5100_socket_release_lock( socket );
       return;
     }
 
     socket->ir |= 1 << 0;
     socket->state = W5100_SOCKET_STATE_ESTABLISHED;
-
-    w5100_socket_release_lock( socket );
   }
 }
 
@@ -318,10 +301,8 @@ w5100_socket_discon( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   if( socket->state == W5100_SOCKET_STATE_ESTABLISHED ||
     socket->state == W5100_SOCKET_STATE_CLOSE_WAIT ) {
-    w5100_socket_acquire_lock( socket );
     socket->ir |= 1 << 1;
     socket->state = W5100_SOCKET_STATE_CLOSED;
-    w5100_socket_release_lock( socket );
     compat_socket_selfpipe_wake( self->selfpipe );
 
     nic_w5100_debug( "w5100: disconnected socket %d\n", socket->id );
@@ -331,7 +312,6 @@ w5100_socket_discon( nic_w5100_t *self, nic_w5100_socket_t *socket )
 static void
 w5100_socket_close( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
-  w5100_socket_acquire_lock( socket );
   if( socket->fd != compat_socket_invalid ) {
     compat_socket_close( socket->fd );
     socket->fd = compat_socket_invalid;
@@ -341,32 +321,25 @@ w5100_socket_close( nic_w5100_t *self, nic_w5100_socket_t *socket )
     compat_socket_selfpipe_wake( self->selfpipe );
     nic_w5100_debug( "w5100: closed socket %d\n", socket->id );
   }
-  w5100_socket_release_lock( socket );
 }
 
 static void
 w5100_socket_send( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   if( socket->state == W5100_SOCKET_STATE_UDP ) {
-    w5100_socket_acquire_lock( socket );
 
     if( !socket->socket_bound )
-      if( w5100_socket_bind_port( self, socket ) ) {
-        w5100_socket_release_lock( socket );
+      if( w5100_socket_bind_port( self, socket ) )
         return;
-      }
 
     socket->datagram_lengths[socket->datagram_count++] =
       socket->tx_wr - socket->last_send;
     socket->last_send = socket->tx_wr;
     socket->write_pending = 1;
-    w5100_socket_release_lock( socket );
     compat_socket_selfpipe_wake( self->selfpipe );
   }
   else if( socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
-    w5100_socket_acquire_lock( socket );
     socket->write_pending = 1;
-    w5100_socket_release_lock( socket );
     compat_socket_selfpipe_wake( self->selfpipe );
   }
 }
@@ -376,12 +349,10 @@ w5100_socket_recv( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   if( socket->state == W5100_SOCKET_STATE_UDP ||
     socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
-    w5100_socket_acquire_lock( socket );
     socket->rx_rsr -= socket->rx_rd - socket->old_rx_rd;
     socket->old_rx_rd = socket->rx_rd;
     if( socket->rx_rsr != 0 )
       socket->ir |= 1 << 2;
-    w5100_socket_release_lock( socket );
     compat_socket_selfpipe_wake( self->selfpipe );
   }
 }
@@ -426,13 +397,10 @@ w5100_write_socket_port( nic_w5100_t *self, nic_w5100_socket_t *socket, int whic
   socket->port[which] = b;
   if( ++socket->bind_count == 2 ) {
     if( socket->state == W5100_SOCKET_STATE_UDP && !socket->socket_bound ) {
-      w5100_socket_acquire_lock( socket );
       if( w5100_socket_bind_port( self, socket ) ) {
-        w5100_socket_release_lock( socket );
         socket->bind_count = 0;
         return;
       }
-      w5100_socket_release_lock( socket );
       compat_socket_selfpipe_wake( self->selfpipe );
     }
     socket->bind_count = 0;
@@ -447,6 +415,9 @@ nic_w5100_socket_read( nic_w5100_t *self, libspectrum_word reg )
   int reg_offset;
   libspectrum_word fsr;
   libspectrum_byte b;
+
+  w5100_socket_acquire_lock( socket );
+
   switch( socket_reg ) {
     case W5100_SOCKET_MR:
       b = socket->mode;
@@ -495,6 +466,9 @@ nic_w5100_socket_read( nic_w5100_t *self, libspectrum_word reg )
       ui_error( UI_ERROR_WARNING, "w5100: reading 0x%02x from unsupported register 0x%03x\n", b, reg );
       break;
   }
+
+  w5100_socket_release_lock( socket );
+
   return b;
 }
 
@@ -503,6 +477,9 @@ nic_w5100_socket_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byt
 {
   nic_w5100_socket_t *socket = &self->socket[(reg >> 8) - 4];
   int socket_reg = reg & 0xff;
+
+  w5100_socket_acquire_lock( socket );
+
   switch( socket_reg ) {
     case W5100_SOCKET_MR:
       w5100_write_socket_mr( socket, b );
@@ -548,6 +525,8 @@ nic_w5100_socket_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byt
 
   if( socket_reg != W5100_SOCKET_PORT0 && socket_reg != W5100_SOCKET_PORT1 )
     socket->bind_count = 0;
+
+  w5100_socket_release_lock( socket );
 }
 
 libspectrum_byte

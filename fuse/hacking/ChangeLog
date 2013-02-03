@@ -4396,3 +4396,5 @@
          spectranet.c}: revert fix to bug #273, ensure that interfaces are
          disabled in the reset function unless the peripheral is enabled
          (bug #276 #278) (thanks, Stuart Brady) (Fred).
+20130203 peripherals/nic/w5100_socket.c: remove data races (patch #306) (thanks,
+         Alberto Garcia and helgrind).
