@@ -4398,3 +4398,5 @@
          (bug #276 #278) (thanks, Stuart Brady) (Fred).
 20130203 peripherals/nic/w5100_socket.c: remove data races (patch #306) (thanks,
          Alberto Garcia and helgrind).
+20130211 peripherals/disk/disciple.c: fix typo in comment documenting port
+         decoding at the single bit level (Stuart).

@@ -136,7 +136,7 @@ static const periph_port_t disciple_ports[] = {
   { 0x00ff, 0x005b, disciple_tr_read, disciple_tr_write },
   /* ---- ---- 1001 1011 */
   { 0x00ff, 0x009b, disciple_sec_read, disciple_sec_write },
-  /* ---- ---- 1110 1011 */
+  /* ---- ---- 1101 1011 */
   { 0x00ff, 0x00db, disciple_dr_read, disciple_dr_write },
 
   /* ---- ---- 0001 1111 */
