@@ -395,3 +395,4 @@
 20130203 man/snapconv.1: complete SYNOPSIS (Fred).
 20130203 converter/romloader.cc: fix incomplete byte warning (thanks, Ivan
          Shmakov) (Fred).
+20130212 man/audio2tape.1: fix input file specification (Fred).
