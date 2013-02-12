@@ -4400,3 +4400,7 @@
          Alberto Garcia and helgrind).
 20130211 peripherals/disk/disciple.c: fix typo in comment documenting port
          decoding at the single bit level (Stuart).
+20130212 peripherals/disk/{disciple.c,opus.c,plusd.c}: revert further changes
+         made when reverting the fix to bug #273, causing the Opus Discovery
+         to be left paged in after a reset and +D/DISCiPLE to be left paged in
+         if loading of the interface's ROM fails (Stuart).

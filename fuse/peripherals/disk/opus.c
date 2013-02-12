@@ -179,11 +179,12 @@ opus_reset( int hard_reset )
   wd_fdc_drive *d;
   const fdd_params_t *dt;
 
+  opus_active = 0;
+  opus_available = 0;
+
   event_remove_type( index_event );
 
   if( !periph_is_active( PERIPH_TYPE_OPUS ) ) {
-    opus_active = 0;
-    opus_available = 0;
     return;
   }
 

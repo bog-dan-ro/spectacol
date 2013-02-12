@@ -213,11 +213,12 @@ disciple_reset( int hard_reset )
   wd_fdc_drive *d;
   const fdd_params_t *dt;
 
+  disciple_active = 0;
+  disciple_available = 0;
+
   event_remove_type( index_event );
 
   if( !periph_is_active( PERIPH_TYPE_DISCIPLE ) ) {
-    disciple_active = 0;
-    disciple_available = 0;
     return;
   }
 
