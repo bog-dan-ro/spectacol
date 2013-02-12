@@ -4403,5 +4403,6 @@
 20130212 peripherals/disk/{disciple.c,opus.c,plusd.c}: revert further changes
          made when reverting the fix to bug #273, causing the Opus Discovery
          to be left paged in after a reset and +D/DISCiPLE to be left paged in
-         if loading of the interface's ROM fails (Stuart).
-20130212 ChangeLog: document limitations of the DISCiPLE emulation (Stuart).
+         if loading of the interface's ROM fails (bug #284) Stuart).
+20130212 ChangeLog: document limitations of the DISCiPLE emulation (bug #285)
+         (Stuart).
