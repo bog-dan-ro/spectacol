@@ -9,6 +9,8 @@
           * Add SpeccyBoot ethernet interface emulation (Patrik Persson).
           * Add SpecDrum sound interface emulation (Jon Mitchell).
           * Add DISCiPLE disk interface emulation (Stuart Brady).
+            Sinclair Network emulation is not provided, and the interface is
+            not available under 128K emulation in this release.
           * Support reading PZX files (Fredrick Meunier).
           * Add support for POK files (Sergio Baldoví).
           * Add recording of movies to FMF files (Gergely Szasz).
