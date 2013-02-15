@@ -104,7 +104,7 @@ sub win32_keysym ($) {
 
     my $keysym = shift;
 
-    # http://msdn2.microsoft.com/en-us/library/ms645540.aspx
+    # http://msdn.microsoft.com/en-us/library/dd375731(VS.85).aspx
 
     $keysym =~ tr/a-z/A-Z/;
 

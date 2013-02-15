@@ -4406,3 +4406,6 @@
          if loading of the interface's ROM fails (bug #284) Stuart).
 20130212 ChangeLog: document limitations of the DISCiPLE emulation (bug #285)
          (Stuart).
+20130216 compat/win32/paths.c,keysyms.pl,man/fuse.1,sound/blipbuffer.[ch],
+         spectrum.c,THANKS,ui/win32/debugger.h: fix broken URLs (thanks, Fred)
+         (Sergio).

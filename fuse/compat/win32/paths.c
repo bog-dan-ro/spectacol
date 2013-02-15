@@ -42,7 +42,7 @@ compat_get_temp_path( void )
   const char *dir;
 
   /* Something close to this algorithm specified at
-     http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/base/gettemppath.asp
+     http://msdn.microsoft.com/en-us/library/windows/desktop/aa364992%28v=vs.85%29.aspx
   */
   dir = getenv( "TMP" ); if( dir ) return dir;
   dir = getenv( "TEMP" ); if( dir ) return dir;

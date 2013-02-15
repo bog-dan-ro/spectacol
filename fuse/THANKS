@@ -5,10 +5,10 @@ Some thanks (in alphabetical order):
 
 * Michael Bukin: for XWinAllegro, which was used by previous versions of
   Fuse for the graphical display.
-  (http://www.canvaslink.com/allegro/xwinallegro/)
+  (http://web.archive.org/web/19990210094206/http://www.canvaslink.com/allegro/xwinallegro/)
 
 * Ian Collier: the source to his xz80
-  (http://www.comlab.ox.ac.uk/oucl/users/ian.collier/Spectrum/index.html)
+  (http://web.archive.org/web/19990428010016/http://www.comlab.ox.ac.uk/oucl/users/ian.collier/Spectrum/index.html)
   was very helpful for getting the z80 opcodes right; also the ZX Printer
   emulation is based on xz80's.
 
@@ -27,9 +27,9 @@ Some thanks (in alphabetical order):
 
 * Ian Greenway: for information about reading from unattached ports. If
   you've got an Amiga, you may well like to check out Ian's Spectrum
-  Emulator, ASp: http://www.greew.freeserve.co.uk/ASp.html
+  Emulator, ASp: http://www.lasernet.plus.com/asp.html
 
-* Shawn Hargreaves: for Allegro (http://www.talula.demon.co.uk/allegro/)
+* Shawn Hargreaves: for Allegro (http://alleg.sourceforge.net/)
   (again, used by previous versions of Fuse for the graphical display)
 
 * Steven Harrison: for helping track down why the SDL sound routines
@@ -67,7 +67,7 @@ Some thanks (in alphabetical order):
 
 * Darren Salt: quite a few bits of code (see `AUTHORS')
 
-* Dmitry Sanarin: the author of Glukalka (http://glukalka.sf.net/),
+* Dmitry Sanarin: the author of Glukalka (http://www.sanarin.ru/glukalka/),
   from which Fuse's TR-DOS emulation code was taken.
 
 * Steve Snake (via Mark Woodmass): for pointing out which memory pages
@@ -81,7 +81,8 @@ Some thanks (in alphabetical order):
 * Gergely Szasz: Interface 1/Microdrive emulation, the 'movie' code and the
   ao sound driver (see `AUTHORS')
 
-* Miklos Szeredi: his `SpectEmu' (http://www.inf.bme.hu/~mszeredi/spectemu/)
+* Miklos Szeredi: his `SpectEmu'
+  (http://web.archive.org/web/20100408033206/http://www.inf.bme.hu/~mszeredi/spectemu/)
   gave the inspiration for an important rewrite of the Z80 core, and was
   also _very_ useful whilst trying to track down some bugs.
 

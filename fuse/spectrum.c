@@ -215,7 +215,7 @@ spectrum_unattached_port( void )
 
     /* The pattern of bytes returned here is the same as documented by
        Ramsoft in their 'Floating bus technical guide' at
-       http://www.ramsoft.bbk.org/floatingbus.html
+       http://web.archive.org/web/20080509193736/http://www.ramsoft.bbk.org/floatingbus.html
 
        However, the timings used are based on the first byte being
        returned at 14338 (48K) and 14364 (128K) respectively, not

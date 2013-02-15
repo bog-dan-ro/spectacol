@@ -23,7 +23,7 @@
 
 */
 
-/* FIXME: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vclib/html/_MFCNOTES_TN020.asp */
+/* FIXME: http://msdn.microsoft.com/en-us/library/t2zechd4%28v=VS.80%29.aspx */
 
 #define IDD_DBG				2000
 #define IDC_DBG_LV_PC			( IDD_DBG + 1 )
