@@ -59,6 +59,7 @@
 #include <stdlib.h>
 
 #include <libavformat/avformat.h>
+#include <libavutil/mathematics.h>
 #include <libswscale/swscale.h>
 
 #include "libspectrum.h"
@@ -108,7 +109,9 @@ static enum PixelFormat out_pix_fmt = PIX_FMT_NONE;
 
 static int res_rte = -1;
 
+#ifdef HAVE_FFMPEG_AVDICTIONARY
 static void setup_x264_dict( AVDictionary **  pm );
+#endif
 
 int
 ffmpeg_resample_audio( void )
@@ -211,11 +214,20 @@ add_audio_stream( enum CodecID codec_id, int freq, int stereo )
 {
   AVCodecContext *c;
 
+#ifdef HAVE_FFMPEG_AVFORMAT_NEW_STREAM
+  audio_st = avformat_new_stream( oc, NULL );
+#else
   audio_st = av_new_stream( oc, 1 );
+#endif
+
   if( !audio_st ) {
     printe( "FFMPEG: Could not allocate audio stream stream\n" );
     return 1;
   }
+
+#ifdef HAVE_FFMPEG_AVFORMAT_NEW_STREAM
+  audio_st->id = 1;
+#endif
 
   c = audio_st->codec;
   c->codec_id = codec_id;
@@ -242,6 +254,7 @@ open_audio( void )
 {
   AVCodecContext *c;
   AVCodec *codec;
+  int ret;
 
   c = audio_st->codec;
 
@@ -253,7 +266,13 @@ open_audio( void )
   }
 
     /* open it */
-  if( avcodec_open2( c, codec, NULL ) < 0 ) {
+#ifdef HAVE_FFMPEG_AVCODEC_OPEN2
+  ret = avcodec_open2( c, codec, NULL );
+#else
+  ret = avcodec_open( c, codec );
+#endif
+
+  if( ret < 0 ) {
     printe( "FFMPEG: could not open audio codec\n" );
     return 1;
   }
@@ -419,7 +438,12 @@ add_video_stream( enum CodecID codec_id, int w, int h, int timing )
 {
   AVCodecContext *c;
 
+#ifdef HAVE_FFMPEG_AVFORMAT_NEW_STREAM
+  video_st = avformat_new_stream( oc, NULL );
+#else
   video_st = av_new_stream( oc, 0 );
+#endif
+
   if( !video_st ) {
     printe( "FFMPEG: Could not allocate video stream\n" );
     return 1;
@@ -450,6 +474,10 @@ add_video_stream( enum CodecID codec_id, int w, int h, int timing )
     c->max_qdiff = 4;
     c->qmin = 10;
     c->qmax = 51;
+#ifndef HAVE_FFMPEG_AVDICTIONARY
+    c->crf = 23;
+    c->cqp = -1;
+#endif
     c->qcompress = 0.0;
     c->me_method = 8;
     c->trellis = 1;
@@ -457,9 +485,6 @@ add_video_stream( enum CodecID codec_id, int w, int h, int timing )
     c->partitions = X264_PART_I4X4 | X264_PART_I8X8 | X264_PART_P8X8 | X264_PART_P4X4 | X264_PART_B8X8;
 */
     c->flags2 |= 0;
-    
-    setup_x264_dict( c->priv_data );
-
   }
     /* some formats want stream headers to be separate */
   if( oc->oformat->flags & AVFMT_GLOBALHEADER )
@@ -497,6 +522,7 @@ open_video( void )
 {
   AVCodec *codec;
   AVCodecContext *c;
+  int ret;
 
   c = video_st->codec;
 
@@ -528,12 +554,21 @@ open_video( void )
     }
   }
 
+#ifdef HAVE_FFMPEG_AVCODEC_OPEN2
+  AVDictionary *options = NULL;
   if( ffmpeg_libx264 ) {
-    setup_x264_dict( c->priv_data );
+    setup_x264_dict( &options );
   }
 
     /* open the codec */
-  if( avcodec_open2( c, codec, NULL ) < 0 ) {
+  ret = avcodec_open2( c, codec, &options );
+
+  av_dict_free( &options );
+#else
+  ret = avcodec_open( c, codec );
+#endif
+
+  if( ret < 0 ) {
     printe( "FFMPEG: could not open video codec\n" );
     return 1;
   }
@@ -586,6 +621,8 @@ ffmpeg_add_frame_ffmpeg( void )
 
     ret = av_interleaved_write_frame( oc, &pkt );
   } else {
+    ffmpeg_pict->pts = c->frame_number;
+
         /* encode the image */
     out_size = avcodec_encode_video( c, video_outbuf, video_outbuf_size, ffmpeg_pict );
         /* if zero size, it means the image was buffered */
@@ -896,7 +933,11 @@ show_codecs( int what )
         encode = 0;
       }
       if( p2 && strcmp( p->name, p2->name ) == 0 ) {
+#ifdef HAVE_FFMPEG_AVCODEC_OPEN2
         if( p->encode2 ) encode=1;
+#else
+        if( p->encode ) encode=1;
+#endif
       }
     }
     if( p2 == NULL ) break;
@@ -962,6 +1003,7 @@ ffmpeg_list_ffmpeg( int what )
   putc('\n', stdout);
 }
 
+#ifdef HAVE_FFMPEG_AVDICTIONARY
 static void
 setup_x264_dict( AVDictionary ** dict )
 {
@@ -971,8 +1013,9 @@ setup_x264_dict( AVDictionary ** dict )
   av_dict_set( dict, "8x8dct", "1", 0 );
   av_dict_set( dict, "fast-pskip", "1", 0 );
   av_dict_set( dict, "qp", "-1", 0 );
-  av_dict_set( dict, "crf", "0", 0 );
+  av_dict_set( dict, "crf", "23", 0 );
   av_dict_set( dict, "preset", "medium", 0 );
 }
+#endif	/* ifdef HAVE_FFMPEG_AVDICTIONARY */
 
 #endif	/* ifdef USE_FFMPEG */

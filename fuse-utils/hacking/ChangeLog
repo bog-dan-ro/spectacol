@@ -397,3 +397,5 @@
          Shmakov) (Fred).
 20130212 man/audio2tape.1: fix input file specification (Fred).
 20130216 AUTHORS,man/createhdf.1,man/raw2hdf.1: fix broken URLs (Sergio).
+20130216 configure.ac,fmfconv_ff.c: fix the build on Debian stable and fix a
+         crash when encoding H.264 (more from bug #272) (thanks, Fred) (Sergio).
