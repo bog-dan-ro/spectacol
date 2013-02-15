@@ -396,3 +396,4 @@
 20130203 converter/romloader.cc: fix incomplete byte warning (thanks, Ivan
          Shmakov) (Fred).
 20130212 man/audio2tape.1: fix input file specification (Fred).
+20130216 AUTHORS,man/createhdf.1,man/raw2hdf.1: fix broken URLs (Sergio).

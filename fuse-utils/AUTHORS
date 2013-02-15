@@ -5,7 +5,7 @@ The Fuse utilities have been brought to you by:
 * Fredrick Meunier: scl2trd.
 
 * Dmitry Sanarin: the original scl to trd conversion code, taken from
-  Glukalka (http://glukalka.sf.net/)
+  Glukalka (http://www.sanarin.ru/glukalka/)
 
 * Chris Cowley: listbasic is very heavily based on his SnapList utility
   (http://freestuff.grok.co.uk/snaplist/index.html)
@@ -14,7 +14,7 @@ The Fuse utilities have been brought to you by:
   from Taper (http://www.worldofspectrum.org/taper.html)
 
 * Tomaz Kac: snap2tzx is very heavily based on his z802tzx utility
-  (ftp://ftp.worldofspectrum.org/tools/pc/Z802TZXv11.zip)
+  (ftp://ftp.worldofspectrum.org/pub/sinclair/tools/pc/Z802TZXv11.zip)
 
 * Philip Kendall: everything else.
 
