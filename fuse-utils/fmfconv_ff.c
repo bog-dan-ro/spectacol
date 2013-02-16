@@ -113,6 +113,20 @@ static int res_rte = -1;
 static void setup_x264_dict( AVDictionary **  pm );
 #endif
 
+/* check that a given sample format is supported by the encoder */
+static int
+check_sample_fmt( AVCodec *codec, enum AVSampleFormat sample_fmt )
+{
+  const enum AVSampleFormat *p = codec->sample_fmts;
+
+  while (*p != AV_SAMPLE_FMT_NONE) {
+    if (*p == sample_fmt)
+      return 1;
+    p++;
+  }
+  return 0;
+}
+
 int
 ffmpeg_resample_audio( void )
 {
@@ -749,11 +763,20 @@ out_write_ffmpegheader( void )
   if( snd_t == TYPE_FFMPEG && acodec != CODEC_ID_NONE ) {
     if( ffmpeg_acodec != NULL && *ffmpeg_acodec != 0 ) {
       c = avcodec_find_encoder_by_name( ffmpeg_acodec );
+
       if( c && c->type == AVMEDIA_TYPE_AUDIO ) {
         acodec = c->id;
       } else {
         printe( "FFMPEG: Unknown audio encoder '%s'.\n", ffmpeg_acodec );
       }
+
+        /* check that the encoder supports s16 pcm input */
+      if( !check_sample_fmt( c, AV_SAMPLE_FMT_S16 ) ) {
+        printe( "FFMPEG: Encoder %s does not support sample format %s\n",
+                ffmpeg_acodec, av_get_sample_fmt_name( AV_SAMPLE_FMT_S16 ) );
+        exit(1);
+      }
+
     }
     if( add_audio_stream( acodec, snd_rte, snd_chn > 1 ? 1 : 0 ) ) {
       close_video();
