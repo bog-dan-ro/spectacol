@@ -287,6 +287,31 @@ Set yuv4mpeg2 file frame format to `frm', where `frm' is one of `444',
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH EXAMPLES
+Convert a Fuse movie file to a mpeg video with quality equivalent to YouTube
+.PP
+.RS
+.B fmfconv
+\-p youtube input.fmf output.mov
+.RE
+.PP
+Convert a Fuse movie file to a DVD video format
+.PP
+.RS
+.B fmfconv
+\-p dvd input.fmf output.vob
+.RE
+.PP
+Extract audio (mono) from a recording
+.PP
+.RS
+.B fmfconv
+\-\-sound-only \-\-mono input.fmf output.wav
+.RE
+.PP
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH BUGS
 None known.
 .\"
