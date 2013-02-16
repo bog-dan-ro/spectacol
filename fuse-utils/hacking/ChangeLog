@@ -400,3 +400,5 @@
 20130216 configure.ac,fmfconv_ff.c: fix the build on Debian stable and fix a
          crash when encoding H.264 (more from bug #272) (thanks, Fred) (Sergio).
 20130216 fmfconv.c: fix help punctuation and document svcd profile (Sergio).
+20130216 fmfconv.c: fix a crash when converting PCM stereo samples to mono
+         (Sergio).

@@ -444,7 +444,7 @@ stereo_2_mono( void )
   if( snd_enc == TYPE_PCM ) {
     libspectrum_signed_word *s;
     libspectrum_signed_word *t;
-    buff_end = sound16 + snd_len;
+    buff_end = sound16 + snd_len / 2;
     for( s = t = sound16; (void *)s < buff_end; s++, t++ ) {
       *t = *s; s++; *t = ( (libspectrum_signed_dword)*t + *s + 1 ) / 2;
     }
