@@ -405,3 +405,4 @@
 20130216 man/fmfconv.1: add some examples (Sergio).
 20130216 fmfconv_ff.c: check the codec supports signed 16 bit PCM samples before
          trying to use them (Fred).
+20130219 scl2trd.c: check the return code from read() and write() (Sergio).

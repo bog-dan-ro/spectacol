@@ -87,7 +87,7 @@ Scl2Trd(char *oldname, char *newname)
 {
   int TRD, SCL, i;
 
-  void *TRDh;
+  void *TRDh = NULL;
   void *tmp;
 
   unsigned char *trd_fsec;
@@ -98,10 +98,12 @@ Scl2Trd(char *oldname, char *newname)
   char signature[8];
   unsigned char blocks;
   char headers[256][14];
-  void *tmpscl;
+  void *tmpscl = NULL;
   unsigned long left;
   unsigned long fptr;
   int x;
+  ssize_t bytes_read;
+  ssize_t bytes_written;
 
   unsigned char template[34] =
   {0x01, 0x16, 0x00, 0xF0,
@@ -144,7 +146,13 @@ Scl2Trd(char *oldname, char *newname)
   }
 
   TRDh = malloc(4096);
-  read(TRD, TRDh, 4096);
+  bytes_read = read(TRD, TRDh, 4096);
+  if (bytes_read < 4096) {
+    printf("Error - cannot read TRD header from %s\n", newname);
+    close(TRD);
+    free(TRDh);
+    return;
+  }
 
   tmp = (char *) TRDh + 0x8E5;
   trd_files = (unsigned char *) TRDh + 0x8E4;
@@ -153,24 +161,33 @@ Scl2Trd(char *oldname, char *newname)
 
   if ((SCL = open(oldname, O_RDONLY | O_BINARY)) == -1) {
     printf("Can't open SCL file %s.\n", oldname);
-    close(TRD);
-    close(SCL);
-    return;
+    goto Abort;
   }
 
-  read(SCL, &signature, 8);
+  bytes_read = read(SCL, &signature, 8);
+  if (bytes_read < 8) {
+    printf("Error - cannot read signature from SCL file %s\n", oldname);
+    goto Abort;
+  }
 
   if (strncasecmp(signature, "SINCLAIR", 8)) {
     printf("Wrong signature=%s. \n", signature);
-    close(TRD);
-    close(SCL);
-    return;
+    goto Abort;
   }
 
-  read(SCL, &blocks, 1);
+  bytes_read = read(SCL, &blocks, 1);
+  if (bytes_read < 1) {
+    printf("Error - cannot read number of files in SCL file %s\n", oldname);
+    goto Abort;
+  }
 
-  for (x = 0; x < blocks; x++)
-    read(SCL, &(headers[x][0]), 14);
+  for (x = 0; x < blocks; x++) {
+    bytes_read = read(SCL, &(headers[x][0]), 14);
+    if (bytes_read < 14) {
+      printf("Error - cannot read header %d from SCL file %s\n", x, oldname);
+      goto Abort;
+    }
+  }
 
   for (x = 0; x < blocks; x++) {
     size = headers[x][13];
@@ -200,13 +217,34 @@ Scl2Trd(char *oldname, char *newname)
     lseek(TRD, fptr, SEEK_SET);
 
     while (left > 32000) {
-      read(SCL, tmpscl, 32000);
-      write(TRD, tmpscl, 32000);
-      left -= 32000;
+      bytes_read = read(SCL, tmpscl, 32000);
+      if (bytes_read <= 0) {
+        printf("Error - reading file %d from SCL %s\n", x, oldname);
+        goto Abort;
+      }
+
+      bytes_written = write(TRD, tmpscl, bytes_read);
+      if (bytes_written < bytes_read) {
+        printf("Error - writing to TRD file %s\n", newname);
+        goto Abort;
+      }
+
+      left -= bytes_read;
     }
 
-    read(SCL, tmpscl, left);
-    write(TRD, tmpscl, left);
+    if (left > 0) {
+      bytes_read = read(SCL, tmpscl, left);
+      if (bytes_read < (ssize_t)left) {
+        printf("Error - reading file %d from SCL %s\n", x, oldname);
+        goto Abort;
+      }
+
+      bytes_written = write(TRD, tmpscl, bytes_read);
+      if (bytes_written < bytes_read) {
+        printf("Error - writing to TRD file %s\n", newname);
+        goto Abort;
+      }
+    }
 
     free(tmpscl);
 
@@ -230,9 +268,19 @@ Scl2Trd(char *oldname, char *newname)
 
 Finish:
   lseek(TRD, 0L, SEEK_SET);
-  write(TRD, TRDh, 4096);
+  bytes_written = write(TRD, TRDh, 4096);
+  if (bytes_written < 4096) {
+    printf("Error - writing header to TRD file %s\n", newname);
+  }
   close(TRD);
   free(TRDh);
+  return;
+
+Abort:
+  close(SCL);
+  close(TRD);
+  free(TRDh);
+  free(tmpscl);
 }
 
 static int
