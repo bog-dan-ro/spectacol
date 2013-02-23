@@ -406,3 +406,4 @@
 20130216 fmfconv_ff.c: check the codec supports signed 16 bit PCM samples before
          trying to use them (Fred).
 20130219 scl2trd.c: check the return code from read() and write() (Sergio).
+20130223 fmfconv_ff.c: use the same encoder on later stages (Sergio).

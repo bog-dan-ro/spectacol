@@ -264,20 +264,12 @@ add_audio_stream( enum CodecID codec_id, int freq, int stereo )
 }
 
 static int
-open_audio( void )
+open_audio( AVCodec *codec )
 {
   AVCodecContext *c;
-  AVCodec *codec;
   int ret;
 
   c = audio_st->codec;
-
-    /* find the audio encoder */
-  codec = avcodec_find_encoder( c->codec_id );
-  if( !codec ) {
-    printe( "FFMPEG: audio codec not found\n" );
-    return 1;
-  }
 
     /* open it */
 #ifdef HAVE_FFMPEG_AVCODEC_OPEN2
@@ -532,20 +524,12 @@ alloc_picture( enum PixelFormat pix_fmt, int width, int height, void *fmf_pict )
 }
 
 static int
-open_video( void )
+open_video( AVCodec *codec )
 {
-  AVCodec *codec;
   AVCodecContext *c;
   int ret;
 
   c = video_st->codec;
-
-    /* find the video encoder */
-  codec = avcodec_find_encoder( c->codec_id );
-  if( !codec ) {
-    printe( "FFMPEG: video codec not found\n" );
-    return 1;
-  }
 
   if( codec->pix_fmts == NULL )
      c->pix_fmt = PIX_FMT_YUV420P;
@@ -689,7 +673,7 @@ int
 out_write_ffmpegheader( void )
 {
 
-  AVCodec *c;
+  AVCodec *ac, *vc;
   enum CodecID acodec, vcodec;
 
   ff_picture = NULL;
@@ -736,19 +720,32 @@ out_write_ffmpegheader( void )
        and initialize the codecs */
   video_st = NULL;
   audio_st = NULL;
+  vc = NULL;
+  ac = NULL;
   vcodec = fmt->video_codec;
   acodec = fmt->audio_codec;
+
   if( out_t == TYPE_FFMPEG && vcodec != CODEC_ID_NONE ) {
-    AVCodec *c;
+
+    /* Find the video encoder requested by user selection */
     if( ffmpeg_vcodec != NULL && *ffmpeg_vcodec != 0 ) {
-      c = avcodec_find_encoder_by_name( ffmpeg_vcodec );
-      if( c && c->type == AVMEDIA_TYPE_VIDEO ) {
-        vcodec = c->id;
+      vc = avcodec_find_encoder_by_name( ffmpeg_vcodec );
+      if( vc && vc->type == AVMEDIA_TYPE_VIDEO ) {
+        vcodec = vc->id;
       } else {
         printe( "FFMPEG: Unknown video encoder '%s'.\n", ffmpeg_vcodec );
         return 1;
       }
+    } else {
+      /* Find the video encoder suggested by file format */
+      vc = avcodec_find_encoder( vcodec );
     }
+
+    if( !vc || vc->type != AVMEDIA_TYPE_VIDEO ) {
+      printe( "FFMPEG: video codec not found.\n" );
+      return 1;
+    }
+
     if( ffmpeg_rescale == TYPE_NONE ) {
       out_w = frm_w; out_h = frm_h;
     } else if( ffmpeg_rescale == TYPE_RESCALE_X ) {
@@ -760,24 +757,39 @@ out_write_ffmpegheader( void )
     if( add_video_stream( vcodec, out_w, out_h, machine_timing[frm_mch - 'A'] ) )
       return 1;
   }
-  if( snd_t == TYPE_FFMPEG && acodec != CODEC_ID_NONE ) {
-    if( ffmpeg_acodec != NULL && *ffmpeg_acodec != 0 ) {
-      c = avcodec_find_encoder_by_name( ffmpeg_acodec );
 
-      if( c && c->type == AVMEDIA_TYPE_AUDIO ) {
-        acodec = c->id;
+  if( snd_t == TYPE_FFMPEG && acodec != CODEC_ID_NONE ) {
+
+    /* Find the audio encoder requested by user selection */
+    if( ffmpeg_acodec != NULL && *ffmpeg_acodec != 0 ) {
+      ac = avcodec_find_encoder_by_name( ffmpeg_acodec );
+
+      if( ac && ac->type == AVMEDIA_TYPE_AUDIO ) {
+        acodec = ac->id;
       } else {
         printe( "FFMPEG: Unknown audio encoder '%s'.\n", ffmpeg_acodec );
+        close_video();
+        return 1;
       }
-
-        /* check that the encoder supports s16 pcm input */
-      if( !check_sample_fmt( c, AV_SAMPLE_FMT_S16 ) ) {
-        printe( "FFMPEG: Encoder %s does not support sample format %s\n",
-                ffmpeg_acodec, av_get_sample_fmt_name( AV_SAMPLE_FMT_S16 ) );
-        exit(1);
-      }
-
+    } else {
+      /* Find the audio encoder suggested by file format */
+      ac = avcodec_find_encoder( acodec );
     }
+
+    if( !ac || ac->type != AVMEDIA_TYPE_AUDIO ) {
+      printe( "FFMPEG: audio codec not found.\n" );
+      close_video();
+      return 1;
+    }
+
+    /* check that the encoder supports s16 pcm input */
+    if( !check_sample_fmt( ac, AV_SAMPLE_FMT_S16 ) ) {
+      printe( "FFMPEG: Encoder %s does not support sample format %s\n",
+              ac->name, av_get_sample_fmt_name( AV_SAMPLE_FMT_S16 ) );
+      close_video();
+      return 1;
+    }
+
     if( add_audio_stream( acodec, snd_rte, snd_chn > 1 ? 1 : 0 ) ) {
       close_video();
       return 1;
@@ -794,16 +806,16 @@ out_write_ffmpegheader( void )
     return 1;
   }
 #endif
-/* dump_format( oc, 0, out_name, 1 ); */
+/* av_dump_format( oc, 0, out_name, 1 ); */
 
     /* now that all the parameters are set, we can open the audio and
        video codecs and allocate the necessary encode buffers */
-  if( video_st && open_video() ) {
+  if( video_st && open_video( vc ) ) {
     close_video();
     close_audio();
     return 1;
   }
-  if( audio_st && open_audio() ) {
+  if( audio_st && open_audio( ac ) ) {
     close_video();
     close_audio();
     return 1;
