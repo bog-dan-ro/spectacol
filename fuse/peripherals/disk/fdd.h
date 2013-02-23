@@ -1,4 +1,4 @@
-/* fdd.h: Header for handling raw disk images
+/* fdd.h: Routines for emulating floppy disk drives
    Copyright (c) 2007-2010 Gergely Szasz
 
    $Id$

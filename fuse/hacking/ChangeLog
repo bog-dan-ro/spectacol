@@ -4410,3 +4410,4 @@
          spectrum.c,THANKS,ui/win32/debugger.h: fix broken URLs (thanks, Fred)
          (Sergio).
 20130223 ui/widget/filesel.c: fix a couple of memory leaks (Sergio).
+20130223 peripherals/disk/{disk.h,fdd.h}: fix header descriptions (Sergio).

@@ -1,4 +1,4 @@
-/* fdd.h: Header for handling raw disk images
+/* disk.h: Routines for handling disk images
    Copyright (c) 2007-2010 Gergely Szasz
 
    $Id$
