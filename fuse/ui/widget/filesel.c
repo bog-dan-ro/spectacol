@@ -494,19 +494,21 @@ widget_filesel_draw( void *data )
   /* Create the dialog box */
   error = widget_dialog_with_border( 1, 2, 30, 22 );
   if( error ) {
-    if( directory ) free( directory );
+    free( directory );
     return error; 
   }
 
 #ifdef WIN32
   if( directory == NULL ) {
-    directory = "Drive selection";
+    directory = utils_safe_strdup( "Drive selection" );
   }
 #endif				/* #ifdef WIN32 */
 
   /* Show all the filenames */
   widget_print_all_filenames( widget_filenames, widget_numfiles,
 			      top_left_file, current_file, directory );
+
+  free( directory );
 
 #endif /* ifndef AMIGA */
 
@@ -943,7 +945,7 @@ widget_filesel_keyhandler( input_key key )
 
 #ifdef WIN32
   if( is_drivesel ) {
-    dirtitle = "Drive selection";
+    dirtitle = utils_safe_strdup( "Drive selection" );
   } else {
 #endif				/* #ifdef WIN32 */
     dirtitle = widget_getcwd();
@@ -987,5 +989,7 @@ widget_filesel_keyhandler( input_key key )
     current_file = new_current_file;
 
   }
+
+  free( dirtitle );
 #endif /* ifdef AMIGA */
 }

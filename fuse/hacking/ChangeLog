@@ -4409,3 +4409,4 @@
 20130216 compat/win32/paths.c,keysyms.pl,man/fuse.1,sound/blipbuffer.[ch],
          spectrum.c,THANKS,ui/win32/debugger.h: fix broken URLs (thanks, Fred)
          (Sergio).
+20130223 ui/widget/filesel.c: fix a couple of memory leaks (Sergio).
