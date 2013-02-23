@@ -126,7 +126,7 @@ static const periph_port_t plusd_ports[] = {
   /* ---- ---- 1110 1111 */
   { 0x00ff, 0x00ef, NULL, plusd_cn_write },
   /* ---- ---- 1110 0111 */
-  { 0x00ff, 0x00e7, plusd_mem_read, plusd_mem_write },
+  { 0x00ff, 0x00e7, plusd_patch_read, plusd_patch_write },
   /* 0000 0000 1111 0111 */
   { 0x00ff, 0x00f7, plusd_printer_read, plusd_printer_write },
 
@@ -342,7 +342,7 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 libspectrum_byte
-plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
+plusd_patch_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
 {
   /* should we set *attached = 1? */
 
@@ -351,7 +351,7 @@ plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
 }
 
 void
-plusd_mem_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
+plusd_patch_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
 {
   plusd_unpage();
 }

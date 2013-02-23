@@ -4415,3 +4415,6 @@
          DISCiPLE ROM image and use 8 KiB ROMs (Stuart).
 20130223 peripherals/disk/disciple.c: remove comments regarding unattached
          port I/O for paging operations (Stuart).
+20130223 peripherals/disk/{disciple,plusd}.[ch]: rename the paging port
+         functions to {disciple,plusd}_patch_{read,write} (from *_mem_*)
+         to follow MGT terminology (Stuart).

@@ -152,7 +152,7 @@ static const periph_port_t disciple_ports[] = {
   /* ---- ---- 0111 1011 */
   { 0x00ff, 0x007b, disciple_boot_read, disciple_boot_write },
   /* ---- ---- 1011 1011 */
-  { 0x00ff, 0x00bb, disciple_mem_read, disciple_mem_write },
+  { 0x00ff, 0x00bb, disciple_patch_read, disciple_patch_write },
   /* ---- ---- 1111 1011 */
   { 0x00ff, 0x00fb, NULL, disciple_printer_write },
 
@@ -431,14 +431,15 @@ disciple_boot_write( libspectrum_word port GCC_UNUSED,
 }
 
 libspectrum_byte
-disciple_mem_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
+disciple_patch_read( libspectrum_word port GCC_UNUSED,
+		     int *attached GCC_UNUSED )
 {
   disciple_page();
   return 0;
 }
 
 void
-disciple_mem_write( libspectrum_word port GCC_UNUSED,
+disciple_patch_write( libspectrum_word port GCC_UNUSED,
 		    libspectrum_byte b GCC_UNUSED )
 {
   disciple_unpage();

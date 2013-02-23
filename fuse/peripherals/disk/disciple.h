@@ -68,8 +68,8 @@ void disciple_net_write( libspectrum_word port, libspectrum_byte b);
 libspectrum_byte disciple_boot_read( libspectrum_word port, int *attached );
 void disciple_boot_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte disciple_mem_read( libspectrum_word port, int *attached );
-void disciple_mem_write( libspectrum_word port, libspectrum_byte b );
+libspectrum_byte disciple_patch_read( libspectrum_word port, int *attached );
+void disciple_patch_write( libspectrum_word port, libspectrum_byte b );
 
 void disciple_printer_write( libspectrum_word port, libspectrum_byte b );
 
