@@ -47,16 +47,21 @@
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
-/* Three 8 KiB memory chunks accessible by the Z80 when /ROMCS is low */
-/* Two 8 KiB chunks of ROM, one 8 KiB chunk of RAM */
-static memory_page disciple_memory_map_romcs_rom[ 2 ][ MEMORY_PAGES_IN_8K ];
+/* Two 8 KiB memory chunks accessible by the Z80 when /ROMCS is low */
+/* One 8 KiB chunk of ROM, one 8 KiB chunk of RAM */
+/* TODO: add support for 16 KiB ROM images. */
+/* Real hardware supports the use of a 16 KiB ROM, but all of the 16 KiB
+ * 'ROM dumps' for the DISCiPLE actually contain a dump of GDOS (RAM).
+ * Uni-DOS also uses an 8 KiB ROM. */
+static memory_page disciple_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page disciple_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
 
 static int disciple_memory_source_rom;
 static int disciple_memory_source_ram;
 
 int disciple_memswap = 0;        /* Are the ROM and RAM pages swapped? */
-int disciple_rombank = 1;        /* ROM bank that is paged in */
+/* TODO: add support for 16 KiB ROM images. */
+/* int disciple_rombank = 0; */
 int disciple_inhibited;
 
 int disciple_available = 0;
@@ -115,7 +120,8 @@ disciple_memory_map( void )
 
   if( !disciple_active ) return;
 
-  rom_page = disciple_memory_map_romcs_rom[ disciple_rombank ];
+  /* TODO: add support for 16 KiB ROM images. */
+  rom_page = disciple_memory_map_romcs_rom;
 
   if( !disciple_memswap ) {
     lower_page = rom_page;
@@ -162,7 +168,7 @@ static const periph_t disciple_periph = {
 void
 disciple_init( void )
 {
-  int i, j;
+  int i;
   wd_fdc_drive *d;
 
   disciple_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
@@ -189,12 +195,10 @@ disciple_init( void )
   disciple_memory_source_rom = memory_source_register( "DISCiPLE ROM" );
   disciple_memory_source_ram = memory_source_register( "DISCiPLE RAM" );
 
-  for( i = 0; i < 2; i++ ) {
-    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
-      disciple_memory_map_romcs_rom[i][j].source = disciple_memory_source_rom;
-      disciple_memory_map_romcs_rom[i][j].page_num = i;
-      disciple_memory_map_romcs_rom[i][j].writable = 0;
-    }
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+    disciple_memory_map_romcs_rom[i].source = disciple_memory_source_rom;
+    disciple_memory_map_romcs_rom[i].page_num = 0;
+    disciple_memory_map_romcs_rom[i].writable = 0;
   }
 
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
@@ -222,9 +226,10 @@ disciple_reset( int hard_reset )
     return;
   }
 
-  if( machine_load_rom_bank( disciple_memory_map_romcs_rom[ 0 ], 0,
+  /* TODO: add support for 16 KiB ROM images. */
+  if( machine_load_rom_bank( disciple_memory_map_romcs_rom, 0,
 			     settings_current.rom_disciple,
-			     settings_default.rom_disciple, 0x4000 ) ) {
+			     settings_default.rom_disciple, 0x2000 ) ) {
     settings_current.disciple = 0;
     periph_activate_type( PERIPH_TYPE_DISCIPLE, 0 );
     return;
@@ -243,7 +248,8 @@ disciple_reset( int hard_reset )
   disciple_index_pulse = 0;
 
   disciple_memswap = 0;
-  disciple_rombank = 1;
+  /* TODO: add support for 16 KiB ROM images. */
+  /* disciple_rombank = 0; */
 
   if( hard_reset )
     memset( disciple_ram, 0, 0x2000 );
@@ -393,7 +399,8 @@ disciple_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 
   printer_parallel_strobe_write( b & 0x40 );
 
-  disciple_rombank = ( b & 0x08 ) ? 0 : 1;
+  /* We only support the use of an 8 KiB ROM. */
+  /* disciple_rombank = ( b & 0x08 ) ? 1 : 0; */
   machine_current->memory_map();
   if( b & 0x10 )
     disciple_inhibit();
@@ -709,6 +716,9 @@ int
 disciple_unittest( void )
 {
   int r = 0;
+  /* We only support the use of an 8 KiB ROM.  Change this to 1 if adding
+   * support for 16 KiB ROMs. */
+  const int upper_rombank = 0;
 
   disciple_page();
 
@@ -719,7 +729,8 @@ disciple_unittest( void )
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
   disciple_cn_write( 0x001f, 0x08 );
-  r += unittests_assert_8k_page( 0x0000, disciple_memory_source_rom, 1 );
+  r += unittests_assert_8k_page( 0x0000, disciple_memory_source_rom,
+				 upper_rombank );
   r += unittests_assert_8k_page( 0x2000, disciple_memory_source_ram, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
@@ -727,7 +738,8 @@ disciple_unittest( void )
 
   disciple_boot_write( 0x007b, 0x00 );
   r += unittests_assert_8k_page( 0x0000, disciple_memory_source_ram, 0 );
-  r += unittests_assert_8k_page( 0x2000, disciple_memory_source_rom, 1 );
+  r += unittests_assert_8k_page( 0x2000, disciple_memory_source_rom,
+				 upper_rombank );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );

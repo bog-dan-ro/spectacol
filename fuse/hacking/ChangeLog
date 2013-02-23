@@ -4411,3 +4411,5 @@
          (Sergio).
 20130223 ui/widget/filesel.c: fix a couple of memory leaks (Sergio).
 20130223 peripherals/disk/{disk.h,fdd.h}: fix header descriptions (Sergio).
+20130223 peripherals/disk/disciple.c,roms/disciple.rom: remove GDOS from
+         DISCiPLE ROM image and use 8 KiB ROMs (Stuart).
