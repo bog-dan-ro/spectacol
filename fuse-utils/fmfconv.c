@@ -1727,6 +1727,7 @@ parse_args( int argc, char *argv[] )
       if( !strcmp( optarg, "youtube" ) ) {
 	ffmpeg_rescale = TYPE_RESCALE_WH;
 	out_w = 480; out_h = 360; out_fps = 25000;
+	ffmpeg_vcodec = "mpeg4";
 	ffmpeg_format = "mov"; ffmpeg_arate = 128000; ffmpeg_vrate = 600000;
       } else if( !strcmp( optarg, "dvd" ) ) {
 	ffmpeg_rescale = TYPE_RESCALE_WH;
@@ -1743,7 +1744,7 @@ parse_args( int argc, char *argv[] )
       } else if( !strcmp( optarg, "ipod" ) ) {
 	ffmpeg_rescale = TYPE_RESCALE_WH;
 	out_w = 320; out_h = 240; out_fps = 30000;
-	ffmpeg_acodec = "aac"; ffmpeg_vcodec = "libx264";
+	ffmpeg_vcodec = "libx264";
 	ffmpeg_format = "ipod"; ffmpeg_arate = 128000;ffmpeg_vrate = 256000;
 	out_rte = 44100; sound_stereo = 1; ffmpeg_libx264 = 1;
       } else {
