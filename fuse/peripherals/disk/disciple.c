@@ -417,7 +417,6 @@ libspectrum_byte
 disciple_boot_read( libspectrum_word port GCC_UNUSED,
 		    int *attached GCC_UNUSED )
 {
-  /* should we set *attached = 1? */
   disciple_memswap = 0;
   machine_current->memory_map();
   return 0;
@@ -434,7 +433,6 @@ disciple_boot_write( libspectrum_word port GCC_UNUSED,
 libspectrum_byte
 disciple_mem_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
 {
-  /* should we set *attached = 1? */
   disciple_page();
   return 0;
 }
