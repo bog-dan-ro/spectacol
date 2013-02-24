@@ -4418,3 +4418,4 @@
 20130223 peripherals/disk/{disciple,plusd}.[ch]: rename the paging port
          functions to {disciple,plusd}_patch_{read,write} (from *_mem_*)
          to follow MGT terminology (Stuart).
+20130223 man/fuse.1: improve NMI documentation for +D and DISCiPLE (Stuart).

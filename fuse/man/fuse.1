@@ -2847,7 +2847,9 @@ snapshot features (see the
 .B "+D EMULATION"
 and
 .B "DISCIPLE EMULATION"
-sections below).  Note that GDOS on the DISCiPLE contains a bug which
+sections below).  For the DISCiPLE, Caps Shift must be held down whilst
+pressing the NMI button.  For some UIs, this may be tricky, or even
+impossible to do.  Note that GDOS on the DISCiPLE contains a bug which
 causes corruption of saved snapshots, and a failure to return from the
 NMI menu correctly.  This bug is not present in G+DOS on the +D.
 .RE
@@ -4383,8 +4385,16 @@ press `4' to save a 48K snapshot, or `5' to save a 128K snapshot.
 When saving a 128K snapshot, you must then press Y or N to indicate
 whether the screen changed while saving the snapshot, to finish
 saving.  You can also choose `3' to save a screenshot to disk.
-Options `1' and `2' allow screenshots to be printed (in monochrome)
-if printer emulation is enabled.
+Holding Caps Shift together with any of these options will cause
+the +D to save to the `other' drive to the one used last.
+.PP
+Options `1' and `2' allow screenshots to be printed (in monochrome,
+in normal and large formats respectively) if printer emulation is
+enabled.  For saving and loading of snapshots, and saving of
+screenshots to disk, G+DOS must be loaded first, but printing of
+screenshots can be performed without loading G+DOS.
+.PP
+Finally, `X' will return from the NMI menu.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -4411,13 +4421,29 @@ is the number of the drive in use.  For example,
 would load the file named `myfile' from the emulated drive\ 1.
 Microdrive syntax may also be used.
 .PP
-Snapshots can be saved in the same manner as with the +D as described
+Snapshots can be saved in a similar manner to that of the +D as described
 above, but note that GDOS on the DISCiPLE contains a bug which causes
-corruption in any saved snapshots, and incorrect restoration of saved
-snapshots, even if saved on a +D.  This bug is not present in G+DOS
-on the +D.  (Note: this was caused by saving/restoring the AF register
-twice in the NMI handler, where both AF and the AF\(aq shadow register
-should have been saved/restored.)
+corruption as soon as the NMI button is pressed, affecting saving of
+snapshots, and also loading of snapshots that were originally saved with
+a +D or SAM Coup\('.  This will cause corruption even when a screenshot
+is printed, or if the menu is never even entered in the first place (due
+to Caps Shift not being pressed down, as is required for the DISCiPLE),
+provided that GDOS is loaded.  This bug is not present in G+DOS on the +D.
+(Note: this was caused by saving/restoring the AF register twice in the
+NMI handler, where both AF and the AF\(aq shadow register should have
+been saved/restored.)
+.PP
+The NMI button works slightly differently on the DISCiPLE than on the +D.
+Caps Shift must be held down whilst pressing the NMI button, and there
+is no `X' option to exit the menu.  Also, printing of screenshots requires
+GDOS to be loaded.  Depending on the UI that you're using, holding down
+Caps Shift whilst choosing the
+.I "Machine, NMI"
+menu option may be slightly tricky, or even impossible.  For the GTK+ UI,
+ensure that the Shift key is held before entering on the
+.I Machine
+menu.  For the widget UI, it does not seem possible to perform this
+action.
 .\"
 .\"------------------------------------------------------------------
 .\"
