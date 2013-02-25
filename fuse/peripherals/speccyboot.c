@@ -38,6 +38,8 @@
 
 #include "speccyboot.h"
 
+#ifdef BUILD_SPECCYBOOT
+
 /* Determine whether a bit has gone from high to low (or low to high) */
 #define GONE_LO(prev, curr, mask)     (((prev) & (mask)) && !((curr) & (mask)))
 #define GONE_HI(prev, curr, mask)     (((curr) & (mask)) && !((prev) & (mask)))
@@ -96,6 +98,11 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
 {
   static int tap_opened = 0;
 
+  speccyboot_rom_active = 0;
+
+  if( !periph_is_active( PERIPH_TYPE_SPECCYBOOT ) )
+    return;
+
   if( machine_load_rom_bank( speccyboot_memory_map_romcs, 0,
                              settings_current.rom_speccyboot,
                              settings_default.rom_speccyboot, 0x2000 ) )
@@ -103,8 +110,7 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
 
   out_register_state = 0xff;  /* force transitions to low */
 
-  if( periph_is_active( PERIPH_TYPE_SPECCYBOOT ) )
-    speccyboot_register_write( 0, 0 );
+  speccyboot_register_write( 0, 0 );
 
   /*
    * Open TAP. If this fails, SpeccyBoot emulation won't work.
@@ -113,7 +119,7 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
    * error messages are only displayed if SpeccyBoot emulation is
    * actually requested.
    */
-  if( periph_is_active( PERIPH_TYPE_SPECCYBOOT ) && !tap_opened ) {
+  if( !tap_opened ) {
     nic_enc28j60_init( nic );
     tap_opened = 1;
   }
@@ -225,3 +231,25 @@ speccyboot_unittest( void )
 
   return r;
 }
+
+#else			/* #ifdef BUILD_SPECCYBOOT */
+
+/* No speccyboot support */
+
+void
+speccyboot_init( void )
+{
+}
+
+void
+speccyboot_end( void )
+{
+}
+
+int
+speccyboot_unittest( void )
+{
+  return 0;
+}
+
+#endif			/* #ifdef BUILD_SPECCYBOOT */

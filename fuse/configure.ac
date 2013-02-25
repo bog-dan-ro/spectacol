@@ -763,11 +763,14 @@ AC_COMPILE_IFELSE(
       int test2 = TUNSETIFF;
     ]])
   ],
-  [AC_DEFINE([LINUX_TAP], 1, [Define to 1 if Linux TAP devices are supported.])
+  [AC_DEFINE([BUILD_SPECCYBOOT], 1, [Define to 1 if SpeccyBoot is supported.])
+  linux_tap=yes
   AC_MSG_RESULT(yes)],
   [AC_MSG_RESULT(no)]
 )
 CPPFLAGS="$ac_save_CPPFLAGS"
+AM_CONDITIONAL(HAVE_TUNTAP, test x$linux_tap != x)
+AM_CONDITIONAL(BUILD_SPECCYBOOT, test x$linux_tap != x)
 
 dnl Work out which standard routines we're missing
 AC_MSG_CHECKING(which standard routines we're missing)

@@ -29,8 +29,11 @@ noinst_LIBRARIES = libnic.a
 
 AM_CPPFLAGS += @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
-libnic_a_SOURCES = \
-  enc28j60.c
+libnic_a_SOURCES =
+
+if BUILD_SPECCYBOOT
+libnic_a_SOURCES += enc28j60.c
+endif
 
 if BUILD_SPECTRANET
 libnic_a_SOURCES += w5100.c \

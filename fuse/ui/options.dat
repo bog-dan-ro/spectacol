@@ -38,7 +38,9 @@ Checkbox, (I)nterface 1, interface1, INPUT_KEY_i
 Checkbox, In(t)erface 2, interface2, INPUT_KEY_t
 Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
 Checkbox, (Z)X Printer, zxprinter, INPUT_KEY_z
+#ifdef BUILD_SPECCYBOOT
 Checkbox, Speccy(B)oot interface, speccyboot, INPUT_KEY_b
+#endif
 Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
 #ifdef BUILD_SPECTRANET
 Checkbox, Spectra(n)et, spectranet, INPUT_KEY_n

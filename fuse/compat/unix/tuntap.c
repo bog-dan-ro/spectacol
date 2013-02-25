@@ -30,11 +30,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef LINUX_TAP
 #include <linux/if_tun.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
-#endif /* #ifdef LINUX_TAP */
 
 #include "ui/ui.h"
 
@@ -42,8 +40,6 @@ int
 compat_get_tap( const char *interface_name )
 {
   int fd = -1;
-
-#ifdef LINUX_TAP
 
   if ( (fd = open( "/dev/net/tun", O_RDWR | O_NONBLOCK )) < 0 )
     ui_error( UI_ERROR_ERROR, "couldn't open TUN/TAP device '/dev/net/tun'" );
@@ -58,13 +54,6 @@ compat_get_tap( const char *interface_name )
                 ifr.ifr_name );
     }
   }
-
-#else
-
-  ui_error( UI_ERROR_ERROR,
-      "TUN/TAP not yet supported for this operating system" );
-
-#endif /* #ifdef LINUX_TAP */
 
   return fd;
 }

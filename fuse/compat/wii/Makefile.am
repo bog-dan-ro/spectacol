@@ -31,7 +31,10 @@ libcompatos_a_SOURCES = dir.c \
 			../unix/file.c \
 			osname.c \
 			paths.c \
-			timer.c \
-                        ../unix/tuntap.c
+			timer.c
+
+if HAVE_TUNTAP
+libcompatos_a_SOURCES += ../unix/tuntap.c
+endif
 
 AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@

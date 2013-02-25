@@ -4403,7 +4403,7 @@
 20130212 peripherals/disk/{disciple.c,opus.c,plusd.c}: revert further changes
          made when reverting the fix to bug #273, causing the Opus Discovery
          to be left paged in after a reset and +D/DISCiPLE to be left paged in
-         if loading of the interface's ROM fails (bug #284) Stuart).
+         if loading of the interface's ROM fails (bug #284) (Stuart).
 20130212 ChangeLog: document limitations of the DISCiPLE emulation (bug #285)
          (Stuart).
 20130216 compat/win32/paths.c,keysyms.pl,man/fuse.1,sound/blipbuffer.[ch],
@@ -4419,3 +4419,8 @@
          functions to {disciple,plusd}_patch_{read,write} (from *_mem_*)
          to follow MGT terminology (Stuart).
 20130223 man/fuse.1: improve NMI documentation for +D and DISCiPLE (Stuart).
+20130225 compat/{win32/Makefile.am,unix/{Makefile.am,tuntap.c},
+         morphos/Makefile.am,wii/Makefile.am,amiga/Makefile.am,
+         linux/Makefile.am},configure.ac,peripherals/{speccyboot.c,
+         nic/Makefile.am}: improve SpeccyBoot behaviour on non-Linux systems
+         and when ROM is not available (patch #302) (Sergio).

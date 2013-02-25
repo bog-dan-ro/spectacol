@@ -31,11 +31,14 @@ libcompatos_a_SOURCES = dir.c \
 			file.c \
 			osname.c \
 			paths.c \
-			timer.c \
-                        tuntap.c
+			timer.c
 
 if HAVE_SOCKETS
 libcompatos_a_SOURCES += socket.c
+endif
+
+if HAVE_TUNTAP
+libcompatos_a_SOURCES += tuntap.c
 endif
 
 AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \

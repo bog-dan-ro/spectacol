@@ -31,8 +31,7 @@ libcompatos_a_SOURCES = ../unix/dir.c \
 			../unix/file.c \
 			osname.c \
 			paths.c \
-			timer.c \
-                        ../unix/tuntap.c
+			timer.c
 
 if HAVE_SOCKETS
 libcompatos_a_SOURCES += socket.c
