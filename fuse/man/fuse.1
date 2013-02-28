@@ -218,6 +218,19 @@ to disable). Same as the General Options dialog's
 option.
 .RE
 .PP
+.B \-\-disciple
+.RS
+Emulate a DISCiPLE interface. Same as the Disk Peripherals Options dialog's
+.I "DISCiPLE interface"
+option.
+.RE
+.PP
+.B \-\-discipledisk
+.I file
+.RS
+Insert the specified file into the emulated DISCiPLE's drive\ 1.
+.RE
+.PP
 .B \-\-disk\-ask\-merge
 .RS
 Prompt the user to confirm whether Fuse should try to merge the `B' side of a
@@ -249,19 +262,6 @@ The available options are
 .I "With single-sided drives"
 and
 .IR Always .
-.RE
-.PP
-.B \-\-disciple
-.RS
-Emulate a DISCiPLE interface. Same as the Disk Peripherals Options dialog's
-.I "DISCiPLE interface"
-option.
-.RE
-.PP
-.B \-\-discipledisk
-.I file
-.RS
-Insert the specified file into the emulated DISCiPLE's drive\ 1.
 .RE
 .PP
 .B \-\-divide
@@ -798,15 +798,6 @@ option.
 Insert the specified file into the emulated Opus Discovery's drive\ 1.
 .RE
 .PP
-.B \-p
-.I file
-.br
-.B \-\-playback
-.I file
-.RS
-Specify an RZX file to begin playback from.
-.RE
-.PP
 .B \-\-paltv2x
 .RS
 Specify whether the PAL\ TV\ 2x and PAL\ TV\ 3x scalers should also produce
@@ -814,6 +805,15 @@ scanlines along the lines of the TV\ 2x and Timex\ TV scalers.
 The same as the General Options dialog's
 .I "PAL-TV use TV2x effect"
 option.
+.RE
+.PP
+.B \-p
+.I file
+.br
+.B \-\-playback
+.I file
+.RS
+Specify an RZX file to begin playback from.
 .RE
 .PP
 .B \-\-plus3disk
@@ -1136,47 +1136,6 @@ to disable). Same as the Sound Options dialog's
 option.
 .RE
 .PP
-.B \-\-sound\-force\-8bit
-.RS
-Force the use of 8-bit sound, even if 16-bit is possible. Same as the
-Sound Options dialog's
-.I "Force 8-bit"
-option.
-.RE
-.PP
-.B \-\-speaker\-type
-.I type
-.RS
-Select the output speaker emulation, type can be TV speaker, Beeper
-or Unfiltered. Same as the Sound Options dialog's
-.I "Speaker type"
-option.
-.RE
-.PP
-.B \-\-specdrum
-.RS
-Emulate a SpecDrum interface. Same as the Peripherals Options dialog's
-.I "SpecDrum"
-option. See the World of Spectrum Infoseek web page at
-.I http://www.worldofspectrum.org/infoseekid.cgi?id=1000062
-for manuals, software and more.
-.RE
-.PP
-.B \-\-speccyboot
-.RS
-Emulate a SpeccyBoot Ethernet interface. Same as the Peripherals Options dialog's
-.I "SpeccyBoot"
-option. See the SpeccyBoot web page at
-.I http://speccyboot.sourceforge.net/
-for full details on the SpeccyBoot.
-.RE
-.PP
-.B \-\-speccyboot\-tap
-.I device
-.RS
-Specify the TAP device to use for SpeccyBoot emulation.
-.RE
-.PP
 .B \-d
 .I device
 .br
@@ -1441,6 +1400,47 @@ causes Fuse to use the first card and parallel save the raw audio samples
 into
 .IR /tmp/aufwm.raw " file."
 .br
+.RE
+.PP
+.B \-\-sound\-force\-8bit
+.RS
+Force the use of 8-bit sound, even if 16-bit is possible. Same as the
+Sound Options dialog's
+.I "Force 8-bit"
+option.
+.RE
+.PP
+.B \-\-speaker\-type
+.I type
+.RS
+Select the output speaker emulation, type can be TV speaker, Beeper
+or Unfiltered. Same as the Sound Options dialog's
+.I "Speaker type"
+option.
+.RE
+.PP
+.B \-\-speccyboot
+.RS
+Emulate a SpeccyBoot Ethernet interface. Same as the Peripherals Options dialog's
+.I "SpeccyBoot"
+option. See the SpeccyBoot web page at
+.I http://speccyboot.sourceforge.net/
+for full details on the SpeccyBoot.
+.RE
+.PP
+.B \-\-speccyboot\-tap
+.I device
+.RS
+Specify the TAP device to use for SpeccyBoot emulation.
+.RE
+.PP
+.B \-\-specdrum
+.RS
+Emulate a SpecDrum interface. Same as the Peripherals Options dialog's
+.I "SpecDrum"
+option. See the World of Spectrum Infoseek web page at
+.I http://www.worldofspectrum.org/infoseekid.cgi?id=1000062
+for manuals, software and more.
 .RE
 .PP
 .B \-\-speed
