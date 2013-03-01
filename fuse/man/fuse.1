@@ -1443,6 +1443,26 @@ option. See the World of Spectrum Infoseek web page at
 for manuals, software and more.
 .RE
 .PP
+.B \-\-spectranet
+.RS
+Specify whether Fuse will emulate the Spectranet Ethernet interface.
+Same as the General Peripherals Options dialog's
+.I "Spectranet"
+option. See the
+.B "SPECTRANET EMULATION"
+section for more details.
+.RE
+.PP
+.B \-\-spectranet\-disable
+.RS
+This option controls the state of the Spectranet automatic page-in jumper
+(J2). Same as the General Peripherals Options dialog's
+.I "Spectranet disable"
+option. See the
+.B "SPECTRANET EMULATION"
+section for more details.
+.RE
+.PP
 .B \-\-speed
 .I percentage
 .RS
@@ -4425,7 +4445,7 @@ Snapshots can be saved in a similar manner to that of the +D as described
 above, but note that GDOS on the DISCiPLE contains a bug which causes
 corruption as soon as the NMI button is pressed, affecting saving of
 snapshots, and also loading of snapshots that were originally saved with
-a +D or SAM Coup\('.  This will cause corruption even when a screenshot
+a +D or SAM Coup\('e.  This will cause corruption even when a screenshot
 is printed, or if the menu is never even entered in the first place (due
 to Caps Shift not being pressed down, as is required for the DISCiPLE),
 provided that GDOS is loaded.  This bug is not present in G+DOS on the +D.
@@ -4605,7 +4625,7 @@ to convert recorded movie file into a standard video file.
 .PP
 .B Examples
 .PP
-.B "fuse \-\-movie\-start output.fmf \-\-rate 2 \-\-sound-\freq 44100"
+.B "fuse \-\-movie\-start output.fmf \-\-rate 2 \-\-sound\-freq 44100"
 .B "\-\-separation ACB"
 .PP
 start video recording about 25/s video frame rate and 44100\ Hz sampling

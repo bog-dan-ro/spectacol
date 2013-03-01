@@ -4424,5 +4424,7 @@
          linux/Makefile.am},configure.ac,peripherals/{speccyboot.c,
          nic/Makefile.am}: improve SpeccyBoot behaviour on non-Linux systems
          and when ROM is not available (patch #302) (Sergio).
-20130229 man/fuse.1: Sort disciple, discipledisk, paltv2x, sound-device and
+20130229 man/fuse.1: sort disciple, discipledisk, paltv2x, sound-device and
          specdrum options alphabetically (Sergio).
+20130301 man/fuse.1: add Spectranet options and fix a couple of typos (bug #244)
+         (Sergio).
