@@ -461,7 +461,8 @@ menu_options_diskoptions( int action )
 void
 menu_options_joysticks_select( int action )
 {
-  int error, i;
+  int error = 0;
+  int i;
 
   switch( action - 1 ) {
 

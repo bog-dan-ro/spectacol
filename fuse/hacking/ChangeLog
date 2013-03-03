@@ -4428,3 +4428,5 @@
          specdrum options alphabetically (Sergio).
 20130301 man/fuse.1: add Spectranet options and fix a couple of typos (bug #244)
          (Sergio).
+20130303 ui/widget/menu.c: remove potential use of uninitialised variable
+         (Fred).
