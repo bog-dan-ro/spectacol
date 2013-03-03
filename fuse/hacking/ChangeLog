@@ -4430,3 +4430,5 @@
          (Sergio).
 20130303 ui/widget/menu.c: remove potential use of uninitialised variable
          (Fred).
+20130303 peripherals/disk/disk.c: fix memory disk image corrupted after save
+         (bug #279) (Sergio).

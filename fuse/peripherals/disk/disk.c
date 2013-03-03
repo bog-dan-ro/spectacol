@@ -2550,6 +2550,8 @@ disk_write( disk_t *d, const char *filename )
   FILE *file;
   const char *ext;
   size_t namelen;
+  libspectrum_byte *t, *c, *f, *w;
+  int idx;
 
   if( ( file = fopen( filename, "wb" ) ) == NULL )
     return d->status = DISK_WRFILE;
@@ -2585,6 +2587,13 @@ disk_write( disk_t *d, const char *filename )
       d->type = DISK_UDI;				/* ALT side */
   }
 
+  /* Save position of current data */
+  t = d->track;
+  c = d->clocks;
+  f = d->fm;
+  w = d->weak;
+  idx = d->i;
+
   update_tracks_mode( d );
   switch( d->type ) {
   case DISK_UDI:
@@ -2617,6 +2626,14 @@ disk_write( disk_t *d, const char *filename )
     return d->status = DISK_WRFILE;
     break;
   }
+
+  /* Restore position of previous data.
+     FIXME: This is a workaround. Revisit bug #279 and rethink a proper fix */
+  d->track = t;
+  d->clocks = c;
+  d->fm = f;
+  d->weak = w;
+  d->i = idx;
 
   if( d->status != DISK_OK ) {
     fclose( file );
