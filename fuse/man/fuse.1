@@ -416,6 +416,8 @@ which uses no filtering. The available options are
 .IR dotmatrix ,
 .IR half ,
 .IR halfskip ,
+.IR hq2x ,
+.IR hq3x ,
 .IR normal ,
 .IR super2xsai ,
 .IR supereagle ,
@@ -3519,6 +3521,14 @@ An interpolating Timex-specific filter which scales the Timex screen
 up to 1.5\(mu its usual size (which is therefore 3\(mu the size of a
 `normal' Spectrum screen). Available only for the GTK+, Win32 and SDL
 user interfaces or when saving screenshots.
+.RE
+.PP
+.IR "HQ\ 2x " ( hq2x )
+.br
+.IR "HQ\ 3x " ( hq3x )
+.RS
+Two filters which do high quality (but slow) antialiasing. Doubles and
+triples the size of the displayed screen respectively.
 .\"
 .\"------------------------------------------------------------------
 .\"

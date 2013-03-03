@@ -4432,3 +4432,4 @@
          (Fred).
 20130303 peripherals/disk/disk.c: fix memory disk image corrupted after save
          (bug #279) (Sergio).
+20130303 man/fuse.1: document hq2x and hq3x filters (Sergio).
