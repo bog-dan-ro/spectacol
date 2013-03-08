@@ -1,5 +1,5 @@
 /* spectranet.c: Spectranet emulation
-   Copyright (c) 2011 Philip Kendall
+   Copyright (c) 2011-2013 Philip Kendall
    
    $Id$
    
@@ -80,6 +80,9 @@ libspectrum_word spectranet_programmable_trap;
 /* True if the next write to 0x023b will set the MSB of the programmable trap */
 static int trap_write_msb;
 
+/* Whether the Spectranet's "suppress NMI" flipflop is set */
+static int nmi_flipflop = 0;
+
 static int spectranet_source;
 
 /* Debugger events */
@@ -100,6 +103,13 @@ spectranet_page( int via_io )
 }
 
 void
+spectranet_nmi( void )
+{
+  nmi_flipflop = 1;
+  spectranet_page( 0 );
+}
+
+void
 spectranet_unpage( void )
 {
   if( !spectranet_paged )
@@ -110,6 +120,18 @@ spectranet_unpage( void )
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
   debugger_event( unpage_event );
+}
+
+void
+spectranet_retn( void )
+{
+  nmi_flipflop = 0;
+}
+
+int
+spectranet_nmi_flipflop( void )
+{
+  return nmi_flipflop;
 }
 
 static void
@@ -138,6 +160,8 @@ spectranet_hard_reset( void )
   spectranet_programmable_trap = 0x0000;
   spectranet_programmable_trap_active = 0;
   trap_write_msb = 0;
+
+  nmi_flipflop = 0;
 }  
 
 static void
@@ -263,6 +287,8 @@ spectranet_from_snapshot( libspectrum_snap *snap )
     spectranet_map_page( 1, libspectrum_snap_spectranet_page_a( snap ) );
     spectranet_map_page( 2, libspectrum_snap_spectranet_page_b( snap ) );
 
+    nmi_flipflop = libspectrum_snap_spectranet_nmi_flipflop( snap );
+
     if( libspectrum_snap_spectranet_paged( snap ) ) {
       spectranet_page( libspectrum_snap_spectranet_paged_via_io( snap ) );
       memory_map_romcs( spectranet_current_map );
@@ -294,12 +320,14 @@ spectranet_to_snapshot( libspectrum_snap *snap )
     return;
 
   libspectrum_snap_set_spectranet_paged( snap, spectranet_paged );
+  libspectrum_snap_set_spectranet_paged_via_io( snap, spectranet_paged_via_io );
   libspectrum_snap_set_spectranet_programmable_trap( snap,
     spectranet_programmable_trap );
   libspectrum_snap_set_spectranet_programmable_trap_active( snap,
     spectranet_programmable_trap_active );
   libspectrum_snap_set_spectranet_programmable_trap_msb( snap, trap_write_msb );
   libspectrum_snap_set_spectranet_deny_downstream_a15( snap, 0 );
+  libspectrum_snap_set_spectranet_nmi_flipflop( snap, nmi_flipflop );
 
   libspectrum_snap_set_spectranet_all_traps_disabled( snap,
     settings_current.spectranet_disable );

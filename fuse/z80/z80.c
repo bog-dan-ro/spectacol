@@ -1,5 +1,5 @@
 /* z80.c: z80 supplementary functions
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2013 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -192,6 +192,10 @@ z80_interrupt( void )
 static void
 z80_nmi( libspectrum_dword ts, int type, void *user_data )
 {
+  /* TODO: this isn't ideal */
+  if( spectranet_available && spectranet_nmi_flipflop() )
+    return;
+
   if( z80.halted ) { PC++; z80.halted = 0; }
 
   IFF1 = 0;
@@ -211,13 +215,20 @@ z80_nmi( libspectrum_dword ts, int type, void *user_data )
   } else if( spectranet_available ) {
     
     /* Page in spectranet */
-    spectranet_page( 0 );
+    spectranet_nmi();
   }
 
   /* FIXME: how is R affected? */
 
   /* FIXME: how does contention apply here? */
   tstates += 11; PC = 0x0066;
+}
+
+/* Special peripheral processing for RETN */
+void
+z80_retn( void )
+{
+  spectranet_retn();
 }
 
 /* Routines for transferring the Z80 contents to and from snapshots */

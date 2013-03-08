@@ -4433,3 +4433,5 @@
 20130303 peripherals/disk/disk.c: fix memory disk image corrupted after save
          (bug #279) (Sergio).
 20130303 man/fuse.1: document hq2x and hq3x filters (Sergio).
+20130308 peripherals/spectranet.[ch],z80/{coretest.c,z80.{c,h,pl}}: implement
+         Spectranet's "suppress NMI" flipflop (bug #259).

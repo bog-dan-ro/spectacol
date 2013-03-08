@@ -1,5 +1,5 @@
 /* z80.h: z80 emulation core
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2013 Philip Kendall
 
    $Id$
 
@@ -59,6 +59,7 @@ void z80_init( void );
 void z80_reset( int hard_reset );
 
 int z80_interrupt( void );
+void z80_retn( void );
 
 void z80_do_opcodes(void);
 

@@ -1,5 +1,5 @@
 /* coretest.c: Test program for Fuse's Z80 core
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2013 Philip Kendall
 
    $Id$
 
@@ -399,21 +399,18 @@ int profile_active = 0;
 void
 profile_map( libspectrum_word pc GCC_UNUSED )
 {
-  /* Should never be called */
   abort();
 }
 
 int
 debugger_check( debugger_breakpoint_type type GCC_UNUSED, libspectrum_dword value GCC_UNUSED )
 {
-  /* Should never be called */
   abort();
 }
 
 int
 debugger_trap( void )
 {
-  /* Should never be called */
   abort();
 }
 
@@ -507,9 +504,26 @@ spectranet_page( void )
 }
 
 void
+spectranet_nmi( void )
+{
+  abort();
+}
+
+void
 spectranet_unpage( void )
 {
   abort();
+}
+
+void
+spectranet_retn( void )
+{
+}
+
+int
+spectranet_nmi_flipflop( void )
+{
+  return 0;
 }
 
 int
