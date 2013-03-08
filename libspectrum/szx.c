@@ -210,6 +210,7 @@ static const libspectrum_word ZXSTSNET_PROGRAMMABLE_TRAP_MSB = 8;
 static const libspectrum_word ZXSTSNET_ALL_DISABLED = 16;
 static const libspectrum_word ZXSTSNET_RST8_DISABLED = 32;
 static const libspectrum_word ZXSTSNET_DENY_DOWNSTREAM_A15 = 64;
+static const libspectrum_word ZXSTSNET_NMI_FLIPFLOP = 128;
 
 #define ZXSTBID_SPECTRANETFLASHPAGE "SNEF"
 static const libspectrum_byte ZXSTSNEF_FLASH_COMPRESSED = 1;
@@ -2064,6 +2065,7 @@ read_snet_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_snap_set_spectranet_all_traps_disabled( snap, flags & ZXSTSNET_ALL_DISABLED );
   libspectrum_snap_set_spectranet_rst8_trap_disabled( snap, flags & ZXSTSNET_RST8_DISABLED );
   libspectrum_snap_set_spectranet_deny_downstream_a15( snap, flags & ZXSTSNET_DENY_DOWNSTREAM_A15 );
+  libspectrum_snap_set_spectranet_nmi_flipflop( snap, flags & ZXSTSNET_NMI_FLIPFLOP );
 
   libspectrum_snap_set_spectranet_page_a( snap, **buffer ); (*buffer)++;
   libspectrum_snap_set_spectranet_page_b( snap, **buffer ); (*buffer)++;
@@ -3783,6 +3785,8 @@ write_snet_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
     flags |= ZXSTSNET_RST8_DISABLED;
   if( libspectrum_snap_spectranet_deny_downstream_a15( snap ) )
     flags |= ZXSTSNET_DENY_DOWNSTREAM_A15;
+  if( libspectrum_snap_spectranet_nmi_flipflop( snap ) )
+    flags |= ZXSTSNET_NMI_FLIPFLOP;
   libspectrum_write_word( ptr, flags );
 
   *(*ptr)++ = libspectrum_snap_spectranet_page_a( snap );

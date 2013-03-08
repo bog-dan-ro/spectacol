@@ -222,6 +222,7 @@ struct libspectrum_snap {
   int spectranet_active;
   int spectranet_paged;
   int spectranet_paged_via_io;
+  int spectranet_nmi_flipflop;
   int spectranet_programmable_trap_active;
   int spectranet_programmable_trap_msb;
   int spectranet_all_traps_disabled;
