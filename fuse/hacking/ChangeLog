@@ -4441,3 +4441,5 @@
                       speccyboot.c,specdrum.c,spectranet.c},
          ui/options.dat: do a hard reset when a peripheral that requires it is
          enabled or disabled in settings (bugs #281, #283, #289) (Fred).
+20130310 man/fuse.1: mention that peripherals changes can result in hard resets
+         (Fred).
