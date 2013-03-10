@@ -162,6 +162,7 @@ win32statusbar_redraw( HWND hWnd, LPARAM lParam )
   HDC src_dc, dest_dc, mask_dc;
   RECT rc_item;
   HBITMAP src_bmp, src_bmp_mask;
+  HBITMAP old_bmp, old_bmp_mask;
   BITMAP bmp;
   size_t i;
   int new_icons_part_width;
@@ -223,8 +224,8 @@ win32statusbar_redraw( HWND hWnd, LPARAM lParam )
       src_bmp_mask = CreateBitmap( bmp.bmWidth, bmp.bmHeight, 1, 1, NULL );
       src_dc = CreateCompatibleDC( NULL );
       mask_dc = CreateCompatibleDC( NULL );
-      SelectObject( src_dc, src_bmp );
-      SelectObject( mask_dc, src_bmp_mask );
+      old_bmp = SelectObject( src_dc, src_bmp );
+      old_bmp_mask = SelectObject( mask_dc, src_bmp_mask );
       SetBkColor( src_dc, RGB( 0, 0, 0 ) );
       BitBlt( mask_dc, 0, 0, bmp.bmWidth, bmp.bmHeight, src_dc, 0, 0, SRCCOPY );
       BitBlt( src_dc, 0, 0, bmp.bmWidth, bmp.bmHeight, mask_dc, 0, 0, SRCINVERT );
@@ -242,6 +243,8 @@ win32statusbar_redraw( HWND hWnd, LPARAM lParam )
               - ( 2 * icons_part_margin ), 
               bmp.bmWidth, bmp.bmHeight, src_dc, 0, 0, SRCPAINT );
 
+      SelectObject( src_dc, old_bmp );
+      SelectObject( mask_dc, old_bmp_mask );
       DeleteDC( src_dc );
       DeleteDC( mask_dc );
       DeleteObject( src_bmp_mask );
@@ -249,7 +252,6 @@ win32statusbar_redraw( HWND hWnd, LPARAM lParam )
       new_icons_part_width += bmp.bmWidth;
     }
   }
-  ReleaseDC( hWnd, dest_dc );
 
   if( new_icons_part_width > 0 ) new_icons_part_width += icons_part_margin;
   /* FIXME: if the calculations are correction I shouldn't be adding this */

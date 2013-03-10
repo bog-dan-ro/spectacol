@@ -104,14 +104,16 @@ picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     case WM_PAINT:
     {
       PAINTSTRUCT ps;
+      HBITMAP old_bmp;
       HDC dest_dc = BeginPaint( hWnd, &ps );
       HDC pic_dc = CreateCompatibleDC( dest_dc );
 
-      SelectObject( pic_dc, picture_BMP );
+      old_bmp = SelectObject( pic_dc, picture_BMP );
       BitBlt( dest_dc, 0, 0, DISPLAY_ASPECT_WIDTH,
               DISPLAY_SCREEN_HEIGHT, pic_dc, 0, 0, SRCCOPY );
 
       EndPaint( hWnd, &ps );
+      SelectObject( pic_dc, old_bmp );
       DeleteDC( pic_dc );
       return 0;
     }

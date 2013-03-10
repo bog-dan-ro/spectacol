@@ -4443,5 +4443,7 @@
          enabled or disabled in settings (bugs #281, #283, #289) (Fred).
 20130310 man/fuse.1: mention that peripherals changes can result in hard resets
          (Fred).
-20130310 ui/gtk/binary.c,ui/gtk/debugger.c: replace deprecated GtkTable with
-         GtkGrid (Sergio).
+20130310 ui/gtk/{binary.c,debugger.c}: replace deprecated GtkTable with GtkGrid
+         (patch #307) (Sergio).
+20130310 ui/win32/{picture.c,statusbar.c}: use best practices for releasing GDI
+         objects on win32 UI (thanks, Dr. Memory) (Sergio).
