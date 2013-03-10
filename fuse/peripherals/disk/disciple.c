@@ -162,6 +162,7 @@ static const periph_port_t disciple_ports[] = {
 static const periph_t disciple_periph = {
   &settings_current.disciple,
   disciple_ports,
+  1,
   disciple_activate
 };
 

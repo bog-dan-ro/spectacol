@@ -111,6 +111,8 @@ typedef struct periph_t {
   int *option;
   /* The list of ports this peripheral responds to */
   const periph_port_t *ports;
+  /* Hard reset required when added/removed */
+  int hard_reset;
   /* Function to be called when the peripheral is activated */
   periph_activate_function activate;
 } periph_t;
@@ -121,8 +123,9 @@ void periph_register( periph_type type, const periph_t *periph );
 /* Set whether a peripheral can be present on this machine or not */
 void periph_set_present( periph_type type, periph_present present );
 
-/* Mark a specific peripheral as (in)active */
-void periph_activate_type( periph_type type, int active );
+/* Mark a specific peripheral as (in)active, returns 1 if the enabled state has
+   changed */
+int periph_activate_type( periph_type type, int active );
 
 /* Is a specific peripheral active at the moment? */
 int periph_is_active( periph_type type );
@@ -147,7 +150,9 @@ void writeport_internal( libspectrum_word port, libspectrum_byte b );
  * The more Fuse-specific peripheral handling routines
  */
 
-void periph_update( void );
+int periph_update( void );
+
+void periph_posthook( void );
 
 /* Register debugger page/unpage events for a peripheral */
 void periph_register_paging_events( const char *type_string, int *page_event,

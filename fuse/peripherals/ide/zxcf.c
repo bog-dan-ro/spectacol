@@ -71,6 +71,7 @@ static const periph_port_t zxcf_ports[] = {
 static const periph_t zxcf_periph = {
   &settings_current.zxcf_active,
   zxcf_ports,
+  1,
   zxcf_activate
 };
 

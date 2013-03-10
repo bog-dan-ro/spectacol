@@ -4435,3 +4435,9 @@
 20130303 man/fuse.1: document hq2x and hq3x filters (Sergio).
 20130308 peripherals/spectranet.[ch],z80/{coretest.c,z80.{c,h,pl}}: implement
          Spectranet's "suppress NMI" flipflop (bug #259).
+20130310 periph.[ch],peripherals/disk/{beta.c,disciple.c,opus.c,plusd.c},
+         peripherals/ide/{divide.c,simpleide.c,zxatasp.c,zxcf.c},
+         peripherals/{fuller.c,if1.c,kempmouse.c,melodik.c,printer.c,
+                      speccyboot.c,specdrum.c,spectranet.c},
+         ui/options.dat: do a hard reset when a peripheral that requires it is
+         enabled or disabled in settings (bugs #281, #283, #289) (Fred).

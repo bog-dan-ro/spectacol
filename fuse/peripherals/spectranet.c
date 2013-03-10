@@ -441,6 +441,7 @@ static const periph_port_t spectranet_ports[] = {
 static const periph_t spectranet_periph = {
   &settings_current.spectranet,
   spectranet_ports,
+  1,
   spectranet_activate
 };
 

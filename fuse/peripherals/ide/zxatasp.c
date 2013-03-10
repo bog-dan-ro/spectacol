@@ -95,6 +95,7 @@ static const periph_port_t zxatasp_ports[] = {
 static const periph_t zxatasp_periph = {
   &settings_current.zxatasp_active,
   zxatasp_ports,
+  1,
   zxatasp_activate
 };
 

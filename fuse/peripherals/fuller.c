@@ -58,7 +58,8 @@ static const periph_port_t fuller_ports[] = {
 
 static const periph_t fuller_periph = {
   &settings_current.fuller,
-  fuller_ports
+  fuller_ports,
+  1
 };
 
 static void

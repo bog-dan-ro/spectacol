@@ -116,11 +116,11 @@ periph_set_present( periph_type type, periph_present present )
 }
 
 /* Mark a specific peripheral as (in)active */
-void
+int
 periph_activate_type( periph_type type, int active )
 {
   periph_private_t *private = g_hash_table_lookup( peripherals, GINT_TO_POINTER( type ) );
-  if( !private || private->active == active ) return;
+  if( !private || private->active == active ) return 0;
 
   private->active = active;
 
@@ -135,6 +135,8 @@ periph_activate_type( periph_type type, int active )
     while( ( found = g_slist_find_custom( ports, GINT_TO_POINTER( type ), find_by_type ) ) != NULL )
       ports = g_slist_remove( ports, found->data );
   }
+
+  return 1;
 }
 
 /* Is a specific peripheral active at the moment? */
@@ -153,6 +155,7 @@ set_activity( gpointer key, gpointer value, gpointer user_data )
   periph_type type = GPOINTER_TO_INT( key );
   periph_private_t *private = value;
   int active = 0;
+  int *needs_hard_reset = (int *)user_data;
 
   switch ( private->present ) {
   case PERIPH_PRESENT_NEVER: active = 0; break;
@@ -161,7 +164,9 @@ set_activity( gpointer key, gpointer value, gpointer user_data )
   case PERIPH_PRESENT_ALWAYS: active = 1; break;
   }
 
-  periph_activate_type( type, active );
+  *needs_hard_reset = 
+    ( periph_activate_type( type, active ) && private->periph->hard_reset ) ||
+    *needs_hard_reset;
 }
 
 /* Free the memory used by a peripheral-port response pair */
@@ -384,9 +389,11 @@ update_ide_menu( void )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE, divide );
 }
 
-void
+int
 periph_update( void )
 {
+  int needs_hard_reset = 0;
+
   if( ui_mouse_present ) {
     if( settings_current.kempston_mouse ) {
       if( !ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_grab( 1 );
@@ -395,7 +402,7 @@ periph_update( void )
     }
   }
 
-  g_hash_table_foreach( peripherals, set_activity, NULL );
+  g_hash_table_foreach( peripherals, set_activity, &needs_hard_reset );
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1,
 		    periph_is_active( PERIPH_TYPE_INTERFACE1 ) );
@@ -407,6 +414,16 @@ periph_update( void )
   if1_update_menu();
   specplus3_765_update_fdd();
   machine_current->memory_map();
+
+  return needs_hard_reset;
+}
+
+void
+periph_posthook( void )
+{
+  if( periph_update() ) {
+    machine_reset( 1 );
+  }
 }
 
 /* Register debugger page/unpage events for a peripheral */

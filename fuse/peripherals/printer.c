@@ -90,7 +90,8 @@ static const periph_port_t printer_zxp_ports[] = {
 
 static const periph_t printer_zxp_periph = {
   &settings_current.zxprinter,
-  printer_zxp_ports
+  printer_zxp_ports,
+  1
 };
 
 static const periph_port_t printer_zxp_ports_full_decode[] = {

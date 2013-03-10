@@ -136,6 +136,7 @@ static const periph_port_t plusd_ports[] = {
 static const periph_t plusd_periph = {
   &settings_current.plusd,
   plusd_ports,
+  1,
   plusd_activate
 };
 

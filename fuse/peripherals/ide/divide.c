@@ -61,6 +61,7 @@ static const periph_port_t divide_ports[] = {
 static const periph_t divide_periph = {
   &settings_current.divide_enabled,
   divide_ports,
+  1,
   divide_activate
 };
 

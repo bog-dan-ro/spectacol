@@ -91,7 +91,8 @@ static const periph_port_t beta_ports[] = {
 
 static const periph_t beta_peripheral = {
   &settings_current.beta128,  
-  beta_ports
+  beta_ports,
+  1
 };
 
 static void beta_reset( int hard_reset );

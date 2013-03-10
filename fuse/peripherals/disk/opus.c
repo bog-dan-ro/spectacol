@@ -101,7 +101,8 @@ static module_info_t opus_module_info = {
 
 static const periph_t opus_periph = {
   &settings_current.opus,
-  NULL
+  NULL,
+  1
 };
 
 void
