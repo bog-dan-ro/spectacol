@@ -490,14 +490,32 @@ create_register_display( GtkBox *parent, gtkui_font font )
 {
   size_t i;
 
+#if GTK_CHECK_VERSION( 3, 0, 0 )
+
+  register_display = gtk_grid_new();
+  gtk_grid_set_row_spacing( GTK_GRID( register_display ), 4 );
+  gtk_container_set_border_width( GTK_CONTAINER( register_display ), 6 );
+
+#else                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+
   register_display = gtk_table_new( 9, 2, FALSE );
+
+#endif
+
   gtk_box_pack_start( parent, register_display, FALSE, FALSE, 0 );
 
   for( i = 0; i < 18; i++ ) {
     registers[i] = gtk_label_new( "" );
     gtkui_set_font( registers[i], font );
+
+#if GTK_CHECK_VERSION( 3, 0, 0 )
+    gtk_grid_attach( GTK_GRID( register_display ), registers[i],
+                     i%2, i/2, 1, 1 );
+#else
     gtk_table_attach( GTK_TABLE( register_display ), registers[i],
-		      i%2, i%2+1, i/2, i/2+1, 0, 0, 2, 2 );
+                      i%2, i%2+1, i/2, i/2+1, 0, 0, 2, 2 );
+#endif
+
   }
 
   return 0;
@@ -506,25 +524,44 @@ create_register_display( GtkBox *parent, gtkui_font font )
 static int
 create_memory_map( GtkBox *parent )
 {
-  GtkWidget *label;
+  GtkWidget *label_address, *label_source, *label_writable, *label_contended;
+
+  label_address   = gtk_label_new( "Address" );
+  label_source    = gtk_label_new( "Source" );
+  label_writable  = gtk_label_new( "W?" );
+  label_contended = gtk_label_new( "C?" );
 
   memory_map = gtk_frame_new( "Memory Map" );
   gtk_box_pack_start( parent, memory_map, FALSE, FALSE, 0 );
 
+#if GTK_CHECK_VERSION( 3, 0, 0 )
+
+  memory_map_table = gtk_grid_new();
+  gtk_grid_set_row_spacing( GTK_GRID( memory_map_table ), 4 );
+  gtk_grid_set_column_spacing( GTK_GRID( memory_map_table ), 6 );
+  gtk_container_set_border_width( GTK_CONTAINER( memory_map_table ), 6 );
+  gtk_container_add( GTK_CONTAINER( memory_map ), memory_map_table );
+
+  gtk_grid_attach( GTK_GRID( memory_map_table ), label_address, 0, 0, 1, 1 );
+  gtk_grid_attach( GTK_GRID( memory_map_table ), label_source, 1, 0, 1, 1 );
+  gtk_grid_attach( GTK_GRID( memory_map_table ), label_writable, 2, 0, 1, 1 );
+  gtk_grid_attach( GTK_GRID( memory_map_table ), label_contended, 3, 0, 1, 1 );
+
+#else                /* #if GTK_CHECK_VERSION( 3, 0, 0 ) */
+
   memory_map_table = gtk_table_new( 1 + MEMORY_PAGES_IN_64K, 4, FALSE );
   gtk_container_add( GTK_CONTAINER( memory_map ), memory_map_table );
 
-  label = gtk_label_new( "Address" );
-  gtk_table_attach( GTK_TABLE( memory_map_table ), label, 0, 1, 0, 1, 0, 0, 2, 2 );
+  gtk_table_attach( GTK_TABLE( memory_map_table ), label_address,
+                    0, 1, 0, 1, 0, 0, 2, 2 );
+  gtk_table_attach( GTK_TABLE( memory_map_table ), label_source,
+                    1, 2, 0, 1, 0, 0, 2, 2 );
+  gtk_table_attach( GTK_TABLE( memory_map_table ), label_writable,
+                    2, 3, 0, 1, 0, 0, 2, 2 );
+  gtk_table_attach( GTK_TABLE( memory_map_table ), label_contended,
+                    3, 4, 0, 1, 0, 0, 2, 2 );
 
-  label = gtk_label_new( "Source" );
-  gtk_table_attach( GTK_TABLE( memory_map_table ), label, 1, 2, 0, 1, 0, 0, 2, 2 );
-
-  label = gtk_label_new( "W?" );
-  gtk_table_attach( GTK_TABLE( memory_map_table ), label, 2, 3, 0, 1, 0, 0, 2, 2 );
-
-  label = gtk_label_new( "C?" );
-  gtk_table_attach( GTK_TABLE( memory_map_table ), label, 3, 4, 0, 1, 0, 0, 2, 2 );
+#endif
 
   return 0;
 }
@@ -913,9 +950,17 @@ update_memory_map( void )
       row_labels[2] = gtk_label_new( page->writable ? "Y" : "N" );
       row_labels[3] = gtk_label_new( page->contended ? "Y" : "N" );
 
-      for( i = 0; i < 4; i++ )
+      for( i = 0; i < 4; i++ ) {
+
+#if GTK_CHECK_VERSION( 3, 0, 0 )
+        gtk_grid_attach( GTK_GRID( memory_map_table ), row_labels[i],
+                         i, row + 1, 1, 1 );
+#else
         gtk_table_attach( GTK_TABLE( memory_map_table ), row_labels[i],
-            i, i + 1, row + 1, row + 2, 0, 0, 2, 2 );
+                          i, i + 1, row + 1, row + 2, 0, 0, 2, 2 );
+#endif
+
+      }
 
       row++;
 

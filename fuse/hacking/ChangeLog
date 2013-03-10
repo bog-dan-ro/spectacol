@@ -4443,3 +4443,5 @@
          enabled or disabled in settings (bugs #281, #283, #289) (Fred).
 20130310 man/fuse.1: mention that peripherals changes can result in hard resets
          (Fred).
+20130310 ui/gtk/binary.c,ui/gtk/debugger.c: replace deprecated GtkTable with
+         GtkGrid (Sergio).
