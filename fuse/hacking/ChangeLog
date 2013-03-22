@@ -4447,3 +4447,5 @@
          (patch #307) (Sergio).
 20130310 ui/win32/{picture.c,statusbar.c}: use best practices for releasing GDI
          objects on win32 UI (thanks, Dr. Memory) (Sergio).
+20130322 roms/{plus3e-0.rom,plus3e-1.rom,plus3e-2.rom}: update to v1.38 of the
+         +3e ROMs (fixes bug #290)(thanks, Guesser) (Fred).
