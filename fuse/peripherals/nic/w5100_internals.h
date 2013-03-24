@@ -144,6 +144,7 @@ struct nic_w5100_t {
 };
 
 void nic_w5100_socket_init( nic_w5100_socket_t *socket, int which );
+void nic_w5100_socket_end( nic_w5100_socket_t *socket );
 
 void nic_w5100_socket_reset( nic_w5100_socket_t *socket );
 

@@ -185,7 +185,7 @@ nic_w5100_free( nic_w5100_t *self )
     pthread_join( self->thread, NULL );
 
     for( i = 0; i < 4; i++ )
-      nic_w5100_socket_reset( &self->socket[i] );
+      nic_w5100_socket_end( &self->socket[i] );
 
     compat_socket_selfpipe_free( self->selfpipe );
 

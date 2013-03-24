@@ -75,6 +75,13 @@ nic_w5100_socket_init( nic_w5100_socket_t *socket, int which )
   pthread_mutex_init( &socket->lock, NULL );
 }
 
+void
+nic_w5100_socket_end( nic_w5100_socket_t *socket )
+{
+  nic_w5100_socket_reset( socket );
+  pthread_mutex_destroy( &socket->lock );
+}
+
 static void
 w5100_socket_acquire_lock( nic_w5100_socket_t *socket )
 {
