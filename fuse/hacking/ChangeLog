@@ -4451,3 +4451,5 @@
          +3e ROMs (fixes bug #290) (thanks, Guesser) (Fred).
 20130324 peripherals/nic/{w5100.c,w5100_internals.h,w5100_socket.c}: destroy 
          mutex before closing (patch #308) (Sergio).
+20130325 ui/widget/options.pl: run the peripherals posthook at the appropriate
+         point to work (bug #281) (Sergio and Fred).

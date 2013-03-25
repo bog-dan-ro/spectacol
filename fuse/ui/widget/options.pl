@@ -369,7 +369,7 @@ widget_options_finish( widget_finish_state finished )
   if( finished == WIDGET_FINISHED_OK ) {
     error = settings_copy( &settings_current, &widget_options_settings );
     /* Bring the peripherals list into sync with the new options */
-    periph_update();
+    periph_posthook();
     /* make the needed UI changes */
     uidisplay_hotswap_gfx_mode();
   }
@@ -616,9 +616,6 @@ widget_$_->{name}_keyhandler( input_key key )
   case INPUT_JOYSTICK_FIRE_1:
     widget_end_all( WIDGET_FINISHED_OK );
     widget_$_->{name}_running = 0;
-CODE
-    print "    $_->{posthook}();\n" if $_->{posthook};
-    print << "CODE";
     display_refresh_all();
     return;
     break;
