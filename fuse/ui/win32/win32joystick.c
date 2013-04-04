@@ -100,18 +100,12 @@ win32joystick_buttonevent( int which_joystick, int button_down,
     We should use DirectInput. Polling with JoyGetPosEx would take
     up to 8 milliseconds in analog joysticks (digital joysticks just
     a few clock cycles) */
-  if( wParam & JOY_BUTTON1 ) button = INPUT_JOYSTICK_FIRE_1;
-  else if( wParam & JOY_BUTTON2 ) button = INPUT_JOYSTICK_FIRE_2;
-  else if( wParam & JOY_BUTTON3 ) button = INPUT_JOYSTICK_FIRE_3;
-  else if( wParam & JOY_BUTTON4 ) button = INPUT_JOYSTICK_FIRE_4;
-  else if( wParam & JOY_BUTTON5 ) button = INPUT_JOYSTICK_FIRE_5;
-  else if( wParam & JOY_BUTTON6 ) button = INPUT_JOYSTICK_FIRE_6;
-  else if( wParam & JOY_BUTTON7 ) button = INPUT_JOYSTICK_FIRE_7;
-  else if( wParam & JOY_BUTTON8 ) button = INPUT_JOYSTICK_FIRE_8;
-  else if( wParam & JOY_BUTTON9 ) button = INPUT_JOYSTICK_FIRE_9;
-  else if( wParam & JOY_BUTTON10 ) button = INPUT_JOYSTICK_FIRE_10;
-  else return; /* Fuse supports up to 10 joystick buttons */
- 
+  if( wParam & JOY_BUTTON1CHG ) button = INPUT_JOYSTICK_FIRE_1;
+  else if( wParam & JOY_BUTTON2CHG ) button = INPUT_JOYSTICK_FIRE_2;
+  else if( wParam & JOY_BUTTON3CHG ) button = INPUT_JOYSTICK_FIRE_3;
+  else if( wParam & JOY_BUTTON4CHG ) button = INPUT_JOYSTICK_FIRE_4;
+  else return; /* Fuse for Windows supports up to 4 joystick buttons */
+
   event.types.joystick.which = which_joystick; 
   event.type = button_down
                ? INPUT_EVENT_JOYSTICK_PRESS : INPUT_EVENT_JOYSTICK_RELEASE;
