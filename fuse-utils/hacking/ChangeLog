@@ -411,3 +411,4 @@
          force AAC audio encoder for ipod profile (Sergio).
 201300407 converter/{romloader.cc,romloader.h}: include read and computed
           checksum (thanks, Ivan Shmakov) (Fred).
+201300407 converter/romloader.cc: print flag byte (thanks, Ivan Shmakov) (Fred).

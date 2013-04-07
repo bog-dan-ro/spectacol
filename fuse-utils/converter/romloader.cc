@@ -182,6 +182,7 @@ romloader::end_block( double end_marker, double end_tstates )
 {
   std::cout << "Block ended, found " << data.size() << " bytes\n";
   bool isHeader = data.size() == 19 && data[0] == 0x00;
+  std::cout << "Flag: " << uchar2hex(data[0]) << "\n";
   std::cout << "Type: " << (isHeader ? "Header" : "Data") << "\n";
   if( isHeader ) {
     switch( data[1]) {
