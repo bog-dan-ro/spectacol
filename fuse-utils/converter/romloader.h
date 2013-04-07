@@ -98,6 +98,8 @@ class romloader {
     static const unsigned int MIN_PILOT_COUNT = 256;
 
   private:
+    std::string uchar2hex(libspectrum_byte inbyte);
+
     romloaderstate* m_rom_loader_state;
 
     bool show_stats;

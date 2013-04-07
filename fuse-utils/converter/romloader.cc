@@ -24,7 +24,9 @@
 */
 
 #include <iostream>
+#include <iomanip>
 #include <limits>
+#include <sstream>
 
 #include <math.h>
 
@@ -249,16 +251,18 @@ romloader::end_block( double end_marker, double end_tstates )
 bool
 romloader::check_checksum()
 {
+  libspectrum_byte read_checksum = data[data.size()-1];
   libspectrum_byte checksum = 0;
   bool retval = false;
   if( data.size() ) {
     for( size_t i = 0; i < data.size()-1; i++ ) {
       checksum ^= data[i];
     }
-    retval = checksum == data[data.size()-1];
+    retval = checksum == read_checksum;
   }
 
-  std::cout << "Checksum:" << (retval ? "PASS" : "FAIL") << "\n";
+  std::cout << "Checksum:" << (retval ? "PASS" : "FAIL") << " Read:" <<
+    uchar2hex(read_checksum) << " Computed:" << uchar2hex(checksum) << "\n";
   return retval;
 }
 
@@ -293,4 +297,12 @@ void
 romloader::change_state( romloaderstate* new_state )
 {
   m_rom_loader_state = new_state;
+}
+
+std::string
+romloader::uchar2hex(libspectrum_byte inbyte)
+{
+  std::ostringstream oss(std::ostringstream::out);
+  oss << "0x" << std::setw(2) << std::setfill('0') << std::hex << (int)(inbyte);
+  return oss.str();
 }
