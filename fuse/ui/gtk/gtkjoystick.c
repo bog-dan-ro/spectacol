@@ -68,7 +68,7 @@ struct joystick_info {
   int *type;
   GtkWidget *radio[ JOYSTICK_TYPE_COUNT ];
 
-  struct button_info button[10];
+  struct button_info button[15];
 };
 
 typedef enum key_item_t {
@@ -214,7 +214,7 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
 
   model = create_joystick_options_store();
 
-  for( i = 0; i < 10; i += 5 ) {
+  for( i = 0; i < 15; i += 5 ) {
     
     int j;
 
@@ -258,7 +258,12 @@ setup_info( struct joystick_info *info, int callback_action )
     info->button[7].setting = &( settings_current.joystick_1_fire_8  );
     info->button[8].setting = &( settings_current.joystick_1_fire_9  );
     info->button[9].setting = &( settings_current.joystick_1_fire_10 );
-    for( i = 0; i < 10; i++ )
+    info->button[10].setting = &( settings_current.joystick_1_fire_11 );
+    info->button[11].setting = &( settings_current.joystick_1_fire_12 );
+    info->button[12].setting = &( settings_current.joystick_1_fire_13 );
+    info->button[13].setting = &( settings_current.joystick_1_fire_14 );
+    info->button[14].setting = &( settings_current.joystick_1_fire_15 );
+    for( i = 0; i < 15; i++ )
       snprintf( info->button[i].name, 80, "Button %lu", (unsigned long)i + 1 );
     break;
 
@@ -274,7 +279,12 @@ setup_info( struct joystick_info *info, int callback_action )
     info->button[7].setting = &( settings_current.joystick_2_fire_8  );
     info->button[8].setting = &( settings_current.joystick_2_fire_9  );
     info->button[9].setting = &( settings_current.joystick_2_fire_10 );
-    for( i = 0; i < 10; i++ )
+    info->button[10].setting = &( settings_current.joystick_2_fire_10 );
+    info->button[11].setting = &( settings_current.joystick_2_fire_11 );
+    info->button[12].setting = &( settings_current.joystick_2_fire_12 );
+    info->button[13].setting = &( settings_current.joystick_2_fire_13 );
+    info->button[14].setting = &( settings_current.joystick_2_fire_14 );
+    for( i = 0; i < 15; i++ )
       snprintf( info->button[i].name, 80, "Button %lu", (unsigned long)i + 1 );
     break;
 
@@ -440,7 +450,7 @@ joystick_done( GtkButton *button GCC_UNUSED, gpointer user_data )
   int i;
   GtkToggleButton *toggle;
 
-  for( i = 0; i < 10; i++ )
+  for( i = 0; i < 15; i++ )
     if( info->button[i].setting )
       *info->button[i].setting = info->button[i].key;
 

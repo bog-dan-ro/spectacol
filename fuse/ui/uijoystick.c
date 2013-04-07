@@ -213,7 +213,7 @@ poll_joystick( int which )
   event.types.joystick.which = which;
 
   buttons = joystick->total_buttons;
-  if( buttons > 10 ) buttons = 10;	/* We support 'only' 10 fire buttons */
+  if( buttons > 15 ) buttons = 15;	/* We support 'only' 15 fire buttons */
 
   for( i = 0; i < buttons; i++ ) {
 

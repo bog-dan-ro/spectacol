@@ -159,6 +159,11 @@ get_fire_button_key( int which, input_key button )
     case INPUT_JOYSTICK_FIRE_8 : return settings_current.joystick_1_fire_8;
     case INPUT_JOYSTICK_FIRE_9 : return settings_current.joystick_1_fire_9;
     case INPUT_JOYSTICK_FIRE_10: return settings_current.joystick_1_fire_10;
+    case INPUT_JOYSTICK_FIRE_11: return settings_current.joystick_1_fire_11;
+    case INPUT_JOYSTICK_FIRE_12: return settings_current.joystick_1_fire_12;
+    case INPUT_JOYSTICK_FIRE_13: return settings_current.joystick_1_fire_13;
+    case INPUT_JOYSTICK_FIRE_14: return settings_current.joystick_1_fire_14;
+    case INPUT_JOYSTICK_FIRE_15: return settings_current.joystick_1_fire_15;
     default: break;
     }
     break;
@@ -175,6 +180,11 @@ get_fire_button_key( int which, input_key button )
     case INPUT_JOYSTICK_FIRE_8 : return settings_current.joystick_2_fire_8;
     case INPUT_JOYSTICK_FIRE_9 : return settings_current.joystick_2_fire_9;
     case INPUT_JOYSTICK_FIRE_10: return settings_current.joystick_2_fire_10;
+    case INPUT_JOYSTICK_FIRE_11: return settings_current.joystick_2_fire_11;
+    case INPUT_JOYSTICK_FIRE_12: return settings_current.joystick_2_fire_12;
+    case INPUT_JOYSTICK_FIRE_13: return settings_current.joystick_2_fire_13;
+    case INPUT_JOYSTICK_FIRE_14: return settings_current.joystick_2_fire_14;
+    case INPUT_JOYSTICK_FIRE_15: return settings_current.joystick_2_fire_15;
     default: break;
     }
     break;

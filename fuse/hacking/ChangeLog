@@ -4455,3 +4455,7 @@
          point to work (bug #281) (Sergio and Fred).
 20130404 ui/win32/win32joystick.c: fix input events fired when various joystick
          buttons are pressed simultaneously (Sergio).
+20130407 input.[ch],man/fuse.1,settings.dat,ui/{gtk/gtkjoystick.c,
+         sdl/sdljoystick.c,uijoystick.c,widget/menu.c}: allow up to 15 joytick
+         buttons to be defined to accomodate e.g. XBox 360 ABXY button use
+         (patch #309) (Fred).
