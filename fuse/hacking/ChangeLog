@@ -4459,3 +4459,5 @@
          sdl/sdljoystick.c,uijoystick.c,widget/menu.c}: allow up to 15 joytick
          buttons to be defined to accomodate e.g. XBox 360 ABXY button use
          (patch #309) (Fred).
+20130420 peripherals/disk/disk.c: fix loading of EDSK files with redundant
+         sector images (bug #293) (Fred).

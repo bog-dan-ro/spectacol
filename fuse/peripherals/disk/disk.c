@@ -1326,6 +1326,9 @@ cpc_set_weak_range( disk_t *d, int idx, buffer_t *buffer, int n, int len )
       }
     }
   }
+  if( first == -1 || last == -1 ) {
+    return;
+  }
   for( ; first <= last; first++ ) {
     bitmap_set( d->weak, first );
   }
