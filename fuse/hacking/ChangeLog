@@ -4461,3 +4461,5 @@
          (patch #309) (Fred).
 20130420 peripherals/disk/disk.c: fix loading of EDSK files with redundant
          sector images (bug #293) (Fred).
+20130420 peripherals/spectranet.c: allow disabling Spectranet code (more from 
+         bug #259) (Sergio).

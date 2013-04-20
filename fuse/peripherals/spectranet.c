@@ -521,8 +521,24 @@ spectranet_page( int via_io )
 }
 
 void
+spectranet_nmi( void )
+{
+}
+
+void
 spectranet_unpage( void )
 {
+}
+
+void
+spectranet_retn( void )
+{
+}
+
+int
+spectranet_nmi_flipflop( void )
+{
+  return 0;
 }
 
 libspectrum_byte
