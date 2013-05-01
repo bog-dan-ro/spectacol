@@ -4456,10 +4456,13 @@
 20130404 ui/win32/win32joystick.c: fix input events fired when various joystick
          buttons are pressed simultaneously (Sergio).
 20130407 input.[ch],man/fuse.1,settings.dat,ui/{gtk/gtkjoystick.c,
-         sdl/sdljoystick.c,uijoystick.c,widget/menu.c}: allow up to 15 joytick
-         buttons to be defined to accomodate e.g. XBox 360 ABXY button use
+         sdl/sdljoystick.c,uijoystick.c,widget/menu.c}: allow up to 15 joystick
+         buttons to be defined to accommodate e.g. XBox 360 ABXY button use
          (patch #309) (Fred).
 20130420 peripherals/disk/disk.c: fix loading of EDSK files with redundant
          sector images (bug #293) (Fred).
 20130420 peripherals/spectranet.c: allow disabling Spectranet code (more from 
          bug #259) (Sergio).
+20130501 sound.c: don't try to enable right channel for Specdrum unless stereo
+         mode is set (fixes bug #294) (thanks, mcleod_ideafix and Sergio)
+         (Fred).

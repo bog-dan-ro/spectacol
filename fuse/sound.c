@@ -275,12 +275,6 @@ sound_init( const char *device )
     blip_synth_set_output( ay_c_synth, left_buf );
   }
 
-  right_specdrum_synth = new_Blip_Synth();
-  blip_synth_set_volume( right_specdrum_synth,
-                         sound_get_volume( settings_current.volume_specdrum ) );
-  blip_synth_set_output( right_specdrum_synth, right_buf );
-  blip_synth_set_treble_eq( right_specdrum_synth, treble );
-
   sound_enabled = sound_enabled_ever = 1;
 
   sound_channels = ( sound_stereo_ay != SOUND_STEREO_AY_NONE ? 2 : 1 );
