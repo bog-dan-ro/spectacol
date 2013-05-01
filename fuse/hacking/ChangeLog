@@ -4466,3 +4466,5 @@
 20130501 sound.c: don't try to enable right channel for Specdrum unless stereo
          mode is set (fixes bug #294) (thanks, mcleod_ideafix and Sergio)
          (Fred).
+20130501 man/fuse.1: add %cfgnew step in Spectranet initialisation steps
+         (thanks, smogit and Guesser) (Fred).
