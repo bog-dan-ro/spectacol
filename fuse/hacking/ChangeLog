@@ -4478,3 +4478,5 @@
          machines_periph.c,melodik.c,printer.c,scld.c,speccyboot.c,specdrum.c,
          ula.c},peripherals/disk/{beta.c,opus.c}, peripherals/ide/simpleide.c:
          complete some missing field initializers (Sergio).
+20130505 peripherals/if1.c: put braces around empty body in ‘do’ statements
+         (Sergio).

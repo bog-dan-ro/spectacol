@@ -898,8 +898,8 @@ port_ctr_out( libspectrum_byte val )
   if( settings_current.rs232_handshake && 
       if1_ula.fd_t != -1 && if1_ula.cts != val ) {
     char data = val ? 0x03 : 0x02;
-    do ; while( write( if1_ula.fd_t, "", 1 ) != 1 );
-    do ; while( write( if1_ula.fd_t, &data, 1 ) != 1 );
+    do {} while( write( if1_ula.fd_t, "", 1 ) != 1 );
+    do {} while( write( if1_ula.fd_t, &data, 1 ) != 1 );
   }
   if1_ula.cts = val;
     
@@ -948,15 +948,15 @@ port_net_out( libspectrum_byte val )
     if( if1_ula.count_out == -1 ) {
       if1_ula.count_out = 13;
       if1_ula.data_out = '?';
-      do ; while( write( if1_ula.fd_t, "", 1 ) != 1 );
+      do {} while( write( if1_ula.fd_t, "", 1 ) != 1 );
     }
     if( if1_ula.count_out == 13 ) {
         /* Here is the output routine */
       if( if1_ula.data_out == 0x00 ) {
         if1_ula.data_out = '*';
-        do ; while( write( if1_ula.fd_t, "", 1 ) != 1 );
+        do {} while( write( if1_ula.fd_t, "", 1 ) != 1 );
       }
-      do ; while( write( if1_ula.fd_t, &if1_ula.data_out, 1 ) != 1 );
+      do {} while( write( if1_ula.fd_t, &if1_ula.data_out, 1 ) != 1 );
       if1_ula.count_out = 0;
     }
     if1_ula.rx = val & 0x01;		/* set rx */
@@ -971,7 +971,7 @@ port_net_out( libspectrum_byte val )
 */
       if1_ula.net = ( val & 0x01 ) ? 0 : 1;		/* set rx */
       lseek( if1_ula.fd_net, 0, SEEK_SET );		/* we save only the state of the wire*/
-      do ; while( write( if1_ula.fd_net, &if1_ula.net, 1 ) == -1 );
+      do {} while( write( if1_ula.fd_net, &if1_ula.net, 1 ) == -1 );
 #ifdef HAVE_FSYNC
       fsync( if1_ula.fd_net );
 #endif /* #ifdef HAVE_FSYNC */
@@ -989,7 +989,7 @@ port_net_out( libspectrum_byte val )
         
 /*	lseek( if1_ula.fd_net, 0, SEEK_SET );  start a packet */
 		/* first we send the station number */
-        do ; while( write( if1_ula.fd_net, &if1_ula.net_data, 1 ) == -1 );
+        do {} while( write( if1_ula.fd_net, &if1_ula.net_data, 1 ) == -1 );
 #ifdef HAVE_FSYNC
         fsync( if1_ula.fd_net );
 #endif /* #ifdef HAVE_FSYNC */
