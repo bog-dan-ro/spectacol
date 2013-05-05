@@ -29,7 +29,6 @@
 #include <libspectrum.h>
 
 #include "machine.h"
-#include "periph.h"
 
 int spec128_init( fuse_machine_info *machine );
 int spec128_common_reset( int contention );

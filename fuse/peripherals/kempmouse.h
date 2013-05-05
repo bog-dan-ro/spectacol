@@ -26,9 +26,6 @@
 #ifndef FUSE_KEMPMOUSE_H
 #define FUSE_KEMPMOUSE_H
 
-#include <libspectrum.h>
-#include "periph.h"
-
 void kempmouse_init( void );
 void kempmouse_update( int dx, int dy, int button, int down );
 

@@ -30,8 +30,6 @@
 
 #include <libspectrum.h>
 
-#include "periph.h"
-
 typedef struct specdrum_info {
   int specdrum_present;  /* SpecDrum present */
   libspectrum_signed_byte specdrum_dac; /* Current byte in the SpecDrum 8bit DAC */

@@ -30,15 +30,14 @@
 
 #include <config.h>
 
+#include <libspectrum.h>
+
+#include "fdd.h"
+
 typedef enum opus_drive_number {
   OPUS_DRIVE_1 = 0,
   OPUS_DRIVE_2,
 } opus_drive_number;
-
-#include <libspectrum.h>
-
-#include "periph.h"
-#include "fdd.h"
 
 extern int opus_available;  /* Is the Opus available for use? */
 extern int opus_active;     /* Opus enabled? */

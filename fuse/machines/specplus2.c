@@ -32,6 +32,7 @@
 #include "machine.h"
 #include "machines_periph.h"
 #include "machines.h"
+#include "periph.h"
 #include "peripherals/disk/beta.h"
 #include "settings.h"
 #include "spec128.h"
