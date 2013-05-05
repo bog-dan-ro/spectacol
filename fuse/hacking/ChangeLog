@@ -4468,3 +4468,5 @@
          (Fred).
 20130501 man/fuse.1: add %cfgnew step in Spectranet initialisation steps
          (thanks, smogit and Guesser) (Fred).
+20130505 peripherals/{disk/opus.h,specdrum.h}: add missing subversion properties
+         (Sergio).
