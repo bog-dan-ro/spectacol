@@ -91,7 +91,8 @@ static const periph_port_t printer_zxp_ports[] = {
 static const periph_t printer_zxp_periph = {
   &settings_current.zxprinter,
   printer_zxp_ports,
-  1
+  1,
+  NULL
 };
 
 static const periph_port_t printer_zxp_ports_full_decode[] = {
@@ -101,7 +102,9 @@ static const periph_port_t printer_zxp_ports_full_decode[] = {
 
 static const periph_t printer_zxp_periph_full_decode = {
   &settings_current.zxprinter,
-  printer_zxp_ports_full_decode
+  printer_zxp_ports_full_decode,
+  0,
+  NULL
 };
 
 static const periph_port_t printer_parallel_ports[] = {
@@ -111,7 +114,9 @@ static const periph_port_t printer_parallel_ports[] = {
 
 static const periph_t printer_parallel_periph = {
   &settings_current.printer,
-  printer_parallel_ports
+  printer_parallel_ports,
+  0,
+  NULL
 };
 
 static void printer_zxp_init(void)

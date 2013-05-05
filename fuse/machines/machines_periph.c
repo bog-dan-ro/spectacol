@@ -49,7 +49,9 @@ static const periph_port_t spec128_memory_ports[] = {
 
 static const periph_t spec128_memory = {
   NULL,
-  spec128_memory_ports
+  spec128_memory_ports,
+  0,
+  NULL
 };
 
 static const periph_port_t plus3_memory_ports[] = {
@@ -60,7 +62,9 @@ static const periph_port_t plus3_memory_ports[] = {
 
 static const periph_t plus3_memory = {
   NULL,
-  plus3_memory_ports
+  plus3_memory_ports,
+  0,
+  NULL
 };
 
 static const periph_port_t upd765_ports[] = {
@@ -71,7 +75,9 @@ static const periph_port_t upd765_ports[] = {
 
 static const periph_t upd765 = {
   NULL,
-  upd765_ports
+  upd765_ports,
+  0,
+  NULL
 };
 
 static const periph_port_t se_memory_ports[] = {
@@ -81,7 +87,9 @@ static const periph_port_t se_memory_ports[] = {
 
 static const periph_t se_memory = {
   NULL,
-  se_memory_ports
+  se_memory_ports,
+  0,
+  NULL
 };
 
 static const periph_port_t tc2068_ay_ports[] = {
@@ -92,7 +100,9 @@ static const periph_port_t tc2068_ay_ports[] = {
 
 static const periph_t tc2068_ay = {
   NULL,
-  tc2068_ay_ports
+  tc2068_ay_ports,
+  0,
+  NULL
 };
 
 static const periph_port_t beta128_pentagon_ports[] = {
@@ -106,7 +116,9 @@ static const periph_port_t beta128_pentagon_ports[] = {
 
 static const periph_t beta128_pentagon = {
   NULL,
-  beta128_pentagon_ports
+  beta128_pentagon_ports,
+  0,
+  NULL
 };
 
 static const periph_port_t beta128_pentagon_late_ports[] = {
@@ -120,7 +132,9 @@ static const periph_port_t beta128_pentagon_late_ports[] = {
 
 static const periph_t beta128_pentagon_late = {
   NULL,
-  beta128_pentagon_late_ports
+  beta128_pentagon_late_ports,
+  0,
+  NULL
 };
 
 static const periph_port_t pentagon1024_memory_ports[] = {
@@ -131,7 +145,9 @@ static const periph_port_t pentagon1024_memory_ports[] = {
 
 static const periph_t pentagon1024_memory = {
   NULL,
-  pentagon1024_memory_ports
+  pentagon1024_memory_ports,
+  0,
+  NULL
 };
 
 void

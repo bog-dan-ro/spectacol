@@ -76,7 +76,9 @@ static const periph_port_t scld_ports[] = {
 
 static const periph_t scld_periph = {
   NULL,
-  scld_ports
+  scld_ports,
+  0,
+  NULL
 };
 
 void

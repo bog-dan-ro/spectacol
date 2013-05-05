@@ -65,6 +65,8 @@ static module_info_t if2_module_info = {
 
 static const periph_t if2_periph = {
   &settings_current.interface2,
+  NULL,
+  0,
   NULL
 };
 

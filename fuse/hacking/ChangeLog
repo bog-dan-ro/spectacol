@@ -4473,4 +4473,8 @@
 20130505 machines/{spec128.h,specplus2.c},peripherals/{disk/opus.h,ide/divide.h,
          kempmouse.h,specdrum.h},settings-header.pl: remove and relocate some
          header inclusions (Sergio).
-20130505 unittests/unittests.c: Add missing header (Sergio).
+20130505 unittests/unittests.c: add missing header (Sergio).
+20130505 peripherals/{ay.c,fuller.c,if1.c,if2.c,joystick.c,kempmouse.c,
+         machines_periph.c,melodik.c,printer.c,scld.c,speccyboot.c,specdrum.c,
+         ula.c},peripherals/disk/{beta.c,opus.c}, peripherals/ide/simpleide.c:
+         complete some missing field initializers (Sergio).

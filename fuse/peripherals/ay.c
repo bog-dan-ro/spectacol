@@ -66,7 +66,9 @@ static periph_port_t ay_ports[] = {
 
 static periph_t ay_periph = {
   NULL,
-  ay_ports
+  ay_ports,
+  0,
+  NULL
 };
 
 static periph_port_t ay_ports_plus3[] = {
@@ -77,7 +79,9 @@ static periph_port_t ay_ports_plus3[] = {
 
 static periph_t ay_periph_plus3 = {
   NULL,
-  ay_ports_plus3
+  ay_ports_plus3,
+  0,
+  NULL
 };
 
 static periph_port_t ay_ports_full_decode[] = {
@@ -88,7 +92,9 @@ static periph_port_t ay_ports_full_decode[] = {
 
 static periph_t ay_periph_full_decode = {
   NULL,
-  ay_ports_full_decode
+  ay_ports_full_decode,
+  0,
+  NULL
 };
 
 static periph_port_t ay_ports_timex[] = {
@@ -99,7 +105,9 @@ static periph_port_t ay_ports_timex[] = {
 
 static periph_t ay_periph_timex = {
   NULL,
-  ay_ports_timex
+  ay_ports_timex,
+  0,
+  NULL
 };
 
 void

@@ -221,7 +221,8 @@ static const periph_port_t if1_ports[] = {
 static const periph_t if1_periph = {
   &settings_current.interface1,
   if1_ports,
-  1
+  1,
+  NULL
 };
 
 /* Memory source */

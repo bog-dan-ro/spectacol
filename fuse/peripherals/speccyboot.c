@@ -75,7 +75,8 @@ static const periph_port_t speccyboot_ports[] = {
 static const periph_t speccyboot_periph = {
   &settings_current.speccyboot,
   speccyboot_ports,
-  1
+  1,
+  NULL
 };
 
 /* ---------------------------------------------------------------------------

@@ -71,7 +71,9 @@ static const periph_port_t ula_ports[] = {
 
 static const periph_t ula_periph = {
   NULL,
-  ula_ports
+  ula_ports,
+  0,
+  NULL
 };
 
 static const periph_port_t ula_ports_full_decode[] = {
@@ -81,7 +83,9 @@ static const periph_port_t ula_ports_full_decode[] = {
 
 static const periph_t ula_periph_full_decode = {
   NULL,
-  ula_ports_full_decode
+  ula_ports_full_decode,
+  0,
+  NULL
 };
 
 void

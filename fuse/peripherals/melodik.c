@@ -57,7 +57,8 @@ static const periph_port_t melodik_ports[] = {
 static const periph_t melodik_periph = {
   &settings_current.melodik,
   melodik_ports,
-  1
+  1,
+  NULL
 };
 
 static void

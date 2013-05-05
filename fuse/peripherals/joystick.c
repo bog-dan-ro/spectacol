@@ -104,7 +104,9 @@ static const periph_port_t kempston_strict_decoding[] = {
 
 static const periph_t kempston_strict_periph = {
   &settings_current.joy_kempston,
-  kempston_strict_decoding
+  kempston_strict_decoding,
+  0,
+  NULL
 };
 
 static const periph_port_t kempston_loose_decoding[] = {
@@ -114,7 +116,9 @@ static const periph_port_t kempston_loose_decoding[] = {
 
 static const periph_t kempston_loose_periph = {
   &settings_current.joy_kempston,
-  kempston_loose_decoding
+  kempston_loose_decoding,
+  0,
+  NULL
 };
 
 /* Init/shutdown functions. Errors aren't important here */

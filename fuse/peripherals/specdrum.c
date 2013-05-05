@@ -59,7 +59,8 @@ static const periph_port_t specdrum_ports[] = {
 static const periph_t specdrum_periph = {
   &settings_current.specdrum,
   specdrum_ports,
-  1
+  1,
+  NULL
 };
 
 void

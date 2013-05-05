@@ -51,7 +51,8 @@ static const periph_port_t simpleide_ports[] = {
 static const periph_t simpleide_periph = {
   &settings_current.simpleide_active,
   simpleide_ports,
-  1
+  1,
+  NULL
 };
 
 static libspectrum_ide_channel *simpleide_idechn;

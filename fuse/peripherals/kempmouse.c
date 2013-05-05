@@ -73,7 +73,8 @@ static const periph_port_t kempmouse_ports[] = {
 static const periph_t kempmouse_periph = {
   &settings_current.kempston_mouse,
   kempmouse_ports,
-  1
+  1,
+  NULL
 };
 
 void
