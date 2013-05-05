@@ -30,6 +30,7 @@
 #include "fuse.h"
 #include "machine.h"
 #include "mempool.h"
+#include "periph.h"
 #include "peripherals/disk/beta.h"
 #include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
