@@ -4480,3 +4480,5 @@
          complete some missing field initializers (Sergio).
 20130505 peripherals/if1.c: put braces around empty body in ‘do’ statements
          (Sergio).
+20130512 ui/win32/options.pl: refactor options dialogs to split *_init and
+         *_done functions out of *_proc function (Sergio).
