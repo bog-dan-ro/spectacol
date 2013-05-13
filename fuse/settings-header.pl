@@ -102,8 +102,8 @@ extern settings_info settings_current;
 extern settings_info settings_default;
 
 int settings_init( int *first_arg, int argc, char **argv );
-int settings_defaults( settings_info *settings );
-int settings_copy( settings_info *dest, settings_info *src );
+void settings_defaults( settings_info *settings );
+void settings_copy( settings_info *dest, settings_info *src );
 
 #define SETTINGS_ROM_COUNT 30
 char **settings_get_rom_setting( settings_info *settings, size_t which );

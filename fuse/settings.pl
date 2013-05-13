@@ -130,7 +130,7 @@ static int parse_ini( utils_file *file, settings_info *settings );
 static int settings_command_line( settings_info *settings, int *first_arg,
 				  int argc, char **argv );
 
-static int settings_copy_internal( settings_info *dest, settings_info *src );
+static void settings_copy_internal( settings_info *dest, settings_info *src );
 
 /* Called on emulator startup */
 int
@@ -138,11 +138,7 @@ settings_init( int *first_arg, int argc, char **argv )
 {
   int error;
 
-  error = settings_defaults( &settings_current );
-  if( error ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return error;
-  }
+  settings_defaults( &settings_current );
 
   error = read_config_file( &settings_current );
   if( error ) return error;
@@ -154,9 +150,9 @@ settings_init( int *first_arg, int argc, char **argv )
 }
 
 /* Fill the settings structure with sensible defaults */
-int settings_defaults( settings_info *settings )
+void settings_defaults( settings_info *settings )
 {
-  return settings_copy_internal( settings, &settings_default );
+  settings_copy_internal( settings, &settings_default );
 }
 
 #ifdef HAVE_LIB_XML2
@@ -684,7 +680,7 @@ print hashline( __LINE__ ), << 'CODE';
 }
 
 /* Copy one settings object to another */
-static int
+static void
 settings_copy_internal( settings_info *dest, settings_info *src )
 {
   settings_free( dest );
@@ -708,15 +704,13 @@ CODE
 }
 
 print hashline( __LINE__ ), << 'CODE';
-
-  return 0;
 }
 
 /* Copy one settings object to another */
-int settings_copy( settings_info *dest, settings_info *src )
+void settings_copy( settings_info *dest, settings_info *src )
 {
-  if( settings_defaults( dest ) ) return 1;
-  return settings_copy_internal( dest, src );
+  settings_defaults( dest );
+  settings_copy_internal( dest, src );
 }
 
 char **
