@@ -44,7 +44,7 @@ static void print_rom( int which );
 int
 widget_roms_draw( void *data )
 {
-  int i, error;
+  int i;
   char buffer[32];
   char key[] = "\x0A ";
 
@@ -59,11 +59,7 @@ widget_roms_draw( void *data )
       ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
       return 1;
     }
-    error = settings_copy( widget_settings, &settings_current );
-    if( error ) {
-      settings_free( widget_settings ); free( widget_settings );
-      return error;
-    }
+    settings_copy( widget_settings, &settings_current );
 
     info->initialised = 1;
   }
@@ -158,11 +154,8 @@ widget_roms_keyhandler( input_key key )
 int
 widget_roms_finish( widget_finish_state finished )
 {
-  int error;
-
   if( finished == WIDGET_FINISHED_OK ) {
-    error = settings_copy( &settings_current, widget_settings );
-    if( error ) return error;
+    settings_copy( &settings_current, widget_settings );
   }
 
   settings_free( widget_settings ); free( widget_settings );

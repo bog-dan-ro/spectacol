@@ -4484,3 +4484,5 @@
          *_done functions out of *_proc function (Sergio).
 20130513 settings-header.pl,settings.pl: change settings_defaults(),
          settings_copy() and settings_copy_internal() to void functions (Fred).
+20130513 ui/widget/{options.pl,roms.c}: change settings_copy() to void function
+         on widget UIs (Sergio).

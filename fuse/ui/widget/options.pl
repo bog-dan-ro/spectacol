@@ -363,11 +363,9 @@ widget_options_print_combo( int left_edge, int width, int number, const char *pr
 int
 widget_options_finish( widget_finish_state finished )
 {
-  int error = 0;
-
   /* If we exited normally, actually set the options */
   if( finished == WIDGET_FINISHED_OK ) {
-    error = settings_copy( &settings_current, &widget_options_settings );
+    settings_copy( &settings_current, &widget_options_settings );
     /* Bring the peripherals list into sync with the new options */
     periph_posthook();
     /* make the needed UI changes */
@@ -375,7 +373,6 @@ widget_options_finish( widget_finish_state finished )
   }
   settings_free( &widget_options_settings );
   memset( &widget_options_settings, 0, sizeof( settings_info ) );
-  if( error ) return error;
 
   return 0;
 }
@@ -434,8 +431,7 @@ widget_$_->{name}_draw( void *data GCC_UNUSED )
   if( !widget_$_->{name}_running ) {		/* we want to copy settings, only when start up */
     highlight_line = 0;
     /* Get a copy of the current settings */
-    error = settings_copy( &widget_options_settings, &settings_current );
-    if( error ) { settings_free( &widget_options_settings ); return error; }
+    settings_copy( &widget_options_settings, &settings_current );
     widget_$_->{name}_running = 1;
   }
 
