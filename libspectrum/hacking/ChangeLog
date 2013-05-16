@@ -943,3 +943,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20130307 accessor.pl,snap_accessors.txt,szx.c: implement Spectranet's "suppress
          NMI" flipflop (bug #259).
 20130516 Makefile.am: update library version number for 1.1 release.
+20130516 doc/libspectrum.3: update version number and date for 1.1 release.
