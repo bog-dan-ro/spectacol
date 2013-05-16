@@ -4486,3 +4486,4 @@
          settings_copy() and settings_copy_internal() to void functions (Fred).
 20130513 ui/widget/{options.pl,roms.c}: change settings_copy() to void function
          on widget UIs (Sergio).
+20130516 man/fuse.1: update date and version for 1.1 release.
