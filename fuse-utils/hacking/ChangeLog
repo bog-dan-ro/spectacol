@@ -412,4 +412,5 @@
 20130407 converter/{romloader.cc,romloader.h}: include read and computed
          checksum (thanks, Ivan Shmakov) (Fred).
 20130407 converter/romloader.cc: print flag byte (thanks, Ivan Shmakov) (Fred).
-20130514 man/*.1: update date and revision for 1.1 release.
+20130516 man/*.1: update date and revision for 1.1 release.
+20130516 ChangeLog: update date in main changelog.
