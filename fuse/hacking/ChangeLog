@@ -4487,3 +4487,4 @@
 20130513 ui/widget/{options.pl,roms.c}: change settings_copy() to void function
          on widget UIs (Sergio).
 20130516 man/fuse.1: update date and version for 1.1 release.
+20130516 ChangeLog: update date in main changelog.
