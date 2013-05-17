@@ -415,3 +415,4 @@
 20130516 man/*.1: update date and revision for 1.1 release.
 20130516 ChangeLog: update date in main changelog.
 20130517 README: update date for 1.1 release.
+20130518 man/fmfconv.1: update date for 1.1 release (Sergio).
