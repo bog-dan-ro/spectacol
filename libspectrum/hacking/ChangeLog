@@ -946,3 +946,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20130516 doc/libspectrum.3: update version number and date for 1.1 release.
 20130516 ChangeLog: update date in main changelog.
 20130517 README: update one more date for the 1.1 release.
+20130518 doc/libspectrum.txt: update version number for 1.1 release (Sergio).
