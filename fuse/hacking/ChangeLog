@@ -4492,3 +4492,4 @@
          gtkinternals.h,gtkjoystick.c,gtkui.c,options.pl,pokemem.c,rollback.c,
          roms.c,stock.c},ui/options.dat,ui/win32/options.pl: display
          confirmation dialogue for reset due to peripheral changes (Sergio).
+20130517 README: update date for 1.1 release.
