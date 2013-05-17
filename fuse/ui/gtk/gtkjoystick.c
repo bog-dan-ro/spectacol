@@ -231,7 +231,7 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
   g_object_unref( model );
 
   gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( joystick_done ),
-			     &info, NULL );
+                             &info, DEFAULT_DESTROY, DEFAULT_DESTROY );
 
   gtk_widget_show_all( dialog );
   gtk_main();

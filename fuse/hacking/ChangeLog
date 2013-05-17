@@ -4488,3 +4488,7 @@
          on widget UIs (Sergio).
 20130516 man/fuse.1: update date and version for 1.1 release.
 20130516 ChangeLog: update date in main changelog.
+20130517 periph.[c|h],perl/Fuse/Dialog.pm,ui/gtk/{binary.c,confirm.c,
+         gtkinternals.h,gtkjoystick.c,gtkui.c,options.pl,pokemem.c,rollback.c,
+         roms.c,stock.c},ui/options.dat,ui/win32/options.pl: display
+         confirmation dialogue for reset due to peripheral changes (Sergio).

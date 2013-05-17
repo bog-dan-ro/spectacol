@@ -49,12 +49,18 @@ sub read (;$) {
 	my( $name, $title, @widgets ) = split /\n/;
 
 	my @widget_data;
+	my $postcheck;
 	my $posthook;
 
 	foreach( @widgets ) {
 
 	    my( $widget_type, $text, $value, $key, $data1, $data2 ) =
 		split /\s*,\s*/;
+
+	    if( lc $widget_type eq 'postcheck' ) {
+		$postcheck = $text;
+		next;
+	    }
 
 	    if( lc $widget_type eq 'posthook' ) {
 		$posthook = $text;
@@ -72,6 +78,7 @@ sub read (;$) {
 
 	push @dialogs, { name => $name,
 			 title => $title,
+			 postcheck => $postcheck,
 			 posthook => $posthook,
 			 widgets => \@widget_data };
     }

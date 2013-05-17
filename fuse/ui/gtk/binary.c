@@ -146,7 +146,7 @@ create_binary_dialog( struct binary_info *info, const char *title )
 
   /* Command buttons */
   gtkstock_create_ok_cancel( info->dialog, NULL, info->activate_data, info,
-                             NULL );
+                             DEFAULT_DESTROY, DEFAULT_DESTROY );
 }
 
 void

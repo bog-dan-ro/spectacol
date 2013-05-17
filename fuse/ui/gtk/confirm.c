@@ -60,7 +60,7 @@ gtkui_confirm( const char *string )
   gtk_box_pack_start( GTK_BOX( content_area ), label, TRUE, TRUE, 5 );
 
   gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( set_confirmed ),
-			     &confirm, NULL );
+                             &confirm, DEFAULT_DESTROY, DEFAULT_DESTROY );
 
   gtk_widget_show_all( dialog );
   gtk_main();

@@ -108,7 +108,8 @@ GtkAccelGroup* gtkstock_create_ok_cancel( GtkWidget *widget,
 					  GtkAccelGroup *accel,
 	/* for OK button -> */	          GCallback action,
 				          gpointer actiondata,
-	/* for both buttons -> */         GCallback destroy );
+	/* for both buttons -> */         GCallback destroy_ok,
+	                                  GCallback destroy_cancel );
 GtkAccelGroup* gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
 				      GCallback destroy,
 				      gboolean esconly );

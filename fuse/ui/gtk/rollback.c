@@ -100,7 +100,7 @@ create_dialog( void )
   list = create_rollback_list();
 
   gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( select_row ), list,
-                             NULL );
+                             DEFAULT_DESTROY, DEFAULT_DESTROY );
 
   content_area = gtk_dialog_get_content_area( GTK_DIALOG( dialog ) );
   gtk_box_pack_start( GTK_BOX( content_area ), list, TRUE, TRUE, 0 );

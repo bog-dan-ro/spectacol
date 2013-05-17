@@ -199,6 +199,19 @@ menu_options_$_->{name}_done( HWND hwndDlg )
   buffer[0] = '\\0';          /* Shut gcc up */
 
 CODE
+
+    if( $_->{postcheck} ) {
+
+      print << "CODE";
+  /* Get a copy of current settings */
+  settings_info original_settings;
+  memset( &original_settings, 0, sizeof( settings_info ) );
+  settings_copy( &original_settings, &settings_current );
+
+CODE
+
+    }
+
     foreach my $widget ( @{ $_->{widgets} } ) {
 	my $type = $widget->{type};
 
@@ -231,6 +244,30 @@ CODE
         } else {
           die "Unknown type `$widget->{type}'";
         }
+    }
+
+    if( $_->{postcheck} ) {
+
+      print << "CODE";
+  int needs_hard_reset = $_->{postcheck}();
+
+  /* Confirm reset */
+  if( needs_hard_reset ) {
+    ShowWindow( hwndDlg, SW_HIDE );
+
+    if( !win32ui_confirm("Some options need to reset the machine. Reset?" ) ) {
+      /* Cancel new settings */
+      settings_copy( &settings_current, &original_settings );
+      settings_free( &original_settings );
+
+      ShowWindow( hwndDlg, SW_SHOW );
+      return;
+    }
+  }
+
+  settings_free( &original_settings );
+
+CODE
     }
 
     print "  $_->{posthook}();\n\n" if $_->{posthook};

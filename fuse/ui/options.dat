@@ -46,6 +46,7 @@ Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
 Checkbox, Spectra(n)et, spectranet, INPUT_KEY_n
 Checkbox, Spe(c)tranet disable, spectranet_disable, INPUT_KEY_c
 #endif
+Postcheck, periph_postcheck
 Posthook, periph_posthook
 
 peripherals_disk
@@ -63,6 +64,7 @@ Checkbox, DISCi(P)LE interf(a)ce, disciple, INPUT_KEY_p
 Checkbox, (B)eta 128 interface, beta128, INPUT_KEY_b
 Checkbox, Beta 128 (a)uto-boot in 48K machines, beta128_48boot, INPUT_KEY_a
 Checkbox, (O)pus Discovery interface, opus, INPUT_KEY_o
+Postcheck, periph_postcheck
 Posthook, periph_posthook
 
 rzx

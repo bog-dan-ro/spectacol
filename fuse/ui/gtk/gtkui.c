@@ -456,8 +456,9 @@ menu_get_scaler( scaler_available_fn selector )
 
   /* Create and add the actions buttons to the dialog box */
   gtkstock_create_ok_cancel( dialog.dialog, NULL,
-			     G_CALLBACK( menu_options_filter_done ),
-			     (gpointer) &dialog, NULL );
+                             G_CALLBACK( menu_options_filter_done ),
+                             (gpointer) &dialog, DEFAULT_DESTROY,
+                             DEFAULT_DESTROY );
 
   gtk_widget_show_all( dialog.dialog );
 
@@ -589,8 +590,9 @@ menu_machine_select( GtkAction *gtk_action GCC_UNUSED,
 
   /* Create and add the actions buttons to the dialog box */
   gtkstock_create_ok_cancel( dialog.dialog, NULL,
-			     G_CALLBACK( menu_machine_select_done ),
-			     (gpointer) &dialog, NULL );
+                             G_CALLBACK( menu_machine_select_done ),
+                             (gpointer) &dialog, DEFAULT_DESTROY,
+                             DEFAULT_DESTROY );
 
   gtk_widget_show_all( dialog.dialog );
 
@@ -749,8 +751,9 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
 
   /* Create and add the actions buttons to the dialog box */
   gtkstock_create_ok_cancel( dialog.dialog, NULL,
-			     G_CALLBACK( confirm_joystick_done ),
-			     (gpointer) &dialog, NULL );
+                             G_CALLBACK( confirm_joystick_done ),
+                             (gpointer) &dialog, DEFAULT_DESTROY,
+                             DEFAULT_DESTROY );
 
   gtk_widget_show_all( dialog.dialog );
 

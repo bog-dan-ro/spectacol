@@ -147,14 +147,15 @@ gtkstock_create_buttons( GtkWidget *widget, GtkAccelGroup *accel,
 
 GtkAccelGroup*
 gtkstock_create_ok_cancel( GtkWidget *widget, GtkAccelGroup *accel,
-			   GCallback action, gpointer actiondata,
-			   GCallback destroy )
+                           GCallback action, gpointer actiondata,
+                           GCallback destroy_ok, GCallback destroy_cancel )
 {
   gtkstock_button btn[] = {
     { GTK_STOCK_CANCEL, NULL, NULL, NULL, 0, 0, 0, 0 },
     { GTK_STOCK_OK, NULL, NULL, NULL, 0, 0, 0, 0 },
   };
-  btn[1].destroy = btn[0].destroy = destroy ? destroy : DEFAULT_DESTROY;
+  btn[0].destroy = destroy_cancel ? destroy_cancel : NULL;
+  btn[1].destroy = destroy_ok ? destroy_ok : NULL;
   btn[1].action = action;
   btn[1].actiondata = actiondata;
 

@@ -182,6 +182,7 @@ create_dialog( void )
   gtkstock_create_ok_cancel( dialog, accel_group,
                              G_CALLBACK( pokemem_update_list ),
                              (gpointer) &dialog,
+                             G_CALLBACK( pokemem_close ),
                              G_CALLBACK( pokemem_close ) );
   gtk_accel_group_disconnect_key( accel_group, GDK_KEY_Return, 0 );
 

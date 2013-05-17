@@ -169,6 +169,28 @@ set_activity( gpointer key, gpointer value, gpointer user_data )
     *needs_hard_reset;
 }
 
+/* Work out whether a peripheral needs a hard reset without (de)activate */
+static void
+get_hard_reset( gpointer key, gpointer value, gpointer user_data )
+{
+  periph_private_t *private = value;
+  int active = 0;
+  int *machine_hard_reset = (int *)user_data;
+  int periph_hard_reset = 0;
+
+  switch ( private->present ) {
+  case PERIPH_PRESENT_NEVER: active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    active = private->periph->option ? *(private->periph->option) : 0; break;
+  case PERIPH_PRESENT_ALWAYS: active = 1; break;
+  }
+
+  periph_hard_reset = ( private && ( private->active != active ) &&
+                        private->periph->hard_reset );
+
+  *machine_hard_reset = ( periph_hard_reset || *machine_hard_reset );
+}
+
 /* Free the memory used by a peripheral-port response pair */
 static void
 free_peripheral( gpointer data, gpointer user_data GCC_UNUSED )
@@ -424,6 +446,17 @@ periph_posthook( void )
   if( periph_update() ) {
     machine_reset( 1 );
   }
+}
+
+int
+periph_postcheck( void )
+{
+  int needs_hard_reset = 0;
+
+  /* Detect if a hard reset is needed without (de)activating peripherals */
+  g_hash_table_foreach( peripherals, get_hard_reset, &needs_hard_reset );
+
+  return needs_hard_reset;
 }
 
 /* Register debugger page/unpage events for a peripheral */

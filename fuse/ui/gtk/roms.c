@@ -75,7 +75,7 @@ menu_select_roms_with_title( const char *title, size_t start, size_t n )
 
   /* Create the OK and Cancel buttons */
   gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( roms_done ), &info,
-			     NULL );
+                             DEFAULT_DESTROY, DEFAULT_DESTROY );
 
   /* And the current values of each of the ROMs */
   vbox = GTK_BOX( gtk_dialog_get_content_area( GTK_DIALOG( dialog ) ) );
