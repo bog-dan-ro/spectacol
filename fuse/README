@@ -25,7 +25,7 @@ What Fuse does have:
 * Support for the RZX input recording file format, including
   rollback and 'competition mode'.
 * Emulation of the DivIDE, Interface 1, Kempston mouse, Spectrum +3e,
-  ZXATASP, ZXCF, Beta 128, Opus Discovery and +D interfaces.
+  ZXATASP, ZXCF, Beta 128, Opus Discovery, +D and DISCiPLE interfaces.
 
 Help! <xyz> doesn't work
 ------------------------

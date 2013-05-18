@@ -4493,3 +4493,5 @@
          roms.c,stock.c},ui/options.dat,ui/win32/options.pl: display
          confirmation dialogue for reset due to peripheral changes (Sergio).
 20130517 README: update date for 1.1 release.
+20130518 ui/widget/options.pl: display confirmation dialogue for reset due to
+         peripheral changes (Stuart).

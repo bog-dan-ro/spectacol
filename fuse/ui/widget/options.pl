@@ -363,11 +363,29 @@ widget_options_print_combo( int left_edge, int width, int number, const char *pr
 int
 widget_options_finish( widget_finish_state finished )
 {
+  int error;
+
   /* If we exited normally, actually set the options */
   if( finished == WIDGET_FINISHED_OK ) {
+    /* Get a copy of current settings */
+    settings_info original_settings;
+    memset( &original_settings, 0, sizeof( settings_info ) );
+    settings_copy( &original_settings, &settings_current );
+
     settings_copy( &settings_current, &widget_options_settings );
     /* Bring the peripherals list into sync with the new options */
-    periph_posthook();
+
+    int needs_hard_reset = periph_postcheck();
+
+    if( needs_hard_reset ) {
+      widget_query.confirm = 0;
+      error = widget_do( WIDGET_TYPE_QUERY,
+                         "Some options need to reset the machine. Reset?" );
+      if( !error && !widget_query.confirm )
+        settings_copy( &settings_current, &original_settings );
+      else
+        periph_posthook();
+    }
     /* make the needed UI changes */
     uidisplay_hotswap_gfx_mode();
   }
