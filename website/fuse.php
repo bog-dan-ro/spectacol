@@ -55,6 +55,7 @@ fuse_section ("Features", "What features does it have?", <<<END_SECTION
    <li>Emulation of the various printers you could attach to the Spectrum.</li>
    <li>Support for the RZX input recording file format, including 'competition mode'.</li>
    <li>Emulation of the DivIDE, Interface I, +D, Beta 128, Opus Discovery, Kempston mouse, Fuller audio box, Spectrum +3e, ZXATASP and ZXCF interfaces.</li>
+   <li>Emulation of the Spectranet interface.</li>
   </ul>
 
 END_SECTION
@@ -80,7 +81,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Unix</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
-   <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.0.0 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available. As of February 2011, these are only in the unstable distribution, but should move into the testing distribution soon and from there into the next stable distribution. The packages should also work on <a href="http://www.ubuntu.com/">Ubuntu</a>.</li>
+   <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.0.0 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available. The packages should also work on <a href="http://www.ubuntu.com/">Ubuntu</a>.</li>
    <li><a href="http://fedoraproject.org/index.html">Fedora</a> has <a href="https://admin.fedoraproject.org/pkgdb/acls/name/fuse-emulator">packages</a> of 1.0.0 available.</li>
    <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.0.0.1 available as <a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/fuse/">emulators/fuse</a>.</li>
    <li>Nokia's <a href="http://maemo.org/">Maemo</a> platform has a port of <a href="http://maemo.org/downloads/product/OS2008/fuse-emulator/">1.0.0</a> available by Alberto Garcia.</li>
@@ -140,12 +141,14 @@ fuse_section ("Source", "Source", <<<END_SECTION
   <ul>
    <li>First, check the requirements below and ensure all the libraries you want/need are installed.</li>
    <li>Secondly, install <a href="libspectrum.php">libspectrum</a>.</li>
-   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0.1a/fuse-1.0.0.1a.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0.1a/fuse-1.0.0.1a.tar.gz.sig/download">PGP signature</a>).</li>
-   <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.0.0/fuse-utils-1.0.0.tar.gz/download">own package</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.0.0/fuse-utils-1.0.0.tar.gz.sig/download">PGP signature</a>). Note that
+   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.1.0/fuse-1.1.0.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.1.0/fuse-1.1.0.tar.gz.sig/download">PGP signature</a>).</li>
+   <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.1.0/fuse-utils-1.1.0.tar.gz/download">own package</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.1.0/fuse-utils-1.1.0.tar.gz.sig/download">PGP signature</a>). Note that
 you'll still need <a href="libspectrum.php">libspectrum</a> installed to run these.</li>
+   <!--
    <li>The above are also mirrored at <a href="http://www.worldofspectrum.org/">World of Spectrum</a>: <a
-href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.1a.tar.gz">Fuse source</a> (<a
-href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.0.0.1a.tar.gz.sig">signature</a>), <a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.0.0.tar.gz">utils source</a> (<a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.0.0.tar.gz.sig">signature</a>).</li>
+href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.1.0.tar.gz">Fuse source</a> (<a
+href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.1.0.tar.gz.sig">signature</a>), <a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.1.0.tar.gz">utils source</a> (<a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-utils-1.1.0.tar.gz.sig">signature</a>).</li>
+   -->
    <li>The source code releases above are signed with the <a href="http://wwwkeys.pgp.net:11371/pks/lookup?op=get&amp;search=0xD0767AB9">Fuse Release Key, ID <tt>D0767AB9</tt></a>, which has fingerprint <tt>064E 0BA9 688F 2699 3267 B1E5 1043 EEEB D076 7AB9</tt>. This is different from the key used to sign the 0.6.0(.1) releases as I forgot the passphrase for that key <tt>:-(</tt>.</li>
   </ul>
 
@@ -179,21 +182,12 @@ END_SECTION
 #<!-- ======================================================= -->
 
 fuse_section (NULL, "What's new?", <<<END_SECTION
-  <h3>1.0.0.1</h3>
+  <h3>1.1.0</h3>
   <ul>
-    <li>Fix temporary breakpoints when using replacement Glib routines</li>
-    <li>Ensure Amiga port can load files</li>
-    <li>Fix SVGAlib compilation</li>
-  </ul>
-
-  <h3>1.0.0</h3>
-  <ul>
-    <li>Opus Discovery interface support</li>
-    <li>Wii support</li>
-    <li>Many improvements to Win32 UI</li>
-    <li>NTSC Spectrum support</li>
-    <li>Improved sound output, including when not running at 100% speed</li>
-    <li>Fuller Audio Box support</li>
+    <li>Emulation of the Spectranet, SpeccyBoot, SpecDrum and DISCiPLE interfaces</li>
+    <li>Support for reading PZX and POK files</li>
+    <li>Support for recording FMF movies</li>
+    <li>GTK+ 3 compatability</li>
   </ul>
 
 END_SECTION
