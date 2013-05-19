@@ -4497,3 +4497,5 @@
          peripheral changes (Stuart).
 20130518 ui/widget/options.pl: update peripherals list when a machine reset is
          not needed (Sergio).
+20130519 query.c,widget.c,widget_internals.h: display confirmation messages
+         (Stuart).

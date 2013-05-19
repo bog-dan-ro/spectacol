@@ -259,6 +259,7 @@ int widget_query_draw( void *data );
 void widget_query_keyhandler( input_key key );
 int widget_query_save_draw( void *data );
 void widget_query_save_keyhandler( input_key key );
+int widget_query_finish( widget_finish_state finished );
 
 /* The widgets actually available */
 

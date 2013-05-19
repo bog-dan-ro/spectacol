@@ -692,8 +692,8 @@ widget_t widget_data[] = {
   { widget_roms_draw,     widget_roms_finish,	 widget_roms_keyhandler     },
   { widget_peripherals_general_draw, widget_options_finish, widget_peripherals_general_keyhandler },
   { widget_peripherals_disk_draw, widget_options_finish, widget_peripherals_disk_keyhandler },
-  { widget_query_draw,    NULL,			 widget_query_keyhandler    },
-  { widget_query_save_draw,NULL,		 widget_query_save_keyhandler },
+  { widget_query_draw,    widget_query_finish,	 widget_query_keyhandler    },
+  { widget_query_save_draw,widget_query_finish,	 widget_query_save_keyhandler },
   { widget_diskoptions_draw, widget_options_finish, widget_diskoptions_keyhandler  },
 };
 

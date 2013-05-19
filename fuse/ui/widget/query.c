@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "fuse.h"
+#include "utils.h"
 #include "widget_internals.h"
 
 widget_query_t widget_query;
@@ -104,12 +105,15 @@ widget_no_click( void )
 
 static size_t highlight_line = 0;
 
+static char **message_lines;
+static size_t num_message_lines;
+
 static void
 widget_query_line_draw( int left_edge, int width, struct widget_query_entry *menu,
                         const char *label )
 {
   int colour = WIDGET_COLOUR_BACKGROUND;
-  int y = menu->index * 8 + 24;
+  int y = (menu->index + num_message_lines) * 8 + 24;
 
   if( menu->index == highlight_line ) colour = WIDGET_COLOUR_HIGHLIGHT;
   widget_rectangle( left_edge*8+1, y, width*8-2, 1*8, colour );
@@ -121,10 +125,12 @@ widget_query_line_draw( int left_edge, int width, struct widget_query_entry *men
 const int query_vert_external_margin = 8;
 
 static int
-widget_calculate_query_width( const char *title, widget_query_entry *menu )
+widget_calculate_query_width( const char *title, widget_query_entry *menu,
+			      char **lines, int num_lines )
 {
   widget_query_entry *ptr;
   int max_width=0;
+  int i;
 
   if (!menu) {
     return 64;
@@ -139,16 +145,33 @@ widget_calculate_query_width( const char *title, widget_query_entry *menu )
       max_width = total_width;
   }
 
+  for( i=0; i<num_lines; i++) {
+    int total_width = widget_stringwidth( lines[i] )+2*8;
+
+    if( total_width > max_width )
+      max_width = total_width;
+  }
+
   return ( max_width + query_vert_external_margin * 2 ) / 8;
 }
 
 static int
-internal_query_draw( widget_query_entry *query, int save, const char *data )
+internal_query_draw( widget_query_entry *query, int save, const char *message )
 {
   widget_query_entry *ptr;
   size_t height = 0;
-  int menu_width = widget_calculate_query_width( title, query );
+  int menu_width;
   int menu_left_edge_x;
+  int i;
+
+  if( split_message( message, &message_lines, &num_message_lines, 28 ) ) {
+    return 1;
+  }
+
+  menu_width = widget_calculate_query_width( title, query, message_lines,
+					     num_message_lines );
+
+  height = num_message_lines;
 
   /* How many options do we have? */
   for( ptr = query; ptr->text; ptr++ )
@@ -160,6 +183,11 @@ internal_query_draw( widget_query_entry *query, int save, const char *data )
   widget_dialog_with_border( menu_left_edge_x, 2, menu_width, 2 + height );
 
   widget_printstring( menu_left_edge_x*8+2, 16, WIDGET_COLOUR_TITLE, title );
+
+  for( i=0; i<num_message_lines; i++ ) {
+    widget_printstring( menu_left_edge_x*8+8, i*8+24,
+                        WIDGET_COLOUR_FOREGROUND, message_lines[i] );
+  }
 
   for( ptr = query; ptr->text; ptr++ ) {
     widget_query_line_draw( menu_left_edge_x, menu_width, ptr, ptr->text );
@@ -191,7 +219,8 @@ widget_query_generic_keyhandler( widget_query_entry *query, int num_entries,
   int new_highlight_line = 0;
   int cursor_pressed = 0;
   widget_query_entry *ptr;
-  int menu_width = widget_calculate_query_width( title, query );
+  int menu_width = widget_calculate_query_width( title, query, message_lines,
+						 num_message_lines );
   int menu_left_edge_x = DISPLAY_WIDTH_COLS/2-menu_width/2;
 
   switch( key ) {
@@ -281,4 +310,16 @@ widget_query_save_keyhandler( input_key key )
   widget_query_generic_keyhandler( query_save,
                                    sizeof(query_save)/sizeof(widget_query_entry),
                                    key );
+}
+
+int
+widget_query_finish( widget_finish_state finished )
+{
+  int i;
+  for( i=0; i<num_message_lines; i++ ) {
+    free( message_lines[i] );
+  }
+  free( message_lines );
+
+  return 0;
 }
