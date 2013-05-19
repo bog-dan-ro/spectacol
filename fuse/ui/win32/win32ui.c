@@ -564,8 +564,12 @@ void
 menu_machine_reset( int action )
 {
   int hard_reset = action;
+  const char *message = "Reset?";
+
+  if( hard_reset )
+    message = "Hard reset?";
   
-  if( win32ui_confirm( "Reset?" ) && machine_reset( hard_reset ) ) {
+  if( win32ui_confirm( message ) && machine_reset( hard_reset ) ) {
     ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
 
     /* FIXME: abort() seems a bit extreme here, but it'll do for now */

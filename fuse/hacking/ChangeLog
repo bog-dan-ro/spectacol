@@ -4502,3 +4502,5 @@
 20130519 ui/widget/{options.pl,query.c}: choose no/cancel upon pressing escape
          for all all confirmation dialogues, and remove workaround for this
          from peripheral reset confirmation dialogue (Stuart).
+20130519 ui/{gtk/gtkui.c,widget/menu.c,win32/win32ui.c}: use different
+         confirmation messages for hard and soft resets (Stuart).

@@ -584,12 +584,18 @@ menu_select_roms_with_title( const char *title, size_t start, size_t count )
 void
 menu_machine_reset( int action )
 {
-  if( widget_do( WIDGET_TYPE_QUERY, "Reset machine?" ) ||
+  int hard_reset = action;
+  const char *message = "Reset?";
+
+  if( hard_reset )
+    message = "Hard reset?";
+
+  if( widget_do( WIDGET_TYPE_QUERY, message ) ||
       !widget_query.confirm )
     return;
 
   widget_end_all( WIDGET_FINISHED_OK );
-  machine_reset( action );
+  machine_reset( hard_reset );
 }
 
 void

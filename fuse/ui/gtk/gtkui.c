@@ -536,8 +536,12 @@ void
 menu_machine_reset( GtkAction *gtk_action GCC_UNUSED, guint action )
 {
   int hard_reset = action;
+  const char *message = "Reset?";
 
-  if( gtkui_confirm( "Reset?" ) && machine_reset( hard_reset ) ) {
+  if( hard_reset )
+    message = "Hard reset?";
+
+  if( gtkui_confirm( message ) && machine_reset( hard_reset ) ) {
     ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
 
     /* FIXME: abort() seems a bit extreme here, but it'll do for now */
