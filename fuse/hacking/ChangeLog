@@ -4506,3 +4506,6 @@
          confirmation messages for hard and soft resets (Stuart).
 20130519 AUTHOR,man/fuse.1: Add Sergio Baldoví (Stuart).
 20130519 lib/Makefile.am: distribute tests/success.{mgt.bz2,opd} (Stuart).
+20130519 Makefile.am,hacking/Makefile.am,sound/Makefile.am,ui/wii/Makefile.am:
+         distribute PORTING,hacking/valgrind.supp,sound/wiisound.c,
+         ui/wii/wiimouse.h (Stuart).

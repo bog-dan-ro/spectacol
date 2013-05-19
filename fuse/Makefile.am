@@ -203,6 +203,7 @@ noinst_HEADERS = bitmap.h \
 
 EXTRA_DIST = AUTHORS \
 	     INSTALL \
+	     PORTING \
 	     README \
 	     THANKS \
 	     keysyms.dat \

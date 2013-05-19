@@ -41,6 +41,7 @@ EXTRA_libsound_a_SOURCES = dxsound.c \
 		     	   sdlsound.c \
 		     	   sfifo.c \
 		     	   sunsound.c \
+		     	   wiisound.c \
 		     	   win32sound.c
 
 libsound_a_LIBADD = $(SOUND_LIBADD)

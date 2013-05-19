@@ -43,6 +43,7 @@ keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 
 noinst_HEADERS = wiidisplay.h \
 	         wiikeyboard.h \
-	         wiikeysyms.h
+	         wiikeysyms.h \
+	         wiimouse.h
 
 CLEANFILES = keysyms.c

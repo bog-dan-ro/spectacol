@@ -33,4 +33,5 @@ EXTRA_DIST = \
 	spectranet.txt \
 	tc2048_tech_notes.txt \
 	timer.txt \
-	ui.txt
+	ui.txt \
+	valgrind.supp
