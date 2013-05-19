@@ -4505,3 +4505,4 @@
 20130519 ui/{gtk/gtkui.c,widget/menu.c,win32/win32ui.c}: use different
          confirmation messages for hard and soft resets (Stuart).
 20130519 AUTHOR,man/fuse.1: Add Sergio Baldoví (Stuart).
+20130519 lib/Makefile.am: distribute tests/success.{mgt.bz2,opd} (Stuart).
