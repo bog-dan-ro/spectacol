@@ -202,6 +202,7 @@ int
 widget_query_draw( void *data )
 {
   highlight_line = 0;
+  widget_query.confirm = 0;
   return internal_query_draw( query_confirm, 0, (const char *) data );
 }
 
@@ -209,6 +210,7 @@ int
 widget_query_save_draw( void *data )
 {
   highlight_line = 0;
+  widget_query.save = UI_CONFIRM_SAVE_CANCEL;
   return internal_query_draw( query_save, 1, (const char *) data );
 }
 

@@ -378,7 +378,6 @@ widget_options_finish( widget_finish_state finished )
     int needs_hard_reset = periph_postcheck();
 
     if( needs_hard_reset ) {
-      widget_query.confirm = 0;
       error = widget_do( WIDGET_TYPE_QUERY,
                          "Some options need to reset the machine. Reset?" );
       if( !error && !widget_query.confirm )
