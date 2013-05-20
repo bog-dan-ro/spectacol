@@ -70,7 +70,7 @@ CPPFLAGS="$CPPFLAGS -I$withval/include";
 CXXFLAGS="$CXXFLAGS -I$withval/include";
 LDFLAGS="$LDFLAGS -L$withval/lib",
 if test "$prefix" != "NONE"; then
-  CPPFLAGS="$CPPLAGS -I$prefix/include";
+  CPPFLAGS="$CPPFLAGS -I$prefix/include";
   CXXFLAGS="$CXXFLAGS -I$prefix/include";
   LDFLAGS="$LDFLAGS -L$prefix/lib"
 fi)

@@ -416,3 +416,5 @@
 20130516 ChangeLog: update date in main changelog.
 20130517 README: update date for 1.1 release.
 20130518 man/fmfconv.1: update date for 1.1 release (Sergio).
+20130520 configure.ac: fix typo in the CPPFLAGS variable name (patch #310)
+         (Alberto).
