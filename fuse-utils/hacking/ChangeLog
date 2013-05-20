@@ -418,3 +418,4 @@
 20130518 man/fmfconv.1: update date for 1.1 release (Sergio).
 20130520 configure.ac: fix typo in the CPPFLAGS variable name (patch #310)
          (Alberto).
+20130520 man/fmfconv.1: fix syntax error (patch #311) (Alberto).
