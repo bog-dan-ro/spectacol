@@ -3401,6 +3401,7 @@
          everything else (fixes bug #3084862) (thanks, Phil) (Fred).
 20110104 nic: add .deps and Makefile to the ignore property (Fred).
 20110109 ui/widget/filesel.c: make Amiga work again (Chris Young).
+20110112 ChangeLog,README,configure.in,man/fuse.1: updates for 1.0.0.1 release.
 20110113 ui/win32/installer/fuse.nsi: windows installer improvements; optionally
          delete configuration file (fuse.cfg) on uninstall, silently uninstall
          previous version if reinstalling to the same folder, include AUTHORS
@@ -3552,8 +3553,11 @@
          Makefile.am}: remove ROMs that there is no formal permission to
          distribute.
 20110327 roms/Makefile.am: distribute README.copyright.
+20110327 ChangeLog,README,configure.in,fuse.c,man/fuse.1: updates for 1.0.0.1a
+         release.
 20110328 configure.in: allow the user to say they do not want to use windres
          (works around bug #3248008; thanks, Cygnus).
+20110401 ChangeLog,man/fuse.1: didn't manage to release this earlier.
 20110401 peripherals/disk/{opus,plusd}.c: remove incorrect use of GCC_UNUSED
          (Stuart).
 20110401 fuse.c,ui/{gtk/gtkui.c,widget/menu.c},windres.rc: update copyright
