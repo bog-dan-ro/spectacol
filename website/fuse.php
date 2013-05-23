@@ -118,7 +118,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <p>A port of 0.9.0 to the Gizmondo tablet is available. The source is available via <a href="http://opensvn.csie.org/GizPorts/trunk/sdlport/fuzegiz/">csie.org</a>.</p>
 
   <h3>GP2X</h3>
-  <p>Ben O'Steen has made a GP2X port, based on Fuse 0.6. Binaries and source are available from <a href="http://www.zen71790.zen.co.uk/#fuse">his homepage</a>.</p>
+  <p>Ben O'Steen has made a GP2X port, based on Fuse 0.6. Binaries and source are available from <a href="http://web.archive.org/web/20090905033548/http://www.zen71790.zen.co.uk/#fuse">his homepage</a>.</p>
 
   <h3>XBox</h3>
   <p>Crabfists's has made an Xbox port, based on Fuse 0.6. Binaries and source are available from the <a href="http://sourceforge.net/projects/fusex/">FuseX project</a> at SourceForge.</p>
@@ -127,7 +127,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <p>Anders Holmberg's ported Fuse 0.4 to the PocketPC as <a href="http://pocketclive.emuunlim.com/">PocketClive</a>.</p>
 
   <h3>Smartphone</h3>
-  <p>Keith Orbell's then ported PocketClive to the Smartphone as <a href="http://www.aooa27.dsl.pipex.com/FuseSP.htm">FuseSP</a>.</p>
+  <p>Keith Orbell's then ported PocketClive to the Smartphone as <a href="http://web.archive.org/web/20090418170517/http://www.aooa27.dsl.pipex.com/FuseSP.htm">FuseSP</a>.</p>
 
 END_SECTION
 );
@@ -164,11 +164,11 @@ href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.1.0.tar.g
    <dt>Optional:</dt>
    <dd>
     <ul>
-     <li><a href="http://www.gnu.org/directory/security/libgcrypt.html">libgcrypt</a>: the ability to digitally sign RZX files (note that Fuse requires version 1.1.42 or later).</li>
+     <li><a href="http://www.gnu.org/software/libgcrypt/">libgcrypt</a>: the ability to digitally sign RZX files (note that Fuse requires version 1.1.42 or later).</li>
      <li><a href="http://www.libpng.org/pub/png/libpng.html">libpng</a>: the ability to save screenshots.</li>
      <li><a href="http://xmlsoft.org/">libxml2</a>: the ability to load and save Fuse's current configuration.</li>
-     <li><a href="http://www.battlefieldlinux.com/wolfpack/libjsw/">libjsw</a>: allow joystick input to be used (not required for joystick emulation).</li>
-     <li><a href="http://www.gzip.org/zlib/">zlib</a>: support for compressed RZX files.</li>
+     <li><a href="http://freecode.com/projects/libjsw">libjsw</a>: allow joystick input to be used (not required for joystick emulation).</li>
+     <li><a href="http://www.zlib.net/">zlib</a>: support for compressed RZX files.</li>
      <li><a href="http://www.bzip.org/">libbzip2</a>: support for certain compressed files.</li>
      <li><a href="http://www.68k.org/~michael/audiofile/">libaudiofile</a>: support for loading from .wav files.</li>
      <li>Versions previous to 0.10.0 used John Elliott's <a href="http://www.seasip.demon.co.uk/Unix/LibDsk/">lib765 and libdsk</a> for the +3 support. 0.10.0 and newer include this support natively, so these libraries are no longer necessary (or used).</li>
@@ -187,7 +187,7 @@ fuse_section (NULL, "What's new?", <<<END_SECTION
     <li>Emulation of the Spectranet, SpeccyBoot, SpecDrum and DISCiPLE interfaces</li>
     <li>Support for reading PZX and POK files</li>
     <li>Support for recording FMF movies</li>
-    <li>GTK+ 3 compatability</li>
+    <li>GTK+ 3 compatibility</li>
   </ul>
 
 END_SECTION
@@ -198,7 +198,7 @@ END_SECTION
 fuse_section (NULL, "Development", <<<END_SECTION
   <p>If you're just want news of new versions and the like, the (low volume) <a href="http://lists.sourceforge.net/lists/listinfo/fuse-emulator-announce">fuse-emulator-announce</a> list is available. If you're interested in the development of Fuse, this is coordinated via the <a href="http://lists.sourceforge.net/lists/listinfo/fuse-emulator-devel">fuse-emulator-devel</a> list and the <a href="http://sourceforge.net/projects/fuse-emulator/">project page</a> on SourceForge.</p>
 
-  <p>The latest version of Fuse is always available by checking out the 'trunk/fuse' directory from the <a href="http://sourceforge.net/svn/?group_id=91293">Subversion repository</a> on SourceForge. Note that this isn't guaranteed to compile, let alone work properly. Also, don't expect any support for this version! (You'll also need libspectrum from Subversion; this is in the 'trunk/libspectrum' directory). Similarly, the utilities are available in the 'trunk/fuse-utils' directory.</p>
+  <p>The latest version of Fuse is always available by checking out the 'trunk/fuse' directory from the <a href="http://sourceforge.net/p/fuse-emulator/code/">Subversion repository</a> on SourceForge. Note that this isn't guaranteed to compile, let alone work properly. Also, don't expect any support for this version! (You'll also need libspectrum from Subversion; this is in the 'trunk/libspectrum' directory). Similarly, the utilities are available in the 'trunk/fuse-utils' directory.</p>
 
   <p>One thing which isn't in the SourceForge tracking system (and is now very outdated):</p>
 
@@ -216,7 +216,7 @@ fuse_section ("Related projects", "Are there any related projects?", <<<END_SECT
    <li><a href="libspectrum.php">libspectrum</a> is the library used by Fuse to handle various file formats.</li>
    <li>Mike Wynne's ZX81 emulator, <a href="http://www.chuntey.com/eightyone/">EightyOne</a> is also using Fuse's Z80 core.</li>
    <li>Matthew Westcott's <a href="http://matt.west.co.tt/spectrum/jsspeccy/">JSSpeccy</a> uses a Z80 core based on translating Fuse's core to Javascript.</li>
-   <li>Alexander Shabarshin's <a href="http://robots.ural.net/nedopc/sprinter/">SPRINT</a>, an emulator of the <a href="http://www.interface1.net/zx/clones/peters.html">Peters Plus</a> super-Speccy, the <a href="http://www.petersplus.com/sprinter/">Sprinter</a>. SPRINT is using Fuse's Z80 core for its CPU emulation.</li>
+   <li>Alexander Shabarshin's <a href="http://web.archive.org/web/20030316123953/http://robots.ural.net/nedopc/sprinter/">SPRINT</a>, an emulator of the <a href="http://www.interface1.net/zx/clones/peters.html">Peters Plus</a> super-Speccy, the <a href="http://web.archive.org/web/20040402004216/http://www.petersplus.com/sprinter/">Sprinter</a>. SPRINT is using Fuse's Z80 core for its CPU emulation.</li>
    <li><a href="http://sourceforge.net/projects/z80ex/">z80ex</a>, a Z80 emulation library based on Fuse's Z80 core, used by zemu and <a href="http://pocketspeccy.narod.ru/">PocketSpeccy</a>.</li>
   </ul>
 
