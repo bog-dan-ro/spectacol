@@ -246,10 +246,12 @@ section "!Fuse Core Files (required)" SecCore
 
     ; Installation files
     File "AUTHORS.txt"
+    File "ChangeLog.txt"
     File "COPYING.txt"
     File "fuse.exe"
     File "fuse.html"
     File "README.txt"
+    File /nonfatal "README-win32.txt"
     File "*.dll"
     SetOutPath $INSTDIR\lib
     File "lib\*"
@@ -362,10 +364,12 @@ section "uninstall"
     Delete "$INSTDIR\roms\*"
     RMDir  "$INSTDIR\roms"
     Delete "$INSTDIR\AUTHORS.txt"
+    Delete "$INSTDIR\ChangeLog.txt"
     Delete "$INSTDIR\COPYING.txt"
     Delete "$INSTDIR\fuse.exe"
     Delete "$INSTDIR\fuse.html"
     Delete "$INSTDIR\README.txt"
+    Delete "$INSTDIR\README-win32.txt"
     Delete "$INSTDIR\*.dll"
     RMDir "$INSTDIR"
 

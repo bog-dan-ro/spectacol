@@ -244,7 +244,7 @@ install-win32: all
 	cp $(top_builddir)/.libs/fuse$(EXEEXT) $(DESTDIR) || \
 	cp $(top_builddir)/fuse$(EXEEXT) $(DESTDIR)
 #	Get text files
-	for file in AUTHORS COPYING README; \
+	for file in AUTHORS ChangeLog COPYING README; \
 	  do cp "$(top_srcdir)/$$file" "$(DESTDIR)/$$file.txt"; \
 	done
 #	Get manuals
