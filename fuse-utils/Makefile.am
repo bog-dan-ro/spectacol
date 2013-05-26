@@ -150,7 +150,7 @@ install-win32: all
 	  fi; \
 	done
 #	Get text files
-	for file in AUTHORS COPYING README; \
+	for file in AUTHORS ChangeLog COPYING README; \
 	  do cp "$(top_srcdir)/$$file" "$(DESTDIR)/$$file.txt"; \
 	done
 #	Get manuals
