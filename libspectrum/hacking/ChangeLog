@@ -949,3 +949,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20130518 doc/libspectrum.txt: update version number for 1.1 release (Sergio).
 20130524 Makefile.am: update libtool age to support binaries built against
          libspectrum 1.0.0 (Stuart).
+20130526 Makefile.am: add dll.c into the dist tarball (Sergio).
