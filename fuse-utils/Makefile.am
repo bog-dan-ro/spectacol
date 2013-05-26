@@ -126,7 +126,7 @@ noinst_HEADERS = compat.h ide.h utils.h audio2tape.h importer/interpolator.h \
                  converter/findsync1.h converter/getpulse1.h \
                  converter/getpulse2.h converter/getsync2.h \
                  converter/romloader.h converter/romloaderstate.h \
-                 fmfconv.h movie_tables.h
+                 compat/getopt.h fmfconv.h movie_tables.h
 
 EXTRA_DIST = m4/audiofile.m4 \
              m4/glib-1.0.m4 \
