@@ -54,8 +54,8 @@ fuse_section ("Features", "What features does it have?", <<<END_SECTION
    <li>Kempston joystick emulation.</li>
    <li>Emulation of the various printers you could attach to the Spectrum.</li>
    <li>Support for the RZX input recording file format, including 'competition mode'.</li>
-   <li>Emulation of the DivIDE, Interface I, +D, Beta 128, Opus Discovery, Kempston mouse, Fuller audio box, Spectrum +3e, ZXATASP and ZXCF interfaces.</li>
-   <li>Emulation of the Spectranet interface.</li>
+   <li>Emulation of the DivIDE, Interface 1, +D, DISCiPLE, Beta 128, Opus Discovery, Kempston mouse, Fuller audio box, SpecDrum, Spectrum +3e, ZXATASP and ZXCF interfaces.</li>
+   <li>Emulation of the Spectranet and SpeccyBoot interfaces.</li>
   </ul>
 
 END_SECTION

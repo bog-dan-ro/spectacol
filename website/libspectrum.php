@@ -51,7 +51,7 @@ fuse_section ("Supported formats", "Which formats does it support?", <<<END_SECT
    <li>Tape images:
     <ul>
      <li>read/write: .tzx, .tap, .spc, .sta, .ltp</li>
-     <li>read only: Warajevo .tap, Z80Em, CSW version 1, .wav</li>
+     <li>read only: .pzx, Warajevo .tap, Z80Em, CSW version 1, .wav</li>
     </ul>
    </li>
    <li>Input recordings:
