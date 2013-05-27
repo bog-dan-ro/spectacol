@@ -487,8 +487,8 @@ pokemem_set_pokfile( const char *filename )
 int
 pokemem_find_pokfile( const char *path )
 {
-  int n, has_extension;
-  size_t length, filename_size, last_dot, last_slash;
+  int n, has_extension, last_dot, last_slash;
+  size_t length, filename_size;
   char *test_file, *c;
 
   if( pokfile ) return 1; /* Previous .pok file already found */
@@ -507,7 +507,7 @@ pokemem_find_pokfile( const char *path )
   c = strrchr( test_file, '.' );
   last_dot = ( c )? c - test_file : -1;
 
-  has_extension = ( last_dot > last_slash );
+  has_extension = ( last_dot > last_slash + 1 );
 
   /* Try .pok extension */
   if( has_extension ) {
@@ -532,15 +532,16 @@ pokemem_find_pokfile( const char *path )
   }
 
   /* Browse POKES/ directory */
-  if( last_slash ) {
+  if( last_slash >= 0 ) {
     n = last_slash + 1; /* insert directory */
-    filename_size = ( has_extension )?  last_dot - last_slash - 1 :
-                                        strlen( &path[n] );
+    filename_size =
+      ( has_extension )? (unsigned int) ( last_dot - last_slash - 1 ) :
+                         strlen( &path[n] );
     test_file[ n ] = '\0';
     strncat( test_file, "POKES", 5 );
   } else {
     n = 0; /* prepend directory */
-    filename_size = ( has_extension )?  last_dot : length;
+    filename_size = ( has_extension )? (unsigned int) last_dot : length;
     strncpy( test_file, "POKES", 5 );
     test_file[ 5 ] = '\0';
   }

@@ -4515,3 +4515,5 @@
          ui/wii/wiimouse.h (Stuart).
 20130526 Makefile.am,ui/win32/installer/fuse.nsi.in: distribute ChangeLog and
          build notes in Windows packages (Sergio).
+20130527 pokefinder/pokemem.c: fix crash when opening a file without extension
+         (patch #312) (UB880D and Sergio).
