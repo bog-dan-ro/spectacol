@@ -116,10 +116,6 @@ SetCompressor lzma
   ${CallArtificialFunction} UnRegisterExtension_
 !macroend
 
-!macro AddOpenWithListCall _EXTENSION
-  WriteRegStr HKLM "Software\Classes\${_EXTENSION}\OpenWithProgids" "${PROG_ID}" ""
-!macroend
-
 !macro SelectUnregisteredExt_
   Exch $R1 ;section
   Exch
@@ -145,6 +141,9 @@ NoSelect:
 !macro RegisterExtension_
   Exch $R0 ;extension
   Push $0
+
+  ; Recommend Fuse in the Open With list
+  WriteRegStr HKLM "Software\Classes\$R0\OpenWithProgids" "${PROG_ID}" ""
 
   ; Read global file association
   ReadRegStr $0 HKLM "Software\Classes\$R0" ""
@@ -211,7 +210,6 @@ NoLocalRestore:
 !define SelectUnregisteredExt `!insertmacro SelectUnregisteredExtCall`
 !define RegisterExtension `!insertmacro RegisterExtensionCall`
 !define UnRegisterExtension `!insertmacro UnRegisterExtensionCall`
-!define AddOpenWithList `!insertmacro AddOpenWithListCall`
 
 ;--------------------------------
 ; Uninstall previous version
@@ -305,14 +303,6 @@ Section "-Register Application"
   WriteRegStr HKLM "Software\Classes\${PROG_ID}\shell\open\command" "" '"$INSTDIR\fuse.exe" "%1"'
   WriteRegStr HKLM "Software\Classes\Applications\fuse.exe" "NoOpenWith" ""
 
-  ; Recommend Fuse for known extensions
-  ${AddOpenWithList} ".pzx"
-  ${AddOpenWithList} ".rzx"
-  ${AddOpenWithList} ".sna"
-  ${AddOpenWithList} ".szx"
-  ${AddOpenWithList} ".tap"
-  ${AddOpenWithList} ".tzx"
-  ${AddOpenWithList} ".z80"
   System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v (0x08000000, 0, 0, 0)'
 SectionEnd
 

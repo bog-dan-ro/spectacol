@@ -4520,3 +4520,6 @@
 20130531 man/fuse.1: correct Spectranet initialisation script (thanks, Guesser)
          (Fred).
 20130531 man/fuse.1: add missing documentation (fixes bug #282) (Stuart).
+20130531 ui/win32/installer/fuse.nsi.in: adding Fuse to the OpenWith list for
+         file extensions could result in an true association under some
+         circumstances on Windows 7 (thanks, Alessandro Grussu) (Sergio).
