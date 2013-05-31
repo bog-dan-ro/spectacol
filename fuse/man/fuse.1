@@ -1988,6 +1988,13 @@ time it takes to load programs. You may wish to disable this option if
 you wish to stop the tape at a specific point.
 .RE
 .PP
+.I "Accelerate loaders"
+.RS
+If this option is enabled, then Fuse will attempt to accelerate tape
+loaders by \(lqshort circuiting\(rq the loading loop. This will in
+general speed up loading, but may cause some loaders to fail.
+.RE
+.PP
 .I "Detect loaders"
 .RS
 If this option is enabled, Fuse will attempt to detect when a loading
@@ -2044,6 +2051,14 @@ configuration file.
 .RS
 This option controls the number of blocks in a new Microdrive cartridge.
 If the value smaller than 4 or greater than 254 Fuse assumes 4 or 254.
+.RE
+.PP
+.I "Random length MDR cartridge"
+.RS
+If this option is enabled, Fuse will use a random Microdrive cartridge
+length instead of the length specified in the
+.I "MDR cartridge len"
+option.
 .RE
 .PP
 .I "RS-232 handshake"
@@ -2211,6 +2226,12 @@ Linux, with a 2.6-series kernel) any type of mouse can be used and any
 connected mouse may be used.
 .RE
 .PP
+.I "Swap mouse buttons"
+.RS
+If this option is enabled, the left and right mouse buttons will be swapped
+when emulating a Kempston mouse.
+.RE
+.PP
 .I "Fuller Box"
 .RS
 If this option is selected, Fuse will emulate a Fuller Box AY sound and
@@ -2365,14 +2386,6 @@ jumper. See the
 section for more details.
 .RE
 .PP
-.I "Opus Discovery interface"
-.RS
-If this option is selected, Fuse will emulate the Opus Discovery interface.
-See the
-.B "OPUS DISCOVERY EMULATION"
-section for more details.
-.RE
-.PP
 .I "+D interface"
 .RS
 If this option is selected, Fuse will emulate the +D interface.  See the
@@ -2394,6 +2407,20 @@ See the
 .B "BETA\ 128 EMULATION"
 section for more details. Beta\ 128 emulation is enabled for the
 Pentagon and Scorpion machines regardless of this option.
+.RE
+.PP
+.I "Beta\ 128 auto-boot in 48K\ machines"
+.RS
+If this option is selected, then when a Beta\ 128 interface is used in 48K
+or TC2048 emulation, the machine will boot directly into the TR-DOS system.
+.RE
+.PP
+.I "Opus Discovery interface"
+.RS
+If this option is selected, Fuse will emulate the Opus Discovery interface.
+See the
+.B "OPUS DISCOVERY EMULATION"
+section for more details.
 .RE
 .RE
 .PP

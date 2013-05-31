@@ -4519,3 +4519,4 @@
          (patch #312) (UB880D and Sergio).
 20130531 man/fuse.1: correct Spectranet initialisation script (thanks, Guesser)
          (Fred).
+20130531 man/fuse.1: add missing documentation (fixes bug #282) (Stuart).
