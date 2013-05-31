@@ -3740,11 +3740,7 @@ Spectranet information at the top \(em there should be four status lines,
 starting with \(lqAlioth Spectranet\(rq and ending with the Spectranet's IP
 address (which will be 255.255.255.255 at this stage).
 .PP
-If you see all that, type the following command:
-.PP
-%cfgnew
-.PP
-Which will show the standard 0 OK, 0:1 at the bottom of the screen. Now trigger an NMI (the Machine / NMI menu option)
+Now trigger an NMI (the Machine / NMI menu option)
 and you should get a white on blue Spectranet NMI menu with five
 options.
 .PP
@@ -3798,7 +3794,17 @@ l s.
 .PP
 If everything looks correct, select [I] Save changes and exit (you'll
 see a brief \(lqSaving configuration...\(rq message) followed by [E] Exit,
-at which point you'll be returned to BASIC. Reset the Spectrum again
+at which point you'll be returned to BASIC.
+.PP
+Now type the following commands:
+.PP
+%cfgnew
+.br
+%cfgcommit
+.PP
+Which will show the standard 0 OK, 0:1 at the bottom of the screen. 
+.PP
+Reset the Spectrum again
 and you'll see the same four line status display, but this time with
 your IP address on the last line.
 .PP

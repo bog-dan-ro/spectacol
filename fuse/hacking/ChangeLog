@@ -4517,3 +4517,5 @@
          build notes in Windows packages (Sergio).
 20130527 pokefinder/pokemem.c: fix crash when opening a file without extension
          (patch #312) (UB880D and Sergio).
+20130531 man/fuse.1: correct Spectranet initialisation script (thanks, Guesser)
+         (Fred).
