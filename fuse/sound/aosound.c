@@ -34,6 +34,7 @@
 #include "settings.h"
 #include "sound.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 static ao_device *dev_for_ao;
 static int sixteenbit = 1;
@@ -78,14 +79,14 @@ driver_error( void )
   }
 }
 
-static void
+static int
 parse_driver_options( const char *device, int *driver_id, ao_option **options )
 {
   char *mutable, *option, *key, *value;
 
   /* Get a copy of the device string we can modify */
   if( !device || *device == '\0' )
-    return;
+    return 1;
 
   mutable = utils_safe_strdup( device );
 
@@ -119,6 +120,7 @@ parse_driver_options( const char *device, int *driver_id, ao_option **options )
   }
 
   free( mutable );
+  return 0;
 }
 
 int

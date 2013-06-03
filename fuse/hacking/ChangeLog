@@ -4523,3 +4523,4 @@
 20130531 ui/win32/installer/fuse.nsi.in: adding Fuse to the OpenWith list for
          file extensions could result in an true association under some
          circumstances on Windows 7 (thanks, Alessandro Grussu) (Sergio).
+20130603 sound/aosound.c: remove warnings (mostly patch #313) (Rene Ladan).
