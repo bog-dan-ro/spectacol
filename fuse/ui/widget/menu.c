@@ -590,7 +590,7 @@ menu_machine_reset( int action )
   if( hard_reset )
     message = "Hard reset?";
 
-  if( widget_do( WIDGET_TYPE_QUERY, message ) ||
+  if( widget_do( WIDGET_TYPE_QUERY, (void*)message ) ||
       !widget_query.confirm )
     return;
 
