@@ -4525,3 +4525,4 @@
          circumstances on Windows 7 (thanks, Alessandro Grussu) (Sergio).
 20130603 sound/aosound.c: remove warnings (mostly patch #313) (Rene Ladan).
 20130603 ui/widget/menu.c: (bodge) fix warning.
+20130605 roms/se-1.rom: fix save tape traps with SE ROM (Andrew Owen and Fred).
