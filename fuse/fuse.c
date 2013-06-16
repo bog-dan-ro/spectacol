@@ -261,7 +261,10 @@ static int fuse_init(int argc, char **argv)
 
 #ifdef HAVE_GETEUID
   /* Drop root privs if we have them */
-  if( !geteuid() ) { setuid( getuid() ); }
+  if( !geteuid() ) {
+    error = setuid( getuid() );
+    if( error ) ui_error( UI_ERROR_WARNING, "Could not drop root privileges" );
+  }
 #endif				/* #ifdef HAVE_GETEUID */
 
   mempool_init();
