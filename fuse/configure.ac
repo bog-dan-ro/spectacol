@@ -848,7 +848,7 @@ if test "$desktopdir" = yes; then
 else
   DESKTOP_DATADIR="$datadir"
 fi
-AM_CONDITIONAL(DESKTOP_DATADIR, test "$desktopdir" == yes)
+AM_CONDITIONAL(DESKTOP_DATADIR, test "$desktopdir" = yes)
 AC_SUBST(DESKTOP_DATADIR)
 
 dnl Do we want the low memory compile?

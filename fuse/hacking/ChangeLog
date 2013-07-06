@@ -4527,3 +4527,5 @@
 20130603 ui/widget/menu.c: (bodge) fix warning.
 20130605 roms/se-1.rom: fix save tape traps with SE ROM (Andrew Owen and Fred).
 20130617 fuse.c: don't ignore the return code from setuid() (Sergio).
+20130706 configure.ac: fix condition used in --with-desktop-dir option
+         (thanks, wiz) (Sergio).
