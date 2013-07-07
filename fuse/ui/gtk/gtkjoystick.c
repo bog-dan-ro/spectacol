@@ -63,12 +63,14 @@ struct button_info {
   keyboard_key_name key;
 };
 
+#define NUM_JOY_BUTTONS 15
+
 struct joystick_info {
 
   int *type;
   GtkWidget *radio[ JOYSTICK_TYPE_COUNT ];
 
-  struct button_info button[15];
+  struct button_info button[NUM_JOY_BUTTONS];
 };
 
 typedef enum key_item_t {
@@ -214,7 +216,7 @@ menu_options_joysticks_select( GtkAction *gtk_action GCC_UNUSED,
 
   model = create_joystick_options_store();
 
-  for( i = 0; i < 15; i += 5 ) {
+  for( i = 0; i < NUM_JOY_BUTTONS; i += 5 ) {
     
     int j;
 
@@ -263,7 +265,7 @@ setup_info( struct joystick_info *info, int callback_action )
     info->button[12].setting = &( settings_current.joystick_1_fire_13 );
     info->button[13].setting = &( settings_current.joystick_1_fire_14 );
     info->button[14].setting = &( settings_current.joystick_1_fire_15 );
-    for( i = 0; i < 15; i++ )
+    for( i = 0; i < NUM_JOY_BUTTONS; i++ )
       snprintf( info->button[i].name, 80, "Button %lu", (unsigned long)i + 1 );
     break;
 
@@ -284,7 +286,7 @@ setup_info( struct joystick_info *info, int callback_action )
     info->button[12].setting = &( settings_current.joystick_2_fire_12 );
     info->button[13].setting = &( settings_current.joystick_2_fire_13 );
     info->button[14].setting = &( settings_current.joystick_2_fire_14 );
-    for( i = 0; i < 15; i++ )
+    for( i = 0; i < NUM_JOY_BUTTONS; i++ )
       snprintf( info->button[i].name, 80, "Button %lu", (unsigned long)i + 1 );
     break;
 
@@ -300,7 +302,7 @@ setup_info( struct joystick_info *info, int callback_action )
     snprintf( info->button[3].name, 80, "Button for RIGHT" );
     info->button[4].setting = &( settings_current.joystick_keyboard_fire  );
     snprintf( info->button[4].name, 80, "Button for FIRE" );
-    for( i = 5; i < 10; i++ ) info->button[i].setting = NULL;
+    for( i = 5; i < NUM_JOY_BUTTONS; i++ ) info->button[i].setting = NULL;
     break;
 
   }
@@ -450,7 +452,7 @@ joystick_done( GtkButton *button GCC_UNUSED, gpointer user_data )
   int i;
   GtkToggleButton *toggle;
 
-  for( i = 0; i < 15; i++ )
+  for( i = 0; i < NUM_JOY_BUTTONS; i++ )
     if( info->button[i].setting )
       *info->button[i].setting = info->button[i].key;
 

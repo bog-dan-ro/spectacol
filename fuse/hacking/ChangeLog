@@ -4529,3 +4529,5 @@
 20130617 fuse.c: don't ignore the return code from setuid() (Sergio).
 20130706 configure.ac: fix condition used in --with-desktop-dir option
          (thanks, wiz) (Sergio).
+20130707 ui/gtk/gtkjoystick.c: fix uninitialised keyboard button settings (fixes
+         bug #314) (UB880D).
