@@ -3987,7 +3987,7 @@ Available values are 10 (decimal) or 16 (hex).
 .RE
 .PP
 br{eakpoint}
-.RI [ address "] [" condition ]
+.RI [ address "] [if " condition ]
 .RS
 Set a breakpoint to stop emulation and return to the debugger whenever
 an opcode is executed at
@@ -4000,7 +4000,7 @@ is omitted, it defaults to the current value of PC.
 .RE
 .PP
 br{eakpoint} p{ort} (r{ead}|w{rite})
-.IR "port " [ condition ]
+.IR port " [if " condition ]
 .RS
 Set a breakpoint to trigger whenever IO port
 .I port
@@ -4010,7 +4010,7 @@ evaluates true.
 .RE
 .PP
 br{eakpoint} (r{ead}|w{rite})
-.RI [ address "] [" condition ]
+.RI [ address "] [if " condition ]
 .RS
 Set a breakpoint to trigger whenever memory location
 .I address
@@ -4022,7 +4022,7 @@ again defaults to the current value of PC if omitted.
 .RE
 .PP
 br{eakpoint} ti{me}
-.IR "time " [ condition ]
+.IR time " [if " condition ]
 .RS
 Set a breakpoint to occur
 .I time
@@ -4032,7 +4032,7 @@ evaluates true (if one is given).
 .RE
 .PP
 br{eakpoint} ev{ent}
-.IR area : detail " [" condition ]
+.IR area : detail " [if " condition ]
 .RS
 Set a breakpoint to occur when the event specified by
 .IR area : detail

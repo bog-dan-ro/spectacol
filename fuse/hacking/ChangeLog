@@ -4531,3 +4531,5 @@
          (thanks, wiz) (Sergio).
 20130707 ui/gtk/gtkjoystick.c: fix uninitialised keyboard button settings (fixes
          bug #314) (UB880D).
+20130715 man/fuse.1: document IF token for conditional expressions in debugger
+         section (thanks, TK90XFan) (Sergio).
