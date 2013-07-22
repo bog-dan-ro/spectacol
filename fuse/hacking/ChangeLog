@@ -4533,3 +4533,5 @@
          bug #314) (UB880D).
 20130715 man/fuse.1: document IF token for conditional expressions in debugger
          section (thanks, TK90XFan) (Sergio).
+20130722 ui/win32/win32ui.c: fix pause when minimising Fuse on Windows (fixes
+         bug #298) (Sergio).

@@ -1020,6 +1020,9 @@ win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
     if( !size_paused ) {
       size_paused = 1;
       fuse_emulation_pause();
+
+      /* Process UI events until the window is restored */
+      win32ui_process_messages( 0 );
     }
   } else {
     win32display_drawing_area_resize( LOWORD( lParam ), HIWORD( lParam ), 1 );
@@ -1029,6 +1032,9 @@ win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
     win32statusbar_resize( hWnd, wParam, lParam );
 
     if( size_paused ) {
+      timer_estimate_reset();
+      PostMessage( fuse_hWnd, WM_USER_EXIT_PROCESS_MESSAGES, 0, 0 );
+
       size_paused = 0;
       fuse_emulation_unpause();
     }
