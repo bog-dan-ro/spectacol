@@ -2054,7 +2054,7 @@ disk_open( disk_t *d, const char *filename, int preindex, int merge_disks )
 static int
 write_udi( FILE *file, disk_t *d )
 {
-  int i, j;
+  int i, j, error;
   size_t len;
   libspectrum_dword crc;
 
@@ -2118,6 +2118,13 @@ write_udi( FILE *file, disk_t *d )
   head[3] = ( crc >> 24 ) & 0xff;
   if( fwrite( head, 4, 1, file ) != 1 )		/* CRC */
     fclose( file );
+
+#ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+  /* Keep tracks uncompressed in memory */
+  error = udi_uncompress_tracks( d );
+  if( error ) return error;
+#endif			/* #ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION */
+
   udi_unpack_tracks( d );
   return d->status = DISK_OK;
 }

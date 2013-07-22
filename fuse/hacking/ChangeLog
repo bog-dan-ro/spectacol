@@ -4535,3 +4535,5 @@
          section (thanks, TK90XFan) (Sergio).
 20130722 ui/win32/win32ui.c: fix pause when minimising Fuse on Windows (fixes
          bug #298) (Sergio).
+20130722 peripherals/disk/disk.c: fix disk image corruption after saving UDI
+         files (fixes bug #299) (Sergio).
