@@ -937,8 +937,8 @@ upd_fdc_read_data( upd_fdc *f )
 	f->data_offset++;
       }
     }
-    if( ( f->cmd->id == UPD_CMD_READ_DIAG && f->data_offset == f->rlen ) ||
-	( f->cmd->id == UPD_CMD_READ_DATA && f->data_offset == f->sector_length ) ) {	/* read the CRC */
+    if( ( f->cmd->id == UPD_CMD_READ_DIAG || f->cmd->id == UPD_CMD_READ_DATA )
+        && f->data_offset == f->sector_length ) {       /* read the CRC */
       fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
       fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
       if( f->crc != 0x000 ) {
