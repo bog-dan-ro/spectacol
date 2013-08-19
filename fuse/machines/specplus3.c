@@ -254,6 +254,9 @@ void
 specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
 			     libspectrum_byte b )
 {
+  /* Do nothing else if we've locked the RAM configuration */
+  if( machine_current->ram.locked ) return;
+
   /* Let the parallel printer code know about the strobe bit */
   printer_parallel_strobe_write( b & 0x10 );
 
@@ -269,9 +272,6 @@ specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
 			 b & 0x08 ? UI_STATUSBAR_STATE_ACTIVE :
 			            UI_STATUSBAR_STATE_INACTIVE );
   }
-
-  /* Do nothing else if we've locked the RAM configuration */
-  if( machine_current->ram.locked ) return;
 
   /* Store the last byte written in case we need it */
   machine_current->ram.last_byte2 = b;
