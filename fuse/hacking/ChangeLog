@@ -4539,3 +4539,5 @@
          files (fixes bug #299) (Sergio).
 20130819 peripherals/disk/fdd.c: check ready status after loading a disk into
          floppy disk drive (fixes bug #223) (thanks, John Elliott) (Sergio).
+20130820 peripherals/disk/upd_fdc.[c|h]: fix overlapped SEEK commands (fixes bug
+         #236) (thanks, Fred) (Sergio).

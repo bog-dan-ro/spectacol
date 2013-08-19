@@ -1,5 +1,5 @@
 /* upd_fdc.c: NEC floppy disk controller emulation
-   Copyright (c) 2007-2010 Gergely Szasz
+   Copyright (c) 2007-2013 Gergely Szasz
 
    $Id$
 
@@ -136,7 +136,7 @@ upd_fdc_master_reset( upd_fdc *f )
 
   f->main_status = UPD_FDC_MAIN_DATAREQ;
   for( i = 0; i < 4; i++ )
-    f->status_register[i] = f->pcn[i] = f->seek[i] = 0;
+    f->status_register[i] = f->pcn[i] = f->seek[i] = f->seek_age[i] = 0;
   f->stp_rate = 16;
   f->hut_time = 240;
   f->hld_time = 254;
@@ -418,50 +418,87 @@ cmd_result( upd_fdc *f )
 }
 
 static void
-seek_step( upd_fdc *f )
+seek_step( upd_fdc *f, int start )
 {
-  int i;
+  int i, j;
   upd_fdc_drive *d;
-  
-  for( i = 0; i < 4; i++ ) {			/* look after all disk... */
-    if( f->main_status & ( 1 << i ) ) {		/* this drive in seek state */
-      d = f->drive[i];
-      if( f->pcn[i] == f->ncn[i] &&
-          f->seek[i] == 2 && !d->fdd.tr00 ) {	/* recalibrate fail */
-        f->seek[i] = 5;				/* abnormal termination */
-	f->intrq = UPD_INTRQ_SEEK;
-	f->status_register[0] |= UPD_FDC_ST0_EQUIP_CHECK;
-	f->main_status &= ~( 1 << i );
-	continue;
-      }
-      if( f->pcn[i] == f->ncn[i] || 
-    	  ( f->seek[i] == 2 && d->fdd.tr00 ) ) {	/* end of seek */
-	if( f->seek[i] == 2 )			/* recalibrate */
-	  f->pcn[i] = 0; 
-        f->seek[i] = 4;				/* normal termination */
-	f->intrq = UPD_INTRQ_SEEK;
-	f->main_status &= ~( 1 << i );
-	continue;
-      }
 
-      if( !d->fdd.ready ) {
-	if( f->seek[i] == 2 )			/* recalibrate */
-	  f->pcn[i] = f->rec[i] - ( 77 - f->pcn[i] ); 	/* restore PCN */
-        f->seek[i] = 6;				/* drive not ready termination */
-	f->intrq = UPD_INTRQ_READY;		/* doesn't matter */
-	f->main_status &= ~( 1 << i );
-      } else if( f->pcn[i] != f->ncn[i] ) {	/**FIXME if d->tr00 == 1 ??? */
-        fdd_step( &d->fdd, f->pcn[i] > f->ncn[i] ? 
-			    FDD_STEP_OUT : FDD_STEP_IN );
-        f->pcn[i] += f->pcn[i] > f->ncn[i] ? -1 : 1;
-      }
+  if( start ) {
+    i = f->us;
+
+    /* Drive already in seek state? */
+    if( f->main_status & ( 1 << i ) ) return;   	
+
+    /* Mark seek mode for fdd. It will be cleared by Sense Interrupt command */
+    f->main_status |= 1 << i;
+  } else {
+
+    /* Get drive in seek state that has completed the positioning */
+    i=0;
+    for( j = 1; j < 4; j++) {
+      if( f->seek_age[j] > f->seek_age[i] )
+        i = j;
+    }
+
+    if( f->seek[i] == 0 || f->seek[i] >= 4 ) {
+      return;
     }
   }
-  if( f->main_status & 0x0f ) {		/* there is at least one active seek */
-    event_add_with_data( tstates + f->stp_rate * 
-			 machine_current->timings.processor_speed / 1000,
-			 fdc_event, f );
+
+  d = f->drive[i];
+
+  /* There is need to seek? */
+  if( f->pcn[i] == f->ncn[i] &&
+      f->seek[i] == 2 && !d->fdd.tr00 ) {	/* recalibrate fail */
+    f->seek[i] = 5;				/* abnormal termination */
+    f->seek_age[i] = 0;
+    f->intrq = UPD_INTRQ_SEEK;
+    f->status_register[0] |= UPD_FDC_ST0_EQUIP_CHECK;
+    f->main_status &= ~( 1 << i );
+    return;
   }
+
+  /* There is need to seek? */
+  if( f->pcn[i] == f->ncn[i] || 
+    ( f->seek[i] == 2 && d->fdd.tr00 ) ) {	/* correct position */
+    if( f->seek[i] == 2 )			/* recalibrate */
+      f->pcn[i] = 0; 
+    f->seek[i] = 4;				/* normal termination */
+    f->seek_age[i] = 0;
+    f->intrq = UPD_INTRQ_SEEK;
+    f->main_status &= ~( 1 << i );
+    return;
+  }
+
+  /* Drive not ready */
+  if( !d->fdd.ready ) {
+    if( f->seek[i] == 2 )			/* recalibrate */
+      f->pcn[i] = f->rec[i] - ( 77 - f->pcn[i] ); 	/* restore PCN */
+    f->seek[i] = 6;				/* drive not ready termination */
+    f->seek_age[i] = 0;
+    f->intrq = UPD_INTRQ_READY;		/* doesn't matter */
+    f->main_status &= ~( 1 << i );
+    return;
+  }
+
+  /* Send step */
+  if( f->pcn[i] != f->ncn[i] ) {	/**FIXME if d->tr00 == 1 ??? */
+    fdd_step( &d->fdd, f->pcn[i] > f->ncn[i] ? 
+                        FDD_STEP_OUT : FDD_STEP_IN );
+    f->pcn[i] += f->pcn[i] > f->ncn[i] ? -1 : 1;
+
+    /* Update age for active seek operations */
+    for( j = 0; j < 4; j++) {
+      if( f->seek_age[j] > 0 ) f->seek_age[j]++;
+    }
+    f->seek_age[i] = 1;
+
+    /* wait step completion */
+    event_add_with_data( tstates + f->stp_rate * 
+                         machine_current->timings.processor_speed / 1000,
+                         fdc_event, f );
+  }
+
   return;
 }
 
@@ -842,7 +879,7 @@ upd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
       start_write_data( f );
     }
   } else if( f->main_status & 0x03 ) {		/* seek/recalibrate active */
-    seek_step( f );
+    seek_step( f, 0 );
   } else if( f->cmd->id == UPD_CMD_READ_DATA || f->cmd->id == UPD_CMD_SCAN ) {
     start_read_data( f );
   } else if( f->cmd->id == UPD_CMD_READ_ID ) {
@@ -1240,7 +1277,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
             f->status_register[0] |= UPD_FDC_ST0_INT_ABNORM;
 	  else if( f->seek[i] == 6 )
             f->status_register[0] |= UPD_FDC_ST0_INT_READY | UPD_FDC_ST0_NOT_READY;
-	  f->seek[i] = 0;					/* end of seek */
+          f->seek[i] = f->seek_age[i] = 0;			/* end of seek */
     	  f->sense_int_res[0] = f->status_register[0] & 0xfb;	/* return head always 0 (11111011) */
           f->sense_int_res[1] = f->pcn[i];
 	  i = 4;						/* one interrupt o.k. */
@@ -1251,15 +1288,19 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
         f->intrq = UPD_INTRQ_NONE;				/* delete INTRQ state */
       break;
     case UPD_CMD_RECALIBRATE:
+      if( f->main_status & ( 1 << f->us ) ) break;   	/* previous seek in progress? */
       f->rec[f->us] = f->pcn[f->us];			/* save PCN */
       f->pcn[f->us] = 77;
       f->data_register[1] = 0x00;			/* to track0 */
-      f->seek[f->us] = 1;				/* recalibrate started */
-    case UPD_CMD_SEEK:
       f->ncn[f->us] = f->data_register[1];		/* save new cylinder number */
-      f->main_status |= 1 << f->us;			/* selected drive goes busy  */
-      f->seek[f->us]++;					/* = 2 seek started */
-      seek_step( f );
+      f->seek[f->us] = 2;				/* recalibrate started */
+      seek_step( f, 1 );
+      break;
+    case UPD_CMD_SEEK:
+      if( f->main_status & ( 1 << f->us ) ) break;   	/* previous seek in progress? */
+      f->ncn[f->us] = f->data_register[1];		/* save new cylinder number */
+      f->seek[f->us] = 1;				/* seek started */
+      seek_step( f, 1 );
       break;
     case UPD_CMD_READ_ID:
       head_load( f );

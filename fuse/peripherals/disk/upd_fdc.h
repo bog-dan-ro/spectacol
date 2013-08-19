@@ -1,5 +1,5 @@
 /* upd_fdc.h: NEC floppy disk controller emulation
-   Copyright (c) 2003-2010 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Copyright (c) 2003-2013 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Gergely Szasz
 
    $Id$
@@ -147,6 +147,7 @@ typedef struct upd_fdc {
   int ncn[4];			/* new cylinder numbers */
   int rec[4];			/* recalibrate store pcns */
   int seek[4];			/* seek status for 4 drive */
+  int seek_age[4];		/* order of overlapped seeks for 4 drive */
   int rlen;			/* expected record length */
   upd_scan_t scan;		/* SCAN type: eq/lo/hi */
   
