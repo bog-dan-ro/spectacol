@@ -1,5 +1,5 @@
 /* fdd.c: Routines for emulating floppy disk drives
-   Copyright (c) 2007-2010 Gergely Szasz
+   Copyright (c) 2007-2013 Gergely Szasz
 
    $Id$
 
@@ -134,6 +134,7 @@ fdd_init( fdd_t *d, fdd_type_t type, const fdd_params_t *dt, int reinit )
 
   d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = 0;
   d->upsidedown = d->unreadable = d->loaded = d->auto_geom = d->selected = 0;
+  d->ready = 0;
   d->do_read_weak = 0;
   if( type == FDD_TYPE_NONE )
     d->index = d->tr00 = d->wrprot = 0;
@@ -250,6 +251,8 @@ fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
 
   d->do_read_weak = disk->have_weak;
   fdd_set_data( d, FDD_LOAD_FACT );
+  d->ready = ( d->motoron && d->loaded );
+
   return d->status = FDD_OK;
 }
 

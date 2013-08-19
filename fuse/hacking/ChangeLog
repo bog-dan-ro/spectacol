@@ -4537,3 +4537,5 @@
          bug #298) (Sergio).
 20130722 peripherals/disk/disk.c: fix disk image corruption after saving UDI
          files (fixes bug #299) (Sergio).
+20130819 peripherals/disk/fdd.c: check ready status after loading a disk into
+         floppy disk drive (fixes bug #223) (thanks, John Elliott) (Sergio).
