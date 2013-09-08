@@ -4555,3 +4555,5 @@
          plusd.c}: remove unused macros on disk peripherals (Sergio).
 20130908 ui/gtk/binary.c: fix bad prototypes for activate signal on GTK UI
          (Sergio).
+20130908 man/fuse.1: fix documentation of address syntax used in debugger 
+         section (Sergio).

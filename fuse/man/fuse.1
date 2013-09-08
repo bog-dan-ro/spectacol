@@ -4259,23 +4259,37 @@ once only, and then be removed.
 Addresses can be specified in one of two forms: either an absolute
 addresses, specified by an integer in the range 0x0000 to 0xFFFF or as
 a
-.RI ` page : offset '
+.RI ` source : page : offset '
 combination, which refers to a location
 .I offset
 bytes into memory bank
 .IR page ,
 independent of where that bank is currently paged into memory. RAM
-pages are indicated simply by an integer, while ROMs are prefixed by
-.RI ` R '
-(e.g. offset 0x1234 in ROM 1 is specified as
-.RI ` R1:0x1234 "')."
-Pages selected via the /ROMCS line are prefixed with
-.RI ` C "',"
-while the Timex Dock and Exrom use prefixes
-.RI ` D '
+and ROM pages are indicated, respectively, by
+.RI ` RAM '
 and
-.RI ` X '
-respectively. The 48K machines are treated as having a permanent
+.RI ` ROM '
+sources (e.g. offset 0x1234 in ROM\ 1 is specified as
+.RI ` ROM:1:0x1234 "')."
+Another available sources are:
+.RI ` Betadisk "',"
+.RI ` "DISCiPLE RAM" "',"
+.RI ` "DISCiPLE ROM" "',"
+.RI ` "DivIDE EPROM" "',"
+.RI ` "DivIDE RAM" "',"
+.RI ` If1 "',"
+.RI ` If2 "',"
+.RI ` "Opus RAM" "',"
+.RI ` "Opus ROM" "',"
+.RI ` PlusD "',"
+.RI ` SpeccyBoot "',"
+.RI ` Spectranet "',"
+.RI ` "Timex Dock" "',"
+.RI ` "Timex EXROM" "',"
+.RI ` ZXATASP '
+and
+.RI ` ZXCF "'."
+The 48K machines are treated as having a permanent
 mapping of page\ 5 at 0x4000, page\ 2 at 0x8000 and page\ 0 at 0xC000;
 the 16K\ Spectrum is treated as having page\ 5 at 0x4000 and no page at
 0x8000 and 0xC000.
