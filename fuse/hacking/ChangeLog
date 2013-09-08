@@ -4553,3 +4553,5 @@
          cleanup (more from patch #315) (Alex Badea).
 20130908 machines/specplus3.c,peripherals/disk/{beta.c,disciple.c,opus.c,
          plusd.c}: remove unused macros on disk peripherals (Sergio).
+20130908 ui/gtk/binary.c: fix bad prototypes for activate signal on GTK UI
+         (Sergio).
