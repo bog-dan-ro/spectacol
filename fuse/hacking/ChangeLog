@@ -4551,3 +4551,5 @@
          (Alex Badea).
 20130908 uimedia.c,ui/uimedia.h: add missing files for generic FDD UI handling
          cleanup (more from patch #315) (Alex Badea).
+20130908 machines/specplus3.c,peripherals/disk/{beta.c,disciple.c,opus.c,
+         plusd.c}: remove unused macros on disk peripherals (Sergio).

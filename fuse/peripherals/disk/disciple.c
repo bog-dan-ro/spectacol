@@ -45,9 +45,6 @@
 #include "wd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 
-#define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
-				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
-
 /* Two 8 KiB memory chunks accessible by the Z80 when /ROMCS is low */
 /* One 8 KiB chunk of ROM, one 8 KiB chunk of RAM */
 /* TODO: add support for 16 KiB ROM images. */

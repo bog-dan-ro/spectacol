@@ -46,9 +46,6 @@
 #include "options.h"	/* needed for get combo options */
 #include "z80/z80.h"
 
-#define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
-				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
-
 /* FIXME: this is wrong. Opus has only 2 Kb of RAM, but we can't handle
    anything less than our page size */
 #define OPUS_RAM_SIZE 0x1000

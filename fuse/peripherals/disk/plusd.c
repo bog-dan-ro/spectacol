@@ -45,9 +45,6 @@
 #include "wd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 
-#define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
-				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
-
 /* Two 8KB memory chunks accessible by the Z80 when /ROMCS is low */
 static memory_page plusd_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page plusd_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];

@@ -55,9 +55,6 @@
 #include "utils.h"
 #include "options.h"	/* needed for get combo options */
 
-#define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
-				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
-
 static int normal_memory_map( int rom, int page );
 static void special_memory_map( int which );
 static void select_special_map( int page1, int page2, int page3, int page4 );
