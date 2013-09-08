@@ -4549,3 +4549,5 @@
          peripherals/disk/{beta.c,disciple.c,opus.c,plusd.c},ui.c,
          ui/Makefile.am,ui/ui.h: generic FDD UI handling cleanup (patch #315)
          (Alex Badea).
+20130908 uimedia.c,ui/uimedia.h: add missing files for generic FDD UI handling
+         cleanup (more from patch #315) (Alex Badea).
