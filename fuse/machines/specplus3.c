@@ -51,6 +51,7 @@
 #include "specplus3.h"
 #include "spectrum.h"
 #include "ui/ui.h"
+#include "ui/uimedia.h"
 #include "utils.h"
 #include "options.h"	/* needed for get combo options */
 
@@ -66,6 +67,40 @@ static int specplus3_reset( void );
 #define SPECPLUS3_NUM_DRIVES 2
 upd_fdc *specplus3_fdc;
 static upd_fdc_drive specplus3_drives[ SPECPLUS3_NUM_DRIVES ];
+
+static int ui_drive_is_available( void );
+static const fdd_params_t *ui_drive_get_params_a( void );
+static const fdd_params_t *ui_drive_get_params_b( void );
+static int ui_drive_inserted( const ui_media_drive_info_t *drive, int new );
+
+static ui_media_drive_info_t ui_drives[ SPECPLUS3_NUM_DRIVES ] = {
+  {
+    /* .name = */ "+3 Disk A:",
+    /* .controller_index = */ UI_MEDIA_CONTROLLER_PLUS3,
+    /* .drive_index = */ SPECPLUS3_DRIVE_A,
+    /* .menu_item_parent = */ UI_MENU_ITEM_MEDIA_DISK_PLUS3,
+    /* .menu_item_top = */ UI_MENU_ITEM_INVALID,
+    /* .menu_item_eject = */ UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT,
+    /* .menu_item_flip = */ UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_FLIP_SET,
+    /* .menu_item_wp = */ UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_WP_SET,
+    /* .is_available = */ &ui_drive_is_available,
+    /* .get_params = */ &ui_drive_get_params_a,
+    /* .insert_hook = */ &ui_drive_inserted,
+  },
+  {
+    /* .name = */ "+3 Disk B:",
+    /* .controller_index = */ UI_MEDIA_CONTROLLER_PLUS3,
+    /* .drive_index = */ SPECPLUS3_DRIVE_B,
+    /* .menu_item_parent = */ UI_MENU_ITEM_MEDIA_DISK_PLUS3,
+    /* .menu_item_top = */ UI_MENU_ITEM_MEDIA_DISK_PLUS3_B,
+    /* .menu_item_eject = */ UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT,
+    /* .menu_item_flip = */ UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_FLIP_SET,
+    /* .menu_item_wp = */ UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_WP_SET,
+    /* .is_available = */ &ui_drive_is_available,
+    /* .get_params = */ &ui_drive_get_params_b,
+    /* .insert_hook = */ &ui_drive_inserted,
+  },
+};
 
 int
 specplus3_port_from_ula( libspectrum_word port GCC_UNUSED )
@@ -132,6 +167,12 @@ specplus3_765_init( void )
   specplus3_fdc->reset_datarq = NULL;
 
   specplus3_765_update_fdd();
+
+  for( i = 0; i < SPECPLUS3_NUM_DRIVES; i++ ) {
+    ui_drives[ i ].fdd = &specplus3_drives[ i ].fdd;
+    ui_drives[ i ].disk = &specplus3_drives[ i ].disk;
+    ui_media_drive_register( &ui_drives[ i ] );
+  }
 }
 
 void
@@ -324,24 +365,10 @@ specplus3_memory_map( void )
 void
 specplus3_menu_items( void )
 {
-  const fdd_params_t *dt;
-
-  /* We can eject disks only if they are currently present */
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT,
-		    specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.loaded );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_FLIP_SET,
-		    !specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.upsidedown );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_WP_SET,
-		    !specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.wrprot );
-
-  dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3b_type() ];
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B, dt->enabled );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT,
-		    specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.loaded );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_FLIP_SET,
-		    !specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.upsidedown );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_WP_SET,
-		    !specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.wrprot );
+  ui_media_drive_update_menus( &ui_drives[ SPECPLUS3_DRIVE_A ],
+			       UI_MEDIA_DRIVE_UPDATE_ALL );
+  ui_media_drive_update_menus( &ui_drives[ SPECPLUS3_DRIVE_B ],
+			       UI_MEDIA_DRIVE_UPDATE_ALL );
 }
 
 libspectrum_byte
@@ -370,229 +397,47 @@ int
 specplus3_disk_insert( specplus3_drive_number which, const char *filename,
 		   int autoload )
 {
-  int error;
-  upd_fdc_drive *d;
-  const fdd_params_t *dt;
-
   if( which >= SPECPLUS3_NUM_DRIVES ) {
     ui_error( UI_ERROR_ERROR, "specplus3_disk_insert: unknown drive %d",
 	      which );
     fuse_abort();
   }
 
-  d = &specplus3_drives[ which ];
-
-  /* Eject any disk already in the drive */
-  if( d->fdd.loaded ) {
-    /* Abort the insert if we want to keep the current disk */
-    if( specplus3_disk_eject( which ) ) return 0;
-  }
-
-  if( filename ) {
-    error = disk_open( &d->disk, filename, 0, DISK_TRY_MERGE( d->fdd.fdd_heads ) );
-    if( error != DISK_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
-				disk_strerror( error ) );
-      return 1;
-    }
-  } else {
-    switch( which ) {
-    case 0:
-      dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3a_type() + 1 ];	/* +1 => there is no `Disabled' */
-      break;
-    case 1:
-    default:
-      dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3b_type() ];
-      break;
-    }
-    error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );
-    disk_preformat( &d->disk );			/* pre-format disk for +3 */
-    if( error != DISK_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",
-				disk_strerror( error ) );
-      return 1;
-    }
-  }
-
-  fdd_load( &d->fdd, &d->disk, 0 );
-
-  /* Set the 'eject' item active */
-  switch( which ) {
-  case SPECPLUS3_DRIVE_A:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT, 1 );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_FLIP_SET,
-		      !specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.upsidedown );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_WP_SET,
-		      !specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.wrprot );
-    break;
-  case SPECPLUS3_DRIVE_B:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT, 1 );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_FLIP_SET,
-		      !specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.upsidedown );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_WP_SET,
-		      !specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.wrprot );
-    break;
-  }
-
-  if( filename && autoload ) {
-    /* XXX */
-  }
-
-  return 0;
-}
-
-int
-specplus3_disk_eject( specplus3_drive_number which )
-{
-  upd_fdc_drive *d;
-
-  if( which >= SPECPLUS3_NUM_DRIVES )
-    return 1;
-
-  d = &specplus3_drives[ which ];
-
-  if( d->disk.type == DISK_TYPE_NONE )
-    return 0;
-
-  if( d->disk.dirty ) {
-
-    ui_confirm_save_t confirm = ui_confirm_save(
-      "Disk in drive %c has been modified.\n"
-      "Do you want to save it?",
-      which == SPECPLUS3_DRIVE_A ? 'A' : 'B'
-    );
-
-    switch( confirm ) {
-
-    case UI_CONFIRM_SAVE_SAVE:
-      if( specplus3_disk_save( which, 0 ) ) return 1;   /* first save it...*/
-      break;
-
-    case UI_CONFIRM_SAVE_DONTSAVE: break;
-    case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-    }
-  }
-
-  fdd_unload( &d->fdd );
-  disk_close( &d->disk );
-
-  /* Set the 'eject' item inactive */
-  switch( which ) {
-  case SPECPLUS3_DRIVE_A:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT, 0 );
-    break;
-  case SPECPLUS3_DRIVE_B:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT, 0 );
-    break;
-  }
-  return 0;
-}
-
-int
-specplus3_disk_save( specplus3_drive_number which, int saveas )
-{
-  upd_fdc_drive *d;
-
-  if( which >= SPECPLUS3_NUM_DRIVES )
-    return 1;
-
-  d = &specplus3_drives[ which ];
-
-  if( d->disk.type == DISK_TYPE_NONE )
-    return 0;
-
-  if( d->disk.filename == NULL ) saveas = 1;
-  if( ui_plus3_disk_write( which, saveas ) ) return 1;
-  d->disk.dirty = 0;
-  return 0;
-}
-
-int
-specplus3_disk_flip( specplus3_drive_number which, int flip )
-{
-  upd_fdc_drive *d;
-
-  if( which >= SPECPLUS3_NUM_DRIVES )
-    return 1;
-
-  d = &specplus3_drives[ which ];
-
-  if( !d->fdd.loaded )
-    return 1;
-
-  fdd_flip( &d->fdd, flip );
-
-  /* Update the 'flip' menu items */
-  switch( which ) {
-  case SPECPLUS3_DRIVE_A:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_FLIP_SET,
-		      !specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.upsidedown );
-    break;
-  case SPECPLUS3_DRIVE_B:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_FLIP_SET,
-		      !specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.upsidedown );
-    break;
-  }
-  return 0;
-}
-
-int
-specplus3_disk_writeprotect( specplus3_drive_number which, int wrprot )
-{
-  upd_fdc_drive *d;
-
-  if( which >= SPECPLUS3_NUM_DRIVES )
-    return 1;
-
-  d = &specplus3_drives[ which ];
-
-  if( !d->fdd.loaded )
-    return 1;
-
-  fdd_wrprot( &d->fdd, wrprot );
-
-  /* Update the 'write protect' menu item */
-  switch( which ) {
-  case SPECPLUS3_DRIVE_A:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_WP_SET,
-		      !specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.wrprot );
-    break;
-  case SPECPLUS3_DRIVE_B:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_WP_SET,
-		      !specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.wrprot );
-    break;
-  }
-  return 0;
-}
-
-int
-specplus3_disk_write( specplus3_drive_number which, const char *filename )
-{
-  upd_fdc_drive *d = &specplus3_drives[ which ];
-  int error;
-
-  d->disk.type = DISK_TYPE_NONE;
-  if( filename == NULL ) filename = d->disk.filename; /* write over original file */
-  error = disk_write( &d->disk, filename );
-
-  if( error != DISK_OK ) {
-    ui_error( UI_ERROR_ERROR, "couldn't write '%s' file: %s", filename,
-	      disk_strerror( error ) );
-    return 1;
-  }
-
-  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
-    free( d->disk.filename );
-    d->disk.filename = utils_safe_strdup( filename );
-  }
-  return 0;
+  return ui_media_drive_insert( &ui_drives[ which ], filename, autoload );
 }
 
 fdd_t *
 specplus3_get_fdd( specplus3_drive_number which )
 {
   return &( specplus3_drives[ which ].fdd );
+}
+
+static int
+ui_drive_is_available( void )
+{
+  return machine_current->capabilities &
+          LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK;
+}
+
+static const fdd_params_t *
+ui_drive_get_params_a( void )
+{
+  /* +1 => there is no `Disabled' */
+  return &fdd_params[ option_enumerate_diskoptions_drive_plus3a_type() + 1 ];
+}
+
+static const fdd_params_t *
+ui_drive_get_params_b( void )
+{
+  return &fdd_params[ option_enumerate_diskoptions_drive_plus3b_type() ];
+}
+
+static int
+ui_drive_inserted( const ui_media_drive_info_t *drive, int new )
+{
+  if( new )
+    disk_preformat( drive->disk );		/* pre-format disk for +3 */
+  return 0;
 }
 
 int

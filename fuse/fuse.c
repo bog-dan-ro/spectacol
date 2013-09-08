@@ -94,6 +94,7 @@
 #include "timer/timer.h"
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
+#include "ui/uimedia.h"
 #include "unittests/unittests.h"
 #include "utils.h"
 
@@ -861,6 +862,7 @@ static int fuse_end(void)
   fuse_keyboard_end();
   fuse_joystick_end();
   ui_end();
+  ui_media_drive_end();
   memory_end();
   mempool_end();
   module_end();

@@ -86,6 +86,7 @@ fuse_SOURCES = display.c \
 	tape.c \
 	ui.c \
 	uidisplay.c \
+	uimedia.c \
 	utils.c
 
 if COMPAT_DIRNAME

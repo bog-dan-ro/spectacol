@@ -39,7 +39,8 @@ DIST_SUBDIRS = fb \
 
 noinst_HEADERS = ui.h \
 		 uidisplay.h \
-		 uijoystick.h
+		 uijoystick.h \
+		 uimedia.h
 
 EXTRA_DIST = options.dat \
 	     uijoystick.c

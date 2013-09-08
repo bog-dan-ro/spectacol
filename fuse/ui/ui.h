@@ -130,6 +130,7 @@ int ui_get_rollback_point( GSList *points );
 
 typedef enum ui_menu_item {
 
+  UI_MENU_ITEM_INVALID = 0,
   UI_MENU_ITEM_FILE_MOVIE_RECORDING,
   UI_MENU_ITEM_FILE_MOVIE_PAUSE,
   UI_MENU_ITEM_MACHINE_PROFILER,

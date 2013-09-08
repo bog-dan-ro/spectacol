@@ -39,6 +39,7 @@
 #include "peripherals/printer.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "ui/uimedia.h"
 #include "unittests/unittests.h"
 #include "utils.h"
 #include "wd_fdc.h"
@@ -75,6 +76,7 @@ static int index_event;
 
 static wd_fdc *disciple_fdc;
 static wd_fdc_drive disciple_drives[ DISCIPLE_NUM_DRIVES ];
+static ui_media_drive_info_t disciple_ui_drives[ DISCIPLE_NUM_DRIVES ];
 
 static libspectrum_byte *disciple_ram;
 static int memory_allocated = 0;
@@ -209,6 +211,13 @@ disciple_init( void )
   }
 
   periph_register( PERIPH_TYPE_DISCIPLE, &disciple_periph );
+
+  for( i = 0; i < DISCIPLE_NUM_DRIVES; i++ ) {
+    d = &disciple_drives[ i ];
+    disciple_ui_drives[ i ].fdd = &d->fdd;
+    disciple_ui_drives[ i ].disk = &d->disk;
+    ui_media_drive_register( &disciple_ui_drives[ i ] );
+  }
 }
 
 static void
@@ -216,7 +225,6 @@ disciple_reset( int hard_reset )
 {
   int i;
   wd_fdc_drive *d;
-  const fdd_params_t *dt;
 
   disciple_active = 0;
   disciple_available = 0;
@@ -262,30 +270,10 @@ disciple_reset( int hard_reset )
 
     d->index_pulse = 0;
     d->index_interrupt = 0;
+
+    ui_media_drive_update_menus( &disciple_ui_drives[ i ],
+                                 UI_MEDIA_DRIVE_UPDATE_ALL );
   }
-
-  /* We can eject disks only if they are currently present */
-  dt = &fdd_params[ option_enumerate_diskoptions_drive_disciple1_type() + 1 ];
-  fdd_init( &disciple_drives[ DISCIPLE_DRIVE_1 ].fdd, FDD_SHUGART, dt, 1 );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1, dt->enabled );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_EJECT,
-		    disciple_drives[ DISCIPLE_DRIVE_1 ].fdd.loaded );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_FLIP_SET,
-		    !disciple_drives[ DISCIPLE_DRIVE_1 ].fdd.upsidedown );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_WP_SET,
-		    !disciple_drives[ DISCIPLE_DRIVE_1 ].fdd.wrprot );
-
-
-  dt = &fdd_params[ option_enumerate_diskoptions_drive_disciple2_type() ];
-  fdd_init( &disciple_drives[ DISCIPLE_DRIVE_2 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE, dt, 1 );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2, dt->enabled );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_EJECT,
-		    disciple_drives[ DISCIPLE_DRIVE_2 ].fdd.loaded );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_FLIP_SET,
-		    !disciple_drives[ DISCIPLE_DRIVE_2 ].fdd.upsidedown );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_WP_SET,
-		    !disciple_drives[ DISCIPLE_DRIVE_2 ].fdd.wrprot );
-
 
   disciple_fdc->current_drive = &disciple_drives[ 0 ];
   fdd_select( &disciple_drives[ 0 ].fdd, 1 );
@@ -456,223 +444,13 @@ int
 disciple_disk_insert( disciple_drive_number which, const char *filename,
 		      int autoload )
 {
-  int error;
-  wd_fdc_drive *d;
-  const fdd_params_t *dt;
-
   if( which >= DISCIPLE_NUM_DRIVES ) {
     ui_error( UI_ERROR_ERROR, "disciple_disk_insert: unknown drive %d",
 	      which );
     fuse_abort();
   }
 
-  d = &disciple_drives[ which ];
-
-  /* Eject any disk already in the drive */
-  if( d->fdd.loaded ) {
-    /* Abort the insert if we want to keep the current disk */
-    if( disciple_disk_eject( which ) ) return 0;
-  }
-
-  if( filename ) {
-    error = disk_open( &d->disk, filename, 0, DISK_TRY_MERGE( d->fdd.fdd_heads ) );
-    if( error != DISK_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
-				disk_strerror( error ) );
-      return 1;
-    }
-  } else {
-    switch( which ) {
-    case 0:
-      dt = &fdd_params[ option_enumerate_diskoptions_drive_disciple1_type() + 1 ];	/* +1 => there is no 'Disabled' */
-      break;
-    case 1:
-    default:
-      dt = &fdd_params[ option_enumerate_diskoptions_drive_disciple2_type() ];
-      break;
-    }
-    error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );
-    if( error != DISK_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",
-				disk_strerror( error ) );
-      return 1;
-    }
-  }
-
-  fdd_load( &d->fdd, &d->disk, 0 );
-
-  /* Set the 'eject' item active */
-  switch( which ) {
-  case DISCIPLE_DRIVE_1:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_EJECT, 1 );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_FLIP_SET,
-		      !disciple_drives[ DISCIPLE_DRIVE_1 ].fdd.upsidedown );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_WP_SET,
-		      !disciple_drives[ DISCIPLE_DRIVE_1 ].fdd.wrprot );
-    break;
-  case DISCIPLE_DRIVE_2:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_EJECT, 1 );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_FLIP_SET,
-		      !disciple_drives[ DISCIPLE_DRIVE_2 ].fdd.upsidedown );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_WP_SET,
-		      !disciple_drives[ DISCIPLE_DRIVE_2 ].fdd.wrprot );
-    break;
-  }
-
-  if( filename && autoload ) {
-    /* XXX */
-  }
-
-  return 0;
-}
-
-int
-disciple_disk_eject( disciple_drive_number which )
-{
-  wd_fdc_drive *d;
-
-  if( which >= DISCIPLE_NUM_DRIVES )
-    return 1;
-
-  d = &disciple_drives[ which ];
-
-  if( d->disk.type == DISK_TYPE_NONE )
-    return 0;
-
-  if( d->disk.dirty ) {
-
-    ui_confirm_save_t confirm = ui_confirm_save(
-      "Disk in DISCiPLE drive %c has been modified.\n"
-      "Do you want to save it?",
-      which == DISCIPLE_DRIVE_1 ? '1' : '2'
-    );
-
-    switch( confirm ) {
-
-    case UI_CONFIRM_SAVE_SAVE:
-      if( disciple_disk_save( which, 0 ) ) return 1;	/* first save */
-      break;
-
-    case UI_CONFIRM_SAVE_DONTSAVE: break;
-    case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-    }
-  }
-
-  fdd_unload( &d->fdd );
-  disk_close( &d->disk );
-
-  /* Set the 'eject' item inactive */
-  switch( which ) {
-  case DISCIPLE_DRIVE_1:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_EJECT, 0 );
-    break;
-  case DISCIPLE_DRIVE_2:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_EJECT, 0 );
-    break;
-  }
-  return 0;
-}
-
-int
-disciple_disk_save( disciple_drive_number which, int saveas )
-{
-  wd_fdc_drive *d;
-
-  if( which >= DISCIPLE_NUM_DRIVES )
-    return 1;
-
-  d = &disciple_drives[ which ];
-
-  if( d->disk.type == DISK_TYPE_NONE )
-    return 0;
-
-  if( d->disk.filename == NULL ) saveas = 1;
-  if( ui_disciple_disk_write( which, saveas ) ) return 1;
-  d->disk.dirty = 0;
-  return 0;
-}
-
-int
-disciple_disk_flip( disciple_drive_number which, int flip )
-{
-  wd_fdc_drive *d;
-
-  if( which >= DISCIPLE_NUM_DRIVES )
-    return 1;
-
-  d = &disciple_drives[ which ];
-
-  if( !d->fdd.loaded )
-    return 1;
-
-  fdd_flip( &d->fdd, flip );
-
-  /* Update the 'write flip' menu item */
-  switch( which ) {
-  case DISCIPLE_DRIVE_1:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_FLIP_SET,
-		      !disciple_drives[ DISCIPLE_DRIVE_1 ].fdd.upsidedown );
-    break;
-  case DISCIPLE_DRIVE_2:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_FLIP_SET,
-		      !disciple_drives[ DISCIPLE_DRIVE_2 ].fdd.upsidedown );
-    break;
-  }
-  return 0;
-}
-
-int
-disciple_disk_writeprotect( disciple_drive_number which, int wrprot )
-{
-  wd_fdc_drive *d;
-
-  if( which >= DISCIPLE_NUM_DRIVES )
-    return 1;
-
-  d = &disciple_drives[ which ];
-
-  if( !d->fdd.loaded )
-    return 1;
-
-  fdd_wrprot( &d->fdd, wrprot );
-
-  /* Update the 'write protect' menu item */
-  switch( which ) {
-  case DISCIPLE_DRIVE_1:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_WP_SET,
-		      !disciple_drives[ DISCIPLE_DRIVE_1 ].fdd.wrprot );
-    break;
-  case DISCIPLE_DRIVE_2:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_WP_SET,
-		      !disciple_drives[ DISCIPLE_DRIVE_2 ].fdd.wrprot );
-    break;
-  }
-  return 0;
-}
-
-/***TODO most part of the next routine could be move to a common place... */
-int
-disciple_disk_write( disciple_drive_number which, const char *filename )
-{
-  wd_fdc_drive *d = &disciple_drives[ which ];
-  int error;
-
-  d->disk.type = DISK_TYPE_NONE;
-  if( filename == NULL ) filename = d->disk.filename;	/* write over original file */
-  error = disk_write( &d->disk, filename );
-
-  if( error != DISK_OK ) {
-    ui_error( UI_ERROR_ERROR, "couldn't write '%s' file: %s", filename,
-	      disk_strerror( error ) );
-    return 1;
-  }
-  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
-    free( d->disk.filename );
-    d->disk.filename = utils_safe_strdup( filename );
-  }
-
-  return 0;
+  return ui_media_drive_insert( &disciple_ui_drives[ which ], filename, autoload );
 }
 
 fdd_t *
@@ -764,3 +542,49 @@ disciple_unittest( void )
 
   return r;
 }
+
+static int
+ui_drive_is_available( void )
+{
+  return disciple_available;
+}
+
+static const fdd_params_t *
+ui_drive_get_params_1( void )
+{
+  /* +1 => there is no `Disabled' */
+  return &fdd_params[ option_enumerate_diskoptions_drive_disciple1_type() + 1 ];
+}
+
+static const fdd_params_t *
+ui_drive_get_params_2( void )
+{
+  return &fdd_params[ option_enumerate_diskoptions_drive_disciple2_type() ];
+}
+
+static ui_media_drive_info_t disciple_ui_drives[ DISCIPLE_NUM_DRIVES ] = {
+  {
+    /* .name = */ "DISCiPLE Disk 1",
+    /* .controller_index = */ UI_MEDIA_CONTROLLER_DISCIPLE,
+    /* .drive_index = */ DISCIPLE_DRIVE_1,
+    /* .menu_item_parent = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE,
+    /* .menu_item_top = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1,
+    /* .menu_item_eject = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_EJECT,
+    /* .menu_item_flip = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_FLIP_SET,
+    /* .menu_item_wp = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_WP_SET,
+    /* .is_available = */ &ui_drive_is_available,
+    /* .get_params = */ &ui_drive_get_params_1,
+  },
+  {
+    /* .name = */ "DISCiPLE Disk 2",
+    /* .controller_index = */ UI_MEDIA_CONTROLLER_DISCIPLE,
+    /* .drive_index = */ DISCIPLE_DRIVE_2,
+    /* .menu_item_parent = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE,
+    /* .menu_item_top = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2,
+    /* .menu_item_eject = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_EJECT,
+    /* .menu_item_flip = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_FLIP_SET,
+    /* .menu_item_wp = */ UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_WP_SET,
+    /* .is_available = */ &ui_drive_is_available,
+    /* .get_params = */ &ui_drive_get_params_2,
+  },
+};

@@ -53,6 +53,7 @@
 #include "tape.h"
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
+#include "ui/uimedia.h"
 #include "utils.h"
 #include "z80/z80.h"
 
@@ -363,6 +364,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 )
 MENU_CALLBACK_WITH_ACTION( menu_media_insert_new )
 {
   int which, type;
+  ui_media_drive_info_t *drive;
   
   ui_widget_finish();
 
@@ -371,23 +373,14 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert_new )
   type = ( action & 0xf0 ) >> 4;
 
   switch( type ) {
-  case 0:
-    specplus3_disk_insert( which, NULL, 0 );
-    break;
-  case 1:
-    beta_disk_insert( which, NULL, 0 );
-    break;
-  case 2:
-    plusd_disk_insert( which, NULL, 0 );
-    break;
   case 3:
     if1_mdr_insert( which, NULL );
     break;
-  case 4:
-    opus_disk_insert( which, NULL, 0 );
-    break;
-  case 5:
-    disciple_disk_insert( which, NULL, 0 );
+  default:
+    drive = ui_media_drive_find( type, which );
+    if( !drive )
+      return;
+    ui_media_drive_insert( drive, NULL, 0 );
     break;
   }
 }
@@ -397,6 +390,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
   char *filename;
   char title[80];
   int which, type;
+  ui_media_drive_info_t *drive = NULL;
   
   action--;
   which = action & 0x0f;
@@ -405,48 +399,25 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
   fuse_emulation_pause();
 
   switch( type ) {
-  case 0:
-    snprintf( title, 80, "Fuse - Insert +3 Disk %c:", 'A' + which );
-    break;
-  case 1:
-    snprintf( title, 80, "Fuse - Insert Beta Disk %c:", 'A' + which );
-    break;
-  case 2:
-    snprintf( title, 80, "Fuse - Insert +D Disk %i", which + 1 );
-    break;
   case 3:
     snprintf( title, 80, "Fuse - Insert Microdrive Cartridge %i", which + 1 );
     break;
-  case 4:
-    snprintf( title, 80, "Fuse - Insert Opus Disk %i", which + 1 );
-    break;
-  case 5:
-    snprintf( title, 80, "Fuse - Insert DISCiPLE Disk %i", which + 1 );
-    break;
   default:
-    return;
+    drive = ui_media_drive_find( type, which );
+    if( !drive )
+      return;
+    snprintf( title, sizeof(title), "Fuse - Insert %s", drive->name );
+    break;
   }
   filename = ui_get_open_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   switch( type ) {
-  case 0:
-    specplus3_disk_insert( which, filename, 0 );
-    break;
-  case 1:
-    beta_disk_insert( which, filename, 0 );
-    break;
-  case 2:
-    plusd_disk_insert( which, filename, 0 );
-    break;
   case 3:
     if1_mdr_insert( which, filename );
     break;
-  case 4:
-    opus_disk_insert( which, filename, 0 );
-    break;
-  case 5:
-    disciple_disk_insert( which, filename, 0 );
+  default:
+    ui_media_drive_insert( drive, filename, 0 );
     break;
   }
 
@@ -466,23 +437,11 @@ MENU_CALLBACK_WITH_ACTION( menu_media_eject )
   type = ( action & 0x0f0 ) >> 4;
 
   switch( type ) {
-  case 0:
-    specplus3_disk_eject( which );
-    break;
-  case 1:
-    beta_disk_eject( which );
-    break;
-  case 2:
-    plusd_disk_eject( which );
-    break;
   case 3:
     if1_mdr_eject( which );
     break;
-  case 4:
-    opus_disk_eject( which );
-    break;
-  case 5:
-    disciple_disk_eject( which );
+  default:
+    ui_media_drive_eject( type, which );
     break;
   }
 }
@@ -499,23 +458,11 @@ MENU_CALLBACK_WITH_ACTION( menu_media_save )
   saveas = ( action & 0xf00 ) >> 8;
 
   switch( type ) {
-  case 0:
-    specplus3_disk_save( which, saveas );
-    break;
-  case 1:
-    beta_disk_save( which, saveas );
-    break;
-  case 2:
-    plusd_disk_save( which, saveas );
-    break;
   case 3:
     if1_mdr_save( which, saveas );
     break;
-  case 4:
-    opus_disk_save( which, saveas );
-    break;
-  case 5:
-    disciple_disk_save( which, saveas );
+  default:
+    ui_media_drive_save( type, which, saveas );
     break;
   }
 }
@@ -532,21 +479,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_flip )
   flip = !!( action & 0x100 );
 
   switch( type ) {
-  case 0:
-    specplus3_disk_flip( which, flip );
-    break;
-  case 1:
-    beta_disk_flip( which, flip );
-    break;
-  case 2:
-    plusd_disk_flip( which, flip );
-    break;
   /* No flip option for IF1 */
-  case 4:
-    opus_disk_flip( which, flip );
-    break;
-  case 5:
-    disciple_disk_flip( which, flip );
+  default:
+    ui_media_drive_flip( type, which, flip );
     break;
   }
 }
@@ -563,23 +498,11 @@ MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect )
   wrprot = !!( action & 0x100 );
 
   switch( type ) {
-  case 0:
-    specplus3_disk_writeprotect( which, wrprot );
-    break;
-  case 1:
-    beta_disk_writeprotect( which, wrprot );
-    break;
-  case 2:
-    plusd_disk_writeprotect( which, wrprot );
-    break;
   case 3:
     if1_mdr_writeprotect( which, wrprot );
     break;
-  case 4:
-    opus_disk_writeprotect( which, wrprot );
-    break;
-  case 5:
-    disciple_disk_writeprotect( which, wrprot );
+  default:
+    ui_media_drive_writeprotect( type, which, wrprot );
     break;
   }
 
@@ -912,40 +835,7 @@ menu_check_media_changed( void )
 
   confirm = tape_close(); if( confirm ) return 1;
 
-  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_A );
-  if( confirm ) return 1;
-
-  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_B );
-  if( confirm ) return 1;
-
-  confirm = beta_disk_eject( BETA_DRIVE_A );
-  if( confirm ) return 1;
-
-  confirm = beta_disk_eject( BETA_DRIVE_B );
-  if( confirm ) return 1;
-
-  confirm = beta_disk_eject( BETA_DRIVE_C );
-  if( confirm ) return 1;
-
-  confirm = beta_disk_eject( BETA_DRIVE_D );
-  if( confirm ) return 1;
-
-  confirm = opus_disk_eject( OPUS_DRIVE_1 );
-  if( confirm ) return 1;
-
-  confirm = opus_disk_eject( OPUS_DRIVE_2 );
-  if( confirm ) return 1;
-
-  confirm = plusd_disk_eject( PLUSD_DRIVE_1 );
-  if( confirm ) return 1;
-
-  confirm = plusd_disk_eject( PLUSD_DRIVE_2 );
-  if( confirm ) return 1;
-
-  confirm = disciple_disk_eject( DISCIPLE_DRIVE_1 );
-  if( confirm ) return 1;
-
-  confirm = disciple_disk_eject( DISCIPLE_DRIVE_2 );
+  confirm = ui_media_drive_eject_all();
   if( confirm ) return 1;
 
   for( i = 0; i < 8; i++ ) {
