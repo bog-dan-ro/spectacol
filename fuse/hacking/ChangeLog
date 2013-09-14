@@ -4563,3 +4563,5 @@
          (Sergio).
 20130914 debugger/debugger.h,ui/gtk/gtkui.c: ensure exiting on GTK UI when there
          are active breakpoints (fixes bug #301) (Sergio).
+20130914 ui/win32/debugger.c: improve scrolling of disassembly list on win32 UI
+         (Sergio).
