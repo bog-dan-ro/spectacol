@@ -25,6 +25,7 @@
 
 #include <config.h>
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -140,6 +141,13 @@ static void update_events( void );
 static void add_event( gpointer data, gpointer user_data );
 static int deactivate_debugger( void );
 
+static gboolean
+disassembly_key_press( GtkTreeView *list, GdkEventKey *event,
+                       gpointer user_data );
+static gboolean
+disassembly_wheel_scroll( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
+                          gpointer user_data );
+
 static void move_disassembly( GtkAdjustment *adjustment, gpointer user_data );
 
 static void evaluate_command( GtkWidget *widget, gpointer user_data );
@@ -171,6 +179,9 @@ static GtkAdjustment *disassembly_scrollbar_adjustment;
 
 /* The top line of the current disassembly */
 static libspectrum_word disassembly_top;
+
+/* The next line below the current disassembly */
+static libspectrum_word disassembly_bottom;
 
 /* Have we created the above yet? */
 static int dialog_created = 0;
@@ -614,17 +625,23 @@ create_disassembly( GtkBox *parent, gtkui_font font )
 
   /* The disassembly scrollbar */
   disassembly_scrollbar_adjustment = GTK_ADJUSTMENT(
-    gtk_adjustment_new( 0, 0x0000, 0xffff, 0.5, 20, 20 ) );
+    gtk_adjustment_new( 0, 0x0000, 0x10000, 1, 20, 20 ) );
   g_signal_connect( G_OBJECT( disassembly_scrollbar_adjustment ),
 		    "value-changed", G_CALLBACK( move_disassembly ),
 		    NULL );
   scrollbar = gtk_scrollbar_new( GTK_ORIENTATION_VERTICAL,
                                  disassembly_scrollbar_adjustment );
   gtk_box_pack_start( GTK_BOX( disassembly_box ), scrollbar, FALSE, FALSE, 0 );
-/*
-  gtkui_scroll_connect( GTK_CLIST( disassembly ),
-			disassembly_scrollbar_adjustment );
-*/
+
+  /* Scrolling with keys */
+  g_signal_connect( GTK_TREE_VIEW( disassembly ), "key-press-event",
+                    G_CALLBACK( disassembly_key_press ),
+                    disassembly_scrollbar_adjustment );
+
+  /* Scrolling with mouse wheel */
+  g_signal_connect( GTK_TREE_VIEW( disassembly ), "scroll-event",
+                    G_CALLBACK( disassembly_wheel_scroll ),
+                    disassembly_scrollbar_adjustment );
 }
 
 static void
@@ -1072,6 +1089,8 @@ update_disassembly( void )
 
     address += length;
   }
+
+  disassembly_bottom = address;
 }
 
 static void
@@ -1107,7 +1126,24 @@ int
 ui_debugger_disassemble( libspectrum_word address )
 {
   disassembly_top = address;
+
+  /* Block further events while adjusting scrollbar. */
+  g_signal_handlers_block_by_func( G_OBJECT( disassembly_scrollbar_adjustment ),
+                                   G_CALLBACK( move_disassembly ), NULL );
+
+  /* Note: GtkAdjustment can not cope with "upper bound - page_size" value and
+     higher */
   gtk_adjustment_set_value( disassembly_scrollbar_adjustment, address );
+
+  /* Enable events for scrollbar */
+  g_signal_handlers_unblock_by_func( G_OBJECT(disassembly_scrollbar_adjustment),
+                                     G_CALLBACK( move_disassembly ),  NULL );
+
+  /* And update the disassembly if the debugger is active */
+  if( debugger_active ) {
+    update_disassembly();
+  }
+
   return 0;
 }
 
@@ -1116,18 +1152,22 @@ static void
 move_disassembly( GtkAdjustment *adjustment, gpointer user_data GCC_UNUSED )
 {
   gdouble value;
-  size_t length;
+  int cursor_row;
+  libspectrum_word addresss;
 
+  /* FIXME: Movements are imprecise while dragging the scroll bar */
   value = gtk_adjustment_get_value( adjustment );
 
-  /* disassembly_top < value < disassembly_top + 1 => 'down' button pressed
+  cursor_row = gtkui_list_get_cursor( GTK_TREE_VIEW( disassembly ) );
+
+  /* disassembly_top < value <= disassembly_top + 1 => 'down' button pressed
      Move the disassembly on by one instruction */
-  if( value > disassembly_top && value - disassembly_top < 1 ) {
+  if( value > disassembly_top && value - disassembly_top <= 1 ) {
 
-    debugger_disassemble( NULL, 0, &length, disassembly_top );
-    ui_debugger_disassemble( disassembly_top + length );
+    addresss = debugger_search_instruction( disassembly_top, 1 );
+    ui_debugger_disassemble( addresss );
 
-  /* disassembly_top - 1 < value < disassembly_top => 'up' button pressed
+  /* disassembly_top - 1 <= value < disassembly_top => 'up' button pressed
      
      The desired state after this is for the current top instruction
      to be the second instruction shown in the disassembly.
@@ -1148,28 +1188,151 @@ move_disassembly( GtkAdjustment *adjustment, gpointer user_data GCC_UNUSED )
      second. In this case, just move back a byte.
 
   */
-  } else if( value < disassembly_top && disassembly_top - value < 1 ) {
+  } else if( value < disassembly_top && disassembly_top - value <= 1 ) {
 
-    size_t i, longest = 1;
-
-    for( i = 1; i <= 8; i++ ) {
-
-      debugger_disassemble( NULL, 0, &length, disassembly_top - i );
-      if( length == i ) longest = i;
-
-    }
-
-    ui_debugger_disassemble( disassembly_top - longest );
+    addresss = debugger_search_instruction( disassembly_top, -1 );
+    ui_debugger_disassemble( addresss );
 
   /* Anything else, just set disassembly_top to that value */
-  } else {
+  } else if( value != disassembly_top ) {
 
     ui_debugger_disassemble( value );
 
   }
 
-  /* And update the disassembly if the debugger is active */
-  if( debugger_active ) update_disassembly();
+  /* Mark selected row */
+  gtkui_list_set_cursor( GTK_TREE_VIEW( disassembly ), cursor_row );
+}
+
+static gboolean
+disassembly_key_press( GtkTreeView *list, GdkEventKey *event,
+                       gpointer user_data )
+{
+  GtkAdjustment *adjustment = user_data;
+  gdouble page_size, page_increment;
+  int cursor_row;
+  libspectrum_word initial_top, addresss;
+
+  initial_top = disassembly_top;
+  page_size = gtk_adjustment_get_page_size( adjustment );
+  page_increment = gtk_adjustment_get_page_increment( adjustment );
+
+  /* Get selected row */
+  cursor_row = gtkui_list_get_cursor( list );
+
+  switch( event->keyval ) {
+
+  case GDK_KEY_Down:
+    if( cursor_row == page_size - 1 ) {
+      addresss = debugger_search_instruction( disassembly_top, 1 );
+      ui_debugger_disassemble( addresss );
+    }
+    break;
+
+  case GDK_KEY_Up:
+    if( cursor_row == 0 ) {
+      addresss = debugger_search_instruction( disassembly_top, -1 );
+      ui_debugger_disassemble( addresss );
+    }
+    break;
+
+  case GDK_KEY_Page_Down:
+    ui_debugger_disassemble( disassembly_bottom );
+    break;
+
+  case GDK_KEY_Page_Up:
+    addresss = debugger_search_instruction( disassembly_top, -page_increment );
+    ui_debugger_disassemble( addresss );
+    break;
+
+  case GDK_KEY_Home:
+    cursor_row = 0;
+    ui_debugger_disassemble( 0x0000 );
+    break;
+
+  case GDK_KEY_End:
+    cursor_row = page_size - 1;
+    addresss = debugger_search_instruction( 0x0000, -page_size );
+    ui_debugger_disassemble( addresss );
+    break;
+
+  default:
+    return FALSE;
+  }
+
+  if( initial_top != disassembly_top ) {
+    update_disassembly();
+
+    /* Mark selected row */
+    gtkui_list_set_cursor( list, cursor_row );
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/* Called when the wheel mouse is moved on the list (not on the scrollbar) */
+static gboolean
+disassembly_wheel_scroll( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
+                          gpointer user_data )
+{
+  libspectrum_word initial_top, addresss;
+  int cursor_row;
+
+  initial_top = disassembly_top;
+
+  /* Get selected row */
+  cursor_row = gtkui_list_get_cursor( list );
+
+  switch( event->scroll.direction ) {
+  case GDK_SCROLL_UP:
+    addresss = debugger_search_instruction( disassembly_top, -1 );
+    ui_debugger_disassemble( addresss );
+    break;
+
+  case GDK_SCROLL_DOWN:
+    addresss = debugger_search_instruction( disassembly_top, 1 );
+    ui_debugger_disassemble( addresss );
+    break;
+
+#if GTK_CHECK_VERSION( 3, 4, 0 )
+
+  case GDK_SCROLL_SMOOTH:
+    {
+      GtkAdjustment *adjustment = user_data;
+      static gdouble total_dy = 0;
+      gdouble dx, dy, page_size;
+      int delta;
+
+      if( gdk_event_get_scroll_deltas( event, &dx, &dy ) ) {
+        /* Calculate number of instructions to jump */
+        total_dy += dy;
+        page_size = gtk_adjustment_get_page_size( adjustment );
+        delta = total_dy * pow( page_size, 2.0 / 3.0 );
+
+        /* Is movement significative? */
+        if( delta ) {
+          addresss = debugger_search_instruction( disassembly_top, delta );
+          ui_debugger_disassemble( addresss );
+          total_dy = 0;
+        }
+      }
+      break;
+    }
+
+#endif
+
+  default:
+    return FALSE;
+  }
+
+  if( initial_top != disassembly_top ) {
+    /* Mark selected row */
+    gtkui_list_set_cursor( list, cursor_row );
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /* Evaluate the command currently in the entry box */

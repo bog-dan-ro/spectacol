@@ -156,10 +156,12 @@ int gtkstatusbar_set_visibility( int visible );
 void gtkstatusbar_update_machine( const char *name );
 
 /*
- * Scrolling for GtkCList widgets
+ * Routines for list widgets
  */
 
 void gtkui_scroll_connect( GtkTreeView *list, GtkAdjustment *adj );
+void gtkui_list_set_cursor( GtkTreeView *list, int row );
+int gtkui_list_get_cursor( GtkTreeView *list );
 
 /*
  * Dialog box reset

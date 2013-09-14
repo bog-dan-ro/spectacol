@@ -780,3 +780,36 @@ bit_op_bit( libspectrum_byte b )
 {
   return ( b >> 3 ) & 0x07;
 }
+
+/* Get an instruction relative to a specific address */
+libspectrum_word
+debugger_search_instruction( libspectrum_word address, int delta )
+{
+  size_t j, length, longest;
+  int i;
+
+  if( !delta ) return address;
+
+  if( delta > 0 ) {
+
+    for( i = 0; i < delta; i++ ) {
+      debugger_disassemble( NULL, 0, &length, address );
+      address += length;
+    }
+
+  } else {
+
+    for( i = 0; i > delta; i-- ) {
+      /* Look for _longest_ opcode which produces the current top in second
+         place */
+      for( longest = 1, j = 1; j <= 8; j++ ) {
+        debugger_disassemble( NULL, 0, &length, address - j );
+        if( length == j ) longest = j;
+      }
+      address -= longest;
+    }
+
+  }
+
+  return address;
+}

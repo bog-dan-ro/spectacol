@@ -4558,3 +4558,5 @@
 20130908 man/fuse.1: fix documentation of address syntax used in debugger 
          section (Sergio).
 20130910 uimedia.c,ui/uimedia.h: add missing subversion properties (Sergio).
+20130914 debugger/{debugger.h,disassemble.c},ui/gtk/{debugger.c,gtkinternals.h,
+         gtkui.c}: improve scrolling of disassembly list on GTK UI (Sergio).

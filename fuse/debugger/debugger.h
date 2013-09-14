@@ -65,6 +65,10 @@ int debugger_run( void ); /* Set debugger_mode so that emulation will occur */
 void debugger_disassemble( char *buffer, size_t buflen, size_t *length,
 			   libspectrum_word address );
 
+/* Get an instruction relative to a specific address */
+libspectrum_word debugger_search_instruction( libspectrum_word address,
+                                              int delta );
+
 /* Evaluate a debugger command */
 void debugger_command_evaluate( const char *command );
 

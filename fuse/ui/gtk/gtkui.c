@@ -799,15 +799,44 @@ gtkui_set_font( GtkWidget *widget, gtkui_font font )
   gtk_widget_modify_font( widget, font );
 }
 
+void
+gtkui_list_set_cursor( GtkTreeView *list, int row )
+{
+  GtkTreePath *path;
+
+  if( row >= 0 ) {
+    path = gtk_tree_path_new_from_indices( row, -1 );
+    gtk_tree_view_set_cursor( list, path, NULL, FALSE );
+    gtk_tree_path_free( path );
+  }
+}
+
+int
+gtkui_list_get_cursor( GtkTreeView *list )
+{
+  GtkTreePath *path;
+  GtkTreeViewColumn *focus_column;
+  int *indices;
+  int row = -1;
+
+  /* Get selected row */
+  gtk_tree_view_get_cursor( list, &path, &focus_column );
+  if( path ) {
+    indices = gtk_tree_path_get_indices( path );
+    if( indices ) row = indices[0];
+    gtk_tree_path_free( path );
+  }
+
+  return row;
+}
+
 static gboolean
 key_press( GtkTreeView *list, GdkEventKey *event, gpointer user_data )
 {
   GtkAdjustment *adjustment = user_data;
-  GtkTreePath *path;
-  GtkTreeViewColumn *focus_column;
   gdouble base, oldbase, base_limit;
   gdouble page_size, step_increment;
-  int cursor_row = 0;
+  int cursor_row;
   int num_rows;
 
   base = oldbase = gtk_adjustment_get_value( adjustment );
@@ -816,12 +845,7 @@ key_press( GtkTreeView *list, GdkEventKey *event, gpointer user_data )
   num_rows = ( page_size + 1 ) / step_increment;
 
   /* Get selected row */
-  gtk_tree_view_get_cursor( list, &path, &focus_column );
-  if( path ) {
-    int *indices = gtk_tree_path_get_indices( path );
-    if( indices ) cursor_row = indices[0];
-    gtk_tree_path_free( path );
-  }
+  cursor_row = gtkui_list_get_cursor( list );
 
   switch( event->keyval )
   {
@@ -868,9 +892,7 @@ key_press( GtkTreeView *list, GdkEventKey *event, gpointer user_data )
     gtk_adjustment_set_value( adjustment, base );
 
     /* Mark selected row */
-    path = gtk_tree_path_new_from_indices( cursor_row, -1 );
-    gtk_tree_view_set_cursor( list, path, NULL, FALSE );
-    gtk_tree_path_free( path );
+    gtkui_list_set_cursor( list, cursor_row );
     return TRUE;
   }
 
