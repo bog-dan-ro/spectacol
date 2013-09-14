@@ -25,6 +25,7 @@
 
 #include <config.h>
 
+#include <math.h>
 #include <stdio.h>
 
 #include <gdk/gdkkeysyms.h>
@@ -904,11 +905,11 @@ key_press( GtkTreeView *list, GdkEventKey *event, gpointer user_data )
 }
 
 static gboolean
-wheel_scroll_event( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
-                    gpointer user_data )
+wheel_scroll_event( GtkTreeView *list, GdkEvent *event, gpointer user_data )
 {
   GtkAdjustment *adjustment = user_data;
   gdouble base, oldbase, base_limit;
+  int cursor_row;
 
   base = oldbase = gtk_adjustment_get_value( adjustment );
 
@@ -920,6 +921,29 @@ wheel_scroll_event( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
   case GDK_SCROLL_DOWN:
     base += gtk_adjustment_get_page_increment( adjustment ) / 2;
     break;
+
+#if GTK_CHECK_VERSION( 3, 4, 0 )
+  case GDK_SCROLL_SMOOTH:
+    {
+      static gdouble total_dy = 0;
+      gdouble dx, dy, page_size;
+      int delta;
+
+      if( gdk_event_get_scroll_deltas( event, &dx, &dy ) ) {
+        total_dy += dy;
+        page_size = gtk_adjustment_get_page_size( adjustment );
+        delta = total_dy * pow( page_size, 2.0 / 3.0 );
+
+        /* Is movement significative? */
+        if( delta ) {
+          base += delta;
+          total_dy = 0;
+        }
+      }
+      break;
+    }
+#endif
+
   default:
     return FALSE;
   }
@@ -932,7 +956,11 @@ wheel_scroll_event( GtkTreeView *list GCC_UNUSED, GdkEvent *event,
     if( base > base_limit ) base = base_limit;
   }
 
-  if( base != oldbase ) gtk_adjustment_set_value( adjustment, base );
+  if( base != oldbase ) {
+    cursor_row = gtkui_list_get_cursor( list );
+    gtk_adjustment_set_value( adjustment, base );
+    gtkui_list_set_cursor( list, cursor_row );
+  }
 
   return TRUE;
 }

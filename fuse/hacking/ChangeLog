@@ -4565,3 +4565,5 @@
          are active breakpoints (fixes bug #301) (Sergio).
 20130914 ui/win32/debugger.c: improve scrolling of disassembly list on win32 UI
          (Sergio).
+20130914 ui/gtk/gtkui.c: make mousewheel scrolling on memory browser GTK+ 3.4
+         compatible and keep the selected row. (Sergio).
