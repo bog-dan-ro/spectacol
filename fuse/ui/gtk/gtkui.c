@@ -402,6 +402,10 @@ menu_file_exit( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
     /* Stop the paused state to allow us to exit (occurs from main
        emulation loop) */
     if( paused ) menu_machine_pause( NULL, NULL );
+
+    /* Ensure we break out of the main Z80 loop, there could be active
+       breakpoints before the next event */
+    debugger_exit_emulator();
   }
 }
 

@@ -82,4 +82,7 @@ int debugger_event_register( const char *type, const char *detail );
 /* Fire off a debugger event */
 void debugger_event( int event_code );
 
+/* Exit the emulator */
+void debugger_exit_emulator( void );
+
 #endif				/* #ifndef FUSE_DEBUGGER_H */
