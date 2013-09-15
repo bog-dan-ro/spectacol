@@ -101,7 +101,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <p>A native port to OS X by <a href="mailto:fredm@spamcop.net">Fredrick Meunier</a> is available on its own SourceForge project <a href="http://fuse-for-macosx.sourceforge.net/">here</a>, as well as a Spotlight importer for Mac OS X 10.4 Tiger users. Alternatively, the original version of Fuse will compile on OS X 10.3 (Panther) or later.</p>
 
   <h3>Windows</h3>
-  <p>A port to Windows of 1.0.0.1 by Sergio Baldovi is available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.0.0.1/fuse-1.0.0.1-win32.zip/download">here</a>, and the utilities are available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.0.0/fuse-utils-1.0.0-win32.zip/download">here</a>.</p>
+  <p>A port to Windows of 1.1.1 by Sergio Baldovi is available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.1.1/fuse-1.1.1-win32-setup.exe/download">here</a>, and the utilities are available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.1.1/fuse-utils-1.1.1-win32.zip/download">here</a>.</p>
 
   <h3>AmigaOS 4</h3>
   <p>Chris Young has ported Fuse 1.0.0.1 to AmigaOS 4, with binaries available from Aminet as <a href="http://aminet.net/package/misc/emu/fuse.lha">misc/emu/fuse.lha</a>.</p>
