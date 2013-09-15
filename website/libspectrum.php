@@ -89,14 +89,15 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Binaries</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
-   <li><a href="http://packages.debian.org/search?keywords=libspectrum">Official packages</a> of 1.0.0 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available. The packages should also work on <a href="http://www.ubuntu.com/">Ubuntu</a>.</li>
-   <li><a href="https://admin.fedoraproject.org/pkgdb/acls/name/libspectrum">Fedora</a> (1.0.0)</li>
-   <li><a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/libspectrum/">FreeBSD</a> (1.0.0)</li>
-   <li><a href="http://www.netbsd.org/">NetBSD</a> has 1.0.0 available as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/libspectrum/">emulators/libspectrum</a> in <a href="http://www.pkgsrc.org/">pkgsrc</a>.</li>
-   <li><a href="http://www.openbsd.org/">OpenBSD</a> users can find a port of 1.0.0 in <a href="http://www.openbsd.org/cgi-bin/cvsweb/ports/devel/libspectrum/">ports/devel/libspectrum</a>.</li>
-   <li><a href="http://packages.gentoo.org/package/app-emulation/libspectrum?full_cat">Gentoo</a> (0.5.0.1)</li>
+   <li><a href="http://packages.debian.org/search?keywords=libspectrum">Official packages</a> of 1.1.1 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available.</li>
+   <li><a href="https://admin.fedoraproject.org/pkgdb/acls/name/libspectrum">Fedora</a> (1.1.1)</li>
+   <li><a href="http://www.freebsd.org/cgi/cvsweb.cgi/ports/emulators/libspectrum/">FreeBSD</a> (1.1.1)</li>
+   <li><a href="http://packages.gentoo.org/package/app-emulation/libspectrum?full_cat">Gentoo</a> (1.0.0)</li>
    <li><a href="http://www.mandriva.com/">Mandriva</a> packages of 0.5.0.1 are available from the <a href="http://plf.zarb.org/">PLF</a>, or some <a href="http://www.speccy.org/sinclairmania/arch/emu/mandrake/">older packages</a> from Miguel Barrio Orsikowsky.</li>
-   <li><a href="https://build.opensuse.org/package/show?package=libspectrum&amp;project=Emulators">SuSE</a> (0.5.0.1)</li>
+   <li><a href="http://www.netbsd.org/">NetBSD</a> has 1.1.1 available as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/libspectrum/">emulators/libspectrum</a> in <a href="http://www.pkgsrc.org/">pkgsrc</a>.</li>
+   <li><a href="http://www.openbsd.org/">OpenBSD</a> users can find a port of 1.1.1 in <a href="http://www.openbsd.org/cgi-bin/cvsweb/ports/devel/libspectrum/">ports/devel/libspectrum</a>.</li>
+   <li><a href="https://build.opensuse.org/package/show/Emulators/libspectrum">SUSE</a> (1.0.0)</li>
+   <li><a href="https://launchpad.net/ubuntu/+source/libspectrum">Ubuntu</a> (1.1.1)</li>
   </ul>
 
 END_SECTION
