@@ -421,3 +421,5 @@
 20130520 man/fmfconv.1: fix syntax error (patch #311) (Alberto).
 20130526 Makefile.am: distribute ChangeLog in Windows packages (Sergio).
 20130526 Makefile.am: add compat/getopt.h into the dist tarball (Sergio).
+20130928 Makefile.am,compat/win32/distribution.mk: take Windows distribution
+         rules out of main Makefile.am (Sergio).
