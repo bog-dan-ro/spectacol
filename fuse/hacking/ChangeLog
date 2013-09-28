@@ -4569,3 +4569,5 @@
          compatible and keep the selected row. (Sergio).
 20130928 debugger/breakpoint.[c|h],spectrum.c: fix time breakpoints later than
          a frame (patch #302) (Sergio).
+20130928 ui/win32/options.pl: Ignore unused-but-set-variable warnings for
+         option dialogs on win32 UI (Sergio).

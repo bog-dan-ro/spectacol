@@ -141,7 +141,8 @@ menu_options_$_->{name}_init( HWND hwndDlg )
   int i;
 
   i = 0;
-  buffer[0] = '\\0';          /* Shut gcc up */
+  buffer[0] = '\\0';
+  if( buffer[i] ) {};          /* Shut gcc up */
 
 CODE
     foreach my $widget ( @{ $_->{widgets} } ) {
@@ -196,7 +197,8 @@ menu_options_$_->{name}_done( HWND hwndDlg )
 {
   char buffer[80];
 
-  buffer[0] = '\\0';          /* Shut gcc up */
+  buffer[0] = '\\0';
+  if( buffer[0] ) {};          /* Shut gcc up */
 
 CODE
 
