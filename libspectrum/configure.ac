@@ -49,7 +49,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_HOST
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 
 dnl Substitutions for .in files
 LIBSPECTRUM_FULL_VERSION=libspectrum_full_version

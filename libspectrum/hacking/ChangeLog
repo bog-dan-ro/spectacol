@@ -950,3 +950,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20130524 Makefile.am: update libtool age to support binaries built against
          libspectrum 1.0.0 (Stuart).
 20130526 Makefile.am: add dll.c into the dist tarball (Sergio).
+20130928 configure.ac: use 'subdir-objects' option as advised by automake 1.14
+         to place object files in subdirectories (Sergio).
