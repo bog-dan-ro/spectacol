@@ -36,3 +36,7 @@ EXTRA_fuse_SOURCES += compat/dirname.c \
 		compat/mkstemp.c
 
 noinst_HEADERS += compat/getopt.h
+
+if COMPAT_WIN32
+include compat/win32/distribution.mk
+endif
