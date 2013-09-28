@@ -76,6 +76,7 @@ typedef struct debugger_breakpoint_port {
 
 typedef struct debugger_breakpoint_time {
   libspectrum_dword tstates;
+  libspectrum_dword initial_tstates;
   int triggered;
 } debugger_breakpoint_time;
 
@@ -115,6 +116,9 @@ typedef struct debugger_breakpoint {
 extern GSList *debugger_breakpoints;
 
 int debugger_check( debugger_breakpoint_type type, libspectrum_dword value );
+
+void
+debugger_breakpoint_reduce_tstates( libspectrum_dword tstates );
 
 /* Add a new breakpoint */
 int

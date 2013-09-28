@@ -100,6 +100,7 @@ spectrum_frame( void )
 			      : machine_current->timings.tstates_per_frame;
 
   event_frame( frame_length );
+  debugger_breakpoint_reduce_tstates( frame_length );
   tstates -= frame_length;
   if( z80.interrupts_enabled_at >= 0 )
     z80.interrupts_enabled_at -= frame_length;

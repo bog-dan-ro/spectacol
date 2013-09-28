@@ -4567,3 +4567,5 @@
          (Sergio).
 20130914 ui/gtk/gtkui.c: make mousewheel scrolling on memory browser GTK+ 3.4
          compatible and keep the selected row. (Sergio).
+20130928 debugger/breakpoint.[c|h],spectrum.c: fix time breakpoints later than
+         a frame (patch #302) (Sergio).

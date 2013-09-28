@@ -149,7 +149,9 @@ debugger_breakpoint_add_time( debugger_breakpoint_type type,
     fuse_abort();
   }
 
+  value.time.triggered = 0;
   value.time.tstates = tstates;
+  value.time.initial_tstates = tstates;
 
   return breakpoint_add( type, value, ignore, life, condition );
 }
@@ -261,6 +263,22 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
 
   /* Debugger mode could have been reset by a breakpoint command */
   return ( debugger_mode == DEBUGGER_MODE_HALTED );
+}
+
+void
+debugger_breakpoint_reduce_tstates( libspectrum_dword tstates )
+{
+  GSList *ptr;
+  debugger_breakpoint *bp;
+
+  if( debugger_mode != DEBUGGER_MODE_ACTIVE ) return;
+
+  for( ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
+    bp = ptr->data;
+
+    if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME && !bp->value.time.triggered )
+      bp->value.time.tstates -= tstates;
+  }
 }
 
 static memory_page*
@@ -563,7 +581,7 @@ debugger_breakpoint_set_commands( size_t id, const char *commands )
   return 0;
 }
 
-/* Add events corresponding to all the time events to happen during
+/* Add events corresponding to all the time breakpoints to happen during
    this frame */
 int
 debugger_add_time_events( void )
@@ -577,8 +595,9 @@ add_time_event( gpointer data, gpointer user_data GCC_UNUSED )
 {
   debugger_breakpoint *bp = data;
 
-  if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
+  if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME && bp->value.time.triggered ) {
     bp->value.time.triggered = 0;
+    bp->value.time.tstates = bp->value.time.initial_tstates;
     event_add( bp->value.time.tstates, debugger_breakpoint_event );
   }
 }
