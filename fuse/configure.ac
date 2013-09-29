@@ -410,6 +410,7 @@ AC_CONFIG_LINKS([
 	lib/tape_2048.szx:lib/"$AUTOLOAD_SNAPS"/tape_2048.szx
 	lib/tape_2068.szx:lib/"$AUTOLOAD_SNAPS"/tape_2068.szx
 	lib/tape_48.szx:lib/"$AUTOLOAD_SNAPS"/tape_48.szx
+	lib/tape_48_ntsc.szx:lib/"$AUTOLOAD_SNAPS"/tape_48_ntsc.szx
 	lib/tape_plus2.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus2.szx
 	lib/tape_plus2a.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus2a.szx
 	lib/tape_plus3.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus3.szx

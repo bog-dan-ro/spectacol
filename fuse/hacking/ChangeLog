@@ -4578,3 +4578,4 @@
 20130929 configure.ac: don't check for svgalib UI if another UI has been
          selected (Sergio).
 20130929 configure.ac: make win32 UI default for mingw32/64 toolchains (Sergio).
+20130929 configure.ac: link to autoload snapshot for NTSC Spectrum (Sergio).
