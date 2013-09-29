@@ -135,7 +135,7 @@ my %ui_data = (
 	    },
 
     wii => { headers => [ 'ui/wii/wiikeysyms.h' ],
-	      # max_length not used
+	      max_length => 24,
 	      skips => { map { $_ => 1 } ( 'numbersign',
 					   'Shift_L', 'Shift_R',
 					   'Control_L', 'Control_R',

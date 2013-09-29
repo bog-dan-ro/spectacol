@@ -4573,3 +4573,5 @@
          option dialogs on win32 UI (Sergio).
 20130928 Makefile.am,compat/{Makefile.am,win32/distribution.mk}: take Windows
          distribution rules out of main Makefile.am (Sergio).
+20130929 keysyms.pl: fix warnings about uninitialized values in `make distcheck'
+         (Sergio).
