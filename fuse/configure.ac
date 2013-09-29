@@ -127,8 +127,20 @@ AC_MSG_CHECKING(whether Win32 UI requested)
 AC_ARG_WITH(win32,
 [  --with-win32            use Win32 for user interface],
 if test "$withval" = no; then win32=no; else win32=yes; fi,
-win32=no)
+win32=auto)
+
+if test "$win32" = auto; then
+case "$host_os" in
+  mingw32*)
+    win32=yes
+    ;;
+  *)
+    win32=no
+    ;;
+esac
+fi
 AC_MSG_RESULT($win32)
+
 if test "$win32" = yes; then
   AC_CHECK_HEADER(windows.h,
                   LIBS="$LIBS -mwindows -lcomctl32 -lwinmm";
