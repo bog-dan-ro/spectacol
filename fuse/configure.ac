@@ -141,21 +141,23 @@ if test "$win32" = yes; then
 fi
 
 dnl Look for svgalib (default=no)
-AC_MSG_CHECKING(whether svgalib UI requested)
-AC_ARG_WITH(svgalib,
-[  --with-svgalib          use svgalib for user interface],
-if test "$withval" = no; then svgalib=no; else svgalib=yes; fi,
-svgalib=no)
-AC_MSG_RESULT($svgalib)
-if test "$svgalib" = yes; then
-  AC_CHECK_HEADER(vga.h,
-                  LIBS="$LIBS -lvga";
-                  AC_DEFINE([UI_SVGA], 1, [Defined if svgalib UI in use])
-		  AC_DEFINE([USE_WIDGET], 1,
-		            [Defined if we're using a widget-based UI])
-                  UI=svga; WIDGET=widget;
-                  UI_LIBS="ui/svga/libuisvga.a ui/widget/libwidget.a",
-                  AC_MSG_ERROR([svgalib not found]))
+if test -z "$UI"; then
+  AC_MSG_CHECKING(whether svgalib UI requested)
+  AC_ARG_WITH(svgalib,
+  [  --with-svgalib          use svgalib for user interface],
+  if test "$withval" = no; then svgalib=no; else svgalib=yes; fi,
+  svgalib=no)
+  AC_MSG_RESULT($svgalib)
+  if test "$svgalib" = yes; then
+    AC_CHECK_HEADER(vga.h,
+                    LIBS="$LIBS -lvga";
+                    AC_DEFINE([UI_SVGA], 1, [Defined if svgalib UI in use])
+                    AC_DEFINE([USE_WIDGET], 1,
+                              [Defined if we're using a widget-based UI])
+                    UI=svga; WIDGET=widget;
+                    UI_LIBS="ui/svga/libuisvga.a ui/widget/libwidget.a",
+                    AC_MSG_ERROR([svgalib not found]))
+  fi
 fi
 
 dnl Look for framebuffer interface for SA1110 (default=no)

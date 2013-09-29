@@ -4575,3 +4575,5 @@
          distribution rules out of main Makefile.am (Sergio).
 20130929 keysyms.pl: fix warnings about uninitialized values in `make distcheck'
          (Sergio).
+20130929 configure.ac: don't check for svgalib UI if another UI has been
+         selected (Sergio).
