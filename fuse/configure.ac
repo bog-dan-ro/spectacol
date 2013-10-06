@@ -546,8 +546,7 @@ fi
 dnl Check if DirectSound is available
 AC_CHECK_HEADER(
   dsound.h,
-  [dxsound_available=yes],
-  [AC_MSG_WARN(dsound.h not found - no DirectSound output)],
+  [dxsound_available=yes],,
   [#define DIRECTSOUND_VERSION 0x0700
    #include <windows.h>
    #include <mmsystem.h>]
@@ -556,16 +555,14 @@ AC_CHECK_HEADER(
 dnl Check if MS Windows Multimedia API sound is available
 AC_CHECK_HEADER(
   mmsystem.h,
-  [win32sound_available=yes],
-  [AC_MSG_WARN(mmsystem.h not found - no MS Windows Multimedia API sound output)],
+  [win32sound_available=yes],,
   [#include <windows.h>]
 )
 
 dnl Check if CoreAudio is available
 AC_CHECK_HEADER(
   CoreAudio/AudioHardware.h,
-  [coreaudio_available=yes],
-  [AC_MSG_WARN(CoreAudio/AudioHardware.h not found - no CoreAudio sound output)]
+  [coreaudio_available=yes],,
 )
 
 dnl
@@ -610,6 +607,7 @@ else
   SOUND_LIBADD='nullsound.$(OBJEXT)' SOUND_LIBS=''
   AC_MSG_RESULT(none)
   AC_DEFINE([NO_SOUND], 1, [Defined if no sound code is present])
+  AC_MSG_WARN(No sound library has been found)
 fi
 
 if test "$sound_fifo" = yes; then
