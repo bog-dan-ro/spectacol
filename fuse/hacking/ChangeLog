@@ -4581,3 +4581,5 @@
 20130929 configure.ac: link to autoload snapshot for NTSC Spectrum (Sergio).
 20131006 configure.ac: don't warn about unrequested sound libraries that have
          not been found (Sergio).
+20131007 data/Makefile.am: fix desktop integration rules to cope with VPATH
+         builds (Sergio).

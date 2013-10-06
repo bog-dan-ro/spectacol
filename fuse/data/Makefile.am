@@ -61,7 +61,7 @@ dist_mimeicons128_DATA = icons/128x128/application-x-spectrum.png
 dist_mimeicons256_DATA = icons/256x256/application-x-spectrum.png
 
 # Generate fuse.xml according to libspectrum capabilities
-fuse.xml: fuse.xml.in
+fuse.xml: $(srcdir)/fuse.xml.in
 	if test -z "$(LIBSPEC_HAVE_AUDIOFILE)"; then \
 	  mime_audiofile='/LIBSPECTRUM_HAVE_AUDIOFILE_BEGIN/,/LIBSPECTRUM_HAVE_AUDIOFILE_END/d'; \
 	else \
@@ -77,12 +77,12 @@ fuse.xml: fuse.xml.in
 	else \
 	  mime_bz2='/LIBSPECTRUM_HAVE_BZ2/d'; \
 	fi; \
-	$(SED) -e "$$mime_audiofile" -e "$$mime_zlib" -e "$$mime_bz2" < fuse.xml.in > $@
+	$(SED) -e "$$mime_audiofile" -e "$$mime_zlib" -e "$$mime_bz2" < $(srcdir)/fuse.xml.in > $@
 
 # Generate fuse.desktop from fuse.xml to keep mime types list in sync
-fuse.desktop: fuse.desktop.in $(srcdir)/fuse.xml
-	list=`$(SED) -e '/<mime-type/ s/.*<mime-type type="\(.*\)">.*/\1;/' -e t -e d < $(srcdir)/fuse.xml | tr -d '\n'` && \
-	$(SED) -e "s|@MIME_TYPES@|$$list|" < fuse.desktop.in > $@
+fuse.desktop: $(srcdir)/fuse.desktop.in fuse.xml
+	list=`$(SED) -e '/<mime-type/ s/.*<mime-type type="\(.*\)">.*/\1;/' -e t -e d < fuse.xml | tr -d '\n'` && \
+	$(SED) -e "s|@MIME_TYPES@|$$list|" < $(srcdir)/fuse.desktop.in > $@
 
 update-database-cache:
 	if test -z "$(DESTDIR)"; then \
