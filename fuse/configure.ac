@@ -42,7 +42,7 @@ AC_CONFIG_HEADERS(config.h)
 AC_CANONICAL_HOST
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 
 dnl Substitutions for .in files
 FUSE_FULL_VERSION=fuse_full_version
@@ -836,9 +836,11 @@ case "$host_os" in
     ;;
 esac
 AC_MSG_RESULT($COMPAT_OSNAME)
-COMPAT_SUBDIR="compat/$COMPAT_OSNAME"
-AC_SUBST(COMPAT_SUBDIR)
-AC_SUBST(COMPAT_OSNAME)
+AM_CONDITIONAL(COMPAT_AMIGA, test "$COMPAT_OSNAME" = 'amiga')
+AM_CONDITIONAL(COMPAT_LINUX, test "$COMPAT_OSNAME" = 'linux')
+AM_CONDITIONAL(COMPAT_MORPHOS, test "$COMPAT_OSNAME" = 'morphos')
+AM_CONDITIONAL(COMPAT_UNIX, test "$COMPAT_OSNAME" = 'unix')
+AM_CONDITIONAL(COMPAT_WII, test "$COMPAT_OSNAME" = 'wii')
 AM_CONDITIONAL(COMPAT_WIN32, test "$COMPAT_OSNAME" = 'win32')
 
 dnl Decide whether to install desktop and mime files
@@ -902,12 +904,7 @@ fi
 
 AC_CONFIG_FILES([
 Makefile
-compat/amiga/Makefile
-compat/linux/Makefile
-compat/morphos/Makefile
-compat/unix/Makefile
-compat/wii/Makefile
-compat/win32/Makefile
+compat/Makefile
 data/Makefile
 debugger/Makefile
 hacking/Makefile

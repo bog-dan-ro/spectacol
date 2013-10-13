@@ -4583,3 +4583,7 @@
          not been found (Sergio).
 20131007 data/Makefile.am: fix desktop integration rules to cope with VPATH
          builds (Sergio).
+20131013 configure.ac,Makefile.am,compat/{Makefile.am,amiga/Makefile.am,
+         linux/Makefile.am,morphos/Makefile.am,unix/Makefile.am,wii/Makefile.am,
+         win32/Makefile.am}: use 'subdir-objects' option as advised by automake
+         1.14 to place object files in subdirectories (Sergio).

@@ -27,7 +27,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = @COMPAT_SUBDIR@ \
+SUBDIRS = compat \
 	  data \
 	  debugger \
 	  hacking \
@@ -44,7 +44,8 @@ SUBDIRS = @COMPAT_SUBDIR@ \
 	  unittests \
 	  z80
 
-DIST_SUBDIRS = data \
+DIST_SUBDIRS = compat \
+	       data \
 	       debugger \
 	       hacking \
 	       lib \
@@ -89,18 +90,6 @@ fuse_SOURCES = display.c \
 	uimedia.c \
 	utils.c
 
-if COMPAT_DIRNAME
-fuse_SOURCES += compat/dirname.c
-endif
-
-if COMPAT_GETOPT
-fuse_SOURCES += compat/getopt.c compat/getopt1.c
-endif
-
-if COMPAT_MKSTEMP
-fuse_SOURCES += compat/mkstemp.c
-endif
-
 if COMPAT_WIN32
 fuse_SOURCES += windres.rc
 endif
@@ -129,7 +118,7 @@ z80/libz80.a \
 @SDL_LIBS@ \
 @X_LIBS@ \
 @XML_LIBS@ \
-compat/@COMPAT_OSNAME@/libcompatos.a \
+compat/libcompatos.a \
 @WINDRES_OBJ@
 
 fuse_DEPENDENCIES = debugger/libdebugger.a \
@@ -147,7 +136,7 @@ timer/libtimer.a \
 ui/scaler/libscaler.a \
 unittests/libunittests.a \
 z80/libz80.a \
-compat/@COMPAT_OSNAME@/libcompatos.a \
+compat/libcompatos.a \
 @WINDRES_OBJ@
 
 BUILT_SOURCES = options.h settings.c settings.h
@@ -225,4 +214,6 @@ CLEANFILES = options.h \
 	     settings.c \
 	     settings.h
 
-include compat/Makefile.am
+if COMPAT_WIN32
+include compat/win32/distribution.mk
+endif

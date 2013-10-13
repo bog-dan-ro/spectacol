@@ -21,22 +21,104 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AM_CPPFLAGS += -I$(srcdir)/compat
+AUTOMAKE_OPTIONS = foreign
 
-DIST_SUBDIRS += compat/amiga \
-	       compat/linux \
-	       compat/morphos \
-	       compat/unix \
-	       compat/wii \
-	       compat/win32
+AM_CPPFLAGS = -I$(srcdir)/..
 
-EXTRA_fuse_SOURCES += compat/dirname.c \
-		compat/getopt.c \
-		compat/getopt1.c \
-		compat/mkstemp.c
+noinst_HEADERS = getopt.h
 
-noinst_HEADERS += compat/getopt.h
+noinst_LIBRARIES = libcompatos.a
 
-if COMPAT_WIN32
-include compat/win32/distribution.mk
+libcompatos_a_SOURCES =
+
+if COMPAT_DIRNAME
+libcompatos_a_SOURCES += dirname.c
 endif
+
+if COMPAT_GETOPT
+libcompatos_a_SOURCES += getopt.c getopt1.c
+endif
+
+if COMPAT_MKSTEMP
+libcompatos_a_SOURCES += mkstemp.c
+endif
+
+## Amiga routines
+if COMPAT_AMIGA
+libcompatos_a_SOURCES += \
+                         unix/dir.c \
+                         unix/file.c \
+                         amiga/osname.c \
+                         amiga/paths.c \
+                         unix/timer.c
+endif
+
+## Linux routines
+if COMPAT_LINUX
+libcompatos_a_SOURCES += \
+                         unix/dir.c \
+                         unix/file.c \
+                         unix/osname.c \
+                         linux/paths.c \
+                         unix/timer.c
+
+if HAVE_SOCKETS
+libcompatos_a_SOURCES += unix/socket.c
+endif
+endif
+
+## Morphos routines
+if COMPAT_MORPHOS
+libcompatos_a_SOURCES += \
+                         unix/dir.c \
+                         unix/file.c \
+                         morphos/osname.c \
+                         amiga/paths.c \
+                         unix/timer.c
+endif
+
+## Unix routines
+if COMPAT_UNIX
+libcompatos_a_SOURCES += \
+                         unix/dir.c \
+                         unix/file.c \
+                         unix/osname.c \
+                         unix/paths.c \
+                         unix/timer.c
+
+if HAVE_SOCKETS
+libcompatos_a_SOURCES += unix/socket.c
+endif
+endif
+
+## Wii routines
+if COMPAT_WII
+libcompatos_a_SOURCES += \
+                         wii/dir.c \
+                         unix/file.c \
+                         wii/osname.c \
+                         wii/paths.c \
+                         wii/timer.c
+endif
+
+## Windows routines
+if COMPAT_WIN32
+libcompatos_a_SOURCES += \
+                         unix/dir.c \
+                         unix/file.c \
+                         win32/osname.c \
+                         win32/paths.c \
+                         win32/timer.c
+
+if HAVE_SOCKETS
+libcompatos_a_SOURCES += win32/socket.c
+endif
+endif
+
+## SpeccyBoot routines
+if HAVE_TUNTAP
+libcompatos_a_SOURCES += unix/tuntap.c
+endif
+
+AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
+-DFUSEDATADIR="\"${pkgdatadir}\""
