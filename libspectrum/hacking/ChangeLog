@@ -952,3 +952,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20130526 Makefile.am: add dll.c into the dist tarball (Sergio).
 20130928 configure.ac: use 'subdir-objects' option as advised by automake 1.14
          to place object files in subdirectories (Sergio).
+20131013 configure.ac: replace obsolete ac_cv_prog_gcc with ac_cv_c_compiler_gnu
+         (Sergio).

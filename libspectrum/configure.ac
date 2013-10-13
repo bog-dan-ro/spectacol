@@ -177,7 +177,7 @@ AS_IF([test "$glib" = yes], [
 AM_CONDITIONAL(USE_MYGLIB, test "$glib" = no)
 
 dnl If it appears we're using gcc as our compiler, turn on warnings
-if test "$ac_cv_prog_gcc" = yes; then
+if test "$ac_cv_c_compiler_gnu" = yes; then
   CFLAGS="$CFLAGS -Wall"
   dnl And possibly lots of warnings
   AC_MSG_CHECKING(whether lots of warnings requested)

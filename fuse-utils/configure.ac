@@ -150,7 +150,7 @@ warnings=no)
 AC_MSG_RESULT($warnings)
 
 dnl If it appears we're using gcc as our compiler, turn on warnings
-if test "$ac_cv_prog_gcc" = yes; then
+if test "$ac_cv_c_compiler_gnu" = yes; then
     CFLAGS="$CFLAGS -Wall"
     CXXFLAGS="$CXXFLAGS -Wall"
     dnl And possibly lots of warnings

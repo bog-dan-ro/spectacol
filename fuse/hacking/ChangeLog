@@ -4587,3 +4587,5 @@
          linux/Makefile.am,morphos/Makefile.am,unix/Makefile.am,wii/Makefile.am,
          win32/Makefile.am}: use 'subdir-objects' option as advised by automake
          1.14 to place object files in subdirectories (Sergio).
+20131013 configure.ac: replace obsolete ac_cv_prog_gcc with ac_cv_c_compiler_gnu
+         (Sergio).
