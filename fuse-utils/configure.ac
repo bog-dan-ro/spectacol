@@ -26,7 +26,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_HOST
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -249,9 +249,8 @@ case "$host_os" in
   ;;
 esac
 AC_MSG_RESULT($COMPAT_OSNAME)
-COMPAT_SUBDIR="compat/$COMPAT_OSNAME"
-AC_SUBST(COMPAT_SUBDIR)
-AC_SUBST(COMPAT_OSNAME)
+AM_CONDITIONAL(COMPAT_AMIGA, test "$COMPAT_OSNAME" = 'amiga')
+AM_CONDITIONAL(COMPAT_UNIX, test "$COMPAT_OSNAME" = 'unix')
 AM_CONDITIONAL(COMPAT_WIN32, test "$COMPAT_OSNAME" = 'win32')
 
 if test "$ac_cv_func_getopt_long" = no; then
@@ -272,12 +271,7 @@ fi
 
 AC_CONFIG_FILES([
   Makefile
-  compat/amiga/Makefile
-  compat/unix/Makefile
-  compat/win32/Makefile
   fuse-utils.qpg
-  hacking/Makefile
-  man/Makefile
 ])
 
 AC_OUTPUT

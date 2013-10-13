@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2007-2008 Philip Kendall
+## Copyright (c) 2013 Philip Kendall
 
 ## $Id$
 
@@ -21,13 +21,8 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
-
-AM_CPPFLAGS = -I$(srcdir)/../..
-
-noinst_LIBRARIES = libcompatos.a
-
-libcompatos_a_SOURCES = basename.c \
-                        osname.c
-
-AM_CPPFLAGS += @LIBSPEC_CFLAGS@
+EXTRA_DIST += \
+              m4/audiofile.m4 \
+              m4/glib-1.0.m4 \
+              m4/glib-2.0.m4 \
+              m4/iconv.m4

@@ -21,7 +21,6 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
-
-EXTRA_DIST = ChangeLog \
-	cvs-tags
+EXTRA_DIST += \
+              hacking/ChangeLog \
+              hacking/cvs-tags

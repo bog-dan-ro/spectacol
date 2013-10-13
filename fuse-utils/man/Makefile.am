@@ -21,23 +21,22 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+man_MANS = \
+           man/audio2tape.1 \
+           man/createhdf.1 \
+           man/fmfconv.1 \
+           man/fuse-utils.1 \
+           man/listbasic.1 \
+           man/profile2map.1 \
+           man/raw2hdf.1 \
+           man/rzxcheck.1 \
+           man/rzxdump.1 \
+           man/rzxtool.1 \
+           man/scl2trd.1 \
+           man/snap2tzx.1 \
+           man/snapconv.1 \
+           man/tape2wav.1 \
+           man/tapeconv.1 \
+           man/tzxlist.1
 
-man_MANS = audio2tape.1 \
-	   createhdf.1 \
-	   fmfconv.1 \
-	   fuse-utils.1 \
-	   listbasic.1 \
-	   profile2map.1 \
-	   raw2hdf.1 \
-	   rzxcheck.1 \
-	   rzxdump.1 \
-	   rzxtool.1 \
-	   scl2trd.1 \
-	   snap2tzx.1 \
-	   snapconv.1 \
-	   tape2wav.1 \
-	   tapeconv.1 \
-	   tzxlist.1
-
-EXTRA_DIST = $(man_MANS)
+EXTRA_DIST += $(man_MANS)

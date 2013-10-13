@@ -423,3 +423,7 @@
 20130526 Makefile.am: add compat/getopt.h into the dist tarball (Sergio).
 20130928 Makefile.am,compat/win32/distribution.mk: take Windows distribution
          rules out of main Makefile.am (Sergio).
+20131013 configure.ac,Makefile.am,compat/{Makefile.am,amiga/Makefile.am,
+         unix/Makefile.am,win32/Makefile.am},hacking/Makefile.am,m4/Makefile.am,
+         man/Makefile.am: use 'subdir-objects' option as advised by automake
+         1.14 to place object files in subdirectories (Sergio).

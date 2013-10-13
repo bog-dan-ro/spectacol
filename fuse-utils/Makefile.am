@@ -25,16 +25,6 @@ AUTOMAKE_OPTIONS = foreign
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = @COMPAT_SUBDIR@ \
-          hacking \
-          man
-
-DIST_SUBDIRS = compat/amiga \
-               compat/unix \
-               compat/win32 \
-               hacking \
-               man
-
 bin_PROGRAMS = createhdf \
 	       fmfconv \
 	       listbasic \
@@ -75,38 +65,38 @@ if COMPAT_GETOPT
 fmfconv_SOURCES += compat/getopt.c compat/getopt1.c
 endif
 
-fmfconv_LDADD = @FFMPEG_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+fmfconv_LDADD = @FFMPEG_LIBS@ compat/libcompatos.a
 
 listbasic_SOURCES = listbasic.c utils.c
-listbasic_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+listbasic_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
 
 profile2map_SOURCES = profile2map.c utils.c
-profile2map_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+profile2map_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
 
 raw2hdf_SOURCES = ide.c raw2hdf.c
 
 rzxcheck_SOURCES = rzxcheck.c keys.c utils.c
-rzxcheck_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+rzxcheck_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
 
 rzxdump_SOURCES = rzxdump.c utils.c
-rzxdump_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+rzxdump_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
 
 rzxtool_SOURCES = rzxtool.c utils.c
-rzxtool_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+rzxtool_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
 
 scl2trd_SOURCES = scl2trd.c
 
 snap2tzx_SOURCES = snap2tzx.c utils.c
-snap2tzx_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+snap2tzx_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
 
 snapconv_SOURCES = snapconv.c utils.c
-snapconv_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+snapconv_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
 
 tapeconv_SOURCES = tapeconv.c utils.c
-tapeconv_LDADD = @LIBSPEC_LIBS@ compat/@COMPAT_OSNAME@/libcompatos.a
+tapeconv_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
 
 tzxlist_SOURCES = tzxlist.c utils.c
-tzxlist_LDADD = @LIBSPEC_LIBS@ @LTLIBICONV@ compat/@COMPAT_OSNAME@/libcompatos.a
+tzxlist_LDADD = @LIBSPEC_LIBS@ @LTLIBICONV@ compat/libcompatos.a
 
 audio2tape_SOURCES = audio2tape.cc importer/soundfile.cc importer/trigger.cc \
                      converter/findpilot.cc converter/findsync1.cc \
@@ -114,11 +104,11 @@ audio2tape_SOURCES = audio2tape.cc importer/soundfile.cc importer/trigger.cc \
                      converter/getsync2.cc converter/romloader.cc \
                      converter/romloaderstate.cc utils.c
 audio2tape_LDADD = @LIBSPEC_LIBS@ @AUDIOFILE_LIBS@ \
-                   compat/@COMPAT_OSNAME@/libcompatos.a
+                   compat/libcompatos.a
 
 tape2wav_SOURCES = tape2wav.c utils.c
 tape2wav_LDADD = @LIBSPEC_LIBS@ @AUDIOFILE_LIBS@ \
-                 compat/@COMPAT_OSNAME@/libcompatos.a
+                 compat/libcompatos.a
 
 noinst_HEADERS = compat.h ide.h utils.h audio2tape.h importer/interpolator.h \
                  importer/schmitt.h importer/simple.h importer/soundfile.h \
@@ -128,11 +118,11 @@ noinst_HEADERS = compat.h ide.h utils.h audio2tape.h importer/interpolator.h \
                  converter/romloader.h converter/romloaderstate.h \
                  compat/getopt.h fmfconv.h movie_tables.h
 
-EXTRA_DIST = m4/audiofile.m4 \
-             m4/glib-1.0.m4 \
-             m4/glib-2.0.m4 \
-             m4/iconv.m4
+noinst_LIBRARIES =
 
-if COMPAT_WIN32
-include compat/win32/distribution.mk
-endif
+EXTRA_DIST =
+
+include compat/Makefile.am
+include hacking/Makefile.am
+include m4/Makefile.am
+include man/Makefile.am

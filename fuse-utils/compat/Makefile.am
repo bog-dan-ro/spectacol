@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2007-2008 Philip Kendall
+## Copyright (c) 2013 Philip Kendall
 
 ## $Id$
 
@@ -21,13 +21,28 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+noinst_LIBRARIES += compat/libcompatos.a
 
-AM_CPPFLAGS = -I$(srcdir)/../..
+compat_libcompatos_a_SOURCES =
 
-noinst_LIBRARIES = libcompatos.a
+if COMPAT_AMIGA
+compat_libcompatos_a_SOURCES += \
+                                compat/amiga/basename.c \
+                                compat/amiga/osname.c
+endif
 
-libcompatos_a_SOURCES = basename.c \
-                        osname.c
+if COMPAT_UNIX
+compat_libcompatos_a_SOURCES += \
+                                compat/unix/basename.c \
+                                compat/unix/osname.c
+endif
 
-AM_CPPFLAGS += @LIBSPEC_CFLAGS@
+if COMPAT_WIN32
+compat_libcompatos_a_SOURCES += \
+                                compat/unix/basename.c \
+                                compat/win32/osname.c
+endif
+
+if COMPAT_WIN32
+include compat/win32/distribution.mk
+endif
