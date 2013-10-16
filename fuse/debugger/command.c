@@ -122,6 +122,7 @@ debugger_register_hash( const char *name )
     case 0x0065: case 0x8065:	/* E, E' */
     case 0x0068: case 0x8068:	/* H, H' */
     case 0x006c: case 0x806c:	/* L, L' */
+    case 0x0069: case 0x0072:	/* I, R */
     case 0x6166: case 0xe166:	/* AF, AF' */
     case 0x6263: case 0xe263:	/* BC, BC' */
     case 0x6465: case 0xe465:	/* DE, DE' */
@@ -171,6 +172,9 @@ debugger_register_get( int which )
   case 0x8068: return H_;
   case 0x006c: return L;
   case 0x806c: return L_;
+
+  case 0x0069: return I;
+  case 0x0072: return ( R7 & 0x80 ) | ( R & 0x7f );
     
     /* 16-bit registers */
   case 0x6166: return AF;
@@ -222,6 +226,9 @@ debugger_register_set( int which, libspectrum_word value )
     case 0x006c: L = value; break;
     case 0x806c: L_ = value; break;
 
+    case 0x0069: I = value; break;
+    case 0x0072: R = R7 = value; break;
+
     /* 16-bit registers */
     case 0x6166: AF = value; break;
     case 0xe166: AF_ = value; break;
@@ -271,6 +278,9 @@ debugger_register_text( int which )
   case 0x8068: return "H'";
   case 0x006c: return "L";
   case 0x806c: return "L'";
+
+  case 0x0069: return "I";
+  case 0x0072: return "R";
     
     /* 16-bit registers */
   case 0x6166: return "AF";

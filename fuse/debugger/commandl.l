@@ -68,13 +68,13 @@ ev|eve|even|event { return EVENT; }
 ex|exi|exit { return EXIT; }
 fi|fin|fini|finis|finish { return FINISH; }
 if { return IF; }
-i|ig|ign|igno|ignor|ignore { return DEBUGGER_IGNORE; }
+ig|ign|igno|ignor|ignore { return DEBUGGER_IGNORE; }
 n|ne|nex|next { return NEXT; }
 o|ou|out { return DEBUGGER_OUT; }	/* Different name to avoid clashing
 					   with OUT from z80/z80_macros.h */
 p|po|por|port { return PORT; }
 pr|pri|prin|print { return DEBUGGER_PRINT; }
-r|re|rea|read { return READ; }
+re|rea|read { return READ; }
 se|set { return SET; }
 s|st|ste|step { return STEP; }
 t|tb|tbr|tbre|tbrea|tbreak|tbreakp|tbreakpo|tbreakpoi|tbreakpoin|tbreakpoint {
@@ -93,7 +93,7 @@ af|bc|de|hl|"af\'"|"bc\'"|"de\'"|"hl\'" {
                              yylval.reg = debugger_register_hash( yytext );
 			     return DEBUGGER_REGISTER; }
 
-sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
+sp|pc|ix|iy|i|r { yylval.reg = debugger_register_hash( yytext );
 	      return DEBUGGER_REGISTER; }
 
 im|iff1|iff2 { yylval.reg = debugger_register_hash( yytext );
