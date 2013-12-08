@@ -4591,3 +4591,4 @@
          (Sergio).
 20131016 debugger/{command.c,commandl.l}: add I and R setting and getting to the
          debugger (patch #319) (Sergio).
+20131209 man/fuse.1: document more movie options (Sergio).

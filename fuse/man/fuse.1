@@ -1886,7 +1886,7 @@ Save the current screen as a PNG file. You will be prompted for a
 filename to save the screenshot to.
 .RE
 .PP
-.I "File, Movies, Record..."
+.I "File, Movie, Record..."
 .RS
 Fuse can record movie (video and audio) into a file with special format 
 which can be converted later to a common video file format with the
@@ -1897,7 +1897,23 @@ You will be prompted for a filename to save video. Please see
 section.
 .RE
 .PP
-.I "File, Movies, Stop"
+.I "File, Movie, Record from RZX..."
+.RS
+Start movie recording and RZX playback at the same time. You will be
+prompted for a filename to play from and a filename to save video.
+.RE
+.PP
+.I "File, Movie, Pause"
+.RS
+Pause movie recording which is currently in progress.
+.RE
+.PP
+.I "File, Movie, Continue"
+.RS
+Resume movie recording which has been previously paused.
+.RE
+.PP
+.I "File, Movie, Stop"
 .RS
 Stop movie recording which is currently in progress.
 .RE
@@ -2495,6 +2511,25 @@ tournament, you can safely ignore this option.
 .RS
 Specify whether a snapshot should be embedded in an RZX file when
 recording is started from an existing snapshot.
+.RE
+.RE
+.PP
+.I "Options, Movie..."
+.RS
+Display the Movie Options dialog, letting you configure how Fuse's deals
+with movie recordings.
+.PP
+.I "Movie compression"
+.RS
+This option set the compression level to None, Lossless or High. (See the
+.B "MOVIE RECORDING"
+section for more information).
+.RE
+.PP
+.I "Stop recording after RZX ends"
+.RS
+If this option is selected, Fuse will stop any movie recording after a RZX 
+playback is finished.
 .RE
 .RE
 .PP
