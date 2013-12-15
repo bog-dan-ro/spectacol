@@ -426,6 +426,8 @@
 20131013 configure.ac,Makefile.am,compat/{Makefile.am,amiga/Makefile.am,
          unix/Makefile.am,win32/Makefile.am},hacking/Makefile.am,m4/Makefile.am,
          man/Makefile.am: use 'subdir-objects' option as advised by automake
-         1.14 to place object files in subdirectories (Sergio).
+         1.14 to place object files in subdirectories (more from patch #317)
+         (Sergio).
 20131013 configure.ac: replace obsolete ac_cv_prog_gcc with ac_cv_c_compiler_gnu
          (Sergio).
+20131215 rzxtool.c: fix snapshot insertion in rzx recordings (Sergio).

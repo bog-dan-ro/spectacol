@@ -1621,7 +1621,13 @@ void
 libspectrum_rzx_insert_snap( libspectrum_rzx *rzx, libspectrum_snap *snap,
 			     int where )
 {
-  rzx->blocks = g_slist_insert( rzx->blocks, snap, where );
+  rzx_block_t *block;
+
+  block_alloc( &block, LIBSPECTRUM_RZX_SNAPSHOT_BLOCK );
+  block->types.snap.snap = snap;
+  block->types.snap.automatic = 0;
+
+  rzx->blocks = g_slist_insert( rzx->blocks, block, where );
 }
 
 /*

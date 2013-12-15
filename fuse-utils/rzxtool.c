@@ -178,7 +178,28 @@ extract_snap( libspectrum_rzx *rzx, size_t where, const char *filename )
 static libspectrum_snap*
 read_snap( const char *filename )
 {
-  return NULL;
+  unsigned char *buffer = NULL;
+  size_t length = 0;
+  int error;
+  libspectrum_snap *snap;
+
+  if( read_file( filename, &buffer, &length ) ) {
+    return NULL;
+  }
+
+  snap = libspectrum_snap_alloc();
+
+  error = libspectrum_snap_read( snap, buffer, length, LIBSPECTRUM_ID_UNKNOWN,
+                                 filename );
+
+  if( error ) {
+    libspectrum_snap_free( snap );
+    snap = NULL;
+  }
+
+  free( buffer );
+
+  return snap;
 }
 
 static int
@@ -187,7 +208,10 @@ insert_snap( libspectrum_rzx *rzx, size_t where, const char *filename )
   libspectrum_snap *snap;
 
   snap = read_snap( filename );
-  if( !snap ) return 1;
+  if( !snap ) {
+    fprintf( stderr, "%s: couldn't read `%s'\n", progname, filename );
+    return 1;
+  }
 
   libspectrum_rzx_insert_snap( rzx, snap, where );
 

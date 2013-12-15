@@ -954,3 +954,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          to place object files in subdirectories (Sergio).
 20131013 configure.ac: replace obsolete ac_cv_prog_gcc with ac_cv_c_compiler_gnu
          (Sergio).
+20131215 rzx.c: fix snapshot insertion in rzx recordings (Sergio).
