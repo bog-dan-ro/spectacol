@@ -4597,3 +4597,5 @@
          remove clang tautological-constant-out-of-range-compare warnings by
          moving sentinels into enums and not assigning non-enum values to enum
          variables (Fred).
+20131215 compat/{amiga,linux,morphos,unix,wii,win32}: add Makefile.in and
+         Makefile to the ignore property (Fred).
