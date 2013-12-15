@@ -73,8 +73,6 @@ static int beta_index_pulse = 0;
 
 static int index_event;
 
-#define BETA_NUM_DRIVES 4
-
 static wd_fdc *beta_fdc;
 static wd_fdc_drive beta_drives[ BETA_NUM_DRIVES ];
 static ui_media_drive_info_t beta_ui_drives[ BETA_NUM_DRIVES ];

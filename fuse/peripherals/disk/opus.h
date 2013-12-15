@@ -37,6 +37,7 @@
 typedef enum opus_drive_number {
   OPUS_DRIVE_1 = 0,
   OPUS_DRIVE_2,
+  OPUS_NUM_DRIVES,
 } opus_drive_number;
 
 extern int opus_available;  /* Is the Opus available for use? */

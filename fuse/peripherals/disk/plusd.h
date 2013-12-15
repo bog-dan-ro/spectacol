@@ -33,6 +33,7 @@
 typedef enum plusd_drive_number {
   PLUSD_DRIVE_1 = 0,
   PLUSD_DRIVE_2,
+  PLUSD_NUM_DRIVES,
 } plusd_drive_number;
 
 #include <libspectrum.h>

@@ -32,7 +32,8 @@
 
 typedef enum disciple_drive_number {
   DISCIPLE_DRIVE_1 = 0,
-  DISCIPLE_DRIVE_2
+  DISCIPLE_DRIVE_2,
+  DISCIPLE_NUM_DRIVES,
 } disciple_drive_number;
 
 #include <libspectrum.h>

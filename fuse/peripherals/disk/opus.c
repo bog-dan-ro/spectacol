@@ -68,8 +68,6 @@ static int opus_index_pulse;
 
 static int index_event;
 
-#define OPUS_NUM_DRIVES 2
-
 static wd_fdc *opus_fdc;
 static wd_fdc_drive opus_drives[ OPUS_NUM_DRIVES ];
 static ui_media_drive_info_t opus_ui_drives[ OPUS_NUM_DRIVES ];

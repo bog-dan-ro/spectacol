@@ -69,8 +69,6 @@ static int disciple_index_pulse;
 
 static int index_event;
 
-#define DISCIPLE_NUM_DRIVES 2
-
 static wd_fdc *disciple_fdc;
 static wd_fdc_drive disciple_drives[ DISCIPLE_NUM_DRIVES ];
 static ui_media_drive_info_t disciple_ui_drives[ DISCIPLE_NUM_DRIVES ];

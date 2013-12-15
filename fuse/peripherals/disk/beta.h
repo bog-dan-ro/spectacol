@@ -71,6 +71,7 @@ typedef enum beta_drive_number {
   BETA_DRIVE_B,
   BETA_DRIVE_C,
   BETA_DRIVE_D,
+  BETA_NUM_DRIVES,
 } beta_drive_number;
 
 int beta_disk_insert( beta_drive_number which, const char *filename,

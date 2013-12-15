@@ -57,8 +57,6 @@ static int plusd_index_pulse;
 
 static int index_event;
 
-#define PLUSD_NUM_DRIVES 2
-
 static wd_fdc *plusd_fdc;
 static wd_fdc_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 static ui_media_drive_info_t plusd_ui_drives[ PLUSD_NUM_DRIVES ];

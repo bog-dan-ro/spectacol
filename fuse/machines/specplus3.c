@@ -61,7 +61,6 @@ static void select_special_map( int page1, int page2, int page3, int page4 );
 
 static int specplus3_reset( void );
 
-#define SPECPLUS3_NUM_DRIVES 2
 upd_fdc *specplus3_fdc;
 static upd_fdc_drive specplus3_drives[ SPECPLUS3_NUM_DRIVES ];
 

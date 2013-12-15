@@ -4592,3 +4592,8 @@
 20131016 debugger/{command.c,commandl.l}: add I and R setting and getting to the
          debugger (patch #319) (Sergio).
 20131209 man/fuse.1: document more movie options (Sergio).
+20131215 keyboard.c,machines/specplus3.[ch],
+         peripherals/disk/{beta.[ch],disciple.[ch],opus.[ch],plusd.[ch]}:
+         remove clang tautological-constant-out-of-range-compare warnings by
+         moving sentinels into enums and not assigning non-enum values to enum
+         variables (Fred).
