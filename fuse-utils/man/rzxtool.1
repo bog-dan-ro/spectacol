@@ -36,6 +36,7 @@ rzxtool \(em Modify Sinclair ZX Spectrum input recording files
 .RI [\-d "block number" ]
 .RI [\-e "block number" , filename ]
 .RI [\-i "block number" , filename ]
+[\-f]
 [\-u]
 .I rzxfile
 .RI [ outfile ]
@@ -73,6 +74,14 @@ The snapshot specified in
 .I filename
 will be added to the file at the position specified by
 .IR "block number" .
+.RE
+.PP
+\-f
+.RS
+Finalise the RZX file. Any embedded snapshot (except the first one) will
+be deleted. Fuse can add interspersed snapshots to RZX files to allow
+rollbacking to a previous time. Action replays submitted to the RZX Archive
+should not have these snapshots.
 .RE
 .PP
 \-u

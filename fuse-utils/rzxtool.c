@@ -1,5 +1,5 @@
 /* rzxtool.c: Simple modifications to RZX files
-   Copyright (c) 2007 Philip Kendall
+   Copyright (c) 2007-2014 Philip Kendall
 
    $Id$
 
@@ -44,6 +44,7 @@ typedef enum action_type_t {
   ACTION_DELETE_BLOCK,
   ACTION_EXTRACT_SNAP,
   ACTION_INSERT_SNAP,
+  ACTION_FINALISE_RZX,
 
 } action_type_t;
 
@@ -235,6 +236,9 @@ apply_action( void *data, void *user_data )
   case ACTION_INSERT_SNAP:
     insert_snap( rzx, where, action->filename );
     break;
+  case ACTION_FINALISE_RZX:
+    libspectrum_rzx_finalise( rzx );
+    break;
   default:
     fprintf( stderr, "%s: unknown action type %d\n", progname, action->type );
   }
@@ -292,6 +296,9 @@ add_action( GSList **actions, action_type_t type, const char *argument )
   if( type == ACTION_DELETE_BLOCK ) {
     action->where = atoi( argument );
     action->filename = NULL;
+  } else if( type == ACTION_FINALISE_RZX ) {
+    action->where = 0;
+    action->filename = NULL;
   } else {
 
     error = parse_argument( argument, &where, &filename );
@@ -321,7 +328,7 @@ parse_options( int argc, char **argv, GSList **actions,
 
   options->uncompressed = 0;
 
-  while( ( c = getopt( argc, argv, "d:e:i:u" ) ) != EOF ) {
+  while( ( c = getopt( argc, argv, "d:e:i:uf" ) ) != EOF ) {
     switch( c ) {
     case 'd':
       error = add_action( actions, ACTION_DELETE_BLOCK, optarg );
@@ -332,6 +339,10 @@ parse_options( int argc, char **argv, GSList **actions,
       break;
     case 'i':
       error = add_action( actions, ACTION_INSERT_SNAP, optarg );
+      output_needed = 1;
+      break;
+    case 'f':
+      error = add_action( actions, ACTION_FINALISE_RZX, optarg );
       output_needed = 1;
       break;
     case 'u':

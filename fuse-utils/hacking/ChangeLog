@@ -431,3 +431,5 @@
 20131013 configure.ac: replace obsolete ac_cv_prog_gcc with ac_cv_c_compiler_gnu
          (Sergio).
 20131215 rzxtool.c: fix snapshot insertion in rzx recordings (Sergio).
+20140113 man/rzxtool.1,rzxtool.c: add option for finalising rzx recordings
+         (part of bug #305) (Sergio).
