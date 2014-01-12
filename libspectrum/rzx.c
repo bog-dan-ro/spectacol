@@ -1,5 +1,5 @@
 /* rzx.c: routines for dealing with .rzx files
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2014 Philip Kendall
 
    $Id$
 
@@ -281,6 +281,7 @@ libspectrum_rzx_start_input( libspectrum_rzx *rzx, libspectrum_dword tstates )
   rzx->current_input->frames = NULL;
   rzx->current_input->allocated = 0;
   rzx->current_input->count = 0;
+  rzx->current_input->non_repeat = 0;
 
   rzx->blocks = g_slist_append( rzx->blocks, block );
 }
@@ -393,12 +394,36 @@ libspectrum_rzx_rollback_to( libspectrum_rzx *rzx, libspectrum_snap **snap,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+input_block_resize( input_block_t *input, size_t new_count )
+{
+  libspectrum_rzx_frame_t *ptr;
+  size_t new_allocated;
+
+  /* Get more space if we need it; allocate twice as much as we currently
+     have, with a minimum of 50 */
+  if( new_count > input->allocated ) {
+
+    new_allocated = input->allocated >= 25 ? 2 * input->allocated : 50;
+    if( new_allocated < new_count ) new_allocated = new_count;
+
+    ptr = libspectrum_realloc( input->frames, new_allocated * sizeof( *ptr ) );
+    if( !ptr ) return LIBSPECTRUM_ERROR_MEMORY;
+
+    input->frames = ptr;
+    input->allocated = new_allocated;    
+  }
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 libspectrum_error
 libspectrum_rzx_store_frame( libspectrum_rzx *rzx, size_t instructions,
 			     size_t count, libspectrum_byte *in_bytes )
 {
   input_block_t *input;
   libspectrum_rzx_frame_t *frame;
+  libspectrum_error error;
 
   input = rzx->current_input;
 
@@ -411,19 +436,10 @@ libspectrum_rzx_store_frame( libspectrum_rzx *rzx, size_t instructions,
     return LIBSPECTRUM_ERROR_INVALID;
   }
 
-  /* Get more space if we need it; allocate twice as much as we currently
-     have, with a minimum of 50 */
-  if( input->count == input->allocated ) {
-
-    libspectrum_rzx_frame_t *ptr; size_t new_allocated;
-
-    new_allocated = input->allocated >= 25 ? 2 * input->allocated : 50;
-
-    ptr = realloc( input->frames, new_allocated * sizeof( *ptr ) );
-    if( !ptr ) return LIBSPECTRUM_ERROR_MEMORY;
-
-    input->frames = ptr;
-    input->allocated = new_allocated;
+  /* Get more space if we need it */
+  if( input->allocated == input->count ) {
+    error = input_block_resize( input, input->count + 1 );
+    if( error ) return error;
   }
 
   frame = &input->frames[ input->count ];
@@ -438,6 +454,8 @@ libspectrum_rzx_store_frame( libspectrum_rzx *rzx, size_t instructions,
     ) {
 	
     frame->repeat_last = 1;
+    frame->count = 0;
+    frame->in_bytes = NULL;
 
   } else {
 
@@ -601,6 +619,7 @@ libspectrum_rzx_free( libspectrum_rzx *rzx )
 {
   g_slist_foreach( rzx->blocks, block_free_wrapper, NULL );
   g_slist_free( rzx->blocks );
+  libspectrum_free( rzx );
 
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -1646,6 +1665,13 @@ libspectrum_rzx_iterator_next( libspectrum_rzx_iterator it )
   return it->next;
 }
 
+libspectrum_rzx_iterator
+libspectrum_rzx_iterator_last( libspectrum_rzx *rzx )
+{
+  /* This function iterates over the whole list */
+  return g_slist_last( rzx->blocks );
+}
+
 libspectrum_rzx_block_id
 libspectrum_rzx_iterator_get_type( libspectrum_rzx_iterator it )
 {
@@ -1691,4 +1717,85 @@ libspectrum_rzx_iterator_snap_is_automatic( libspectrum_rzx_iterator it )
   if( block->type != LIBSPECTRUM_RZX_SNAPSHOT_BLOCK ) return 0;
 
   return block->types.snap.automatic;
+}
+
+static libspectrum_error
+input_block_merge( input_block_t *input, input_block_t *next_input )
+{
+  libspectrum_error error;
+
+  /* Get more space if we need it */
+  if( input->allocated < input->count + next_input->count ) {
+    error = input_block_resize( input, input->count + next_input->count );
+    if( error ) return error;
+  }
+
+  /* Note in_bytes are not duplicated */
+  memcpy( &( input->frames[input->count] ), next_input->frames,
+          next_input->count * sizeof( libspectrum_rzx_frame_t ) );
+
+  input->non_repeat = input->count + next_input->non_repeat;
+  input->count += next_input->count;
+  next_input->count = 0; /* don't free reused in_bytes */
+
+  return 0;
+}
+
+libspectrum_error
+libspectrum_rzx_finalise( libspectrum_rzx *rzx )
+{
+  GSList *list, *item, *next_item;
+  rzx_block_t *block, *next_block;
+  libspectrum_error error;
+  int first_snap = 1;
+  int finalised = 0;
+
+  /* Delete interspersed snapshots */
+  list = rzx->blocks;
+
+  while( list ) {
+    item = list;
+    block = list->data;
+    list = list->next;
+
+    if( block->type == LIBSPECTRUM_RZX_SNAPSHOT_BLOCK ) {
+      if( first_snap ) {
+        first_snap = 0;
+      } else {
+        block_free( block );
+        rzx->blocks = g_slist_delete_link( rzx->blocks, item );
+        finalised = 1;
+      }
+    }
+  }
+
+  /* Merge adjacent input blocks */
+  list = rzx->blocks;
+
+  while( list ) {
+    block = list->data;
+
+    if( block->type == LIBSPECTRUM_RZX_INPUT_BLOCK ) {
+
+      next_item = list->next;
+      next_block = ( next_item )? next_item->data : NULL;
+
+      if( next_block && next_block->type == LIBSPECTRUM_RZX_INPUT_BLOCK ) {
+        error = input_block_merge( &( block->types.input ),
+                                   &( next_block->types.input ) );
+        if( error ) return error;
+
+        block_free( next_block );
+        rzx->blocks = g_slist_delete_link( rzx->blocks, next_item );
+        finalised = 1;
+      } else {
+        list = list->next;
+      }
+
+    } else {
+      list = list->next;
+    }
+  }
+
+  return finalised? LIBSPECTRUM_ERROR_NONE : LIBSPECTRUM_ERROR_INVALID;
 }

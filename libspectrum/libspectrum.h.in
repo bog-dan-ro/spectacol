@@ -806,6 +806,8 @@ WIN32_DLL libspectrum_rzx_iterator
 libspectrum_rzx_iterator_begin( libspectrum_rzx *rzx );
 WIN32_DLL libspectrum_rzx_iterator
 libspectrum_rzx_iterator_next( libspectrum_rzx_iterator it );
+WIN32_DLL libspectrum_rzx_iterator
+libspectrum_rzx_iterator_last( libspectrum_rzx *rzx );
 
 WIN32_DLL libspectrum_rzx_block_id
 libspectrum_rzx_iterator_get_type( libspectrum_rzx_iterator it );
@@ -819,6 +821,9 @@ WIN32_DLL libspectrum_snap*
 libspectrum_rzx_iterator_get_snap( libspectrum_rzx_iterator it );
 WIN32_DLL int
 libspectrum_rzx_iterator_snap_is_automatic( libspectrum_rzx_iterator it );
+
+WIN32_DLL libspectrum_error
+libspectrum_rzx_finalise( libspectrum_rzx *rzx );
 
 /*
  * Microdrive image handling routines
