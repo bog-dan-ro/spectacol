@@ -591,7 +591,9 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/File/Recording/Stop", 
     "/File/Recording/Record...", 1,
     "/File/Recording/Record from snapshot...", 1,
-    "/File/Recording/Play...", 1 },
+    "/File/Recording/Continue recording...", 1,
+    "/File/Recording/Play...", 1,
+    "/File/Recording/Finalise...", 1 },
 
   { UI_MENU_ITEM_RECORDING_ROLLBACK,
     "/File/Recording/Insert snapshot",

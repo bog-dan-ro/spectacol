@@ -4599,3 +4599,6 @@
          variables (Fred).
 20131215 compat/{amiga,linux,morphos,unix,wii,win32}: add Makefile.in and
          Makefile to the ignore property (Fred).
+20140113 man/fuse.1,menu.[ch],menu_data.dat,rzx.[ch],ui.c: allow to continue
+         recordings if there is a final snapshot in the RZX file and allow to
+         finalise recordings (part of bug #305) (Sergio).

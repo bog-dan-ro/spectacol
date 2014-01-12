@@ -1,5 +1,5 @@
 /* rzx.h: .rzx files
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2014 Philip Kendall
 
    $Id$
 
@@ -63,6 +63,8 @@ void rzx_init( void );
 
 int rzx_start_recording( const char *filename, int embed_snapshot );
 int rzx_stop_recording( void );
+int rzx_continue_recording( const char *filename );
+int rzx_finalise_recording( const char *filename );
 
 int rzx_start_playback( const char *filename, int check_snapshot );
 int

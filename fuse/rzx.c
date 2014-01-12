@@ -1,5 +1,5 @@
 /* rzx.c: .rzx files
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2014 Philip Kendall
 
    $Id$
 
@@ -108,6 +108,7 @@ static const char *end_event_detail_string = "end";
 int end_event;
 
 static int start_playback( libspectrum_rzx *rzx );
+static void start_recording( libspectrum_rzx *rzx, int competition_mode );
 static int recording_frame( void );
 static int playback_frame( void );
 static int counter_reset( void );
@@ -129,6 +130,27 @@ rzx_init( void )
   end_event = debugger_event_register( event_type_string, end_event_detail_string );
 }
 
+static int
+rzx_add_snap( libspectrum_rzx *rzx, int automatic )
+{
+  int error;
+  libspectrum_snap *snap = libspectrum_snap_alloc();
+
+  error = snapshot_copy_to( snap );
+  if( error ) {
+    libspectrum_snap_free( snap );
+    return error;
+  }
+
+  error = libspectrum_rzx_add_snap( rzx, snap, automatic );
+  if( error ) {
+    libspectrum_snap_free( snap );
+    return error;
+  }
+
+  return 0;
+}
+
 int rzx_start_recording( const char *filename, int embed_snapshot )
 {
   int error;
@@ -142,49 +164,17 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
 
   /* If we're embedding a snapshot, create it now */
   if( embed_snapshot ) {
+    error = rzx_add_snap( rzx, 0 );
 
-    libspectrum_snap *snap = libspectrum_snap_alloc();
-
-    error = snapshot_copy_to( snap );
     if( error ) {
-      libspectrum_snap_free( snap );
-      return 1;
-    }
-
-    error = libspectrum_rzx_add_snap( rzx, snap, 0 );
-    if( error ) {
-      libspectrum_snap_free( snap );
+      libspectrum_free( rzx_filename );
+      libspectrum_rzx_free( rzx );
       return error;
     }
-
   }
 
-  libspectrum_rzx_start_input( rzx, tstates );
+  start_recording( rzx, settings_current.competition_mode );
 
-  counter_reset();
-  rzx_in_count = 0;
-  autosave_frame_count = 0;
-
-  rzx_recording = 1;
-
-  ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
-
-  if( settings_current.competition_mode ) {
-
-    if( !libspectrum_gcrypt_version() )
-      ui_error( UI_ERROR_WARNING,
-		"gcrypt not available: recording will NOT be signed" );
-
-    settings_current.emulation_speed = 100;
-    rzx_competition_mode = 1;
-    
-  } else {
-
-    ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 1 );
-    rzx_competition_mode = 0;
-
-  }
-    
   return 0;
 }
 
@@ -198,6 +188,13 @@ int rzx_stop_recording( void )
   /* Stop recording data */
   rzx_recording = 0;
   if( settings_current.movie_stop_after_rzx ) movie_stop();
+
+  /* Embed final snapshot */
+  if( !rzx_competition_mode ) rzx_add_snap( rzx, 0 );
+
+  libspectrum_free( rzx_in_bytes );
+  rzx_in_bytes = NULL;
+  rzx_in_allocated = 0;
 
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
@@ -213,6 +210,7 @@ int rzx_stop_recording( void )
     settings_current.rzx_compression, rzx_competition_mode ? &rzx_key : NULL
   );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
+    libspectrum_free( rzx_filename );
     libspectrum_rzx_free( rzx );
     return libspec_error;
   }
@@ -409,6 +407,135 @@ int rzx_stop_playback( int add_interrupt )
   return 0;
 }  
 
+static void
+start_recording( libspectrum_rzx *rzx, int competition_mode )
+{
+  libspectrum_rzx_start_input( rzx, tstates );
+
+  counter_reset();
+  rzx_in_count = 0;
+  autosave_frame_count = 0;
+
+  rzx_recording = 1;
+
+  ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
+
+  if( competition_mode ) {
+
+    if( !libspectrum_gcrypt_version() )
+      ui_error( UI_ERROR_WARNING,
+                "gcrypt not available: recording will NOT be signed" );
+
+    settings_current.emulation_speed = 100;
+    rzx_competition_mode = 1;
+
+  } else {
+
+    ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 1 );
+    rzx_competition_mode = 0;
+
+  }
+}
+
+int
+rzx_continue_recording( const char *filename )
+{
+  utils_file file;
+  libspectrum_error libspec_error; int error;
+  libspectrum_snap* snap = NULL;
+  libspectrum_rzx_iterator last_it = NULL;
+
+  if( rzx_recording || rzx_playback ) return 1;
+
+  /* Store the filename */
+  rzx_filename = utils_safe_strdup( filename );
+
+  error = utils_read_file( filename, &file );
+  if( error ) return error;
+
+  rzx = libspectrum_rzx_alloc();
+
+  libspec_error = libspectrum_rzx_read( rzx, file.buffer, file.length );
+  if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
+    utils_close_file( &file );
+    return libspec_error;
+  }
+
+  utils_close_file( &file );
+
+  /* Get final snapshot */
+  last_it = libspectrum_rzx_iterator_last( rzx );
+  if( last_it ) snap = libspectrum_rzx_iterator_get_snap( last_it );
+
+  if( snap ) {
+    error = snapshot_copy_from( snap );
+    if( error ) return error;
+  } else {
+    ui_error( UI_ERROR_WARNING, "RZX file cannot be continued" );
+    libspectrum_free( rzx_filename );
+    libspectrum_rzx_free( rzx );
+    return 1;
+  }
+
+  start_recording( rzx, 0 );
+
+  return 0;
+}
+
+int
+rzx_finalise_recording( const char *filename )
+{
+  libspectrum_byte *buffer; size_t length;
+  libspectrum_error libspec_error; int error;
+  utils_file file;
+
+  if( rzx_recording || rzx_playback ) return 1;
+
+  error = utils_read_file( filename, &file );
+  if( error ) return error;
+
+  rzx = libspectrum_rzx_alloc();
+
+  libspec_error = libspectrum_rzx_read( rzx, file.buffer, file.length );
+  if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
+    utils_close_file( &file );
+    libspectrum_rzx_free( rzx );
+    return libspec_error;
+  }
+
+  utils_close_file( &file );
+
+  libspec_error = libspectrum_rzx_finalise( rzx );
+  if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
+    libspectrum_rzx_free( rzx );
+    return libspec_error;
+  }
+
+  /* Write the file */
+  length = 0;
+  buffer = NULL;
+  libspec_error = libspectrum_rzx_write(
+    &buffer, &length, rzx, LIBSPECTRUM_ID_UNKNOWN, fuse_creator,
+    settings_current.rzx_compression, rzx_competition_mode ? &rzx_key : NULL
+  );
+  if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
+    libspectrum_rzx_free( rzx );
+    return libspec_error;
+  }
+
+  error = utils_write_file( filename, buffer, length );
+  if( error ) {
+    libspectrum_free( buffer );
+    libspectrum_rzx_free( rzx );
+    return error;
+  }
+
+  libspectrum_free( buffer );
+  libspectrum_rzx_free( rzx );
+
+  return 0;
+}
+
 int rzx_frame( void )
 {
   if( rzx_recording ) return recording_frame();
@@ -476,15 +603,10 @@ autosave_prune( void )
 static void
 autosave_frame( void )
 {
-  libspectrum_snap *snap;
-
   if( ++autosave_frame_count % AUTOSAVE_INTERVAL ) return;
 
-  snap = libspectrum_snap_alloc();
-  snapshot_copy_to( snap );
+  rzx_add_snap( rzx, 1 );
 
-  libspectrum_rzx_stop_input( rzx );
-  libspectrum_rzx_add_snap( rzx, snap, 1 );
   libspectrum_rzx_start_input( rzx, tstates );
 
   autosave_prune();

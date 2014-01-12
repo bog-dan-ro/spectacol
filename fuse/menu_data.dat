@@ -27,12 +27,16 @@ File/_Save Snapshot..., Item, F2
 
 File/_Recording, Branch
 File/Recording/_Record..., Item
-File/Recording/Record _from snapshot..., Item
+File/Recording/Record from s_napshot..., Item
+File/Recording/_Continue recording..., Item
+File/Recording/separator, Separator
 File/Recording/_Insert snapshot, Item, Insert
 File/Recording/Roll_back, Item, Delete
 File/Recording/Rollback _to..., Item
+File/Recording/separator, Separator
 File/Recording/_Play..., Item
 File/Recording/_Stop, Item
+File/Recording/_Finalise..., Item
 
 File/A_Y Logging, Branch
 File/AY Logging/_Record..., Item

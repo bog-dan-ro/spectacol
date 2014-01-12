@@ -1816,6 +1816,13 @@ will first be asked for the snapshot to use and then the file to save
 the recording to.
 .RE
 .PP
+.I "File, Recording, Continue recording..."
+.RS
+Continue recording input into an existing RZX file from the last recorded
+state. Finalised recordings cannot be resumed. You will be prompted for
+the recording to continue.
+.RE
+.PP
 .I Insert
 .br
 .I "File, Recording, Insert snapshot"
@@ -1851,6 +1858,13 @@ as well.
 .I "File, Recording, Stop"
 .RS
 Stop any currently-recording/playing RZX file.
+.RE
+.PP
+.I "File, Recording, Finalise..."
+.RS
+Compact a RZX file. Any interspersed snapshot will be removed and the
+recording cannot be continued. All action replays submitted to the RZX
+Archive should be finalised.
 .RE
 .PP
 .I "File, AY Logging, Record..."

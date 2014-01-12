@@ -160,6 +160,31 @@ MENU_CALLBACK( menu_file_recording_stop )
   if( rzx_playback  ) rzx_stop_playback( 1 );
 }  
 
+MENU_CALLBACK( menu_file_recording_finalise )
+{
+  char *rzx_filename;
+  int error;
+
+  if( rzx_playback || rzx_recording ) return;
+
+  fuse_emulation_pause();
+
+  rzx_filename = ui_get_open_filename( "Fuse - Finalise Recording" );
+  if( !rzx_filename ) { fuse_emulation_unpause(); return; }
+
+  error = rzx_finalise_recording( rzx_filename );
+
+  if( error == LIBSPECTRUM_ERROR_NONE ) {
+    ui_error( UI_ERROR_INFO, "RZX file finalised" );
+  } else {
+    ui_error( UI_ERROR_WARNING, "RZX file cannot be finalised" );
+  }
+
+  libspectrum_free( rzx_filename );
+
+  fuse_emulation_unpause();
+}  
+
 MENU_CALLBACK( menu_file_aylogging_stop )
 {
   if ( !psg_recording ) return;
@@ -802,6 +827,24 @@ MENU_CALLBACK( menu_file_recording_recordfromsnapshot )
   libspectrum_free( recording );
 
   display_refresh_all();
+
+  fuse_emulation_unpause();
+}
+
+MENU_CALLBACK( menu_file_recording_continuerecording )
+{
+  char *rzx_filename;
+
+  if( rzx_playback || rzx_recording ) return;
+
+  fuse_emulation_pause();
+
+  rzx_filename = ui_get_open_filename( "Fuse - Continue Recording" );
+  if( !rzx_filename ) { fuse_emulation_unpause(); return; }
+
+  rzx_continue_recording( rzx_filename );
+
+  libspectrum_free( rzx_filename );
 
   fuse_emulation_unpause();
 }
