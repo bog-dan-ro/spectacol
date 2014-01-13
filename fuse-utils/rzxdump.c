@@ -1,5 +1,5 @@
 /* rzxdump.c: get info on an RZX file
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2014 Philip Kendall
 
    $Id$
 
@@ -45,6 +45,8 @@
 char *progname;
 
 const char *rzx_signature = "RZX!";
+
+size_t block_number;
 
 libspectrum_word read_word( unsigned char **ptr );
 libspectrum_dword read_dword( unsigned char **ptr );
@@ -130,6 +132,7 @@ do_file( const char *filename )
 
   printf( "Found RZX signature\n" );
   ptr += strlen( rzx_signature );
+  block_number = 0;
 
   printf( "  Major version: %d\n", (int)*ptr++ );
   printf( "  Minor version: %d\n", (int)*ptr++ );
@@ -202,6 +205,8 @@ read_snapshot_block( unsigned char **ptr, unsigned char *end )
 
   printf( "Found a snapshot block\n" );
 
+  printf( "  Block: %lu\n", (unsigned long)block_number ); block_number++;
+
   block_length = read_dword( ptr );
   printf( "  Length: %lu bytes\n", (unsigned long)block_length );
 
@@ -230,6 +235,8 @@ read_input_block( unsigned char **ptr, unsigned char *end )
   }
 
   printf( "Found an input recording block\n" );
+
+  printf( "  Block: %lu\n", (unsigned long)block_number ); block_number++;
   
   length = read_dword( ptr );
   printf( "  Length: %ld bytes\n", (unsigned long)length );

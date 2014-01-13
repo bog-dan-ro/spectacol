@@ -433,3 +433,5 @@
 20131215 rzxtool.c: fix snapshot insertion in rzx recordings (Sergio).
 20140113 man/rzxtool.1,rzxtool.c: add option for finalising rzx recordings
          (part of bug #305) (Sergio).
+20140113 rzxdump.c: show block number as is needed for some operations with
+         rzxtool (Sergio).
