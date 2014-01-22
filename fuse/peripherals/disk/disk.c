@@ -1355,6 +1355,11 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
   buffer->index = 256;
 /* first scan for the longest track */
   for( i = 0; i < d->sides*d->cylinders; i++ ) {
+    /* ignore Sector Offset block */
+    if( buffavail( buffer ) >= 13 && !memcmp( buff, "Offset-Info\r\n", 13 ) ) {
+      buffer->index = buffer->file.length;
+    }
+
       /* sometimes in the header there are more track than in the file */
     if( buffavail( buffer ) == 0 ) {			/* no more data */
       d->cylinders = i / d->sides + i % d->sides;	/* the real cylinder number */
