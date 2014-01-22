@@ -4602,3 +4602,5 @@
 20140113 man/fuse.1,menu.[ch],menu_data.dat,rzx.[ch],ui.c: allow to continue
          recordings if there is a final snapshot in the RZX file and allow to
          finalise recordings (part of bug #305) (Sergio).
+20140123 rzx.c: reset the autosave frame count on rollback to fix the prune
+         function. Fix some warnings about unused parameters (Sergio).

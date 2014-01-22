@@ -612,6 +612,39 @@ autosave_frame( void )
   autosave_prune();
 }
 
+static void
+autosave_reset( void )
+{
+  libspectrum_rzx_iterator it;
+  size_t frames = 0;
+
+  for( it = libspectrum_rzx_iterator_begin( rzx );
+       it;
+       it = libspectrum_rzx_iterator_next( it ) ) {
+
+    libspectrum_rzx_block_id id = libspectrum_rzx_iterator_get_type( it );
+
+    switch( id ) {
+
+    case LIBSPECTRUM_RZX_INPUT_BLOCK:
+      frames += libspectrum_rzx_iterator_get_frames( it );
+      break;
+      
+    case LIBSPECTRUM_RZX_SNAPSHOT_BLOCK:
+      if( libspectrum_rzx_iterator_snap_is_automatic( it ) ) {
+        frames = 0;
+      }
+      break;
+
+    default:
+      break;
+    }
+  }
+
+  /* Reset the frame count. Allow to prune previous points after rolling back */
+  autosave_frame_count = frames % AUTOSAVE_INTERVAL;
+}
+
 static int recording_frame( void )
 {
   libspectrum_error error;
@@ -772,6 +805,9 @@ start_after_rollback( libspectrum_snap *snap )
   error = counter_reset();
   if( error ) return error;
 
+  if( settings_current.rzx_autosaves )
+    autosave_reset();
+
   return 0;
 }
 
@@ -813,7 +849,8 @@ rzx_rollback_to( void )
 }
 
 static void
-rzx_sentinel( libspectrum_dword ts, int type, void *user_data )
+rzx_sentinel( libspectrum_dword ts GCC_UNUSED, int type GCC_UNUSED,
+              void *user_data GCC_UNUSED )
 {
   ui_error( UI_ERROR_WARNING, "RZX frame is longer than %u tstates",
 	    RZX_SENTINEL_TIME );
