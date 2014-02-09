@@ -957,3 +957,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20131215 rzx.c: fix snapshot insertion in rzx recordings (Sergio).
 20140113 libspectrum.h.in,rzx.c: allow to finalise rzx recordings (part of bug
          #305) (Sergio).
+20140210 rzx.c: use SZX format for interspersed snapshots in RZX recordings
+         (part of bug #304) (Sergio).

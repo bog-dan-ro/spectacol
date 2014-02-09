@@ -1283,6 +1283,9 @@ libspectrum_rzx_write( libspectrum_byte **buffer, size_t *length,
       break;
 
     case LIBSPECTRUM_RZX_INPUT_BLOCK:
+      /* z80 snapshots can't safely store an intermediate state */
+      snap_format = LIBSPECTRUM_ID_SNAPSHOT_SZX;
+
       error = rzx_write_input( &( block->types.input ), buffer, &ptr, length,
 			       compress );
       if( error != LIBSPECTRUM_ERROR_NONE ) return error;
