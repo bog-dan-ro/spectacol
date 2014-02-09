@@ -4606,3 +4606,5 @@
          function. Fix some warnings about unused parameters (Sergio).
 20140123 peripherals/disk/disk.c: fix loading of EDSK files with Sector Offset
          block (fixes bug #307) (Sergio).
+20140210 data/fuse.desktop.in: Remove GNOME category as Fuse is not based on
+         GNOME libraries (Sergio).
