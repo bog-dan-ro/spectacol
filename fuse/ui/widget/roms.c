@@ -54,11 +54,12 @@ widget_roms_draw( void *data )
   if( !info->initialised ) {
 
     widget_settings = malloc( sizeof( settings_info ) );
-    memset( widget_settings, 0, sizeof( settings_info ) );
     if( !widget_settings ) {
       ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
       return 1;
     }
+
+    memset( widget_settings, 0, sizeof( settings_info ) );
     settings_copy( widget_settings, &settings_current );
 
     info->initialised = 1;

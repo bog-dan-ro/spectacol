@@ -4608,3 +4608,5 @@
          block (fixes bug #307) (Sergio).
 20140210 data/fuse.desktop.in: Remove GNOME category as Fuse is not based on
          GNOME libraries (Sergio).
+20140217 ui/widget/{filesel.c,roms.c},ui/win32/win32ui.c: fix possible leaks and
+         null pointer dereferences (thanks, cppcheck) (Sergio).

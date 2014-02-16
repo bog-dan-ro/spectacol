@@ -750,7 +750,7 @@ win32ui_get_monospaced_font( HFONT *font )
 
     *font = CreateFont( font_height, 0, 0, 0, 400, FALSE, FALSE, FALSE, 0,
                         400, 2, 1, 1, TEXT( "Courier New" ) );
-    if( !font ) {
+    if( *font == NULL ) {
       ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
       return 1;
     }
@@ -940,7 +940,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       if ( HIWORD( wParam ) != BN_CLICKED ) break;
 
       /* service OK and Cancel buttons */
-      switch LOWORD( wParam )
+      switch( LOWORD( wParam ) )
       {
         case IDOK:
         {

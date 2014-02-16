@@ -819,7 +819,7 @@ widget_filesel_keyhandler( input_key key )
     widget_end_widget( err );
   }
 #else  /* ifndef AMIGA */
-  char *fn;
+  char *fn, *ptr;
   char *dirtitle;
 
   new_current_file = current_file;
@@ -900,9 +900,11 @@ widget_filesel_keyhandler( input_key key )
 							/* relative name */
         /* Get current dir name and allocate space for the leafname */
         fn = widget_getcwd();
+        ptr = fn;
         if( fn )
     	  fn = realloc( fn, strlen( fn ) + strlen( widget_text_text ) + 2 );
         if( !fn ) {
+          free( ptr );
 	  widget_end_widget( WIDGET_FINISHED_CANCEL );
 	  return;
         }
