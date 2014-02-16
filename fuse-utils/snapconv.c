@@ -159,10 +159,12 @@ main( int argc, char **argv )
   if( fwrite( buffer, 1, length, f ) != length ) {
     fprintf( stderr, "%s: error writing to '%s'\n", progname, argv[1] );
     free( buffer );
+    fclose( f );
     return 1;
   }
 
   free( buffer );
-   
+  fclose( f );
+
   return 0;
 }

@@ -109,7 +109,7 @@ read_tape( char *filename, libspectrum_tape **tape )
 static int
 write_tape( char *filename, libspectrum_tape *tape )
 {
-  libspectrum_byte *buffer; size_t length;
+  libspectrum_byte *buffer, *ptr; size_t length;
   size_t tape_length = 0;
   libspectrum_error error;
   short level = 0; /* The last level output to this block */
@@ -176,8 +176,10 @@ write_tape( char *filename, libspectrum_tape *tape )
 
     while( tape_length + pulse_length > length ) {
       length *= 2;
+      ptr = buffer;
       buffer = realloc( buffer, length );
       if( !buffer ) {
+        free( ptr );
         fprintf( stderr, "%s: unable to allocate memory for conversion buffer\n",
                  progname );
         return 1;

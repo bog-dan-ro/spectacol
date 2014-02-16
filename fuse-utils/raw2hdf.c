@@ -219,17 +219,25 @@ main( int argc, char **argv )
   if( !hdf ) {
     fprintf( stderr, "%s: error opening '%s': %s\n", progname, hdf_filename,
 	     strerror( errno ) );
+    fclose( raw );
     return 1;
   }
 
   error = copy_data( raw, hdf, &byte_count, raw_filename, hdf_filename,
 		     version );
-  if( error ) return error;
+  if( error ) {
+    fclose( hdf );
+    fclose( raw );
+    return error;
+  }
 
   fclose( raw );
 
   error = write_header( hdf, byte_count, hdf_filename, version );
-  if( error ) return error;
+  if( error ) {
+    fclose( hdf );
+    return error;
+  }
 
   fclose( hdf );
 

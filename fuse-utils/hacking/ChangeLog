@@ -435,3 +435,6 @@
          (part of bug #305) (Sergio).
 20140113 rzxdump.c: show block number as is needed for some operations with
          rzxtool (Sergio).
+20140216 fmfconv.c,raw2hdf.c,rzxtool.c,scl2trd.c,snap2tzx.c,snapconv.c,
+         tape2wav.c: fix leaks and possible null pointer dereferences (thanks,
+         cppcheck) (Sergio).

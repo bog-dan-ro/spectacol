@@ -111,6 +111,7 @@ write_file( unsigned char *buffer, size_t length, const char *filename )
   if( bytes != length ) {
     fprintf( stderr, "%s: wrote only %lu of %lu bytes to `%s'\n", progname,
 	     (unsigned long)bytes, (unsigned long)length, filename );
+    fclose( f );
     return 1;
   }
 
@@ -263,6 +264,7 @@ parse_argument( const char *argument, int *where, const char **filename )
   if( !comma ) {
     fprintf( stderr, "%s: no comma found in argument `%s'\n", progname,
 	     argument );
+    free( buffer );
     return 1;
   }
 

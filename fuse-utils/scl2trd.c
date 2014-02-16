@@ -124,9 +124,9 @@ Scl2Trd(char *oldname, char *newname)
   fh = fopen(newname, "wb");
   if (fh) {
     mem = (unsigned char *) malloc(BLOCKSIZE);
-    memset(mem, 0, BLOCKSIZE);
 
     if (mem) {
+      memset(mem, 0, BLOCKSIZE);
       memcpy(&mem[TRD_DIRSTART], template, TRD_DIRLEN);
       strncpy((char*)&mem[TRD_NAMEOFFSET], "Fuse", TRD_MAXNAMELENGTH);
       fwrite((void *) mem, 1, BLOCKSIZE, fh);
@@ -136,8 +136,8 @@ Scl2Trd(char *oldname, char *newname)
 	fwrite((void *) mem, 1, BLOCKSIZE, fh);
 
       free(mem);
-      fclose(fh);
     }
+    fclose(fh);
   }
 
   if ((TRD = open(newname, O_RDWR | O_BINARY)) == -1) {

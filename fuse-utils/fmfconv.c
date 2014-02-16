@@ -334,16 +334,20 @@ swap_endian_dword( libspectrum_dword d )
 int
 alloc_sound_buff( size_t len )
 {
+  libspectrum_signed_byte *ptr = NULL;
+
   if( sound_buf_len < len ) {
     len = ( ( len * 3 / 2 ) / SOUND_CHUNK_LEN + 1 ) * SOUND_CHUNK_LEN;
 
     if( sound_buf_len == 0 ) {
       sound8 = malloc( len );
     } else {
+      ptr = sound8;
       sound8 = realloc( sound8, len );
     }
     if( sound8 == NULL ) {
       printe( "\n\nMemory (re)allocation error.\n" );
+      free( ptr );
       return ERR_OUTOFMEM;
     }
     sound16 = (void *)sound8;

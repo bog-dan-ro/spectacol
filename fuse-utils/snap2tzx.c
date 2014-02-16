@@ -1165,6 +1165,7 @@ get_loading_screen( libspectrum_byte *screen, const char *filename )
       print_error( "could read only %lu bytes from '%s'", (unsigned long)count,
 		   filename );
     }
+    fclose( f );
     return 1;
   }
 
@@ -1465,6 +1466,7 @@ write_tape( libspectrum_tape *tape, const char *filename )
 		   (unsigned long)written, (unsigned long)length, filename );
     }
     free( buffer );
+    fclose( f );
     return 1;
   }
 
