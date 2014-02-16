@@ -438,3 +438,5 @@
 20140216 fmfconv.c,raw2hdf.c,rzxtool.c,scl2trd.c,snap2tzx.c,snapconv.c,
          tape2wav.c: fix leaks and possible null pointer dereferences (thanks,
          cppcheck) (Sergio).
+20140216 fmfconv_ff.c: FFmpeg no longer provides backward compatible CodecID as
+         alias for AVCodecID (Sergio).
