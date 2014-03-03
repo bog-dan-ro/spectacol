@@ -4610,3 +4610,5 @@
          GNOME libraries (Sergio).
 20140217 ui/widget/{filesel.c,roms.c},ui/win32/win32ui.c: fix possible leaks and
          null pointer dereferences (thanks, cppcheck) (Sergio).
+20140303 memory.c: Timex EXROM and Dock text was truncated in the debugger UI
+         (thanks, Andrew Owen) (Fred).
