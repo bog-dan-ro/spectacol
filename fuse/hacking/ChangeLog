@@ -4612,3 +4612,6 @@
          null pointer dereferences (thanks, cppcheck) (Sergio).
 20140303 memory.c: Timex EXROM and Dock text was truncated in the debugger UI
          (thanks, Andrew Owen) (Fred).
+20140322 memory.c,ui/widget/debugger.c: allow room in the widget UI debugger for
+         longer memory straings, restore Timex EXROM and Dock text as it isn't
+         truncated in any UIs now (thanks, Sergio) (Fred).

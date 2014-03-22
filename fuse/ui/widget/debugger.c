@@ -112,8 +112,8 @@ int widget_debugger_draw( void *data )
   int x;
   char pbuf[8];
 
-  widget_rectangle( LC(0), LR(0), 40 * 8, 11 * 8 + 4, 1 );
-  widget_rectangle( LC(0), LR(11) + 2, 320, 1, 7 );
+  widget_rectangle( LC(0), LR(0), 40 * 8, 17 * 8 + 4, 1 );
+  widget_rectangle( LC(0), LR(17) + 2, 320, 1, 7 );
 
   switch ( display ) {
   case DB_REGISTERS: display_registers(); break;
@@ -123,31 +123,31 @@ int widget_debugger_draw( void *data )
   case DB_BREAKPT:   display_breakpts();  break;
   }
 
-  widget_printstring( LC(0), LR(9) - 4, 6, state[debugger_mode] );
-  widget_printstring( LC(10), LR(9) - 4, 6,
+  widget_printstring( LC(0), LR(15) - 4, 6, state[debugger_mode] );
+  widget_printstring( LC(10), LR(15) - 4, 6,
 		      "\022S\021ingle step  \022C\021ontinue  Co\022m\021mand" );
 
   x = LC(-1);
   if( display != DB_REGISTERS )
-    x = widget_printstring( x + 8, LR(10), 7, "\022R\021egs" );
+    x = widget_printstring( x + 8, LR(16), 7, "\022R\021egs" );
   if( display != DB_BYTES )
-    x = widget_printstring( x + 8, LR(10), 7, "\022B\021ytes" );
+    x = widget_printstring( x + 8, LR(16), 7, "\022B\021ytes" );
   if( display != DB_TEXT )
-    x = widget_printstring( x + 8, LR(10), 7, "\022T\021ext" );
+    x = widget_printstring( x + 8, LR(16), 7, "\022T\021ext" );
   if( display != DB_DISASM )
-    x = widget_printstring( x + 8, LR(10), 7, "\022D\021isasm" );
+    x = widget_printstring( x + 8, LR(16), 7, "\022D\021isasm" );
   if( display != DB_BREAKPT )
-    x = widget_printstring( x + 8, LR(10), 7, "Brea\022k\021pts" );
+    x = widget_printstring( x + 8, LR(16), 7, "Brea\022k\021pts" );
 
-  widget_printstring_right( LC(25) + 4, LR(10), 5, "PC" );
+  widget_printstring_right( LC(25) + 4, LR(16), 5, "PC" );
   sprintf( pbuf, "%04X", PC );
-  widget_printstring_fixed( LC(26) / 8, LR(10) / 8, 7, pbuf );
+  widget_printstring_fixed( LC(26) / 8, LR(16) / 8, 7, pbuf );
 
-  widget_printstring_right( LR(35) + 4, LR(10), 5, "Bas\022e\021" );
+  widget_printstring_right( LR(35) + 4, LR(16), 5, "Bas\022e\021" );
   sprintf( pbuf, "%d", debugger_output_base );
-  widget_printstring( LR(36), LR(10), 7, pbuf );
+  widget_printstring( LR(36), LR(16), 7, pbuf );
 
-  widget_display_lines( LR(0) / 8, 12 );
+  widget_display_lines( LR(0) / 8, 18 );
 
   return 0;
 }
@@ -275,6 +275,9 @@ static void show_register2( int x, int y, const char *label, int value )
 
 static void display_registers( void )
 {
+  int source, page_num, writable, contended;
+  libspectrum_word offset;
+  size_t block;
   char pbuf[16];
   int i, capabilities;
 
@@ -335,19 +338,43 @@ static void display_registers( void )
   if( settings_current.zxcf_active )
     show_register1( LC(6), LR(5), "ZXCF", zxcf_last_memctl() );
 
-  for( i = 0; i < 8; ++i ) {
-    int x = LC(2 + 10 * ( i & 3) ), y = LR(i < 4 ? 6 : 7);
+  source = page_num = writable = contended = -1;
+  offset = 0;
+  i = 0;
 
-    sprintf( pbuf, "P%X", i );
-    widget_printstring_right( x, y, 5, pbuf );
-    snprintf( pbuf, sizeof( pbuf ), "%s %d",
-              memory_source_description( memory_map_read[i].source ),
-	      memory_map_read[i].page_num );
-    x = widget_printstring( x + 4, y, 7, pbuf ) + 4;
-    if( memory_map_read[i].writable )
-      x = widget_printstring( x, y, 4, "w" );
-    if( memory_map_read[i].contended )
-      x = widget_printstring( x, y, 4, "c" );
+  for( block = 0; block < MEMORY_PAGES_IN_64K; block++ ) {
+    memory_page *page = &memory_map_read[block];
+
+    if( page->source != source ||
+      page->page_num != page_num ||
+      page->offset != offset ||
+      page->writable != writable ||
+      page->contended != contended ) {
+
+      int x = LC(5 + 20 * ( i & 1 ) ), y = LR(6 + ( i / 2 ) );
+
+      sprintf( pbuf, format_16_bit(), (unsigned)block * MEMORY_PAGE_SIZE );
+      widget_printstring_right( x, y, 5, pbuf );
+      snprintf( pbuf, sizeof( pbuf ), "%s %d",
+                memory_source_description( memory_map_read[block].source ),
+                memory_map_read[block].page_num );
+      x = widget_printstring( x + 4, y, 7, pbuf ) + 4;
+      if( memory_map_read[block].writable )
+        x = widget_printstring( x, y, 4, "w" );
+      if( memory_map_read[block].contended )
+        x = widget_printstring( x, y, 4, "c" );
+
+      i++;
+
+      source = page->source;
+      page_num = page->page_num;
+      writable = page->writable;
+      contended = page->contended;
+      offset = page->offset;
+    }
+
+    /* We expect the next page to have an increased offset */
+    offset += MEMORY_PAGE_SIZE;
   }
 }
 
