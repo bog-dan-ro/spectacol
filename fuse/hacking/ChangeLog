@@ -4615,3 +4615,5 @@
 20140322 memory.c,ui/widget/debugger.c: allow room in the widget UI debugger for
          longer memory straings, restore Timex EXROM and Dock text as it isn't
          truncated in any UIs now (thanks, Sergio) (Fred).
+20140322 sound/blipbuffer.h: remove second inline declaration of
+         blip_buffer_set_clock_rate() (Fred).
