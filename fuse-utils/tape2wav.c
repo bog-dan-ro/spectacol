@@ -41,7 +41,7 @@ static int read_tape( char *filename, libspectrum_tape **tape );
 static int write_tape( char *filename, libspectrum_tape *tape );
 
 char *progname;
-int sample_rate = 41000;
+int sample_rate = 44100;
 
 int
 main( int argc, char **argv )

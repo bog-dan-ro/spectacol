@@ -440,3 +440,5 @@
          cppcheck) (Sergio).
 20140216 fmfconv_ff.c: FFmpeg no longer provides backward compatible CodecID as
          alias for AVCodecID (Sergio).
+20140414 tape2wav.c: correct default WAV sample rate (thanks, Alberto Garcia)
+         (patch #324) (Santiago Vila).
