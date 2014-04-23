@@ -1782,7 +1782,7 @@ parse_args( int argc, char *argv[] )
     case 'R':
       if( !strcmp( optarg, "vga" ) ) {
 	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_w = 640; out_h = 320;
+	out_w = 640; out_h = 480;
       } else if( !strcmp( optarg, "hvga" ) ) {
 	ffmpeg_rescale = TYPE_RESCALE_WH;
 	out_w = 480; out_h = 360;
