@@ -959,3 +959,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          #305) (Sergio).
 20140210 rzx.c: use SZX format for interspersed snapshots in RZX recordings
          (part of bug #304) (Sergio).
+20140504 tape.c: ensure that we have an edge at the end of a tape to ensure that
+         the last pulse is terminated - fixes loading of Moon Cresta (thanks,
+         Lee Tonks) (Fred).

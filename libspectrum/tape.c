@@ -499,6 +499,9 @@ libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates,
       if( libspectrum_tape_iterator_current( it->current_block ) == NULL ) {
 	*flags |= LIBSPECTRUM_TAPE_FLAGS_STOP;
         *flags |= LIBSPECTRUM_TAPE_FLAGS_TAPE;
+        /* Need to have an edge at the end of the tape to terminate the last
+           pulse so clear the NO_EDGE flag if it has been set */
+        *flags &= ~LIBSPECTRUM_TAPE_FLAGS_NO_EDGE;
         libspectrum_tape_iterator_init( &(it->current_block), tape );
       }
     }
