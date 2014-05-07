@@ -444,3 +444,4 @@
          (patch #324) (Santiago Vila).
 20140424 fmfconv.c: correct vga resolution (Sergio).
 20140507 m4/iconv.m4: update iconv to version from gettext-0.18.2 (Fred).
+20140507 autogen.sh: select glibtoolize where required (Sergio).
