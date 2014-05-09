@@ -4617,3 +4617,5 @@
          truncated in any UIs now (thanks, Sergio) (Fred).
 20140322 sound/blipbuffer.h: remove second inline declaration of
          blip_buffer_set_clock_rate() (Fred).
+20140510 tape.c: fix speech in Cobra's Arc - Medium Case.tzx when loaded with
+         tape traps enabled (thanks, zx81 and Sergio) (Fred).

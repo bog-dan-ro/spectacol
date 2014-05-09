@@ -659,6 +659,7 @@ int tape_stop( void )
   if( tape_playing ) {
 
     tape_playing = 0;
+    tape_microphone = 0;
     ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
     loader_tape_stop();
 
