@@ -445,3 +445,7 @@
 20140424 fmfconv.c: correct vga resolution (Sergio).
 20140507 m4/iconv.m4: update iconv to version from gettext-0.18.2 (Fred).
 20140507 autogen.sh: select glibtoolize where required (Sergio).
+20140511 m4/{Makefile.am,lib-ld.m4,lib-link.m4,lib-prefix.m4}: ensure
+         definitions of AC_LIB_PREPARE_PREFIX, AC_LIB_RPATH,
+         AC_LIB_LINKFLAGS_BODY and AC_LIB_APPENDTOVAR are always available
+         (patch #325) (Fred).
