@@ -4619,3 +4619,5 @@
          blip_buffer_set_clock_rate() (Fred).
 20140510 tape.c: fix speech in Cobra's Arc - Medium Case.tzx when loaded with
          tape traps enabled (thanks, zx81 and Sergio) (Fred).
+20140706 hacking/peripheral_tests.txt: use unzipped tapes for peripheral tests
+         (thanks, Phil Reynolds) (Sergio).

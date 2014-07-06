@@ -26,7 +26,7 @@ DISCiPLE
 * Uncompress lib/tests/success.mgt.bz2
 * Place a DISCiPLE ROM image in the 'roms' directory.
 * Start fuse as
-  ./fuse --disciple --discipledisk lib/tests/success.mgt DISCiPLESystemTapeV3d.tzx.zip
+  ./fuse --disciple --discipledisk lib/tests/success.mgt DISCiPLESystemTapeV3d.tzx
 * Hit enter
 * Hit <Break>
 * Enter NEW
