@@ -60,6 +60,12 @@
 
 #include <libavformat/avformat.h>
 #include <libavutil/mathematics.h>
+
+#if HAVE_LIBAVRESAMPLE_AVRESAMPLE_H
+#include <libavutil/opt.h>
+#include <libavresample/avresample.h>
+#endif
+
 #include <libswscale/swscale.h>
 
 #include "libspectrum.h"
@@ -96,7 +102,14 @@ static int audio_inpbuf_len;			/* actual number of audio frames */
 static AVFrame *ff_picture, *ff_tmp_picture, *ffmpeg_pict;
 static struct SwsContext *video_resize_ctx;
 
+static AVFrame *audio_frame;
+
+#ifdef HAVE_LIBAVRESAMPLE_AVRESAMPLE_H
+static AVAudioResampleContext *audio_resample_ctx;
+#else
 static ReSampleContext *audio_resample_ctx;
+#endif
+
 static int16_t **ffmpeg_sound;
 
 static uint8_t *video_outbuf;
@@ -121,6 +134,17 @@ static void setup_x264_dict( AVDictionary **  pm );
 #define FMF_CODEC(name) name
 #endif
 
+#ifndef HAVE_FFMPEG_AV_FRAME_ALLOC
+#define av_frame_alloc( X ) avcodec_alloc_frame( X )
+
+#ifdef HAVE_FFMPEG_AVCODEC_FREE_FRAME
+#define av_frame_free( X ) avcodec_free_frame( X )
+#else
+#define av_frame_free( X ) av_free( *(X) )
+#endif
+
+#endif				/* #ifndef HAVE_FFMPEG_AV_FRAME_ALLOC */
+
 /* check that a given sample format is supported by the encoder */
 static int
 check_sample_fmt( AVCodec *codec, enum AVSampleFormat sample_fmt )
@@ -141,8 +165,14 @@ ffmpeg_resample_audio( void )
   int len;
 
   if( audio_resample_ctx && res_rte != snd_rte ) {
+
+#ifdef HAVE_LIBAVRESAMPLE_AVRESAMPLE_H
+    avresample_free( &audio_resample_ctx );
+#else
     audio_resample_close( audio_resample_ctx );
     audio_resample_ctx = NULL;
+#endif
+
     av_free( audio_tmp_inpbuf );
     ffmpeg_sound = &sound16;
     printi( 2, "ffmpeg_resample_audio(): reinit resample %dHz -> %dHz\n", snd_rte, out_rte );
@@ -153,11 +183,32 @@ ffmpeg_resample_audio( void )
     out_fsz = 2 * out_chn;
   }
   if( !audio_resample_ctx ) {
+
+#ifdef HAVE_LIBAVRESAMPLE_AVRESAMPLE_H
+    audio_resample_ctx = avresample_alloc_context();
+    av_opt_set_int( audio_resample_ctx, "in_channel_layout", 
+                    av_get_default_channel_layout( snd_chn ), 0 );
+    av_opt_set_int( audio_resample_ctx, "out_channel_layout", 
+                    av_get_default_channel_layout( out_chn ), 0 );
+    av_opt_set_int( audio_resample_ctx, "in_sample_fmt", AV_SAMPLE_FMT_S16, 0 );
+    av_opt_set_int( audio_resample_ctx, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0 );
+    av_opt_set_int( audio_resample_ctx, "in_sample_rate", snd_rte, 0 );
+    av_opt_set_int( audio_resample_ctx, "out_sample_rate", out_rte, 0 );
+
+    int ret;
+    ret = avresample_open( audio_resample_ctx );
+    if( ret < 0 ) {
+      printe( "Error opening the resample context\n" );
+      return 1;
+    }
+#else
     audio_resample_ctx = av_audio_resample_init( out_chn, snd_chn,
-						 out_rte, snd_rte,
-						 AV_SAMPLE_FMT_S16,
+                                                 out_rte, snd_rte,
                                                  AV_SAMPLE_FMT_S16,
-						 16, 8, 1, 1.0 );
+                                                 AV_SAMPLE_FMT_S16,
+                                                 16, 8, 1, 1.0 );
+#endif				/* #ifdef HAVE_LIBAVRESAMPLE_AVRESAMPLE_H */
+
     audio_tmp_inpbuf_size = (float)audio_outbuf_size * out_rte / snd_rte * (float)out_chn / snd_chn + 1.0;
     audio_tmp_inpbuf = av_malloc( audio_tmp_inpbuf_size );
     ffmpeg_sound = (void *)(&audio_tmp_inpbuf);
@@ -168,9 +219,17 @@ ffmpeg_resample_audio( void )
     return 1;
   }
 
+#ifdef HAVE_LIBAVRESAMPLE_AVRESAMPLE_H
+  len = avresample_convert( audio_resample_ctx, (uint8_t**)&audio_tmp_inpbuf,
+                            audio_tmp_inpbuf_size,
+                            audio_tmp_inpbuf_size / out_fsz,
+                            (uint8_t**)&sound16, snd_len, snd_len / snd_fsz );
+#else
   len = audio_resample( audio_resample_ctx,
                   (short *)audio_tmp_inpbuf, (short *)sound16,
                   snd_len / snd_fsz );
+#endif
+
   if( !len ) {
     printe( "FFMPEG: Error during audio resampling\n" );
     return 1;
@@ -303,6 +362,10 @@ open_audio( AVCodec *codec )
 #endif
   audio_input_frames = c->frame_size;
 
+#ifdef HAVE_FFMPEG_AVCODEC_ENCODE_AUDIO2
+  audio_frame = av_frame_alloc();
+#endif
+
   if( audio_input_frames <= 1 ) {
     audio_outbuf_size = out_rte * 1250 * audio_oframe_size / out_fps;
   } else {
@@ -318,18 +381,16 @@ open_audio( AVCodec *codec )
 }
 
 /* add an audio frame to the stream */
-void
+int
 ffmpeg_add_sound_ffmpeg( int len )
 {
   AVCodecContext *c;
-  int coded_bps;
   int16_t *buf;
 
-  if( !audio_st ) return;
+  if( !audio_st ) return 0;
 
   buf = *ffmpeg_sound;
   c = audio_st->codec;
-  coded_bps = av_get_bits_per_sample( c->codec_id );
   audio_iframe_size = snd_chn > 1 ? 4 : 2;
 
   if( audio_input_frames > 1 && audio_inpbuf_len + len < audio_input_frames ) {
@@ -337,32 +398,58 @@ ffmpeg_add_sound_ffmpeg( int len )
     memcpy( (char *)audio_inpbuf + ( audio_inpbuf_len * audio_iframe_size ), buf, len * audio_iframe_size );
     audio_inpbuf_len += len;
     printi( 3, "ffmpeg_add_sound_ffmpeg(): store %d samples (%d/%d)\n", len, audio_input_frames, audio_iframe_size );
-    return;
+    return 0;
   }
 
   printi( 3, "ffmpeg_add_sound_ffmpeg(): %d -> %d\n", audio_iframe_size, audio_oframe_size );
   if( audio_input_frames > 1 ) {
      while( audio_inpbuf_len + len >= audio_input_frames ) {
       int copy_len = ( audio_input_frames - audio_inpbuf_len ) * audio_iframe_size;
-      AVPacket pkt;
-      av_init_packet( &pkt );
 
       memcpy( (char *)audio_inpbuf + ( audio_inpbuf_len * audio_iframe_size ), buf, copy_len );
       len -= audio_input_frames - audio_inpbuf_len;
       buf = (void *)( (char *)buf + copy_len );
 
-      pkt.size = avcodec_encode_audio( c, audio_outbuf, audio_outbuf_size, audio_inpbuf );
+      AVPacket pkt;
+      av_init_packet( &pkt );
+      pkt.data = NULL;
+      pkt.size = 0;
 
-      if( c->coded_frame && c->coded_frame->pts != AV_NOPTS_VALUE )
-	pkt.pts= av_rescale_q( c->coded_frame->pts, c->time_base, audio_st->time_base );
+#ifdef HAVE_FFMPEG_AVCODEC_ENCODE_AUDIO2
+      int ret, got_output;
+
+      audio_frame->data[0] = (uint8_t*)audio_inpbuf;
+      audio_frame->linesize[0] = c->frame_size * audio_iframe_size;
+      audio_frame->nb_samples = c->frame_size;
+
+      ret = avcodec_encode_audio2( c, &pkt, audio_frame, &got_output );
+
+      if( ret < 0 ) {
+        printe( "Error encoding audio frame\n" );
+        return 1;
+      }
+
+      if( !got_output )
+          continue;
+#else
+      pkt.size = avcodec_encode_audio( c, audio_outbuf,
+                                       audio_outbuf_size,
+                                       audio_inpbuf );
+
       pkt.flags |= AV_PKT_FLAG_KEY;
-      pkt.stream_index = audio_st->index;
       pkt.data = audio_outbuf;
+#endif				/* #ifdef HAVE_FFMPEG_AVCODEC_ENCODE_AUDIO2 */
 
-    /* write the compressed frame in the media file */
+      if( c->coded_frame && c->coded_frame->pts != AV_NOPTS_VALUE ) {
+        pkt.pts = av_rescale_q( c->coded_frame->pts, c->time_base,
+                                audio_st->time_base );
+      }
+      pkt.stream_index = audio_st->index;
+
+      /* write the compressed frame in the media file */
       if( av_interleaved_write_frame( oc, &pkt ) != 0 ) {
         fprintf( stderr, "Error while writing audio frame\n" );
-    /*    exit( 1 ); */
+        return 1;
       }
       audio_inpbuf_len = 0;
       printi( 3, "ffmpeg_add_sound_ffmpeg(): write sound packet %d samples (remain: %d) pkt.size = %dbyte\n", audio_input_frames, len, pkt.size );
@@ -373,13 +460,50 @@ ffmpeg_add_sound_ffmpeg( int len )
 
 
   } else {			/* with PCM output */
+
     AVPacket pkt;
     av_init_packet( &pkt );
+    pkt.data = NULL;
+    pkt.size = 0;
 
-    pkt.size = avcodec_encode_audio( c, audio_outbuf, coded_bps ? len * out_chn * coded_bps / 8 : len * out_chn, buf );
+#ifdef HAVE_FFMPEG_AVCODEC_ENCODE_AUDIO2
+    int ret, got_output;
 
-    if( c->coded_frame && c->coded_frame->pts != AV_NOPTS_VALUE )
-      pkt.pts= av_rescale_q( c->coded_frame->pts, c->time_base, audio_st->time_base );
+    audio_frame->data[0] = (uint8_t*)buf;
+    audio_frame->linesize[0] = c->frame_size * audio_iframe_size;
+    audio_frame->nb_samples = c->frame_size;
+
+    ret = avcodec_encode_audio2( c, &pkt, audio_frame, &got_output );
+
+    if( ret < 0 ) {
+      printe( "Error encoding audio frame\n" );
+      return 1;
+    }
+
+    if( got_output ) {
+      if( c->coded_frame && c->coded_frame->pts != AV_NOPTS_VALUE ) {
+        pkt.pts = av_rescale_q( c->coded_frame->pts, c->time_base,
+                                audio_st->time_base );
+      }
+      pkt.stream_index = audio_st->index;
+
+      /* write */
+      if( av_interleaved_write_frame( oc, &pkt ) != 0 ) {
+        fprintf( stderr, "Error while writing audio frame\n" );
+        return 1;
+      }
+    }
+#else
+    int coded_bps;
+    coded_bps = av_get_bits_per_sample( c->codec_id );
+
+    pkt.size = avcodec_encode_audio( c, audio_outbuf, 
+      coded_bps ? len * out_chn * coded_bps / 8 : len * out_chn, buf );
+
+    if( c->coded_frame && c->coded_frame->pts != AV_NOPTS_VALUE ) {
+      pkt.pts = av_rescale_q( c->coded_frame->pts, c->time_base,
+                              audio_st->time_base );
+    }
     pkt.flags |= AV_PKT_FLAG_KEY;
     pkt.stream_index = audio_st->index;
     pkt.data = audio_outbuf;
@@ -387,15 +511,20 @@ ffmpeg_add_sound_ffmpeg( int len )
     /* write */
     if( av_interleaved_write_frame( oc, &pkt ) != 0 ) {
       fprintf( stderr, "Error while writing audio frame\n" );
-/*      exit( 1 ); */
+      return 1;
     }
+#endif				/* #ifdef HAVE_FFMPEG_AVCODEC_ENCODE_AUDIO2 */
+
     printi( 3, "ffmpeg_add_sound_ffmpeg(): write sound packet %d samples pkt.size = %dbyte\n", len, pkt.size );
   }
+
+  return 0;
 }
 
 int
 snd_write_ffmpeg( void )
 {
+  int ret;
 
 /*  if( !snd_header_ok && ( err = snd_write_ffmpegheader() ) ) return err; */
   if( !audio_st ) return 0;
@@ -411,7 +540,9 @@ snd_write_ffmpeg( void )
   }
   if( snd_len > 0 && ( out_rte != snd_rte || out_chn != snd_chn ) ) {
     printi( 3, "snd_write_ffmpeg(): got %d samples sound\n", snd_len / snd_fsz );
-    ffmpeg_resample_audio();
+    ret = ffmpeg_resample_audio();
+    if( ret ) return ret;
+
     ffmpeg_add_sound_ffmpeg( out_len / out_fsz );
     printi( 2, "snd_write_ffmpeg(): %d samples sound\n", out_len / out_fsz );
   } else if( snd_len > 0 ) {
@@ -427,6 +558,10 @@ close_audio( void )
 {
   if( audio_st ) avcodec_close( audio_st->codec );
   if( audio_outbuf ) av_free( audio_outbuf );
+
+#ifdef HAVE_FFMPEG_AVCODEC_ENCODE_AUDIO2
+  av_frame_free( &audio_frame );
+#endif
 }
 
 /**************************************************************/
@@ -607,18 +742,21 @@ open_video( AVCodec *codec )
 void
 ffmpeg_add_frame_ffmpeg( void )
 {
-  int out_size, ret;
+  int ret;
   AVCodecContext *c;
 
   if( !video_st ) return;
 
   c = video_st->codec;
 
+  AVPacket pkt;
+  av_init_packet( &pkt );
+  pkt.data = NULL;
+  pkt.size = 0;
+
   if( oc->oformat->flags & AVFMT_RAWPICTURE ) {
         /* raw video case. The API will change slightly in the near
            future for that */
-    AVPacket pkt;
-    av_init_packet( &pkt );
 
     pkt.flags |= AV_PKT_FLAG_KEY;
     pkt.stream_index= video_st->index;
@@ -629,13 +767,31 @@ ffmpeg_add_frame_ffmpeg( void )
   } else {
     ffmpeg_pict->pts = c->frame_number;
 
+#ifdef HAVE_FFMPEG_AVCODEC_ENCODE_VIDEO2
+    int got_output;
+
+        /* encode the image */
+    ret = avcodec_encode_video2(c, &pkt, ffmpeg_pict, &got_output);
+    if( ret >= 0 && got_output) {
+      pkt.pts = av_rescale_q( pkt.pts, c->time_base, video_st->time_base );
+      pkt.dts = av_rescale_q( pkt.dts, c->time_base, video_st->time_base );
+
+      pkt.stream_index= video_st->index;
+
+            /* write the compressed frame in the media file */
+      ret = av_interleaved_write_frame( oc, &pkt );
+    } else {
+      ret = 0;
+    }
+
+#else				/* #ifdef HAVE_FFMPEG_AVCODEC_ENCODE_VIDEO2 */
+
+    int out_size;
+
         /* encode the image */
     out_size = avcodec_encode_video( c, video_outbuf, video_outbuf_size, ffmpeg_pict );
         /* if zero size, it means the image was buffered */
     if( out_size > 0 ) {
-      AVPacket pkt;
-      av_init_packet( &pkt );
-
       if( c->coded_frame->pts != AV_NOPTS_VALUE )
         pkt.pts = av_rescale_q( c->coded_frame->pts, c->time_base, video_st->time_base );
       if( c->coded_frame->key_frame )
@@ -649,7 +805,10 @@ ffmpeg_add_frame_ffmpeg( void )
     } else {
       ret = 0;
     }
+#endif				/* #ifdef HAVE_FFMPEG_AVCODEC_ENCODE_VIDEO2 */
+
   }
+
   if( ret != 0 ) {
     fprintf(stderr, "Error while writing video frame\n");
 /*      exit( 1 ); */

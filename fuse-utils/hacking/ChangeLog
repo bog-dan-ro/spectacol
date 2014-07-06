@@ -450,3 +450,5 @@
          AC_LIB_LINKFLAGS_BODY and AC_LIB_APPENDTOVAR are always available
          (patch #325) (Fred).
 20140511 autogen.sh: fix line break (Sergio).
+20140706 configure.ac,fmfconv_ff.c: add libav10 support (thanks, Alberto Garcia)
+         (Anton Khirnov and Sergio).

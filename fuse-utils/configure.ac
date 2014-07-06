@@ -89,12 +89,21 @@ if test "$ffmpeglib" = yes; then
     FFMPEG_LIBS="-lavformat -lavcodec -lswscale -lavutil",
     FFMPEG_LIBS=''; break
   )
+  AC_CHECK_HEADERS([libavresample/avresample.h],
+    [FFMPEG_LIBS="$FFMPEG_LIBS -lavresample"]
+  )
   if test "x$FFMPEG_LIBS" != "x"
   then
     AC_SUBST(FFMPEG_LIBS)
     AC_DEFINE([USE_FFMPEG], 1, [Defined if ffmpeg available and requested])
     AC_CHECK_LIB(avutil, av_dict_set,
       AC_DEFINE([HAVE_FFMPEG_AVDICTIONARY],1,[Defined if AVDictionary is available]),
+      true
+    )
+    AC_CHECK_LIB(avutil, av_frame_alloc,
+      AC_DEFINE([HAVE_FFMPEG_AV_FRAME_ALLOC],1,
+        [Defined if av_frame_alloc is available]
+      ),
       true
     )
 dnl AC_CHECK_LIB(avcore, av_get_bytes_per_sample,
@@ -104,6 +113,24 @@ dnl AC_CHECK_LIB(avcore, av_get_bytes_per_sample,
     )
     AC_CHECK_LIB(avutil, av_get_bits_per_sample_fmt,
       AC_DEFINE([HAVE_FFMPEG_SAMPLE_FMT],1,[Defined if av_get_bits_per_sample_fmt available]),
+      true
+    )
+    AC_CHECK_LIB(avcodec, avcodec_encode_audio2,
+      AC_DEFINE([HAVE_FFMPEG_AVCODEC_ENCODE_AUDIO2],1,
+        [Defined if avcodec_encode_audio2 is available]
+      ),
+      true
+    )
+    AC_CHECK_LIB(avcodec, avcodec_encode_video2,
+      AC_DEFINE([HAVE_FFMPEG_AVCODEC_ENCODE_VIDEO2],1,
+        [Defined if avcodec_encode_video2 is available]
+      ),
+      true
+    )
+    AC_CHECK_LIB(avcodec, avcodec_free_frame,
+      AC_DEFINE([HAVE_FFMPEG_AVCODEC_FREE_FRAME],1,
+        [Defined if avcodec_free_frame is available]
+      ),
       true
     )
     AC_CHECK_LIB(avcodec, avcodec_open2,
