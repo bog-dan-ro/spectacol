@@ -84,6 +84,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
    <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.1.1 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available.</li>
    <li><a href="http://fedoraproject.org/">Fedora</a> has <a href="https://admin.fedoraproject.org/pkgdb/acls/name/fuse-emulator">packages</a> of 1.1.1 available by Lucian Langa.</li>
    <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.1.1 available as <a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/fuse/">emulators/fuse</a>.</li>
+   <li><a href="http://www.gentoo.org/">Gentoo</a> users have an <a href="http://packages.gentoo.org/package/app-emulation/fuse?full_cat">ebuild</a> of 1.1.1 available.</li>
    <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 1.1.1 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse/">emulators/fuse</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-utils/">emulators/fuse-utils</a>.</li>
    <li><a href="http://www.openbsd.org/">OpenBSD</a> users have version 1.1.1 available as the fuse and fuse-utils package, with thanks to Anthony J. Bentley.</li>
    <li><a href="http://www.opensuse.org/">openSUSE</a> users have version 1.1.1 as the <a href="https://build.opensuse.org/package/show/Emulators/Fuse">Fuse</a> package from Emulators repository.</li>
@@ -92,7 +93,6 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   </ul>
   <p>Packages of older versions of Fuse are also available for some other distributions:</p>
   <ul>
-   <li><a href="http://www.gentoo.org/">Gentoo</a> users have an <a href="http://packages.gentoo.org/package/app-emulation/fuse?full_cat">ebuild</a> of 1.0.0 available.</li>
    <li>Nokia's <a href="http://maemo.org/">Maemo</a> platform has a port of <a href="http://maemo.org/downloads/product/OS2008/fuse-emulator/">1.0.0</a> available by Alberto Garcia.</li>
    <li><a href="http://www.mandriva.com/">Mandriva</a> packages of 0.10.0.2 are available from the <a href="http://plf.zarb.org/">Penguin Liberation Front</a>.</li>
   </ul>
