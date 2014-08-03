@@ -4621,3 +4621,5 @@
          tape traps enabled (thanks, zx81 and Sergio) (Fred).
 20140706 hacking/peripheral_tests.txt: use unzipped tapes for peripheral tests
          (thanks, Phil Reynolds) (Sergio).
+20140804 ui/gtk/{gtkcompat.h,gtkui.c}: replace deprecated gtk_widget_modify_font
+         and remove obsolete gtk_window_set_wmclass (Sergio).

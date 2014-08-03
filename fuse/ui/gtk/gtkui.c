@@ -167,7 +167,6 @@ ui_init( int *argc, char ***argv )
   settings = gtk_widget_get_settings( GTK_WIDGET( gtkui_window ) );
   g_object_set( settings, "gtk-menu-bar-accel", "F1", NULL );
   gtk_window_set_title( GTK_WINDOW(gtkui_window), "Fuse" );
-  gtk_window_set_wmclass( GTK_WINDOW(gtkui_window), fuse_progname, "Fuse" );
 
   g_signal_connect(G_OBJECT(gtkui_window), "delete-event",
 		   G_CALLBACK(gtkui_delete), NULL);
@@ -801,7 +800,7 @@ gtkui_free_font( gtkui_font font )
 void
 gtkui_set_font( GtkWidget *widget, gtkui_font font )
 {
-  gtk_widget_modify_font( widget, font );
+  gtk_widget_override_font( widget, font );
 }
 
 void

@@ -50,6 +50,8 @@ gtk_separator_new( GtkOrientation orientation );
 GtkWidget *
 gtk_scrollbar_new( GtkOrientation orientation, GtkAdjustment *adjustment );
 
+#define gtk_widget_override_font( X, Y ) gtk_widget_modify_font( X, Y )
+
 #endif
 
 
