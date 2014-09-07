@@ -28,7 +28,9 @@ set -e
 
 aclocal -I m4
 # Mac OS X: Use glibtoolize instead
-libtoolize --automake
+(glibtoolize --version) < /dev/null > /dev/null 2>&1 && LIBTOOLIZE=glibtoolize \
+  || LIBTOOLIZE=libtoolize
+$LIBTOOLIZE --automake
 autoheader
 automake --add-missing
 autoconf
