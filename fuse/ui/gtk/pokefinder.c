@@ -238,6 +238,14 @@ gtkui_pokefinder_close( GtkWidget *widget, gpointer user_data GCC_UNUSED )
   gtk_widget_hide( widget );
 }
 
+static gboolean
+widget_delayed_show( GtkWidget *item )
+{
+  gtk_widget_show( item );
+
+  return FALSE;
+}
+
 static void
 update_pokefinder( void )
 {
@@ -277,7 +285,9 @@ update_pokefinder( void )
 	}
     }
 
-    gtk_widget_show( location_list );
+    /* Show widget when the GtkTreeView has been filled with data. Fix an empty
+       list on GTK+ 3.10 (and maybe other versions) */
+    g_idle_add( (GSourceFunc)widget_delayed_show, location_list );
 
   } else {
     gtk_widget_hide( location_list );

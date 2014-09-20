@@ -4624,3 +4624,4 @@
 20140804 ui/gtk/{gtkcompat.h,gtkui.c}: replace deprecated gtk_widget_modify_font
          and remove obsolete gtk_window_set_wmclass (Sergio).
 20140907 autogen.sh: select glibtoolize where required (Sergio).
+20140920 ui/gtk/pokefinder.c: fix empty list on GTK+ 3 (Sergio).
