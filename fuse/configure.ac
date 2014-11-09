@@ -266,7 +266,7 @@ if test -z "$UI"; then
   if test "$gtk" = yes; then
 
     AC_ARG_ENABLE(gtk3,
-      AS_HELP_STRING([--enable-gtk3],[prefer GTK+ 3 to GTK+ 2]),
+      AS_HELP_STRING([--disable-gtk3],[prefer GTK+ 2 to GTK+ 3]),
       if test "$enableval" = yes; then gtk3=yes; else gtk3=no; fi,
       gtk3=auto
     )
@@ -278,18 +278,17 @@ if test -z "$UI"; then
 
     elif test "$gtk3" = no; then
       AM_PATH_GTK_2_0(2.18.0,,
-        AC_MSG_WARN([GTK+ not found. Reverting to Xlib])
-        gtk=no
+        AC_MSG_ERROR([GTK+ not found])
       )
 
     elif test "$gtk3" = auto; then
-      AM_PATH_GTK_2_0(2.18.0,
-        gtk3=no,
+      PKG_CHECK_MODULES(GTK, [gtk+-3.0],
+        gtk3=yes
       )
 
       if test "$gtk3" = auto; then
-        PKG_CHECK_MODULES(GTK, [gtk+-3.0],
-          gtk3=yes,
+        AM_PATH_GTK_2_0(2.18.0,
+          gtk3=no,
           AC_MSG_WARN([GTK+ not found. Reverting to Xlib])
           gtk3=no
           gtk=no

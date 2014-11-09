@@ -4626,3 +4626,4 @@
 20140907 autogen.sh: select glibtoolize where required (Sergio).
 20140920 ui/gtk/pokefinder.c: fix empty list on GTK+ 3 (Sergio).
 20140920 data: add fuse.desktop and fuse.xml to the ignore property (Sergio).
+20141109 configure.ac: prefer GTK+ 3 to GTK+ 2 (Sergio).
