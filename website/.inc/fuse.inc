@@ -167,7 +167,7 @@ END_IMGSCRIPT;
   <span class="menuhover">
    <a href="http://www.shadowmagic.org.uk/spectrum/"><img src="images/grey.png" width="12" height="12" alt="&middot;" />Sinclair Spectrum</a>
   </span>
-  <div class="logo"><img src="logo/fuse.jpeg" alt="Fuse" /></div>
+  <div class="logo"><img src="logo/fuse.png" alt="Fuse" width="112" height="32"/></div>
   <span class="x">&bull;</span>
 
 END_HEADER;
