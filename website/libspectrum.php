@@ -78,7 +78,7 @@ END_SECTION
 
 fuse_section ("Download", "Downloads", <<<END_SECTION
 
-  <p>libspectrum is licensed under the <a href="COPYING">GNU General Public License</a>. Please read this before downloading libspectrum if you're not already familiar with it.</p>
+  <p>libspectrum is licensed under the <a href="COPYING">GNU General Public License</a>, version 2 or later. Please read this before downloading libspectrum if you're not already familiar with it.</p>
 
   <h3>Source</h3>
   <ul>
@@ -89,11 +89,12 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Binaries</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
+   <li><a href="https://www.archlinux.org/">Arch Linux</a> has 1.1.1 available from the <a href="https://aur.archlinux.org/packages/libspectrum/">Arch User Repository</a>.</li>
    <li><a href="http://packages.debian.org/search?keywords=libspectrum">Official packages</a> of 1.1.1 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available.</li>
-   <li><a href="https://admin.fedoraproject.org/pkgdb/acls/name/libspectrum">Fedora</a> (1.1.1)</li>
-   <li><a href="http://www.freebsd.org/cgi/cvsweb.cgi/ports/emulators/libspectrum/">FreeBSD</a> (1.1.1)</li>
+   <li><a href="https://apps.fedoraproject.org/packages/libspectrum">Fedora</a> (1.1.1)</li>
+   <li><a href="http://svnweb.freebsd.org/ports/head/emulators/libspectrum/">FreeBSD</a> (1.1.1)</li>
    <li><a href="http://packages.gentoo.org/package/app-emulation/libspectrum?full_cat">Gentoo</a> (1.1.1)</li>
-   <li><a href="http://www.mandriva.com/">Mandriva</a> packages of 0.5.0.1 are available from the <a href="http://plf.zarb.org/">PLF</a>, or some <a href="http://www.speccy.org/sinclairmania/arch/emu/mandrake/">older packages</a> from Miguel Barrio Orsikowsky.</li>
+   <li><a href="http://www.mandriva.com/">Mandriva</a> packages of 0.5.0.1 are available from the <a href="http://plf.zarb.org/">PLF</a>, or some <a href="http://sinclairmania.speccy.org/arch/emu/mandrake/">older packages</a> from Miguel Barrio Orsikowsky.</li>
    <li><a href="http://www.netbsd.org/">NetBSD</a> has 1.1.1 available as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/libspectrum/">emulators/libspectrum</a> in <a href="http://www.pkgsrc.org/">pkgsrc</a>.</li>
    <li><a href="http://www.openbsd.org/">OpenBSD</a> has 1.1.1 available as libspectrum package.</li>
    <li><a href="https://build.opensuse.org/package/show/Emulators/libspectrum">openSUSE</a> (1.1.1)</li>

@@ -81,9 +81,10 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Unix</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
+   <li><a href="https://www.archlinux.org/">Arch Linux</a> users can get version 1.1.1 from AUR as a <a href="https://aur.archlinux.org/packages/fuse-emulator/">PKGBUILD</a>.</li>
    <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.1.1 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available.</li>
-   <li><a href="http://fedoraproject.org/">Fedora</a> has <a href="https://admin.fedoraproject.org/pkgdb/acls/name/fuse-emulator">packages</a> of 1.1.1 available by Lucian Langa.</li>
-   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.1.1 available as <a href="http://www.FreeBSD.org/cgi/cvsweb.cgi/ports/emulators/fuse/">emulators/fuse</a>.</li>
+   <li><a href="http://fedoraproject.org/">Fedora</a> has <a href="https://apps.fedoraproject.org/packages/fuse-emulator/">packages</a> of 1.1.1 available by Lucian Langa.</li>
+   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.1.1 available as <a href="http://svnweb.freebsd.org/ports/head/emulators/fuse/">emulators/fuse</a>.</li>
    <li><a href="http://www.gentoo.org/">Gentoo</a> users have an <a href="http://packages.gentoo.org/package/app-emulation/fuse?full_cat">ebuild</a> of 1.1.1 available.</li>
    <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 1.1.1 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse/">emulators/fuse</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-utils/">emulators/fuse-utils</a>.</li>
    <li><a href="http://www.openbsd.org/">OpenBSD</a> users have version 1.1.1 available as the fuse and fuse-utils package, with thanks to Anthony J. Bentley.</li>
