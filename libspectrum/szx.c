@@ -3284,6 +3284,15 @@ write_if1_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
       return LIBSPECTRUM_ERROR_LOGIC;
     }
     rom_data = libspectrum_snap_interface1_rom( snap, 0 );
+    if( rom_data == NULL ) {
+      libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+                              "Interface 1 custom ROM specified to be %lu "
+                              "bytes but NULL pointer provided",
+                              (unsigned long)
+                              libspectrum_snap_interface1_rom_length(
+                                 snap, 0 ) );
+      return LIBSPECTRUM_ERROR_LOGIC;
+    }
     uncompressed_rom_length = disk_rom_length =
       libspectrum_snap_interface1_rom_length( snap, 0 );
   }

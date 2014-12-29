@@ -962,3 +962,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20140504 tape.c: ensure that we have an edge at the end of a tape to ensure that
          the last pulse is terminated - fixes loading of Moon Cresta (thanks,
          Lee Tonks) (Fred).
+20141230 szx.c: guard against passing a NULL pointer to memcpy in
+         write_if1_chunk() (thanks, clang static analyser) (Fred).
