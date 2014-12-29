@@ -4627,3 +4627,8 @@
 20140920 ui/gtk/pokefinder.c: fix empty list on GTK+ 3 (Sergio).
 20140920 data: add fuse.desktop and fuse.xml to the ignore property (Sergio).
 20141109 configure.ac: prefer GTK+ 3 to GTK+ 2 (Sergio).
+20141230 fuse.c: abort start if we can't drop root priveleges (thanks, clang
+         static analyser) (Fred).
+20141230 peripherals/disk/disk.c: avoid passing null argument to strcasecmp() if
+         filename is less than 4 characters in disk_write() (thanks, clang
+         static analyser) (Fred).
