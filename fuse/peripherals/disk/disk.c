@@ -2573,7 +2573,7 @@ disk_write( disk_t *d, const char *filename )
 
   namelen = strlen( filename );
   if( namelen < 4 )
-    ext = NULL;
+    ext = "";
   else
     ext = filename + namelen - 4;
 
