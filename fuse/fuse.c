@@ -264,7 +264,10 @@ static int fuse_init(int argc, char **argv)
   /* Drop root privs if we have them */
   if( !geteuid() ) {
     error = setuid( getuid() );
-    if( error ) ui_error( UI_ERROR_WARNING, "Could not drop root privileges" );
+    if( error ) {
+      ui_error( UI_ERROR_ERROR, "Could not drop root privileges" );
+      return 1;
+    }
   }
 #endif				/* #ifdef HAVE_GETEUID */
 
