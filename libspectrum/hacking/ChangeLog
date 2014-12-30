@@ -964,3 +964,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          Lee Tonks) (Fred).
 20141230 szx.c: guard against passing a NULL pointer to memcpy in
          write_if1_chunk() (thanks, clang static analyser) (Fred).
+20141230 autogen.sh: select glibtoolize where required (Sergio via fuse).
