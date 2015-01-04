@@ -561,7 +561,7 @@ disassemble_ed( libspectrum_word address, char *buffer, size_t buflen,
 
     }
   } else if( b < 0xa0 ) {
-    snprintf( buffer, buflen, "NOPD" ); *length = 1; *length = 1;
+    snprintf( buffer, buflen, "NOPD" ); *length = 1;
   } else {
     /* Note: 0xbc to 0xbf already removed */
     snprintf( buffer, buflen, "%s", opcode_101xxxxx[ b & 0x1f ] ); *length = 1;

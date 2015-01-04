@@ -4632,3 +4632,4 @@
 20141230 peripherals/disk/disk.c: avoid passing null argument to strcasecmp() if
          filename is less than 4 characters in disk_write() (thanks, clang
          static analyser) (Fred).
+20150104 debugger/disassemble.c: remove redundant code (Sergio).
