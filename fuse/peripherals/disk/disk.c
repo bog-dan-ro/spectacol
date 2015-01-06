@@ -800,11 +800,8 @@ udi_read_compressed( const libspectrum_byte *buffer,
   tmp = NULL;
 
   error = libspectrum_zlib_inflate( buffer, compr_size, &tmp, &olength );
-  if( error ) {
-    if( *data ) free( *data );
-    *data_size = 0;
-    return error;
-  }
+  if( error ) return error;
+
   if( *data_size < uncompr_size ) {
     *data = libspectrum_realloc( *data, uncompr_size );
     *data_size = uncompr_size;

@@ -458,11 +458,11 @@ debugger_breakpoint_clear( libspectrum_word address )
 
     found++;
 
-    free_breakpoint( ptr->data, NULL );
-
     debugger_breakpoints = g_slist_remove( debugger_breakpoints, ptr->data );
     if( debugger_mode == DEBUGGER_MODE_ACTIVE && !debugger_breakpoints )
       debugger_mode = DEBUGGER_MODE_INACTIVE;
+
+    free_breakpoint( ptr->data, NULL );
   }
 
   if( !found ) {
