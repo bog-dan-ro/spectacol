@@ -839,9 +839,9 @@ FUNCTION( scaler_AdvMame2x )( const libspectrum_byte *srcPtr,
   while (height--) {
     int i;
 
-    B = *(p - 1 - nextlineSrc);
+    /* B = *(p - 1 - nextlineSrc); */
     E = *(p - 1);
-    H = *(p - 1 + nextlineSrc);
+    /* H = *(p - 1 + nextlineSrc); */
     C = *(p - nextlineSrc);
     F = *(p);
     I = *(p + nextlineSrc);
@@ -883,9 +883,9 @@ FUNCTION( scaler_AdvMame3x )( const libspectrum_byte *srcPtr,
   while (height--) {
     int i;
 
-    B = *(p - 1 - nextlineSrc);
+    /* B = *(p - 1 - nextlineSrc); */
     E = *(p - 1);
-    H = *(p - 1 + nextlineSrc);
+    /* H = *(p - 1 + nextlineSrc); */
     C = *(p - nextlineSrc);
     F = *(p);
     I = *(p + nextlineSrc);
