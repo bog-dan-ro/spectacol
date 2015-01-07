@@ -497,8 +497,8 @@ static test_return_t
 test_24( void )
 {
   const char *filename = DYNAMIC_TEST_PATH( "complete-tzx.tzx" );
-  libspectrum_byte *buffer;
-  size_t filesize;
+  libspectrum_byte *buffer = NULL;
+  size_t filesize = 0;
   libspectrum_tape *tape;
   libspectrum_tape_iterator it;
   libspectrum_tape_block *block;

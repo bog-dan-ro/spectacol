@@ -967,3 +967,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20141230 autogen.sh: select glibtoolize where required (Sergio via fuse).
 20150107 rzx.c: rewrite some conditions for RZX finalisation in a more logical
          way (thanks, clang static analyser) (Sergio).
+20150107 test/test.c: remove "Function call argument is an uninitialized value"
+         warning. There's no chance that it is, but clang doesn't realise that
+         (Sergio).
