@@ -1781,9 +1781,11 @@ libspectrum_rzx_finalise( libspectrum_rzx *rzx )
     if( block->type == LIBSPECTRUM_RZX_INPUT_BLOCK ) {
 
       next_item = list->next;
-      next_block = ( next_item )? next_item->data : NULL;
+      if( !next_item ) break;
 
-      if( next_block && next_block->type == LIBSPECTRUM_RZX_INPUT_BLOCK ) {
+      next_block = next_item->data;
+
+      if( next_block->type == LIBSPECTRUM_RZX_INPUT_BLOCK ) {
         error = input_block_merge( &( block->types.input ),
                                    &( next_block->types.input ) );
         if( error ) return error;
