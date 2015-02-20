@@ -4637,3 +4637,4 @@
          after it is freed (thanks, clang static analyser) (Sergio).
 20150107 ui/scaler/scalers.c: remove unused code (thanks, clang static analyser)
          (Sergio).
+20150221 hacking/peripheral_tests.txt: add a couple of implicit steps (Fred).

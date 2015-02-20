@@ -10,6 +10,7 @@ Beta Disk
 
 * Acquire the +D system tape from
   ftp://ftp.worldofspectrum.org/pub/sinclair/utils/PlusDSystemTape.tzx.zip
+* Uncompress PlusDSystemTape.tzx.zip
 * Uncompress lib/tests/success.mgt.bz2
 * Start fuse as
   ./fuse --plusd --plusddisk lib/tests/success.mgt PlusDSystemTape.tzx
@@ -23,6 +24,7 @@ DISCiPLE
 
 * Acquire the DISCiPLE system tape from
   ftp://ftp.worldofspectrum.org/pub/sinclair/utils/DISCiPLESystemTapeV3d.tzx.zip
+* Uncompress DISCiPLESystemTapeV3d.tzx.zip
 * Uncompress lib/tests/success.mgt.bz2
 * Place a DISCiPLE ROM image in the 'roms' directory.
 * Start fuse as
