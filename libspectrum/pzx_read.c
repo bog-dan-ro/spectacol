@@ -548,7 +548,7 @@ read_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   error = read_block_header( id, &data_length, buffer, end );
   if( error ) return error;
 
-  if( *buffer + data_length > end || *buffer + data_length < *buffer ) {
+  if( end - *buffer < data_length ) {
     libspectrum_print_error(
       LIBSPECTRUM_ERROR_CORRUPT,
       "read_block: block length goes beyond end of file"

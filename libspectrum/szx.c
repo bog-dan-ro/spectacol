@@ -2246,7 +2246,7 @@ read_chunk( libspectrum_snap *snap, libspectrum_word version,
   error = read_chunk_header( id, &data_length, buffer, end );
   if( error ) return error;
 
-  if( *buffer + data_length > end || *buffer + data_length < *buffer ) {
+  if( end - *buffer < data_length ) {
     libspectrum_print_error(
       LIBSPECTRUM_ERROR_CORRUPT,
       "szx_read_chunk: chunk length goes beyond end of file"

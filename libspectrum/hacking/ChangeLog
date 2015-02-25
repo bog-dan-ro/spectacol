@@ -970,3 +970,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150107 test/test.c: remove "Function call argument is an uninitialized value"
          warning. There's no chance that it is, but clang doesn't realise that
          (Sergio).
+20150225 pzx_read.c,szx.c,tzx_read.c,warajevo_read.c: avoid (undefined) reliance
+         on pointer overflow in buffer length checks (Stuart).
