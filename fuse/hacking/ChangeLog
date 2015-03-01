@@ -4643,3 +4643,4 @@
          uimedia.c: migrate "index event" handling to the FDD layer and have FDC
          layer use it for their STATUS registers (fixes bug #311) (Gergely
          Szasz).
+20150301 hacking/peripheral_tests.txt: fix details for Disciple test (Fred).
