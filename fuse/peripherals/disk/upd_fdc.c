@@ -131,7 +131,7 @@ upd_fdc_master_reset( upd_fdc *f )
   int i;
   for( i = 0; i < 4; i++ )
     if( f->drive[i] != NULL )
-      fdd_select( &f->drive[i]->fdd, i == 0 ? 1 : 0 );
+      fdd_select( f->drive[i], i == 0 ? 1 : 0 );
   f->current_drive = f->drive[0];
 
   f->main_status = UPD_FDC_MAIN_DATAREQ;
@@ -159,9 +159,9 @@ crc_preset( upd_fdc *f )
 }
 
 static void
-crc_add( upd_fdc *f, upd_fdc_drive *d )
+crc_add( upd_fdc *f, fdd_t *d )
 {
-  f->crc = crc_fdc( f->crc, d->fdd.data & 0xff );
+  f->crc = crc_fdc( f->crc, d->data & 0xff );
 }
 
 /* 
@@ -174,58 +174,58 @@ static int
 read_id( upd_fdc *f )
 {
   int i;
-  upd_fdc_drive *d = f->current_drive;
+  fdd_t *d = f->current_drive;
 
   f->status_register[1] &= ~( UPD_FDC_ST1_CRC_ERROR | 
     			      UPD_FDC_ST1_MISSING_AM |
     			      UPD_FDC_ST1_NO_DATA );
   f->id_mark = UPD_FDC_AM_NONE;
   i = f->rev;
-  while( i == f->rev && d->fdd.ready ) {
-    fdd_read_write_data( &d->fdd, FDD_READ ); if( d->fdd.index ) f->rev--;
+  while( i == f->rev && d->ready ) {
+    fdd_read_write_data( d, FDD_READ ); if( d->index ) f->rev--;
     crc_preset( f );
     if( f->mf ) {	/* double density (MFM) */
-      if( d->fdd.data == 0xffa1 ) {
+      if( d->data == 0xffa1 ) {
         crc_add( f, d );
-	fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-	if( d->fdd.index ) f->rev--;
-	if( d->fdd.data != 0xffa1 )
+	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+	if( d->index ) f->rev--;
+	if( d->data != 0xffa1 )
 	  continue;
-	fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-	if( d->fdd.index ) f->rev--;
-	if( d->fdd.data != 0xffa1 )
+	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+	if( d->index ) f->rev--;
+	if( d->data != 0xffa1 )
 	  continue;
       } else {		/* no 0xa1 with missing clock... */
 	continue;
       }
     }
-    fdd_read_write_data( &d->fdd, FDD_READ );
-    if( d->fdd.index ) f->rev--;
+    fdd_read_write_data( d, FDD_READ );
+    if( d->index ) f->rev--;
     if( f->mf ) {	/* double density (MFM) */
-      if( d->fdd.data != 0x00fe )
+      if( d->data != 0x00fe )
 	continue;
     } else {		/* single density (FM) */
-      if( d->fdd.data != 0xfffe )
+      if( d->data != 0xfffe )
 	continue;
     }
     crc_add( f, d );
-    fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-    if( d->fdd.index ) f->rev--;
-    f->id_track = d->fdd.data;
-    fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-    if( d->fdd.index ) f->rev--;
-    f->id_head = d->fdd.data;
-    fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-    if( d->fdd.index ) f->rev--;
-    f->id_sector = d->fdd.data;
-    fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-    if( d->fdd.index ) f->rev--;
-    f->id_length = d->fdd.data > MAX_SIZE_CODE ? MAX_SIZE_CODE : d->fdd.data;
+    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    if( d->index ) f->rev--;
+    f->id_track = d->data;
+    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    if( d->index ) f->rev--;
+    f->id_head = d->data;
+    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    if( d->index ) f->rev--;
+    f->id_sector = d->data;
+    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    if( d->index ) f->rev--;
+    f->id_length = d->data > MAX_SIZE_CODE ? MAX_SIZE_CODE : d->data;
     f->sector_length = 0x80 << f->id_length; 
-    fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-    if( d->fdd.index ) f->rev--;
-    fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-    if( d->fdd.index ) f->rev--;
+    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    if( d->index ) f->rev--;
+    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    if( d->index ) f->rev--;
 
     if( f->crc != 0x0000 ) {
       f->status_register[1] |= UPD_FDC_ST1_CRC_ERROR | UPD_FDC_ST1_NO_DATA;
@@ -236,7 +236,7 @@ read_id( upd_fdc *f )
       return 0;		/* found and OK */
     }
   }
-  if(!d->fdd.ready) f->rev = 0;
+  if(!d->ready) f->rev = 0;
   f->status_register[1] |= UPD_FDC_ST1_MISSING_AM | UPD_FDC_ST1_NO_DATA;	/*FIXME _NO_DATA? */
   return 2;		/* not found */
 }
@@ -250,16 +250,16 @@ read_id( upd_fdc *f )
 static int
 read_datamark( upd_fdc *f )
 {
-  upd_fdc_drive *d = f->current_drive;
+  fdd_t *d = f->current_drive;
   int i;
 
   if( f->mf ) {	/* double density (MFM) */
     for( i = 40; i > 0; i-- ) {
-      fdd_read_write_data( &d->fdd, FDD_READ );
-      if( d->fdd.data == 0x4e )		/* read next */
+      fdd_read_write_data( d, FDD_READ );
+      if( d->data == 0x4e )		/* read next */
 	continue;
 
-      if( d->fdd.data == 0x00 )		/* go to PLL sync */
+      if( d->data == 0x00 )		/* go to PLL sync */
 	break;
 
       f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
@@ -267,40 +267,40 @@ read_datamark( upd_fdc *f )
     } 
     for( ; i > 0; i-- ) {
       crc_preset( f );
-      fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-      if( d->fdd.data == 0x00 )
+      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      if( d->data == 0x00 )
 	continue;
 
-      if( d->fdd.data == 0xffa1 )	/* got to a1 mark */
+      if( d->data == 0xffa1 )	/* got to a1 mark */
 	break;
 
       f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
       return 1;
     }
-    for( i = d->fdd.data == 0xffa1 ? 2 : 3; i > 0; i-- ) {
-      fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-      if( d->fdd.data != 0xffa1 ) {
+    for( i = d->data == 0xffa1 ? 2 : 3; i > 0; i-- ) {
+      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      if( d->data != 0xffa1 ) {
         f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
 	return 1;
       }
     } 
-    fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-    if( d->fdd.data < 0x00f8 || d->fdd.data > 0x00fb ) { /* !fb deleted mark */
+    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    if( d->data < 0x00f8 || d->data > 0x00fb ) { /* !fb deleted mark */
       f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
       return 1;
     }
-    if( d->fdd.data != 0x00fb )
+    if( d->data != 0x00fb )
       f->ddam = 1;
     else
       f->ddam = 0;
     return 0;
   } else {		/* SD -> FM */
     for( i = 30; i > 0; i-- ) {
-      fdd_read_write_data( &d->fdd, FDD_READ );
-      if( d->fdd.data == 0xff )		/* read next */
+      fdd_read_write_data( d, FDD_READ );
+      if( d->data == 0xff )		/* read next */
 	continue;
 
-      if( d->fdd.data == 0x00 )		/* go to PLL sync */
+      if( d->data == 0x00 )		/* go to PLL sync */
 	break;
 
       f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
@@ -308,24 +308,24 @@ read_datamark( upd_fdc *f )
     } 
     for( ; i > 0; i-- ) {
       crc_preset( f );
-      fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-      if( d->fdd.data == 0x00 )
+      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      if( d->data == 0x00 )
 	continue;
 
-      if( d->fdd.data >= 0xfff8 && d->fdd.data <= 0xfffb )	/* !fb deleted mark */
+      if( d->data >= 0xfff8 && d->data <= 0xfffb )	/* !fb deleted mark */
 	break;
 
       f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
       return 1;
     }
     if( i == 0 ) {
-      fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-      if( d->fdd.data < 0xfff8 || d->fdd.data > 0xfffb ) {	/* !fb deleted mark */
+      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      if( d->data < 0xfff8 || d->data > 0xfffb ) {	/* !fb deleted mark */
         f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
 	return 1;
       }
     }
-    if( d->fdd.data != 0x00fb )
+    if( d->data != 0x00fb )
       f->ddam = 1;
     else
       f->ddam = 0;
@@ -421,7 +421,7 @@ static void
 seek_step( upd_fdc *f, int start )
 {
   int i, j;
-  upd_fdc_drive *d;
+  fdd_t *d;
 
   if( start ) {
     i = f->us;
@@ -449,7 +449,7 @@ seek_step( upd_fdc *f, int start )
 
   /* There is need to seek? */
   if( f->pcn[i] == f->ncn[i] &&
-      f->seek[i] == 2 && !d->fdd.tr00 ) {	/* recalibrate fail */
+      f->seek[i] == 2 && !d->tr00 ) {	/* recalibrate fail */
     f->seek[i] = 5;				/* abnormal termination */
     f->seek_age[i] = 0;
     f->intrq = UPD_INTRQ_SEEK;
@@ -460,7 +460,7 @@ seek_step( upd_fdc *f, int start )
 
   /* There is need to seek? */
   if( f->pcn[i] == f->ncn[i] || 
-    ( f->seek[i] == 2 && d->fdd.tr00 ) ) {	/* correct position */
+    ( f->seek[i] == 2 && d->tr00 ) ) {	/* correct position */
     if( f->seek[i] == 2 )			/* recalibrate */
       f->pcn[i] = 0; 
     f->seek[i] = 4;				/* normal termination */
@@ -471,7 +471,7 @@ seek_step( upd_fdc *f, int start )
   }
 
   /* Drive not ready */
-  if( !d->fdd.ready ) {
+  if( !d->ready ) {
     if( f->seek[i] == 2 )			/* recalibrate */
       f->pcn[i] = f->rec[i] - ( 77 - f->pcn[i] ); 	/* restore PCN */
     f->seek[i] = 6;				/* drive not ready termination */
@@ -483,7 +483,7 @@ seek_step( upd_fdc *f, int start )
 
   /* Send step */
   if( f->pcn[i] != f->ncn[i] ) {	/**FIXME if d->tr00 == 1 ??? */
-    fdd_step( &d->fdd, f->pcn[i] > f->ncn[i] ? 
+    fdd_step( d, f->pcn[i] > f->ncn[i] ? 
                         FDD_STEP_OUT : FDD_STEP_IN );
     f->pcn[i] += f->pcn[i] > f->ncn[i] ? -1 : 1;
 
@@ -697,7 +697,7 @@ static void
 start_write_data( upd_fdc *f )
 {
   int i;
-  upd_fdc_drive *d = f->current_drive;
+  fdd_t *d = f->current_drive;
 
 multi_track_next:
   if( f->first_rw || f->read_id ||
@@ -734,24 +734,24 @@ multi_track_next:
     }
 
     for( i = 11; i > 0; i-- )	/* "delay" 11 GAP byte */
-      fdd_read_write_data( &d->fdd, FDD_READ );
+      fdd_read_write_data( d, FDD_READ );
     if( f->mf )					/* MFM */
       for( i = 11; i > 0; i-- )	/* "delay" another 11 GAP byte */
-	fdd_read_write_data( &d->fdd, FDD_READ );
+	fdd_read_write_data( d, FDD_READ );
 
-    d->fdd.data = 0x00;
+    d->data = 0x00;
     for( i = f->mf ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
-      fdd_read_write_data( &d->fdd, FDD_WRITE );
+      fdd_read_write_data( d, FDD_WRITE );
     crc_preset( f );
     if( f->mf ) {				/* MFM */
-      d->fdd.data = 0xffa1;
+      d->data = 0xffa1;
       for( i = 3; i > 0; i-- ) {		/* write 3 0xa1 with clock mark */
-	fdd_read_write_data( &d->fdd, FDD_WRITE ); crc_add( f, d );
+	fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
       }
     }
-    d->fdd.data = ( f->del_data ? 0x00f8 : 0x00fb ) |
+    d->data = ( f->del_data ? 0x00f8 : 0x00fb ) |
     			( f->mf ? 0x0000 : 0xff00 );	/* write data mark */
-    fdd_read_write_data( &d->fdd, FDD_WRITE ); crc_add( f, d );
+    fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
   } else {
     f->data_register[1]++;		/* next track */
     f->data_register[3] = 1;		/* first sector */
@@ -787,33 +787,33 @@ static void
 start_write_id( upd_fdc *f )
 {
   int i;
-  upd_fdc_drive *d = f->current_drive;
+  fdd_t *d = f->current_drive;
 
-  d->fdd.data = f->mf ? 0x4e : 0xff;
+  d->data = f->mf ? 0x4e : 0xff;
   for( i = 40; i > 0; i-- )	/* write 40 GAP byte */
-    fdd_read_write_data( &d->fdd, FDD_WRITE );
+    fdd_read_write_data( d, FDD_WRITE );
   if( f->mf )					/* MFM */
     for( i = 40; i > 0; i-- )	/* write another 40 GAP byte */
-      fdd_read_write_data( &d->fdd, FDD_WRITE );
-  d->fdd.data = 0x00;
+      fdd_read_write_data( d, FDD_WRITE );
+  d->data = 0x00;
   for( i = f->mf ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
-    fdd_read_write_data( &d->fdd, FDD_WRITE );
+    fdd_read_write_data( d, FDD_WRITE );
   crc_preset( f );
   if( f->mf ) {				/* MFM */
-    d->fdd.data = 0xffc2;
+    d->data = 0xffc2;
     for( i = 3; i > 0; i-- ) {		/* write 3 0xc2 with clock mark */
-      fdd_read_write_data( &d->fdd, FDD_WRITE );
+      fdd_read_write_data( d, FDD_WRITE );
     }
   }
-  d->fdd.data = 0x00fc | ( f->mf ? 0x0000 : 0xff00 );	/* write index mark */
-  fdd_read_write_data( &d->fdd, FDD_WRITE );
+  d->data = 0x00fc | ( f->mf ? 0x0000 : 0xff00 );	/* write index mark */
+  fdd_read_write_data( d, FDD_WRITE );
 
-  d->fdd.data = f->mf ? 0x4e : 0xff;	/* postindex GAP */
+  d->data = f->mf ? 0x4e : 0xff;	/* postindex GAP */
   for( i = 26; i > 0; i-- )	/* write 26 GAP byte */
-    fdd_read_write_data( &d->fdd, FDD_WRITE );
+    fdd_read_write_data( d, FDD_WRITE );
   if( f->mf )					/* MFM */
     for( i = 24; i > 0; i-- )	/* write another 24 GAP byte */
-      fdd_read_write_data( &d->fdd, FDD_WRITE );
+      fdd_read_write_data( d, FDD_WRITE );
 
   f->main_status |= UPD_FDC_MAIN_DATAREQ | UPD_FDC_MAIN_DATA_WRITE;
   f->data_offset = 0;
@@ -832,16 +832,16 @@ head_load( upd_fdc *f )
     else if( f->cmd->id == UPD_CMD_READ_ID )
       start_read_id( f );
     else if( f->cmd->id == UPD_CMD_READ_DIAG ) {
-      fdd_wait_index_hole( &f->current_drive->fdd );		/* start reading from index hole */
+      fdd_wait_index_hole( f->current_drive );		/* start reading from index hole */
       start_read_diag( f );
     } else if( f->cmd->id == UPD_CMD_WRITE_DATA )
       start_write_data( f );
     else if( f->cmd->id == UPD_CMD_WRITE_ID ) {
-      fdd_wait_index_hole( &f->current_drive->fdd );		/* start writing from index hole */
+      fdd_wait_index_hole( f->current_drive );		/* start writing from index hole */
       start_write_id( f );
     }
   } else {
-    fdd_head_load( &f->current_drive->fdd, 1 );
+    fdd_head_load( f->current_drive, 1 );
     f->head_load = 1;
     event_add_with_data( tstates + f->hld_time * 
 			 machine_current->timings.processor_speed / 1000,
@@ -863,7 +863,7 @@ upd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
   }
 
   if( event == head_event ) {
-    fdd_head_load( &f->current_drive->fdd, 0 );
+    fdd_head_load( f->current_drive, 0 );
     f->head_load = 0;
     return;
   }
@@ -885,12 +885,12 @@ upd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
   } else if( f->cmd->id == UPD_CMD_READ_ID ) {
     start_read_id( f );
   } else if( f->cmd->id == UPD_CMD_READ_DIAG ) {
-    fdd_wait_index_hole( &f->current_drive->fdd );		/* start reading from index hole */
+    fdd_wait_index_hole( f->current_drive );		/* start reading from index hole */
     start_read_diag( f );
   } else if( f->cmd->id == UPD_CMD_WRITE_DATA ) {
     start_write_data( f );
   } else if( f->cmd->id == UPD_CMD_WRITE_ID ) {
-    fdd_wait_index_hole( &f->current_drive->fdd );		/* start writing from index hole */
+    fdd_wait_index_hole( f->current_drive );		/* start writing from index hole */
     start_write_id( f );
   }
 
@@ -908,7 +908,7 @@ upd_fdc_read_data( upd_fdc *f )
 {
   libspectrum_byte r;
 
-  upd_fdc_drive *d = f->current_drive;
+  fdd_t *d = f->current_drive;
 
   if( !( f->main_status & UPD_FDC_MAIN_DATAREQ ) || 
       !( f->main_status & UPD_FDC_MAIN_DATA_READ ) )
@@ -916,31 +916,31 @@ upd_fdc_read_data( upd_fdc *f )
 
   if( f->state == UPD_FDC_STATE_EXE ) {		/* READ_DATA/READ_DIAG */
     f->data_offset++;				/* count read bytes */
-    fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d ); /* read a byte */
+    fdd_read_write_data( d, FDD_READ ); crc_add( f, d ); /* read a byte */
 
     /* Speedlock hack */
-    if( f->speedlock > 0 && !d->fdd.do_read_weak ) {	/* do not conflict with fdd weak reads */
-      if( f->data_offset < 64 && d->fdd.data != 0xe5 )
+    if( f->speedlock > 0 && !d->do_read_weak ) {	/* do not conflict with fdd weak reads */
+      if( f->data_offset < 64 && d->data != 0xe5 )
         f->speedlock = 2;		/* W.E.C Le Mans type ... */
       else if( ( f->speedlock > 1 || f->data_offset < 64 ) &&
 	       !( f->data_offset % 29 ) ) {
-	d->fdd.data ^= f->data_offset;	/* mess up data */
+	d->data ^= f->data_offset;	/* mess up data */
 	crc_add( f, d );			/* mess up crc */
       }
     }
     /* EOSpeedlock hack */
 
-    r = d->fdd.data & 0xff;
+    r = d->data & 0xff;
     if( f->data_offset == f->rlen ) {	/* send only rlen byte to host */
       while( f->data_offset < f->sector_length ) {
-	fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
+	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
 	f->data_offset++;
       }
     }
     if( ( f->cmd->id == UPD_CMD_READ_DIAG || f->cmd->id == UPD_CMD_READ_DATA )
         && f->data_offset == f->sector_length ) {       /* read the CRC */
-      fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-      fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
+      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
       if( f->crc != 0x000 ) {
 	f->status_register[2] |= UPD_FDC_ST2_DATA_ERROR;
 	f->status_register[1] |= UPD_FDC_ST1_CRC_ERROR;
@@ -1004,9 +1004,8 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
 {
   int i, terminated = 0;
   unsigned int u;
-  upd_fdc_drive *d;
+  fdd_t *d;
 
-  
   if( !( f->main_status & UPD_FDC_MAIN_DATAREQ ) || 
       ( f->main_status & UPD_FDC_MAIN_DATA_READ ) )
     return;
@@ -1021,67 +1020,67 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       if( f->data_offset == 4 ) {			/* C, H, R, N done => format track */
 	event_remove_type( timeout_event );
 
-        d->fdd.data = 0x00;
+        d->data = 0x00;
         for( i = f->mf ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
-          fdd_read_write_data( &d->fdd, FDD_WRITE );
+          fdd_read_write_data( d, FDD_WRITE );
         crc_preset( f );
         if( f->mf ) {				/* MFM */
-          d->fdd.data = 0xffa1;
+          d->data = 0xffa1;
           for( i = 3; i > 0; i-- ) {		/* write 3 0xa1 with clock mark */
-	    fdd_read_write_data( &d->fdd, FDD_WRITE ); crc_add( f, d );
+	    fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
           }
         }
-        d->fdd.data = 0x00fe | ( f->mf ? 0x0000 : 0xff00 );	/* write id mark */
-        fdd_read_write_data( &d->fdd, FDD_WRITE ); crc_add( f, d );
+        d->data = 0x00fe | ( f->mf ? 0x0000 : 0xff00 );	/* write id mark */
+        fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
 	for( i = 0; i < 4; i++ ) {
-    	  d->fdd.data =  f->data_register[i + 5];	/* write id fields */
-          fdd_read_write_data( &d->fdd, FDD_WRITE ); crc_add( f, d );
+    	  d->data =  f->data_register[i + 5];	/* write id fields */
+          fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
 	}
-        d->fdd.data = f->crc >> 8;
-        fdd_read_write_data( &d->fdd, FDD_WRITE );	/* write crc1 */
-        d->fdd.data = f->crc & 0xff;
-        fdd_read_write_data( &d->fdd, FDD_WRITE );	/* write crc2 */
+        d->data = f->crc >> 8;
+        fdd_read_write_data( d, FDD_WRITE );	/* write crc1 */
+        d->data = f->crc & 0xff;
+        fdd_read_write_data( d, FDD_WRITE );	/* write crc2 */
 
-        d->fdd.data = f->mf ? 0x4e : 0xff;
+        d->data = f->mf ? 0x4e : 0xff;
         for( i = 11; i > 0; i-- )	/* write 11 GAP byte */
-          fdd_read_write_data( &d->fdd, FDD_WRITE );
+          fdd_read_write_data( d, FDD_WRITE );
         if( f->mf )					/* MFM */
           for( i = 11; i > 0; i-- )	/* write another 11 GAP byte */
-	    fdd_read_write_data( &d->fdd, FDD_WRITE );
-        d->fdd.data = 0x00;
+	    fdd_read_write_data( d, FDD_WRITE );
+        d->data = 0x00;
         for( i = f->mf ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
-          fdd_read_write_data( &d->fdd, FDD_WRITE );
+          fdd_read_write_data( d, FDD_WRITE );
         crc_preset( f );
         if( f->mf ) {				/* MFM */
-          d->fdd.data = 0xffa1;
+          d->data = 0xffa1;
           for( i = 3; i > 0; i-- ) {		/* write 3 0xa1 with clock mark */
-	    fdd_read_write_data( &d->fdd, FDD_WRITE ); crc_add( f, d );
+	    fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
           }
         }
-        d->fdd.data = 0x00fb | ( f->mf ? 0x0000 : 0xff00 );	/* write data mark */
-        fdd_read_write_data( &d->fdd, FDD_WRITE ); crc_add( f, d );
+        d->data = 0x00fb | ( f->mf ? 0x0000 : 0xff00 );	/* write data mark */
+        fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
 	
-    	d->fdd.data =  f->data_register[4];	/* write filler byte */
+    	d->data =  f->data_register[4];	/* write filler byte */
 	for( i = f->rlen; i > 0; i-- ) {
-          fdd_read_write_data( &d->fdd, FDD_WRITE ); crc_add( f, d );
+          fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
 	}
-        d->fdd.data = f->crc >> 8;
-        fdd_read_write_data( &d->fdd, FDD_WRITE );	/* write crc1 */
-        d->fdd.data = f->crc & 0xff;
-        fdd_read_write_data( &d->fdd, FDD_WRITE );	/* write crc2 */
+        d->data = f->crc >> 8;
+        fdd_read_write_data( d, FDD_WRITE );	/* write crc1 */
+        d->data = f->crc & 0xff;
+        fdd_read_write_data( d, FDD_WRITE );	/* write crc2 */
 
-        d->fdd.data = f->mf ? 0x4e : 0xff;
+        d->data = f->mf ? 0x4e : 0xff;
 	for( i = f->data_register[3]; i > 0; i-- ) {	/* GAP */
-          fdd_read_write_data( &d->fdd, FDD_WRITE );
+          fdd_read_write_data( d, FDD_WRITE );
 	}
         f->data_offset = 0;
 	f->data_register[2]--;		/* prepare next sector */
       }
       if( f->data_register[2] == 0 ) {	/* finish all sector */
 
-        d->fdd.data = f->mf ? 0x4e : 0xff;	/* GAP3 as Intel call this GAP */
-        while( !d->fdd.index )
-          fdd_read_write_data( &d->fdd, FDD_WRITE );
+        d->data = f->mf ? 0x4e : 0xff;	/* GAP3 as Intel call this GAP */
+        while( !d->index )
+          fdd_read_write_data( d, FDD_WRITE );
 
 
 	f->state = UPD_FDC_STATE_RES;	/* end of execution phase */
@@ -1097,43 +1096,43 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       return;
     } else if( f->cmd->id == UPD_CMD_WRITE_DATA ) {		/* WRITE DATA */
       f->data_offset++;
-      d->fdd.data = data;
-      fdd_read_write_data( &d->fdd, FDD_WRITE ); crc_add( f, d );
+      d->data = data;
+      fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
     
       if( f->data_offset == f->rlen ) {	/* read only rlen byte from host */
-        d->fdd.data = 0x00;
+        d->data = 0x00;
         while( f->data_offset < f->sector_length ) {	/* fill with 0x00 */
-	  fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
+	  fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
 	  f->data_offset++;
         }
       }
       if( f->data_offset == f->sector_length ) {	/* write the CRC */
-        d->fdd.data = f->crc >> 8;
-        fdd_read_write_data( &d->fdd, FDD_WRITE );	/* write crc1 */
-        d->fdd.data = f->crc & 0xff;
-        fdd_read_write_data( &d->fdd, FDD_WRITE );	/* write crc2 */
+        d->data = f->crc >> 8;
+        fdd_read_write_data( d, FDD_WRITE );	/* write crc1 */
+        d->data = f->crc & 0xff;
+        fdd_read_write_data( d, FDD_WRITE );	/* write crc2 */
         f->main_status &= ~UPD_FDC_MAIN_DATAREQ;
 	start_write_data( f );
       }
       return;
     } else {						/* SCAN */
       f->data_offset++;
-      fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-      if( f->data_offset == 0 && d->fdd.data == data )	/* `scan hit' */
+      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      if( f->data_offset == 0 && d->data == data )	/* `scan hit' */
         f->status_register[2] |= UPD_FDC_ST2_SCAN_HIT;
 
-      if( d->fdd.data != data )				/* `scan _not_ hit' */
+      if( d->data != data )				/* `scan _not_ hit' */
         f->status_register[2] &= ~UPD_FDC_ST2_SCAN_HIT;
 
-      if( ( f->scan == UPD_SCAN_EQ && d->fdd.data != data ) ||	/* scan not satisfied */
-          ( f->scan == UPD_SCAN_LO && d->fdd.data > data ) ||
-          ( f->scan == UPD_SCAN_HI && d->fdd.data < data ) ) {
+      if( ( f->scan == UPD_SCAN_EQ && d->data != data ) ||	/* scan not satisfied */
+          ( f->scan == UPD_SCAN_LO && d->data > data ) ||
+          ( f->scan == UPD_SCAN_HI && d->data < data ) ) {
         f->status_register[2] |= UPD_FDC_ST2_SCAN_NOT_SAT;
       }
     
       if( f->data_offset == f->sector_length ) {	/* read the CRC */
-	fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
-	fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
+	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
 	if( f->crc != 0x000 ) {
 	  f->status_register[2] |= UPD_FDC_ST2_DATA_ERROR;
 	  f->status_register[1] |= UPD_FDC_ST1_CRC_ERROR;
@@ -1195,13 +1194,13 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
 	f->cmd->id != UPD_CMD_INVALID ) {
       f->us = f->data_register[0] & 0x03;
       if( f->current_drive != f->drive[ f->us ] ) {
-        fdd_select( &f->current_drive->fdd, 0 );
+        fdd_select( f->current_drive, 0 );
         f->current_drive = f->drive[ f->us ];
-        fdd_select( &f->current_drive->fdd, 1 );
+        fdd_select( f->current_drive, 1 );
       }
 
       f->hd = ( f->data_register[0] & 0x04 ) >> 2;
-      fdd_set_head( &f->current_drive->fdd, f->hd );
+      fdd_set_head( f->current_drive, f->hd );
 
       /* identify READ_DELETED_DATA/WRITE_DELETED_DATA */
       if( f->cmd->id == UPD_CMD_READ_DATA || 
@@ -1264,9 +1263,9 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       f->status_register[3] = f->us + ( f->hd << 2 );
       /*???? the plus3 wiring cause that the double side signal is the
          same as the write protect signal... */
-      f->status_register[3] |= d->fdd.wrprot ? UPD_FDC_ST3_WRPROT : 0;
-      f->status_register[3] |= d->fdd.tr00 ? UPD_FDC_ST3_TR00 : 0;
-      f->status_register[3] |= d->fdd.ready ? UPD_FDC_ST3_READY : 0;
+      f->status_register[3] |= d->wrprot ? UPD_FDC_ST3_WRPROT : 0;
+      f->status_register[3] |= d->tr00 ? UPD_FDC_ST3_TR00 : 0;
+      f->status_register[3] |= d->ready ? UPD_FDC_ST3_READY : 0;
       break;
     case UPD_CMD_SENSE_INT:
       for( i = 0; i < 4; i++ ) {
@@ -1308,7 +1307,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       break;
     case UPD_CMD_READ_DATA:
     /* Speedlock hack */
-      if( f->speedlock != -1 && !d->fdd.do_read_weak ) {	/* do not conflict with fdd weak read */
+      if( f->speedlock != -1 && !d->do_read_weak ) {	/* do not conflict with fdd weak read */
 	u = ( f->data_register[2] & 0x01 ) + ( f->data_register[1] << 1 ) +
 	    ( f->data_register[3] << 8 );
 	if( f->data_register[3] == f->data_register[5] && u == 0x200 ) {
@@ -1340,7 +1339,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       break;
 
     case UPD_CMD_WRITE_DATA:
-      if( d->fdd.wrprot ) {
+      if( d->wrprot ) {
         f->status_register[1] |= UPD_FDC_ST1_NOT_WRITEABLE;
         f->status_register[0] |= UPD_FDC_ST0_INT_ABNORM;
 	terminated = 1;
@@ -1354,7 +1353,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       return;
       break;
     case UPD_CMD_WRITE_ID:			/* FORMAT TRACK */
-      if( d->fdd.wrprot ) {
+      if( d->wrprot ) {
         f->status_register[1] |= UPD_FDC_ST1_NOT_WRITEABLE;
         f->status_register[0] |= UPD_FDC_ST0_INT_ABNORM;
 	terminated = 1;

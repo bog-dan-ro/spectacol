@@ -52,7 +52,6 @@ typedef struct ui_media_drive_info_t
   ui_media_drive_insert_hook_fn insert_hook;
   ui_media_drive_autoload_hook_fn autoload_hook;
   struct fdd_t *fdd;
-  struct disk_t *disk;
 } ui_media_drive_info_t;
 
 int ui_media_drive_register( ui_media_drive_info_t *drive );

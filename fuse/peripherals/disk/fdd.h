@@ -88,13 +88,19 @@ typedef struct fdd_t {
   int data;		/* read/write to data byte 0x00nn or 0xffnn */
   int marks;		/* read/write other marks 0x01 -> FM 0x02 -> WEAK */
 
-  disk_t *disk;		/* pointer to inserted disk */
+  disk_t disk;		/* disk */
   int loaded;		/* disk loaded */
   int upsidedown;	/* flipped disk */
   int selected;		/* Drive Select line active */
   int ready;		/* some disk drive offer a ready signal */
 
   fdd_error_t status;
+
+/* WD/FD 177X may wait for an index or RDY->/RDY or /RDY->RDY 
+   we do not need more, just a subroutine and a pointer to fdc_struct 
+*/
+  void ( *fdc_index ) ( void *fdc );
+  void *fdc;		/* if not NULL FDC wait for an index pulse */
 
 /*--private section, fdc may never use it */
   int unreadable;	/* disk unreadable in this drive */
@@ -104,7 +110,7 @@ typedef struct fdd_t {
   int c_bpt;		/* current track length in bytes */
   int motoron;		/* motor on */
   int loadhead;		/* head loaded */
-
+  int index_pulse;	/* 'second' index hole, for index status */
 } fdd_t;
 
 typedef struct fdd_params_t {
@@ -122,7 +128,7 @@ const char *fdd_strerror( int error );
 /* initialize the fdd_t struct, and set fdd_heads and cylinders (e.g. 2/83 ) */
 int fdd_init( fdd_t *d, fdd_type_t type, const fdd_params_t *dt, int reinit );
 /* load the given disk into the fdd. if upsidedown = 1, floppy upsidedown in drive :) */
-int fdd_load( fdd_t *d, disk_t *disk, int upsidedown );
+int fdd_load( fdd_t *d, int upsidedown );
 /* unload the disk from fdd */
 void fdd_unload( fdd_t *d );
 /* set fdd head */

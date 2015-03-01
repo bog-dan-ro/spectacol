@@ -53,12 +53,8 @@ static int plusd_memory_source;
 int plusd_available = 0;
 int plusd_active = 0;
 
-static int plusd_index_pulse;
-
-static int index_event;
-
 static wd_fdc *plusd_fdc;
-static wd_fdc_drive plusd_drives[ PLUSD_NUM_DRIVES ];
+static fdd_t plusd_drives[ PLUSD_NUM_DRIVES ];
 static ui_media_drive_info_t plusd_ui_drives[ PLUSD_NUM_DRIVES ];
 
 static libspectrum_byte *plusd_ram;
@@ -69,8 +65,6 @@ static void plusd_memory_map( void );
 static void plusd_enabled_snapshot( libspectrum_snap *snap );
 static void plusd_from_snapshot( libspectrum_snap *snap );
 static void plusd_to_snapshot( libspectrum_snap *snap );
-static void plusd_event_index( libspectrum_dword last_tstates, int type,
-			       void *user_data );
 static void plusd_activate( void );
 
 static module_info_t plusd_module_info = {
@@ -141,26 +135,23 @@ void
 plusd_init( void )
 {
   int i;
-  wd_fdc_drive *d;
+  fdd_t *d;
 
   plusd_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     d = &plusd_drives[ i ];
-    fdd_init( &d->fdd, FDD_SHUGART, NULL, 0 );
+    fdd_init( d, FDD_SHUGART, NULL, 0 );
     d->disk.flag = DISK_FLAG_NONE;
   }
 
   plusd_fdc->current_drive = &plusd_drives[ 0 ];
-  fdd_select( &plusd_drives[ 0 ].fdd, 1 );
+  fdd_select( &plusd_drives[ 0 ], 1 );
   plusd_fdc->dden = 1;
   plusd_fdc->set_intrq = NULL;
   plusd_fdc->reset_intrq = NULL;
   plusd_fdc->set_datarq = NULL;
   plusd_fdc->reset_datarq = NULL;
-  plusd_fdc->iface = NULL;
-
-  index_event = event_register( plusd_event_index, "+D index" );
 
   module_register( &plusd_module_info );
 
@@ -173,9 +164,7 @@ plusd_init( void )
   periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
-    d = &plusd_drives[ i ];
-    plusd_ui_drives[ i ].fdd = &d->fdd;
-    plusd_ui_drives[ i ].disk = &d->disk;
+    plusd_ui_drives[ i ].fdd = &plusd_drives[ i ];
     ui_media_drive_register( &plusd_ui_drives[ i ] );
   }
 }
@@ -184,12 +173,9 @@ static void
 plusd_reset( int hard_reset )
 {
   int i;
-  wd_fdc_drive *d;
 
   plusd_active = 0;
   plusd_available = 0;
-
-  event_remove_type( index_event );
 
   if( !periph_is_active( PERIPH_TYPE_PLUSD ) ) {
     return;
@@ -212,7 +198,6 @@ plusd_reset( int hard_reset )
 
   plusd_available = 1;
   plusd_active = 1;
-  plusd_index_pulse = 0;
 
   if( hard_reset )
     memset( plusd_ram, 0, 0x2000 );
@@ -220,19 +205,13 @@ plusd_reset( int hard_reset )
   wd_fdc_master_reset( plusd_fdc );
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
-    d = &plusd_drives[ i ];
-
-    d->index_pulse = 0;
-    d->index_interrupt = 0;
-
     ui_media_drive_update_menus( &plusd_ui_drives[ i ],
                                  UI_MEDIA_DRIVE_UPDATE_ALL );
   }
 
   plusd_fdc->current_drive = &plusd_drives[ 0 ];
-  fdd_select( &plusd_drives[ 0 ].fdd, 1 );
+  fdd_select( &plusd_drives[ 0 ], 1 );
   machine_current->memory_map();
-  plusd_event_index( 0, index_event, NULL );
 
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
 }
@@ -309,15 +288,15 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 
   /* TODO: set current_drive to NULL when bits 0 and 1 of b are '00' or '11' */
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
-    fdd_set_head( &plusd_drives[ i ].fdd, side );
+    fdd_set_head( &plusd_drives[ i ], side );
   }
-  fdd_select( &plusd_drives[ (!drive) ].fdd, 0 );
-  fdd_select( &plusd_drives[ drive ].fdd, 1 );
+  fdd_select( &plusd_drives[ (!drive) ], 0 );
+  fdd_select( &plusd_drives[ drive ], 1 );
 
   if( plusd_fdc->current_drive != &plusd_drives[ drive ] ) {
-    if( plusd_fdc->current_drive->fdd.motoron ) {            /* swap motoron */
-      fdd_motoron( &plusd_drives[ (!drive) ].fdd, 0 );
-      fdd_motoron( &plusd_drives[ drive ].fdd, 1 );
+    if( plusd_fdc->current_drive->motoron ) {            /* swap motoron */
+      fdd_motoron( &plusd_drives[ (!drive) ], 0 );
+      fdd_motoron( &plusd_drives[ drive ], 1 );
     }
     plusd_fdc->current_drive = &plusd_drives[ drive ];
   }
@@ -375,29 +354,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 fdd_t *
 plusd_get_fdd( plusd_drive_number which )
 {
-  return &( plusd_drives[ which ].fdd );
-}
-
-static void
-plusd_event_index( libspectrum_dword last_tstates, int type GCC_UNUSED,
-                   void *user_data GCC_UNUSED )
-{
-  int next_tstates;
-  int i;
-
-  plusd_index_pulse = !plusd_index_pulse;
-  for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
-    wd_fdc_drive *d = &plusd_drives[ i ];
-
-    d->index_pulse = plusd_index_pulse;
-    if( !plusd_index_pulse && d->index_interrupt ) {
-      wd_fdc_set_intrq( plusd_fdc );
-      d->index_interrupt = 0;
-    }
-  }
-  next_tstates = ( plusd_index_pulse ? 10 : 190 ) *
-    machine_current->timings.processor_speed / 1000;
-  event_add( last_tstates + next_tstates, index_event );
+  return &( plusd_drives[ which ] );
 }
 
 static libspectrum_byte *

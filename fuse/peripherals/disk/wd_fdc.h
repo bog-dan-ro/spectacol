@@ -56,19 +56,8 @@ typedef enum wd_type_t {
   WD1772,
 } wd_type_t;
 
-extern int wd_fdc_index_pulse;
-extern int wd_fdc_index_interrupt;
-
-typedef struct wd_fdc_drive {
-  fdd_t fdd;			/* floppy disk drive */
-  disk_t disk;			/* the floppy disk itself */
-  int index_pulse;
-  int index_interrupt;
-
-} wd_fdc_drive;
-
 typedef struct wd_fdc {
-  wd_fdc_drive *current_drive;
+  fdd_t *current_drive;
 
   wd_type_t type;		/* WD1770, WD1772, WD1773 */
 
@@ -139,7 +128,6 @@ typedef struct wd_fdc {
   void ( *reset_intrq ) ( struct wd_fdc *f );
   void ( *set_datarq ) ( struct wd_fdc *f );
   void ( *reset_datarq ) ( struct wd_fdc *f );
-  void *iface;
 
 } wd_fdc;
 

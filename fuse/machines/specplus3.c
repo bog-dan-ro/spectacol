@@ -62,7 +62,7 @@ static void select_special_map( int page1, int page2, int page3, int page4 );
 static int specplus3_reset( void );
 
 upd_fdc *specplus3_fdc;
-static upd_fdc_drive specplus3_drives[ SPECPLUS3_NUM_DRIVES ];
+static fdd_t specplus3_drives[ SPECPLUS3_NUM_DRIVES ];
 
 static int ui_drive_is_available( void );
 static const fdd_params_t *ui_drive_get_params_a( void );
@@ -140,7 +140,6 @@ void
 specplus3_765_init( void )
 {
   int i;
-  upd_fdc_drive *d;
 
   specplus3_fdc = upd_fdc_alloc_fdc( UPD765A, UPD_CLOCK_4MHZ );
   /*!!!! the plus3 only use the US0 pin to select drives,
@@ -151,12 +150,11 @@ specplus3_765_init( void )
   specplus3_fdc->drive[3] = &specplus3_drives[ 1 ];
 
   for( i = 0; i < SPECPLUS3_NUM_DRIVES; i++ ) {
-    d = &specplus3_drives[ i ];
-    d->disk.flag = DISK_FLAG_PLUS3_CPC;
+    specplus3_drives[ i ].disk.flag = DISK_FLAG_PLUS3_CPC;
   }
 					/* builtin drive 1 head 42 track */
-  fdd_init( &specplus3_drives[ 0 ].fdd, FDD_SHUGART, &fdd_params[ 1 ], 0 );
-  fdd_init( &specplus3_drives[ 1 ].fdd, FDD_SHUGART, NULL, 0 );	/* drive geometry 'autodetect' */
+  fdd_init( &specplus3_drives[ 0 ], FDD_SHUGART, &fdd_params[ 1 ], 0 );
+  fdd_init( &specplus3_drives[ 1 ], FDD_SHUGART, NULL, 0 );	/* drive geometry 'autodetect' */
   specplus3_fdc->set_intrq = NULL;
   specplus3_fdc->reset_intrq = NULL;
   specplus3_fdc->set_datarq = NULL;
@@ -165,8 +163,7 @@ specplus3_765_init( void )
   specplus3_765_update_fdd();
 
   for( i = 0; i < SPECPLUS3_NUM_DRIVES; i++ ) {
-    ui_drives[ i ].fdd = &specplus3_drives[ i ].fdd;
-    ui_drives[ i ].disk = &specplus3_drives[ i ].disk;
+    ui_drives[ i ].fdd = &specplus3_drives[ i ];
     ui_media_drive_register( &ui_drives[ i ] );
   }
 }
@@ -178,10 +175,10 @@ specplus3_765_reset( void )
 
   upd_fdc_master_reset( specplus3_fdc );
   dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3a_type() + 1 ];	/* +1 => there is no `Disabled' */
-  fdd_init( &specplus3_drives[ 0 ].fdd, FDD_SHUGART, dt, 1 );
+  fdd_init( &specplus3_drives[ 0 ], FDD_SHUGART, dt, 1 );
 
   dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3b_type() ];
-  fdd_init( &specplus3_drives[ 1 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE, dt, 1 );
+  fdd_init( &specplus3_drives[ 1 ], dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE, dt, 1 );
 }
 
 static int
@@ -302,8 +299,8 @@ specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
   if( machine_current->capabilities &&
       LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) {
 
-    fdd_motoron( &specplus3_drives[0].fdd, b & 0x08 );
-    fdd_motoron( &specplus3_drives[1].fdd, b & 0x08 );
+    fdd_motoron( &specplus3_drives[0], b & 0x08 );
+    fdd_motoron( &specplus3_drives[1], b & 0x08 );
 
     ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
 			 b & 0x08 ? UI_STATUSBAR_STATE_ACTIVE :
@@ -405,7 +402,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
 fdd_t *
 specplus3_get_fdd( specplus3_drive_number which )
 {
-  return &( specplus3_drives[ which ].fdd );
+  return &( specplus3_drives[ which ] );
 }
 
 static int
@@ -431,8 +428,10 @@ ui_drive_get_params_b( void )
 static int
 ui_drive_inserted( const ui_media_drive_info_t *drive, int new )
 {
+  /* Did real +3 hardware also have problems formatting disks unformatted
+     disks? */
   if( new )
-    disk_preformat( drive->disk );		/* pre-format disk for +3 */
+    disk_preformat( &drive->fdd->disk );	/* pre-format disk for +3 ??? */
   return 0;
 }
 

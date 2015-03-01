@@ -126,7 +126,7 @@ TRACK_LEN TYPE TRACK......DATA CLOCK..MARKS MF..MARKS WEAK..MARKS
    d->weak   = d->fm     + DISK_CLEN( d->bpt )
 
 #define DISK_SET_TRACK( d, head, cyl ) \
-   DISK_SET_TRACK_IDX( d, d->sides * cyl + head )
+   DISK_SET_TRACK_IDX( (d), (d)->sides * cyl + head )
 
 const char *disk_strerror( int error );
 /* create an unformatted disk sides -> (1/2) cylinders -> track/side,

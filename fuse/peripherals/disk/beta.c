@@ -69,12 +69,8 @@ static libspectrum_byte beta_system_register; /* FDC system register */
 libspectrum_word beta_pc_mask;
 libspectrum_word beta_pc_value;
 
-static int beta_index_pulse = 0;
-
-static int index_event;
-
 static wd_fdc *beta_fdc;
-static wd_fdc_drive beta_drives[ BETA_NUM_DRIVES ];
+static fdd_t beta_drives[ BETA_NUM_DRIVES ];
 static ui_media_drive_info_t beta_ui_drives[ BETA_NUM_DRIVES ];
 
 static const periph_port_t beta_ports[] = {
@@ -98,8 +94,6 @@ static void beta_memory_map( void );
 static void beta_enabled_snapshot( libspectrum_snap *snap );
 static void beta_from_snapshot( libspectrum_snap *snap );
 static void beta_to_snapshot( libspectrum_snap *snap );
-static void beta_event_index( libspectrum_dword last_tstates, int type,
-			      void *user_data );
 
 static module_info_t beta_module_info = {
 
@@ -140,9 +134,9 @@ beta_select_drive( int i )
 {
   if( beta_fdc->current_drive != &beta_drives[ i & 0x03 ] ) {
     if( beta_fdc->current_drive != NULL )
-      fdd_select( &beta_fdc->current_drive->fdd, 0 );
+      fdd_select( beta_fdc->current_drive, 0 );
     beta_fdc->current_drive = &beta_drives[ i & 0x03 ];
-    fdd_select( &beta_fdc->current_drive->fdd, 1 );
+    fdd_select( beta_fdc->current_drive, 1 );
   }
 }
 
@@ -150,14 +144,14 @@ void
 beta_init( void )
 {
   int i;
-  wd_fdc_drive *d;
+  fdd_t *d;
 
   beta_fdc = wd_fdc_alloc_fdc( FD1793, 0, WD_FLAG_BETA128 );
   beta_fdc->current_drive = NULL;
 
   for( i = 0; i < BETA_NUM_DRIVES; i++ ) {
     d = &beta_drives[ i ];
-    fdd_init( &d->fdd, FDD_SHUGART, NULL, 0 );	/* drive geometry 'autodetect' */
+    fdd_init( d, FDD_SHUGART, NULL, 0 );	/* drive geometry 'autodetect' */
     d->disk.flag = DISK_FLAG_NONE;
   }
   beta_select_drive( 0 );
@@ -168,8 +162,6 @@ beta_init( void )
   beta_fdc->set_datarq = NULL;
   beta_fdc->reset_datarq = NULL;
 
-  index_event = event_register( beta_event_index, "Beta disk index" );
-
   module_register( &beta_module_info );
 
   beta_memory_source = memory_source_register( "Betadisk" );
@@ -179,9 +171,7 @@ beta_init( void )
   periph_register( PERIPH_TYPE_BETA128, &beta_peripheral );
 
   for( i = 0; i < BETA_NUM_DRIVES; i++ ) {
-    d = &beta_drives[ i ];
-    beta_ui_drives[ i ].fdd = &d->fdd;
-    beta_ui_drives[ i ].disk = &d->disk;
+    beta_ui_drives[ i ].fdd = &beta_drives[ i ];
     ui_media_drive_register( &beta_ui_drives[ i ] );
   }
 }
@@ -190,9 +180,6 @@ static void
 beta_reset( int hard_reset GCC_UNUSED )
 {
   int i;
-  wd_fdc_drive *d;
-
-  event_remove_type( index_event );
 
   if( !(periph_is_active( PERIPH_TYPE_BETA128 ) ||
         periph_is_active( PERIPH_TYPE_BETA128_PENTAGON ) ||
@@ -206,15 +193,8 @@ beta_reset( int hard_reset GCC_UNUSED )
 
   beta_pc_mask = 0xff00;
   beta_pc_value = 0x3d00;
-  
+
   wd_fdc_master_reset( beta_fdc );
-
-  for( i = 0; i < BETA_NUM_DRIVES; i++ ) {
-    d = &beta_drives[ i ];
-
-    d->index_pulse = 0;
-    d->index_interrupt = 0;
-  }
 
   if( !beta_builtin ) {
     if( machine_load_rom_bank( beta_memory_map_romcs, 0,
@@ -251,7 +231,6 @@ beta_reset( int hard_reset GCC_UNUSED )
 
   beta_select_drive( 0 );
   machine_current->memory_map();
-  beta_event_index( 0, 0, NULL );
 
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
 }
@@ -340,7 +319,7 @@ beta_sp_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   beta_select_drive( b & 0x03 );
   /* 0x08 = block hlt, normally set */
   wd_fdc_set_hlt( beta_fdc, ( ( b & 0x08 ) ? 1 : 0 ) );
-  fdd_set_head( &beta_fdc->current_drive->fdd, ( ( b & 0x10 ) ? 0 : 1 ) );
+  fdd_set_head( beta_fdc->current_drive, ( ( b & 0x10 ) ? 0 : 1 ) );
   /* 0x20 = density, reset = FM, set = MFM */
   beta_fdc->dden = b & 0x20 ? 1 : 0;
 
@@ -394,31 +373,7 @@ ui_drive_autoload( void )
 fdd_t *
 beta_get_fdd( beta_drive_number which )
 {
-  return &( beta_drives[ which ].fdd );
-}
-
-static void
-beta_event_index( libspectrum_dword last_tstates, int type, void *user_data )
-{
-  int next_tstates;
-  int i;
-
-  beta_index_pulse = !beta_index_pulse;
-  for( i = 0; i < BETA_NUM_DRIVES; i++ ) {
-    wd_fdc_drive *d = &beta_drives[ i ];
-
-    d->index_pulse = beta_index_pulse;
-/* disabled, until we have better timing emulation,
- * to avoid interrupts while reading/writing data */
-    if( !beta_index_pulse && d->index_interrupt ) {
-      wd_fdc_set_intrq( beta_fdc );
-      d->index_interrupt = 0;
-    }
-  }
-  next_tstates = ( beta_index_pulse ? 10 : 190 ) *
-    machine_current->timings.processor_speed / 1000;
-
-  event_add( last_tstates + next_tstates, index_event );
+  return &( beta_drives[ which ] );
 }
 
 static void

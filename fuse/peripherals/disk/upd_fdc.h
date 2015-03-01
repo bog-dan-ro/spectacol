@@ -87,14 +87,9 @@ typedef enum upd_intrq_t {
   UPD_INTRQ_SEEK,
 } upd_intrq_t;
 
-typedef struct upd_fdc_drive {
-  fdd_t fdd;			/* floppy disk drive */
-  disk_t disk;			/* the floppy disk itself */
-} upd_fdc_drive;
-
 typedef struct upd_fdc {
-  upd_fdc_drive *current_drive;
-  upd_fdc_drive *drive[4];	/* UPD765 control 4 drives */
+  fdd_t *current_drive;
+  fdd_t *drive[4];		/* UPD765 control 4 drives */
 
   upd_type_t type;		/* UPD765A UPD765B */
   upd_clock_t clock;		/* clock rate ( 4/8 MHz ) */

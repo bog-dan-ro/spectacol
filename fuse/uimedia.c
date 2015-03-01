@@ -187,10 +187,10 @@ drive_disk_write( const ui_media_drive_info_t *drive, const char *filename )
 {
   int error;
 
-  drive->disk->type = DISK_TYPE_NONE;
+  drive->fdd->disk.type = DISK_TYPE_NONE;
   if( filename == NULL )
-    filename = drive->disk->filename; /* write over original file */
-  error = disk_write( drive->disk, filename );
+    filename = drive->fdd->disk.filename; /* write over original file */
+  error = disk_write( &drive->fdd->disk, filename );
 
   if( error != DISK_OK ) {
     ui_error( UI_ERROR_ERROR, "couldn't write '%s' file: %s", filename,
@@ -198,9 +198,9 @@ drive_disk_write( const ui_media_drive_info_t *drive, const char *filename )
     return 1;
   }
 
-  if( drive->disk->filename && strcmp( filename, drive->disk->filename ) ) {
-    free( drive->disk->filename );
-    drive->disk->filename = utils_safe_strdup( filename );
+  if( drive->fdd->disk.filename && strcmp( filename, drive->fdd->disk.filename ) ) {
+    free( drive->fdd->disk.filename );
+    drive->fdd->disk.filename = utils_safe_strdup( filename );
   }
   return 0;
 }
@@ -212,9 +212,9 @@ drive_save( const ui_media_drive_info_t *drive, int saveas )
   int err;
   char *filename = NULL, title[80];
 
-  if( drive->disk->type == DISK_TYPE_NONE )
+  if( drive->fdd->disk.type == DISK_TYPE_NONE )
     return 0;
-  if( drive->disk->filename == NULL )
+  if( drive->fdd->disk.filename == NULL )
     saveas = 1;
 
   fuse_emulation_pause();
@@ -237,7 +237,7 @@ drive_save( const ui_media_drive_info_t *drive, int saveas )
   if( err )
     return 1;
 
-  drive->disk->dirty = 0;
+  drive->fdd->disk.dirty = 0;
   return 0;
 }
 
@@ -255,10 +255,10 @@ ui_media_drive_save( int controller, int which, int saveas )
 static int
 drive_eject( const ui_media_drive_info_t *drive )
 {
-  if( drive->disk->type == DISK_TYPE_NONE )
+  if( !drive->fdd->loaded || drive->fdd->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( drive->disk->dirty ) {
+  if( drive->fdd->disk.dirty ) {
 
     ui_confirm_save_t confirm = ui_confirm_save(
       "%s has been modified.\n"
@@ -280,7 +280,7 @@ drive_eject( const ui_media_drive_info_t *drive )
   }
 
   fdd_unload( drive->fdd );
-  disk_close( drive->disk );
+  disk_close( &drive->fdd->disk );
   ui_media_drive_update_menus( drive, UI_MEDIA_DRIVE_UPDATE_EJECT );
   return 0;
 }
@@ -328,7 +328,7 @@ ui_media_drive_insert( const ui_media_drive_info_t *drive,
   }
 
   if( filename ) {
-    error = disk_open( drive->disk, filename, 0,
+    error = disk_open( &drive->fdd->disk, filename, 0,
                        DISK_TRY_MERGE( drive->fdd->fdd_heads ) );
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
@@ -337,7 +337,7 @@ ui_media_drive_insert( const ui_media_drive_info_t *drive,
     }
   } else {
     dt = drive->get_params();
-    error = disk_new( drive->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO,
+    error = disk_new( &drive->fdd->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO,
                       DISK_UDI );
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",
@@ -351,7 +351,7 @@ ui_media_drive_insert( const ui_media_drive_info_t *drive,
       return 1;
   }
 
-  fdd_load( drive->fdd, drive->disk, 0 );
+  fdd_load( drive->fdd, 0 );
 
   /* Set the 'eject' item active */
   ui_media_drive_update_menus( drive, UI_MEDIA_DRIVE_UPDATE_ALL );

@@ -65,12 +65,8 @@ int disciple_inhibited;
 int disciple_available = 0;
 int disciple_active = 0;
 
-static int disciple_index_pulse;
-
-static int index_event;
-
 static wd_fdc *disciple_fdc;
-static wd_fdc_drive disciple_drives[ DISCIPLE_NUM_DRIVES ];
+static fdd_t disciple_drives[ DISCIPLE_NUM_DRIVES ];
 static ui_media_drive_info_t disciple_ui_drives[ DISCIPLE_NUM_DRIVES ];
 
 static libspectrum_byte *disciple_ram;
@@ -78,8 +74,6 @@ static int memory_allocated = 0;
 
 static void disciple_reset( int hard_reset );
 static void disciple_memory_map( void );
-static void disciple_event_index( libspectrum_dword last_tstates, int type,
-				  void *user_data );
 static void disciple_activate( void );
 
 static module_info_t disciple_module_info = {
@@ -167,29 +161,26 @@ void
 disciple_init( void )
 {
   int i;
-  wd_fdc_drive *d;
+  fdd_t *d;
 
   disciple_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
 
   for( i = 0; i < DISCIPLE_NUM_DRIVES; i++ ) {
     d = &disciple_drives[ i ];
-    fdd_init( &d->fdd, FDD_SHUGART, NULL, 0 );
+    fdd_init( d, FDD_SHUGART, NULL, 0 );
     d->disk.flag = DISK_FLAG_NONE;
   }
 
   disciple_fdc->current_drive = &disciple_drives[ 0 ];
-  fdd_select( &disciple_drives[ 0 ].fdd, 1 );
+  fdd_select( &disciple_drives[ 0 ], 1 );
   disciple_fdc->dden = 1;
   disciple_fdc->set_intrq = NULL;
   disciple_fdc->reset_intrq = NULL;
   disciple_fdc->set_datarq = NULL;
   disciple_fdc->reset_datarq = NULL;
-  disciple_fdc->iface = NULL;
-
-  index_event = event_register( disciple_event_index, "DISCiPLE index" );
 
   module_register( &disciple_module_info );
-  
+
   disciple_memory_source_rom = memory_source_register( "DISCiPLE ROM" );
   disciple_memory_source_ram = memory_source_register( "DISCiPLE RAM" );
 
@@ -208,9 +199,7 @@ disciple_init( void )
   periph_register( PERIPH_TYPE_DISCIPLE, &disciple_periph );
 
   for( i = 0; i < DISCIPLE_NUM_DRIVES; i++ ) {
-    d = &disciple_drives[ i ];
-    disciple_ui_drives[ i ].fdd = &d->fdd;
-    disciple_ui_drives[ i ].disk = &d->disk;
+    disciple_ui_drives[ i ].fdd = &disciple_drives[ i ];
     ui_media_drive_register( &disciple_ui_drives[ i ] );
   }
 }
@@ -219,12 +208,9 @@ static void
 disciple_reset( int hard_reset )
 {
   int i;
-  wd_fdc_drive *d;
 
   disciple_active = 0;
   disciple_available = 0;
-
-  event_remove_type( index_event );
 
   if( !periph_is_active( PERIPH_TYPE_DISCIPLE ) ) {
     return;
@@ -249,7 +235,6 @@ disciple_reset( int hard_reset )
 
   disciple_available = 1;
   disciple_active = 1;
-  disciple_index_pulse = 0;
 
   disciple_memswap = 0;
   /* TODO: add support for 16 KiB ROM images. */
@@ -261,19 +246,13 @@ disciple_reset( int hard_reset )
   wd_fdc_master_reset( disciple_fdc );
 
   for( i = 0; i < DISCIPLE_NUM_DRIVES; i++ ) {
-    d = &disciple_drives[ i ];
-
-    d->index_pulse = 0;
-    d->index_interrupt = 0;
-
     ui_media_drive_update_menus( &disciple_ui_drives[ i ],
                                  UI_MEDIA_DRIVE_UPDATE_ALL );
   }
 
   disciple_fdc->current_drive = &disciple_drives[ 0 ];
-  fdd_select( &disciple_drives[ 0 ].fdd, 1 );
+  fdd_select( &disciple_drives[ 0 ], 1 );
   machine_current->memory_map();
-  disciple_event_index( 0, index_event, NULL );
 
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
 }
@@ -368,14 +347,14 @@ disciple_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   side = ( b & 0x02 ) ? 1 : 0;
 
   for( i = 0; i < DISCIPLE_NUM_DRIVES; i++ ) {
-    fdd_set_head( &disciple_drives[ i ].fdd, side );
-    fdd_select( &disciple_drives[ i ].fdd, drive == i );
+    fdd_set_head( &disciple_drives[ i ], side );
+    fdd_select( &disciple_drives[ i ], drive == i );
   }
 
   if( disciple_fdc->current_drive != &disciple_drives[ drive ] ) {
-    if( disciple_fdc->current_drive->fdd.motoron ) {
+    if( disciple_fdc->current_drive->motoron ) {
       for (i = 0; i < DISCIPLE_NUM_DRIVES; i++ ) {
-        fdd_motoron( &disciple_drives[ i ].fdd, drive == i );
+        fdd_motoron( &disciple_drives[ i ], drive == i );
       }
     }
     disciple_fdc->current_drive = &disciple_drives[ drive ];
@@ -451,29 +430,7 @@ disciple_disk_insert( disciple_drive_number which, const char *filename,
 fdd_t *
 disciple_get_fdd( disciple_drive_number which )
 {
-  return &( disciple_drives[ which ].fdd );
-}
-
-static void
-disciple_event_index( libspectrum_dword last_tstates, int type GCC_UNUSED,
-		      void *user_data GCC_UNUSED )
-{
-  int next_tstates;
-  int i;
-
-  disciple_index_pulse = !disciple_index_pulse;
-  for( i = 0; i < DISCIPLE_NUM_DRIVES; i++ ) {
-    wd_fdc_drive *d = &disciple_drives[ i ];
-
-    d->index_pulse = disciple_index_pulse;
-    if( !disciple_index_pulse && d->index_interrupt ) {
-      wd_fdc_set_intrq( disciple_fdc );
-      d->index_interrupt = 0;
-    }
-  }
-  next_tstates = ( disciple_index_pulse ? 10 : 190 ) *
-    machine_current->timings.processor_speed / 1000;
-  event_add( last_tstates + next_tstates, index_event );
+  return &( disciple_drives[ which ] );
 }
 
 static void

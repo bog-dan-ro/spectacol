@@ -64,12 +64,8 @@ static memory_page opus_memory_map_romcs_ram[ OPUS_RAM_PAGES ];
 int opus_available = 0;
 int opus_active = 0;
 
-static int opus_index_pulse;
-
-static int index_event;
-
 static wd_fdc *opus_fdc;
-static wd_fdc_drive opus_drives[ OPUS_NUM_DRIVES ];
+static fdd_t opus_drives[ OPUS_NUM_DRIVES ];
 static ui_media_drive_info_t opus_ui_drives[ OPUS_NUM_DRIVES ];
 
 static libspectrum_byte opus_ram[ OPUS_RAM_SIZE ];
@@ -83,8 +79,6 @@ static void opus_memory_map( void );
 static void opus_enabled_snapshot( libspectrum_snap *snap );
 static void opus_from_snapshot( libspectrum_snap *snap );
 static void opus_to_snapshot( libspectrum_snap *snap );
-static void opus_event_index( libspectrum_dword last_tstates, int type,
-			       void *user_data );
 
 static module_info_t opus_module_info = {
 
@@ -138,26 +132,23 @@ void
 opus_init( void )
 {
   int i;
-  wd_fdc_drive *d;
+  fdd_t *d;
 
   opus_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_OPUS );
 
   for( i = 0; i < OPUS_NUM_DRIVES; i++ ) {
     d = &opus_drives[ i ];
-    fdd_init( &d->fdd, FDD_SHUGART, NULL, 0 );	/* drive geometry 'autodetect' */
+    fdd_init( d, FDD_SHUGART, NULL, 0 );	/* drive geometry 'autodetect' */
     d->disk.flag = DISK_FLAG_NONE;
   }
 
   opus_fdc->current_drive = &opus_drives[ 0 ];
-  fdd_select( &opus_drives[ 0 ].fdd, 1 );
+  fdd_select( &opus_drives[ 0 ], 1 );
   opus_fdc->dden = 1;
   opus_fdc->set_intrq = NULL;
   opus_fdc->reset_intrq = NULL;
   opus_fdc->set_datarq = opus_set_datarq;
   opus_fdc->reset_datarq = NULL;
-  opus_fdc->iface = NULL;
-
-  index_event = event_register( opus_event_index, "Opus index" );
 
   module_register( &opus_module_info );
 
@@ -170,9 +161,7 @@ opus_init( void )
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
   for( i = 0; i < OPUS_NUM_DRIVES; i++ ) {
-    d = &opus_drives[ i ];
-    opus_ui_drives[ i ].fdd = &d->fdd;
-    opus_ui_drives[ i ].disk = &d->disk;
+    opus_ui_drives[ i ].fdd = &opus_drives[ i ];
     ui_media_drive_register( &opus_ui_drives[ i ] );
   }
 }
@@ -181,12 +170,9 @@ static void
 opus_reset( int hard_reset )
 {
   int i;
-  wd_fdc_drive *d;
 
   opus_active = 0;
   opus_available = 0;
-
-  event_remove_type( index_event );
 
   if( !periph_is_active( PERIPH_TYPE_OPUS ) ) {
     return;
@@ -220,7 +206,6 @@ opus_reset( int hard_reset )
   control_b  = 0;
 
   opus_available = 1;
-  opus_index_pulse = 0;
 
   if( hard_reset )
     memset( opus_ram, 0, TRUE_OPUS_RAM_SIZE );
@@ -228,19 +213,13 @@ opus_reset( int hard_reset )
   wd_fdc_master_reset( opus_fdc );
 
   for( i = 0; i < OPUS_NUM_DRIVES; i++ ) {
-    d = &opus_drives[ i ];
-
-    d->index_pulse = 0;
-    d->index_interrupt = 0;
-
     ui_media_drive_update_menus( &opus_ui_drives[ i ],
                                  UI_MEDIA_DRIVE_UPDATE_ALL );
   }
 
   opus_fdc->current_drive = &opus_drives[ 0 ];
-  fdd_select( &opus_drives[ 0 ].fdd, 1 );
+  fdd_select( &opus_drives[ 0 ], 1 );
   machine_current->memory_map();
-  opus_event_index( 0, index_event, NULL );
 
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
 }
@@ -283,16 +262,16 @@ opus_6821_access( libspectrum_byte reg, libspectrum_byte data,
         side = ( data & 0x10 )>>4 ? 1 : 0;
 
         for( i = 0; i < OPUS_NUM_DRIVES; i++ ) {
-          fdd_set_head( &opus_drives[ i ].fdd, side );
+          fdd_set_head( &opus_drives[ i ], side );
         }
 
-        fdd_select( &opus_drives[ (!drive) ].fdd, 0 );
-        fdd_select( &opus_drives[ drive ].fdd, 1 );
+        fdd_select( &opus_drives[ (!drive) ], 0 );
+        fdd_select( &opus_drives[ drive ], 1 );
 
         if( opus_fdc->current_drive != &opus_drives[ drive ] ) {
-          if( opus_fdc->current_drive->fdd.motoron ) {        /* swap motoron */
-            fdd_motoron( &opus_drives[ (!drive) ].fdd, 0 );
-            fdd_motoron( &opus_drives[ drive ].fdd, 1 );
+          if( opus_fdc->current_drive->motoron ) {        /* swap motoron */
+            fdd_motoron( &opus_drives[ (!drive) ], 0 );
+            fdd_motoron( &opus_drives[ drive ], 1 );
           }
           opus_fdc->current_drive = &opus_drives[ drive ];
         }
@@ -367,29 +346,7 @@ opus_disk_insert( opus_drive_number which, const char *filename,
 fdd_t *
 opus_get_fdd( opus_drive_number which )
 {
-  return &( opus_drives[ which ].fdd );
-}
-
-static void
-opus_event_index( libspectrum_dword last_tstates, int type GCC_UNUSED,
-                   void *user_data GCC_UNUSED )
-{
-  int next_tstates;
-  int i;
-
-  opus_index_pulse = !opus_index_pulse;
-  for( i = 0; i < OPUS_NUM_DRIVES; i++ ) {
-    wd_fdc_drive *d = &opus_drives[ i ];
-
-    d->index_pulse = opus_index_pulse;
-    if( !opus_index_pulse && d->index_interrupt ) {
-      wd_fdc_set_intrq( opus_fdc );
-      d->index_interrupt = 0;
-    }
-  }
-  next_tstates = ( opus_index_pulse ? 10 : 190 ) *
-    machine_current->timings.processor_speed / 1000;
-  event_add( last_tstates + next_tstates, index_event );
+  return &( opus_drives[ which ] );
 }
 
 libspectrum_byte

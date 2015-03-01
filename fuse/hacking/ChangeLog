@@ -4638,3 +4638,8 @@
 20150107 ui/scaler/scalers.c: remove unused code (thanks, clang static analyser)
          (Sergio).
 20150221 hacking/peripheral_tests.txt: add a couple of implicit steps (Fred).
+20150301 machines/specplus3.c,peripherals/disk/{beta.c,disciple.c,disk.h,
+         fdd.[ch],opus.c,plusd.c,upd_fdc.[ch],wd_fdc.[ch]},ui/uimedia.h,
+         uimedia.c: migrate "index event" handling to the FDD layer and have FDC
+         layer use it for their STATUS registers (fixes bug #311) (Gergely
+         Szasz).
