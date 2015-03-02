@@ -974,3 +974,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          on pointer overflow in buffer length checks (Stuart).
 20150302 internals.h,pzx_read.c,szx.c,test/test.c,zxs.c: add and use ARRAY_SIZE
          macro (Stuart).
+20150302 libspectrum.h.in: add libspectrum_{new,new0,renew}() macros (Stuart).

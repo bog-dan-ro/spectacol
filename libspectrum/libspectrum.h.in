@@ -149,6 +149,15 @@ WIN32_DLL void libspectrum_free( void *ptr );
 
 WIN32_DLL void libspectrum_mem_set_vtable( libspectrum_mem_vtable_t *table );
 
+#define libspectrum_new( type, count ) \
+  ( ( type * ) libspectrum_malloc( sizeof( type ) * (count) ) )
+
+#define libspectrum_new0( type, count ) \
+  ( ( type * ) libspectrum_calloc( sizeof( type ), (count) ) )
+
+#define libspectrum_renew( type, mem, count ) \
+  ( ( type * ) libspectrum_realloc( (void *)mem, sizeof( type ) * (count) ) )
+
 /* Attempt to identify a given file */
 
 /* Various types of file we might manage to identify */
