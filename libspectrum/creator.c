@@ -45,7 +45,7 @@ struct libspectrum_creator {
 libspectrum_creator*
 libspectrum_creator_alloc( void )
 {
-  libspectrum_creator *creator = libspectrum_malloc( sizeof( *creator ) );
+  libspectrum_creator *creator = libspectrum_new( libspectrum_creator, 1 );
   creator->custom = NULL;
   creator->custom_length = 0;
   return creator;

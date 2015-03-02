@@ -947,7 +947,7 @@ tzx_write_pulse_sequence( libspectrum_tape_block *block,
       if( uncommitted_pulse_count == max_pulse_count ) {
         max_pulse_count = uncommitted_pulse_count + 64;
         lengths =
-          libspectrum_realloc( lengths, max_pulse_count * sizeof( *lengths ) );
+          libspectrum_renew( libspectrum_dword, lengths, max_pulse_count );
       }
       /* Queue up pulse */
       lengths[uncommitted_pulse_count++] =

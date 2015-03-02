@@ -53,7 +53,7 @@ libspectrum_csw_read( libspectrum_tape *tape,
   }
 
   /* Claim memory for the block */
-  block = libspectrum_malloc( sizeof( *block ) );
+  block = libspectrum_new( libspectrum_tape_block, 1 );
 
   /* Set the block type */
   block->type = LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE;

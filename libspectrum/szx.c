@@ -2399,7 +2399,7 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
     break;
   }
 
-  ctx = libspectrum_malloc( sizeof( *ctx ) );
+  ctx = libspectrum_new( szx_context, 1 );
   ctx->swap_af = 0;
 
   while( buffer < end ) {

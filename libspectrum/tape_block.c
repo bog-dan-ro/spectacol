@@ -63,7 +63,7 @@ data_block_init( libspectrum_tape_data_block *block,
 libspectrum_tape_block*
 libspectrum_tape_block_alloc( libspectrum_tape_type type )
 {
-  libspectrum_tape_block *block = libspectrum_malloc( sizeof( *block ) );
+  libspectrum_tape_block *block = libspectrum_new( libspectrum_tape_block, 1 );
   libspectrum_tape_block_set_type( block, type );
   return block;
 }
@@ -470,13 +470,15 @@ libspectrum_tape_block_read_symbol_table(
     }
 
 
-    table->symbols = libspectrum_malloc( table->symbols_in_table * sizeof( *table->symbols ) );
+    table->symbols =
+      libspectrum_new( libspectrum_tape_generalised_data_symbol,
+                       table->symbols_in_table );
 
     for( i = 0, symbol = table->symbols;
 	 i < table->symbols_in_table;
 	 i++, symbol++ ) {
       symbol->edge_type = **ptr; (*ptr)++;
-      symbol->lengths = libspectrum_malloc( table->max_pulses * sizeof( *symbol->lengths ) );
+      symbol->lengths = libspectrum_new( libspectrum_word, table->max_pulses );
       for( j = 0; j < table->max_pulses; j++ ) {
 	symbol->lengths[ j ] = (*ptr)[0] + (*ptr)[1] * 0x100;
 	(*ptr) += 2;

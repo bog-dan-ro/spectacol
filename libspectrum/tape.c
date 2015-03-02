@@ -130,7 +130,7 @@ data_block_edge( libspectrum_tape_data_block *block,
 libspectrum_tape*
 libspectrum_tape_alloc( void )
 {
-  libspectrum_tape *tape = libspectrum_malloc( sizeof( *tape ) );
+  libspectrum_tape *tape = libspectrum_new( libspectrum_tape, 1 );
   tape->blocks = NULL;
   tape->last_block = NULL;
   libspectrum_tape_iterator_init( &(tape->state.current_block), tape );

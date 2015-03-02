@@ -185,7 +185,7 @@ const libspectrum_word libspectrum_rzx_repeat_frame = 0xffff;
 static void
 block_alloc( rzx_block_t **block, libspectrum_rzx_block_id type )
 {
-  *block = libspectrum_malloc( sizeof( **block ) );
+  *block = libspectrum_new( rzx_block_t, 1 );
   (*block)->type = type;
 }
 
@@ -260,7 +260,7 @@ find_block( gconstpointer a, gconstpointer b )
 libspectrum_rzx*
 libspectrum_rzx_alloc( void )
 {
-  libspectrum_rzx *rzx = libspectrum_malloc( sizeof( *rzx ) );
+  libspectrum_rzx *rzx = libspectrum_new( libspectrum_rzx, 1 );
   rzx->blocks = NULL;
   rzx->current_block = NULL;
   rzx->current_input = NULL;
@@ -407,7 +407,8 @@ input_block_resize( input_block_t *input, size_t new_count )
     new_allocated = input->allocated >= 25 ? 2 * input->allocated : 50;
     if( new_allocated < new_count ) new_allocated = new_count;
 
-    ptr = libspectrum_realloc( input->frames, new_allocated * sizeof( *ptr ) );
+    ptr = libspectrum_renew( libspectrum_rzx_frame_t, input->frames,
+                             new_allocated );
     if( !ptr ) return LIBSPECTRUM_ERROR_MEMORY;
 
     input->frames = ptr;
@@ -1009,7 +1010,7 @@ rzx_read_input( libspectrum_rzx *rzx,
   (*ptr)++;
 
   /* Allocate memory for the frames */
-  block->frames = libspectrum_malloc( block->count * sizeof( *block->frames ) );
+  block->frames = libspectrum_new( libspectrum_rzx_frame_t, block->count );
   block->allocated = block->count;
 
   /* Fetch the T-state counter and the flags */

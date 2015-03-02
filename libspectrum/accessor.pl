@@ -246,7 +246,7 @@ struct libspectrum_snap {
 libspectrum_snap*
 libspectrum_snap_alloc_internal( void )
 {
-  return libspectrum_malloc( sizeof( libspectrum_snap ) );
+  return libspectrum_new( libspectrum_snap, 1 );
 }
 CODE
 

@@ -975,3 +975,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150302 internals.h,pzx_read.c,szx.c,test/test.c,zxs.c: add and use ARRAY_SIZE
          macro (Stuart).
 20150302 libspectrum.h.in: add libspectrum_{new,new0,renew}() macros (Stuart).
+20150302 accessor.pl,creator.c,csw.c,dck.c,ide.c,microdrive.c,pzx_read.c,rzx.c,
+         szx.c,tape.c,tape_block.c,tzx_read.c,tzx_write.c: use libspectrum_new()
+         and libspectrum_renew() macros where sizeof(elem) > 1 (Stuart).

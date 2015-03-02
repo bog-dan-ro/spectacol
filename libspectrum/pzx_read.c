@@ -154,8 +154,8 @@ read_pzxt_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   }
 
   if( *buffer < block_end ) {
-    ids = libspectrum_malloc( sizeof( *ids ) );
-    strings = libspectrum_malloc( sizeof( *strings ) );
+    ids = libspectrum_new( int, 1 );
+    strings = libspectrum_new( char *, 1 );
     count = 1;
     i = 0;
 
@@ -191,8 +191,8 @@ read_pzxt_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
     }
 
     i = count++;
-    ids = libspectrum_realloc( ids, count * sizeof( *ids ) );
-    strings = libspectrum_realloc( strings, count * sizeof( *strings ) );
+    ids = libspectrum_renew( int, ids, count );
+    strings = libspectrum_renew( char *, strings, count );
 
     if( id == -1 ) {
       size_t new_len = strlen( info_tag ) + strlen( string ) +
@@ -347,9 +347,9 @@ read_puls_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   libspectrum_error error;
   size_t buffer_sizes = 64;
   size_t *pulse_repeats_buffer =
-    libspectrum_malloc( buffer_sizes * sizeof( size_t ) );
+    libspectrum_new( size_t, buffer_sizes );
   libspectrum_dword *lengths_buffer =
-    libspectrum_malloc( buffer_sizes * sizeof( libspectrum_dword ) );
+    libspectrum_new( libspectrum_dword, buffer_sizes );
   const libspectrum_byte *block_end = *buffer + data_length;
 
   while( ( block_end - (*buffer) ) > (ptrdiff_t)0 ) {
@@ -365,11 +365,9 @@ read_puls_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
     if( buffer_sizes == count ) {
       buffer_sizes *= 2;
       pulse_repeats_buffer =
-        libspectrum_realloc( pulse_repeats_buffer,
-                             buffer_sizes * sizeof( size_t ) );
+        libspectrum_renew( size_t, pulse_repeats_buffer, buffer_sizes );
       lengths_buffer =
-        libspectrum_realloc( lengths_buffer,
-                             buffer_sizes * sizeof( libspectrum_dword ) );
+        libspectrum_renew( libspectrum_dword, lengths_buffer, buffer_sizes );
     }
   }
 
@@ -381,11 +379,9 @@ read_puls_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
 
   if( buffer_sizes != count ) {
     pulse_repeats_buffer =
-      libspectrum_realloc( pulse_repeats_buffer,
-                           count * sizeof( size_t ) );
+      libspectrum_renew( size_t, pulse_repeats_buffer, count );
     lengths_buffer =
-      libspectrum_realloc( lengths_buffer,
-                           count * sizeof( libspectrum_dword ) );
+      libspectrum_renew( libspectrum_dword, lengths_buffer, count );
   }
 
   block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE );
@@ -597,7 +593,7 @@ internal_pzx_read( libspectrum_tape *tape, const libspectrum_byte *buffer,
     return LIBSPECTRUM_ERROR_SIGNATURE;
   }
 
-  ctx = libspectrum_malloc( sizeof( *ctx ) );
+  ctx = libspectrum_new( pzx_context, 1 );
   ctx->version = 0;
 
   while( buffer < end ) {

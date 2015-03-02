@@ -40,7 +40,7 @@ libspectrum_dck_block_alloc( libspectrum_dck_block **dck )
 {
   size_t i;
 
-  *dck = libspectrum_malloc( sizeof( **dck ) );
+  *dck = libspectrum_new( libspectrum_dck_block, 1 );
 
   (*dck)->bank = LIBSPECTRUM_DCK_BANK_DOCK;
   for( i = 0; i < 8; i++ ) {
@@ -69,7 +69,7 @@ libspectrum_dck_block_free( libspectrum_dck_block *dck, int keep_pages )
 libspectrum_dck*
 libspectrum_dck_alloc( void )
 {
-  libspectrum_dck *dck = libspectrum_malloc( sizeof( *dck ) );
+  libspectrum_dck *dck = libspectrum_new( libspectrum_dck, 1 );
   size_t i;
   for( i=0; i<256; i++ ) dck->dck[i] = NULL;
   return dck;
