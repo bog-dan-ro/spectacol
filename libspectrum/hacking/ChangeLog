@@ -978,3 +978,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150302 accessor.pl,creator.c,csw.c,dck.c,ide.c,microdrive.c,pzx_read.c,rzx.c,
          szx.c,tape.c,tape_block.c,tzx_read.c,tzx_write.c: use libspectrum_new()
          and libspectrum_renew() macros where sizeof(elem) > 1 (Stuart).
+20150302 libspectrum.in.h: fix ordering of args in libspectrum_new0() (Stuart).

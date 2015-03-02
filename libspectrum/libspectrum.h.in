@@ -153,7 +153,7 @@ WIN32_DLL void libspectrum_mem_set_vtable( libspectrum_mem_vtable_t *table );
   ( ( type * ) libspectrum_malloc( sizeof( type ) * (count) ) )
 
 #define libspectrum_new0( type, count ) \
-  ( ( type * ) libspectrum_calloc( sizeof( type ), (count) ) )
+  ( ( type * ) libspectrum_calloc( (count), sizeof( type ) ) )
 
 #define libspectrum_renew( type, mem, count ) \
   ( ( type * ) libspectrum_realloc( (void *)mem, sizeof( type ) * (count) ) )
