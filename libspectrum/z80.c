@@ -1105,7 +1105,7 @@ read_v2_block( const libspectrum_byte *buffer, libspectrum_byte **block,
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
-    *block = libspectrum_malloc( 0x4000 * sizeof( *block ) );
+    *block = libspectrum_malloc( 0x4000 * sizeof( **block ) );
     memcpy( *block, buffer + 3, 0x4000 );
 
     *length = 0x4000;
