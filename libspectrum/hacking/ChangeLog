@@ -985,3 +985,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          tzx_read.c,tzx_write.c,warajevo_read.c,wav.c,z80.c,z80em.c,zlib.c,
          zxs.c: use libspectrum_{new,new0,renew}() macros where
          sizeof(elem) == 1 (Stuart).
+20150302 memory.c: check for overflow in libspectrum_calloc() (Stuart).

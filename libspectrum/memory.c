@@ -48,7 +48,11 @@ libspectrum_malloc( size_t size )
 void*
 libspectrum_calloc( size_t nmemb, size_t size )
 {
-  void *ptr = libspectrum_calloc_fn( nmemb, size );
+  void *ptr;
+
+  if( nmemb > SIZE_MAX / size ) abort();
+
+  ptr = libspectrum_calloc_fn( nmemb, size );
 
   /* If nmemb * size == 0, acceptable to return NULL */
   if( ( nmemb * size ) && !ptr ) abort();
