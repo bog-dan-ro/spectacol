@@ -871,7 +871,7 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
 #else				/* #ifndef __MORPHOS__ */
               if( xfdDecrunchBuffer( xfdobj ) ) {
 #endif				/* #ifndef __MORPHOS__ */
-                *new_buffer = libspectrum_malloc( xfdobj->xfdbi_TargetBufSaveLen );
+                *new_buffer = libspectrum_new( char, xfdobj->xfdbi_TargetBufSaveLen );
                 *new_length = xfdobj->xfdbi_TargetBufSaveLen;
                 memcpy( *new_buffer, xfdobj->xfdbi_TargetBuffer, *new_length );
 #ifndef __MORPHOS__
@@ -921,7 +921,7 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
 }
 
 /* Ensure there is room for `requested' characters after the current
-   position `ptr' in `buffer'. If not, realloc() and update the
+   position `ptr' in `buffer'. If not, renew() and update the
    pointers as necessary */
 void
 libspectrum_make_room( libspectrum_byte **dest, size_t requested,
@@ -932,7 +932,7 @@ libspectrum_make_room( libspectrum_byte **dest, size_t requested,
   if( *allocated == 0 ) {
 
     (*allocated) = requested;
-    *dest = libspectrum_malloc( requested * sizeof( **dest ) );
+    *dest = libspectrum_new( libspectrum_byte, requested );
 
   } else {
     current_length = *ptr - *dest;
@@ -947,7 +947,7 @@ libspectrum_make_room( libspectrum_byte **dest, size_t requested,
       current_length + requested :
       2 * (*allocated);
 
-    *dest = libspectrum_realloc( *dest, *allocated * sizeof( **dest ) );
+    *dest = libspectrum_renew( libspectrum_byte, *dest, *allocated );
   }
 
   /* Update the secondary pointer to the block */

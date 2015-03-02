@@ -63,7 +63,7 @@ libspectrum_z80em_read( libspectrum_tape *tape,
 
   /* Claim memory for the data (it's one big lump) */
   z80em_block->length = length;
-  z80em_block->data = libspectrum_malloc( length );
+  z80em_block->data = libspectrum_new( libspectrum_byte, length );
 
   /* Copy the data across */
   memcpy( z80em_block->data, buffer, length );

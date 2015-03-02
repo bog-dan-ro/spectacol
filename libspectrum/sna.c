@@ -185,7 +185,7 @@ libspectrum_sna_read_data( const libspectrum_byte *buffer,
   case LIBSPECTRUM_MACHINE_PENT:
     
     for( i=0; i<8; i++ ) {
-      libspectrum_byte *ram = libspectrum_malloc( 0x4000 * sizeof( *ram ) );
+      libspectrum_byte *ram = libspectrum_new( libspectrum_byte, 0x4000 );
       libspectrum_snap_set_pages( snap, i, ram );
     }
 

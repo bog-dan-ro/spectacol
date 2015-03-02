@@ -424,7 +424,7 @@ libspectrum_split_to_48k_pages( libspectrum_snap *snap,
   }
 
   for( i = 0; i < 3; i++ )
-    buffer[i] = libspectrum_malloc( 0x4000 * sizeof( libspectrum_byte ) );
+    buffer[i] = libspectrum_new( libspectrum_byte, 0x4000 );
 
   libspectrum_snap_set_pages( snap, 5, buffer[0] );
   libspectrum_snap_set_pages( snap, 2, buffer[1] );

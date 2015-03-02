@@ -831,7 +831,7 @@ read_slt( libspectrum_snap *snap, const libspectrum_byte **next_block,
     libspectrum_byte *buffer;
 
     /* Should expand to 6912 bytes, so give me a buffer that long */
-    buffer = libspectrum_malloc( 6912 * sizeof( *buffer ) );
+    buffer = libspectrum_new( libspectrum_byte, 6912 );
 
     if( screen_length == 6912 ) {	/* Not compressed */
 
@@ -899,7 +899,7 @@ read_block( const libspectrum_byte *buffer, libspectrum_snap *snap,
 
     /* If it is an Interface 1 ROM page put it in the appropriate structure */
     if( page == 1 && libspectrum_snap_interface1_active( snap ) ) {
-      libspectrum_byte *chunk = libspectrum_malloc( 0x4000 * sizeof( *chunk ) );
+      libspectrum_byte *chunk = libspectrum_new( libspectrum_byte, 0x4000 );
       memcpy( chunk, uncompressed, 0x4000 );
       libspectrum_snap_set_interface1_custom_rom( snap, 1 );
       libspectrum_snap_set_interface1_rom( snap, 0, chunk );
@@ -911,10 +911,10 @@ read_block( const libspectrum_byte *buffer, libspectrum_snap *snap,
     /* If it is a +D ROM/RAM page put it in the appropriate structures */
     if( page == 1 && libspectrum_snap_plusd_active( snap ) ) {
       /* Bottom 8K of page is +D ROM, upper 8K is +D RAM */
-      libspectrum_byte *chunk = libspectrum_malloc( 0x2000 * sizeof( *chunk ) );
+      libspectrum_byte *chunk = libspectrum_new( libspectrum_byte, 0x2000 );
       memcpy( chunk, uncompressed, 0x2000 );
       libspectrum_snap_set_plusd_rom( snap, 0, chunk );
-      chunk = libspectrum_malloc( 0x2000 * sizeof( *chunk ) );
+      chunk = libspectrum_new( libspectrum_byte, 0x2000 );
       memcpy( chunk, uncompressed + 0x2000, 0x2000 );
       libspectrum_snap_set_plusd_ram( snap, 0, chunk );
       libspectrum_free( uncompressed );
@@ -1052,7 +1052,7 @@ read_v1_block( const libspectrum_byte *buffer, int is_compressed,
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
-    *uncompressed = libspectrum_malloc( 0xc000 * sizeof( **uncompressed ) );
+    *uncompressed = libspectrum_new( libspectrum_byte, 0xc000 );
     memcpy( *uncompressed, buffer, 0xc000 );
     *next_block = buffer + 0xc000;
   }
@@ -1105,7 +1105,7 @@ read_v2_block( const libspectrum_byte *buffer, libspectrum_byte **block,
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
-    *block = libspectrum_malloc( 0x4000 * sizeof( **block ) );
+    *block = libspectrum_new( libspectrum_byte, 0x4000 );
     memcpy( *block, buffer + 3, 0x4000 );
 
     *length = 0x4000;
@@ -1514,7 +1514,7 @@ write_pages( libspectrum_byte **buffer, libspectrum_byte **ptr, size_t *length,
   /* If Interface 1 is enabled, write the Interface 1 ROM in Z80 page 1 */
   if( libspectrum_snap_interface1_active( snap ) &&
       libspectrum_snap_interface1_custom_rom( snap ) ) {
-    libspectrum_byte *uncompressed = libspectrum_calloc( 0x4000, sizeof( *uncompressed ) );
+    libspectrum_byte *uncompressed = libspectrum_new0( libspectrum_byte, 0x4000 );
     
     memcpy( uncompressed, libspectrum_snap_interface1_rom( snap, 0 ),
             libspectrum_snap_interface1_rom_length( snap, 0 ) );
@@ -1529,7 +1529,7 @@ write_pages( libspectrum_byte **buffer, libspectrum_byte **ptr, size_t *length,
      RAM if we also overwrite the ROM with 0 */
   if( libspectrum_snap_plusd_active( snap ) &&
       libspectrum_snap_plusd_custom_rom( snap ) ) {
-    libspectrum_byte *uncompressed = libspectrum_malloc( 0x4000 * sizeof( *uncompressed ) );
+    libspectrum_byte *uncompressed = libspectrum_new( libspectrum_byte, 0x4000 );
     
     memcpy( uncompressed, libspectrum_snap_plusd_rom( snap, 0 ), 0x2000 );
     memcpy( uncompressed + 0x2000,
@@ -1709,7 +1709,7 @@ compress_block( libspectrum_byte **dest, size_t *dest_length,
   /* Allocate memory for dest if requested */
   if( *dest_length == 0 ) {
     *dest_length = src_length/2;
-    *dest = libspectrum_malloc( *dest_length * sizeof( **dest ) );
+    *dest = libspectrum_new( libspectrum_byte, *dest_length );
   }
 
   in_ptr = src;
@@ -1792,7 +1792,7 @@ uncompress_block( libspectrum_byte **dest, size_t *dest_length,
   /* Allocate memory for dest if requested */
   if( *dest_length == 0 ) {
     *dest_length = src_length / 2;
-    *dest = libspectrum_malloc( *dest_length * sizeof( **dest ) );
+    *dest = libspectrum_new( libspectrum_byte, *dest_length );
   }
 
   in_ptr = src;

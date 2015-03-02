@@ -209,7 +209,7 @@ libspectrum_plusd_read_128_data( libspectrum_snap *snap,
 
     libspectrum_byte *ram;
 
-    ram = libspectrum_malloc( 0x4000 * sizeof( *ram ) );
+    ram = libspectrum_new( libspectrum_byte, 0x4000 );
     libspectrum_snap_set_pages( snap, i, ram );
 
     memcpy( ram, buffer, 0x4000 );

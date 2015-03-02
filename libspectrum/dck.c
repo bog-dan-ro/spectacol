@@ -205,7 +205,7 @@ libspectrum_dck_read2( libspectrum_dck *dck, const libspectrum_byte *buffer,
         break;
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
         dck->dck[num_dck_block]->pages[i] =
-                        libspectrum_calloc( DCK_PAGE_SIZE, sizeof( libspectrum_byte ) );
+                        libspectrum_new0( libspectrum_byte, DCK_PAGE_SIZE );
         if( !dck->dck[num_dck_block]->pages[i] ) {
           libspectrum_print_error( LIBSPECTRUM_ERROR_MEMORY,
                                    "libspectrum_dck_read: out of memory" );
@@ -216,7 +216,7 @@ libspectrum_dck_read2( libspectrum_dck *dck, const libspectrum_byte *buffer,
       case LIBSPECTRUM_DCK_PAGE_ROM:
       case LIBSPECTRUM_DCK_PAGE_RAM:
         dck->dck[num_dck_block]->pages[i] =
-	  libspectrum_malloc( DCK_PAGE_SIZE * sizeof( libspectrum_byte ) );
+	  libspectrum_new( libspectrum_byte, DCK_PAGE_SIZE );
         memcpy( dck->dck[num_dck_block]->pages[i], buffer, DCK_PAGE_SIZE );
         buffer += DCK_PAGE_SIZE;
         break;

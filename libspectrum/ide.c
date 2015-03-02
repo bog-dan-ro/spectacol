@@ -504,7 +504,7 @@ write_hdf( libspectrum_ide_channel *chn )
     gint *key;
 
     key = libspectrum_new( gint, 1 );
-    buffer = libspectrum_malloc( drv->sector_size * sizeof( *buffer ) );
+    buffer = libspectrum_new( libspectrum_byte, drv->sector_size );
 
     *key = chn->sector_number;
     g_hash_table_insert( cache, key, buffer );

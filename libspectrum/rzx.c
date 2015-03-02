@@ -73,7 +73,7 @@ typedef struct input_block_t {
 
   /* Used for recording to note the last non-repeated frame. We can't
      really use a direct pointer to the frame here as that will move
-     around when we do a realloc on the array, so just dereference it
+     around when we do a renew on the array, so just dereference it
      every time */
   size_t non_repeat;
 
@@ -468,7 +468,7 @@ libspectrum_rzx_store_frame( libspectrum_rzx *rzx, size_t instructions,
 
     if( count ) {
 
-      frame->in_bytes = libspectrum_malloc( count * sizeof( *( frame->in_bytes ) ) );
+      frame->in_bytes = libspectrum_new( libspectrum_byte, count );
 
       memcpy( frame->in_bytes, in_bytes,
 	      count * sizeof( *( frame->in_bytes ) ) );
@@ -1113,7 +1113,7 @@ rzx_read_frames( input_block_t *block, const libspectrum_byte **ptr,
     if( block->frames[i].count ) {
 
       block->frames[i].in_bytes =
-	libspectrum_malloc( block->frames[i].count * sizeof( libspectrum_byte ) );
+	libspectrum_new( libspectrum_byte, block->frames[i].count );
       memcpy( block->frames[i].in_bytes, *ptr, block->frames[i].count );
 
     } else {

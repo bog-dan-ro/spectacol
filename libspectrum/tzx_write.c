@@ -780,8 +780,9 @@ write_pulse( libspectrum_dword pulse_length )
 
   if( rle_state.tape_length <= target_size ) {
     rle_state.tape_length = target_size * 2;
-    rle_state.tape_buffer = libspectrum_realloc( rle_state.tape_buffer,
-                                                 rle_state.tape_length );
+    rle_state.tape_buffer = libspectrum_renew( libspectrum_byte,
+					       rle_state.tape_buffer,
+					       rle_state.tape_length );
   }
 
   for( i = pulse_length; i > 0; i-- ) {
@@ -824,7 +825,7 @@ tzx_write_rle( libspectrum_tape_block *block, libspectrum_byte **buffer,
   rle_state.level = 0;
   rle_state.length = 0;
   rle_state.tape_length = 8192;
-  rle_state.tape_buffer = libspectrum_malloc( rle_state.tape_length );
+  rle_state.tape_buffer = libspectrum_new( libspectrum_byte, rle_state.tape_length );
 
   *rle_state.tape_buffer = 0;
 
@@ -998,7 +999,7 @@ tzx_write_data_block( libspectrum_tape_block *block, libspectrum_byte **buffer,
   /* And the actual data */
   data_length = libspectrum_tape_block_data_length( block );
   libspectrum_tape_block_set_data_length( pure_data, data_length );
-  libspectrum_byte *data = libspectrum_malloc( data_length * sizeof( *data ) );
+  libspectrum_byte *data = libspectrum_new( libspectrum_byte, data_length );
   memcpy( data, libspectrum_tape_block_data( block ), data_length );
   libspectrum_tape_block_set_data( pure_data, data );
 

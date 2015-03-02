@@ -571,7 +571,7 @@ tzx_read_generalised_data( libspectrum_tape *tape,
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  symbols = libspectrum_malloc( symbol_count * sizeof( *symbols ) );
+  symbols = libspectrum_new( libspectrum_byte, symbol_count );
   repeats = libspectrum_new( libspectrum_word, symbol_count );
 
   for( i = 0; i < symbol_count; i++ ) {
@@ -602,7 +602,7 @@ tzx_read_generalised_data( libspectrum_tape *tape,
   data_count = ( ( bits_per_symbol * symbol_count ) + 7 ) / 8;
   data_size = data_count * sizeof( *data );
 
-  data = libspectrum_malloc( data_size );
+  data = libspectrum_new( libspectrum_byte, data_size );
 
   if( end - (*ptr) < data_size ) {
     libspectrum_free( data );
@@ -1054,7 +1054,7 @@ tzx_read_custom( libspectrum_tape *tape, const libspectrum_byte **ptr,
   block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_CUSTOM );
 
   /* Get the description */
-  description = libspectrum_malloc( 17 * sizeof( libspectrum_byte ) );
+  description = libspectrum_new( char, 17 );
   memcpy( description, *ptr, 16 ); (*ptr) += 16; description[16] = '\0';
   libspectrum_tape_block_set_text( block, description );
 
@@ -1124,9 +1124,9 @@ tzx_read_data( const libspectrum_byte **ptr, const libspectrum_byte *end,
   }
 
   /* Allocate memory for the data; the check for *length is to avoid
-     the implementation-defined of malloc( 0 ) */
+     the implementation-defined behaviour of malloc( 0 ) */
   if( *length || padding ) {
-    *data = libspectrum_malloc( ( *length + padding ) * sizeof( **data ) );
+    *data = libspectrum_new( libspectrum_byte, *length + padding );
     /* Copy the block data across, and move along */
     memcpy( *data, *ptr, *length ); *ptr += *length;
   } else {

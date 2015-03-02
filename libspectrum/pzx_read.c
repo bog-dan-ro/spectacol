@@ -197,7 +197,7 @@ read_pzxt_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
     if( id == -1 ) {
       size_t new_len = strlen( info_tag ) + strlen( string ) +
                        strlen( ": " ) + 1;
-      char *comment = libspectrum_malloc( new_len );
+      char *comment = libspectrum_new( char, new_len );
       snprintf( comment, new_len, "%s: %s", info_tag, string );
       libspectrum_free( string );
       ids[i] = 0xff;
@@ -620,9 +620,9 @@ pzx_read_data( const libspectrum_byte **ptr, const libspectrum_byte *end,
   }
 
   /* Allocate memory for the data; the check for *length is to avoid
-     the implementation-defined of malloc( 0 ) */
+     the implementation-defined behaviour of malloc( 0 ) */
   if( length ) {
-    *data = libspectrum_malloc( ( length ) * sizeof( **data ) );
+    *data = libspectrum_new( libspectrum_byte, length );
     /* Copy the block data across, and move along */
     memcpy( *data, *ptr, length ); *ptr += length;
   } else {
@@ -639,13 +639,12 @@ pzx_read_string( const libspectrum_byte **ptr, const libspectrum_byte *end,
   size_t length = 0;
   char *ptr2;
   size_t buffer_size = 64;
-  char *buffer =
-    libspectrum_malloc( buffer_size * sizeof( char ) );
+  char *buffer = libspectrum_new( char, buffer_size );
 
   while( **ptr != '\0' && *ptr < end ) {
     if( length == buffer_size ) {
       buffer_size *= 2;
-      buffer = libspectrum_realloc( buffer, buffer_size * sizeof( char ) );
+      buffer = libspectrum_renew( char, buffer, buffer_size );
     }
     *(buffer + length++) = **ptr; (*ptr)++;
   }
@@ -653,7 +652,7 @@ pzx_read_string( const libspectrum_byte **ptr, const libspectrum_byte *end,
   /* Advance past the null terminator if it isn't the end of the block */
   if( **ptr == '\0' && *ptr < end ) (*ptr)++;
   
-  *dest = libspectrum_malloc( (length + 1) * sizeof( libspectrum_byte ) );
+  *dest = libspectrum_new( char, (length + 1) );
 
   strncpy( *dest, buffer, length );
 

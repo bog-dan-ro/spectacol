@@ -39,7 +39,7 @@ read_file( libspectrum_byte **buffer, size_t *length, const char *filename )
   }
 
   *length = info.st_size;
-  *buffer = libspectrum_malloc( *length );
+  *buffer = libspectrum_new( libspectrum_byte, *length );
 
   bytes = read( fd, *buffer, *length );
   if( bytes == -1 ) {

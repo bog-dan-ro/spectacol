@@ -126,7 +126,7 @@ libspectrum_csw_read( libspectrum_tape *tape,
   } else {
     /* Claim memory for the data (it's one big lump) */
     csw_block->length = length;
-    csw_block->data = libspectrum_malloc( length );
+    csw_block->data = libspectrum_new( libspectrum_byte, length );
 
     /* Copy the data across */
     memcpy( csw_block->data, buffer, length );

@@ -473,7 +473,7 @@ read_rom_block( libspectrum_tape *tape, const libspectrum_byte *ptr,
   }
 
   /* Allocate memory for the data */
-  block_data = libspectrum_malloc( length * sizeof( *block_data ) );
+  block_data = libspectrum_new( libspectrum_byte, length );
   libspectrum_tape_block_set_data( block, block_data );
 
   /* Add flag */
@@ -534,7 +534,7 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
   }
 
   /* Allocate memory for the data */
-  block_data = libspectrum_malloc( length * sizeof( libspectrum_byte ) );
+  block_data = libspectrum_new( libspectrum_byte, length );
   libspectrum_tape_block_set_data( block, block_data );
 
   if( compressed_size != decompressed_size ) {
@@ -594,8 +594,9 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
     /* Combine the two blocks */
     size_t new_length = libspectrum_tape_block_data_length( last_block ) + 
                           length;
-    block_data = libspectrum_realloc( libspectrum_tape_block_data( last_block ),
-                                      new_length * sizeof( libspectrum_byte ) );
+    block_data = libspectrum_renew( libspectrum_byte,
+				    libspectrum_tape_block_data( last_block ),
+				    new_length );
 
     memcpy( block_data + libspectrum_tape_block_data_length( last_block ),
             libspectrum_tape_block_data( block ), length );

@@ -102,7 +102,7 @@ internal_tap_read( libspectrum_tape *tape, const libspectrum_byte *buffer,
     }
 
     /* Allocate memory for the data */
-    data = libspectrum_malloc( data_length * sizeof( *data ) );
+    data = libspectrum_new( libspectrum_byte, data_length );
     libspectrum_tape_block_set_data( block, data );
 
     /* Copy the block data across */
