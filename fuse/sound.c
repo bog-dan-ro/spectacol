@@ -289,9 +289,7 @@ sound_init( const char *device )
   sound_framesiz = ( float )settings_current.sound_freq / hz;
   sound_framesiz++;
 
-  samples =
-    (blip_sample_t *)libspectrum_calloc( sound_framesiz * sound_channels,
-                                         sizeof(blip_sample_t) );
+  samples = libspectrum_new0( blip_sample_t, sound_framesiz * sound_channels );
   /* initialize movie settings... */
   movie_init_sound( settings_current.sound_freq, sound_stereo_ay );
 

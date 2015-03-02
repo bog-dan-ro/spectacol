@@ -114,8 +114,7 @@ static int machine_add_machine( int (*init_function)( fuse_machine_info *machine
   machine_count++;
 
   machine_types =
-    libspectrum_realloc( machine_types,
-                         machine_count * sizeof( fuse_machine_info* ) );
+    libspectrum_renew( fuse_machine_info *, machine_types, machine_count );
 
   machine_types[ machine_count - 1 ] = malloc( sizeof( fuse_machine_info ) );
   if( !machine_types[ machine_count - 1 ] ) {

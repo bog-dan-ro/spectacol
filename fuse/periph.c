@@ -74,7 +74,7 @@ port_register( periph_type type, const periph_port_t *port )
 {
   periph_port_private_t *private;
 
-  private = libspectrum_malloc( sizeof( *private ) );
+  private = libspectrum_new( periph_port_private_t, 1 );
 
   private->type = type;
   private->port = *port;
@@ -89,7 +89,7 @@ periph_register( periph_type type, const periph_t *periph )
   if( !peripherals )
     peripherals = g_hash_table_new_full( NULL, NULL, NULL, libspectrum_free );
 
-  periph_private_t *private = libspectrum_malloc( sizeof( *private ) );
+  periph_private_t *private = libspectrum_new( periph_private_t, 1 );
 
   private->present = PERIPH_PRESENT_NEVER;
   private->active = 0;

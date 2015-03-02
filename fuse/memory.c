@@ -215,7 +215,7 @@ memory_pool_allocate_persistent( size_t length, int persistent )
 
   memory = libspectrum_malloc( length * sizeof( *memory ) );
 
-  entry = libspectrum_malloc( sizeof( *entry ) );
+  entry = libspectrum_new( memory_pool_entry_t, 1 );
 
   entry->persistent = persistent;
   entry->memory = memory;

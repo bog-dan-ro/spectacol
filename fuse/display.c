@@ -137,10 +137,8 @@ alloc_change(void)
 
   if( border_changes_size == border_changes_last ) {
     border_changes_size += 10;
-    border_changes = libspectrum_realloc( border_changes,
-                                          border_changes_size *
-                                            sizeof( struct border_change_t )
-                                        );
+    border_changes = libspectrum_renew( struct border_change_t,
+                                        border_changes, border_changes_size );
   }
   return border_changes + border_changes_last++; 
 }

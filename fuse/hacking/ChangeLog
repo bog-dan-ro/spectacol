@@ -4647,3 +4647,6 @@
 20150302 compat/win32/socket.c,compat.h,menu_data.pl,ui/{gtk/{confirm.c,
          debugger.c,gtkjoystick.c,gtkui.c,pokefinder.c,stock.c},widget/query.c,
          win32/win32ui.c}: add and use ARRAY_SIZE macro (Stuart).
+20150302 display.c,event.c,machine.c,memory.c,periph.c,rectangle.c,sound.c: use
+         libspectrum_{new,new0,renew}() macros where sizeof(elem) > 1 (Stuart).
+

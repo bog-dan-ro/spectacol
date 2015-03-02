@@ -98,7 +98,7 @@ event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
     ptr = event_free;
     event_free = NULL;
   } else {
-    ptr = libspectrum_malloc( sizeof( *ptr ) );
+    ptr = libspectrum_new( event_t, 1 );
   }
 
   ptr->tstates = event_time;
