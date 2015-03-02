@@ -369,7 +369,7 @@ int creator_init( void )
 					 version[2] * 0x100 + version[3] );
   if( error ) { libspectrum_creator_free( fuse_creator ); return error; }
 
-  custom = libspectrum_malloc( CUSTOM_SIZE );
+  custom = libspectrum_new( char, CUSTOM_SIZE );
 
   gcrypt_version = libspectrum_gcrypt_version();
   if( !gcrypt_version ) gcrypt_version = "not available";

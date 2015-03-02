@@ -164,7 +164,7 @@ widget_text_finish( widget_finish_state finished )
   if( finished == WIDGET_FINISHED_OK ) {
 
     widget_text_text =
-      libspectrum_realloc( widget_text_text, strlen( text ) + 1 );
+      libspectrum_renew( char, widget_text_text, strlen( text ) + 1 );
 
     strcpy( widget_text_text, text );
   } else {

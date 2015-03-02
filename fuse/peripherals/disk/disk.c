@@ -803,7 +803,7 @@ udi_read_compressed( const libspectrum_byte *buffer,
   if( error ) return error;
 
   if( *data_size < uncompr_size ) {
-    *data = libspectrum_realloc( *data, uncompr_size );
+    *data = libspectrum_renew( libspectrum_byte, *data, uncompr_size );
     *data_size = uncompr_size;
   }
   memcpy( *data, tmp, uncompr_size );
@@ -826,7 +826,7 @@ udi_write_compressed( const libspectrum_byte *buffer,
   if( error ) return error;
 
   if( *data_size < *compr_size ) {
-    *data = libspectrum_realloc( *data, *compr_size );
+    *data = libspectrum_renew( libspectrum_byte, *data, *compr_size );
     *data_size = *compr_size;
   }
   memcpy( *data, tmp, *compr_size );

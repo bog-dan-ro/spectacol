@@ -506,7 +506,7 @@ int tape_save_trap( void )
   length = DE + 2;
   libspectrum_tape_block_set_data_length( block, length );
 
-  data = libspectrum_malloc( length * sizeof(libspectrum_byte) );
+  data = libspectrum_new( libspectrum_byte, length );
   libspectrum_tape_block_set_data( block, data );
 
   /* First, store the flag byte (and initialise the parity counter) */
@@ -712,7 +712,8 @@ tape_record_start( void )
     machine_current->timings.processor_speed/44100;
 
   rec_state.tape_buffer_size = 8192;
-  rec_state.tape_buffer = libspectrum_malloc(rec_state.tape_buffer_size);
+  rec_state.tape_buffer = libspectrum_new(libspectrum_byte,
+					  rec_state.tape_buffer_size);
   rec_state.tape_buffer_used = 0;
 
   /* start scheduling events that record into a buffer that we
@@ -762,8 +763,9 @@ tape_event_record_sample( libspectrum_dword last_tstates, int type,
     /* make sure we can still fit a dword and a flag byte in the buffer */
     if( rec_state.tape_buffer_used+5 >= rec_state.tape_buffer_size ) {
       rec_state.tape_buffer_size = rec_state.tape_buffer_size*2;
-      rec_state.tape_buffer = libspectrum_realloc( rec_state.tape_buffer,
-                                                   rec_state.tape_buffer_size );
+      rec_state.tape_buffer =
+        libspectrum_renew( libspectrum_byte, rec_state.tape_buffer,
+                           rec_state.tape_buffer_size );
     }
   }
 

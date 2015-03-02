@@ -134,7 +134,7 @@ slt_to_snapshot( libspectrum_snap *snap )
 
       libspectrum_byte *buffer;
 
-      buffer = libspectrum_malloc( slt_length[i] * sizeof(libspectrum_byte) );
+      buffer = libspectrum_new( libspectrum_byte, slt_length[i] );
 
       memcpy( buffer, slt[i], slt_length[i] );
       libspectrum_snap_set_slt( snap, i, buffer );
@@ -143,7 +143,7 @@ slt_to_snapshot( libspectrum_snap *snap )
 
   if( slt_screen ) {
  
-    buffer = libspectrum_malloc( 6912 * sizeof( libspectrum_byte ) );
+    buffer = libspectrum_new( libspectrum_byte, 6912 );
 
     memcpy( buffer, slt_screen, 6912 );
     libspectrum_snap_set_slt_screen( snap, buffer );

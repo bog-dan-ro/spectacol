@@ -449,7 +449,7 @@ parse_ini( utils_file *file, settings_info *settings )
 	    libspectrum_free( *val_char );
 	    *val_char = NULL;
 	  }
-	  *val_char = libspectrum_malloc( n + 1 );
+	  *val_char = libspectrum_new( char, n + 1 );
 	  (*val_char)[n] = '\\0';
 	  memcpy( *val_char, value, n );
 	}

@@ -731,10 +731,7 @@ int rzx_store_byte( libspectrum_byte value )
     libspectrum_byte *ptr; size_t new_allocated;
 
     new_allocated = rzx_in_allocated >= 25 ? 2 * rzx_in_allocated : 50;
-    ptr =
-      (libspectrum_byte*)libspectrum_realloc(
-        rzx_in_bytes, new_allocated * sizeof(libspectrum_byte)
-      );
+    ptr = libspectrum_renew( libspectrum_byte, rzx_in_bytes, new_allocated );
 
     rzx_in_bytes = ptr;
     rzx_in_allocated = new_allocated;

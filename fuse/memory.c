@@ -213,7 +213,7 @@ memory_pool_allocate_persistent( size_t length, int persistent )
   memory_pool_entry_t *entry;
   libspectrum_byte *memory;
 
-  memory = libspectrum_malloc( length * sizeof( *memory ) );
+  memory = libspectrum_new( libspectrum_byte, length );
 
   entry = libspectrum_new( memory_pool_entry_t, 1 );
 
@@ -574,14 +574,14 @@ memory_rom_to_snapshot( libspectrum_snap *snap )
 
         /* Start a new ROM image */
         rom_length = MEMORY_PAGE_SIZE;
-        current_rom = libspectrum_malloc( rom_length );
+        current_rom = libspectrum_new( libspectrum_byte, rom_length );
 
         memcpy( current_rom, memory_map_rom[ i ].page, MEMORY_PAGE_SIZE );
         current_page_num = memory_map_rom[ i ].page_num;
       } else {
         /* Extend the current ROM image */
-        current_rom = libspectrum_realloc( current_rom,
-                                           rom_length + MEMORY_PAGE_SIZE );
+        current_rom = libspectrum_renew( libspectrum_byte, current_rom,
+                                         rom_length + MEMORY_PAGE_SIZE );
 
         memcpy( current_rom + rom_length, memory_map_rom[ i ].page,
                 MEMORY_PAGE_SIZE );
@@ -610,7 +610,7 @@ memory_to_snapshot( libspectrum_snap *snap )
   for( i = 0; i < 64; i++ ) {
     if( RAM[i] != NULL ) {
 
-      buffer = libspectrum_malloc( 0x4000 * sizeof( libspectrum_byte ) );
+      buffer = libspectrum_new( libspectrum_byte, 0x4000 );
 
       memcpy( buffer, RAM[i], 0x4000 );
       libspectrum_snap_set_pages( snap, i, buffer );
