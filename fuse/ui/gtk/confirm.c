@@ -103,8 +103,7 @@ ui_confirm_save_specific( const char *message )
       { GTK_STOCK_SAVE, G_CALLBACK( set_save ), NULL, DEFAULT_DESTROY, 0, 0, 0, 0 }
     };
     btn[0].actiondata = btn[2].actiondata = &confirm;
-    gtkstock_create_buttons( dialog, NULL, btn,
-			     sizeof( btn ) / sizeof( btn[0] ) );
+    gtkstock_create_buttons( dialog, NULL, btn, ARRAY_SIZE( btn ) );
   }
 
   gtk_widget_show_all( dialog );

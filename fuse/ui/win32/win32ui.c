@@ -93,8 +93,6 @@ static BOOL win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam );
 static int
 selector_dialog( win32ui_select_info *items );
 
-#define DIM(X) sizeof((X)) / sizeof((X)[0])
-
 static void
 handle_drop( HDROP hDrop )
 {
@@ -1178,7 +1176,7 @@ win32ui_process_messages( int process_queue_once )
       /* FIXME: rethink this loop, IsDialogMessage in particular */
       processMsg = TRUE;
 
-      for( i = 0; processMsg && i < DIM( hModelessDlgs ); i++) {
+      for( i = 0; processMsg && i < ARRAY_SIZE( hModelessDlgs ); i++) {
         if( IsDialogMessage( hModelessDlgs[i], &msg ) ) processMsg = FALSE;
       }
 

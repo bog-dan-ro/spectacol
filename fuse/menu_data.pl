@@ -239,8 +239,7 @@ HEADERS
 
 };
 
-guint gtkui_menu_data_size =
-  sizeof( gtkui_menu_data ) / sizeof( GtkActionEntry );
+guint gtkui_menu_data_size = ARRAY_SIZE( gtkui_menu_data );
 CODE
 
  } elsif( $mode eq 'ui' ) {

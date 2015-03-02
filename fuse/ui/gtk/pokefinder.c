@@ -170,7 +170,7 @@ create_dialog( void )
     };
     btn[2].actiondata = G_OBJECT( entry );
     accel_group = gtkstock_create_buttons( dialog, NULL, btn,
-					   sizeof( btn ) / sizeof( btn[0] ) );
+					   ARRAY_SIZE( btn ) );
     gtkstock_create_close( dialog, accel_group,
 			   G_CALLBACK( gtkui_pokefinder_close ), TRUE );
   }

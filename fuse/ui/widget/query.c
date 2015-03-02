@@ -302,7 +302,7 @@ void
 widget_query_keyhandler( input_key key )
 {
   widget_query_generic_keyhandler( query_confirm,
-                                   sizeof(query_confirm)/sizeof(widget_query_entry),
+                                   ARRAY_SIZE(query_confirm),
                                    key );
 }
 
@@ -310,7 +310,7 @@ void
 widget_query_save_keyhandler( input_key key )
 {
   widget_query_generic_keyhandler( query_save,
-                                   sizeof(query_save)/sizeof(widget_query_entry),
+                                   ARRAY_SIZE(query_save),
                                    key );
 }
 

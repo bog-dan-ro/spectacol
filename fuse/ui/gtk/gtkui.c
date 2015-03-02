@@ -185,7 +185,7 @@ ui_init( int *argc, char ***argv )
   gtk_drag_dest_set( GTK_WIDGET( gtkui_window ),
                      GTK_DEST_DEFAULT_ALL,
                      drag_types,
-                     G_N_ELEMENTS( drag_types ),
+                     ARRAY_SIZE( drag_types ),
                      GDK_ACTION_COPY | GDK_ACTION_PRIVATE | GDK_ACTION_MOVE );
                      /* GDK_ACTION_PRIVATE alone DNW with ROX-Filer,
                         GDK_ACTION_MOVE allow DnD from KDE */

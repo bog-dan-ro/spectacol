@@ -30,6 +30,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "compat.h"
 #include "gtkcompat.h"
 #include "gtkinternals.h"
 
@@ -160,7 +161,7 @@ gtkstock_create_ok_cancel( GtkWidget *widget, GtkAccelGroup *accel,
   btn[1].actiondata = actiondata;
 
   return gtkstock_create_buttons( widget, accel, btn,
-				  sizeof( btn ) / sizeof( btn[0] ) );
+				  ARRAY_SIZE( btn ) );
 }
 
 GtkAccelGroup*

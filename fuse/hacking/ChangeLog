@@ -4644,3 +4644,6 @@
          layer use it for their STATUS registers (fixes bug #311) (Gergely
          Szasz).
 20150301 hacking/peripheral_tests.txt: fix details for Disciple test (Fred).
+20150302 compat/win32/socket.c,compat.h,menu_data.pl,ui/{gtk/{confirm.c,
+         debugger.c,gtkjoystick.c,gtkui.c,pokefinder.c,stock.c},widget/query.c,
+         win32/win32ui.c}: add and use ARRAY_SIZE macro (Stuart).

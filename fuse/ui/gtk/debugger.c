@@ -212,8 +212,6 @@ static GtkActionEntry menu_data[] = {
 
 };
 
-static guint menu_data_count = G_N_ELEMENTS( menu_data );
-
 static GtkToggleActionEntry menu_toggles[] = {
 
   { "VIEW_REGISTERS", NULL, "_Registers", NULL, NULL, G_CALLBACK( toggle_display_registers ), TRUE },
@@ -224,8 +222,6 @@ static GtkToggleActionEntry menu_toggles[] = {
   { "VIEW_EVENTS", NULL, "_Events", NULL, NULL, G_CALLBACK( toggle_display_events ), TRUE },
 
 };
-
-static guint menu_toggles_count = G_N_ELEMENTS( menu_toggles );
 
 static const char*
 format_8_bit( void )
@@ -418,10 +414,10 @@ create_menu_bar( GtkBox *parent, GtkAccelGroup **accel_group )
 
   /* Load actions */
   menu_action_group = gtk_action_group_new( "DebuggerActionGroup" );
-  gtk_action_group_add_actions( menu_action_group, menu_data, menu_data_count,
-                                NULL );
+  gtk_action_group_add_actions( menu_action_group, menu_data,
+				ARRAY_SIZE( menu_data ), NULL );
   gtk_action_group_add_toggle_actions( menu_action_group, menu_toggles,
-                                       menu_toggles_count, NULL );
+                                       ARRAY_SIZE( menu_toggles ), NULL );
   gtk_ui_manager_insert_action_group( ui_manager_debugger, menu_action_group,
                                       0 );
   g_object_unref( menu_action_group );
