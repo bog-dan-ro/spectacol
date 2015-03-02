@@ -46,6 +46,14 @@ libspectrum_malloc( size_t size )
 }
 
 void*
+libspectrum_malloc_n( size_t nmemb, size_t size )
+{
+  if( nmemb > SIZE_MAX / size ) abort();
+
+  return libspectrum_malloc( nmemb * size );
+}
+
+void*
 libspectrum_calloc( size_t nmemb, size_t size )
 {
   void *ptr;
@@ -69,6 +77,14 @@ libspectrum_realloc( void *ptr, size_t size )
   if( size && !ptr ) abort();
 
   return ptr;
+}
+
+void*
+libspectrum_realloc_n( void *ptr, size_t nmemb, size_t size )
+{
+  if( nmemb > SIZE_MAX / size ) abort();
+
+  return libspectrum_realloc( ptr, nmemb * size );
 }
 
 void
