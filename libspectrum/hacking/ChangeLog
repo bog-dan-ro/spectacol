@@ -988,3 +988,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150302 memory.c: check for overflow in libspectrum_calloc() (Stuart).
 20150302 libspectrum.h.in,memory.c: add libspectrum_{m,re}alloc_n() and use this
          for libspectrum_{new,renew}() macros (Stuart).
+20150302 libspectrum.h.in,memory.c: rename libspectrum_calloc() to
+         libspectrum_malloc0_n() (Stuart).

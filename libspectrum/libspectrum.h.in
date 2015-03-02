@@ -144,7 +144,7 @@ typedef struct libspectrum_mem_vtable_t {
 
 WIN32_DLL void* libspectrum_malloc( size_t size );
 WIN32_DLL void* libspectrum_malloc_n( size_t nmemb, size_t size );
-WIN32_DLL void* libspectrum_calloc( size_t nmemb, size_t size );
+WIN32_DLL void* libspectrum_malloc0_n( size_t nmemb, size_t size );
 WIN32_DLL void* libspectrum_realloc( void *ptr, size_t size );
 WIN32_DLL void* libspectrum_realloc_n( void *ptr, size_t nmemb, size_t size );
 WIN32_DLL void libspectrum_free( void *ptr );
@@ -155,10 +155,13 @@ WIN32_DLL void libspectrum_mem_set_vtable( libspectrum_mem_vtable_t *table );
   ( ( type * ) libspectrum_malloc_n( (count), sizeof( type ) ) )
 
 #define libspectrum_new0( type, count ) \
-  ( ( type * ) libspectrum_calloc( (count), sizeof( type ) ) )
+  ( ( type * ) libspectrum_malloc0_n( (count), sizeof( type ) ) )
 
 #define libspectrum_renew( type, mem, count ) \
-  ( ( type * ) libspectrum_realloc_n( (void *)mem, (count), sizeof( type ) ) )
+  ( ( type * ) libspectrum_realloc_n( (void *)mem, (count), sizeof( type ) )
+
+/* Deprecated */
+#define libspectrum_calloc libspectrum_malloc0_n
 
 /* Attempt to identify a given file */
 

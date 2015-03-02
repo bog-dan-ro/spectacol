@@ -29,6 +29,12 @@
 
 #include "internals.h"
 
+/* We don't want the macro from libspectrum.h */
+#undef libspectrum_calloc
+
+/* Deprecated, removed from header in favour of macro. */
+void* libspectrum_calloc( size_t nmemb, size_t size );
+
 libspectrum_malloc_fn_t libspectrum_malloc_fn = malloc;
 libspectrum_calloc_fn_t libspectrum_calloc_fn = calloc;
 libspectrum_realloc_fn_t libspectrum_realloc_fn = realloc;
@@ -54,7 +60,7 @@ libspectrum_malloc_n( size_t nmemb, size_t size )
 }
 
 void*
-libspectrum_calloc( size_t nmemb, size_t size )
+libspectrum_malloc0_n( size_t nmemb, size_t size )
 {
   void *ptr;
 
@@ -66,6 +72,12 @@ libspectrum_calloc( size_t nmemb, size_t size )
   if( ( nmemb * size ) && !ptr ) abort();
 
   return ptr;
+}
+
+void*
+libspectrum_calloc( size_t nmemb, size_t size )
+{
+  return libspectrum_malloc0_n( nmemb, size );
 }
 
 void*
