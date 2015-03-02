@@ -427,9 +427,6 @@ static struct read_chunk_t read_chunks[] = {
 
 };
 
-static size_t read_chunks_count =
-  sizeof( read_chunks ) / sizeof( struct read_chunk_t );
-
 static libspectrum_error
 read_chunk_header( char *id, libspectrum_dword *data_length, 
 		   const libspectrum_byte **buffer,
@@ -472,7 +469,7 @@ read_chunk( libspectrum_snap *snap, const libspectrum_byte **buffer,
 
   done = 0;
 
-  for( i = 0; !done && i < read_chunks_count; i++ ) {
+  for( i = 0; !done && i < ARRAY_SIZE( read_chunks ); i++ ) {
 
     if( !strcmp( id, read_chunks[i].id ) ) {
       error = read_chunks[i].function( snap, &compression, buffer, end,

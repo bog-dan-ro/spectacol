@@ -51,6 +51,32 @@
 #endif				/* _MSC_VER > 1200 */
 #endif				/* #ifdef _MSC_VER */
 
+#if defined(__GNUC__) && defined(__GNUC_MINOR__)
+  #define GNUC_VERSION \
+    (__GNUC__ << 16) + __GNUC_MINOR__
+  #define GNUC_PREREQ(maj, min) \
+    (GNUC_VERSION >= ((maj) << 16) + (min))
+#else
+  #define GNUC_PREREQ(maj, min) 0
+#endif
+
+#define BUILD_BUG_ON_ZERO(e) \
+  (sizeof(struct { int:-!!(e) * 1234; }))
+
+#if GNUC_PREREQ(3, 1)
+  #define SAME_TYPE(a, b) \
+    __builtin_types_compatible_p(typeof(a), typeof(b))
+  #define MUST_BE_ARRAY(a) \
+    BUILD_BUG_ON_ZERO(SAME_TYPE((a), &(*a)))
+#else
+  #define MUST_BE_ARRAY(a) \
+    BUILD_BUG_ON_ZERO(sizeof(a) % sizeof(*a))
+#endif
+
+#define ARRAY_SIZE(a) ( \
+  (sizeof(a) / sizeof(*a)) \
+   + MUST_BE_ARRAY(a))
+
 /* VC6 lacks M_LN2, and VS2003+ require _USE_MATH_DEFINES defined before math.h
  */
 #ifndef M_LN2

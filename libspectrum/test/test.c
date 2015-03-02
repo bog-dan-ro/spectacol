@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "internals.h"
 #include "test.h"
 
 const char *progname;
@@ -770,7 +771,7 @@ static struct test_description tests[] = {
   { test_27, "Reading old SZX file", 0 },
 };
 
-static size_t test_count = sizeof( tests ) / sizeof( tests[0] );
+static size_t test_count = ARRAY_SIZE( tests );
 
 static void
 parse_test_specs( char **specs, int count )

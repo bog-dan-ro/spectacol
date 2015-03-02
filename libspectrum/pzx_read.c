@@ -69,9 +69,6 @@ static struct info_t info_ids[] = {
 
 };
 
-static size_t info_ids_count =
-  sizeof( info_ids ) / sizeof( struct info_t );
-
 #define PZX_PULSE  "PULS"
 
 #define PZX_DATA   "DATA"
@@ -118,7 +115,7 @@ info_t_compar(const void *a, const void *b)
 static int
 get_id_byte( char *info_tag ) {
   struct info_t *info =
-    (struct info_t*)bsearch( info_tag, info_ids, info_ids_count,
+    (struct info_t*)bsearch( info_tag, info_ids, ARRAY_SIZE( info_ids ),
                              sizeof( struct info_t ), info_t_compar );
   return info == NULL ? -1 : info->archive_info_id;
 }
@@ -514,9 +511,6 @@ static struct read_block_t read_blocks[] = {
 
 };
 
-static size_t read_blocks_count =
-  sizeof( read_blocks ) / sizeof( struct read_block_t );
-
 static libspectrum_error
 read_block_header( char *id, libspectrum_dword *data_length, 
 		   const libspectrum_byte **buffer,
@@ -558,7 +552,7 @@ read_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
 
   done = 0;
 
-  for( i = 0; !done && i < read_blocks_count; i++ ) {
+  for( i = 0; !done && i < ARRAY_SIZE( read_blocks ); i++ ) {
 
     if( !memcmp( id, read_blocks[i].id, 4 ) ) {
       error = read_blocks[i].function( tape, buffer, end, data_length, ctx );
