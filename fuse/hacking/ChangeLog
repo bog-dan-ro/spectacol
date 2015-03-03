@@ -4655,3 +4655,6 @@
 20150303 debugger/{commandy.y,expression.c},mempool.[ch],unittests/unittests.c:
          rename mempool_alloc() to mempool_malloc() to match libspectrum and
          GLib (Stuart).
+20150303 debugger/commandy.y,debugger/expression.c,mempool.[ch],
+         unittests/unittests.c: add and use mempool_new() macro (Stuart).
+

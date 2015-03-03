@@ -150,7 +150,7 @@ debugger_expression_new_number( libspectrum_dword number, int pool )
 {
   debugger_expression *exp;
 
-  exp = mempool_malloc( pool, sizeof( *exp ) );
+  exp = mempool_new( pool, debugger_expression, 1 );
   if( !exp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return NULL;
@@ -168,7 +168,7 @@ debugger_expression_new_register( int which, int pool )
 {
   debugger_expression *exp;
 
-  exp = mempool_malloc( pool, sizeof( *exp ) );
+  exp = mempool_new( pool, debugger_expression, 1 );
   if( !exp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return NULL;
@@ -187,7 +187,7 @@ debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
 {
   debugger_expression *exp;
 
-  exp = mempool_malloc( pool, sizeof( *exp ) );
+  exp = mempool_new( pool, debugger_expression, 1 );
   if( !exp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return NULL;
@@ -210,7 +210,7 @@ debugger_expression_new_unaryop( int operation, debugger_expression *operand,
 {
   debugger_expression *exp;
 
-  exp = mempool_malloc( pool, sizeof( *exp ) );
+  exp = mempool_new( pool, debugger_expression, 1 );
   if( !exp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return NULL;
@@ -230,7 +230,7 @@ debugger_expression_new_variable( const char *name, int pool )
 {
   debugger_expression *exp;
 
-  exp = mempool_malloc( pool, sizeof( *exp ) );
+  exp = mempool_new( pool, debugger_expression, 1 );
   if( !exp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return NULL;

@@ -238,9 +238,13 @@ mempool_test( void )
 
   TEST_ASSERT( mempool_get_pool_size( pool1 ) == 1 );
 
-  mempool_malloc( pool1, 42 );
+  mempool_malloc_n( pool1, 42, 4 );
 
   TEST_ASSERT( mempool_get_pool_size( pool1 ) == 2 );
+
+  mempool_new( pool1, libspectrum_word, 5 );
+
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 3 );
 
   mempool_free( pool1 );
 
@@ -255,13 +259,21 @@ mempool_test( void )
 
   TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
 
+  mempool_malloc_n( pool1, 6, 7 );
+
+  TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
+
+  mempool_new( pool1, libspectrum_byte, 5 );
+
+  TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
+
   mempool_malloc( pool2, 42 );
   
   TEST_ASSERT( mempool_get_pool_size( pool2 ) == 1 );
 
   mempool_free( pool2 );
 
-  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 1 );
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 3 );
   TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
   
   mempool_free( pool1 );
