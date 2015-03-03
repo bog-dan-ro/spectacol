@@ -209,7 +209,8 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
       sizeof(one) ) == -1 ) {
       nic_w5100_error( UI_ERROR_ERROR,
         "w5100: failed to set SO_REUSEADDR on socket %d; errno %d: %s\n",
-        socket_obj->id, compat_socket_get_error(), compat_socket_get_error() );
+        socket_obj->id, compat_socket_get_error(),
+        compat_socket_get_strerror() );
     }
 #endif
 
