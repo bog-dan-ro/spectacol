@@ -30,7 +30,7 @@ extern const int MEMPOOL_UNTRACKED;
 
 void mempool_init( void );
 int mempool_register_pool( void );
-void* mempool_alloc( int pool, size_t size );
+void* mempool_malloc( int pool, size_t size );
 char* mempool_strdup( int pool, const char *string );
 void mempool_free( int pool );
 void mempool_end( void );

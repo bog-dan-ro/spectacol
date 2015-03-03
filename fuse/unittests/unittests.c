@@ -234,11 +234,11 @@ mempool_test( void )
   TEST_ASSERT( mempool_get_pools() == initial_pools + 1 );
   TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
 
-  mempool_alloc( pool1, 23 );
+  mempool_malloc( pool1, 23 );
 
   TEST_ASSERT( mempool_get_pool_size( pool1 ) == 1 );
 
-  mempool_alloc( pool1, 42 );
+  mempool_malloc( pool1, 42 );
 
   TEST_ASSERT( mempool_get_pool_size( pool1 ) == 2 );
 
@@ -251,11 +251,11 @@ mempool_test( void )
   TEST_ASSERT( mempool_get_pools() == initial_pools + 2 );
   TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
 
-  mempool_alloc( pool1, 23 );
+  mempool_malloc( pool1, 23 );
 
   TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
 
-  mempool_alloc( pool2, 42 );
+  mempool_malloc( pool2, 42 );
   
   TEST_ASSERT( mempool_get_pool_size( pool2 ) == 1 );
 

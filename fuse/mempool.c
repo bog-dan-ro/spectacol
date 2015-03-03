@@ -57,7 +57,7 @@ mempool_register_pool( void )
 }
 
 void*
-mempool_alloc( int pool, size_t size )
+mempool_malloc( int pool, size_t size )
 {
   void *ptr;
 
@@ -78,7 +78,7 @@ mempool_strdup( int pool, const char *string )
 {
   size_t length = strlen( string ) + 1;
 
-  char *ptr = mempool_alloc( pool, length );
+  char *ptr = mempool_malloc( pool, length );
   if( !ptr ) return NULL;
 
   memcpy( ptr, string, length );

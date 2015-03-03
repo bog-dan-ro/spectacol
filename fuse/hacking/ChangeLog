@@ -4652,3 +4652,6 @@
 20150302 fuse.c,memory.c,peripherals/disk/disk.c,rzx.c,settings.pl,slt.c,tape.c,
          ui/widget/text.c,utils.c: use libspectrum_{new,new0,renew}() macros
          where sizeof(elem) == 1 (Stuart).
+20150303 debugger/{commandy.y,expression.c},mempool.[ch],unittests/unittests.c:
+         rename mempool_alloc() to mempool_malloc() to match libspectrum and
+         GLib (Stuart).
