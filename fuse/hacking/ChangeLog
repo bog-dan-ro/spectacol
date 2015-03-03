@@ -4657,4 +4657,5 @@
          GLib (Stuart).
 20150303 debugger/commandy.y,debugger/expression.c,mempool.[ch],
          unittests/unittests.c: add and use mempool_new() macro (Stuart).
-
+20150303 peripherals/disk/{fdd.[ch],upd_fdc.c,wd_fdc.c}: use separate functions
+         for reading and writing (Stuart).

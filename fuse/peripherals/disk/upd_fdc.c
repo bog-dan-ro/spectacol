@@ -182,16 +182,16 @@ read_id( upd_fdc *f )
   f->id_mark = UPD_FDC_AM_NONE;
   i = f->rev;
   while( i == f->rev && d->ready ) {
-    fdd_read_write_data( d, FDD_READ ); if( d->index ) f->rev--;
+    fdd_read_data( d ); if( d->index ) f->rev--;
     crc_preset( f );
     if( f->mf ) {	/* double density (MFM) */
       if( d->data == 0xffa1 ) {
         crc_add( f, d );
-	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+	fdd_read_data( d ); crc_add( f, d );
 	if( d->index ) f->rev--;
 	if( d->data != 0xffa1 )
 	  continue;
-	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+	fdd_read_data( d ); crc_add( f, d );
 	if( d->index ) f->rev--;
 	if( d->data != 0xffa1 )
 	  continue;
@@ -199,7 +199,7 @@ read_id( upd_fdc *f )
 	continue;
       }
     }
-    fdd_read_write_data( d, FDD_READ );
+    fdd_read_data( d );
     if( d->index ) f->rev--;
     if( f->mf ) {	/* double density (MFM) */
       if( d->data != 0x00fe )
@@ -209,22 +209,22 @@ read_id( upd_fdc *f )
 	continue;
     }
     crc_add( f, d );
-    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    fdd_read_data( d ); crc_add( f, d );
     if( d->index ) f->rev--;
     f->id_track = d->data;
-    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    fdd_read_data( d ); crc_add( f, d );
     if( d->index ) f->rev--;
     f->id_head = d->data;
-    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    fdd_read_data( d ); crc_add( f, d );
     if( d->index ) f->rev--;
     f->id_sector = d->data;
-    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    fdd_read_data( d ); crc_add( f, d );
     if( d->index ) f->rev--;
     f->id_length = d->data > MAX_SIZE_CODE ? MAX_SIZE_CODE : d->data;
     f->sector_length = 0x80 << f->id_length; 
-    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    fdd_read_data( d ); crc_add( f, d );
     if( d->index ) f->rev--;
-    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    fdd_read_data( d ); crc_add( f, d );
     if( d->index ) f->rev--;
 
     if( f->crc != 0x0000 ) {
@@ -255,7 +255,7 @@ read_datamark( upd_fdc *f )
 
   if( f->mf ) {	/* double density (MFM) */
     for( i = 40; i > 0; i-- ) {
-      fdd_read_write_data( d, FDD_READ );
+      fdd_read_data( d );
       if( d->data == 0x4e )		/* read next */
 	continue;
 
@@ -267,7 +267,7 @@ read_datamark( upd_fdc *f )
     } 
     for( ; i > 0; i-- ) {
       crc_preset( f );
-      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      fdd_read_data( d ); crc_add( f, d );
       if( d->data == 0x00 )
 	continue;
 
@@ -278,13 +278,13 @@ read_datamark( upd_fdc *f )
       return 1;
     }
     for( i = d->data == 0xffa1 ? 2 : 3; i > 0; i-- ) {
-      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      fdd_read_data( d ); crc_add( f, d );
       if( d->data != 0xffa1 ) {
         f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
 	return 1;
       }
     } 
-    fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+    fdd_read_data( d ); crc_add( f, d );
     if( d->data < 0x00f8 || d->data > 0x00fb ) { /* !fb deleted mark */
       f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
       return 1;
@@ -296,7 +296,7 @@ read_datamark( upd_fdc *f )
     return 0;
   } else {		/* SD -> FM */
     for( i = 30; i > 0; i-- ) {
-      fdd_read_write_data( d, FDD_READ );
+      fdd_read_data( d );
       if( d->data == 0xff )		/* read next */
 	continue;
 
@@ -308,7 +308,7 @@ read_datamark( upd_fdc *f )
     } 
     for( ; i > 0; i-- ) {
       crc_preset( f );
-      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      fdd_read_data( d ); crc_add( f, d );
       if( d->data == 0x00 )
 	continue;
 
@@ -319,7 +319,7 @@ read_datamark( upd_fdc *f )
       return 1;
     }
     if( i == 0 ) {
-      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      fdd_read_data( d ); crc_add( f, d );
       if( d->data < 0xfff8 || d->data > 0xfffb ) {	/* !fb deleted mark */
         f->status_register[2] |= UPD_FDC_ST2_MISSING_DM;
 	return 1;
@@ -734,24 +734,24 @@ multi_track_next:
     }
 
     for( i = 11; i > 0; i-- )	/* "delay" 11 GAP byte */
-      fdd_read_write_data( d, FDD_READ );
+      fdd_read_data( d );
     if( f->mf )					/* MFM */
       for( i = 11; i > 0; i-- )	/* "delay" another 11 GAP byte */
-	fdd_read_write_data( d, FDD_READ );
+	fdd_read_data( d );
 
     d->data = 0x00;
     for( i = f->mf ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
-      fdd_read_write_data( d, FDD_WRITE );
+      fdd_write_data( d );
     crc_preset( f );
     if( f->mf ) {				/* MFM */
       d->data = 0xffa1;
       for( i = 3; i > 0; i-- ) {		/* write 3 0xa1 with clock mark */
-	fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
+	fdd_write_data( d ); crc_add( f, d );
       }
     }
     d->data = ( f->del_data ? 0x00f8 : 0x00fb ) |
     			( f->mf ? 0x0000 : 0xff00 );	/* write data mark */
-    fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
+    fdd_write_data( d ); crc_add( f, d );
   } else {
     f->data_register[1]++;		/* next track */
     f->data_register[3] = 1;		/* first sector */
@@ -791,29 +791,29 @@ start_write_id( upd_fdc *f )
 
   d->data = f->mf ? 0x4e : 0xff;
   for( i = 40; i > 0; i-- )	/* write 40 GAP byte */
-    fdd_read_write_data( d, FDD_WRITE );
+    fdd_write_data( d );
   if( f->mf )					/* MFM */
     for( i = 40; i > 0; i-- )	/* write another 40 GAP byte */
-      fdd_read_write_data( d, FDD_WRITE );
+      fdd_write_data( d );
   d->data = 0x00;
   for( i = f->mf ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
-    fdd_read_write_data( d, FDD_WRITE );
+    fdd_write_data( d );
   crc_preset( f );
   if( f->mf ) {				/* MFM */
     d->data = 0xffc2;
     for( i = 3; i > 0; i-- ) {		/* write 3 0xc2 with clock mark */
-      fdd_read_write_data( d, FDD_WRITE );
+      fdd_write_data( d );
     }
   }
   d->data = 0x00fc | ( f->mf ? 0x0000 : 0xff00 );	/* write index mark */
-  fdd_read_write_data( d, FDD_WRITE );
+  fdd_write_data( d );
 
   d->data = f->mf ? 0x4e : 0xff;	/* postindex GAP */
   for( i = 26; i > 0; i-- )	/* write 26 GAP byte */
-    fdd_read_write_data( d, FDD_WRITE );
+    fdd_write_data( d );
   if( f->mf )					/* MFM */
     for( i = 24; i > 0; i-- )	/* write another 24 GAP byte */
-      fdd_read_write_data( d, FDD_WRITE );
+      fdd_write_data( d );
 
   f->main_status |= UPD_FDC_MAIN_DATAREQ | UPD_FDC_MAIN_DATA_WRITE;
   f->data_offset = 0;
@@ -916,7 +916,7 @@ upd_fdc_read_data( upd_fdc *f )
 
   if( f->state == UPD_FDC_STATE_EXE ) {		/* READ_DATA/READ_DIAG */
     f->data_offset++;				/* count read bytes */
-    fdd_read_write_data( d, FDD_READ ); crc_add( f, d ); /* read a byte */
+    fdd_read_data( d ); crc_add( f, d );	/* read a byte */
 
     /* Speedlock hack */
     if( f->speedlock > 0 && !d->do_read_weak ) {	/* do not conflict with fdd weak reads */
@@ -933,14 +933,14 @@ upd_fdc_read_data( upd_fdc *f )
     r = d->data & 0xff;
     if( f->data_offset == f->rlen ) {	/* send only rlen byte to host */
       while( f->data_offset < f->sector_length ) {
-	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+	fdd_read_data( d ); crc_add( f, d );
 	f->data_offset++;
       }
     }
     if( ( f->cmd->id == UPD_CMD_READ_DIAG || f->cmd->id == UPD_CMD_READ_DATA )
         && f->data_offset == f->sector_length ) {       /* read the CRC */
-      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
-      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      fdd_read_data( d ); crc_add( f, d );
+      fdd_read_data( d ); crc_add( f, d );
       if( f->crc != 0x000 ) {
 	f->status_register[2] |= UPD_FDC_ST2_DATA_ERROR;
 	f->status_register[1] |= UPD_FDC_ST1_CRC_ERROR;
@@ -1022,56 +1022,56 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
 
         d->data = 0x00;
         for( i = f->mf ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
-          fdd_read_write_data( d, FDD_WRITE );
+          fdd_write_data( d );
         crc_preset( f );
         if( f->mf ) {				/* MFM */
           d->data = 0xffa1;
           for( i = 3; i > 0; i-- ) {		/* write 3 0xa1 with clock mark */
-	    fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
+	    fdd_write_data( d ); crc_add( f, d );
           }
         }
         d->data = 0x00fe | ( f->mf ? 0x0000 : 0xff00 );	/* write id mark */
-        fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
+        fdd_write_data( d ); crc_add( f, d );
 	for( i = 0; i < 4; i++ ) {
     	  d->data =  f->data_register[i + 5];	/* write id fields */
-          fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
+          fdd_write_data( d ); crc_add( f, d );
 	}
         d->data = f->crc >> 8;
-        fdd_read_write_data( d, FDD_WRITE );	/* write crc1 */
+        fdd_write_data( d );			/* write crc1 */
         d->data = f->crc & 0xff;
-        fdd_read_write_data( d, FDD_WRITE );	/* write crc2 */
+        fdd_write_data( d );			/* write crc2 */
 
         d->data = f->mf ? 0x4e : 0xff;
         for( i = 11; i > 0; i-- )	/* write 11 GAP byte */
-          fdd_read_write_data( d, FDD_WRITE );
+          fdd_write_data( d );
         if( f->mf )					/* MFM */
           for( i = 11; i > 0; i-- )	/* write another 11 GAP byte */
-	    fdd_read_write_data( d, FDD_WRITE );
+	    fdd_write_data( d );
         d->data = 0x00;
         for( i = f->mf ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
-          fdd_read_write_data( d, FDD_WRITE );
+          fdd_write_data( d );
         crc_preset( f );
         if( f->mf ) {				/* MFM */
           d->data = 0xffa1;
           for( i = 3; i > 0; i-- ) {		/* write 3 0xa1 with clock mark */
-	    fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
+	    fdd_write_data( d ); crc_add( f, d );
           }
         }
         d->data = 0x00fb | ( f->mf ? 0x0000 : 0xff00 );	/* write data mark */
-        fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
+        fdd_write_data( d ); crc_add( f, d );
 	
     	d->data =  f->data_register[4];	/* write filler byte */
 	for( i = f->rlen; i > 0; i-- ) {
-          fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
+          fdd_write_data( d ); crc_add( f, d );
 	}
         d->data = f->crc >> 8;
-        fdd_read_write_data( d, FDD_WRITE );	/* write crc1 */
+        fdd_write_data( d );			/* write crc1 */
         d->data = f->crc & 0xff;
-        fdd_read_write_data( d, FDD_WRITE );	/* write crc2 */
+        fdd_write_data( d );			/* write crc2 */
 
         d->data = f->mf ? 0x4e : 0xff;
 	for( i = f->data_register[3]; i > 0; i-- ) {	/* GAP */
-          fdd_read_write_data( d, FDD_WRITE );
+          fdd_write_data( d );
 	}
         f->data_offset = 0;
 	f->data_register[2]--;		/* prepare next sector */
@@ -1080,7 +1080,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
 
         d->data = f->mf ? 0x4e : 0xff;	/* GAP3 as Intel call this GAP */
         while( !d->index )
-          fdd_read_write_data( d, FDD_WRITE );
+          fdd_write_data( d );
 
 
 	f->state = UPD_FDC_STATE_RES;	/* end of execution phase */
@@ -1097,27 +1097,27 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
     } else if( f->cmd->id == UPD_CMD_WRITE_DATA ) {		/* WRITE DATA */
       f->data_offset++;
       d->data = data;
-      fdd_read_write_data( d, FDD_WRITE ); crc_add( f, d );
+      fdd_write_data( d ); crc_add( f, d );
     
       if( f->data_offset == f->rlen ) {	/* read only rlen byte from host */
         d->data = 0x00;
         while( f->data_offset < f->sector_length ) {	/* fill with 0x00 */
-	  fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+	  fdd_read_data( d ); crc_add( f, d );
 	  f->data_offset++;
         }
       }
       if( f->data_offset == f->sector_length ) {	/* write the CRC */
         d->data = f->crc >> 8;
-        fdd_read_write_data( d, FDD_WRITE );	/* write crc1 */
+        fdd_write_data( d );			/* write crc1 */
         d->data = f->crc & 0xff;
-        fdd_read_write_data( d, FDD_WRITE );	/* write crc2 */
+        fdd_write_data( d );			/* write crc2 */
         f->main_status &= ~UPD_FDC_MAIN_DATAREQ;
 	start_write_data( f );
       }
       return;
     } else {						/* SCAN */
       f->data_offset++;
-      fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+      fdd_read_data( d ); crc_add( f, d );
       if( f->data_offset == 0 && d->data == data )	/* `scan hit' */
         f->status_register[2] |= UPD_FDC_ST2_SCAN_HIT;
 
@@ -1131,8 +1131,8 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       }
     
       if( f->data_offset == f->sector_length ) {	/* read the CRC */
-	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
-	fdd_read_write_data( d, FDD_READ ); crc_add( f, d );
+	fdd_read_data( d ); crc_add( f, d );
+	fdd_read_data( d ); crc_add( f, d );
 	if( f->crc != 0x000 ) {
 	  f->status_register[2] |= UPD_FDC_ST2_DATA_ERROR;
 	  f->status_register[1] |= UPD_FDC_ST1_CRC_ERROR;

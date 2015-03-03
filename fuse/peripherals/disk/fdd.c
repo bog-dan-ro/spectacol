@@ -43,6 +43,11 @@
 #define FDD_MAX_TRACK 99		/* absolute maximum number of track*/
 #define FDD_TRACK_TRESHOLD 10		/* unreadable disk*/
 
+typedef enum fdd_write_t {
+  FDD_READ = 0,
+  FDD_WRITE,
+} fdd_write_t;
+
 static const char *fdd_error[] = {
   "OK",
   "invalid disk geometry",
@@ -312,7 +317,7 @@ fdd_step( fdd_t *d, fdd_dir_t direction )
 }
 
 /* read/write next byte from/to sector */
-int
+static int
 fdd_read_write_data( fdd_t *d, fdd_write_t write )
 {
   if( !d->selected || !d->ready || !d->loadhead || d->disk.track == NULL ) {
@@ -373,6 +378,20 @@ fdd_read_write_data( fdd_t *d, fdd_write_t write )
   d->index = d->disk.i >= d->c_bpt ? 1 : 0;
 
   return d->status = FDD_OK;
+}
+
+/* read next byte from sector */
+int
+fdd_read_data( fdd_t *d )
+{
+  return fdd_read_write_data( d, FDD_READ );
+}
+
+/* write next byte to sector */
+int
+fdd_write_data( fdd_t *d )
+{
+  return fdd_read_write_data( d, FDD_WRITE );
 }
 
 void fdd_flip( fdd_t *d, int upsidedown )

@@ -221,15 +221,15 @@ read_id( wd_fdc *f )
   while( i == f->rev ) {
     crc_preset( f );
     if( f->dden ) {	/* double density (MFM) */
-      fdd_read_write_data( d, FDD_READ );
+      fdd_read_data( d );
       if( d->index ) f->rev--;
       crc_add(f, d);
       if( d->data == 0xffa1 ) {
-        fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+        fdd_read_data( d ); crc_add(f, d);
         if( d->index ) f->rev--;
         if( d->data != 0xffa1 )
           continue;
-        fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+        fdd_read_data( d ); crc_add(f, d);
         if( d->index ) f->rev--;
         if( d->data != 0xffa1 )
           continue;
@@ -237,7 +237,7 @@ read_id( wd_fdc *f )
         continue;
       }
     }
-    fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+    fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     if( f->dden ) {	/* double density (MFM) */
       if( d->data != 0x00fe )
@@ -246,22 +246,22 @@ read_id( wd_fdc *f )
       if( d->data != 0xfffe )
         continue;
     }
-    fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+    fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     f->id_track = d->data;
-    fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+    fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     f->id_head = d->data;
-    fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+    fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     f->id_sector = d->data;
-    fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+    fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     f->id_length = d->data;
     f->sector_length = 0x80 << d->data; 
-    fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+    fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
-    fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+    fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     if( f->crc != 0x0000 ) {
       f->status_register |= WD_FDC_SR_CRCERR;
@@ -286,7 +286,7 @@ read_datamark( wd_fdc *f )
 
   if( f->dden ) {	/* double density (MFM) */
     for( i = 40; i > 0; i-- ) {
-      fdd_read_write_data( d, FDD_READ );
+      fdd_read_data( d );
       if( d->data == 0x4e )		/* read next */
 	continue;
 
@@ -297,7 +297,7 @@ read_datamark( wd_fdc *f )
     } 
     for( ; i > 0; i-- ) {
       crc_preset( f );
-      fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+      fdd_read_data( d ); crc_add(f, d);
       if( d->data == 0x00 )
 	continue;
 
@@ -307,11 +307,11 @@ read_datamark( wd_fdc *f )
       return 1;
     }
     for( i = d->data == 0xffa1 ? 2 : 3; i > 0; i-- ) {
-      fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+      fdd_read_data( d ); crc_add(f, d);
       if( d->data != 0xffa1 )
 	return 1;
     } 
-    fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+    fdd_read_data( d ); crc_add(f, d);
     if( d->data < 0x00f8 || d->data > 0x00fb )	/* !fb deleted mark */
       return 1;
     if( d->data != 0x00fb )
@@ -322,7 +322,7 @@ read_datamark( wd_fdc *f )
     return 0;
   } else {		/* SD -> FM */
     for( i = 30; i > 0; i-- ) {
-      fdd_read_write_data( d, FDD_READ );
+      fdd_read_data( d );
       if( d->data == 0xff )		/* read next */
 	continue;
 
@@ -333,7 +333,7 @@ read_datamark( wd_fdc *f )
     } 
     for( ; i > 0; i-- ) {
       crc_preset( f );
-      fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+      fdd_read_data( d ); crc_add(f, d);
       if( d->data == 0x00 )
 	continue;
 
@@ -343,7 +343,7 @@ read_datamark( wd_fdc *f )
       return 1;
     }
     if( i == 0 ) {
-      fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+      fdd_read_data( d ); crc_add(f, d);
       if( d->data < 0xfff8 || d->data > 0xfffb )	/* !fb deleted mark */
 	return 1;
     }
@@ -609,26 +609,26 @@ wd_fdc_type_ii_seek( wd_fdc *f )
   } else {
     f->ddam = b & 0x01;
     for( i = 11; i > 0; i-- )	/* "delay" 11 GAP byte */
-      fdd_read_write_data( d, FDD_READ );
+      fdd_read_data( d );
     wd_fdc_set_datarq( f );
     f->data_offset = 0;
     if( f->dden )
       for( i = 11; i > 0; i-- )	/* "delay" another 11 GAP byte */
-	fdd_read_write_data( d, FDD_READ );
+	fdd_read_data( d );
 
     d->data = 0x00;
     for( i = f->dden ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
-      fdd_read_write_data( d, FDD_WRITE );
+      fdd_write_data( d );
     crc_preset( f );
     if( f->dden ) {				/* MFM */
       d->data = 0xffa1;
       for( i = 3; i > 0; i-- ) {		/* write 3 0xa1 with clock mark */
-	fdd_read_write_data( d, FDD_WRITE ); crc_add(f, d);
+	fdd_write_data( d ); crc_add(f, d);
       }
     }
     d->data = ( f->ddam ? 0x00f8 : 0x00fb ) |
     			( f->dden ? 0x0000 : 0xff00 );	/* write data mark */
-    fdd_read_write_data( d, FDD_WRITE ); crc_add(f, d);
+    fdd_write_data( d ); crc_add(f, d);
   }
   event_remove_type( timeout_event );
   event_add_with_data( tstates + 			/* 5 revolutions: 5 * 200 / 1000 */
@@ -1039,7 +1039,7 @@ wd_fdc_dr_read( wd_fdc *f )
 
   if( f->state == WD_FDC_STATE_READ ) {
     f->data_offset++;				/* count read bytes */
-    fdd_read_write_data( d, FDD_READ ); crc_add(f, d); /* read a byte */
+    fdd_read_data( d ); crc_add(f, d);		/* read a byte */
     if( d->data > 0xff ) {			/* no data */
       f->status_register |= WD_FDC_SR_RNF;
       f->status_register &= ~WD_FDC_SR_BUSY;
@@ -1050,8 +1050,8 @@ wd_fdc_dr_read( wd_fdc *f )
     } else {
       f->data_register = d->data;
       if( f->data_offset == f->sector_length ) {	/* read the CRC */
-	fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
-	fdd_read_write_data( d, FDD_READ ); crc_add(f, d);
+	fdd_read_data( d ); crc_add(f, d);
+	fdd_read_data( d ); crc_add(f, d);
 
 	/* FIXME: make this per-FDC */
 	event_remove_type( timeout_event );	/* clear the timeout */
@@ -1112,7 +1112,7 @@ wd_fdc_dr_read( wd_fdc *f )
     f->data_offset++;
   } else if( f->state == WD_FDC_STATE_READTRACK ) {
 						/* unformatted/out of track looks like 1x 0x00 */
-    fdd_read_write_data( d, FDD_READ );	/* read a byte and give to host */
+    fdd_read_data( d );			/* read a byte and give to host */
     f->data_register = d->data & 0x00ff;	/* drop clock marks */
     if( d->index ) {
       event_remove_type( timeout_event );	/* clear the timeout */
@@ -1141,14 +1141,14 @@ wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b )
   if( f->state == WD_FDC_STATE_WRITE ) {
     d->data = b;
     f->data_offset++;				/* count bytes read */
-    fdd_read_write_data( d, FDD_WRITE ); crc_add(f, d);
+    fdd_write_data( d ); crc_add(f, d);
     if( f->data_offset == f->sector_length ) {	/* write the CRC */
       d->data = f->crc >> 8;
-      fdd_read_write_data( d, FDD_WRITE );	/* write crc1 */
+      fdd_write_data( d );			/* write crc1 */
       d->data = f->crc & 0xff;
-      fdd_read_write_data( d, FDD_WRITE );	/* write crc2 */
+      fdd_write_data( d );			/* write crc2 */
       d->data = 0xff;
-      fdd_read_write_data( d, FDD_WRITE );	/* write 1 byte of ff? */
+      fdd_write_data( d );			/* write 1 byte of ff? */
 
       event_remove_type( timeout_event );	/* clear the timeout */
 
@@ -1175,7 +1175,7 @@ wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b )
     if( f->dden ) {			/* MFM */
       if( b == 0xf7 ) {			/* CRC */
 	d->data = f->crc >> 8;
-	fdd_read_write_data( d, FDD_WRITE );	/* write crc1 */
+	fdd_write_data( d );			/* write crc1 */
 	d->data = f->crc & 0xff;
       } else if ( b == 0xf5 ) {
 	d->data = 0xffa1;		/* and preset CRC */
@@ -1188,7 +1188,7 @@ wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b )
     } else {				/* FM */
       if( b == 0xf7 ) {			/* CRC */
 	d->data = f->crc >> 8;
-	fdd_read_write_data( d, FDD_WRITE );	/* write crc1 */
+	fdd_write_data( d );			/* write crc1 */
 	d->data = f->crc & 0xff;
       } else if ( b == 0xfe || ( b >= 0xf8 && b <= 0xfb ) ) {
 	crc_preset( f );		/* preset CRC */
@@ -1200,7 +1200,7 @@ wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b )
 	crc_add(f, d);
       }
     }
-    fdd_read_write_data( d, FDD_WRITE );	/* write a byte */
+    fdd_write_data( d );			/* write a byte */
 
     if( d->index ) {
       event_remove_type( timeout_event );	/* clear the timeout */

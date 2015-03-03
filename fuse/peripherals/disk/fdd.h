@@ -66,11 +66,6 @@ typedef enum fdd_type_t {
   FDD_IBMPC,
 } fdd_type_t;
 
-typedef enum fdd_write_t {
-  FDD_READ = 0,
-  FDD_WRITE,
-} fdd_write_t;
-
 typedef enum fdd_dir_t {
   FDD_STEP_OUT = 0,
   FDD_STEP_IN = 1,
@@ -143,12 +138,17 @@ void fdd_head_load( fdd_t *d, int load );
 void fdd_select( fdd_t *d, int select );
 /* select (1) or unselect (0) FDD */
 void fdd_flip( fdd_t *d, int upsidedown );
-/* read or write next 1 byte from disk. if read, the read byte go into
-   d->data, if write d->data written to disk. if d->data = 0xffnn then this
-   byte recorded with different clock 'mark'. set d->idx if reach 'index hole'
-   read 0x0100 if disk unreadable or not motor on and/or head not loaded.
+/* Read the next byte from disk. The byte will go into d->data.
+   If d->data = 0xffnn then this byte was recorded with different clock 'mark'.
+   d->idx is set if we reach the 'index hole'.  0x0100 is read if the disk is
+   unreadable, the motor is not on, or the head is not loaded.
 */
-int fdd_read_write_data( fdd_t *d, fdd_write_t write );
+int fdd_read_data( fdd_t *d );
+/* Write the next byte to disk. The byte is taken from d->data.
+   If d->data = 0xffnn then this byte recorded with different clock 'mark'.
+   d->idx is set if we reach the 'index hole'.
+*/
+int fdd_write_data( fdd_t *d );
 /* set write protect status on loaded disk */
 void fdd_wrprot( fdd_t *d, int wrprot );
 /* to reach index hole */
