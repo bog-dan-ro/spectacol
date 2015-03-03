@@ -4659,3 +4659,5 @@
          unittests/unittests.c: add and use mempool_new() macro (Stuart).
 20150303 peripherals/disk/{fdd.[ch],upd_fdc.c,wd_fdc.c}: use separate functions
          for reading and writing (Stuart).
+20150303 peripherals/nic/w5100_internals.h,ui/ui.h: add missing GCC_PRINTF
+         annotations (Stuart).

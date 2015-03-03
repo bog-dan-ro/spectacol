@@ -164,8 +164,11 @@ void nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
 /* Define this to spew debugging info to stdout */
 #define W5100_DEBUG 0
 
-void nic_w5100_debug( const char *format, ... );
-void nic_w5100_vdebug( const char *format, va_list ap );
-void nic_w5100_error( int severity, const char *format, ... );
+void nic_w5100_debug( const char *format, ... )
+     GCC_PRINTF( 1, 2 );
+void nic_w5100_vdebug( const char *format, va_list ap )
+     GCC_PRINTF( 1, 0 );
+void nic_w5100_error( int severity, const char *format, ... )
+     GCC_PRINTF( 2, 3 );
 
 #endif                          /* #ifndef FUSE_W5100_H */
