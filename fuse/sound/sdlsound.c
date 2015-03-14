@@ -60,7 +60,8 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   /* I'd rather just use setenv, but Windows doesn't have it */
   if( device ) {
     const char *environment = "SDL_AUDIODRIVER=";
-    char *command = malloc( strlen( environment ) + strlen( device ) + 1 );
+    char *command = libspectrum_new( char, strlen( environment ) +
+                                           strlen( device ) + 1 );
     strcpy( command, environment );
     strcat( command, device );
     error = putenv( command );

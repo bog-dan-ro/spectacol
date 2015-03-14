@@ -381,7 +381,7 @@ upd_fdc_alloc_fdc( upd_type_t type, upd_clock_t clock )
 {
   int i;
   
-  upd_fdc *f = malloc( sizeof( *f ) );
+  upd_fdc *f = libspectrum_new( upd_fdc, 1 );
   if( !f ) return NULL;
 
   f->type = type != UPD765B ? UPD765A : UPD765B;

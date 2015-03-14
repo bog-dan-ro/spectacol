@@ -4663,3 +4663,9 @@
          annotations (Stuart).
 20150303 peripherals/nic/w5100_socket.c: fix segfault in error handling when
          setting SO_REUSEADDR (Stuart).
+20150314 compat/{unix/socket.c,win32/socket.c},debugger/{breakpoint.c,
+         expression.c},machine.c,peripherals/{if1.c,if2.c,disk/{beta.c,opus.c,
+         plusd.c,upd_fdc.c,wd_fdc.c},flash/am29f010.c,ide/{divide.c,zxatasp.c,
+         zxcf.c},nic/{enc28j60.c,w5100.c},scld.c,spectranet.c},
+         pokefinder/pokemem.c,sound/sdlsound.c,ui/uijoystick.c: switch to using
+         libspectrum_new over raw malloc (Sergio).

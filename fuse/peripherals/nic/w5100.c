@@ -149,7 +149,7 @@ nic_w5100_alloc( void )
   
   compat_socket_networking_init();
 
-  nic_w5100_t *self = malloc( sizeof( *self ) );
+  nic_w5100_t *self = libspectrum_new( nic_w5100_t, 1 );
   if( !self ) {
     ui_error( UI_ERROR_ERROR, "%s:%d out of memory", __FILE__, __LINE__ );
     fuse_abort();
@@ -354,7 +354,7 @@ nic_w5100_from_snapshot( nic_w5100_t *self, libspectrum_byte *data )
 libspectrum_byte*
 nic_w5100_to_snapshot( nic_w5100_t *self )
 {
-  libspectrum_byte *data = malloc( 0x30 * sizeof(*data) );
+  libspectrum_byte *data = libspectrum_new( libspectrum_byte, 0x30 );
   int i;
 
   if( !data ) {

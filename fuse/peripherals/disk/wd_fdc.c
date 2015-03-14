@@ -97,7 +97,7 @@ wd_fdc_master_reset( wd_fdc *f )
 wd_fdc *
 wd_fdc_alloc_fdc( wd_type_t type, int hlt_time, unsigned int flags )
 {
-  wd_fdc *fdc = malloc( sizeof( *fdc ) );
+  wd_fdc *fdc = libspectrum_new( wd_fdc, 1 );
   if( !fdc ) return NULL;
 
   switch( type ) {

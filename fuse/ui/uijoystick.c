@@ -150,7 +150,8 @@ ui_joystick_init( void )
   home = compat_get_home_path(); if( !home ) return 1;
 
   /* Default calibration file is ~/.joystick */
-  calibration = malloc( strlen( home ) + strlen( JSDefaultCalibration ) + 2 );
+  calibration = libspectrum_new( char, strlen( home ) +
+                                       strlen( JSDefaultCalibration ) + 2 );
 
   if( !calibration ) {
     ui_error( UI_ERROR_ERROR, "failed to initialise joystick: %s",

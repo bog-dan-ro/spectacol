@@ -290,7 +290,7 @@ scld_to_snapshot( libspectrum_snap *snap )
          in the 8Kb chunk apply to all the pages */
 
       if( exrom_base->save_to_snapshot || exrom_base->writable ) {
-        buffer = malloc( 0x2000 * sizeof( libspectrum_byte ) );
+        buffer = libspectrum_new( libspectrum_byte, 0x2000 );
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
                     __LINE__ );
@@ -306,7 +306,7 @@ scld_to_snapshot( libspectrum_snap *snap )
       }
 
       if( dock_base->save_to_snapshot || dock_base->writable ) {
-        buffer = malloc( 0x2000 * sizeof( libspectrum_byte ) );
+        buffer = libspectrum_new( libspectrum_byte, 0x2000 );
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
                     __LINE__ );

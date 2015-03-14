@@ -193,7 +193,7 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
 {
   debugger_breakpoint *bp;
 
-  bp = malloc( sizeof( *bp ) );
+  bp = libspectrum_new( debugger_breakpoint, 1 );
   if( !bp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     fuse_abort();

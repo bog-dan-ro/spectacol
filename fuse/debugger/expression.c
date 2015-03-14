@@ -279,7 +279,7 @@ debugger_expression_copy( debugger_expression *src )
 {
   debugger_expression *dest;
 
-  dest = malloc( sizeof( *dest ) );
+  dest = libspectrum_new( debugger_expression, 1 );
   if( !dest ) return NULL;
 
   dest->type = src->type;
@@ -476,7 +476,7 @@ deparse_unaryop( char *buffer, size_t length,
 
   int error;
 
-  operand_buffer = malloc( length );
+  operand_buffer = libspectrum_new( char, length );
   if( !operand_buffer ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
@@ -517,7 +517,7 @@ deparse_binaryop( char *buffer, size_t length,
 
   int error;
 
-  operand1_buffer = malloc( 2 * length );
+  operand1_buffer = libspectrum_new( char, 2 * length );
   if( !operand1_buffer ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;

@@ -437,7 +437,7 @@ beta_to_snapshot( libspectrum_snap *snap )
   if( beta_memory_map_romcs[0].save_to_snapshot ) {
     size_t rom_length = MEMORY_PAGE_SIZE * 2;
 
-    buffer = malloc( rom_length );
+    buffer = libspectrum_new( libspectrum_byte, rom_length );
     if( !buffer ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
       return;

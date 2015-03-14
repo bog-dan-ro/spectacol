@@ -453,7 +453,7 @@ divide_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_divide_paged( snap, divide_active );
   libspectrum_snap_set_divide_control( snap, divide_control );
 
-  buffer = malloc( DIVIDE_PAGE_LENGTH * sizeof( libspectrum_byte ) );
+  buffer = libspectrum_new( libspectrum_byte, DIVIDE_PAGE_LENGTH );
   if( !buffer ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
     return;
@@ -466,7 +466,7 @@ divide_to_snapshot( libspectrum_snap *snap )
 
   for( i = 0; i < DIVIDE_PAGES; i++ ) {
 
-    buffer = malloc( DIVIDE_PAGE_LENGTH * sizeof( libspectrum_byte ) );
+    buffer = libspectrum_new( libspectrum_byte, DIVIDE_PAGE_LENGTH );
     if( !buffer ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
       return;

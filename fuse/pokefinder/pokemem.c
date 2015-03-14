@@ -257,13 +257,13 @@ pokemem_read_trainer( const libspectrum_byte **ptr,
   /* store data */
   length = clast - *ptr + 1;
   if( length > 80 ) length = 80;
-  title = malloc( length + 1 );
+  title = libspectrum_new( char, length + 1 );
   if( !title ) return 1;
 
   memcpy( title, *ptr, length );
   title[ length ] = '\0';
 
-  current_trainer = malloc( sizeof( trainer_t ) );
+  current_trainer = libspectrum_new( trainer_t, 1 );
   if( !current_trainer ) {
     free( title );
     return 1;
@@ -333,7 +333,7 @@ pokemem_poke_add( trainer_t *trainer, int bank, int address, int value,
   }
 
   /* store data */
-  current_poke = malloc( sizeof( poke_t ) );
+  current_poke = libspectrum_new( poke_t, 1 );
   if( !current_poke ) {
     trainer->disabled = 1;
     return NULL;
@@ -384,12 +384,12 @@ pokemem_trainer_list_add( libspectrum_byte bank, libspectrum_word address,
 {
   char *title;
 
-  title = malloc( 17 );
+  title = libspectrum_new( char, 17 );
   if( !title ) return NULL;
   snprintf( title, 17, "Custom %u,%u", address, value );
 
   /* Create trainer */
-  current_trainer = malloc( sizeof( trainer_t ) );
+  current_trainer = libspectrum_new( trainer_t, 1 );
   if( !current_trainer ) {
     free( title );
     return NULL;
@@ -496,7 +496,7 @@ pokemem_find_pokfile( const char *path )
   length = strlen( path );
   if( !length ) return 1; /* Nothing to search */
 
-  test_file = malloc( length + 11 );
+  test_file = libspectrum_new( char, length + 11 );
   if( !test_file ) return 1;
 
   memcpy( test_file, path, length + 1 );

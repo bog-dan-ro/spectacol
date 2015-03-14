@@ -75,7 +75,8 @@ compat_socket_selfpipe_t* compat_socket_selfpipe_alloc( void )
   int error;
   int pipefd[2];
 
-  compat_socket_selfpipe_t *self = malloc( sizeof( *self ) );
+  compat_socket_selfpipe_t *self =
+    libspectrum_new( compat_socket_selfpipe_t, 1 );
   if( !self ) {
     ui_error( UI_ERROR_ERROR, "%s: %d: out of memory", __FILE__, __LINE__ );
     fuse_abort();

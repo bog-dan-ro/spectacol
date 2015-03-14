@@ -570,7 +570,7 @@ zxatasp_to_snapshot( libspectrum_snap *snap )
 
   for( i = 0; i < ZXATASP_PAGES; i++ ) {
 
-    buffer = malloc( ZXATASP_PAGE_LENGTH * sizeof( libspectrum_byte ) );
+    buffer = libspectrum_new( libspectrum_byte, ZXATASP_PAGE_LENGTH );
     if( !buffer ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
       return;

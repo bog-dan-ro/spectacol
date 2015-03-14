@@ -196,7 +196,7 @@ if2_to_snapshot( libspectrum_snap *snap )
 
   libspectrum_snap_set_interface2_active( snap, 1 );
 
-  buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+  buffer = libspectrum_new( libspectrum_byte, 0x4000 );
   if( !buffer ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
     return;

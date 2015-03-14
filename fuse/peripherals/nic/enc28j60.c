@@ -137,7 +137,7 @@ struct nic_enc28j60_t {
 nic_enc28j60_t*
 nic_enc28j60_alloc( void )
 {
-  nic_enc28j60_t *self = malloc( sizeof( *self ) );
+  nic_enc28j60_t *self = libspectrum_new( nic_enc28j60_t, 1 );
   if( !self ) {
     ui_error( UI_ERROR_ERROR, "%s:%d out of memory", __FILE__, __LINE__ );
     fuse_abort();

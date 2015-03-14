@@ -116,7 +116,7 @@ static int machine_add_machine( int (*init_function)( fuse_machine_info *machine
   machine_types =
     libspectrum_renew( fuse_machine_info *, machine_types, machine_count );
 
-  machine_types[ machine_count - 1 ] = malloc( sizeof( fuse_machine_info ) );
+  machine_types[ machine_count - 1 ] = libspectrum_new( fuse_machine_info, 1 );
   if( !machine_types[ machine_count - 1 ] ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
