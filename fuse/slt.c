@@ -96,11 +96,6 @@ slt_from_snapshot( libspectrum_snap *snap )
 
       slt[i] = memory_pool_allocate( slt_length[i] *
 				     sizeof( libspectrum_byte ) );
-      if( !slt[i] ) {
-	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-		  __LINE__ );
-	return;
-      }
 
       memcpy( slt[i], libspectrum_snap_slt( snap, i ),
 	      libspectrum_snap_slt_length( snap, i ) );
@@ -110,10 +105,6 @@ slt_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_slt_screen( snap ) ) {
 
     slt_screen = memory_pool_allocate( 6912 * sizeof( libspectrum_byte ) );
-    if( !slt_screen ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return;
-    }
 
     memcpy( slt_screen, libspectrum_snap_slt_screen( snap ), 6912 );
     slt_screen_level = libspectrum_snap_slt_screen_level( snap );

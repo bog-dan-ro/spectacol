@@ -4669,3 +4669,8 @@
          zxcf.c},nic/{enc28j60.c,w5100.c},scld.c,spectranet.c},
          pokefinder/pokemem.c,sound/sdlsound.c,ui/uijoystick.c: switch to using
          libspectrum_new over raw malloc (Sergio).
+20150315 compat/{unix/socket.c,win32/socket.c},debugger/{breakpoint.c,
+         expression.c},machine.c,peripherals/{disk/{beta.c,disk.c,opus.c,
+         plusd.c,upd_fdc.c,wd_fdc.c},flash/am29f010.c,ide/{divide.c,zxatasp.c,
+         zxcf.c},if1.c,if2.c,nic/{enc28j60.c,w5100.c},scld.c,spectranet.c},
+         slt.c: remove unneeded "out of memory" error handling (Sergio).

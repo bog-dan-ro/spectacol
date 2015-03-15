@@ -341,20 +341,12 @@ spectranet_to_snapshot( libspectrum_snap *snap )
     nic_w5100_to_snapshot( w5100 ) );
 
   snap_buffer = libspectrum_new( libspectrum_byte, SPECTRANET_ROM_LENGTH );
-  if( !snap_buffer ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return;
-  }
 
   src = spectranet_full_map[SPECTRANET_ROM_BASE * MEMORY_PAGES_IN_4K].page;
   memcpy( snap_buffer, src, SPECTRANET_ROM_LENGTH );
   libspectrum_snap_set_spectranet_flash( snap, 0, snap_buffer );
 
   snap_buffer = libspectrum_new( libspectrum_byte, SPECTRANET_RAM_LENGTH );
-  if( !snap_buffer ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return;
-  }
 
   src = spectranet_full_map[SPECTRANET_RAM_BASE * MEMORY_PAGES_IN_4K].page;
   memcpy( snap_buffer, src, SPECTRANET_RAM_LENGTH );

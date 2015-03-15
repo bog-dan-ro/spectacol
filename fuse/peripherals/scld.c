@@ -291,11 +291,6 @@ scld_to_snapshot( libspectrum_snap *snap )
 
       if( exrom_base->save_to_snapshot || exrom_base->writable ) {
         buffer = libspectrum_new( libspectrum_byte, 0x2000 );
-        if( !buffer ) {
-          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-                    __LINE__ );
-          return;
-        }
 
         libspectrum_snap_set_exrom_ram( snap, i, exrom_base->writable );
         for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
@@ -307,11 +302,6 @@ scld_to_snapshot( libspectrum_snap *snap )
 
       if( dock_base->save_to_snapshot || dock_base->writable ) {
         buffer = libspectrum_new( libspectrum_byte, 0x2000 );
-        if( !buffer ) {
-          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-                    __LINE__ );
-          return;
-        }
 
         libspectrum_snap_set_dock_ram( snap, i, dock_base->writable );
         for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {

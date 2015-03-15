@@ -51,12 +51,7 @@ struct flash_am29f010_t {
 flash_am29f010_t*
 flash_am29f010_alloc( void )
 {
-  flash_am29f010_t *self = libspectrum_new( flash_am29f010_t, 1 );
-  if( !self ) {
-    ui_error( UI_ERROR_ERROR, "%s:%d out of memory", __FILE__, __LINE__ );
-    fuse_abort();
-  }
-  return self;
+  return libspectrum_new( flash_am29f010_t, 1 );
 }
 
 void

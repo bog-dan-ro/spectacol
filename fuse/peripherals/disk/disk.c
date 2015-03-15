@@ -2024,10 +2024,6 @@ disk_open( disk_t *d, const char *filename, int preindex, int merge_disks )
   d2.data = NULL; d2.flag = d->flag;
   filename2 = utils_safe_strdup( filename );
   *(filename2 + pos) = c;
-  if( filename2 == NULL ) {
-    fprintf( stderr, "out of memory in merge disk files\n" );
-    return d->status = DISK_OPEN;
-  }
 
   if( settings_current.disk_ask_merge &&
       !ui_query( "Try to merge 'B' side of this disk?" ) ) {

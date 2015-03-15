@@ -408,11 +408,6 @@ alloc_and_copy_page( libspectrum_byte* source_page )
 {
   libspectrum_byte *buffer;
   buffer = libspectrum_new( libspectrum_byte, MEMORY_PAGE_SIZE );
-  if( !buffer ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-              __LINE__ );
-    return 0;
-  }
 
   memcpy( buffer, source_page, MEMORY_PAGE_SIZE );
   return buffer;

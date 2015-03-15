@@ -150,10 +150,6 @@ nic_w5100_alloc( void )
   compat_socket_networking_init();
 
   nic_w5100_t *self = libspectrum_new( nic_w5100_t, 1 );
-  if( !self ) {
-    ui_error( UI_ERROR_ERROR, "%s:%d out of memory", __FILE__, __LINE__ );
-    fuse_abort();
-  }
 
   self->selfpipe = compat_socket_selfpipe_alloc();
 
@@ -356,11 +352,6 @@ nic_w5100_to_snapshot( nic_w5100_t *self )
 {
   libspectrum_byte *data = libspectrum_new( libspectrum_byte, 0x30 );
   int i;
-
-  if( !data ) {
-    ui_error( UI_ERROR_ERROR, "%s:%d: out of memory\n", __FILE__, __LINE__ );
-    fuse_abort();
-  }
 
   for( i = 0; i < 0x30; i++ )
     data[i] = nic_w5100_read( self, i );

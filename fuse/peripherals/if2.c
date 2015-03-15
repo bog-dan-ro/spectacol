@@ -168,10 +168,6 @@ if2_from_snapshot( libspectrum_snap *snap )
     if2_memory_map_romcs[0].page =
       memory_pool_allocate( 2 * MEMORY_PAGE_SIZE *
 			    sizeof( libspectrum_byte ) );
-    if( !if2_memory_map_romcs[0].page ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return;
-    }
 
     memcpy( if2_memory_map_romcs[0].page,
 	    libspectrum_snap_interface2_rom( snap, 0 ), 2 * MEMORY_PAGE_SIZE );
@@ -197,10 +193,6 @@ if2_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_interface2_active( snap, 1 );
 
   buffer = libspectrum_new( libspectrum_byte, 0x4000 );
-  if( !buffer ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return;
-  }
 
   memcpy( buffer, if2_memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
   memcpy( buffer + MEMORY_PAGE_SIZE, if2_memory_map_romcs[1].page,
