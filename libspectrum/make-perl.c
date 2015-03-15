@@ -115,11 +115,13 @@ int main(void)
 
 #ifdef HAVE_LIB_GLIB		/* #ifdef HAVE_LIB_GLIB */
 
-  printf( "  $_ = '';\n\n" );
+  printf( "  $_ = \"#define LIBSPECTRUM_HAS_GLIB_REPLACEMENT 0\\n\"\n" );
 
 #else				/* #ifdef HAVE_LIB_GLIB */
 
   printf( "  $_ = << \"CODE\";\n"
+"#define LIBSPECTRUM_HAS_GLIB_REPLACEMENT 1\n"
+"\n"
 "#ifndef	FALSE\n"
 "#define	FALSE	(0)\n"
 "#endif\n"
