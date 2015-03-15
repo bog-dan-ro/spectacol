@@ -719,10 +719,11 @@ disk_alloc( disk_t *d )
 
   if( d->bpt > 0 )
     d->tlen = 4 + d->bpt + 3 * DISK_CLEN( d->bpt );
-  dlen = d->sides * d->cylinders * d->tlen;	/* track len with clock and other marks */
 
-  if( ( d->data = calloc( 1, dlen ) ) == NULL )
-    return d->status = DISK_MEM;
+  dlen = d->sides * d->cylinders * d->tlen;	/* track len with clock and other marks */
+  if( dlen == 0 ) return d->status = DISK_GEOM;
+
+  d->data = libspectrum_new0( libspectrum_byte, dlen );
 
   return d->status = DISK_OK;
 }
@@ -760,7 +761,7 @@ alloc_uncompress_buffer( unsigned char **buffer, int length )
 
   if( *buffer != NULL )				/* return if allocated */
     return 0;
-  b = calloc( length, 1 );
+  b = libspectrum_new0( unsigned char, length );
   if( b == NULL )
     return 1;
   *buffer = b;
