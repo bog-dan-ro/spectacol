@@ -602,6 +602,8 @@ w5100_socket_process_accept( nic_w5100_socket_t *socket )
   socklen_t sa_length = sizeof(sa);
   compat_socket_t new_fd;
 
+  memset( &sa, 0, sizeof(sa) );
+
   new_fd = accept( socket->fd, (struct sockaddr*)&sa, &sa_length );
   if( new_fd == compat_socket_invalid ) {
     nic_w5100_debug( "w5100: error from accept on socket %d; errno %d: %s\n",

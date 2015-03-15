@@ -4676,3 +4676,4 @@
          slt.c: remove unneeded "out of memory" error handling (Sergio).
 20150315 peripherals/disk/disk.c: use libspectrum_new0 where appropriate
          (Sergio).
+20150315 peripherals/nic/w5100_socket.c: initialise sockaddr_in (Sergio).
