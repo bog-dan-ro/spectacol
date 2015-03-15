@@ -63,7 +63,7 @@ compat_socket_get_strerror( void )
                FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                NULL, WSAGetLastError(),
                MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-               buffer, ARRAY_SIZE( TCHAR ), NULL );
+               buffer, ARRAY_SIZE( buffer ), NULL );
 
   if( !msg_size ) return NULL;
 

@@ -4677,3 +4677,4 @@
 20150315 peripherals/disk/disk.c: use libspectrum_new0 where appropriate
          (Sergio).
 20150315 peripherals/nic/w5100_socket.c: initialise sockaddr_in (Sergio).
+20150316 compat/win32/socket.c: fix misuse of ARRAY_SIZE (Sergio).
