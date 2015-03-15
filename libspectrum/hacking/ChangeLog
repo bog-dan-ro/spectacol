@@ -990,3 +990,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          for libspectrum_{new,renew}() macros (Stuart).
 20150302 libspectrum.h.in,memory.c: rename libspectrum_calloc() to
          libspectrum_malloc0_n() (Stuart).
+20150315 configure.ac: remove automatic fallback to GLib replacement (now
+         --with-fake-glib) (Stuart).

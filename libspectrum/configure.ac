@@ -158,23 +158,23 @@ if test "$bzip2" = yes; then
   )
 fi
 
-dnl Either find glib or use the replacement
-AC_MSG_CHECKING(whether to use glib)
-AC_ARG_WITH(glib,
-[  --without-glib          don't use glib],
-if test "$withval" = no; then glib=no; else glib=yes; fi,
-glib=yes)
-AC_MSG_RESULT($glib)
-AS_IF([test "$glib" = yes], [
+dnl Either find GLib or use the replacement
+AC_MSG_CHECKING(whether to use internal GLib replacement)
+AC_ARG_WITH(fake-glib,
+[  --with-fake-glib        use internal GLib replacement],
+if test "$withval" = no; then myglib=no; else myglib=yes; fi,
+myglib=no)
+AC_MSG_RESULT($myglib)
+AS_IF([test "$myglib" = no], [
   PKG_CHECK_MODULES(
     GLIB,
     glib-2.0,
-    AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib]),
-    glib="no"
+    AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got GLib]),
+    AC_MSG_ERROR([GLib not found])
   )
 ])
 
-AM_CONDITIONAL(USE_MYGLIB, test "$glib" = no)
+AM_CONDITIONAL(USE_MYGLIB, test "$myglib" = yes)
 
 dnl If it appears we're using gcc as our compiler, turn on warnings
 if test "$ac_cv_c_compiler_gnu" = yes; then

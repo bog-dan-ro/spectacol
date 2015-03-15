@@ -59,7 +59,7 @@ To compile for the Wii, first make sure the dev tools are in your path
 
 ./configure --target=powerpc-gekko --host=powerpc-gekko \
 	    --prefix=$DEVKITPPC \
-	    --without-gcrypt --without-glib --without-libaudiofile
+	    --without-gcrypt --with-fake-glib --without-libaudiofile
 
 That is assuming you don't have gcrypt, glib and libaudiofile for the
 Wii. At the time of writing, those haven't been ported yet.
