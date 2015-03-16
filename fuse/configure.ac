@@ -163,7 +163,6 @@ CPPFLAGS="$ac_save_CPPFLAGS"
 # If we're not libspectrum's own internal GLib replacement, we must use the
 # real thing
 if test "$fakeglib" = no; then
-  AC_MSG_CHECKING(for GLib)
   AM_PATH_GLIB_2_0(
     2.20.0,
     AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got GLib])
