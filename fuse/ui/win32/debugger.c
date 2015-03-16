@@ -641,6 +641,9 @@ ui_debugger_update( void )
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_R,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
 
+  _sntprintf( buffer, 80, TEXT( "Halted %d" ), z80.halted );
+  SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_HALTED,
+                      WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
   _sntprintf( buffer, 80, TEXT( "T-states %5d" ), tstates );
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_T_STATES,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
