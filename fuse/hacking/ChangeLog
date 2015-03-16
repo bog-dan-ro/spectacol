@@ -4697,3 +4697,5 @@
          the status of the halted flag in the debugger (Stuart).
 20150316 z80/{tests/tests.expected,z80.{c,h,pl},z80_checks.h,z80_ops.c}:
          accurate emulation of the HALT instruction (Stuart).
+20150317 utils.c: use libspectrum's memory managment in utils_safe_strdup
+         (Sergio).

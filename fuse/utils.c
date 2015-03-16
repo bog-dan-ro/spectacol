@@ -465,11 +465,9 @@ utils_safe_strdup( const char *src )
 {
   char *dest = NULL;
   if( src ) {
-    dest = strdup( src );
-    if( !dest ) {
-      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
-      fuse_abort();
-    }
+    size_t length = strlen( src ) + 1;
+    dest = libspectrum_new( char, length );
+    memcpy( dest, src, length );
   }
   return dest;
 }
