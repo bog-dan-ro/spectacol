@@ -160,6 +160,18 @@ AC_PREPROC_IFELSE(
 )
 CPPFLAGS="$ac_save_CPPFLAGS"
 
+# If we're not libspectrum's own internal GLib replacement, we must use the
+# real thing
+if test "$fakeglib" = no; then
+  AC_MSG_CHECKING(for GLib)
+  AM_PATH_GLIB_2_0(
+    2.20.0,
+    AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got GLib])
+    LIBS="$LIBS `pkg-config --libs glib-2.0`",
+    AC_MSG_ERROR(GLib not found, and libspectrum has no internal replacement)
+  )
+fi
+
 dnl Check if supplied libspectrum has support for compressed szx files
 AC_MSG_CHECKING(whether libspectrum supports compressed szx snaps)
 ac_save_CPPFLAGS="$CPPFLAGS"
@@ -338,10 +350,17 @@ if test -z "$UI"; then
   AC_ARG_WITH(gtk,
   [  --without-gtk           don't use GTK+ for user interface],
   if test "$withval" = no; then gtk=no; else gtk=yes; fi,
-  gtk=yes)
+  if test "$fakeglib" = yes; then gtk=no; else gtk=yes; fi)
   AC_MSG_RESULT($gtk)
 
   if test "$gtk" = yes; then
+
+    if test "$fakeglib" = yes; then
+      AC_MSG_ERROR([libspectrum is using its own internal GLib replacement
+GTK+ requires the real GLib library, so the GTK+ UI cannot be used with
+the libspectrum that was found.  Rebuild libspectrum to use the real GLib
+library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
+    fi
 
     AC_ARG_ENABLE(gtk3,
       AS_HELP_STRING([--disable-gtk3],[prefer GTK+ 2 to GTK+ 3]),
@@ -431,25 +450,6 @@ AC_SUBST(UI)
 AC_SUBST(UI_LIBS)
 AC_SUBST(WIDGET)
 AM_CONDITIONAL(WIDGET, test x$WIDGET != x)
-
-# If we're not using GTK+, must either find glib or use the replacement
-# (as supplied by libspectrum)
-if test "$UI" != gtk; then
-  AC_MSG_CHECKING(whether to use glib)
-  AC_ARG_WITH(glib,
-  [  --without-glib          don't use glib],
-  if test "$withval" = no; then glib=no; else glib=yes; fi,
-  glib=yes)
-  AC_MSG_RESULT($glib)
-  if test "$glib" = yes; then
-    AM_PATH_GLIB_2_0(
-      2.20.0,
-      AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-      LIBS="$LIBS `pkg-config --libs glib-2.0`",
-      AC_MSG_WARN(glib not found - using libspectrum's replacement)
-    )
-  fi
-fi
 
 dnl Check whether to use zlib (the UNIX version is called z, Win32 zdll)
 AC_MSG_CHECKING(whether to use zlib)
