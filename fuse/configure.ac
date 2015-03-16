@@ -115,6 +115,52 @@ if test "$prefix" != "NONE"; then
   CPPFLAGS="$CPPFLAGS -I$prefix/include"; LDFLAGS="$LDFLAGS -L$prefix/lib"
 fi)
 
+dnl Check that libspectrum is available
+AC_ARG_WITH(libspectrum-prefix,
+[  --with-libspectrum-prefix=PFX where libspectrum is installed (optional)],
+LIBSPEC_CFLAGS=-I$withval/include; LIBSPEC_LIBS=-L$withval/lib,
+LIBSPEC_CFLAGS=""; LIBSPEC_LIBS="")
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS $GLIB_CFLAGS"
+AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS="$LIBSPEC_LIBS -lspectrum",
+	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
+CPPFLAGS="$ac_save_CPPFLAGS"
+AC_SUBST(LIBSPEC_CFLAGS)
+AC_SUBST(LIBSPEC_LIBS)
+
+dnl Check if supplied libspectrum has support for compressed szx files
+AC_MSG_CHECKING(whether libspectrum supports compressed szx snaps)
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
+    [[
+      int test = LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION;
+    ]])
+  ],
+  [AUTOLOAD_SNAPS=compressed; LIBSPEC_HAVE_ZLIB=yes; AC_MSG_RESULT(yes)],
+  [AUTOLOAD_SNAPS=uncompressed; LIBSPEC_HAVE_ZLIB=""; AC_MSG_RESULT(no)]
+)
+CPPFLAGS="$ac_save_CPPFLAGS"
+AC_SUBST(AUTOLOAD_SNAPS)
+AC_SUBST(LIBSPEC_HAVE_ZLIB)
+AC_CONFIG_LINKS([
+	lib/disk_plus3.szx:lib/"$AUTOLOAD_SNAPS"/disk_plus3.szx
+	lib/tape_128.szx:lib/"$AUTOLOAD_SNAPS"/tape_128.szx
+	lib/tape_16.szx:lib/"$AUTOLOAD_SNAPS"/tape_16.szx
+	lib/tape_2048.szx:lib/"$AUTOLOAD_SNAPS"/tape_2048.szx
+	lib/tape_2068.szx:lib/"$AUTOLOAD_SNAPS"/tape_2068.szx
+	lib/tape_48.szx:lib/"$AUTOLOAD_SNAPS"/tape_48.szx
+	lib/tape_48_ntsc.szx:lib/"$AUTOLOAD_SNAPS"/tape_48_ntsc.szx
+	lib/tape_plus2.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus2.szx
+	lib/tape_plus2a.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus2a.szx
+	lib/tape_plus3.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus3.szx
+	lib/tape_plus3e.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus3e.szx
+	lib/tape_pentagon.szx:lib/"$AUTOLOAD_SNAPS"/tape_pentagon.szx
+	lib/tape_scorpion.szx:lib/"$AUTOLOAD_SNAPS"/tape_scorpion.szx
+	lib/tape_se.szx:lib/"$AUTOLOAD_SNAPS"/tape_se.szx
+	lib/tape_ts2068.szx:lib/"$AUTOLOAD_SNAPS"/tape_ts2068.szx])
+
 dnl Select a user interface
 
 dnl Try various UI options; set the `ui' variable when we've got one
@@ -372,52 +418,6 @@ if test "$UI" != gtk; then
     )
   fi
 fi
-
-dnl Check that libspectrum is available
-AC_ARG_WITH(libspectrum-prefix,
-[  --with-libspectrum-prefix=PFX where libspectrum is installed (optional)],
-LIBSPEC_CFLAGS=-I$withval/include; LIBSPEC_LIBS=-L$withval/lib,
-LIBSPEC_CFLAGS=""; LIBSPEC_LIBS="")
-ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS $GTK_CFLAGS $GLIB_CFLAGS"
-AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS="$LIBSPEC_LIBS -lspectrum",
-	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
-CPPFLAGS="$ac_save_CPPFLAGS"
-AC_SUBST(LIBSPEC_CFLAGS)
-AC_SUBST(LIBSPEC_LIBS)
-
-dnl Check if supplied libspectrum has support for compressed szx files
-AC_MSG_CHECKING(whether libspectrum supports compressed szx snaps)
-ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
-AC_COMPILE_IFELSE(
-  [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
-    [[
-      int test = LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION;
-    ]])
-  ],
-  [AUTOLOAD_SNAPS=compressed; LIBSPEC_HAVE_ZLIB=yes; AC_MSG_RESULT(yes)],
-  [AUTOLOAD_SNAPS=uncompressed; LIBSPEC_HAVE_ZLIB=""; AC_MSG_RESULT(no)]
-)
-CPPFLAGS="$ac_save_CPPFLAGS"
-AC_SUBST(AUTOLOAD_SNAPS)
-AC_SUBST(LIBSPEC_HAVE_ZLIB)
-AC_CONFIG_LINKS([
-	lib/disk_plus3.szx:lib/"$AUTOLOAD_SNAPS"/disk_plus3.szx
-	lib/tape_128.szx:lib/"$AUTOLOAD_SNAPS"/tape_128.szx
-	lib/tape_16.szx:lib/"$AUTOLOAD_SNAPS"/tape_16.szx
-	lib/tape_2048.szx:lib/"$AUTOLOAD_SNAPS"/tape_2048.szx
-	lib/tape_2068.szx:lib/"$AUTOLOAD_SNAPS"/tape_2068.szx
-	lib/tape_48.szx:lib/"$AUTOLOAD_SNAPS"/tape_48.szx
-	lib/tape_48_ntsc.szx:lib/"$AUTOLOAD_SNAPS"/tape_48_ntsc.szx
-	lib/tape_plus2.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus2.szx
-	lib/tape_plus2a.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus2a.szx
-	lib/tape_plus3.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus3.szx
-	lib/tape_plus3e.szx:lib/"$AUTOLOAD_SNAPS"/tape_plus3e.szx
-	lib/tape_pentagon.szx:lib/"$AUTOLOAD_SNAPS"/tape_pentagon.szx
-	lib/tape_scorpion.szx:lib/"$AUTOLOAD_SNAPS"/tape_scorpion.szx
-	lib/tape_se.szx:lib/"$AUTOLOAD_SNAPS"/tape_se.szx
-	lib/tape_ts2068.szx:lib/"$AUTOLOAD_SNAPS"/tape_ts2068.szx])
 
 dnl Check whether to use zlib (the UNIX version is called z, Win32 zdll)
 AC_MSG_CHECKING(whether to use zlib)
