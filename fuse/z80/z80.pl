@@ -627,7 +627,12 @@ sub opcode_EXX (@) {
 EXX
 }
 
-sub opcode_HALT (@) { print "      z80.halted=1;\n      PC--;\n"; }
+sub opcode_HALT (@) {
+    print << "HALT";
+      z80.halted=1;
+      event_add( tstates, z80_halt_event );
+HALT
+}
 
 sub opcode_IM (@) {
 

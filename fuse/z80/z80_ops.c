@@ -274,6 +274,14 @@ z80_do_opcodes( void )
 
     END_CHECK
 
+    CHECK( z80_halted, z80.halted )
+
+    /* Opcode read from memory is ignored and PC is left unchanged */
+    R++;
+    continue;
+
+    END_CHECK
+
   end_opcode:
     PC++; R++;
     switch(opcode) {

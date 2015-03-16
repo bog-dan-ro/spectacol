@@ -4695,3 +4695,5 @@
          (Stuart).
 20150316 ui/{gtk/debugger.c,widget/debugger.c,win32/debugger.{c,rc}}: show
          the status of the halted flag in the debugger (Stuart).
+20150316 z80/{tests/tests.expected,z80.{c,h,pl},z80_checks.h,z80_ops.c}:
+         accurate emulation of the HALT instruction (Stuart).

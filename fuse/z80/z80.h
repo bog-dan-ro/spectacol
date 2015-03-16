@@ -74,6 +74,6 @@ extern libspectrum_byte sz53_table[];
 extern libspectrum_byte sz53p_table[];
 extern libspectrum_byte parity_table[];
 
-extern int z80_interrupt_event, z80_nmi_event;
+extern int z80_interrupt_event, z80_nmi_event, z80_halt_event;
 
 #endif			/* #ifndef FUSE_Z80_H */
