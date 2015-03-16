@@ -4682,3 +4682,4 @@
 20150316 configure.ac: check for libspectrum's own GLib replacement (Stuart).
 20150316 configure.ac: use real GLib iff libspectrum does and make GTK+ UI
          depend on real GLib (Stuart).
+20150316 configure.ac: add missing quotes to AC_MSG_ERROR for GLib (Stuart).

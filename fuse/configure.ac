@@ -168,7 +168,7 @@ if test "$fakeglib" = no; then
     2.20.0,
     AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got GLib])
     LIBS="$LIBS `pkg-config --libs glib-2.0`",
-    AC_MSG_ERROR(GLib not found, and libspectrum has no internal replacement)
+    [AC_MSG_ERROR([GLib not found, and libspectrum has no internal replacement])]
   )
 fi
 
