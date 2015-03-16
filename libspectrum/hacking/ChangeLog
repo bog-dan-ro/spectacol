@@ -996,3 +996,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150316 configure.ac: always use -Wwrite-strings when using GCC (Stuart).
 20150316 zlib.c,zxs.c: define ZLIB_CONST when including <zlib.h> and remove cast
          used as workaround for discarding of const (Stuart).
+20150316 pzx_read.c: add missing const qualifiers and remove casts (Stuart).

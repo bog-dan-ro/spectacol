@@ -107,8 +107,8 @@ pzx_read_string( const libspectrum_byte **ptr, const libspectrum_byte *end,
 static int
 info_t_compar(const void *a, const void *b)
 {
-  char *key = (char *)a;
-  struct info_t *test = (struct info_t *)b;
+  const char *key = a;
+  const struct info_t *test = b;
   return strcmp( key, test->id );
 }
 
