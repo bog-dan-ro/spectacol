@@ -999,3 +999,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150316 pzx_read.c: add missing const qualifiers and remove casts (Stuart).
 20150316 generate.pl.in,libspectrum.h.in: remove autogeneration warning from
          libspectrum.h.in (Stuart).
+20150316 doc/libspectrum.txt: add missing line break (Stuart).

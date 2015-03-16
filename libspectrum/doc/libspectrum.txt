@@ -1038,7 +1038,8 @@ LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE	A run-length encoded list of pulses
 
 The following two blocks are defined in the PZX format
 
-LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE   A run-length encoded list of pulses with					polarity specified
+LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE   A run-length encoded list of pulses
+					with polarity specified
 LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK       A block of data without pilot or sync
 					pulses with bit encoding and polarity
 					specified
