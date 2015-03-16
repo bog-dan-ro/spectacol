@@ -178,7 +178,7 @@ AM_CONDITIONAL(USE_MYGLIB, test "$myglib" = yes)
 
 dnl If it appears we're using gcc as our compiler, turn on warnings
 if test "$ac_cv_c_compiler_gnu" = yes; then
-  CFLAGS="$CFLAGS -Wall"
+  CFLAGS="$CFLAGS -Wall -Wwrite-strings"
   dnl And possibly lots of warnings
   AC_MSG_CHECKING(whether lots of warnings requested)
   AC_ARG_ENABLE(warnings,
@@ -191,7 +191,7 @@ if test "$ac_cv_c_compiler_gnu" = yes; then
   warnings=no)
   AC_MSG_RESULT($warnings)
   if test "$warnings" = yes; then
-      CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Waggregate-return -W -Wsign-compare"
+      CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Waggregate-return -W -Wsign-compare"
   fi
 fi
 

@@ -993,3 +993,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150315 README,configure.ac: remove automatic fallback to GLib replacement (now
          --with-fake-glib) (Stuart).
 20150315 make-perl.c: add LIBSPECTRUM_HAS_GLIB_REPLACEMENT macro (Stuart).
+20150316 configure.ac: always use -Wwrite-strings when using GCC (Stuart).
