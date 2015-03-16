@@ -4699,3 +4699,4 @@
          accurate emulation of the HALT instruction (Stuart).
 20150317 utils.c: use libspectrum's memory managment in utils_safe_strdup
          (Sergio).
+20150317 sound/win32sound.c: don't free static buffers (Sergio).

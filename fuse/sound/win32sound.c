@@ -133,9 +133,6 @@ sound_lowlevel_end( void )
 
   CloseHandle( sem_sound_done );
   DeleteCriticalSection( &sound_lock );
-  
-  free( buffers[ 0 ] );
-  free( buffers[ 1 ] );
 }
 
 void
