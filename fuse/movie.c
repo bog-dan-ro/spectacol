@@ -34,6 +34,7 @@
 
 #include <libspectrum.h>
 #ifdef HAVE_ZLIB_H
+#define ZLIB_CONST
 #include <zlib.h>
 #endif
 
