@@ -4685,3 +4685,4 @@
 20150316 configure.ac: add missing quotes to AC_MSG_ERROR for GLib (Stuart).
 20150316 configure.ac: remove duplicate 'checking for GLib' message (Stuart).
 20150316 configure.ac: remove duplicate HAVE_LIB_GLIB definition (Stuart).
+20150316 configure.ac: always use -Wwrite-strings when using GCC (Stuart).
