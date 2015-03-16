@@ -396,7 +396,6 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
 
   if test "$gtk" = yes; then
     AC_DEFINE([UI_GTK], 1, [Defined if GTK+ UI is in use])
-    AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
     UI=gtk; UI_LIBS="ui/gtk/libuigtk.la"
   fi
 fi
