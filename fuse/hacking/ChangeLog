@@ -4679,3 +4679,4 @@
 20150315 peripherals/nic/w5100_socket.c: initialise sockaddr_in (Sergio).
 20150316 compat/win32/socket.c: fix misuse of ARRAY_SIZE (Sergio).
 20150316 configure.ac: check for libspectrum before checking for UIs (Stuart).
+20150316 configure.ac: check for libspectrum's own GLib replacement (Stuart).
