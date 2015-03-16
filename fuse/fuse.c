@@ -101,7 +101,7 @@
 #include "z80/z80.h"
 
 /* What name were we called under? */
-char *fuse_progname;
+const char *fuse_progname;
 
 /* A flag to say when we want to exit the emulator */
 int fuse_exiting;

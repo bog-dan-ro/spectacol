@@ -4688,3 +4688,5 @@
 20150316 configure.ac: always use -Wwrite-strings when using GCC (Stuart).
 20150316 movie.c,screenshot.c: define ZLIB_CONST when including <zlib.h>
          (Stuart).
+20150316 fuse.[ch],movie.c,settings.pl,ui/gtk/{debugger.c,gtkinternals.h,
+         gtkui.c}: add missing const qualifiers and casts (Stuart).

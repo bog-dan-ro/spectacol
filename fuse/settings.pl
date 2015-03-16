@@ -111,7 +111,11 @@ CODE
 
     foreach my $name ( sort keys %options ) {
 	next if $options{$name}->{type} eq 'null';
-	print "  /* $name */ $options{$name}->{default},\n";
+        if( $options{$name}->{type} eq 'string' ) {
+	  print "  /* $name */ (char *)$options{$name}->{default},\n";
+	} else {
+	  print "  /* $name */ $options{$name}->{default},\n";
+	}
     }
 
 print hashline( __LINE__ ), << 'CODE';

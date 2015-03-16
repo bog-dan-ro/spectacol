@@ -193,7 +193,7 @@ get_screentype()
 
 #ifdef HAVE_ZLIB_H
 static void
-fwrite_compr( void *b, size_t n, size_t m, FILE *f )
+fwrite_compr( const void *b, size_t n, size_t m, FILE *f )
 {
   if( fmf_compr == 0 ) {
     fwrite( b, n, m, f );

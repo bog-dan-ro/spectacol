@@ -32,7 +32,7 @@
 
 #include "compat.h"
 
-extern char *fuse_progname;		/* argv[0] */
+extern const char *fuse_progname;	/* argv[0] */
 
 extern int fuse_exiting;		/* Shall we exit now? */
 

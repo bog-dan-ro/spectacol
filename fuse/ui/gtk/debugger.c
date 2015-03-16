@@ -578,8 +578,8 @@ create_breakpoints( GtkBox *parent )
 {
   size_t i;
 
-  gchar *titles[] = { "ID", "Type", "Value", "Ignore", "Life",
-		      "Condition" };
+  static const gchar *const titles[] =
+    { "ID", "Type", "Value", "Ignore", "Life", "Condition" };
 
   breakpoints_model = gtk_list_store_new( BREAKPOINTS_COLUMN_COUNT, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING );
 
@@ -599,7 +599,8 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   size_t i;
 
   GtkWidget *scrollbar;
-  const gchar *titles[] = { "Address", "Instruction" };
+  static const gchar *const titles[] =
+    { "Address", "Instruction" };
 
   /* A box to hold the disassembly listing and the scrollbar */
   disassembly_box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
@@ -644,7 +645,7 @@ static void
 create_stack_display( GtkBox *parent, gtkui_font font )
 {
   size_t i;
-  const gchar *titles[] = { "Address", "Instruction" };
+  static const gchar *const titles[] = { "Address", "Instruction" };
   
   stack_model =
     gtk_list_store_new( STACK_COLUMN_COUNT, G_TYPE_STRING, G_TYPE_STRING,
@@ -691,7 +692,7 @@ stack_activate( GtkTreeView *tree_view, GtkTreePath *path,
 static void
 create_events( GtkBox *parent )
 {
-  const gchar *titles[] = { "Time", "Type" };
+  static const gchar *const titles[] = { "Time", "Type" };
   size_t i;
 
   events_model =

@@ -76,7 +76,7 @@ GtkAccelGroup* gtkstock_add_accel_group( GtkWidget *widget );
  * For either, GDK_KEY_VoidSymbol means "no accel key".
  */
 typedef struct gtkstock_button {
-  gchar *label;
+  const gchar *label;
   GCallback action;		/* "clicked" func; data is actiondata. */
   gpointer actiondata;
   GCallback destroy;	/* "clicked" func; data is parent widget */

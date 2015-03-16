@@ -101,7 +101,7 @@ static void menu_machine_select_done( GtkWidget *widget, gpointer user_data );
 
 static const GtkTargetEntry drag_types[] =
 {
-    { "text/uri-list", GTK_TARGET_OTHER_APP, 0 }
+    { (gchar *)"text/uri-list", GTK_TARGET_OTHER_APP, 0 }
 };
 
 static void gtkui_drag_data_received( GtkWidget *widget GCC_UNUSED,
