@@ -361,6 +361,13 @@ libspectrum_snap_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
     return LIBSPECTRUM_ERROR_LOGIC;
   }
 
+  /* Sadly, virtually all emulators handle saving of PC incorrectly when
+   * executing a HALT instruction, so it's easiest to deal with this just
+   * once, so that it affects all snapshot formats. */
+  if( libspectrum_snap_halted( snap ) ) {
+    libspectrum_snap_set_pc( snap, libspectrum_snap_pc( snap ) + 1 );
+  }
+
   libspectrum_free( new_buffer );
   return error;
 }
@@ -373,6 +380,7 @@ libspectrum_snap_write( libspectrum_byte **buffer, size_t *length,
 {
   libspectrum_class_t class;
   libspectrum_error error;
+  libspectrum_word orig_pc;
 
   error = libspectrum_identify_class( &class, type );
   if( error ) return error;
@@ -383,17 +391,29 @@ libspectrum_snap_write( libspectrum_byte **buffer, size_t *length,
     return LIBSPECTRUM_ERROR_INVALID;
   }
 
+  /* Sadly, virtually all emulators handle saving of PC incorrectly when
+   * executing a HALT instruction, so it's easiest to deal with this just
+   * once, so that it affects all snapshot formats. */
+  orig_pc = libspectrum_snap_pc( snap );
+  if( libspectrum_snap_halted( snap ) ) {
+    libspectrum_snap_set_pc( snap, orig_pc - 1 );
+  }
+
   switch( type ) {
 
   case LIBSPECTRUM_ID_SNAPSHOT_SNA:
-    return libspectrum_sna_write( buffer, length, out_flags, snap, in_flags );
+    error = libspectrum_sna_write( buffer, length, out_flags, snap, in_flags );
+    break;
 
   case LIBSPECTRUM_ID_SNAPSHOT_SZX:
-    return libspectrum_szx_write( buffer, length, out_flags, snap, creator,
-				  in_flags );
+    error = libspectrum_szx_write( buffer, length, out_flags, snap, creator,
+				   in_flags );
+    break;
 
   case LIBSPECTRUM_ID_SNAPSHOT_Z80:
-    return libspectrum_z80_write2( buffer, length, out_flags, snap, in_flags );
+    error = libspectrum_z80_write2( buffer, length, out_flags, snap,
+				    in_flags );
+    break;
 
   default:
     libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
@@ -401,6 +421,11 @@ libspectrum_snap_write( libspectrum_byte **buffer, size_t *length,
     return LIBSPECTRUM_ERROR_UNKNOWN;
 
   }
+
+  /* Put back the correct value of PC, in case snap is needed again */
+  libspectrum_snap_set_pc( snap, orig_pc );
+
+  return error;
 }
 
 /* Given a 48K memory dump `data', place it into the
