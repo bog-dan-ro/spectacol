@@ -38,6 +38,7 @@
 #include <unistd.h>
 #endif			/* #ifdef HAVE_UNISTD_H */
 
+#define ZLIB_CONST
 #include <zlib.h>
 
 #include "internals.h"
@@ -86,8 +87,7 @@ zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
   /* Use default memory management */
   stream.zalloc = Z_NULL; stream.zfree = Z_NULL; stream.opaque = Z_NULL;
 
-  /* Cast needed to avoid warning about losing const */
-  stream.next_in = (libspectrum_byte*)gzptr; stream.avail_in = gzlength;
+  stream.next_in = gzptr; stream.avail_in = gzlength;
 
   if( gzip_hack ) { 
 

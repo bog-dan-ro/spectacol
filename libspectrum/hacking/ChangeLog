@@ -994,3 +994,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          --with-fake-glib) (Stuart).
 20150315 make-perl.c: add LIBSPECTRUM_HAS_GLIB_REPLACEMENT macro (Stuart).
 20150316 configure.ac: always use -Wwrite-strings when using GCC (Stuart).
+20150316 zlib.c,zxs.c: define ZLIB_CONST when including <zlib.h> and remove cast
+         used as workaround for discarding of const (Stuart).
