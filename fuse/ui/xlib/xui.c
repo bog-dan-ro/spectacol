@@ -57,7 +57,7 @@ ui_init( int *argc, char ***argv )
   XWMHints *wmHints;
   XSizeHints *sizeHints;
   XClassHint *classHint;
-  char *windowNameList="Fuse",*iconNameList="Fuse";
+  char *windowNameList=(char *)"Fuse",*iconNameList=(char *)"Fuse";
   XTextProperty windowName, iconName;
   unsigned long windowFlags;
   XSetWindowAttributes windowAttributes;
@@ -141,8 +141,8 @@ ui_init( int *argc, char ***argv )
   wmHints->initial_state=NormalState;
   wmHints->input=True;
 
-  classHint->res_name=fuse_progname;
-  classHint->res_class="Fuse";
+  classHint->res_name=(char *)fuse_progname;
+  classHint->res_class=(char *)"Fuse";
 
   XSetWMProperties(display, xui_mainWindow, &windowName, &iconName,
 		   *argv, *argc, sizeHints, wmHints, classHint);
