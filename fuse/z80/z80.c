@@ -126,17 +126,20 @@ static void z80_init_tables(void)
 
 /* Reset the z80 */
 void
-z80_reset( int hard_reset GCC_UNUSED )
+z80_reset( int hard_reset )
 {
   AF =AF_=0xffff;
-  BC =DE =HL =0;
-  BC_=DE_=HL_=0;
-  IX=IY=0;
   I=R=R7=0;
   PC=0;
   SP=0xffff;
   IFF1=IFF2=IM=0;
   z80.halted=0;
+
+  if( hard_reset ) {
+    BC =DE =HL =0;
+    BC_=DE_=HL_=0;
+    IX=IY=0;
+  }
 
   z80.interrupts_enabled_at = -1;
 }
