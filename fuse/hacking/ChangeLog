@@ -4709,3 +4709,4 @@
          (Sergio).
 20150317 z80/z80.c: set AF, AF' and SP to 0xffff on reset (Stuart).
 20150317 z80/z80.c: leave most registers unchanged on a soft reset (Stuart).
+20150317 z80/z80.c: document emulation of interrupt modes (Stuart).

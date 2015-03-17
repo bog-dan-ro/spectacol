@@ -171,9 +171,21 @@ z80_interrupt( void )
     R++; rzx_instructions_offset--;
 
     switch(IM) {
-      case 0: PC = 0x0038; tstates += 7; break;
-      case 1: PC = 0x0038; tstates += 7; break;
+      case 0:
+        /* We assume 0xff (RST 38) is on the data bus, as the Spectrum leaves
+	   it pulled high when the end-of-frame interrupt is delivered.  Only
+	   the first byte is provided directly to the Z80: all remaining bytes
+	   of the instruction are fetched from memory using PC, which is
+	   incremented as normal.  As RST 38 takes a single byte, we do not
+	   emulate fetching of additional bytes. */
+	PC = 0x0038; tstates += 7; break;
+      case 1:
+	/* RST 38 */
+	PC = 0x0038; tstates += 7; break;
       case 2: 
+	/* We assume 0xff is on the data bus, as the Spectrum leaves it pulled
+	   high when the end-of-frame interrupt is delivered.  Our interrupt
+	   vector is therefore 0xff. */
 	{
 	  libspectrum_word inttemp=(0x100*I)+0xff;
 	  PCL = readbyte(inttemp++); PCH = readbyte(inttemp);
