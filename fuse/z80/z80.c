@@ -128,11 +128,13 @@ static void z80_init_tables(void)
 void
 z80_reset( int hard_reset GCC_UNUSED )
 {
-  AF =BC =DE =HL =0;
-  AF_=BC_=DE_=HL_=0;
+  AF =AF_=0xffff;
+  BC =DE =HL =0;
+  BC_=DE_=HL_=0;
   IX=IY=0;
   I=R=R7=0;
-  SP=PC=0;
+  PC=0;
+  SP=0xffff;
   IFF1=IFF2=IM=0;
   z80.halted=0;
 

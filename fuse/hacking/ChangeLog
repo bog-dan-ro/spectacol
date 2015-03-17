@@ -4707,3 +4707,4 @@
          sound/{aosound.c,sdlsound.c},ui/{gtk/options.pl,scaler/scaler.c,
          win32/options.pl},uimedia.c: use libspectrum_free where appropriate
          (Sergio).
+20150317 z80/z80.c: set AF, AF' and SP to 0xffff on reset (Stuart).
