@@ -119,8 +119,8 @@ debugger_event_end( void )
 
   for( i = 0; i < registered_events->len; i++ ) {
     event = g_array_index( registered_events, debugger_event_t, i );
-    free( event.detail );
-    free( event.type );
+    libspectrum_free( event.detail );
+    libspectrum_free( event.type );
   }
 
   g_array_free( registered_events, TRUE );

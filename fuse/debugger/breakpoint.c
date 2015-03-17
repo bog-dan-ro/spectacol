@@ -201,7 +201,7 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
   if( condition ) {
     bp->condition = debugger_expression_copy( condition );
     if( !bp->condition ) {
-      free( bp );
+      libspectrum_free( bp );
       return 1;
     }
   } else {
@@ -246,7 +246,7 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
 
         if( bp->life == DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) {
           debugger_breakpoints = g_slist_remove( debugger_breakpoints, bp );
-          free( bp );
+          libspectrum_free( bp );
         }
       }
 
@@ -391,7 +391,7 @@ debugger_breakpoint_remove( size_t id )
     event_foreach( remove_time, &remove );
   }
 
-  free( bp );
+  libspectrum_free( bp );
 
   return 0;
 }
@@ -512,8 +512,8 @@ free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
 
   switch( bp->type ) {
   case DEBUGGER_BREAKPOINT_TYPE_EVENT:
-    free( bp->value.event.type );
-    free( bp->value.event.detail );
+    libspectrum_free( bp->value.event.type );
+    libspectrum_free( bp->value.event.detail );
     break;
 
   case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
@@ -527,9 +527,9 @@ free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
   }
 
   if( bp->condition ) debugger_expression_delete( bp->condition );
-  if( bp->commands ) free( bp->commands );
+  if( bp->commands ) libspectrum_free( bp->commands );
 
-  free( bp );
+  libspectrum_free( bp );
 }
 
 /* Ignore breakpoint 'id' the next 'ignore' times it hits */
@@ -571,7 +571,7 @@ debugger_breakpoint_set_commands( size_t id, const char *commands )
   debugger_breakpoint *bp = get_breakpoint_by_id( id );
   if( !bp ) return 1;
 
-  free( bp->commands );
+  libspectrum_free( bp->commands );
   bp->commands = utils_safe_strdup( commands );
 
   return 0;

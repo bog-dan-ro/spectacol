@@ -239,7 +239,7 @@ void
 beta_end( void )
 {
   beta_available = 0;
-  free( beta_fdc );
+  libspectrum_free( beta_fdc );
 }
 
 libspectrum_byte

@@ -74,7 +74,7 @@ pokemem_poke_free( gpointer data, gpointer user_data GCC_UNUSED )
 {
   poke_t *poke = data;
 
-  free( poke );
+  libspectrum_free( poke );
 }
 
 static void
@@ -89,8 +89,8 @@ pokemem_trainer_free( gpointer data, gpointer user_data GCC_UNUSED )
     g_slist_free( trainer->poke_list );
   }
 
-  free( trainer->name );
-  free( trainer );
+  libspectrum_free( trainer->name );
+  libspectrum_free( trainer );
 }
 
 void
@@ -102,7 +102,7 @@ pokemem_clear( void )
     trainer_list = NULL;
   }
 
-  free( pokfile );
+  libspectrum_free( pokfile );
   pokfile = NULL;
   current_trainer = NULL;
 }
@@ -265,7 +265,7 @@ pokemem_read_trainer( const libspectrum_byte **ptr,
 
   current_trainer = libspectrum_new( trainer_t, 1 );
   if( !current_trainer ) {
-    free( title );
+    libspectrum_free( title );
     return 1;
   }
   memset( current_trainer, 0, sizeof( trainer_t ) );
@@ -391,7 +391,7 @@ pokemem_trainer_list_add( libspectrum_byte bank, libspectrum_word address,
   /* Create trainer */
   current_trainer = libspectrum_new( trainer_t, 1 );
   if( !current_trainer ) {
-    free( title );
+    libspectrum_free( title );
     return NULL;
   }
   memset( current_trainer, 0, sizeof( trainer_t ) );
@@ -566,7 +566,7 @@ pokemem_find_pokfile( const char *path )
     return 0;
   }
 
-  free( test_file );
+  libspectrum_free( test_file );
 
   return 1;
 }

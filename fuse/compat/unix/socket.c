@@ -94,7 +94,7 @@ void compat_socket_selfpipe_free( compat_socket_selfpipe_t *self )
 {
   close( self->read_fd );
   close( self->write_fd );
-  free( self );
+  libspectrum_free( self );
 }
 
 compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self )

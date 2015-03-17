@@ -228,7 +228,7 @@ void
 opus_end( void )
 {
   opus_available = 0;
-  free( opus_fdc );
+  libspectrum_free( opus_fdc );
 }
 
 /*

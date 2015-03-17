@@ -268,7 +268,7 @@ void
 disciple_end( void )
 {
   disciple_available = 0;
-  free( disciple_fdc );
+  libspectrum_free( disciple_fdc );
 }
 
 libspectrum_byte

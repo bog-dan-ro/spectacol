@@ -65,7 +65,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     strcpy( command, environment );
     strcat( command, device );
     error = putenv( command );
-    free( command );
+    libspectrum_free( command );
     if( error ) { 
       settings_current.sound = 0;
       ui_error( UI_ERROR_ERROR, "Couldn't set SDL_AUDIODRIVER: %s",

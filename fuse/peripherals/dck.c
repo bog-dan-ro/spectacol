@@ -71,7 +71,7 @@ dck_eject( void )
     return;
   }
 
-  if( settings_current.dck_file ) free( settings_current.dck_file );
+  if( settings_current.dck_file ) libspectrum_free( settings_current.dck_file );
   settings_current.dck_file = NULL;
 
   dck_active = 0;

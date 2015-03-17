@@ -319,19 +319,19 @@ if1_init( void )
   
   if( settings_current.rs232_rx ) {
     if1_plug( settings_current.rs232_rx, 1 );
-    free( settings_current.rs232_rx );
+    libspectrum_free( settings_current.rs232_rx );
     settings_current.rs232_rx = NULL;
   }
 
   if( settings_current.rs232_tx ) {
     if1_plug( settings_current.rs232_tx, 2 );
-    free( settings_current.rs232_tx );
+    libspectrum_free( settings_current.rs232_tx );
     settings_current.rs232_tx = NULL;
   }
 
   if( settings_current.snet ) {
     if1_plug( settings_current.snet, 3 );
-    free( settings_current.snet );
+    libspectrum_free( settings_current.snet );
     settings_current.snet = NULL;
   }
 
@@ -1198,7 +1198,7 @@ if1_mdr_eject( int which )
 
   mdr->inserted = 0;
   if( mdr->filename != NULL ) {
-    free( mdr->filename );
+    libspectrum_free( mdr->filename );
     mdr->filename = NULL;
   }
 
@@ -1239,7 +1239,7 @@ if1_mdr_write( int which, const char *filename )
     return 1;
 
   if( mdr->filename && strcmp( filename, mdr->filename ) ) {
-    free( mdr->filename );
+    libspectrum_free( mdr->filename );
     mdr->filename = utils_safe_strdup( filename );
   }
   return 0;

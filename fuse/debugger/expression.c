@@ -242,11 +242,11 @@ debugger_expression_delete( debugger_expression *exp )
     break;
 
   case DEBUGGER_EXPRESSION_TYPE_VARIABLE:
-    free( exp->types.variable );
+    libspectrum_free( exp->types.variable );
     break;
   }
     
-  free( exp );
+  libspectrum_free( exp );
 }
 
 debugger_expression*
@@ -274,7 +274,7 @@ debugger_expression_copy( debugger_expression *src )
     dest->types.unaryop.operation = src->types.unaryop.operation;
     dest->types.unaryop.op = debugger_expression_copy( src->types.unaryop.op );
     if( !dest->types.unaryop.op ) {
-      free( dest );
+      libspectrum_free( dest );
       return NULL;
     }
     break;
@@ -284,14 +284,14 @@ debugger_expression_copy( debugger_expression *src )
     dest->types.binaryop.op1 =
       debugger_expression_copy( src->types.binaryop.op1 );
     if( !dest->types.binaryop.op1 ) {
-      free( dest );
+      libspectrum_free( dest );
       return NULL;
     }
     dest->types.binaryop.op2 =
       debugger_expression_copy( src->types.binaryop.op2 );
     if( !dest->types.binaryop.op2 ) {
       debugger_expression_delete( dest->types.binaryop.op1 );
-      free( dest );
+      libspectrum_free( dest );
       return NULL;
     }
     break;
@@ -454,7 +454,7 @@ deparse_unaryop( char *buffer, size_t length,
   operand_buffer = libspectrum_new( char, length );
 
   error = debugger_expression_deparse( operand_buffer, length, unaryop->op );
-  if( error ) { free( operand_buffer ); return error; }
+  if( error ) { libspectrum_free( operand_buffer ); return error; }
 
   switch( unaryop->operation ) {
   case '!': operation_string = "!"; break;
@@ -474,7 +474,7 @@ deparse_unaryop( char *buffer, size_t length,
 	    brackets ? "( " : "", operand_buffer,
 	    brackets ? " )" : "" );
 
-  free( operand_buffer );
+  libspectrum_free( operand_buffer );
 
   return 0;
 }
@@ -493,11 +493,11 @@ deparse_binaryop( char *buffer, size_t length,
 
   error = debugger_expression_deparse( operand1_buffer, length,
 				       binaryop->op1 );
-  if( error ) { free( operand1_buffer ); return error; }
+  if( error ) { libspectrum_free( operand1_buffer ); return error; }
 
   error = debugger_expression_deparse( operand2_buffer, length,
 				       binaryop->op2 );
-  if( error ) { free( operand1_buffer ); return error; }
+  if( error ) { libspectrum_free( operand1_buffer ); return error; }
 
   switch( binaryop->operation ) {
   case    '+': operation_string = "+";  break;
@@ -534,7 +534,7 @@ deparse_binaryop( char *buffer, size_t length,
 	    brackets_necessary2 ? "( " : "", operand2_buffer,
 	    brackets_necessary2 ? " )" : "" );
 
-  free( operand1_buffer );
+  libspectrum_free( operand1_buffer );
 
   return 0;
 }

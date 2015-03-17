@@ -52,7 +52,7 @@ debugger_command_evaluate( const char *command )
 {
   if( !command ) return;
 
-  if( command_buffer ) free( command_buffer );
+  if( command_buffer ) libspectrum_free( command_buffer );
 
   command_buffer = utils_safe_strdup( command );
 

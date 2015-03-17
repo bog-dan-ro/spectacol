@@ -4700,3 +4700,10 @@
 20150317 utils.c: use libspectrum's memory managment in utils_safe_strdup
          (Sergio).
 20150317 sound/win32sound.c: don't free static buffers (Sergio).
+20150317 compat/{unix/socket.c,win32/socket.c},debugger/{breakpoint.c,
+         command.c,event.c,expression.c,variable.c},peripherals/{dck.c,
+         disk/{beta.c,disciple.c,disk.c,opus.c,plusd.c},flash/am29f010.c,
+         ide/ide.c,if1.c,if2.c,nic/{enc28j60.c,w5100.c}},pokefinder/pokemem.c,
+         sound/{aosound.c,sdlsound.c},ui/{gtk/options.pl,scaler/scaler.c,
+         win32/options.pl},uimedia.c: use libspectrum_free where appropriate
+         (Sergio).

@@ -110,7 +110,7 @@ if2_eject( void )
     return;
   }
 
-  if( settings_current.if2_file ) free( settings_current.if2_file );
+  if( settings_current.if2_file ) libspectrum_free( settings_current.if2_file );
   settings_current.if2_file = NULL;
 
   machine_current->ram.romcs = 0;

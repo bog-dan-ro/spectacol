@@ -237,7 +237,7 @@ CODE
 	} elsif( $widget->{type} eq "Combo" ) {
 	    my $idcname = uc( "$widget->{value}" );
 	    print << "CODE";
-  free( settings_current.$widget->{value} );
+  libspectrum_free( settings_current.$widget->{value} );
   settings_current.$widget->{value} =
     utils_safe_strdup( $_->{name}_$widget->{value}_combo[
     SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname}, CB_GETCURSEL, 0, 0 ) ] );

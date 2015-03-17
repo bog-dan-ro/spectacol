@@ -119,7 +119,7 @@ parse_driver_options( const char *device, int *driver_id, ao_option **options )
 
   }
 
-  free( mutable );
+  libspectrum_free( mutable );
   return 0;
 }
 
@@ -203,7 +203,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 void
 sound_lowlevel_end( void )
 {
-  if( filename != default_filename ) free( filename );
+  if( filename != default_filename ) libspectrum_free( filename );
   ao_close(dev_for_ao);
   ao_shutdown();
 }

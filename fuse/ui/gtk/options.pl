@@ -298,7 +298,7 @@ CODE
         } elsif( $widget->{type} eq "Combo" ) {
 
 	    print << "CODE";
-  free( settings_current.$widget->{value} );
+  libspectrum_free( settings_current.$widget->{value} );
   settings_current.$widget->{value} = utils_safe_strdup( $_->{name}_$widget->{value}_combo[
     gtk_combo_box_get_active( GTK_COMBO_BOX( ptr->$widget->{value} ) ) ] );
 

@@ -169,7 +169,7 @@ void
 compat_socket_selfpipe_free( compat_socket_selfpipe_t *self )
 {
   compat_socket_close( self->self_socket );
-  free( self );
+  libspectrum_free( self );
 }
 
 compat_socket_t

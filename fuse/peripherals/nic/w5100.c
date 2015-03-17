@@ -187,7 +187,7 @@ nic_w5100_free( nic_w5100_t *self )
 
     compat_socket_networking_end();
 
-    free( self );
+    libspectrum_free( self );
   }
 }
 

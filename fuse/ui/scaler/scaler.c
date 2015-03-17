@@ -131,7 +131,7 @@ scaler_select_scaler( scaler_type scaler )
 
   current_scaler = scaler;
 
-  if( settings_current.start_scaler_mode ) free( settings_current.start_scaler_mode );
+  if( settings_current.start_scaler_mode ) libspectrum_free( settings_current.start_scaler_mode );
   settings_current.start_scaler_mode =
     utils_safe_strdup( available_scalers[current_scaler].id );
 

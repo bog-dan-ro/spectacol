@@ -672,11 +672,11 @@ void
 disk_close( disk_t *d )
 {
   if( d->data != NULL ) {
-    free( d->data );
+    libspectrum_free( d->data );
     d->data = NULL;
   }
   if( d->filename != NULL ) {
-    free( d->filename );
+    libspectrum_free( d->filename );
     d->filename = NULL;
   }
   d->type = DISK_TYPE_NONE;
@@ -1728,13 +1728,13 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
 	case 0:				/* raw sector data */
 	  if( hdrb[6] + 256 * hdrb[7] - 1 != seclen ) {
 	    if( uncomp_buff )
-	      free( uncomp_buff );
+	      libspectrum_free( uncomp_buff );
 	    return d->status = DISK_OPEN;
 	  }
 	  if( data_add( d, buffer, NULL, hdrb[6] + 256 * hdrb[7] - 1,
 			hdrb[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL, NULL ) ) {
 	    if( uncomp_buff )
-	      free( uncomp_buff );
+	      libspectrum_free( uncomp_buff );
 	    return d->status = DISK_OPEN;
 	  }
 	  break;
@@ -1743,12 +1743,12 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
 	    return d->status = DISK_MEM;
 	  for( i = 0; i < seclen; ) {			/* fill buffer */
 	    if( buffavail( buffer ) < 13 ) { 		/* check block header is avail. */
-	      free( uncomp_buff );
+	      libspectrum_free( uncomp_buff );
 	      return d->status = DISK_OPEN;
 	    }
 	    if( i + 2 * ( hdrb[9] + 256*hdrb[10] ) > seclen ) {
 						  /* too many data bytes */
-	      free( uncomp_buff );
+	      libspectrum_free( uncomp_buff );
 	      return d->status = DISK_OPEN;
 	    }
 	    /* ab ab ab ab ab ab ab ab ab ab ab ... */
@@ -1758,7 +1758,7 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
 	  }
 	  if( data_add( d, NULL, uncomp_buff, hdrb[6] + 256 * hdrb[7] - 1,
 		      hdrb[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL, NULL ) ) {
-	    free( uncomp_buff );
+	    libspectrum_free( uncomp_buff );
 	    return d->status = DISK_OPEN;
 	  }
 	  break;
@@ -1767,20 +1767,20 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
 	    return d->status = DISK_MEM;
 	  for( i = 0; i < seclen; ) {			/* fill buffer */
 	    if( buffavail( buffer ) < 11 ) {		/* check block header is avail */
-	      free( uncomp_buff );
+	      libspectrum_free( uncomp_buff );
 	      return d->status = DISK_OPEN;
 	    }
 	    if( hdrb[9] == 0 ) {		/* raw bytes */
 	      if( i + hdrb[10] > seclen ||	/* too many data bytes */
 		      buffread( uncomp_buff + i, hdrb[10], buffer ) != 1 ) {
-	        free( uncomp_buff );
+	        libspectrum_free( uncomp_buff );
 	        return d->status = DISK_OPEN;
 	      }
 	      i += hdrb[10];
 	    } else {				/* repeated samples */
 	      if( i + 2 * hdrb[9] * hdrb[10] > seclen || /* too many data bytes */
 		      buffread( uncomp_buff + i, 2 * hdrb[9], buffer ) != 1 ) {
-	        free( uncomp_buff );
+	        libspectrum_free( uncomp_buff );
 	        return d->status = DISK_OPEN;
 	      }
 	      /*
@@ -1797,13 +1797,13 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
 	  }
 	  if( data_add( d, NULL, uncomp_buff, hdrb[6] + 256 * hdrb[7] - 1,
 	      hdrb[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL, NULL ) ) {
-	    free( uncomp_buff );
+	    libspectrum_free( uncomp_buff );
 	    return d->status = DISK_OPEN;
 	  }
 	  break;
 	default:
 	  if( uncomp_buff )
-	    free( uncomp_buff );
+	    libspectrum_free( uncomp_buff );
 	  return d->status = DISK_OPEN;
 	  break;
 	}
@@ -1813,7 +1813,7 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
   }
 
   if( uncomp_buff )
-    free( uncomp_buff );
+    libspectrum_free( uncomp_buff );
   return d->status = DISK_OK;
 }
 
@@ -1905,7 +1905,7 @@ disk_open2( disk_t *d, const char *filename, int preindex )
   }
   if( d->status != DISK_OK ) {
     if( d->data != NULL )
-      free( d->data );
+      libspectrum_free( d->data );
     utils_close_file( &buffer.file );
     return d->status;
   }
@@ -2028,7 +2028,7 @@ disk_open( disk_t *d, const char *filename, int preindex, int merge_disks )
 
   if( settings_current.disk_ask_merge &&
       !ui_query( "Try to merge 'B' side of this disk?" ) ) {
-    free( filename2 );
+    libspectrum_free( filename2 );
     return d->status = disk_open2( d, filename, preindex );
   }
 
@@ -2044,7 +2044,7 @@ disk_open( disk_t *d, const char *filename, int preindex, int merge_disks )
     *d = d1;
   }
 /*  fprintf( stderr, "`%s' and `%s' merged\n", filename, filename2 ); */
-  free( filename2 );
+  libspectrum_free( filename2 );
   return d->status;
 }
 

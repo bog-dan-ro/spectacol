@@ -80,7 +80,7 @@ ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
     }
   }
 
-  free( *setting ); *setting = NULL;
+  libspectrum_free( *setting ); *setting = NULL;
   
   error = libspectrum_ide_eject( chn, unit );
   if( error ) return error;

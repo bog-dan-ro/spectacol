@@ -153,7 +153,7 @@ nic_enc28j60_init( nic_enc28j60_t *self )
 void
 nic_enc28j60_free( nic_enc28j60_t *self )
 {
-  free( self );
+  libspectrum_free( self );
 }
 
 /* Poll for received frames. */

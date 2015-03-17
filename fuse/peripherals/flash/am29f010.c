@@ -57,7 +57,7 @@ flash_am29f010_alloc( void )
 void
 flash_am29f010_free( flash_am29f010_t *self )
 {
-  free( self );
+  libspectrum_free( self );
 }
 
 void
