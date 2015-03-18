@@ -4722,3 +4722,5 @@
          widget.[ch]}}: split tape/Microdrive options into a new Media Options
          dialogue (Stuart).
 20150318 man/fuse.1,ui/options.dat: reorder General and Media options (Stuart).
+20150318 man/fuse.1: reflect split of Peripherals Options dialogue into General
+         and Disk options (Stuart).

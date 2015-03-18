@@ -396,7 +396,7 @@ support a single frequency or a limited range (e.g.
 .PP
 .B \-\-fuller
 .RS
-Emulate a Fuller Box interface. Same as the Peripherals Options dialog's
+Emulate a Fuller Box interface. Same as the General Peripherals Options dialog's
 .I "Fuller Box"
 option.
 .RE
@@ -465,7 +465,7 @@ Insert the specified file into the emulated Interface\ 2.
 .PP
 .B \-\-interface1
 .RS
-Emulate a Sinclair Interface\ 1. Same as the Peripherals Options dialog's
+Emulate a Sinclair Interface\ 1. Same as the General Peripherals Options dialog's
 .I "Interface\ 1"
 option.
 .RE
@@ -474,7 +474,7 @@ option.
 .RS
 Emulate a Sinclair Interface\ 2. (Enabled by default, but you can use
 .RB ` \-\-no\-interface2 '
-to disable). Same as the Peripherals Options dialog's
+to disable). Same as the General Peripherals Options dialog's
 .I "Interface\ 2"
 option.
 .RE
@@ -683,14 +683,14 @@ option.
 .PP
 .B \-\-kempston
 .RS
-Emulate a Kempston joystick. Same as the Peripherals Options dialog's
+Emulate a Kempston joystick. Same as the General Peripherals Options dialog's
 .I "Kempston joystick"
 option.
 .RE
 .PP
 .B \-\-kempston\-mouse
 .RS
-Emulate a Kempston mouse. Same as the Peripherals Options dialog's
+Emulate a Kempston mouse. Same as the General Peripherals Options dialog's
 .I "Kempston mouse"
 option.
 .RE
@@ -893,7 +893,7 @@ Insert the specified file into the emulated +D's drive\ 1.
 .B \-\-printer
 .RS
 Specify whether the emulation should include a printer. Same as the
-Peripherals Options dialog's
+General Peripherals Options dialog's
 .I "Emulate printers"
 option.
 .RE
@@ -1461,7 +1461,7 @@ option.
 .PP
 .B \-\-speccyboot
 .RS
-Emulate a SpeccyBoot Ethernet interface. Same as the Peripherals Options dialog's
+Emulate a SpeccyBoot Ethernet interface. Same as the General Peripherals Options dialog's
 .I "SpeccyBoot"
 option. See the SpeccyBoot web page at
 .I http://speccyboot.sourceforge.net/
@@ -1476,7 +1476,7 @@ Specify the TAP device to use for SpeccyBoot emulation.
 .PP
 .B \-\-specdrum
 .RS
-Emulate a SpecDrum interface. Same as the Peripherals Options dialog's
+Emulate a SpecDrum interface. Same as the General Peripherals Options dialog's
 .I "SpecDrum"
 option. See the World of Spectrum Infoseek web page at
 .I http://www.worldofspectrum.org/infoseekid.cgi?id=1000062
@@ -2242,9 +2242,9 @@ Sets the relative volume of the SpecDrum from a range of 0\(en100%.
 .PP
 .I "Options, Peripherals, General..."
 .RS
-Display the Peripherals Options dialog, letting you configure the
+Display the General Peripherals Options dialog, letting you configure the
 peripherals which Fuse will consider to be attached to the emulated
-machines. (With the widget UI, the keys shown in brackets toggle the
+machine. (With the widget UI, the keys shown in brackets toggle the
 options,
 .I Enter
 confirms any changes, and
@@ -2377,8 +2377,16 @@ section for more details.
 .PP
 .I "Options, Peripherals, Disk..."
 .RS
-Note that any changes that enable and disable peripherals may result in a hard
-reset of the emulated machine.
+Display the Disk Peripherals Options dialog, letting you configure the
+disk interface peripherals which Fuse will consider to be attached to
+the emulated machine. (With the widget UI, the keys shown in brackets
+toggle the options,
+.I Enter
+confirms any changes, and
+.I Esc
+aborts). Note that any changed settings only apply to the
+currently-running Fuse. Also note that any changes that enable and disable
+peripherals may result in a hard reset of the emulated machine.
 .PP
 .I "Simple 8-bit IDE"
 .RS
