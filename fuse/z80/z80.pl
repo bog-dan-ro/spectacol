@@ -724,25 +724,23 @@ sub opcode_LD (@) {
 
 	if( length $src == 1 or $src =~ /^REGISTER[HL]$/ ) {
 
+	    if( $dest eq 'R' or $src eq 'R' or $dest eq 'I' or $src eq 'I') {
+		print "      contend_read_no_mreq( IR, 1 );\n"
+	    }
+
 	    if( $dest eq 'R' and $src eq 'A' ) {
 		print << "LD";
-      contend_read_no_mreq( IR, 1 );
       /* Keep the RZX instruction counter right */
       rzx_instructions_offset += ( R - A );
       R=R7=A;
 LD
             } elsif( $dest eq 'A' and $src eq 'R' ) {
-		print << "LD";
-      contend_read_no_mreq( IR, 1 );
-      A=(R&0x7f) | (R7&0x80);
-      F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );
-LD
+		print "      A=(R&0x7f) | (R7&0x80);\n";
 	    } else {
-		print "      contend_read_no_mreq( IR, 1 );\n" if $src eq 'I' or $dest eq 'I';
 		print "      $dest=$src;\n" if $dest ne $src;
-		if( $dest eq 'A' and $src eq 'I' ) {
-		    print "      F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );\n";
-		}
+	    }
+            if( $dest eq 'A' and ( $src eq 'I' or $src eq 'R' ) ) {
+		print "      F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );\n";
 	    }
 	} elsif( $src eq 'nn' ) {
 	    print "      $dest = readbyte( PC++ );\n";

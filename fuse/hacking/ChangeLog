@@ -4714,3 +4714,4 @@
 20150318 z80/z80.c: really emulate interrupt timings more precisely (Stuart).
 20150318 z80/z80.c: really emulate NMI timings more precisely (Stuart).
 20150318 z80/z80_ops.c: don't trap on breakpoints whilst halted (Stuart).
+20150318 z80/z80.pl: refactor generation of LD r,r handling (Stuart).
