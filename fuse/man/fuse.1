@@ -2008,16 +2008,20 @@ in most circumstances, especially as the 48K\ ROM overwrites parts of
 itself.
 .RE
 .PP
-.I "Auto-save settings"
+.I "Late timings"
 .RS
-If this option is selected, Fuse will automatically write its
-currently selected options to its configuration file on exit (if
-.I libxml2
-was available when Fuse was compiled). If you turn this option off,
-you'll have to manually use
-.I "Options, Save"
-afterwards to ensure that this setting gets written to Fuse's
-configuration file.
+If selected, Fuse will cause all screen-related timings (for example,
+when the screen is rendered and when memory contention occurs) to be
+one tstate later than \(lqnormal\(rq, an effect which is present on some real
+hardware.
+.RE
+.PP
+.I "Z80 is CMOS"
+.RS
+If selected, Fuse will emulate a CMOS Z80, as opposed to an NMOS Z80.
+The undocumented `OUT (C),0' instruction will be replaced with
+`OUT (C),255' and emulation of a minor timing bug in the NMOS Z80's
+`LD A,I' and `LD A,R' instructions will be disabled.
 .RE
 .PP
 .I "RS-232 handshake"
@@ -2043,13 +2047,6 @@ also reproduce scanlines in the same way as the TV\ 2x, TV\ 3x and Timex\ TV
 scalers.
 .RE
 .PP
-.I "Confirm actions"
-.RS
-Specify whether `dangerous' actions (those which could cause data
-loss, for example resetting the Spectrum) require confirmation before
-occurring.
-.RE
-.PP
 .I "Show statusbar"
 .RS
 For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
@@ -2065,20 +2062,23 @@ to connect to the joystick interface enabled in the snapshot unless it
 already matches your current configuration.
 .RE
 .PP
-.I "Late timings"
+.I "Confirm actions"
 .RS
-If selected, Fuse will cause all screen-related timings (for example,
-when the screen is rendered and when memory contention occurs) to be
-one tstate later than \(lqnormal\(rq, an effect which is present on some real
-hardware.
+Specify whether `dangerous' actions (those which could cause data
+loss, for example resetting the Spectrum) require confirmation before
+occurring.
 .RE
 .PP
-.I "Z80 is CMOS"
+.I "Auto-save settings"
 .RS
-If selected, Fuse will emulate a CMOS Z80, as opposed to an NMOS Z80.
-The undocumented `OUT (C),0' instruction will be replaced with
-`OUT (C),255' and emulation of a minor timing bug in the NMOS Z80's
-`LD A,I' and `LD A,R' instructions will be disabled.
+If this option is selected, Fuse will automatically write its
+currently selected options to its configuration file on exit (if
+.I libxml2
+was available when Fuse was compiled). If you turn this option off,
+you'll have to manually use
+.I "Options, Save"
+afterwards to ensure that this setting gets written to Fuse's
+configuration file.
 .RE
 .RE
 .PP
@@ -2092,6 +2092,37 @@ confirms any changes, and
 .I Esc
 aborts). Note that any changed settings only apply to the
 currently-running Fuse.
+.PP
+.I "Auto-load media"
+.RS
+On many occasions when you open a tape or disk file, it's because it's
+got a program in you want to load and run. If this option is selected,
+this will automatically happen for you when you open one of these
+files using the
+.I "File, Open..."
+menu option \(em you must then use the
+.I Media
+menu to use
+tapes or disks for saving data to, or for loading data into an already
+running program.
+.RE
+.PP
+.I "Detect loaders"
+.RS
+If this option is enabled, Fuse will attempt to detect when a loading
+routine is in progress, and then automatically start the virtual tape
+to load the program in. This is done by using a heuristic to identify
+a loading routine, so is by no means infallible, but works in most
+cases.
+.RE
+.PP
+.I "Fastloading"
+.RS
+If this option is enabled, then Fuse will run at the fastest possible
+speed when the virtual tape is playing, thus dramatically reducing the
+time it takes to load programs. You may wish to disable this option if
+you wish to stop the tape at a specific point.
+.RE
 .PP
 .I "Use tape traps"
 .RS
@@ -2111,42 +2142,11 @@ using the
 menu item.
 .RE
 .PP
-.I "Fastloading"
-.RS
-If this option is enabled, then Fuse will run at the fastest possible
-speed when the virtual tape is playing, thus dramatically reducing the
-time it takes to load programs. You may wish to disable this option if
-you wish to stop the tape at a specific point.
-.RE
-.PP
 .I "Accelerate loaders"
 .RS
 If this option is enabled, then Fuse will attempt to accelerate tape
 loaders by \(lqshort circuiting\(rq the loading loop. This will in
 general speed up loading, but may cause some loaders to fail.
-.RE
-.PP
-.I "Detect loaders"
-.RS
-If this option is enabled, Fuse will attempt to detect when a loading
-routine is in progress, and then automatically start the virtual tape
-to load the program in. This is done by using a heuristic to identify
-a loading routine, so is by no means infallible, but works in most
-cases.
-.RE
-.PP
-.I "Auto-load media"
-.RS
-On many occasions when you open a tape or disk file, it's because it's
-got a program in you want to load and run. If this option is selected,
-this will automatically happen for you when you open one of these
-files using the
-.I "File, Open..."
-menu option \(em you must then use the
-.I Media
-menu to use
-tapes or disks for saving data to, or for loading data into an already
-running program.
 .RE
 .PP
 .I "Use .slt traps"

@@ -4721,3 +4721,4 @@
 20150318 man/fuse.1,menu.h,menu_data.dat,ui/{options.dat,widget/{menu.c,
          widget.[ch]}}: split tape/Microdrive options into a new Media Options
          dialogue (Stuart).
+20150318 man/fuse.1,ui/options.dat: reorder General and Media options (Stuart).

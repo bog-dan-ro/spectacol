@@ -4,7 +4,8 @@ Entry, (E)mulation speed, emulation_speed, INPUT_KEY_e, 5, %
 Entry, F(r)ame rate (1:n), frame_rate, INPUT_KEY_r, 1, frames
 Checkbox, Issue (2) keyboard, issue2, INPUT_KEY_2
 Checkbox, Allow (w)rites to ROM, writable_roms, INPUT_KEY_w
-Checkbox, A(u)to-save settings, autosave_settings, INPUT_KEY_u
+Checkbox, Late t(i)mings, late_timings, INPUT_KEY_i
+Checkbox, (Z)80 is CMOS, z80_is_cmos, INPUT_KEY_z
 Checkbox, RS-232 (h)andshake, rs232_handshake, INPUT_KEY_h
 #ifdef BUILD_WITH_SNET
 Checkbox, Raw Sinclair(N)ET, raw_s_net, INPUT_KEY_n
@@ -14,19 +15,18 @@ Checkbox, (P)AL-TV use TV2x effect, pal_tv2x, INPUT_KEY_p
 #ifdef UI_SDL
 Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
 #endif
-Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Checkbox, Snap (j)oystick prompt, joy_prompt, INPUT_KEY_j
-Checkbox, Late t(i)mings, late_timings, INPUT_KEY_i
-Checkbox, (Z)80 is CMOS, z80_is_cmos, INPUT_KEY_z
+Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
+Checkbox, A(u)to-save settings, autosave_settings, INPUT_KEY_u
 
 media
 Media Options
-Checkbox, Use (t)ape traps, tape_traps, INPUT_KEY_t
-Checkbox, (F)astloading, fastload, INPUT_KEY_f
-Checkbox, (D)etect loaders, detect_loader, INPUT_KEY_d
-Checkbox, Accelerate l(o)aders, accelerate_loader, INPUT_KEY_o
 Checkbox, (A)uto-load media, auto_load, INPUT_KEY_a
+Checkbox, (D)etect loaders, detect_loader, INPUT_KEY_d
+Checkbox, (F)astloading, fastload, INPUT_KEY_f
+Checkbox, Use (t)ape traps, tape_traps, INPUT_KEY_t
+Checkbox, Accelerate l(o)aders, accelerate_loader, INPUT_KEY_o
 Checkbox, Use .s(l)t traps, slt_traps, INPUT_KEY_l
 Entry, (M)DR cartridge len, mdr_len, INPUT_KEY_m, 3, blocks
 Checkbox, Random len(g)th MDR cartridge, mdr_random_len, INPUT_KEY_g
