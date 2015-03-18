@@ -4712,3 +4712,4 @@
 20150317 z80/z80.c: document emulation of interrupt modes (Stuart).
 20150318 z80/z80.c: emulate interrupt and NMI timings more precisely (Stuart).
 20150318 z80/z80.c: really emulate interrupt timings more precisely (Stuart).
+20150318 z80/z80.c: really emulate NMI timings more precisely (Stuart).

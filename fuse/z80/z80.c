@@ -213,12 +213,13 @@ z80_nmi( libspectrum_dword ts, int type, void *user_data )
   if( spectranet_available && spectranet_nmi_flipflop() )
     return;
 
-  if( z80.halted ) { z80.halted = 0; }
-
+  z80.halted = 0;
   IFF1 = 0;
+  R++; tstates += 5;
 
   writebyte( --SP, PCH ); writebyte( --SP, PCL );
 
+  /* TODO: check whether any of these should occur before PC is pushed. */
   if( machine_current->capabilities &
       LIBSPECTRUM_MACHINE_CAPABILITY_SCORP_MEMORY ) {
 
@@ -235,7 +236,7 @@ z80_nmi( libspectrum_dword ts, int type, void *user_data )
     spectranet_nmi();
   }
 
-  R++; tstates += 5; PC = 0x0066;
+  PC = 0x0066;
 }
 
 /* Special peripheral processing for RETN */
