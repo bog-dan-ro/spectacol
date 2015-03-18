@@ -148,6 +148,8 @@ z80_reset( int hard_reset )
 int
 z80_interrupt( void )
 {
+  libspectrum_word temppc;
+
   /* An interrupt will occur if IFF1 is set and the /INT line hasn't
      gone high again. On a Timex machine, we also need the SCLD's
      INTDISABLE to be clear */
@@ -162,12 +164,10 @@ z80_interrupt( void )
       return 0;
     }
 
-    if( z80.halted ) { z80.halted = 0; }
-    
+    temppc = PC;
+
+    z80.halted = 0;
     IFF1=IFF2=0;
-
-    writebyte( --SP, PCH ); writebyte( --SP, PCL );
-
     R++; rzx_instructions_offset--;
 
     switch(IM) {
@@ -196,6 +196,8 @@ z80_interrupt( void )
 	ui_error( UI_ERROR_ERROR, "Unknown interrupt mode %d", IM );
 	fuse_abort();
     }
+
+    writebyte( --SP, temppc >> 8 ); writebyte( --SP, temppc & 0xff );
 
     return 1;			/* Accepted an interrupt */
 
@@ -236,10 +238,7 @@ z80_nmi( libspectrum_dword ts, int type, void *user_data )
     spectranet_nmi();
   }
 
-  /* FIXME: how is R affected? */
-
-  /* FIXME: how does contention apply here? */
-  tstates += 11; PC = 0x0066;
+  R++; tstates += 5; PC = 0x0066;
 }
 
 /* Special peripheral processing for RETN */
