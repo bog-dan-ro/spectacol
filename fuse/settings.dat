@@ -72,6 +72,7 @@ plusd, boolean, 0
 disciple, boolean, 0
 beta128, boolean, 0
 beta128_48boot, boolean, 1
+z80_is_cmos, boolean, 0,, cmos-z80
 late_timings, boolean, 0
 unittests, boolean, 0
 fuller, boolean, 0

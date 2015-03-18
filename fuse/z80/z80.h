@@ -46,6 +46,7 @@ typedef struct {
 			   so it can also act as an RZX instruction counter */
   libspectrum_byte r7;	/* The high bit of the R register */
   regpair sp,pc;
+  int iff2_read;
   libspectrum_byte iff1, iff2, im;
   int halted;
 
@@ -74,6 +75,7 @@ extern libspectrum_byte sz53_table[];
 extern libspectrum_byte sz53p_table[];
 extern libspectrum_byte parity_table[];
 
-extern int z80_interrupt_event, z80_nmi_event, z80_halt_event;
+extern int z80_interrupt_event, z80_nmi_event;
+extern int z80_halt_event, z80_nmos_iff2_event;
 
 #endif			/* #ifndef FUSE_Z80_H */

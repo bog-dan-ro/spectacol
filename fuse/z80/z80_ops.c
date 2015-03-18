@@ -282,6 +282,14 @@ z80_do_opcodes( void )
 
     END_CHECK
 
+    CHECK( z80_iff2_read, z80.iff2_read )
+
+    z80.iff2_read = 0;
+    /* Execute *one* instruction before reevaluating the checks */
+    event_add( tstates, z80_nmos_iff2_event );
+
+    END_CHECK
+
   end_opcode:
     PC++; R++;
     switch(opcode) {

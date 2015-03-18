@@ -32,6 +32,7 @@
 #include "peripherals/scld.h"
 #include "peripherals/spectranet.h"
 #include "rzx.h"
+#include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "z80.h"
@@ -62,7 +63,7 @@ libspectrum_byte sz53p_table[0x100]; /* OR the above two tables together */
 /* This is what everything acts on! */
 processor z80;
 
-int z80_interrupt_event, z80_nmi_event, z80_halt_event;
+int z80_interrupt_event, z80_nmi_event, z80_halt_event, z80_nmos_iff2_event;
 
 static void z80_init_tables(void);
 static void z80_from_snapshot( libspectrum_snap *snap );
@@ -101,6 +102,7 @@ z80_init( void )
 					"Retriggered interrupt" );
   z80_nmi_event = event_register( z80_nmi, "Non-maskable interrupt" );
   z80_halt_event = event_register( NULL, "HALT dummy event" );
+  z80_nmos_iff2_event = event_register( NULL, "IFF2 update dummy event" );
 
   module_register( &z80_module_info );
 }
@@ -134,6 +136,7 @@ z80_reset( int hard_reset )
   SP=0xffff;
   IFF1=IFF2=IM=0;
   z80.halted=0;
+  z80.iff2_read=0;
 
   if( hard_reset ) {
     BC =DE =HL =0;
@@ -154,6 +157,16 @@ z80_interrupt( void )
   if( IFF1 &&
       tstates < machine_current->timings.interrupt_length &&
       !scld_last_dec.name.intdisable ) {
+
+    if ( z80.iff2_read && !IS_CMOS ) {
+      /* We just executed LD A,I or LD A,R, causing IFF2 to be copied to the
+	 parity flag.  This occured whilst accepting an interrupt.  For NMOS
+	 Z80s only, clear the parity flag to reflect the fact that IFF2 would
+	 have actually been cleared before its value was transferred by LD A,I
+	 or LD A,R.  We cannot do this when emulating LD itself as we cannot
+	 tell whether the next instruction will be interrupted. */
+      F &= ~FLAG_P;
+    }
 
     /* If interrupts have just been enabled, don't accept the interrupt now,
        but check after the next instruction has been executed */

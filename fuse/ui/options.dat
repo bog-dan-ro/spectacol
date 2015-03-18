@@ -26,6 +26,7 @@ Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Checkbox, Snap (j)oystick prompt, joy_prompt, INPUT_KEY_j
 Checkbox, Late t(i)mings, late_timings, INPUT_KEY_i
+Checkbox, (Z)80 is CMOS, z80_is_cmos, INPUT_KEY_z
 
 peripherals_general
 General Peripheral Options

@@ -740,7 +740,11 @@ LD
 		print "      $dest=$src;\n" if $dest ne $src;
 	    }
             if( $dest eq 'A' and ( $src eq 'I' or $src eq 'R' ) ) {
-		print "      F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );\n";
+		print << "LD";
+      F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );
+      z80.iff2_read = 1;
+      event_add( tstates, z80_nmos_iff2_event );
+LD
 	    }
 	} elsif( $src eq 'nn' ) {
 	    print "      $dest = readbyte( PC++ );\n";
@@ -900,7 +904,11 @@ sub opcode_OUT (@) {
       }
 OUT
     } elsif( $port eq '(C)' and length $register == 1 ) {
-	print "      writeport( BC, $register );\n";
+	if ( $register eq '0' ) {
+	    print "      writeport( BC, IS_CMOS ? 0xff : 0 );\n";
+	} else {
+	    print "      writeport( BC, $register );\n";
+	}
     }
 }
 
