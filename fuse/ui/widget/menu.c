@@ -438,6 +438,12 @@ menu_options_general( int action )
 }
 
 void
+menu_options_media( int action )
+{
+  widget_do( WIDGET_TYPE_MEDIA, NULL );
+}
+
+void
 menu_options_peripherals_general( int action )
 {
   widget_do( WIDGET_TYPE_PERIPHERALS_GENERAL, NULL );

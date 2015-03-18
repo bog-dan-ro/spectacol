@@ -679,6 +679,7 @@ widget_t widget_data[] = {
   { widget_picture_draw,  NULL,                  widget_picture_keyhandler  },
   { widget_menu_draw,	  NULL,			 widget_menu_keyhandler     },
   { widget_select_draw,   widget_select_finish,  widget_select_keyhandler   },
+  { widget_media_draw,	  widget_options_finish, widget_media_keyhandler    },
   { widget_sound_draw,	  widget_options_finish, widget_sound_keyhandler    },
   { widget_error_draw,	  NULL,			 widget_error_keyhandler    },
   { widget_rzx_draw,      widget_options_finish, widget_rzx_keyhandler      },

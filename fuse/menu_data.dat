@@ -68,6 +68,7 @@ File/E_xit..., Item, F10
 
 _Options, Branch
 Options/_General..., Item, F4
+Options/_Media..., Item
 Options/_Sound..., Item
 
 Options/_Peripherals, Branch

@@ -133,6 +133,7 @@ MENU_CALLBACK( menu_file_movie_record );
 MENU_CALLBACK( menu_file_movie_record_recordfromrzx );
 
 MENU_CALLBACK( menu_options_general );
+MENU_CALLBACK( menu_options_media );
 MENU_CALLBACK( menu_options_sound );
 MENU_CALLBACK( menu_options_peripherals_general );
 MENU_CALLBACK( menu_options_peripherals_disk );

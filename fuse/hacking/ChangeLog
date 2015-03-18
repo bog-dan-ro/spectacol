@@ -4716,5 +4716,8 @@
 20150318 z80/z80_ops.c: don't trap on breakpoints whilst halted (Stuart).
 20150318 z80/z80.pl: refactor generation of LD r,r handling (Stuart).
 20150318 settings.dat,ui/options.dat,z80/{coretest.c,z80.{c,h,pl},z80_checks.h,
-         z80_macros.h,z80_ops.c: emulate NMOS and CMOS Z80 variants (Stuart).
+         z80_macros.h,z80_ops.c}: emulate NMOS and CMOS Z80 variants (Stuart).
 20150318 man/fuse.1: document the CMOS Z80 option (Stuart).
+20150318 man/fuse.1,menu.h,menu_data.dat,ui/{options.dat,widget/{menu.c,
+         widget.[ch]}}: split tape/Microdrive options into a new Media Options
+         dialogue (Stuart).

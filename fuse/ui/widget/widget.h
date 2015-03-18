@@ -43,6 +43,7 @@ typedef enum widget_type {
   WIDGET_TYPE_PICTURE,		/* Keyboard picture */
   WIDGET_TYPE_MENU,		/* General menu */
   WIDGET_TYPE_SELECT,		/* Select machine */
+  WIDGET_TYPE_MEDIA,		/* Media options */
   WIDGET_TYPE_SOUND,		/* Sound options */
   WIDGET_TYPE_ERROR,		/* Error report */
   WIDGET_TYPE_RZX,		/* RZX options */

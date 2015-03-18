@@ -86,7 +86,7 @@ Specify whether Fuse should attempt to accelerate tape loaders by \(lqshort
 circuiting\(rq the loading loop. This will in general speed up loading, but
 may cause some loaders to fail. (Enabled by default, but you can use
 .RB ` \-\-no\-accelerate\-loader '
-to disable). The same as the General Options dialog's
+to disable). The same as the Media Options dialog's
 .I "Accelerate loaders"
 option.
 .RE
@@ -121,7 +121,7 @@ when they are opened using the
 .I "File, Open..."
 menu option. (Enabled by default, but you can use
 .RB ` \-\-no\-auto\-load '
-to disable). Same as the General Options dialog's
+to disable). Same as the Media Options dialog's
 .I "Auto-load media"
 option.
 .RE
@@ -221,7 +221,7 @@ Specify whether Fuse should attempt to detect when the tape is being
 accessed and start and stop the virtual tape playing
 automatically. (Enabled by default, but you can use
 .RB ` \-\-no\-detect\-loader '
-to disable). Same as the General Options dialog's
+to disable). Same as the Media Options dialog's
 .I "Detect loaders"
 option.
 .RE
@@ -377,7 +377,7 @@ option.
 Specify whether Fuse should run at the fastest possible speed when the
 virtual tape is playing. (Enabled by default, but you can use
 .RB ` \-\-no\-fastload '
-to disable). The same as the General Options dialog's
+to disable). The same as the Media Options dialog's
 .I "Fastloading"
 option.
 .RE
@@ -1150,7 +1150,7 @@ interface's slave channel.
 .RS
 Support the SLT trap instruction. (Enabled by default, but you can use
 .RB ` \-\-no\-slt '
-to disable). Same as the General Options dialog's
+to disable). Same as the Media Options dialog's
 .I "Use .slt traps"
 option.
 .RE
@@ -1607,7 +1607,7 @@ section below for more details.
 Support traps for ROM tape loading/saving. (Enabled by default, but
 you can use
 .RB ` \-\-no\-traps '
-to disable). Same as the General Options dialog's
+to disable). Same as the Media Options dialog's
 .I "Use tape traps"
 option.
 .RE
@@ -2000,6 +2000,99 @@ of these bits. Enabling this option switches to the old value, to let
 you run them.
 .RE
 .PP
+.I "Allow writes to ROM"
+.RS
+If this option is selected, Fuse will happily allow programs to
+overwrite what would normally be ROM. This probably isn't very useful
+in most circumstances, especially as the 48K\ ROM overwrites parts of
+itself.
+.RE
+.PP
+.I "Auto-save settings"
+.RS
+If this option is selected, Fuse will automatically write its
+currently selected options to its configuration file on exit (if
+.I libxml2
+was available when Fuse was compiled). If you turn this option off,
+you'll have to manually use
+.I "Options, Save"
+afterwards to ensure that this setting gets written to Fuse's
+configuration file.
+.RE
+.PP
+.I "RS-232 handshake"
+.RS
+If you turn this option off, Fuse assumes the RS-232 line other end is
+live when you connect the communication channels.
+See also the
+.RB ` \-\-rs232\-rx "' and `" \-\-rs232\-tx '
+options.
+.RE
+.PP
+.I "Black and white TV"
+.RS
+This option allows you to choose whether to simulate a colour or black
+and white television. This is effective only under the GTK+, Win32, Xlib and
+SDL user interfaces: the others will always simulate a colour TV.
+.RE
+.PP
+.I "PAL-TV use TV2x effect"
+.RS
+This option allows you to choose whether the PAL\ TV\ 2x and higher scalers
+also reproduce scanlines in the same way as the TV\ 2x, TV\ 3x and Timex\ TV
+scalers.
+.RE
+.PP
+.I "Confirm actions"
+.RS
+Specify whether `dangerous' actions (those which could cause data
+loss, for example resetting the Spectrum) require confirmation before
+occurring.
+.RE
+.PP
+.I "Show statusbar"
+.RS
+For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
+SDL UI, enables the status icons showing whether the disk and tape are
+being accessed. This option has no effect for the other user
+interfaces.
+.RE
+.PP
+.I "Snap joystick prompt"
+.RS
+If set, Fuse will prompt you which physical joystick or keyboard you want
+to connect to the joystick interface enabled in the snapshot unless it
+already matches your current configuration.
+.RE
+.PP
+.I "Late timings"
+.RS
+If selected, Fuse will cause all screen-related timings (for example,
+when the screen is rendered and when memory contention occurs) to be
+one tstate later than \(lqnormal\(rq, an effect which is present on some real
+hardware.
+.RE
+.PP
+.I "Z80 is CMOS"
+.RS
+If selected, Fuse will emulate a CMOS Z80, as opposed to an NMOS Z80.
+The undocumented `OUT (C),0' instruction will be replaced with
+`OUT (C),255' and emulation of a minor timing bug in the NMOS Z80's
+`LD A,I' and `LD A,R' instructions will be disabled.
+.RE
+.RE
+.PP
+.I "Options, Media..."
+.RS
+Display the Media Options dialog, letting you configure Fuse's tape
+and Microdrive options. (With the widget UI, the keys shown in brackets
+toggle the options,
+.I Enter
+confirms any changes, and
+.I Esc
+aborts). Note that any changed settings only apply to the
+currently-running Fuse.
+.PP
 .I "Use tape traps"
 .RS
 Ordinarily, Fuse intercepts calls to the ROM tape-loading routine in
@@ -2065,26 +2158,6 @@ to use the real instruction instead, you can choose whether to support
 the trap or not.
 .RE
 .PP
-.I "Allow writes to ROM"
-.RS
-If this option is selected, Fuse will happily allow programs to
-overwrite what would normally be ROM. This probably isn't very useful
-in most circumstances, especially as the 48K\ ROM overwrites parts of
-itself.
-.RE
-.PP
-.I "Auto-save settings"
-.RS
-If this option is selected, Fuse will automatically write its
-currently selected options to its configuration file on exit (if
-.I libxml2
-was available when Fuse was compiled). If you turn this option off,
-you'll have to manually use
-.I "Options, Save"
-afterwards to ensure that this setting gets written to Fuse's
-configuration file.
-.RE
-.PP
 .I "MDR cartridge len"
 .RS
 This option controls the number of blocks in a new Microdrive cartridge.
@@ -2097,67 +2170,6 @@ If this option is enabled, Fuse will use a random Microdrive cartridge
 length instead of the length specified in the
 .I "MDR cartridge len"
 option.
-.RE
-.PP
-.I "RS-232 handshake"
-.RS
-If you turn this option off, Fuse assumes the RS-232 line other end is
-live when you connect the communication channels.
-See also the
-.RB ` \-\-rs232\-rx "' and `" \-\-rs232\-tx '
-options.
-.RE
-.PP
-.I "Black and white TV"
-.RS
-This option allows you to choose whether to simulate a colour or black
-and white television. This is effective only under the GTK+, Win32, Xlib and
-SDL user interfaces: the others will always simulate a colour TV.
-.RE
-.PP
-.I "PAL-TV use TV2x effect"
-.RS
-This option allows you to choose whether the PAL\ TV\ 2x and higher scalers
-also reproduce scanlines in the same way as the TV\ 2x, TV\ 3x and Timex\ TV
-scalers.
-.RE
-.PP
-.I "Confirm actions"
-.RS
-Specify whether `dangerous' actions (those which could cause data
-loss, for example resetting the Spectrum) require confirmation before
-occurring.
-.RE
-.PP
-.I "Show statusbar"
-.RS
-For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
-SDL UI, enables the status icons showing whether the disk and tape are
-being accessed. This option has no effect for the other user
-interfaces.
-.RE
-.PP
-.I "Snap joystick prompt"
-.RS
-If set, Fuse will prompt you which physical joystick or keyboard you want
-to connect to the joystick interface enabled in the snapshot unless it
-already matches your current configuration.
-.RE
-.PP
-.I "Late timings"
-.RS
-If selected, Fuse will cause all screen-related timings (for example,
-when the screen is rendered and when memory contention occurs) to be
-one tstate later than \(lqnormal\(rq, an effect which is present on some real
-hardware.
-.RE
-.PP
-.I "Z80 is CMOS"
-.RS
-If selected, Fuse will emulate a CMOS Z80, as opposed to an NMOS Z80.
-The undocumented `OUT (C),0' instruction will be replaced with
-`OUT (C),255' and emulation of a minor timing bug in the NMOS Z80's
-`LD A,I' and `LD A,R' instructions will be disabled.
 .RE
 .RE
 .PP
@@ -3009,7 +3021,7 @@ Choose a PZX, TAP or TZX virtual-tape file to load from. See the
 .B "FILE SELECTION"
 section below for details on how to choose the file. If
 .I "Auto-load media"
-is set in the General Options dialog (as it is by default),
+is set in the Media Options dialog (as it is by default),
 you may use the
 .I "File, Open..."
 menu option instead, and the tape will begin loading automatically.
@@ -3020,7 +3032,7 @@ to reset first).
 To
 .I guarantee
 that TZX files will load properly, you should select the file, make
-sure tape-loading traps are disabled in the General Options dialog,
+sure tape-loading traps are disabled in the Media Options dialog,
 then press
 .I F8
 (or do
@@ -3038,7 +3050,7 @@ Start playing the PZX, TAP or TZX file, if required. (Choosing the option
 (or pressing
 .IR F8 )
 again pauses playback, and a further press resumes). To explain \(em if
-tape-loading traps have been disabled (in the General Options dialog),
+tape-loading traps have been disabled (in the Media Options dialog),
 starting the loading process in the emulated machine isn't enough. You
 also have to `press play', so to speak :\-), and this is how you do
 that. You may also need to `press play' like this in certain other
