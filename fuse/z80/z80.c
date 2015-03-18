@@ -148,8 +148,6 @@ z80_reset( int hard_reset )
 int
 z80_interrupt( void )
 {
-  libspectrum_word temppc;
-
   /* An interrupt will occur if IFF1 is set and the /INT line hasn't
      gone high again. On a Timex machine, we also need the SCLD's
      INTDISABLE to be clear */
@@ -164,11 +162,13 @@ z80_interrupt( void )
       return 0;
     }
 
-    temppc = PC;
-
     z80.halted = 0;
     IFF1=IFF2=0;
     R++; rzx_instructions_offset--;
+
+    tstates += 7; /* Longer than usual M1 cycle */
+
+    writebyte( --SP, PCH ); writebyte( --SP, PCL );
 
     switch(IM) {
       case 0:
@@ -178,10 +178,10 @@ z80_interrupt( void )
 	   of the instruction are fetched from memory using PC, which is
 	   incremented as normal.  As RST 38 takes a single byte, we do not
 	   emulate fetching of additional bytes. */
-	PC = 0x0038; tstates += 7; break;
+	PC = 0x0038; break;
       case 1:
 	/* RST 38 */
-	PC = 0x0038; tstates += 7; break;
+	PC = 0x0038; break;
       case 2: 
 	/* We assume 0xff is on the data bus, as the Spectrum leaves it pulled
 	   high when the end-of-frame interrupt is delivered.  Our interrupt
@@ -189,15 +189,12 @@ z80_interrupt( void )
 	{
 	  libspectrum_word inttemp=(0x100*I)+0xff;
 	  PCL = readbyte(inttemp++); PCH = readbyte(inttemp);
-	  tstates += 7;
 	  break;
 	}
       default:
 	ui_error( UI_ERROR_ERROR, "Unknown interrupt mode %d", IM );
 	fuse_abort();
     }
-
-    writebyte( --SP, temppc >> 8 ); writebyte( --SP, temppc & 0xff );
 
     return 1;			/* Accepted an interrupt */
 
