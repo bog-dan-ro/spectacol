@@ -159,6 +159,14 @@ The same as the General Options dialog's
 option.
 .RE
 .PP
+.B \-\-cmos-z80
+.RS
+This option specifies that Fuse should emulate a CMOS Z80, as opposed
+to an NMOS Z80. Same as the General Options dialog's
+.I "Z80 is CMOS"
+option.
+.RE
+.PP
 .B \-\-competition\-code
 .I code
 .RS
@@ -2142,6 +2150,14 @@ If selected, Fuse will cause all screen-related timings (for example,
 when the screen is rendered and when memory contention occurs) to be
 one tstate later than \(lqnormal\(rq, an effect which is present on some real
 hardware.
+.RE
+.PP
+.I "Z80 is CMOS"
+.RS
+If selected, Fuse will emulate a CMOS Z80, as opposed to an NMOS Z80.
+The undocumented `OUT (C),0' instruction will be replaced with
+`OUT (C),255' and emulation of a minor timing bug in the NMOS Z80's
+`LD A,I' and `LD A,R' instructions will be disabled.
 .RE
 .RE
 .PP

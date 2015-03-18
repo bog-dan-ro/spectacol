@@ -4717,3 +4717,4 @@
 20150318 z80/z80.pl: refactor generation of LD r,r handling (Stuart).
 20150318 settings.dat,ui/options.dat,z80/{coretest.c,z80.{c,h,pl},z80_checks.h,
          z80_macros.h,z80_ops.c: emulate NMOS and CMOS Z80 variants (Stuart).
+20150318 man/fuse.1: document the CMOS Z80 option (Stuart).
