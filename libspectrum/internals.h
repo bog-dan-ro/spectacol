@@ -130,7 +130,7 @@ libspectrum_bzip2_inflate( const libspectrum_byte *bzptr, size_t bzlength,
 
 /* The TZX file signature */
 
-extern const char *libspectrum_tzx_signature;
+extern const char * const libspectrum_tzx_signature;
 
 /* Convert a 48K memory dump into separate RAM pages */
 

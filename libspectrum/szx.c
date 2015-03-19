@@ -61,12 +61,12 @@ typedef enum szx_machine_type {
 
 } szx_machine_type;
 
-static const char *signature = "ZXST";
+static const char * const signature = "ZXST";
 static const size_t signature_length = 4;
 
 static const libspectrum_byte ZXSTMF_ALTERNATETIMINGS = 1;
 
-static const char *libspectrum_string = "libspectrum: ";
+static const char * const libspectrum_string = "libspectrum: ";
 
 static const libspectrum_byte SZX_VERSION_MAJOR = 1;
 static const libspectrum_byte SZX_VERSION_MINOR = 5;

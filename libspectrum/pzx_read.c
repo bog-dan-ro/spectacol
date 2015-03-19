@@ -83,7 +83,7 @@ static const libspectrum_byte PZXF_STOP48 = 1;
 /* TODO: an extension to be similar to the TZX Custom Block Picture type */
 #define PZX_INLAY  "inly"
 
-static const char *signature = PZX_HEADER;
+static const char * const signature = PZX_HEADER;
 static const size_t signature_length = 4;
 
 static libspectrum_error

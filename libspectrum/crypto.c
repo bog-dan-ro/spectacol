@@ -31,12 +31,12 @@
 
 #include "internals.h"
 
-static const char *private_key_format =
+static const char * const private_key_format =
   "(key-data (private-key (dsa (p %m) (q %m) (g %m) (y %m) (x %m))))";
-static const char *public_key_format =
+static const char * const public_key_format =
   "(key-data (public-key (dsa (p %m) (q %m) (g %m) (y %m))))";
-static const char *hash_format = "(data (flags raw) (value %m))";
-static const char *signature_format = "(sig-val (dsa (r %m) (s %m)))";
+static const char * const hash_format = "(data (flags raw) (value %m))";
+static const char * const signature_format = "(sig-val (dsa (r %m) (s %m)))";
 
 #define HASH_ALGORITHM GCRY_MD_SHA1
 #define MPI_COUNT 5

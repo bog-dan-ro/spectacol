@@ -36,7 +36,7 @@
 #include <gcrypt.h>
 
 /* The version of libgcrypt that we need */
-static const char *MIN_GCRYPT_VERSION = "1.1.42";
+static const char * const MIN_GCRYPT_VERSION = "1.1.42";
 
 #endif				/* #ifdef HAVE_GCRYPT_H */
 

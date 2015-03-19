@@ -1002,3 +1002,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150316 doc/libspectrum.txt: add missing line break (Stuart).
 20150316 snapshot.c: store PC-1 for all snapshot formats whilst in the halted
          state (Stuart).
+20150318 crypto.c,csw.c,internals.h,libspectrum.c,pzx_read.c,rzx.c,szx.c,
+         tzx_read.c: const and static cleanups (Stuart).

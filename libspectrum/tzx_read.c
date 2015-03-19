@@ -33,7 +33,7 @@
 #include "internals.h"
 
 /* The .tzx file signature (first 8 bytes) */
-const char *libspectrum_tzx_signature = "ZXTape!\x1a";
+const char * const libspectrum_tzx_signature = "ZXTape!\x1a";
 
 /*** Local function prototypes ***/
 
