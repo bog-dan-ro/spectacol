@@ -4737,3 +4737,5 @@
          tape.c,ui/{fb/fbdisplay.c,gtk/options.pl,widget/{menu.c,,options.pl,
          pokefinder.c,query.c,select.c,widget_internals.h},win32/options.pl}:
          add missing const qualifiers (Stuart).
+20150319 ui/win32/debugger.[c|h|rc]: relocate halted flag and set monospaced
+         font (Sergio).

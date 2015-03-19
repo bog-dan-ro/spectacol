@@ -350,7 +350,7 @@ create_register_display( HFONT font )
   /* this display is created in rc, just set the monospaced font */
   size_t i;
 
-  for( i = 0; i < 18; i++ ) {
+  for( i = 0; i < NUM_DBG_REGS; i++ ) {
     win32ui_set_font( fuse_hDBGWnd, IDC_DBG_REG_PC + i, font );
   }
 
