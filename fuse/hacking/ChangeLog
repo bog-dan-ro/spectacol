@@ -4724,3 +4724,6 @@
 20150318 man/fuse.1,ui/options.dat: reorder General and Media options (Stuart).
 20150318 man/fuse.1: reflect split of Peripherals Options dialogue into General
          and Disk options (Stuart).
+20150319 ui/widget/{debugger.c,error.c,filesel.c,menu.c,options.pl,pokemem.c,
+         roms.c,widget.[ch]}: add wrappers around widget_do() for better type
+         safety (Stuart).
