@@ -4731,3 +4731,4 @@
          array (Stuart).
 20150319 bitmap.h,display.c,rectangle.c: replace inline static with static
          inline (Stuart).
+20150319 ui/win32/debugger.h: add missing IDC_DBG_REG_HALTED macro (Stuart).
