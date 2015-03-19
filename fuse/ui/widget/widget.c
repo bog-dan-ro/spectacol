@@ -786,7 +786,7 @@ ui_popup_menu( int native_key )
   switch( native_key ) {
   case INPUT_KEY_F1:
     fuse_emulation_pause();
-    widget_do_menu( &widget_menu );
+    widget_do_menu( widget_menu );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F2:

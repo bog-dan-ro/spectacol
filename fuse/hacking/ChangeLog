@@ -4727,3 +4727,5 @@
 20150319 ui/widget/{debugger.c,error.c,filesel.c,menu.c,options.pl,pokemem.c,
          roms.c,widget.[ch]}: add wrappers around widget_do() for better type
          safety (Stuart).
+20150319 ui/widget/widget.c: fix incorrect but benign referencing of widget_menu
+         array (Stuart).
