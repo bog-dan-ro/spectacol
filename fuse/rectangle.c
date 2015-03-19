@@ -88,7 +88,7 @@ rectangle_add( int y, int x, int w )
 #define MIN(a,b)    (((a) < (b)) ? (a) : (b))
 #endif
 
-inline static int
+static inline int
 compare_and_merge_rectangles( struct rectangle *source )
 {
   size_t z;

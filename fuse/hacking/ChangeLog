@@ -4729,3 +4729,5 @@
          safety (Stuart).
 20150319 ui/widget/widget.c: fix incorrect but benign referencing of widget_menu
          array (Stuart).
+20150319 bitmap.h,display.c,rectangle.c: replace inline static with static
+         inline (Stuart).
