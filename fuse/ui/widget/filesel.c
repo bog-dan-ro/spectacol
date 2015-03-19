@@ -122,7 +122,6 @@ static char *
 widget_get_filename( const char *title, int saving )
 {
   char *filename = NULL;
-  widget_type wtype;
 
   widget_filesel_data data;
 
@@ -130,11 +129,10 @@ widget_get_filename( const char *title, int saving )
   data.title = title;
 
   if( saving ) {
-    wtype = WIDGET_TYPE_FILESELECTOR_SAVE;
+    widget_do_fileselector_save( &data );
   } else {
-    wtype = WIDGET_TYPE_FILESELECTOR;
+    widget_do_fileselector( &data );
   }
-  widget_do( wtype, &data );
   if( widget_filesel_name )
     filename = utils_safe_strdup( widget_filesel_name );
 
@@ -893,7 +891,7 @@ widget_filesel_keyhandler( input_key key )
       text_data.title = title;
       text_data.allow = WIDGET_INPUT_ASCII;
       text_data.text[0] = 0;
-      if( widget_do( WIDGET_TYPE_TEXT, &text_data ) ||
+      if( widget_do_text( &text_data ) ||
 	  !widget_text_text || !*widget_text_text      )
 	break;
       if( !compat_is_absolute_path( widget_text_text ) ) {

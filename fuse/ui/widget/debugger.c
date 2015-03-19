@@ -83,7 +83,7 @@ static inline const char *format_16_bit( void )
 
 int ui_debugger_activate( void )
 {
-  return widget_do( WIDGET_TYPE_DEBUGGER, NULL );
+  return widget_do_debugger();
 }
 
 int ui_debugger_deactivate( int interruptible GCC_UNUSED )
@@ -211,7 +211,7 @@ void widget_debugger_keyhandler( input_key key )
       text_data.title = "Debugger command";
       text_data.allow = WIDGET_INPUT_ASCII;
       text_data.text[0] = 0;
-      if( !widget_do( WIDGET_TYPE_TEXT, &text_data ) )
+      if( !widget_do_text( &text_data ) )
 	debugger_command_evaluate( widget_text_text );
     }
     break;

@@ -91,7 +91,7 @@ widget_combo_click( const char *title, const char **options, char **current, int
   }
   sel.count = i;
 
-  error = widget_do( WIDGET_TYPE_SELECT, &sel );
+  error = widget_do_select( &sel );
 
   if( !error && sel.result >= 0 ) \{
     if( *current ) free( *current );
@@ -378,8 +378,7 @@ widget_options_finish( widget_finish_state finished )
     int needs_hard_reset = periph_postcheck();
 
     if( needs_hard_reset ) {
-      error = widget_do( WIDGET_TYPE_QUERY,
-                         "Some options need to reset the machine. Reset?" );
+      error = widget_do_query( "Some options need to reset the machine. Reset?" );
       if( !error && !widget_query.confirm )
         settings_copy( &settings_current, &original_settings );
       else
@@ -495,7 +494,7 @@ widget_$widget->{value}_click( void )
   text_data.allow = WIDGET_INPUT_DIGIT;
   snprintf( text_data.text, 40, "%d",
             widget_options_settings.$widget->{value} );
-  widget_do( WIDGET_TYPE_TEXT, &text_data );
+  widget_do_text( &text_data );
 
   if( widget_text_text ) \{
     widget_options_settings.$widget->{value} = atoi( widget_text_text );

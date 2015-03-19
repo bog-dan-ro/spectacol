@@ -730,7 +730,7 @@ ui_confirm_save_specific( const char *message )
 {
   if( !settings_current.confirm_actions ) return UI_CONFIRM_SAVE_DONTSAVE;
 
-  if( widget_do( WIDGET_TYPE_QUERY_SAVE, (void *) message ) )
+  if( widget_do_query_save( message ) )
     return UI_CONFIRM_SAVE_CANCEL;
   return widget_query.confirm;
 }
@@ -738,7 +738,7 @@ ui_confirm_save_specific( const char *message )
 int
 ui_query( const char *message )
 {
-  widget_do( WIDGET_TYPE_QUERY, (void *) message );
+  widget_do_query( message );
   return widget_query.save;
 }
 
@@ -767,7 +767,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
   info.current = UI_CONFIRM_JOYSTICK_NONE;
   info.finish_all = 1;
 
-  error = widget_do( WIDGET_TYPE_SELECT, &info );
+  error = widget_do_select( &info );
   if( error ) return UI_CONFIRM_JOYSTICK_NONE;
 
   return (ui_confirm_joystick_t)info.result;
@@ -786,7 +786,7 @@ ui_popup_menu( int native_key )
   switch( native_key ) {
   case INPUT_KEY_F1:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MENU, &widget_menu );
+    widget_do_menu( &widget_menu );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F2:

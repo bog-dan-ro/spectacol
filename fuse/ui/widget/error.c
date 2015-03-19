@@ -47,7 +47,7 @@ ui_error_specific( ui_error_level severity, const char *message )
   error_info.message  = message;
 
   fuse_emulation_pause();
-  widget_do( WIDGET_TYPE_ERROR, &error_info );
+  widget_do_error( &error_info );
   fuse_emulation_unpause();
 
   return 0;

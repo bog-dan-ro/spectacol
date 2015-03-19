@@ -333,7 +333,7 @@ widget_menu_keyhandler( input_key key )
     ptr=&menu[1 + highlight_line];
     if(!ptr->inactive) {
       if( ptr->submenu ) {
-        widget_do( WIDGET_TYPE_MENU, ptr->submenu );
+        widget_do_menu( ptr->submenu );
       } else {
         ptr->callback( ptr->action );
       }
@@ -373,7 +373,7 @@ widget_menu_keyhandler( input_key key )
     if( !ptr->inactive && key == ptr->key ) {
 
       if( ptr->submenu ) {
-        widget_do( WIDGET_TYPE_MENU, ptr->submenu );
+        widget_do_menu( ptr->submenu );
       } else {
         ptr->callback( ptr->action );
       }
@@ -406,7 +406,7 @@ menu_get_scaler( scaler_available_fn selector )
   info.count = count;
   info.finish_all = 1;
 
-  error = widget_do( WIDGET_TYPE_SELECT, &info );
+  error = widget_do_select( &info );
   if( error ) return SCALER_NUM;
 
   if( info.result == -1 ) return SCALER_NUM;
@@ -421,7 +421,7 @@ menu_get_scaler( scaler_available_fn selector )
 void
 menu_file_exit( int action )
 {
-  if( widget_do( WIDGET_TYPE_QUERY, "Exit Fuse?" ) || !widget_query.confirm )
+  if( widget_do_query( "Exit Fuse?" ) || !widget_query.confirm )
     return;
 
   if( menu_check_media_changed() ) return;
@@ -434,49 +434,49 @@ menu_file_exit( int action )
 void
 menu_options_general( int action )
 {
-  widget_do( WIDGET_TYPE_GENERAL, NULL );
+  widget_do_general();
 }
 
 void
 menu_options_media( int action )
 {
-  widget_do( WIDGET_TYPE_MEDIA, NULL );
+  widget_do_media();
 }
 
 void
 menu_options_peripherals_general( int action )
 {
-  widget_do( WIDGET_TYPE_PERIPHERALS_GENERAL, NULL );
+  widget_do_peripherals_general();
 }
 
 void
 menu_options_peripherals_disk( int action )
 {
-  widget_do( WIDGET_TYPE_PERIPHERALS_DISK, NULL );
+  widget_do_peripherals_disk();
 }
 
 void
 menu_options_sound( int action )
 {
-  widget_do( WIDGET_TYPE_SOUND, NULL );
+  widget_do_sound();
 }
 
 void
 menu_options_rzx( int action )
 {
-  widget_do( WIDGET_TYPE_RZX, NULL );
+  widget_do_rzx();
 }
 
 void
 menu_options_movie( int action )
 {
-  widget_do( WIDGET_TYPE_MOVIE, NULL );
+  widget_do_movie();
 }
 
 void
 menu_options_diskoptions( int action )
 {
-  widget_do( WIDGET_TYPE_DISKOPTIONS, NULL );
+  widget_do_diskoptions();
 }
 
 void
@@ -556,11 +556,11 @@ menu_options_joysticks_select( int action )
   submenu_types[ i + 1 ].text = NULL;
 
   if( action - 1 == JOYSTICK_KEYBOARD ) 
-    error = widget_do( WIDGET_TYPE_MENU, submenu_type_and_mapping_for_keyboard );
+    error = widget_do_menu( submenu_type_and_mapping_for_keyboard );
 
 #ifdef USE_JOYSTICK
   else
-    error = widget_do( WIDGET_TYPE_MENU, submenu_type_and_mapping_for_joystick );
+    error = widget_do_menu( submenu_type_and_mapping_for_joystick );
 #endif  /* #ifdef USE_JOYSTICK */
 
   if( error ) return;
@@ -584,7 +584,7 @@ menu_select_roms_with_title( const char *title, size_t start, size_t count )
   info.count = count;
   info.initialised = 0;
 
-  return widget_do( WIDGET_TYPE_ROM, &info );
+  return widget_do_rom( &info );
 }
 
 void
@@ -596,7 +596,7 @@ menu_machine_reset( int action )
   if( hard_reset )
     message = "Hard reset?";
 
-  if( widget_do( WIDGET_TYPE_QUERY, (void*)message ) ||
+  if( widget_do_query( message ) ||
       !widget_query.confirm )
     return;
 
@@ -639,7 +639,7 @@ menu_machine_select( int action )
   info.count = machine_count;
   info.finish_all = 1;
 
-  error = widget_do( WIDGET_TYPE_SELECT, &info );
+  error = widget_do_select( &info );
   free( buffer ); free( options );
   if( error ) return;
 
@@ -654,31 +654,31 @@ void
 menu_machine_debugger( int action )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
-  widget_do( WIDGET_TYPE_DEBUGGER, NULL );
+  widget_do_debugger();
 }
 
 void
 menu_machine_pokememory( int action )
 {
-  widget_do( WIDGET_TYPE_POKEMEM, NULL );
+  widget_do_pokemem();
 }
 
 void
 menu_machine_pokefinder( int action )
 {
-  widget_do( WIDGET_TYPE_POKEFINDER, NULL );
+  widget_do_pokefinder();
 }
 
 void
 menu_machine_memorybrowser( int action )
 {
-  widget_do( WIDGET_TYPE_MEMORYBROWSER, NULL );
+  widget_do_memorybrowser();
 }
 
 void
 menu_media_tape_browse( int action )
 {
-  widget_do( WIDGET_TYPE_BROWSE, NULL );
+  widget_do_browse();
 }
 
 void
@@ -697,7 +697,7 @@ menu_help_keyboard( int action )
   info.screen = screen.buffer;
   info.border = 0;
 
-  widget_do( WIDGET_TYPE_PICTURE, &info );
+  widget_do_picture( &info );
 
   utils_close_file( &screen );
 }
