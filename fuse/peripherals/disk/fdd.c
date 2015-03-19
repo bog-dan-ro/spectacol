@@ -48,7 +48,7 @@ typedef enum fdd_write_t {
   FDD_WRITE,
 } fdd_write_t;
 
-static const char *fdd_error[] = {
+static const char * const fdd_error[] = {
   "OK",
   "invalid disk geometry",
   "read only disk",

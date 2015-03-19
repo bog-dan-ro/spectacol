@@ -687,7 +687,7 @@ menu_help_keyboard( int action )
   utils_file screen;
   widget_picture_data info;
 
-  static const char *filename = "keyboard.scr";
+  static const char * const filename = "keyboard.scr";
 
   if( utils_read_screen( filename, &screen ) ) {
     return;

@@ -42,7 +42,7 @@
 /* The ordering of these strings must match the order of the 
  * disk_error_t enumeration in disk.h */
 
-static const char *disk_error[] = {
+static const char * const disk_error[] = {
   "OK",				/* DISK_OK */
   "Feature not implemented",	/* DISK_IMPL */
   "Out of memory",		/* DISK_MEM */

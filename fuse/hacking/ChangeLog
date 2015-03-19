@@ -4732,3 +4732,8 @@
 20150319 bitmap.h,display.c,rectangle.c: replace inline static with static
          inline (Stuart).
 20150319 ui/win32/debugger.h: add missing IDC_DBG_REG_HALTED macro (Stuart).
+20150319 fuse.c,menu.c,periph.c,peripherals/{disk/{disk.c,fdd.c},ide/{divide.c,
+         zxatasp.c,zxcf.c},if1.c,printer.c,spectranet.c},rzx.c,sound/aosound.c,
+         tape.c,ui/{fb/fbdisplay.c,gtk/options.pl,widget/{menu.c,,options.pl,
+         pokefinder.c,query.c,select.c,widget_internals.h},win32/options.pl}:
+         add missing const qualifiers (Stuart).

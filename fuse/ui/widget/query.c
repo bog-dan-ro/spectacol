@@ -35,7 +35,7 @@
 
 widget_query_t widget_query;
 
-static const char *title = "Fuse - Confirm";
+static const char * const title = "Fuse - Confirm";
 
 struct widget_query_entry;
 

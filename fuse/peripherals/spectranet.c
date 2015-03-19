@@ -86,7 +86,7 @@ static int nmi_flipflop = 0;
 static int spectranet_source;
 
 /* Debugger events */
-static const char *event_type_string = "spectranet";
+static const char * const event_type_string = "spectranet";
 static int page_event, unpage_event;
 
 void

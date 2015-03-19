@@ -69,14 +69,14 @@ typedef struct widget_option_entry {
   int index;
   input_key key;		/* Which key to activate this option */
   const char *suffix;
-  const char **options;
+  const char * const *options;
 
   widget_option_click_fn click;
   widget_option_draw_fn draw;
 } widget_option_entry;
 
 static void
-widget_combo_click( const char *title, const char **options, char **current, int def )
+widget_combo_click( const char *title, const char * const *options, char **current, int def )
 \{
   int error, i;
   widget_select_t sel;
@@ -100,7 +100,7 @@ widget_combo_click( const char *title, const char **options, char **current, int
 \}
 
 static int
-option_enumerate_combo( const char **options, char *value, int def ) {
+option_enumerate_combo( const char * const *options, char *value, int def ) {
   int i;
   if( value != NULL ) {
     for( i = 0; options[i] != NULL; i++) {
@@ -130,7 +130,7 @@ foreach( @dialogs ) {
 		$combo_sets{$widget->{data1}} = "widget_$widget->{value}_combo";
 
 		print << "CODE";
-static const char *widget_$widget->{value}_combo[] = {
+static const char * const widget_$widget->{value}_combo[] = {
 CODE
 		foreach( split /\|/, $widget->{data1} ) {
 		    print << "CODE";
@@ -232,7 +232,7 @@ int widget_options_print_value( int left_edge, int width, int number, int value 
 int widget_options_print_entry( int left_edge, int width, int number, const char *prefix, int value,
 				const char *suffix );
 int widget_options_print_combo( int left_edge, int width, int number, const char *prefix,
-				const char **options, const char *value, int def );
+				const char * const *options, const char *value, int def );
 
 static int widget_options_print_label( int left_edge, int width, int number, const char *string );
 static int widget_options_print_data( int left_edge, int menu_width, int number, const char *string, int tcolor );
@@ -341,7 +341,7 @@ widget_options_print_entry( int left_edge, int width, int number, const char *pr
 
 int
 widget_options_print_combo( int left_edge, int width, int number, const char *prefix,
-			    const char **option, const char *value, int def )
+			    const char * const *option, const char *value, int def )
 {
   int i = 0;
   const char *c;
@@ -422,7 +422,7 @@ widget_calculate_option_width(widget_option_entry *menu)
     if( ptr->suffix ) total_width += widget_stringwidth(ptr->suffix)+4*8;
     if( ptr->options ) {
       int combo_width = 0;
-      const char **options = ptr->options;
+      const char * const *options = ptr->options;
       while( *options != NULL ) {
         if( combo_width < widget_stringwidth( *options ) )
           combo_width = widget_stringwidth( *options );

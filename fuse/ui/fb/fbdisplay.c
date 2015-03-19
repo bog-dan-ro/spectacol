@@ -52,10 +52,10 @@ libspectrum_word
 ptrdiff_t fbdisplay_pitch = DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
 
 /* The environment variable specifying which device to use */
-static const char *DEVICE_VARIABLE = "FRAMEBUFFER";
+static const char * const DEVICE_VARIABLE = "FRAMEBUFFER";
 
 /* The device we will use if device_env_variable is not specified */
-static const char *DEFAULT_DEVICE = "/dev/fb0";
+static const char * const DEFAULT_DEVICE = "/dev/fb0";
 
 /* The size of a 1x1 image in units of
    DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT */

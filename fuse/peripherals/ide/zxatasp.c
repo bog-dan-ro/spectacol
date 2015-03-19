@@ -52,7 +52,7 @@ static int zxatasp_memory_source;
 
 
 /* Debugger events */
-static const char *event_type_string = "zxatasp";
+static const char * const event_type_string = "zxatasp";
 static int page_event, unpage_event;
 
 /* Private function prototypes */

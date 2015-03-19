@@ -102,8 +102,8 @@ static const float SPEED_TOLERANCE = 5;
 static const size_t AUTOSAVE_INTERVAL = 5 * 50;
 
 /* Debugger events */
-static const char *event_type_string = "rzx";
-static const char *end_event_detail_string = "end";
+static const char * const event_type_string = "rzx";
+static const char * const end_event_detail_string = "end";
 
 int end_event;
 

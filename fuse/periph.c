@@ -65,8 +65,8 @@ typedef struct periph_port_private_t {
 static GSList *ports = NULL;
 
 /* The strings used for debugger events */
-static const char *page_event_string = "page",
-  *unpage_event_string = "unpage";
+static const char * const page_event_string = "page",
+  * const unpage_event_string = "unpage";
 
 /* Place one port response in the list of currently active ones */
 static void

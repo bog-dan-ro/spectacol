@@ -47,7 +47,7 @@ static void update_possible( void );
 static void display_possible( void );
 static void display_value( void );
 
-static const char *title = "Poke finder";
+static const char * const title = "Poke finder";
 
 int
 widget_pokefinder_draw( void *data )

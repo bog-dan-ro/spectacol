@@ -107,7 +107,7 @@ static module_info_t divide_module_info = {
 };
 
 /* Debugger events */
-static const char *event_type_string = "divide";
+static const char * const event_type_string = "divide";
 static int page_event, unpage_event;
 
 /* Housekeeping functions */

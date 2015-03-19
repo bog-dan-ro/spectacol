@@ -33,7 +33,7 @@
 static size_t highlight_line;
 
 const char *title;
-const char **options;
+const char * const *options;
 static int finish_all;
 static size_t count;
 static int *result;

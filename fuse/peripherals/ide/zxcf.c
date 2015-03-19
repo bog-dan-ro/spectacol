@@ -102,7 +102,7 @@ static module_info_t zxcf_module_info = {
 };
 
 /* Debugger events */
-static const char *event_type_string = "zxcf";
+static const char * const event_type_string = "zxcf";
 static int page_event, unpage_event;
 
 /* Housekeeping functions */

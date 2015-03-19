@@ -138,7 +138,7 @@ static void printer_text_init(void)
 
 static int printer_zxp_open_file(void)
 {
-static const char *pbmstart="P4\n256 ";
+static const char * const pbmstart="P4\n256 ";
 FILE *tmpf;
 int overwrite=1;
 

@@ -66,10 +66,10 @@ static int tape_autoplay;
 int tape_microphone;
 
 /* Debugger events */
-static const char *event_type_string = "tape";
+static const char * const event_type_string = "tape";
 
-static const char *play_event_detail_string = "play",
-  *stop_event_detail_string = "stop";
+static const char * const play_event_detail_string = "play",
+  * const stop_event_detail_string = "stop";
 static int play_event, stop_event = -1;
 
 /* Spectrum events */

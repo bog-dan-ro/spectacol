@@ -969,7 +969,7 @@ menu_tape_detail( void )
   else return "Stopped";
 }
 
-static const char *disk_detail_str[] = {
+static const char * const disk_detail_str[] = {
   "Inserted",
   "Inserted WP",
   "Inserted UD",

@@ -229,7 +229,7 @@ static const periph_t if1_periph = {
 static int if1_memory_source;
 
 /* Debugger events */
-static const char *event_type_string = "if1";
+static const char * const event_type_string = "if1";
 static int page_event, unpage_event;
 
 static void

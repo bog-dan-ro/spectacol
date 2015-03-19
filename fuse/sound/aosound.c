@@ -39,7 +39,7 @@
 static ao_device *dev_for_ao;
 static int sixteenbit = 1;
 static char *filename = NULL;
-static const char *default_filename = "fuse-sound.ao";
+static const char * const default_filename = "fuse-sound.ao";
 static int first_init = 1;
 
 static void
