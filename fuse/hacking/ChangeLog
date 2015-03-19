@@ -4739,3 +4739,5 @@
          add missing const qualifiers (Stuart).
 20150319 ui/win32/debugger.[c|h|rc]: relocate halted flag and set monospaced
          font (Sergio).
+20150319 ui/uijoystick.c: fix memory leak and remove unneeded "out of memory"
+         error handling (Sergio).

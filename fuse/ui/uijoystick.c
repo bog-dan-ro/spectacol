@@ -153,12 +153,6 @@ ui_joystick_init( void )
   calibration = libspectrum_new( char, strlen( home ) +
                                        strlen( JSDefaultCalibration ) + 2 );
 
-  if( !calibration ) {
-    ui_error( UI_ERROR_ERROR, "failed to initialise joystick: %s",
-	      "not enough memory" );
-    return 0;
-  }
-
   sprintf( calibration, "%s/%s", home, JSDefaultCalibration );
 
   for( i = 0; i<2; i++ ) {
@@ -169,10 +163,18 @@ ui_joystick_init( void )
 
   /* If we can't init the first, don't try the second */
   error = open_joystick( 0, settings_current.joystick_1, calibration );
-  if( error ) return 0;
+  if( error ) {
+    libspectrum_free( calibration );
+    return 0;
+  }
 
   error = open_joystick( 1, settings_current.joystick_2, calibration );
-  if( error ) return 1;
+  if( error ) {
+    libspectrum_free( calibration );
+    return 1;
+  }
+
+  libspectrum_free( calibration );
 
   return 2;
 }
