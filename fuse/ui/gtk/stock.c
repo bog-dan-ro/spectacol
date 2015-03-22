@@ -71,24 +71,10 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
 {
   GtkWidget *btn;
   gboolean link_object = ( button->label[0] == '!' );
-  gboolean is_stock = !strncmp( button->label, "gtk-", 4 );
 
   if( !accel ) accel = gtkstock_add_accel_group (widget);
 
-  if( is_stock ) {
-    btn = gtk_button_new_from_stock( button->label + link_object );
-
-/* FIXME: for future use
-
-  else if( button->shortcut ) {
-    button = gtk_button_new_with_mnemonic( button->label + link_object )
-  }
-*/
-
-  } else {
-    btn = gtk_button_new_with_label( button->label + link_object +
-				     ( is_stock ? 4 : 0 ) );
-  }
+  btn = gtk_button_new_with_mnemonic( button->label );
 
   if( GTK_IS_DIALOG( widget ) ) {
     GtkWidget *action_area = gtk_dialog_get_action_area( GTK_DIALOG( widget ) );
@@ -112,24 +98,33 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
     g_signal_connect_swapped( G_OBJECT( btn ), "clicked", button->destroy,
 			      G_OBJECT( widget ) );
 
-  if( is_stock ) {
-    if( !strcmp( button->label, GTK_STOCK_CLOSE ) )
-      add_click( btn, button, accel, GDK_KEY_Return, 0, GDK_KEY_Escape, 0 );
-    else if( !strcmp( button->label, GTK_STOCK_OK ) )
-      add_click( btn, button, accel, GDK_KEY_Return, 0, 0, 0 );
-    else if( !strcmp( button->label, GTK_STOCK_CANCEL ) )
-      add_click( btn, button, accel, GDK_KEY_Escape, 0, 0, 0 );
-    else if( !strcmp( button->label, GTK_STOCK_SAVE ) )
-      add_click( btn, button, accel, GDK_KEY_S, GDK_MOD1_MASK, 0, 0 );
-    else if( !strcmp( button->label, GTK_STOCK_YES ) )
-      add_click( btn, button, accel, GDK_KEY_Y, GDK_MOD1_MASK, GDK_KEY_Return, 0 );
-    else if( !strcmp( button->label, GTK_STOCK_NO ) )
-      add_click( btn, button, accel, GDK_KEY_N, GDK_MOD1_MASK, GDK_KEY_Escape, 0 );
-    else
-      add_click( btn, button, accel, 0, 0, 0, 0 );
-  } else {
-    add_click( btn, button, accel, 0, 0, 0, 0 );
-  }
+  GtkWidget *icon = NULL;
+  if( !strcmp( button->label, "_Close" ) )
+    icon = gtk_image_new_from_icon_name( "window-close", GTK_ICON_SIZE_BUTTON );    
+  else if( !strcmp( button->label, "_Open" ) )
+    icon = gtk_image_new_from_icon_name( "document-open",GTK_ICON_SIZE_BUTTON );
+  else if( !strcmp( button->label, "_Save" ) )
+    icon = gtk_image_new_from_icon_name( "document-save",GTK_ICON_SIZE_BUTTON );
+  else if( !strcmp( button->label, "_Add" ) )
+    icon = gtk_image_new_from_icon_name( "list-add", GTK_ICON_SIZE_BUTTON );
+
+#if !GTK_CHECK_VERSION( 3, 0, 0 )
+  /* Note: ok/cancel/yes/no icons are not covered by freedesktop's Icon Naming
+     Specification 0.8.90 */
+  else if( !strcmp( button->label, "_OK" ) )
+    icon = gtk_image_new_from_icon_name( GTK_STOCK_OK, GTK_ICON_SIZE_BUTTON );
+  else if( !strcmp( button->label, "_Cancel" ) )
+    icon = gtk_image_new_from_icon_name( GTK_STOCK_CANCEL,
+                                         GTK_ICON_SIZE_BUTTON );
+  else if( !strcmp( button->label, "_Yes" ) )
+    icon = gtk_image_new_from_icon_name( GTK_STOCK_YES, GTK_ICON_SIZE_BUTTON );
+  else if( !strcmp( button->label, "_No" ) )
+    icon = gtk_image_new_from_icon_name( GTK_STOCK_NO, GTK_ICON_SIZE_BUTTON );
+#endif
+
+  if( icon ) gtk_button_set_image( GTK_BUTTON( btn ), icon );
+
+  add_click( btn, button, accel, 0, 0, 0, 0 );
 
   return btn;
 }
@@ -152,8 +147,8 @@ gtkstock_create_ok_cancel( GtkWidget *widget, GtkAccelGroup *accel,
                            GCallback destroy_ok, GCallback destroy_cancel )
 {
   gtkstock_button btn[] = {
-    { GTK_STOCK_CANCEL, NULL, NULL, NULL, 0, 0, 0, 0 },
-    { GTK_STOCK_OK, NULL, NULL, NULL, 0, 0, 0, 0 },
+    { "_Cancel", NULL, NULL, NULL, GDK_KEY_Escape, 0, 0, 0 },
+    { "_OK", NULL, NULL, NULL, GDK_KEY_Return, 0, 0, 0 },
   };
   btn[0].destroy = destroy_cancel ? destroy_cancel : NULL;
   btn[1].destroy = destroy_ok ? destroy_ok : NULL;
@@ -169,8 +164,8 @@ gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
 		       GCallback destroy, gboolean esconly )
 {
   gtkstock_button btn = {
-    GTK_STOCK_CLOSE, NULL, NULL, (destroy ? destroy : DEFAULT_DESTROY),
-    (esconly ? GDK_KEY_VoidSymbol : 0), 0, 0, 0
+    "_Close", NULL, NULL, (destroy ? destroy : DEFAULT_DESTROY),
+    (esconly ? GDK_KEY_VoidSymbol : GDK_KEY_Return), 0, GDK_KEY_Escape, 0
   };
   return gtkstock_create_buttons( widget, accel, &btn, 1 );
 }

@@ -157,7 +157,7 @@ create_dialog( void )
 
   /* Create Add button for custom pokes */
   static const gtkstock_button
-    add  = { "Add", G_CALLBACK( pokemem_add_custom_poke ), NULL, NULL,
+    add  = { "_Add", G_CALLBACK( pokemem_add_custom_poke ), NULL, NULL,
              0, 0, 0, 0 };
   gtkstock_create_button( GTK_WIDGET( hbox ), accel_group, &add );
 

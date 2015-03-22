@@ -98,9 +98,9 @@ ui_confirm_save_specific( const char *message )
 
   {
     static gtkstock_button btn[] = {
-      { GTK_STOCK_NO, G_CALLBACK( set_dont_save ), NULL, DEFAULT_DESTROY, 0, 0, GDK_KEY_VoidSymbol, 0 }, /* override Escape */
-      { GTK_STOCK_CANCEL, NULL, NULL, DEFAULT_DESTROY, 0, 0, 0, 0 },
-      { GTK_STOCK_SAVE, G_CALLBACK( set_save ), NULL, DEFAULT_DESTROY, 0, 0, 0, 0 }
+      { "_No", G_CALLBACK( set_dont_save ), NULL, DEFAULT_DESTROY, 0, 0, 0, 0 },
+      { "_Cancel", NULL, NULL, DEFAULT_DESTROY, GDK_KEY_Escape, 0, 0, 0 },
+      { "_Save", G_CALLBACK( set_save ), NULL, DEFAULT_DESTROY, 0, 0, 0, 0 }
     };
     btn[0].actiondata = btn[2].actiondata = &confirm;
     gtkstock_create_buttons( dialog, NULL, btn, ARRAY_SIZE( btn ) );

@@ -40,16 +40,16 @@ run_dialog( const char *title, GtkFileChooserAction action )
   const char *button;
 
   if( action == GTK_FILE_CHOOSER_ACTION_SAVE ) {
-    button = GTK_STOCK_SAVE;
+    button = "_Save";
   } else {
-    button = GTK_STOCK_OPEN;
+    button = "_Open";
   }
 
   dialog =
     gtk_file_chooser_dialog_new( title, GTK_WINDOW( gtkui_window ),
-				 action, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-				 button, GTK_RESPONSE_ACCEPT,
-				 NULL );
+                                 action, "_Cancel", GTK_RESPONSE_CANCEL,
+                                 button, GTK_RESPONSE_ACCEPT,
+                                 NULL );
 
   gtk_dialog_set_default_response( GTK_DIALOG( dialog ), GTK_RESPONSE_ACCEPT );
 
