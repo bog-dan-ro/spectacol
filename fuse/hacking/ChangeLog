@@ -4680,7 +4680,7 @@
 20150316 compat/win32/socket.c: fix misuse of ARRAY_SIZE (Sergio).
 20150316 configure.ac: check for libspectrum before checking for UIs (Stuart).
 20150316 configure.ac: check for libspectrum's own GLib replacement (Stuart).
-20150316 configure.ac: use real GLib iff libspectrum does and make GTK+ UI
+20150316 configure.ac: use real GLib if libspectrum does and make GTK+ UI
          depend on real GLib (Stuart).
 20150316 configure.ac: add missing quotes to AC_MSG_ERROR for GLib (Stuart).
 20150316 configure.ac: remove duplicate 'checking for GLib' message (Stuart).
@@ -4697,7 +4697,7 @@
          the status of the halted flag in the debugger (Stuart).
 20150316 z80/{tests/tests.expected,z80.{c,h,pl},z80_checks.h,z80_ops.c}:
          accurate emulation of the HALT instruction (Stuart).
-20150317 utils.c: use libspectrum's memory managment in utils_safe_strdup
+20150317 utils.c: use libspectrum's memory management in utils_safe_strdup
          (Sergio).
 20150317 sound/win32sound.c: don't free static buffers (Sergio).
 20150317 compat/{unix/socket.c,win32/socket.c},debugger/{breakpoint.c,
@@ -4741,3 +4741,5 @@
          font (Sergio).
 20150319 ui/uijoystick.c: fix memory leak and remove unneeded "out of memory"
          error handling (Sergio).
+20150322 menu.c,tape.[c|h]: don't show an error when rewinding an empty tape
+         (Sergio).

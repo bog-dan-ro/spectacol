@@ -339,7 +339,7 @@ MENU_CALLBACK( menu_media_tape_play )
 MENU_CALLBACK( menu_media_tape_rewind )
 {
   ui_widget_finish();
-  tape_select_block( 0 );
+  tape_rewind();
 }
 
 MENU_CALLBACK( menu_media_tape_clear )

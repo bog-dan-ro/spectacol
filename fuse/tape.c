@@ -240,6 +240,15 @@ int tape_close( void )
   return 0;
 }
 
+/* Rewind to block 0, if any */
+int
+tape_rewind( void )
+{
+  if( !libspectrum_tape_present( tape ) ) return 0;
+
+  return tape_select_block( 0 );
+}
+
 /* Select the nth block on the tape; 0 => 1st block */
 int
 tape_select_block( size_t n )
