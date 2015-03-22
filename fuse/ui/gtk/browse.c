@@ -269,7 +269,7 @@ select_row( GtkTreeView *treeview GCC_UNUSED, GtkTreePath *path,
   if( current_block != -1 ) {
     path = gtk_tree_path_new_from_indices( current_block, -1 );
 
-    if( gtk_tree_model_get_iter( GTK_TREE_MODEL( model ), &iter, path ) ) {
+    if( !gtk_tree_model_get_iter( GTK_TREE_MODEL( model ), &iter, path ) ) {
       gtk_tree_path_free( path );
       return;
     }

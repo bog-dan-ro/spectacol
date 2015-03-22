@@ -4745,3 +4745,5 @@
          (Sergio).
 20150322 ui/gtk/{confirm.c,fileselector.c,gtkinternals.h,pokemem.c,stock.c}:
          replace deprecated GtkStock (Sergio).
+20150322 ui/gtk/browse.c: clear out row mark in tape browser when selecting
+         another block (Sergio).
