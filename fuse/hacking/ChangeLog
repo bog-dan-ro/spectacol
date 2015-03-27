@@ -4680,7 +4680,7 @@
 20150316 compat/win32/socket.c: fix misuse of ARRAY_SIZE (Sergio).
 20150316 configure.ac: check for libspectrum before checking for UIs (Stuart).
 20150316 configure.ac: check for libspectrum's own GLib replacement (Stuart).
-20150316 configure.ac: use real GLib if libspectrum does and make GTK+ UI
+20150316 configure.ac: use real GLib iff libspectrum does and make GTK+ UI
          depend on real GLib (Stuart).
 20150316 configure.ac: add missing quotes to AC_MSG_ERROR for GLib (Stuart).
 20150316 configure.ac: remove duplicate 'checking for GLib' message (Stuart).
