@@ -35,7 +35,7 @@
 20030821 rzxtool.c: free any snapshot we're using at program exit.
 20030822 rzxcheck.c: free signature memory.
 20030824 rzxtool.c: free snapshot after writing it rather than before.
-20030901 Build rzxcheck if libgcrypt is present.
+20030901 Build rzxcheck iff libgcrypt is present.
 20030901 Remove the find an <n>-bit type stuff as that's now done by
 	 libspectrum.
 20030912 man/: update man pages for the 0.6.1 release.
