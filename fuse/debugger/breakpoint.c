@@ -443,6 +443,7 @@ int
 debugger_breakpoint_clear( libspectrum_word address )
 {
   GSList *ptr;
+  gpointer ptr_data;
 
   int found = 0;
 
@@ -454,11 +455,12 @@ debugger_breakpoint_clear( libspectrum_word address )
 
     found++;
 
-    debugger_breakpoints = g_slist_remove( debugger_breakpoints, ptr->data );
+    ptr_data = ptr->data;
+    debugger_breakpoints = g_slist_remove( debugger_breakpoints, ptr_data );
     if( debugger_mode == DEBUGGER_MODE_ACTIVE && !debugger_breakpoints )
       debugger_mode = DEBUGGER_MODE_INACTIVE;
 
-    free_breakpoint( ptr->data, NULL );
+    free_breakpoint( ptr_data, NULL );
   }
 
   if( !found ) {
