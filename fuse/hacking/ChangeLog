@@ -4750,3 +4750,6 @@
 20150328 debugger/breakpoint.c: store the matched breakpoint before removing it
          from the list and freeing it (fixes bug #317) (Tom Seddon).
 20150402 man/fuse.1: adjust some references to peripherals options (Sergio).
+20150402 compat/win32/distribution.mk,ui/win32/installer/fuse.nsi.in: prefer
+         groff over man2html. Ensure tables are not broken. Distribute images
+         referenced in the manual (Sergio).

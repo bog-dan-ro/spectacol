@@ -41,11 +41,14 @@ install-win32: all
 	  do cp "$(top_srcdir)/$$file" "$(DESTDIR)/$$file.txt"; \
 	done
 #	Get manuals
-	if test -n "$(MAN2HTML)"; then \
-	  $(MAN2HTML) -r $(top_srcdir)/man/fuse.1 | sed '1d' > $(DESTDIR)/fuse.html; \
+	if test -n "$(GROFF)"; then \
+	  sed ':a;N;$!ba;s/\.PP\n\.TS/\.bp\n&/g' $(top_srcdir)/man/fuse.1 | \
+	  groff -t -Thtml -man -P -I -P manual > $(DESTDIR)/fuse.html; \
 	else \
-	  test -z "$(GROFF)" || $(GROFF) -Thtml -man $(top_srcdir)/man/fuse.1 > $(DESTDIR)/fuse.html; \
+	  test -z "$(MAN2HTML)" || man2html -r $(top_srcdir)/man/fuse.1 | \
+	  sed '1d' > $(DESTDIR)/fuse.html; \
 	fi
+	-mv manual*.png $(DESTDIR);
 #	Convert to DOS line endings
 	test -z "$(UNIX2DOS)" || find $(DESTDIR) -type f \( -name "*.txt" -or -name "*.html" -or -name "*.copyright" \) -exec $(UNIX2DOS) {} \;
 
