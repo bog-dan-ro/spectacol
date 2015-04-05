@@ -1912,7 +1912,7 @@ filename to save the screenshot to.
 .RS
 Fuse can record movie (video and audio) into a file with special format 
 which can be converted later to a common video file format with the
-.I fmfconv
+.IR fmfconv (1)
 utility.
 You will be prompted for a filename to save video. Please see
 .B "MOVIE RECORDING"
@@ -4761,12 +4761,17 @@ present, and can save back weak sector data to UDI image format.
 .PP
 Fuse can save movies with sound in a specific file format (FMF).
 This recording is very fast, and has a moderate size, but you need to use
-the fmfconv program in fuse-utils to convert into regular video and/or audio
+the
+.IR fmfconv (1)
+program in 
+.IR fuse\-utils (1)
+to convert into regular video and/or audio
 files.
 The
 .B \-\-movie\-compr
 option allows you to set the compression level to None, Lossless or High. If
-Zlib is not available, only None is valid. The default when Zlib is available
+.IR zlib (3)
+is not available, only None is valid. The default when Zlib is available
 is Lossless.
 Recording a movie may slow down emulation, if you experience performance
 problems, you can try to set compression to None.
@@ -4799,7 +4804,7 @@ or the equivalent
 command line switch.
 .PP
 You can use
-.I fmfconv
+.IR fmfconv (1)
 to convert recorded movie file into a standard video file.
 .PP
 .B Examples
@@ -4854,13 +4859,13 @@ error messages.
 .\"
 .SH SEE ALSO
 .IR bzip2 "(3),"
-.IR fmfconv "(1)"
+.IR fmfconv "(1),"
 .IR fuse\-utils "(1),"
 .IR gzip "(3),"
 .IR libspectrum "(3),"
 .IR ogg123 "(1),"
 .IR xspect "(1),"
-.IR xzx "(1)"
+.IR xzx "(1)."
 .PP
 The comp.sys.sinclair Spectrum FAQ, at
 .br

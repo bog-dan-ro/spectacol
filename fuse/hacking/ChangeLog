@@ -4753,3 +4753,4 @@
 20150402 compat/win32/distribution.mk,ui/win32/installer/fuse.nsi.in: prefer
          groff over man2html. Ensure tables are not broken. Distribute images
          referenced in the manual (Sergio).
+20150405 man/fuse.1: adjust some cross-references (Sergio).
