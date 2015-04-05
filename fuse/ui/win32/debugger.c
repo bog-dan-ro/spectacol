@@ -361,9 +361,10 @@ static int
 create_breakpoints()
 {
   size_t i;
-  
-  TCHAR *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life",
-                                 "Condition" };
+
+  LPCTSTR breakpoint_titles[] = { _T( "ID" ), _T( "Type" ), _T( "Value" ),
+                                  _T( "Ignore" ), _T( "Life" ), 
+                                  _T( "Condition" ) };
   /* set extended listview style to select full row, when an item is selected */
   DWORD lv_ext_style;
   lv_ext_style = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_BPS,
@@ -381,7 +382,7 @@ create_breakpoints()
     if( i != 0 )
       lvc.mask |= LVCF_SUBITEM;
     lvc.cx = _tcslen( breakpoint_titles[i] ) * 8 + 10;
-    lvc.pszText = breakpoint_titles[i];
+    lvc.pszText = (LPTSTR)breakpoint_titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_BPS, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }
@@ -394,7 +395,7 @@ create_disassembly( HFONT font )
 {
   size_t i;
 
-  TCHAR *disassembly_titles[] = { TEXT( "Address" ), TEXT( "Instruction" ) };
+  LPCTSTR disassembly_titles[] = { TEXT( "Address" ), TEXT( "Instruction" ) };
 
   /* The disassembly listview itself */
 
@@ -423,7 +424,7 @@ create_disassembly( HFONT font )
 
   for( i = 0; i < 2; i++ ) {
     if( i != 0 ) lvc.mask |= LVCF_SUBITEM;
-    lvc.pszText = disassembly_titles[i];
+    lvc.pszText = (LPTSTR)disassembly_titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }
@@ -454,9 +455,9 @@ static int
 create_stack_display( HFONT font )
 {
   size_t i;
-  
-  TCHAR *stack_titles[] = { "Address", "Value" };
-  
+
+  LPCTSTR stack_titles[] = { _T( "Address" ), _T( "Value" ) };
+
   /* set extended listview style to select full row, when an item is selected */
   DWORD lv_ext_style;
   lv_ext_style = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_STACK,
@@ -474,7 +475,7 @@ create_stack_display( HFONT font )
 
   for( i = 0; i < 2; i++ ) {
     if( i != 0 ) lvc.mask |= LVCF_SUBITEM;
-    lvc.pszText = stack_titles[i];
+    lvc.pszText = (LPTSTR)stack_titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_STACK, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }
@@ -524,9 +525,8 @@ static int
 create_events()
 {
   size_t i;
-  
-  TCHAR *titles[] = { "Time", "Type" };
-  
+  LPCTSTR titles[] = { _T( "Time" ), _T( "Type" ) };
+
   /* set extended listview style to select full row, when an item is selected */
   DWORD lv_ext_style;
   lv_ext_style = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_EVENTS,
@@ -542,7 +542,7 @@ create_events()
 
   for( i = 0; i < 2; i++ ) {
     if( i != 0 ) lvc.mask |= LVCF_SUBITEM;
-    lvc.pszText = titles[i];
+    lvc.pszText = (LPTSTR)titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_EVENTS, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }

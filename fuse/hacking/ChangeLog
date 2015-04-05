@@ -4754,3 +4754,6 @@
          groff over man2html. Ensure tables are not broken. Distribute images
          referenced in the manual (Sergio).
 20150405 man/fuse.1: adjust some cross-references (Sergio).
+20150405 compat/win32/osname.c,sound/win32sound.c,ui/win32/{browse.c,debugger.c,
+         pokefinder.c,ui/win32/pokemem.c,rollback.c,win32ui.c}: add missing
+         const qualifiers and casts (Sergio).

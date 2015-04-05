@@ -249,12 +249,12 @@ menu_machine_pokefinder( int action GCC_UNUSED )
     lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
     lvc.fmt = LVCFMT_LEFT;
     lvc.cx = cx;
-    lvc.pszText = TEXT( "Page" );
+    lvc.pszText = (LPTSTR) TEXT( "Page" );
     SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LIST, LVM_INSERTCOLUMN, 0,
                         ( LPARAM ) &lvc );
     lvc.mask |= LVCF_SUBITEM;
     lvc.cx = cx;
-    lvc.pszText = TEXT( "Offset" );
+    lvc.pszText = (LPTSTR) TEXT( "Offset" );
     SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LIST, LVM_INSERTCOLUMN, 1,
                         ( LPARAM ) &lvc );
 

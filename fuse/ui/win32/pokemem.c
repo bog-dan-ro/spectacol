@@ -246,13 +246,13 @@ listview_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
           lvi.iItem = dispinfo->item.iItem;
           lvi.iSubItem = dispinfo->item.iSubItem;
           lvi.pszText = ( dispinfo->item.cchTextMax > 1 )?
-                        dispinfo->item.pszText : TEXT( "0" );
+                        dispinfo->item.pszText : (LPTSTR) TEXT( "0" );
 
           /* Validate value */
           val = _ttol( lvi.pszText );
           if( val > 256 ) {
             val = 0;
-            lvi.pszText = TEXT( "0" );
+            lvi.pszText = (LPTSTR) TEXT( "0" );
           }
 
           /* Update listview */
@@ -387,13 +387,13 @@ initialize_dialog( HWND hwnd_dialog )
   lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
   lvc.fmt = LVCFMT_LEFT;
   lvc.cx = cx - ( cx >> 2 );
-  lvc.pszText = TEXT( "Trainer" );
+  lvc.pszText = (LPTSTR) TEXT( "Trainer" );
   SendMessage( hwnd_list, LVM_INSERTCOLUMN, 0, (LPARAM) &lvc );
 
   /* Create value column */
   lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
   lvc.cx = cx >> 2;
-  lvc.pszText = TEXT( "Value" );
+  lvc.pszText = (LPTSTR) TEXT( "Value" );
   SendMessage( hwnd_list, LVM_INSERTCOLUMN, 1, (LPARAM) &lvc );
 
   /* Fill listview with data */

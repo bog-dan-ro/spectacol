@@ -77,7 +77,7 @@ typedef struct win32ui_select_info {
   int length;
   int selected;
   const char **labels;
-  TCHAR *dialog_title;
+  LPCTSTR dialog_title;
 
 } win32ui_select_info;
 
@@ -692,7 +692,7 @@ ui_confirm_joystick_t
 ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
   win32ui_select_info items;
-  char title[ 80 ];
+  TCHAR title[ 80 ];
   int i, selection;
   int selected_joystick;
 
@@ -709,7 +709,8 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
   fuse_emulation_pause();
 
   /* Populate win32ui_select_info */
-  _sntprintf( title, sizeof( title ), "Fuse - Configure %s Joystick",
+  /* FIXME: libspectrum_joystick_name is not unicode compliant */
+  _sntprintf( title, ARRAY_SIZE( title ), _T( "Fuse - Configure %s Joystick" ),
 	    libspectrum_joystick_name( libspectrum_type ) );
   items.dialog_title = title;
   items.length = JOYSTICK_CONN_COUNT; 
@@ -762,7 +763,7 @@ win32ui_get_monospaced_font( HFONT *font )
 }
 
 int
-window_recommended_width( HWND hwndDlg, TCHAR *title )
+window_recommended_width( HWND hwndDlg, LPCTSTR title )
 {
   HDC dc;
   SIZE sz;

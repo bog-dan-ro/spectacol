@@ -53,7 +53,7 @@ dialog_init( HWND hwndDlg )
   lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
   lvc.fmt = LVCFMT_LEFT;
   lvc.cx = 100; /* FIXME: preferably calculate the whole length */
-  lvc.pszText = TEXT( "Seconds" );
+  lvc.pszText = (LPTSTR) TEXT( "Seconds" );
   SendDlgItemMessage( hwndDlg, IDC_ROLLBACK_LV, LVM_INSERTCOLUMN, 0,
                         ( LPARAM ) &lvc );
 }

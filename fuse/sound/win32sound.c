@@ -1,4 +1,4 @@
-/* win32sound.c: Win32 sound using MS Windows Mulitmedia API
+/* win32sound.c: Win32 sound using MS Windows Multimedia API
    Copyright (c) 2007 Marek Januszewski
 
    $Id$
@@ -48,7 +48,7 @@ static char buffer2[ BUFFER_SIZE ];
 static int sixteenbit;
 
 static void
-sound_display_mmresult( char *func, MMRESULT result );
+sound_display_mmresult( const char * const func, MMRESULT result );
 
 static void CALLBACK
 sound_callback( HWAVEOUT hwo, UINT uMsg, DWORD_PTR dwInstance,
@@ -199,9 +199,9 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 }
 
 static void
-sound_display_mmresult( char *func, MMRESULT result )
+sound_display_mmresult( const char * const func, MMRESULT result )
 {
-  char *mmresult;
+  const char *mmresult;
 
   switch ( result ) {
     case WAVERR_BADFORMAT:     mmresult = "WAVERR_BADFORMAT"; break;

@@ -72,7 +72,7 @@ static void
 dialog_init( HWND hwndDlg )
 {
   size_t i;
-  TCHAR *titles[3] = { "", "Block type", "Data" };
+  LPCTSTR titles[3] = { _T( "" ), _T( "Block type" ), _T( "Data" ) };
   int titles_widths[3] = { 16, 115, 150 };
 
   /* set extended listview style to select full row, when an item is selected */
@@ -92,7 +92,7 @@ dialog_init( HWND hwndDlg )
     if( i != 0 )
       lvc.mask |= LVCF_SUBITEM;
     lvc.cx = titles_widths[i];
-    lvc.pszText = titles[i];
+    lvc.pszText = (LPTSTR)titles[i];
     SendDlgItemMessage( hwndDlg, IDC_BROWSE_LV, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }

@@ -31,9 +31,9 @@
 
 int compat_osname( char *osname, size_t length )
 {
-	OSVERSIONINFO buf;
-	char *windows_name;
-	int error;
+  OSVERSIONINFO buf;
+  const char *windows_name;
+  int error;
 
   buf.dwOSVersionInfoSize = sizeof( buf );
   error = GetVersionEx( &buf );
@@ -49,6 +49,7 @@ int compat_osname( char *osname, size_t length )
   default:			   windows_name = "unknown"; break;
   }
 
+  /* FIXME: verify function below is unicode compliant */
   /* The casts to int work around a suspected Wine (or MinGW) bug */
   snprintf( osname, length, "Windows %s %i.%i build %i %s",
 	    windows_name, (int)buf.dwMajorVersion, (int)buf.dwMinorVersion,
