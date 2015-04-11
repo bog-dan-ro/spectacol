@@ -4757,3 +4757,5 @@
 20150405 compat/win32/osname.c,sound/win32sound.c,ui/win32/{browse.c,debugger.c,
          pokefinder.c,ui/win32/pokemem.c,rollback.c,win32ui.c}: add missing
          const qualifiers and casts (Sergio).
+20150411 compat/win32/distribution.mk: revert the use of variables for groff and
+         man2html, escape variable substitution (thanks, Stuart) (Sergio).

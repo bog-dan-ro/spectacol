@@ -42,11 +42,10 @@ install-win32: all
 	done
 #	Get manuals
 	if test -n "$(GROFF)"; then \
-	  sed ':a;N;$!ba;s/\.PP\n\.TS/\.bp\n&/g' $(top_srcdir)/man/fuse.1 | \
-	  groff -t -Thtml -man -P -I -P manual > $(DESTDIR)/fuse.html; \
-	else \
-	  test -z "$(MAN2HTML)" || man2html -r $(top_srcdir)/man/fuse.1 | \
-	  sed '1d' > $(DESTDIR)/fuse.html; \
+	  sed ':a;N;$$!ba;s/\.PP\n\.TS/\.bp\n&/g' $(top_srcdir)/man/fuse.1 | \
+	  $(GROFF) -t -Thtml -man -P -I -P manual > $(DESTDIR)/fuse.html; \
+	elif test -n "$(MAN2HTML)"; then \
+	  $(MAN2HTML) -r $(top_srcdir)/man/fuse.1 | sed '1d' > $(DESTDIR)/fuse.html; \
 	fi
 	-mv manual*.png $(DESTDIR);
 #	Convert to DOS line endings
