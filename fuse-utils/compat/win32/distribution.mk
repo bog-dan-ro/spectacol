@@ -45,10 +45,11 @@ install-win32: all
 	man_files=`for file in $(top_srcdir)/man/*.1; do echo "$$file"; done | \
 	  sed -e "s|^$$topsrcdirstrip/||" -e "s|.1$$||"`; \
 	for file in $$man_files; do \
-	  if test -n "$(MAN2HTML)"; then \
-	    $(MAN2HTML) -r "$(top_srcdir)/man/$$file.1" | sed '1d' > "$(DESTDIR)/$$file.html"; \
-	  else \
-	    test -z "$(GROFF)" || $(GROFF) -Thtml -man "$(top_srcdir)/man/$$file.1" > "$(DESTDIR)/$$file.html"; \
+	  if test -n "$(GROFF)"; then \
+	    $(GROFF) -Thtml -man "$(top_srcdir)/man/$$file.1" > "$(DESTDIR)/$$file.html"; \
+	  elif test -n "$(MAN2HTML)"; then \
+	    $(MAN2HTML) -r "$(top_srcdir)/man/$$file.1" | \
+	    sed '1d' > "$(DESTDIR)/$$file.html"; \
 	  fi; \
 	done
 #	Convert to DOS line endings
