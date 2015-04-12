@@ -133,8 +133,8 @@ snd_write_aiffheader( void )
 
   fwrite( "SSND\377\377\377\377\000\000\000\000\000\000\000\000", 16, 1, snd );/* data Chunk header */
   snd_header_ok = 1;
-  printi( 1, "snd_write_aif%cheader(): %dHz %c encoded %s\n", aifc ? 'c' : 'f', snd_rte, snd_enc,
-		 snd_chn == 2 ? "stereo" : "mono" );
+  printi( 1, "snd_write_aif%cheader(): %dHz %c encoded %s\n", aifc ? 'c' : 'f',
+          out_rte, snd_enc, snd_chn == 2 ? "stereo" : "mono" );
   return 0;
 }
 

@@ -88,10 +88,10 @@ snd_write_wavheader( void )
   else
     fwrite( "\001\000", 2, 1, snd );			/* Mono */
 
-  buff[0] = snd_rte & 0xff; buff[1] = snd_rte >> 8; buff[2] = buff[3] = 0;
+  buff[0] = out_rte & 0xff; buff[1] = out_rte >> 8; buff[2] = buff[3] = 0;
   fwrite( buff, 4, 1, snd );			/* sampling rate in Hz */
 
-  tmp = snd_rte * snd_fsz;
+  tmp = out_rte * snd_fsz;
   buff[0] = tmp & 0xff; buff[1] = ( tmp >> 8 )  & 0xff ; buff[2] = tmp >> 16; buff[3] = 0;
   fwrite( buff, 4, 1, snd );			/* avarege byte rate */
 
@@ -103,7 +103,7 @@ snd_write_wavheader( void )
 
   fwrite( "data\377\377\377\377", 8, 1, snd );/* data Chunk header */
   snd_header_ok = 1;
-  printi( 1, "snd_write_wavheader(): %dHz %c encoded %s\n", snd_rte, snd_enc,
+  printi( 1, "snd_write_wavheader(): %dHz %c encoded %s\n", out_rte, snd_enc,
 		 snd_chn == 2 ? "stereo" : "mono" );
   return 0;
 }

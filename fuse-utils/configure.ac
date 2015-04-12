@@ -42,6 +42,9 @@ case "$host_os" in
     ;;
 esac
 
+dnl Check non C89 functions
+AC_CHECK_FUNCS(fdopen signal)
+
 dnl Check for big endianness
 AC_C_BIGENDIAN
 
@@ -74,6 +77,53 @@ if test "$prefix" != "NONE"; then
   CXXFLAGS="$CXXFLAGS -I$prefix/include";
   LDFLAGS="$LDFLAGS -L$prefix/lib"
 fi)
+
+dnl Check if libjpeg is available and supports jpeg_write_scanlines
+AC_MSG_CHECKING(whether to use libjpeg)
+AC_ARG_WITH(libjpeg,
+  [  --without-libjpeg        don't use libjpeg],
+  if test "$withval" = no; then libjpeg=no; else libjpeg=yes; fi,
+  libjpeg=yes
+)
+AC_MSG_RESULT($libjpeg)
+
+if test "$libjpeg" = yes; then
+  AC_CHECK_HEADER(
+    jpeglib.h,
+    [AC_CHECK_LIB( jpeg, jpeg_write_scanlines,
+      [AC_DEFINE([USE_LIBJPEG], 1,
+        [Defined if we're going to be using the installed libjpeg])
+        JPEG_LIBS='-ljpeg'],
+      [AC_MSG_WARN(jpeg_write_scanlines not found - jpeg output not supported...)],
+    )],
+    [AC_MSG_WARN(jpeglib.h not found - jpeg output not supported...)]
+  )
+fi
+AM_CONDITIONAL(HAVE_LIBJPEG, test x$JPEG_LIBS != x)
+AC_SUBST(JPEG_LIBS)
+
+dnl Check if a version of libpng which supplies png_write_png is available
+AC_MSG_CHECKING(whether to use libpng)
+AC_ARG_WITH(libpng,
+  [  --without-libpng        don't use libpng],
+  if test "$withval" = no; then libpng=no; else libpng=yes; fi,
+  libpng=yes
+)
+AC_MSG_RESULT($libpng)
+if test "$libpng" = yes; then
+  AC_CHECK_HEADER(
+    png.h,
+    [AC_CHECK_LIB( png, png_write_png,
+      [AC_DEFINE([USE_LIBPNG], 1,
+        [Defined if we're going to be using the installed libpng])
+        PNG_LIBS='-lpng'],
+      [AC_MSG_WARN(png_write_png not found - PNG output not supported...)],
+    )],
+    [AC_MSG_WARN(png.h not found - PNG output not supported...)]
+  )
+fi
+AM_CONDITIONAL(HAVE_LIBPNG, test x$PNG_LIBS != x)
+AC_SUBST(PNG_LIBS)
 
 dnl Check for ffmpeg libs
 AC_MSG_CHECKING(whether ffmpeg movie recording requested)

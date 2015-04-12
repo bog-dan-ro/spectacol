@@ -448,7 +448,7 @@ ffmpeg_add_sound_ffmpeg( int len )
 
       /* write the compressed frame in the media file */
       if( av_interleaved_write_frame( oc, &pkt ) != 0 ) {
-        fprintf( stderr, "Error while writing audio frame\n" );
+        printe( "Error while writing audio frame\n" );
         return 1;
       }
       audio_inpbuf_len = 0;
@@ -489,7 +489,7 @@ ffmpeg_add_sound_ffmpeg( int len )
 
       /* write */
       if( av_interleaved_write_frame( oc, &pkt ) != 0 ) {
-        fprintf( stderr, "Error while writing audio frame\n" );
+        printe( "Error while writing audio frame\n" );
         return 1;
       }
     }
@@ -510,7 +510,7 @@ ffmpeg_add_sound_ffmpeg( int len )
 
     /* write */
     if( av_interleaved_write_frame( oc, &pkt ) != 0 ) {
-      fprintf( stderr, "Error while writing audio frame\n" );
+      printe( "Error while writing audio frame\n" );
       return 1;
     }
 #endif				/* #ifdef HAVE_FFMPEG_AVCODEC_ENCODE_AUDIO2 */
@@ -810,7 +810,7 @@ ffmpeg_add_frame_ffmpeg( void )
   }
 
   if( ret != 0 ) {
-    fprintf(stderr, "Error while writing video frame\n");
+    printe( "Error while writing video frame\n");
 /*      exit( 1 ); */
   }
 }

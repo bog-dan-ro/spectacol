@@ -453,3 +453,7 @@
 20140706 configure.ac,fmfconv_ff.c: add libav10 support (thanks, Alberto Garcia)
          (Anton Khirnov and Sergio).
 20150411 compat/win32/distribution.mk: prefer groff over man2html (Sergio).
+20150412 Makefile.am,configure.ac,fmfconv.[c|h],
+         fmfconv_[aiff|au|avi|ff|jpg|png|ppm|wav|yuv].c: support JPEG, PNG and
+         AVI output formats. New internal sound resampling. Allow greyscale
+         output (patch #329) (Gergely Szasz).

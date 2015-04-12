@@ -23,6 +23,19 @@
 
 */
 
+#ifndef FMFCONV_H
+#define FMFCONV_H
+
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#else
+#define PRIu64 "llu"
+#endif /* #ifdef HAVE_INTTYPES_H */
+
+#ifdef HAVE_ZLIB_H
+#define USE_ZLIB
+#endif
+
 #ifdef USE_FFMPEG
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
@@ -61,10 +74,12 @@ typedef enum {
   TYPE_FMF,	/* i */
 
   TYPE_SCR,	/* io (no conv) */
-
   TYPE_PPM,	/* o (conv to RGB) */
   TYPE_PNG,
   TYPE_JPEG,
+
+  TYPE_MJPEG,	/* o */
+  TYPE_AVI,	/* os */
 
   TYPE_YUV,	/* o (conv to YUV) */
   TYPE_FFMPEG,	/* os */
@@ -79,6 +94,9 @@ typedef enum {
   TYPE_420M,
   TYPE_420,
   TYPE_410,
+  TYPE_mono,
+
+  TYPE_AVI_DIB,
 
   TYPE_RESCALE_WH,
   TYPE_RESCALE_X,
@@ -110,10 +128,12 @@ typedef enum {
 extern int verbose;
 
 extern FILE *out, *snd;
+extern int out_to_stdout;
 
 extern int frm_slice_x, frm_slice_y, frm_slice_w, frm_slice_h;
 extern int frm_w, frm_h;
 extern int frm_fps, frm_mch;
+extern libspectrum_qword output_no;	/* output frame no */
 
 extern type_t scr_t, yuv_t, out_t, snd_t;
 
@@ -141,13 +161,31 @@ extern int machine_timing[];
 
 extern int force_aifc;			/* record aifc file even PCM sound */
 
+FILE *fopen_overwr( const char *path, const char *mode, int rw );
 libspectrum_dword swap_endian_dword( libspectrum_dword d );
 void pcm_swap_endian( void );	/* buff == sound */
+int next_outname( libspectrum_qword num );
+void close_out( void );
+int open_out( void );
+
+int snd_write_avi( void );
+int out_write_avi( void );
+void out_finalize_avi( void );
 
 int out_write_yuv( void );
 
 int out_write_scr( void );
 int out_write_ppm( void );
+#ifdef USE_LIBPNG
+int out_write_png( void );
+#endif
+#ifdef USE_LIBJPEG
+int out_write_jpg( void );
+int out_write_mjpeg( void );
+int out_build_avi_mjpeg_frame( char **frame_buff,
+                               unsigned long int *frame_size );
+void out_finalize_mjpeg( void );
+#endif
 
 int snd_write_wav( void );
 void snd_finalize_wav( void );
@@ -158,16 +196,19 @@ void snd_finalize_au( void );
 int snd_write_aiff( void );
 void snd_finalize_aiff( void );
 
-#ifdef USE_FFMPEG
+#ifdef USE_FFMPEG_VARS
 extern int ffmpeg_arate;		/* audio bitrate */
 extern int ffmpeg_vrate;		/* video bitrate */
-extern AVRational ffmpeg_aspect;
-extern int ffmpeg_libx264;
+extern type_t ffmpeg_rescale;
 extern const char *ffmpeg_frate;
 extern const char *ffmpeg_format;
 extern const char *ffmpeg_vcodec;
 extern const char *ffmpeg_acodec;
-extern type_t ffmpeg_rescale;
+extern AVRational ffmpeg_aspect;
+#endif
+
+#ifdef USE_FFMPEG
+extern int ffmpeg_libx264;
 extern int ffmpeg_list;
 
 int snd_write_ffmpeg( void );
@@ -179,5 +220,7 @@ int ffmpeg_resample_audio( void );
 int ffmpeg_rescale_video( void );
 
 void ffmpeg_list_ffmpeg( int what );
-
 #endif
+
+
+#endif	/* FMFCONV_H */

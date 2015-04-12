@@ -30,6 +30,8 @@
 #include "libspectrum.h"
 #include "fmfconv.h"
 
+extern int greyscale;
+
 int yuv_ylen = 0, yuv_uvlen = 0;
 static libspectrum_byte pix_uv[2][40 * 8 * 240 * 2];	/* bpp = 2; w = 40*8 h = 240 timex = 2 subsampled yuv*/
 
@@ -205,9 +207,10 @@ int
 out_write_yuvheader( void )
 {
   const char *yuv4mpeg2[] = {
-    "444", "422", "420jpeg", "420mpeg2", "420", "410"
+    "444", "422", "420jpeg", "420mpeg2", "420", "410", "mono"
   };
 
+  if( greyscale ) yuv_t = TYPE_mono;
   fprintf( out, 
 	    "YUV4MPEG2"
 	    " W%d H%d F%d:1000 Ip A%c:1 C%s\n", 
@@ -229,13 +232,15 @@ out_write_yuv( void )
 
   fprintf( out, "FRAME\n" );
   if( fwrite( pix_yuv[0], yuv_ylen, 1, out ) != 1 ) return ERR_WRITE_OUT;
-  if( yuv_t != TYPE_444 ) {
-    uv_subsample();
-    if( fwrite( pix_uv[0], yuv_uvlen, 1, out ) != 1 ) return ERR_WRITE_OUT;
-    if( fwrite( pix_uv[1], yuv_uvlen, 1, out ) != 1 ) return ERR_WRITE_OUT;
-  } else {
-    if( fwrite( pix_yuv[1], yuv_ylen, 1, out ) != 1 ) return ERR_WRITE_OUT;
-    if( fwrite( pix_yuv[2], yuv_ylen, 1, out ) != 1 ) return ERR_WRITE_OUT;
+  if( !greyscale ) {
+    if( yuv_t != TYPE_444 ) {
+      uv_subsample();
+      if( fwrite( pix_uv[0], yuv_uvlen, 1, out ) != 1 ) return ERR_WRITE_OUT;
+      if( fwrite( pix_uv[1], yuv_uvlen, 1, out ) != 1 ) return ERR_WRITE_OUT;
+    } else {
+      if( fwrite( pix_yuv[1], yuv_ylen, 1, out ) != 1 ) return ERR_WRITE_OUT;
+      if( fwrite( pix_yuv[2], yuv_ylen, 1, out ) != 1 ) return ERR_WRITE_OUT;
+    }
   }
 
   printi( 2, "out_write_yuv()\n" );

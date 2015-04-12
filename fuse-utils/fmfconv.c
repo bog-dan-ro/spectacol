@@ -31,36 +31,40 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+
+#ifdef HAVE_SIGNAL
+#include <signal.h>
+#endif /* #ifdef HAVE_SIGNAL */
+
 #ifdef HAVE_STRINGS_H
 #include <strings.h>		/* Needed for strncasecmp() on QNX6 */
 #endif /* #ifdef HAVE_STRINGS_H */
+
 #include <fcntl.h>
-
-#ifdef HAVE_INTTYPES_H
-#include <inttypes.h>
-#else
-#define PRIu64 "llu"
-#endif /* #ifdef HAVE_INTTYPES_H */
-
-#include "libspectrum.h"
-#include "movie_tables.h"
-
 #include <getopt.h>
 
 #ifdef USE_FFMPEG
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
+#ifndef USE_FFMPEG_VARS
+#define USE_FFMPEG_VARS 1
+#endif
 #endif
 
 #ifdef HAVE_ZLIB_H
-#define USE_ZLIB 1
-#endif
-
-#ifdef USE_ZLIB
 #include <zlib.h>
+#else
+#define Z_NO_COMPRESSION 0
+#define Z_BEST_SPEED 1
+#define Z_DEFAULT_COMPRESSION 6
+#define Z_BEST_COMPRESSION 9
 #endif
 
+#include <libspectrum.h>
+
+#include "compat.h"
 #include "fmfconv.h"
+#include "movie_tables.h"
 
 #define VERBOSE_MAX 3
 #define VERBOSE_MIN -1
@@ -73,6 +77,26 @@ unsigned char zbuf_o[ZBUF_SIZE];	/* zlib output buffer */
 unsigned char zbuf_i[ZBUF_INP_SIZE];	/* zlib input buffer */
 int fmf_compr_feof = 0;
 #endif	/* USE_ZLIB */
+
+#ifdef USE_LIBJPEG
+extern int jpg_dctfloat;
+extern int jpg_idctfast;
+extern int jpg_optimize;
+extern int jpg_smooth;
+extern int jpg_quality;
+#endif
+
+int png_palette = -1;
+#ifdef USE_LIBPNG
+extern int png_compress;
+#endif
+
+#if defined USE_LIBJPEG || defined USE_LIBPNG
+int progressive = 0;
+#endif
+int greyscale = 0;
+
+int avi_subtype = -1;	/* fmfconv guess */
 
 typedef enum {
   DO_FILE = 0,		/* open (next) file */
@@ -90,14 +114,17 @@ int help_exit = 0;	/* exit after print help */
 int verbose = 0;
 int do_info = 0;	/* no output and verbose 2 */
 do_t do_now = DO_FILE;
+int fmfconv_stop = 0;
 
 FILE *inp_file = NULL, *out = NULL, *snd = NULL;
+int out_to_stdout = 0;
 
 type_t inp_t = TYPE_UNSET, out_t = TYPE_UNSET, snd_t = TYPE_UNSET, scr_t = TYPE_UNSET, prg_t = TYPE_NONE;
 
 const char *inp_name = NULL;
 const char *out_name = NULL;
 const char *snd_name = NULL;
+int overwr_out = 0;
 
 char out_tmpl[16];		/* multiple out filename number template */
 const char *out_orig = NULL;		/* multiple out original filename/template */
@@ -130,10 +157,11 @@ int machine_ftime[] = {
 };
 
 const char *machine_name[] = {
- "ZX Spectrum 16K/48K, Timex TC2048/2068, Scorpion, Spectrum SE",
- "ZX Spectrum 128K/+2/+2A/+3/+3E",
- "Timex TS2068", "Pentagon 128K/256K/512K"
- "ZX Spectrum 48K (NTSC)"
+ "ZX Spectrum 16K/48K, Timex TC2048/2068, Scorpion, Spectrum SE",	/* A */
+ "ZX Spectrum 128K/+2/+2A/+3/+3E/128Ke",				/* B */
+ "Timex TS2068", 							/* C */
+ "Pentagon 128K/256K/512K"						/* D */
+ "ZX Spectrum 48K (NTSC)"						/* E */
 };
 
 #define SCR_PITCH 40
@@ -176,13 +204,13 @@ libspectrum_qword output_no = 0;	/* output frame no */
 int frm_scr = 0, frm_rte = 0, frm_mch = 0; /* screen type, frame rate, machine type (A/B/C/D) */
 int frm_slice_x, frm_slice_y, frm_slice_w, frm_slice_h;
 int frm_w = -1, frm_h = -1;
-int frm_fps = 0;
 
 int out_w, out_h;
 int out_fps = 0;			/* desired output frame rate */
 int out_header_ok = 0;			/* output header ok? */
 
 int out_chn = 2, out_rte = -1, out_fsz, out_len;	/* by default convert sound to 2 channel (STEREO) */
+int no_sound_resample = -1;		/* FFMPEG/AVCODEC do their own... */
 
 /* fmf variables */
 int fmf_compr = 0;			/* fmf compressed or not */
@@ -195,6 +223,7 @@ libspectrum_qword fmf_sound_no = 0;
 #define SOUND_BUFF_MAX_SIZE 65536	/* soft max size of collected sound samples */
 type_t snd_enc;				/* sound type (pcm/alaw) */
 int snd_rte, snd_chn, snd_fsz, snd_len;	/* sound rate (Hz), sound channels (1/2), sound length in byte  */
+int snd_frg = 0;			/* sound fragment len from previous resample in bytes */
 int snd_header_ok = 0;			/* sound header ok? */
 
 int sound_raw = 0;			/* do not do law->PCM and channels conversion */
@@ -214,6 +243,28 @@ size_t fbuff_size = 0;
 
 #define INTO_BUFF 0
 #define FROM_BUFF 1
+
+FILE *
+fopen_overwr( const char *path, const char *mode, int rw )
+{
+  if( overwr_out )
+    return fopen( path, mode );
+
+#ifdef HAVE_FDOPEN
+  int fd;
+  fd = open( path, ( rw ? O_RDWR : O_WRONLY ) | O_EXCL | O_CREAT | O_BINARY,
+                   S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH );
+  if( fd >= 0 )
+    return fdopen( fd, mode );
+  else
+    return NULL;
+#else
+  if( access( path, F_OK ) == 0 )
+    return NULL;
+
+  return fopen( path, mode );
+#endif
+}
 
 size_t
 fread_buff( libspectrum_byte *ptr, size_t size, int how )	/* read from inp, how -> into buff or buff + file */
@@ -366,12 +417,19 @@ law_2_pcm( void )
 
   if( snd_t == TYPE_NONE ) return 0;
 
-  if( ( err = alloc_sound_buff( snd_len * 2 ) ) ) return err;
+/* we have to deal resample fragment space */
+  if( ( err = alloc_sound_buff( snd_frg + snd_len * 2 ) ) ) return err;
 
-  for( s = sound8 + snd_len - 1, t = sound16 + snd_len - 1 ;
-		s >= sound8; s--, t-- ) {
+/* we have to skip resample fragment space */
+  sound8 += snd_frg;
+  sound16 = (void *)sound8;
+  for( s = sound8 + snd_len - 1, t = sound16 + snd_len - 1;
+       s >= sound8 + snd_frg; s--, t-- ) {
     *t = alaw_table[*(libspectrum_byte*)s];
   }
+/* restore pointers */
+  sound8 -= snd_frg;
+  sound16 = (void *)sound8;
 #ifdef WORDS_BIGENDIAN
   snd_little_endian = 0;
 #else
@@ -445,6 +503,9 @@ stereo_2_mono( void )
 
   if( snd_t == TYPE_NONE ) return 0;
 
+/* we have to skip resample fragment space */
+  sound8 += snd_frg;
+  sound16 = (void *)sound8;
   if( snd_enc == TYPE_PCM ) {
     libspectrum_signed_word *s;
     libspectrum_signed_word *t;
@@ -460,6 +521,9 @@ stereo_2_mono( void )
       *t = *s; s++; *t = ( (libspectrum_signed_dword)*t + *s + 1 ) / 2;
     }
   }
+/* restore pointers */
+  sound8 -= snd_frg;
+  sound16 = (void *)sound8;
   snd_chn = 1;
   snd_fsz >>= 1;		/* 1/2byte -> 2/4byte */
   snd_len >>= 1;		/* 1/2byte -> 2/4byte */
@@ -470,15 +534,133 @@ stereo_2_mono( void )
 }
 
 /*
-   [-/^^^^\______/-] ->
+   [;;;;;         /^^^^\______/]
+   ^     ^       ^
+   |     |       |
+  sbuf  snd_frg  snd_r
 
+  fmf_rte
+  snd_rte
+  out_rte
+*/
 int
 resample_sound( void )
 {
+  int err, nsamples;
+  static int fmf_rte = -1;
+  static int snd_cpy = 0;
+  static int last_l = 0, last_r = 0;
+  size_t new_len;
+  libspectrum_signed_byte *snd8_w, *snd8_r;
+  libspectrum_signed_word *snd16_w, *snd16_r;
+
+  if( snd_t == TYPE_NONE || no_sound_resample ) return 0;
+
+
+  snd16_r = snd16_w = sound16;
+  snd8_r = snd8_w = sound8;
+
+  if( out_rte > snd_rte ) { /* move samples to upper part */
+    new_len = snd_len + snd_fsz;
+    new_len = new_len * out_rte / snd_rte + snd_frg;
+    if( ( err = alloc_sound_buff( new_len ) ) ) return err;
+
+    snd8_r = snd8_r + new_len - snd_len;
+    memmove( snd8_r, sound8 + snd_frg, snd_len );
+    snd16_r = (void *)snd8_r;
+
+    if( snd_enc == TYPE_PCM )
+      snd16_w += snd_cpy * snd_chn;
+    else
+      snd8_w += snd_cpy * snd_chn;
+  }
+
+/* rescale last copied samples (fragment) */
+  fmf_rte -= out_rte - snd_rte;
+  nsamples = snd_len / snd_fsz;
+  while( nsamples-- ) {
+    if( snd_cpy ) { /*   [----    ######] [lrlrlr]  */
+      int n = snd_cpy + 1;
+
+      if( snd_enc == TYPE_PCM )
+        snd16_w -= snd_cpy * snd_chn;
+      else
+        snd8_w -= snd_cpy * snd_chn;
+
+      while( snd_cpy ) {
+        if( snd_enc == TYPE_PCM ) {
+          *snd16_w = last_l + (*snd16_r - last_l) * (n - snd_cpy) / n;
+          snd16_w++;
+        } else {
+          *snd8_w = last_l + (*snd8_r - last_l) * (n - snd_cpy) / n;
+          snd8_w++;
+        }
+        if( snd_chn == 2 ) {
+          if( snd_enc == TYPE_PCM ) {
+            *snd16_w = last_r + (*(snd16_r+1) - last_r) * (n - snd_cpy) / n;
+            snd16_w++;
+          } else {
+            *snd8_w = last_r + (*(snd8_r+1) - last_r) * (n - snd_cpy) / n;
+            snd8_w++;
+          }
+        }
+        snd_cpy--;
+      }
+    }
+    while( fmf_rte <= 0 ) {
+      if( snd_enc == TYPE_PCM ) {
+        if( snd16_w != snd16_r )
+          *snd16_w = *snd16_r; /* really we do not need to store copies ... */
+        snd16_w++;
+      } else {
+        if( snd8_w != snd8_r )
+          *snd8_w = *snd8_r;
+        snd8_w++;
+      }
+      if( snd_chn == 2 ) {
+        if( snd_enc == TYPE_PCM ) {
+          if( snd16_w != snd16_r + 1 )
+            *snd16_w = *(snd16_r + 1);
+          snd16_w++;
+        } else {
+          if( snd8_w != snd8_r + 1 )
+          *snd8_w = *(snd8_r + 1);
+          snd8_w++;
+        }
+      }
+      fmf_rte += snd_rte;
+      snd_cpy++;
+    }
+    if( snd_enc == TYPE_PCM ) {
+      last_l = last_r = *snd16_r;
+      snd16_r++;
+    } else {
+      last_l = last_r = *snd8_r;
+      snd8_r++;
+    }
+    if( snd_chn == 2 ) {
+      if( snd_enc == TYPE_PCM ) {
+        last_r = *snd16_r;
+        snd16_r++;
+      } else {
+       last_r = *snd8_r;
+       snd8_r++;
+      }
+    }
+    fmf_rte -= out_rte;
+    if( snd_cpy ) snd_cpy--;
+  }
+  snd_frg = snd_cpy * snd_fsz;
+  new_len = ( snd_enc == TYPE_PCM ? (void *)snd16_w : (void *)snd8_w ) -
+            (void *)sound8;
+  new_len -= snd_frg;
+  printi( 3, "resample_sound(): %d sample converted to %d (%dHz -> %dHz)\n",
+              snd_len / snd_fsz, new_len / snd_fsz, snd_rte, out_rte );
+  snd_len = new_len;
+  fmf_rte += out_rte - snd_rte;
+
   return 0;
 }
-
-*/
 
 char *
 find_filename_ext( const char *filename )
@@ -630,13 +812,13 @@ parse_outname( void )
 }
 
 int
-next_outname( void )
+next_outname( libspectrum_qword num )
 {
   int err;
 
   if( !out_orig && ( err = parse_outname() ) ) return err;
   strcpy( out_next, out_orig );
-  sprintf( out_nmbr, out_tmpl, output_no );
+  sprintf( out_nmbr, out_tmpl, num );
   if( out_pfix )
     strcat( out_next, out_pfix );
   out_name = out_next;
@@ -656,24 +838,42 @@ open_out( void )
 
   int i, err;
   ext_t out_ext_tab[] = {
+    { TYPE_WAV,  "wav" },
+    { TYPE_AU,   "au"  },
+    { TYPE_AU,   "snd" },
+    { TYPE_AIFF, "aif" },
+    { TYPE_AIFF, "aiff" },
+
     { TYPE_YUV,  "yuv" },
     { TYPE_YUV,  "y4m" },
     { TYPE_SCR,  "scr"  },
     { TYPE_PPM,  "ppm"  },
     { TYPE_PPM,  "pnm"  },
-    { TYPE_PNG,  "png" },
-    { TYPE_JPEG, "jpg" },
-    { TYPE_JPEG, "jpeg" },
+#ifdef USE_FFMPEG
     { TYPE_FFMPEG,"mpeg" },
     { TYPE_FFMPEG,"mpg" },
     { TYPE_FFMPEG,"avi" },
     { TYPE_FFMPEG,"mkv" },
+    { TYPE_FFMPEG,"flv" },
+    { TYPE_FFMPEG,"webm" },
+#endif
+#ifdef USE_LIBPNG
+    { TYPE_PNG,  "png" },
+#endif
+#ifdef USE_LIBJPEG
+    { TYPE_JPEG, "jpg" },
+    { TYPE_JPEG, "jpeg" },
+    { TYPE_MJPEG,"mjpeg" },
+#endif
+    { TYPE_AVI,  "avi" },
     { 0, NULL }
   };
   const char *out_tstr[] = {
     "SCR - ZX Spectrum screenshot file",
     "PPM - Portable PixMap", "PNG - Portable Network Graphics",
     "JPEG - Joint Photographic Experts Group file format",
+    "M-JPEG - Motion JPEG video file",
+    "AVI - Microsoft Audio Video Interleave format",
     "YUV4MPEG2 - uncompressed video stream format",
     "FFMPEG - ffmpeg file format"
   };
@@ -695,37 +895,64 @@ open_out( void )
       }
     }
   }
+  if( out_t >= TYPE_WAV && out_t <= TYPE_AIFF ) {
+    sound_only = 1;
+    out_t = TYPE_NONE;
+    snd_name = out_name;
+    out_name = NULL;
+    return 0;
+  }
   if( out_name && ( out_t >= TYPE_SCR && out_t <= TYPE_JPEG ) && 
-      ( err = next_outname() ) > 0 ) return err;
+      ( err = next_outname( output_no ) ) > 0 ) return err;
+
+  /* default out fps PAL */
+  if( out_t >= TYPE_MJPEG && out_t <= TYPE_FFMPEG && out_fps == 0 )
+    out_fps = 25000;
 
   if( out_name
 #ifdef USE_FFMPEG
 		&& out_t != TYPE_FFMPEG
 #endif
   ) {
-    if( ( out = fopen( out_name, "wb" ) ) == NULL ) {
-      printe( "Cannot open output file '%s'...\n", out_name );
+    if( ( out = fopen_overwr( out_name, "wb", 0 ) ) == NULL ) {
+      printe( "Cannot open output file '%s' (%s)...\n", out_name,
+              strerror( errno ) );
       return ERR_OPEN_SND;
     }
-  } else
-#ifdef USE_FFMPEG
-	 if( out_t != TYPE_FFMPEG )
+#ifdef USE_LIBJPEG
+    if( avi_subtype == -1 ) avi_subtype = TYPE_AVI;
 #endif
-  {
+  } else if( 1
+#ifdef USE_FFMPEG
+	&& out_t != TYPE_FFMPEG
+#endif
+  ) {
 
     if( isatty( fileno( stdout ) ) ) {
       out_t = TYPE_NONE;
       out = NULL;
       out_name = "(-=null=-)";
     } else {
-      out_t = TYPE_YUV;		/* default to YUV */
+      if( out_t != TYPE_AVI && out_t != TYPE_MJPEG ) {
+        out_t = TYPE_YUV;		/* default to YUV */
+      }
       out = stdout;
+      out_to_stdout = 1;
       out_name = "(-=stdout=-)";
 #ifdef WIN32
       setmode( fileno( stdout ), O_BINARY );
 #endif				/* #ifdef WIN32 */
     }
   }
+
+#ifdef USE_LIBPNG
+  if( out_t == TYPE_PNG && png_palette < 0 )
+    png_palette = 1;
+#endif
+#ifdef USE_FFMPEG
+  if( out_t == TYPE_FFMPEG && no_sound_resample == -1 )
+    no_sound_resample = 1;
+#endif
 
   if( out_t == TYPE_NONE ) {
     printi( 0, "open_out(): Output is a terminal, cannot dump binary data.\n" );
@@ -738,6 +965,18 @@ open_out( void )
 		out_tstr[out_t - TYPE_SCR] );
     printi( 2, "open_out(): Output file (%s) opened as %s file.\n", out_name,
 		out_tstr[out_t - TYPE_SCR] );
+  }
+
+  if( avi_subtype == -1 ) avi_subtype = TYPE_AVI_DIB;
+  /* convert rgb palette to bgr */
+  if( out_t == TYPE_AVI && avi_subtype == TYPE_AVI_DIB && !greyscale ) {
+    libspectrum_byte r;
+    printi( 3, "Converting RGB palette to BGR for Microsoft AVI/DIB format.\n" );
+    for( i = 0; i < 16; i ++ ) {
+      r = rgb_pal[ i * 3 ];
+      rgb_pal[ i * 3 ] = rgb_pal[ i * 3 + 2 ];
+      rgb_pal[ i * 3 + 2 ] = r;
+    }
   }
   return 0;
 }
@@ -758,29 +997,35 @@ open_snd( void )
     { TYPE_AU,   "snd" },
     { TYPE_AIFF, "aif" },
     { TYPE_AIFF, "aiff" },
+#ifdef FFMPEG
     { TYPE_FFMPEG, "mp2" },
     { TYPE_FFMPEG, "mp3" },
     { TYPE_FFMPEG, "ogg" },
     { TYPE_FFMPEG, "aac" },
     { TYPE_FFMPEG, "ac3" },
     { TYPE_FFMPEG, "m4a" },
+#endif
     { 0, NULL }
   };
 
   const char *snd_tstr[] = {
     "FFMPEG - ffmpeg file format",
-    "WAV - MS Wave format",
+    "WAV - MS Wave file format",
     "AU - SUN OS audio file format",
-    "AIF - MAC/OS audio file"
+    "AIF - MAC/OS audio file format"
   };
 
   if( do_info ) return 0;
 
   if( snd_name ) {
-    if( ( snd = fopen( snd_name, "wb" ) ) == NULL ) {
-      printe( "Cannot open sound file '%s'...\n", snd_name );
+    if( ( snd = fopen_overwr( snd_name, "wb", 0 ) ) == NULL ) {
+      printe( "Cannot open sound file '%s' (%s)...\n", snd_name, 
+              strerror( errno ) );
       return ERR_OPEN_SND;
     }
+  } else if( out_t == TYPE_AVI ) {	/* AVI video and audio if nothing else specified */
+    snd_t = TYPE_AVI;
+    return 0;
   } else if( out_t == TYPE_FFMPEG ) {	/* FFMPEG video and audio if nothing else specified */
     snd_t = TYPE_FFMPEG;
     return 0;
@@ -821,6 +1066,9 @@ open_inp( void )
     }
   } else if( out_t == TYPE_FFMPEG ) {	/* FFMPEG video and audio if nothing else specified */
     snd_t = TYPE_FFMPEG;
+    return 0;
+  } else if( out_t == TYPE_AVI ) {	/* AVI video and audio */
+    snd_t = TYPE_AVI;
     return 0;
   } else {
     inp_file = stdin;
@@ -913,7 +1161,7 @@ check_fmf_head( void )
   frm_mch = fhead[6];				/* machine type */
 
   inp_fps = machine_timing[frm_mch - 'A'] / frm_rte;	/* real input fps * 1000 frame / 1000s */
-  if( out_fps == 0 ) out_fps = inp_fps;	/* later may change */
+  if( out_fps <= 0 ) out_fps = inp_fps;	/* later may change */
 
 /* Check initial sound parameters */
   if( fhead[7] != 'P' && fhead[7] != 'A' ) {
@@ -935,8 +1183,8 @@ check_fmf_head( void )
   snd_fsz = ( snd_enc == TYPE_PCM ? 2 : 1 ) * snd_chn;
   if( snd_enc == TYPE_PCM ) snd_little_endian = fmf_little_endian;
 
-  if( out_rte == -1 ) out_rte = snd_rte;
-  if( out_chn == -1 ) out_chn = snd_chn;
+  if( sound_raw || out_rte == -1 ) out_rte = snd_rte;
+  if( sound_raw ) out_chn = snd_chn;
   do_now = DO_SLICE;
   printi( 1, "check_fmf_head(): file:  FMF V1 %s endian %scompressed.\n",
           fmf_little_endian ? "little" : "big", fmf_compr ? "" : "un" );
@@ -982,7 +1230,7 @@ fmf_read_frame_head( void )
     frm_rte = fhead[0];				/* frame rate (1:#) */
     frm_mch = fhead[2];				/* machine type */
     inp_fps = machine_timing[frm_mch - 'A'] / frm_rte;	/* real input fps * 1000 frame / 1000s */
-    if( out_fps == 0 ) out_fps = inp_fps;	/* later may change */
+    if( out_fps <= 0 ) out_fps = inp_fps;	/* later may change */
   }
   do_now = DO_SLICE;
   frame_no++;
@@ -1069,8 +1317,8 @@ fmf_read_sound( void )
   len = ( fhead[4] + ( fhead[5] << 8 ) + 1 ) * snd_fsz;
 
   if( sound_stereo == -1 ) out_chn = snd_chn;
-  if( ( err = alloc_sound_buff( snd_len + len ) ) ) return err;
-  if( fread_compr( (void *)( sound8 + snd_len ), len, 1, inp_file ) != 1 ) {
+  if( ( err = alloc_sound_buff( snd_len + snd_frg + len ) ) ) return err;
+  if( fread_compr( (void *)( sound8 + snd_frg + snd_len ), len, 1, inp_file ) != 1 ) {
     printe( "\n\nCorrupt input file (S) @0x%08lx.\n", (unsigned long)ftell( inp_file ) );
     return ERR_CORRUPT_INP;
   }
@@ -1093,9 +1341,11 @@ snd_write_sound( void )
 
   if( snd_len <= 0 ) return 0;
 
+  if( no_sound_resample ) out_rte = snd_rte;
   if( snd_enc != TYPE_PCM && sound_pcm && ( err = law_2_pcm() ) ) return err;
-  if( snd_chn == 1 && sound_stereo == 1 && ( err = mono_2_stereo() ) ) return err;
   if( snd_chn == 2 && sound_stereo == 0 && ( err = stereo_2_mono() ) ) return err;
+  if( ( snd_rte != out_rte || snd_frg ) && ( err = resample_sound() ) ) return err;
+  if( snd_chn == 1 && sound_stereo == 1 && ( err = mono_2_stereo() ) ) return err;
 
   if( snd_t == TYPE_WAV )
     err = snd_write_wav();
@@ -1103,6 +1353,8 @@ snd_write_sound( void )
     err = snd_write_au();
   else if( snd_t == TYPE_AIFF )
     err = snd_write_aiff();
+  else if( snd_t == TYPE_AVI )
+    err = snd_write_avi();
 #ifdef USE_FFMPEG
   else if( snd_t == TYPE_FFMPEG )
     err = snd_write_ffmpeg();
@@ -1258,6 +1510,8 @@ we have to handle cut here
       inp_get_next_cut();
     if( ( cut_f_t == TYPE_FRAME ? frame_no >= cut_frm : time_sec >= cut_frm ) &&
 	( cut_cmd == TYPE_CUTFROM || ( cut_t_t == TYPE_FRAME ? frame_no <= cut__to : time_sec <= cut__to ) ) ) {
+
+      if( cut_cmd == TYPE_CUTFROM ) fmfconv_stop = 1;
       drop_no++;
       cut_cut = 1;
     }
@@ -1282,56 +1536,48 @@ scr_read_scr( void )
   return 0;
 }
 
+/* store RGB/YUV/Paletted color/grayscale pixel*/
 void
-out_2_yuv( void )
+pix_pix( int *idx, int xx, int i )
 {
-
-  libspectrum_byte *bitmap, *attr;
-  int i, w, idx;
-  int Y, U, V;
-  int x = frm_slice_x, y = frm_slice_y, h = frm_slice_h;
-  int inv = ( frame_no * frm_rte % 32 ) > 15 ? 1 : 0;
-
-  w = frm_slice_w;
-  for( h = frm_slice_h; h > 0; h--, y++, w = frm_slice_w ) {
-    if( scr_t != TYPE_HRE )
-      idx = y * OUT_PITCH + x * 8 ;		/* 8pixel/data */
-    else
-      idx = y * OUT_PITCH * 2 + x * 16 ;	/* 16 pixel/data*/
-    bitmap = &zxscr[SCR_PITCH * y + x];
-    attr   = &attrs[SCR_PITCH * y + x];
-    for( ; w > 0; w--, bitmap++, attr++ ) {
-      int px, fx, ix = *attr;
-      int bits = scr_t == TYPE_HRE ? ( *bitmap << 8 ) + *(bitmap + 9600) : *bitmap;
-
-      fx = ( ix & 0x80 ) * inv;
-      px = ( ( ix & 0x38 ) >> 3 ) + ( ( ix & 0x40 ) ? 8 : 0 );
-      ix = ( ix & 0x07 ) + ( ( ix & 0x40 ) ? 8 : 0 );
-      for( i = ( scr_t == TYPE_HRE ? 16 : 8 ); i > 0; i-- ) {
-        if( ( bits ^ fx ) & 128 ) {	/* ink */
-          Y = yuv_pal[ ix * 3 + 0 ];
-          U = yuv_pal[ ix * 3 + 1 ];
-          V = yuv_pal[ ix * 3 + 2 ];
-        } else {			/* paper */
-          Y = yuv_pal[ px * 3 + 0 ];
-          U = yuv_pal[ px * 3 + 1 ];
-          V = yuv_pal[ px * 3 + 2 ];
-        }
-        pix_yuv[0][idx]   = Y;
-        pix_yuv[1][idx]   = U;
-        pix_yuv[2][idx++] = V;
-        bits <<= 1;
+  if( out_t >= TYPE_YUV ) {
+    pix_yuv[0][*idx]   = yuv_pal[ xx * 3 + 0 ];
+    if( !greyscale ) {
+      pix_yuv[1][*idx] = yuv_pal[ xx * 3 + 1 ];
+      pix_yuv[2][*idx] = yuv_pal[ xx * 3 + 2 ];
+    }
+    (*idx)++;
+  } else if( out_t >= TYPE_PPM ) {
+    if( png_palette > 0 ) {
+      if( i & 0x01 ) {
+        pix_rgb[*idx] &= 0xf0;
+        pix_rgb[*idx] |= xx;
+        (*idx)++;
+      } else {
+        pix_rgb[*idx] &= 0x0f;
+        pix_rgb[*idx] |= xx << 4;
+      }
+    } else {
+      if( greyscale ) {
+        pix_rgb[*idx] = yuv_pal[ xx * 3 + 0 ];
+        (*idx)++;
+      } else {
+        pix_rgb[*idx] = rgb_pal[ xx * 3 + 0 ];
+        (*idx)++;
+        pix_rgb[*idx] = rgb_pal[ xx * 3 + 1 ];
+        (*idx)++;
+        pix_rgb[*idx] = rgb_pal[ xx * 3 + 2 ];
+        (*idx)++;
       }
     }
   }
 }
 
 void
-out_2_rgb( void )
+out_2_pix( void )
 {
   libspectrum_byte *bitmap, *attr;
   int i, w, idx;
-  int R, G, B;
   int x = frm_slice_x, y = frm_slice_y, h = frm_slice_h;
   int inv = ( frame_no * frm_rte % 32 ) > 15 ? 1 : 0;
 
@@ -1342,7 +1588,10 @@ out_2_rgb( void )
     else
       idx = y * OUT_PITCH * 2 + x * 16 ;	/* 16 pixel/data*/
 
-    idx *= 3;
+    if( png_palette > 0 )
+      idx /= 2;
+    else if( out_t < TYPE_YUV && !greyscale )
+      idx *= 3;
 
     bitmap = &zxscr[SCR_PITCH * y + x];
     attr   = &attrs[SCR_PITCH * y + x];
@@ -1354,18 +1603,7 @@ out_2_rgb( void )
       px = ( ( ix & 0x38 ) >> 3 ) + ( ( ix & 0x40 ) ? 8 : 0 );
       ix = ( ix & 0x07 ) + ( ( ix & 0x40 ) ? 8 : 0 );
       for( i = scr_t == TYPE_HRE ? 16 : 8; i > 0; i-- ) {
-        if( ( bits ^ fx ) & 128 ) {	/* ink */
-          R = rgb_pal[ ix * 3 + 0 ];
-          G = rgb_pal[ ix * 3 + 1 ];
-          B = rgb_pal[ ix * 3 + 2 ];
-        } else {			/* paper */
-          R = rgb_pal[ px * 3 + 0 ];
-          G = rgb_pal[ px * 3 + 1 ];
-          B = rgb_pal[ px * 3 + 2 ];
-        }
-        pix_rgb[idx++] = R;
-        pix_rgb[idx++] = G;
-        pix_rgb[idx++] = B;
+        pix_pix( &idx, ( bits ^ fx ) & 128 ? ix : px, i );
         bits <<= 1;
       }
     }
@@ -1375,22 +1613,22 @@ out_2_rgb( void )
 int
 out_write_frame( void )
 {
+  static int fmf_fps = 0;
+
   int err;
   int add_frame = 0;
-  int n = -frm_fps / inp_fps;
+  int n = -fmf_fps / inp_fps;
 
-  if( frm_fps > 0 ) {
+  if( fmf_fps > 0 ) {
     drop_no++;
     printi( 2, "out_write_frame(): drop this frame.\n" );
-  }
-
-  if( cut_cut ) {
+  } else if( cut_cut ) {
     drop_no++;
     printi( 2, "out_write_frame(): cut this frame.\n" );
     return 0;
   }
 
-  while( frm_fps <= 0 ) {
+  while( fmf_fps <= 0 ) {
     if( n > 1 ) {		/* we have to add sound in more part */
     } else {
       snd_write_sound();
@@ -1412,15 +1650,27 @@ out_write_frame( void )
       if( ( err = out_write_scr() ) ) return err;
     } else if( out_t == TYPE_PPM ) {
       if( ( err = out_write_ppm() ) ) return err;
+#ifdef USE_LIBPNG
+    } else if( out_t == TYPE_PNG ) {
+      if( ( err = out_write_png() ) ) return err;
+#endif
+    } else if( out_t == TYPE_AVI ) {
+      if( ( err = out_write_avi() ) ) return err;
+#ifdef USE_LIBJPEG
+    } else if( out_t == TYPE_JPEG ) {
+      if( ( err = out_write_jpg() ) ) return err;
+    } else if( out_t == TYPE_MJPEG ) {
+      if( ( err = out_write_mjpeg() ) ) return err;
+#endif
     }
-    frm_fps += inp_fps;
+    fmf_fps += inp_fps;
     output_no++;
     if( ( out_t >= TYPE_SCR && out_t <= TYPE_JPEG ) ) {
       close_out();
       open_out();
     }
   }
-  frm_fps -= out_fps;
+  fmf_fps -= out_fps;
 
   return 0;
 }
@@ -1434,10 +1684,16 @@ close_out( void )
 #endif
 
   if( !out ) return;
+
+#ifdef USE_LIBJPEG
+  if( out_t == TYPE_MJPEG && out_header_ok )
+    out_finalize_mjpeg();
+  if( out_t == TYPE_AVI && out_header_ok )
+    out_finalize_avi();
+#endif
   fclose( out );
   out = NULL;
 }
-
 
 int
 prepare_next_file( void )		/* multiple input file */
@@ -1460,6 +1716,7 @@ print_help( void )
 	  "  -i --input <filename>        Input file.\n"
 	  "  -o --output <filename>       Output file.\n"
 	  "  -s --sound <filename>        Output sound file.\n"
+	  "  -y --overwrite               Force overwrite output file(s).\n"
 	  "     --sound-only              Process only the sound from an `fmf' file.\n"
 	  "     --mono                    Convert sound to mono (by default sound\n"
 	  "                                 is converted to stereo).\n"
@@ -1472,6 +1729,12 @@ print_help( void )
 	  "                                 note: FFMPEG needs PCM audio without change\n"
 	  "                                 the channel number too.\n"
 #endif /* USE_FFMPEG */
+	  "     --force-resample          FFMPEG output (see -X) disable the internal\n"
+	  "                                 sound resampling. You can force the internal\n"
+	  "                                 resampling of sound with this option.\n"
+	  "  -E --srate <rate>            Resample audio to <rate> sampling rate where\n"
+	  "                                 <rate> is `cd' for 44100 or `dat' for 48000 or\n"
+	  "                                 a number (`cd' and `dat' set `stereo' as well)\n"
 	  "  -w --wav                     Save sound to Microsoft audio (wav) file.\n"
 	  "  -u --au                      Save sound to Sun Audio (au) file.\n"
 	  "  -m --aiff                    Save sound to Apple Computer audio (aiff/aiff-c)\n"
@@ -1483,10 +1746,47 @@ print_help( void )
 	  "                                 `420j', `420m', `420' or `410'.\n"
 	  "  -S --scr                     Save video as SCR screenshots.\n"
 	  "  -P --ppm                     Save video as PPM screenshots.\n"
-	  "  -f --frate <timing>          Set output frame rate. `timing' is `pal',\n"
+#ifdef USE_LIBPNG
+	  "  -G --png                     Save video as PNG screenshots.\n"
+	  "     --png-compress <level>    Set compression level, where <level> between 0\n"
+	  "                                 and 9, or `none', `fast', `best'.\n"
+	  "     --progressive             Save progressive (interlaced) PNG file.\n"
+#endif
+#ifdef USE_LIBJPEG
+	  "  -J --jpg                     Save video as JPEG screenshots.\n"
+	  "  -Q --jpg-quality <q>         Set jpeg quality, where <q> between 0 and 100.\n"
+	  "     --jpg-smooth <factor>     Set jpeg smoothing factor, where <smooth>\n"
+	  "                                 between 0 and 100.\n"
+	  "     --jpg-optimize            libjpeg optimize Huffman tables.\n"
+	  "     --jpg-float               libjpeg use float DCT algorithm.\n"
+	  "     --jpg-fast                libjpeg use fast DCT algorithm.\n"
+	  "     --progressive             Save progressive (interlaced) JPEG file.\n"
+	  "  -M --mjpeg                   Save video as raw MJPEG file (abbreviated JPEG\n"
+	  "                                 stream).\n"
+	  "     --avi                     Save video as internal AVI encoder format.\n"
+	  "                                 Encode video as M-JPEG and audio as S16_LE PCM\n"
+	  "                                 If output is not a file (stdout or redirected)\n"
+	  "                                 then fmfconv encode video as uncompressed\n"
+	  "                                 BGR24 DIB frames.\n"
+	  "     --avi-uncompr             Force uncompressed AVI frames.\n"
+	  "     --avi-mjpeg               Force M-JPEG AVI frames.\n"
+#else
+	  "     --avi                     Save video as internal AVI encoder format.\n"
+	  "                                 Encode video as uncompressed BGR24 DIB frames\n"
+	  "                                 and audio as S16_LE PCM.\n"
+#endif
+#if defined USE_FFMPEG && defined USE_LIBJPEG
+	  "                                 note: force internal AVI encoder over FFMPEG.\n"
+#endif
+	  "     --greyscale               Save greyscale image/video.\n"
+	  "  -f --frate <timing>          Set output frame rate. `timing' is `raw', `pal',\n"
 	  "                                 `ntsc', `movie' or a number with a maximum\n"
 	  "                                 of 3 digits after the decimal point, or a #/#\n"
 	  "                                 (e.g.: -f 29.97 or -f 30000/1001).\n"
+	  "                                 For video output formats (AVI/MJPEG/YUV4MPEG2)\n"
+	  "                                 fmfconv set framerate to 25fps (PAL timing).\n"
+	  "                                 If you want to keep the original framerate use\n"
+	  "                                 --frate raw.\n"
 	  "  -g --progress <form>         Show progress, where <form> is one of `%%', `bar'\n"
 	  "                                 `frame' or `time'. frame and time are similar\n"
 	  "                                 to bar and show movie seconds or frame number\n"
@@ -1498,6 +1798,8 @@ print_help( void )
 	  "                                 -f/--frate).\n"
 #ifdef USE_FFMPEG
 	  "  -X --ffmpeg                  Save video and audio as FFMPEG file (default).\n"
+#endif
+#ifdef USE_FFMPEG_VARS
 	  "  -p --profile <profile>       Select the profile for FFMPEG output where\n"
 	  "                                 <profile> is `youtube', `dvd', `svcd' or `ipod'\n"
 	  "  -F --format <format>         Select file format for FFMPEG output (by default\n"
@@ -1516,15 +1818,14 @@ print_help( void )
 	  "                                 640x480, `hvga' for 480x360, `qvga' for\n"
 	  "                                 320x240, `pal' for 768x576 (this set frame\n"
 	  "                                 rate to 25 also) or WxH, Sx, N/Mx or W.\n"
-	  "  -E --srate <rate>            Resample audio to <rate> sampling rate where\n"
-	  "                                 <rate> is `cd' for 44100 or `dat' for 48000 or\n"
-	  "                                 a number (`cd' and `dat' set `stereo' as well).\n"
+#endif	/* USE_FFMPEG_VARS */
+#ifdef USE_FFMPEG
 	  "     --formats                 List available FFMPEG formats (see -F/--format).\n"
 	  "     --vcodecs                 List available FFMPEG video codecs (see\n"
 	  "                                 -c/--vcodec).\n"
 	  "     --acodecs                 List available FFMPEG audio codecs (see\n"
 	  "                                 -a/--acodec).\n"
-#endif
+#endif  /* USE_FFMPEG */
 	  "     --info                    Scan input file(s) and print information.\n"
 	  "  -v --verbose                 Increase the verbosity level by one.\n"
 	  "  -q --quiet                   Decrease the verbosity level by one.\n"
@@ -1564,6 +1865,26 @@ print_progress( int force )
   last_perc = perc;
 }
 
+#define ARG_YUV_FORMAT		0x101
+#define ARG_AIFC		0x102
+#define ARG_SOUND_ONLY		0x103
+#define ARG_FORCE_RESAMPLE	0x104
+
+#define ARG_JPG_SMOOTH		0x105
+#define ARG_JPG_OPT		0x106
+#define ARG_JPG_FLOAT		0x107
+#define ARG_JPG_FAST		0x108
+
+#define ARG_PNG_COMPRESS	0x109
+#define ARG_PNG_RGB		0x110
+
+#define ARG_AVI			0x111
+#define ARG_AVI_DIB		0x112
+#define ARG_AVI_MJPEG		0x113
+
+#define ARG_PROGRESSIVE		0x114
+#define ARG_GREYSCALE		0x115
+
 int
 parse_args( int argc, char *argv[] )
 {
@@ -1571,16 +1892,19 @@ parse_args( int argc, char *argv[] )
     {"input", 1, NULL, 'i'},
     {"output", 1, NULL, 'o'},
     {"sound", 1, NULL, 's'},
-    {"sound-only", 0, NULL, 0x103},
+    {"overwrite", 0, NULL, 'y'},
+    {"sound-only", 0, NULL, ARG_SOUND_ONLY},
     {"mono",   0, &sound_stereo, 0},		/* set mono */
     {"raw-sound",0, &sound_raw, 1},		/* do not convert fmf sound to PCM_S16LE */
 /*
     {"no-sound", 0, &video_only, 1},
 */
+    {"srate",  1, NULL, 'E'},		/* audio new samplerate cd/dat set 'stereo' also */
+    {"force-resample", 0, NULL, ARG_FORCE_RESAMPLE},	/* force internal resampling even with FFMPEG */
     {"wav",    0, NULL, 'w'},		/* save .wav sound */
     {"au",     0, NULL, 'u'},		/* save .au sound */
     {"aiff",   0, NULL, 'm'},		/* save .aiff sound */
-    {"aifc",   0, NULL, 0x102},		/* force aifc */
+    {"aifc",   0, NULL, ARG_AIFC},		/* force aifc */
 /*
     {"simple-height", 0, &simple_height, 1},
     {"no-aspect", 0, &simple_height, -1},
@@ -1588,12 +1912,40 @@ parse_args( int argc, char *argv[] )
     {"scr",    0, NULL, 'S'},		/* extract as SCR */
     {"ppm",    0, NULL, 'P'},		/* extract as PPM */
     {"yuv",    0, NULL, 'Y'},		/* YUV output */
-    {"yuv-format", 1, NULL, 0x101},
+    {"yuv-format", 1, NULL, ARG_YUV_FORMAT},
     {"frate",  1, NULL, 'f'},		/* video frame rate */
     {"progress",1,NULL, 'g'},		/* progress 'bar' */
-    {"cut",    1, NULL, 'C'},		/*TODO cut */
+    {"cut",    1, NULL, 'C'},		/* TODO cut */
+#ifdef USE_LIBJPEG
+    {"jpg",    0, NULL, 'J'},		/* jpeg */
+    {"jpg-quality", 1, NULL, 'Q'},	/* jpeg quality */
+    {"jpg-smooth", 1, NULL, ARG_JPG_SMOOTH},	/* jpeg smoothing */
+    {"jpg-optimize", 0, NULL, ARG_JPG_OPT},	/* jpeg optimize */
+    {"jpg-float", 0, NULL, ARG_JPG_FLOAT},	/* jpeg float DTC */
+    {"jpg-fast", 0, NULL, ARG_JPG_FAST},	/* jpeg fast DCT */
+    {"mjpeg",    0, NULL, 'M'},		/* M-JPEG */
+#endif
+    {"avi", 0, NULL, ARG_AVI},		/* select internal AVI output */
+#ifdef USE_LIBJPEG
+    {"avi-uncompr", 0, NULL, ARG_AVI_DIB},		/* force uncompressed AVI output */
+    {"avi-mjpeg", 0, NULL, ARG_AVI_MJPEG},	/* force compressed AVI output */
+#endif
+#ifdef USE_LIBPNG
+    {"png",    0, NULL, 'G'},		/* PNG */
+    {"png-compress", 1, NULL, ARG_PNG_COMPRESS},	/* PNG compression */
+    {"png-rgb", 0, NULL, ARG_PNG_RGB},	/* PNG RGB24 */
+#endif
+#if defined USE_LIBJPEG || USE_LIBPNG
+    {"progressive", 0, NULL, ARG_PROGRESSIVE},	/* jpeg/png progressive */
+#endif
+    {"greyscale",  0, NULL, ARG_GREYSCALE},		/* convert to grescale */
 #ifdef USE_FFMPEG
     {"ffmpeg", 0, NULL, 'X'},		/* select FFMPEG output */
+    {"formats",0, &ffmpeg_list, 0},	/* list formats */
+    {"acodecs",0, &ffmpeg_list, 1},	/* list formats */
+    {"vcodecs",0, &ffmpeg_list, 2},	/* list formats */
+#endif
+#ifdef USE_FFMPEG_VARS
     {"profile",1 ,NULL, 'p'},		/* output profile */
     {"format", 1, NULL, 'F'},		/* file format */
     {"acodec", 1, NULL, 'a'},		/* audio codec */
@@ -1601,10 +1953,6 @@ parse_args( int argc, char *argv[] )
     {"arate",  1, NULL, 'A'},		/* audio bitrate */
     {"vrate",  1, NULL, 'r'},		/* video bitrate */
     {"resize", 1, NULL, 'R'},		/* resize video */
-    {"srate",  1, NULL, 'E'},		/* audio new samplerate cd/dat set 'stereo' also */
-    {"formats",0, &ffmpeg_list, 0},	/* list formats */
-    {"acodecs",0, &ffmpeg_list, 1},	/* list formats */
-    {"vcodecs",0, &ffmpeg_list, 2},	/* list formats */
 #endif
     {"info", 0, &do_info, 1},
 
@@ -1624,9 +1972,18 @@ parse_args( int argc, char *argv[] )
     char t;
     int  i;
 
-    c = getopt_long (argc, argv, "i:o:s:f:g:C:wumSPY"
+    c = getopt_long (argc, argv, "i:o:s:f:g:C:wumSPYy"
+#ifdef USE_LIBJPEG
+				"JQ:M"
+#endif
+#ifdef USE_LIBPNG
+				"G"
+#endif
+#ifdef USE_FFMPEG_VARS
+				"p:F:a:c:A:r:R:E:"
+#endif
 #ifdef USE_FFMPEG
-				"p:F:a:c:A:r:R:E:X"
+				"X"
 #endif
 				"hVvq", long_options, NULL);
 
@@ -1645,6 +2002,9 @@ parse_args( int argc, char *argv[] )
     case 's':
       snd_name = optarg;	/* strdup( optarg ); ?? */
       break;
+    case 'y':
+      overwr_out = 1;	/* force overwrite existing output files */
+      break;
     case 'w':
       snd_t = TYPE_WAV;	/* audio container WAV */
       break;
@@ -1654,10 +2014,10 @@ parse_args( int argc, char *argv[] )
     case 'm':
       snd_t = TYPE_AIFF;	/* audio container AIFF */
       break;
-    case 0x102:
+    case ARG_AIFC:
       force_aifc = 1;
       break;
-    case 0x103:
+    case ARG_SOUND_ONLY:
       sound_only = 1;
       out_t = TYPE_NONE;
       break;
@@ -1667,10 +2027,75 @@ parse_args( int argc, char *argv[] )
     case 'P':		/* PPM  output */
       out_t = TYPE_PPM;
       break;
+    case ARG_AVI:		/* internal AVI encoder */
+      out_t = TYPE_AVI;
+      snd_t = TYPE_AVI;
+      break;
+#ifdef USE_LIBJPEG
+    case 'J':		/* JPEG  output */
+      out_t = TYPE_JPEG;
+      break;
+    case 'Q':		/* JPEG  output */
+      jpg_quality = atoi( optarg );
+      break;
+    case ARG_JPG_SMOOTH:		/* JPEG  smooth */
+      jpg_smooth = atoi( optarg );
+      break;
+    case ARG_JPG_OPT:		/* JPEG  optimize */
+      jpg_optimize = 1;
+      break;
+    case ARG_JPG_FLOAT:		/* JPEG float */
+      jpg_dctfloat = 1;
+      break;
+    case ARG_JPG_FAST:		/* JPEG fast */
+      jpg_idctfast = 1;
+      break;
+    case 'M':			/* M-JPEG  output */
+      out_t = TYPE_MJPEG;
+      break;
+    case ARG_AVI_DIB:		/* uncompressed AVI  */
+      out_t = TYPE_AVI;
+      snd_t = TYPE_AVI;
+      avi_subtype = TYPE_AVI_DIB;
+      break;
+    case ARG_AVI_MJPEG:		/* compressed AVI  */
+      out_t = TYPE_AVI;
+      snd_t = TYPE_AVI;
+      avi_subtype = TYPE_AVI;
+      break;
+#endif
+#ifdef USE_LIBPNG
+    case 'G':		/* PNG  output */
+      out_t = TYPE_PNG;
+      break;
+    case ARG_PNG_COMPRESS:		/* PNG compression */
+      if( !strcmp( optarg, "none" ) )
+        png_compress = Z_NO_COMPRESSION;
+      else if( !strcmp( optarg, "fast" ) )
+        png_compress = Z_BEST_SPEED;
+      else if( !strcmp( optarg, "default" ) )
+        png_compress = Z_DEFAULT_COMPRESSION;
+      else if( !strcmp( optarg, "best" ) )
+        png_compress = Z_BEST_COMPRESSION;
+      else
+        png_compress = atoi( optarg );
+      break;
+    case ARG_PNG_RGB:		/* PNG palette */
+      png_palette = 0;
+      break;
+#endif
+#if defined  USE_LIBJPEG || defined USE_LIBPNG
+    case ARG_PROGRESSIVE:		/* JPEG/PNG progressive */
+      progressive = 1;
+      break;
+    case ARG_GREYSCALE:			/* Greyscale */
+      greyscale = 1;
+      break;
+#endif
     case 'Y':		/* YUV output */
       out_t = TYPE_YUV;
       break;
-    case 0x101:		/* YUV FORMAT */
+    case ARG_YUV_FORMAT:		/* YUV FORMAT */
       if( !strcmp( optarg, "444" ) )
         yuv_t = TYPE_444;
       else if( !strcmp( optarg, "422" ) )
@@ -1693,7 +2118,9 @@ parse_args( int argc, char *argv[] )
 
 	break;
     case 'f':				/* output frame rate */
-      if( !strcmp( optarg, "pal" ) )
+      if( !strcmp( optarg, "raw" ) )
+	out_fps = -1;
+      else if( !strcmp( optarg, "pal" ) )
 	out_fps = 25000;	/* 25.000 1/s */
       else if( !strcmp( optarg, "ntsc" ) )
 	out_fps = 29970;	/* 29.970 1/s */
@@ -1713,7 +2140,7 @@ parse_args( int argc, char *argv[] )
 	printe( "Unknow value for '-f/--frate' ...\n");
 	return ERR_BAD_PARAM;
       }
-      if( out_fps < 1 ) {
+      if( out_fps != -1 && out_fps < 1 ) {
 	printe( "Bad value for '-f/--frate' ...\n");
 	return ERR_BAD_PARAM;
       }
@@ -1727,6 +2154,8 @@ parse_args( int argc, char *argv[] )
       out_t = TYPE_FFMPEG;
       snd_t = TYPE_FFMPEG;
       break;
+#endif
+#ifdef USE_FFMPEG_VARS
     case 'p':		/* profile */
       if( !strcmp( optarg, "youtube" ) ) {
 	ffmpeg_rescale = TYPE_RESCALE_WH;
@@ -1750,7 +2179,10 @@ parse_args( int argc, char *argv[] )
 	out_w = 320; out_h = 240; out_fps = 30000;
 	ffmpeg_vcodec = "libx264";
 	ffmpeg_format = "ipod"; ffmpeg_arate = 128000;ffmpeg_vrate = 256000;
-	out_rte = 44100; sound_stereo = 1; ffmpeg_libx264 = 1;
+	out_rte = 44100; sound_stereo = 1;
+#ifdef USE_FFMPEG
+	ffmpeg_libx264 = 1;
+#endif
       } else {
 	printe( "Unknow value for '-p/--profile' ...\n");
 	return ERR_BAD_PARAM;
@@ -1806,6 +2238,9 @@ parse_args( int argc, char *argv[] )
 	return ERR_BAD_PARAM;
       }
       break;
+    case ARG_FORCE_RESAMPLE: /* force internal resample */
+      no_sound_resample = 0;
+      break;
     case 'E':
       if( !strcmp( optarg, "cd" ) )
         out_rte = 44100, sound_stereo = 1;
@@ -1819,7 +2254,7 @@ parse_args( int argc, char *argv[] )
 	return ERR_BAD_PARAM;
       }
       break;
-#endif
+#endif	/* USE_FFMPEG_VARS */
     case 'h':
 	print_help();
 	help_exit = 1;
@@ -1887,6 +2322,13 @@ parse_args( int argc, char *argv[] )
   return 0;
 }
 
+#ifdef HAVE_SIGNAL
+void
+fmfconv_exit( int signal )
+{
+  fmfconv_stop = 1;
+}
+#endif
 int
 main( int argc, char *argv[] )
 {
@@ -1910,10 +2352,12 @@ main( int argc, char *argv[] )
   }
   if( !sound_only && ( err = open_out() ) ) return err;
   if( ( err = open_snd() ) ) return err;
+  if( no_sound_resample == -1 ) no_sound_resample = 0;
 
   if( snd_t == TYPE_UNSET && out_t == TYPE_FFMPEG ) {
     snd_t = TYPE_FFMPEG;
   }
+
   if( sound_raw ) {
     sound_pcm = 0;
     sound_stereo = -1;
@@ -1931,7 +2375,12 @@ main( int argc, char *argv[] )
   zstream.avail_out = ZBUF_SIZE;
 #endif	/* USE_ZLIB */
 
+#ifdef HAVE_SIGNAL
+  signal( SIGINT, fmfconv_exit );
+#endif
+
   while( !eop ) {
+    if( fmfconv_stop ) do_now = DO_EOP;
     switch ( do_now ) {
     case DO_FILE:
       if( ( err = prepare_next_file() ) ) eop = 1;	/* if we read from multiple file... */
@@ -1953,10 +2402,7 @@ main( int argc, char *argv[] )
         if( ( err = scr_read_scr() ) ) eop = 1;
       }
       if( out_t != TYPE_NONE ) {		/* convert slice to RGB or YUV if needed */
-        if( out_t >= TYPE_YUV )
-          out_2_yuv();
-        else if( out_t >= TYPE_PPM )
-          out_2_rgb();
+        if( out_t >= TYPE_PPM ) out_2_pix();
       }
       break;
     case DO_SOUND:
