@@ -77,6 +77,11 @@
   (sizeof(a) / sizeof(*a)) \
    + MUST_BE_ARRAY(a))
 
+/* C90 lacks SIZE_MAX.  size_t is always unsigned so this is safe. */
+#ifndef SIZE_MAX
+#define SIZE_MAX (~(size_t)0)
+#endif
+
 /* VC6 lacks M_LN2, and VS2003+ require _USE_MATH_DEFINES defined before math.h
  */
 #ifndef M_LN2

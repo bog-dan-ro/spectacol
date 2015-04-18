@@ -1004,3 +1004,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          state (Stuart).
 20150318 crypto.c,csw.c,internals.h,libspectrum.c,pzx_read.c,rzx.c,szx.c,
          tzx_read.c: const and static cleanups (Stuart).
+20150418 internals.h: fix compilation on systems without stdint.h (Stuart).
