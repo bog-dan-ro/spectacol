@@ -428,7 +428,12 @@ parse_args( settings_t *settings, int argc, char **argv )
     case '$': settings->external_filename = optarg; break;
 
     case '?':
-      print_error( "unknown option" );
+      /* getopt prints an error message to stderr */
+      print_usage( 0 );
+      return 1;
+
+    default:
+      print_error( "%s: unknown option `%c'\n", progname, (char) c );
       print_usage( 0 );
       return 1;
 

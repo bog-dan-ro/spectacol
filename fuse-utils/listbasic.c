@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   libspectrum_class_t class;
 
   int c;
-  int error;
+  int error = 0;
 
   progname = argv[0];
 
@@ -78,12 +78,22 @@ int main(int argc, char* argv[])
 
     case 'b': betabasic = 1; break;
 
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
+
     }
   }
   argc -= optind;
   argv += optind;
 
-  if( argc != 1 ) {
+  if( error || argc != 1 ) {
     fprintf( stderr, "%s: usage: %s [-b] <file>\n", progname, progname );
     return 1;
   }

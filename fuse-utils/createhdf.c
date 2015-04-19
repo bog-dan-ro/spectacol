@@ -46,6 +46,7 @@ parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
 	       const char **filename, enum hdf_version_t *version )
 {
   int c;
+  int error = 0;
 
   while( ( c = getopt( argc, argv, "csv:" ) ) != -1 ) {
 
@@ -58,13 +59,26 @@ parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
 	*version = HDF_VERSION_10;
       } else if( strcasecmp( optarg, "1.1" ) == 0 ) {
 	*version = HDF_VERSION_11;
+      } else {
+        error = 1;
+        fprintf( stderr, "%s: version not supported\n", progname );
       }
+      break;
+
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
       break;
 
     }
   }
 
-  if( argc - optind < 4 ) {
+  if( error || argc - optind < 4 ) {
     fprintf( stderr,
 	     "%s: usage: %s [-c] [-s] [-v<version>] <cylinders> <heads> <sectors> <hdf>\n",
 	     progname, progname );

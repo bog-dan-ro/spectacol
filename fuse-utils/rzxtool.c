@@ -351,7 +351,14 @@ parse_options( int argc, char **argv, GSList **actions,
       options->uncompressed = 1;
       output_needed = 1;
       break;
-    case '?': error = 1; break;
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
     }
 
     if( error ) break;

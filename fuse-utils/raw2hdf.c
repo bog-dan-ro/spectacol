@@ -42,6 +42,7 @@ parse_options( int argc, char **argv, const char **raw_filename,
 	       const char **hdf_filename, enum hdf_version_t *version )
 {
   int c;
+  int error = 0;
 
   while( ( c = getopt( argc, argv, "v:" ) ) != -1 ) {
 
@@ -52,13 +53,26 @@ parse_options( int argc, char **argv, const char **raw_filename,
 	*version = HDF_VERSION_10;
       } else if( strcasecmp( optarg, "1.1" ) == 0 ) {
 	*version = HDF_VERSION_11;
+      } else {
+        error = 1;
+        fprintf( stderr, "%s: version not supported\n", progname );
       }
+      break;
+
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
       break;
 
     }
   }
 
-  if( argc - optind != 2 ) {
+  if( error || argc - optind != 2 ) {
     fprintf( stderr, "%s: usage: %s [-v<version>] <raw-filename> <hdf-filename>\n",
              progname, progname );
     return 1;

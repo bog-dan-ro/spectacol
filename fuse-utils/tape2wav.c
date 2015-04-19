@@ -46,7 +46,7 @@ int sample_rate = 44100;
 int
 main( int argc, char **argv )
 {
-  int c, error;
+  int c, error = 0;
   libspectrum_tape *tzx;
 
   progname = argv[0];
@@ -59,6 +59,16 @@ main( int argc, char **argv )
 
     case 'r': sample_rate = abs( atol( optarg ) ); break;
 
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
+
     }
 
   }
@@ -66,7 +76,7 @@ main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( argc < 2 ) {
+  if( error || argc < 2 ) {
     fprintf( stderr,
              "%s: usage: %s [-r rate] <infile> <outfile>\n",
              progname,

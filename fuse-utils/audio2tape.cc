@@ -131,8 +131,14 @@ main( int argc, char **argv )
       schmitt_noise_threshold = atol( optarg );
       break;
 
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
     default:
-      exit(1);
+      std::cerr << progname << ": unknown option `" << (char) c << "'\n";
+      error = 1;
       break;
 
     }
@@ -141,7 +147,7 @@ main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( argc < 2 ) {
+  if( error || argc < 2 ) {
     std::cerr << progname << ": usage: " << progname <<
       " [-r] [-k] [-s] [-t <trigger type>] [-z <zero level>] "
       "[-c <schmitt noise threshold>] <infile> <outfile>\n";

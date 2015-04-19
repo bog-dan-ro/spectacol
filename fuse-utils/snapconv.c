@@ -63,7 +63,7 @@ main( int argc, char **argv )
   int fix = 0;
   FILE *f;
 
-  int error;
+  int error = 0;
   int c;
 
   progname = argv[0];
@@ -81,12 +81,22 @@ main( int argc, char **argv )
     case 'f': fix = 1;
       break;
 
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
+
     }
   }
   argc -= optind;
   argv += optind;
 
-  if( argc < 2 ) {
+  if( error || argc < 2 ) {
     fprintf( stderr, "%s: usage: %s [-c] [-n] [-f] <infile> <outfile>\n", progname,
 	     progname );
     return 1;

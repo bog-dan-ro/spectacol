@@ -57,7 +57,7 @@ char *inlay_file = NULL;
 int
 main( int argc, char **argv )
 {
-  int c, error;
+  int c, error = 0;
   libspectrum_tape *tzx;
 
   progname = argv[0];
@@ -73,6 +73,16 @@ main( int argc, char **argv )
     case 's': scr_file = optarg ; break;
     case 'i': inlay_file = optarg ; break;
 
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
+
     }
 
   }
@@ -80,7 +90,7 @@ main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( argc < 2 ) {
+  if( error || argc < 2 ) {
     fprintf( stderr,
              "%s: usage: %s [-s <scr file>] [-a <archive info tzx>] "
              "[-b] [-i <inlay image>] <infile> <outfile>\n",

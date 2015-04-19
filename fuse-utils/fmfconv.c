@@ -2279,14 +2279,14 @@ parse_args( int argc, char *argv[] )
       else if( !strcmp( optarg, "time" ) )
         prg_t = TYPE_TIME;
       break;
-    case ':':
+
     case '?':
-      break;
+      /* getopt prints an error message to stderr */
+      return ERR_BAD_PARAM;
 
     default:
-      printe ("%s: getopt_long returned `%c'\n",
-		  "fmfconv", (char) c);
-      break;
+      printe ("%s: getopt_long returned `%c'\n", "fmfconv", (char) c);
+      return ERR_BAD_PARAM;
 
     }
   }
@@ -2310,8 +2310,7 @@ parse_args( int argc, char *argv[] )
     int fd = fileno( stdin );
     if( isatty( fd ) ) {
       printe( "%s: no input file specified\n", "fmfconv" );
-      fprintf( stderr, "Try `fmfconv --help' for more information.\n" );
-      help_exit = 1;
+      return ERR_BAD_PARAM;
     }
 #ifdef WIN32
     else {
@@ -2334,7 +2333,11 @@ main( int argc, char *argv[] )
 {
   int err, eop = 0;
 
-  if( ( err = parse_args( argc, argv ) ) ) return err;
+  if( ( err = parse_args( argc, argv ) ) ) {
+    fprintf( stderr, "Try `fmfconv --help' for more information.\n" );
+    return err;
+  }
+
   if( help_exit ) return 0;
 #ifdef USE_FFMPEG
   if( ffmpeg_list >= 0 ) {
