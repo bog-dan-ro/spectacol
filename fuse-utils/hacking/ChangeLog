@@ -457,3 +457,5 @@
          fmfconv_[aiff|au|avi|ff|jpg|png|ppm|wav|yuv].c: support JPEG, PNG and
          AVI output formats. New internal sound resampling. Allow greyscale
          output (patch #329) (Gergely Szasz).
+20150419 man/fmfconv.1: add missing options and arrange options in categories
+         (Sergio).

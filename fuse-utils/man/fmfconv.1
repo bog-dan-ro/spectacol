@@ -47,67 +47,8 @@ any video file format known by FFMPEG.
 .\"------------------------------------------------------------------
 .\"
 .SH OPTIONS
-.PP
-.RI "\-a "codec
-.br
-.RI "\-\-acodec "codec
-.RS
-Select audio codec for FFMPEG output (by default file format determine).
-.RE
-.PP
-.RI \-\-acodecs
-.RS
-List available FFMPEG audio codecs (see \-a/\-\-acodec).
-.RE
-.PP
-.RI \-\-aifc
-.RS
-Force AIFF-C output if sound format is AIFF.
-.RE
-.PP
-.RI "\-A "rate
-.br
-.RI "\-\-arate "rate
-.RS
-Select audio bitrate for FFMPEG output (by default audio codec determine) 
-where `rate' is `default' or a number.
-.RE
-.PP
-.RI \-u
-.br
-.RI \-\-au
-.RS
-Save sound to Sun Audio (au) file.
-.RE
-.PP
-.RI \-m
-.br
-.RI \-\-aiff
-.RS
-Save sound to Apple Computer audio (aiff/aiff-c) file.
-.RE
-.PP
-.RI "\-F "format
-.br
-.RI "\-\-format "format
-.RS
-Select file format for FFMPEG output (by default the filename extension 
-determines the format).
-.RE
-.PP
-.RI \-\-formats
-.RS
-List available FFMPEG formats (see \-F/\-\-format).
-.RE
-.PP
-.RI "\-f "timing
-.br
-.RI "\-\-frate "timing
-.RS
-Set output frame rate. `timing' is `pal', `ntsc', `movie' or a
-number with maximum 3 digit after decimal point, or a #/# (e.g.: 
-\-f 29.97 or \-f 30000/1001).
-.RE
+.SS
+General options:
 .PP
 .RI \-h
 .br
@@ -128,20 +69,6 @@ Scan input file(s) and print information.
 Input file.
 .RE
 .PP
-.RI \-\-mono
-.RS
-Convert sound to mono (by default sound is converted to stereo).
-.RE
-.PP
-.RI "\-C "cut
-.br
-.RI "\-\-out\-cut "cut
-.RS
-Leave out the comma delimited `cut' ranges e.g.: 100\-200,300,500,1:11\-2:22 
-cut the frames 100\(en200, 300, 500 and frames from 1 min 11 sec to 2 min 22 sec 
-(in the given timing see: \-f/\-\-frate).
-.RE
-.PP
 .RI "\-o "filename
 .br
 .RI "\-\-output "filename
@@ -149,27 +76,19 @@ cut the frames 100\(en200, 300, 500 and frames from 1 min 11 sec to 2 min 22 sec
 Output file.
 .RE
 .PP
-.RI \-P
+.RI \-y
 .br
-.RI \-\-ppm
+.RI \-\-overwrite
 .RS
-Save video as PPM screenshots.
-.RE
-.PP
-.RI "\-p "profile
-.br
-.RI "\-\-profile "profile
-.RS
-Select the profile for FFMPEG output where <profile> is `youtube', `dvd', `svcd' 
-or `ipod'.
+Force overwrite of existing output file(s).
 .RE
 .PP
 .RI "\-g "form
 .br
 .RI "\-\-progress "form
 .RS
-Show progress, where <form> is one of `%', `bar', `frame' or `time'. frame and 
-time are similar to bar and show movie seconds or frame number as well.
+Show progress, where `form' is one of `%', `bar', `frame' or `time'. frame
+and time are similar to bar and show movie seconds or frame number as well.
 .RE
 .PP
 .RI \-q
@@ -179,27 +98,51 @@ time are similar to bar and show movie seconds or frame number as well.
 Decrease the verbosity level by one.
 .RE
 .PP
+.RI \-v
+.br
+.RI \-\-verbose
+.RS
+Increase the verbosity level by one.
+.RE
+.PP
+.RI \-V
+.br
+.RI \-\-version
+.RS
+Print the version number and exit.
+.RE
+.SS
+Audio options:
+.PP
+.RI \-\-aifc
+.RS
+Force AIFF-C output if sound format is AIFF.
+.RE
+.PP
+.RI \-m
+.br
+.RI \-\-aiff
+.RS
+Save sound to Apple Computer audio (aiff/aiff-c) file.
+.RE
+.PP
+.RI \-u
+.br
+.RI \-\-au
+.RS
+Save sound to Sun Audio (au) file.
+.RE
+.PP
+.RI \-\-mono
+.RS
+Convert sound to mono (by default sound is converted to stereo).
+.RE
+.PP
 .RI \-\-raw\-sound
 .RS
-Do not convert sound to 16-bit signed PCM and STEREO or MONO. This is an 
-advanced option. If stereo/mono or audio encoding change through `fmf' file, 
+Do not convert sound to 16-bit signed PCM and STEREO or MONO. This is an
+advanced option. If stereo/mono or audio encoding change through `fmf' file,
 your sound will be crappy.
-.RE
-.PP
-.RI "\-R "res
-.br
-.RI "\-\-resize "res
-.RS
-Resize video frame where `res' is `vga' for 640x480, `hvga' for 480x360, `qvga' 
-for 320x240, `pal' for 768x576 (this set frame rate to 25 also) or WxH, Sx, 
-N/Mx or W.
-.RE
-.PP
-.RI \-S
-.br
-.RI \-\-scr
-.RS
-Save video as SCR screenshots.
 .RE
 .PP
 .RI "\-s "filename
@@ -214,60 +157,57 @@ Output sound file.
 Process only the sound from an `fmf' file.
 .RE
 .PP
-.RI "\-E "rate
-.br
-.RI "\-\-srate "rate
-.RS
-Resample audio to `rate' sampling rate where `rate' is `cd' for 44100 or `dat' 
-for 48000 or a number (`cd' and `dat' set `stereo' as well).
-.RE
-.PP
-.RI \-v
-.br
-.RI \-\-verbose
-.RS
-Increase the verbosity level by one.
-.RE
-.PP
-.RI "\-c "codec
-.br
-.RI "\-\-vcodec "codec
-.RS
-Select video codec for FFMPEG output (by default file format determine).
-.RE
-.PP
-.RI \-V
-.br
-.RI \-\-version
-.RS
-Print the version number and exit.
-.RE
-.PP
-.RI "\-r "rate
-.br
-.RI "\-\-vrate "rate
-.RS
-Select video bitrate for FFMPEG output (by default audio codec determine) 
-where `rate' is `default', `ffdefault' or a number.
-.RE
-.PP
-.RI \-\-vcodecs
-.RS
-List available FFMPEG video codecs (see \-c/\-\-vcodec).
-.RE
-.PP
 .RI \-w
 .br
 .RI \-\-wav
 .RS
-Save sound to Microsoft audio (wav) file.
+Save sound to Waveform Audio (wav) file.
+.RE
+.SS
+Video/image options:
+.PP
+.RI \-\-avi
+.RS
+Save video as AVI format with built-in AVI encoder. If fmfconv supports
+jpeg files, encode video as M-JPEG and audio as S16_LE PCM. If output is
+not a file (stdout or redirected) then fmfconv encode video as uncompressed
+BGR24 DIB frames (see \-\-avi\-mjpeg and \-\-avi\-uncompr).
 .RE
 .PP
-.RI \-X
+.RI "\-f "timing
 .br
-.RI \-\-ffmpeg
+.RI "\-\-frate "timing
 .RS
-Save video and audio as FFMPEG file (default if FFMPEG is available).
+Set output frame rate. `timing' is `pal', `ntsc', `movie' or a
+number with maximum 3 digit after decimal point, or a #/# (e.g.:
+\-f 29.97 or \-f 30000/1001).
+.br
+For video output formats (AVI/MJPEG/YUV4MPEG2) fmfconv set frame rate
+to 25 fps (PAL timing). If you want to keep the original frame rate
+use `raw' timing.
+.RE
+.PP
+.RI "\-C "cut
+.br
+.RI "\-\-out\-cut "cut
+.RS
+Leave out the comma delimited `cut' ranges e.g.: 100\-200,300,500,1:11\-2:22
+cut the frames 100\(en200, 300, 500 and frames from 1 min 11 sec to
+2 min 22 sec (in the given timing see: \-f/\-\-frate).
+.RE
+.PP
+.RI \-P
+.br
+.RI \-\-ppm
+.RS
+Save video as PPM screenshots.
+.RE
+.PP
+.RI \-S
+.br
+.RI \-\-scr
+.RS
+Save video as SCR screenshots.
 .RE
 .PP
 .RI \-Y
@@ -279,10 +219,191 @@ Save video as yuv4mpeg2.
 .PP
 .RI "\-\-yuv\-format "frm
 .RS
-Set yuv4mpeg2 file frame format to `frm', where `frm' is one of `444', 
+Set yuv4mpeg2 file frame format to `frm', where `frm' is one of `444',
 `422', `420j', `420m', `420' or `410'.
 .RE
+.SS
+The following options are available when ffmpeg codecs are supported:
 .PP
+.RI "\-a "codec
+.br
+.RI "\-\-acodec "codec
+.RS
+Select audio codec for FFMPEG output (by default file format determine).
+.RE
+.PP
+.RI \-\-acodecs
+.RS
+List available FFMPEG audio codecs (see \-a/\-\-acodec).
+.RE
+.PP
+.RI "\-A "rate
+.br
+.RI "\-\-arate "rate
+.RS
+Select audio bitrate for FFMPEG output (by default audio codec determine)
+where `rate' is `default' or a number.
+.RE
+.PP
+.RI \-X
+.br
+.RI \-\-ffmpeg
+.RS
+Save video and audio as FFMPEG file (default if FFMPEG is available).
+.RE
+.PP
+.RI "\-\-force\-resample
+.RS
+FFMPEG output (see -X) disable the built-in sound resampling. You can
+force the built-in resampling of sound with this option.
+.RE
+.PP
+.RI "\-F "format
+.br
+.RI "\-\-format "format
+.RS
+Select file format for FFMPEG output (by default the filename extension
+determines the format).
+.RE
+.PP
+.RI \-\-formats
+.RS
+List available FFMPEG formats (see \-F/\-\-format).
+.RE
+.PP
+.RI "\-p "profile
+.br
+.RI "\-\-profile "profile
+.RS
+Select the profile for FFMPEG output where `profile' is `youtube', `dvd',
+`svcd' or `ipod'.
+.RE
+.PP
+.RI "\-R "res
+.br
+.RI "\-\-resize "res
+.RS
+Resize video frame where `res' is `vga' for 640x480, `hvga' for 480x360,
+`qvga' for 320x240, `pal' for 768x576 (this set frame rate to 25 also)
+or WxH, Sx, N/Mx or W.
+.RE
+.PP
+.RI "\-E "rate
+.br
+.RI "\-\-srate "rate
+.RS
+Resample audio to `rate' sampling rate where `rate' is `cd' for 44100 Hz
+or `dat' for 48000 Hz or a number (`cd' and `dat' set `stereo' as well).
+.RE
+.PP
+.RI "\-c "codec
+.br
+.RI "\-\-vcodec "codec
+.RS
+Select video codec for FFMPEG output (by default file format determine).
+.RE
+.PP
+.RI \-\-vcodecs
+.RS
+List available FFMPEG video codecs (see \-c/\-\-vcodec).
+.RE
+.PP
+.RI "\-r "rate
+.br
+.RI "\-\-vrate "rate
+.RS
+Select video bitrate for FFMPEG output (by default audio codec determine)
+where `rate' is `default', `ffdefault' or a number.
+.RE
+.SS
+The following options are available when PNG files are supported:
+.PP
+.RI \-\-greyscale
+.RS
+Save greyscale images.
+.RE
+.PP
+.RI \-G
+.br
+.RI \-\-png
+.RS
+Save video frames as PNG screenshots.
+.RE
+.PP
+.RI "\-\-png\-compress "level
+.RS
+Set compression level from a range 0\(en9, or `none', `fast', `best'.
+.RE
+.PP
+.RI \-\-progressive
+.RS
+Save progressive (interlaced) PNG files.
+.RE
+.SS
+The following options are available when JPEG files are supported:
+.PP
+.RI \-\-avi\-mjpeg
+.RS
+Force the use of M-JPEG AVI frames (lossy).
+.RE
+.PP
+.RI \-\-avi\-uncompr
+.RS
+Force the use of uncompressed BGR24 AVI frames. This format does not
+produce compression artifacts but the file size is bigger. It is a good
+choice if you want to process the video with an external tool.
+.RE
+.PP
+.RI \-\-greyscale
+.RS
+Save greyscale images or convert video frames.
+.RE
+.PP
+.RI \-J
+.br
+.RI "\-\-jpeg
+.RS
+Save video frames as JPEG screenshots.
+.RE
+.PP
+.RI \-\-jpeg\-fast
+.RS
+Use faster, less accurate integer method for DCT compression.
+.RE
+.PP
+.RI \-\-jpeg\-float
+.RS
+Use floating-point method for DCT compression.
+.RE
+.PP
+.RI \-\-jpeg\-optimize
+.RS
+Compute optimal Huffman coding tables for the image.
+.RE
+.PP
+.RI \-Q
+.br
+.RI "\-\-jpeg\-quality "q
+.RS
+Set jpeg quality from a range 0\(en100.
+.RE
+.PP
+.RI "\-\-jpeg\-smooth "factor
+.RS
+Set jpeg smoothing factor from a range 0\(en100.
+.RE
+.PP
+.RI \-M
+.br
+.RI \-\-mjpeg
+.RS
+Save video as raw M-JPEG file (abbreviated JPEG stream).
+.RE
+.PP
+.RI \-\-progressive
+.RS
+Save progressive (interlaced) JPEG files.
+.RE
 .\"
 .\"------------------------------------------------------------------
 .\"
