@@ -462,3 +462,6 @@
 20150419 audio2tape.cc,createhdf.c,fmfconv.c,listbasic.c,raw2hdf.c,rzxtool.c,
          snap2tzx.c,snapconv.c,tape2wav.c,tapeconv.c: abort program when passed
          unknown options (fixes bug #318) (thanks, Stuart) (Sergio).
+20150422 fmfconv.c,man/fmfconv.1: set default output type to AVI instead of 
+         YUV4MPEG2 when using pipes. Move --force-resample and --srate options
+         (more from patch #329) (Gergely Szasz).

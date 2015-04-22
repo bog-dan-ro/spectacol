@@ -157,6 +157,14 @@ Output sound file.
 Process only the sound from an `fmf' file.
 .RE
 .PP
+.RI "\-E "rate
+.br
+.RI "\-\-srate "rate
+.RS
+Resample audio to `rate' sampling rate where `rate' is `cd' for 44100\ Hz
+or `dat' for 48000\ Hz or a number (`cd' and `dat' set `stereo' as well).
+.RE
+.PP
 .RI \-w
 .br
 .RI \-\-wav
@@ -286,14 +294,6 @@ Select the profile for FFMPEG output where `profile' is `youtube', `dvd',
 Resize video frame where `res' is `vga' for 640x480, `hvga' for 480x360,
 `qvga' for 320x240, `pal' for 768x576 (this set frame rate to 25 also)
 or WxH, Sx, N/Mx or W.
-.RE
-.PP
-.RI "\-E "rate
-.br
-.RI "\-\-srate "rate
-.RS
-Resample audio to `rate' sampling rate where `rate' is `cd' for 44100 Hz
-or `dat' for 48000 Hz or a number (`cd' and `dat' set `stereo' as well).
 .RE
 .PP
 .RI "\-c "codec

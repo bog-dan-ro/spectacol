@@ -885,7 +885,7 @@ open_out( void )
 #ifdef USE_FFMPEG
     out_t = TYPE_FFMPEG;	/* default to FFMPEG */
 #else
-    out_t = TYPE_YUV;		/* default to YUV */
+    out_t = TYPE_AVI;		/* default to AVI */
 #endif
     ext = find_filename_ext( out_name );
     for( i = 0; ext != NULL && out_ext_tab[i].extension != NULL; i++ ) {
@@ -933,8 +933,8 @@ open_out( void )
       out = NULL;
       out_name = "(-=null=-)";
     } else {
-      if( out_t != TYPE_AVI && out_t != TYPE_MJPEG ) {
-        out_t = TYPE_YUV;		/* default to YUV */
+      if( out_t != TYPE_YUV && out_t != TYPE_MJPEG ) {
+        out_t = TYPE_AVI;		/* default to AVI */
       }
       out = stdout;
       out_to_stdout = 1;
@@ -1728,10 +1728,10 @@ print_help( void )
 #ifdef USE_FFMPEG
 	  "                                 note: FFMPEG needs PCM audio without change\n"
 	  "                                 the channel number too.\n"
-#endif /* USE_FFMPEG */
 	  "     --force-resample          FFMPEG output (see -X) disable the internal\n"
 	  "                                 sound resampling. You can force the internal\n"
 	  "                                 resampling of sound with this option.\n"
+#endif /* USE_FFMPEG */
 	  "  -E --srate <rate>            Resample audio to <rate> sampling rate where\n"
 	  "                                 <rate> is `cd' for 44100 or `dat' for 48000 or\n"
 	  "                                 a number (`cd' and `dat' set `stereo' as well)\n"
@@ -1972,7 +1972,7 @@ parse_args( int argc, char *argv[] )
     char t;
     int  i;
 
-    c = getopt_long (argc, argv, "i:o:s:f:g:C:wumSPYy"
+    c = getopt_long (argc, argv, "i:o:s:f:g:C:wumSPYyE:"
 #ifdef USE_LIBJPEG
 				"JQ:M"
 #endif
@@ -1980,7 +1980,7 @@ parse_args( int argc, char *argv[] )
 				"G"
 #endif
 #ifdef USE_FFMPEG_VARS
-				"p:F:a:c:A:r:R:E:"
+				"p:F:a:c:A:r:R:"
 #endif
 #ifdef USE_FFMPEG
 				"X"
@@ -2020,6 +2020,19 @@ parse_args( int argc, char *argv[] )
     case ARG_SOUND_ONLY:
       sound_only = 1;
       out_t = TYPE_NONE;
+      break;
+    case 'E':
+      if( !strcmp( optarg, "cd" ) )
+        out_rte = 44100, sound_stereo = 1;
+      else if( !strcmp( optarg, "dat" ) )
+        out_rte = 48000, sound_stereo = 1;
+      else
+        out_rte = atoi( optarg );
+
+      if( out_rte < 1000 ) {
+        printe( "Wrong value for '-E/--srate' ...\n");
+        return ERR_BAD_PARAM;
+      }
       break;
     case 'S':		/* SCR output */
       out_t = TYPE_SCR;
@@ -2240,19 +2253,6 @@ parse_args( int argc, char *argv[] )
       break;
     case ARG_FORCE_RESAMPLE: /* force internal resample */
       no_sound_resample = 0;
-      break;
-    case 'E':
-      if( !strcmp( optarg, "cd" ) )
-        out_rte = 44100, sound_stereo = 1;
-      else if( !strcmp( optarg, "dat" ) )
-        out_rte = 48000, sound_stereo = 1;
-      else
-        out_rte = atoi( optarg );
-
-      if( out_rte < 1000 ) {
-	printe( "Wrong value for '-E/--srate' ...\n");
-	return ERR_BAD_PARAM;
-      }
       break;
 #endif	/* USE_FFMPEG_VARS */
     case 'h':
