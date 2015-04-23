@@ -467,3 +467,5 @@
          (more from patch #329) (Gergely Szasz).
 20150423 man/fmfconv.1: add more details on DESCRIPTION, EXAMPLES and SEE ALSO
          (thanks, Gergely Szasz) (Sergio).
+20150423 fmfconv.c: set output mode to AVI when using .avi file extension
+         (Sergio).

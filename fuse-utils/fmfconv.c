@@ -852,7 +852,6 @@ open_out( void )
 #ifdef USE_FFMPEG
     { TYPE_FFMPEG,"mpeg" },
     { TYPE_FFMPEG,"mpg" },
-    { TYPE_FFMPEG,"avi" },
     { TYPE_FFMPEG,"mkv" },
     { TYPE_FFMPEG,"flv" },
     { TYPE_FFMPEG,"webm" },
