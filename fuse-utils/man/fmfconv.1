@@ -27,7 +27,7 @@
 .\"------------------------------------------------------------------
 .\"
 .SH NAME
-fmfconv \(em Fuse movie file converter
+fmfconv \(em Fuse Movie File converter
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -41,8 +41,16 @@ fmfconv \(em Fuse movie file converter
 .\"------------------------------------------------------------------
 .\"
 .SH DESCRIPTION
-fmfconv is a Fuse movie file converter. It can convert .fmf files to
-any video file format known by FFMPEG.
+fmfconv is a Fuse Movie File converter. It can read .fmf files produced by
+Fuse ZX Spectrum emulator and write audio files, video files or sequences of
+images in a variety of popular formats. It can also stream data to external
+tools through a pipe, so you can get virtually any possible format (see
+EXAMPLES).
+.PP
+fmfconv has built-in support for AIFF, AU and WAV sound formats, PPM and
+SCR image formats, AVI and YUV4MPEG2 video formats. Supports PNG and
+JPEG/MJPEG formats internally if libpng and libjpeg are available respectively.
+Also supports any format known by FFmpeg or Libav if they are available.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -408,27 +416,99 @@ Save progressive (interlaced) JPEG files.
 .\"------------------------------------------------------------------
 .\"
 .SH EXAMPLES
-Convert a Fuse movie file to a mpeg video with quality equivalent to YouTube
+Some of the following examples use 
+.IR ffmpeg (1)
+as an external tool for doing the final conversion. In some distributions
+.IR avconv (1)
+is available, which accepts the same parameters.
+.PP
+Convert FMF to AVI:
 .PP
 .RS
-.B fmfconv
-\-p youtube input.fmf output.mov
+.EX
+fmfconv input.fmf output.avi
+.EE
 .RE
 .PP
-Convert a Fuse movie file to a DVD video format
+Convert FMF to a mpeg video with quality equivalent to YouTube:
 .PP
 .RS
-.B fmfconv
-\-p dvd input.fmf output.vob
+.EX
+fmfconv \-p youtube input.fmf output.mov
+.EE
+.PP
+or
+.PP
+.EX
+fmfconv input.fmf | ffmpeg \-i \- \-vf scale=480:360 \-r 25
+        \-codec:v h264 \-codec:a aac \-f mov \-b:a 128000
+        \-b:v 600000 \-pix_fmt yuv420p \-strict \-2 output.mov
+.EE
 .RE
 .PP
-Extract audio (mono) from a recording
+Convert FMF to a DVD video format:
 .PP
 .RS
-.B fmfconv
-\-\-sound-only \-\-mono input.fmf output.wav
+.EX
+fmfconv \-p dvd input.fmf output.vob
+.EE
+.PP
+or
+.PP
+.EX
+fmfconv input.fmf | ffmpeg \-i \- \-aspect 4:3 \-target pal\-dvd
+        output.vob
+.EE
 .RE
 .PP
+Convert FMF to SVCD video format:
+.PP
+.RS
+.EX
+fmfconv \-p svcd input.fmf output.mpg
+.EE
+.PP
+or
+.PP
+.EX
+fmfconv input.fmf | ffmpeg \-i \- \-aspect 4:3 \-target pal\-svcd
+        output.mpg
+.EE
+.RE
+.PP
+Convert FMF to iPod video format:
+.PP
+.RS
+.EX
+fmfconv \-p ipod input.fmf output.m4v
+.EE
+.PP
+or
+.PP
+.EX
+fmfconv input.fmf | ffmpeg \-i \- \-vf scale=320:240 \-r 30
+        \-codec:v h264 \-codec:a aac \-f ipod \-ar 44100 \-b:a 128000
+        \-b:v 256000 \-pix_fmt yuv420p \-strict \-2 output.m4v
+.EE
+.RE
+.PP
+Convert FMF to animated GIF (25 fps) using ImageMagick:
+.PP
+.RS
+.EX
+fmfconv \-f 25 input.fmf tmp.png
+convert \-delay 4 \-loop 0 \-layers removeDups \-layers Optimize
+        tmp*.png output.gif
+.EE
+.RE
+.PP
+Extract audio (mono) from a FMF file:
+.PP
+.RS
+.EX
+fmfconv \-\-sound-only \-\-mono input.fmf output.wav
+.EE
+.RE
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -438,9 +518,15 @@ None known.
 .\"------------------------------------------------------------------
 .\"
 .SH SEE ALSO
+.IR avconv "(1),"
 .IR ffmpeg "(1),"
 .IR fuse "(1),"
-.IR fuse\-utils "(1)"
+.IR fuse\-utils "(1),"
+.IR imagemagick "(1)."
+.PP
+The Fuse Movie File specification, at
+.br
+.IR "http://sourceforge.net/p/fuse-emulator/wiki/FMF%20File%20Format/" .
 .PP
 The comp.sys.sinclair Spectrum FAQ, at
 .br

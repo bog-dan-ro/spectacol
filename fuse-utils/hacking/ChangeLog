@@ -465,3 +465,5 @@
 20150422 fmfconv.c,man/fmfconv.1: set default output type to AVI instead of 
          YUV4MPEG2 when using pipes. Move --force-resample and --srate options
          (more from patch #329) (Gergely Szasz).
+20150423 man/fmfconv.1: add more details on DESCRIPTION, EXAMPLES and SEE ALSO
+         (thanks, Gergely Szasz) (Sergio).
