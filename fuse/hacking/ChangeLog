@@ -4759,3 +4759,4 @@
          const qualifiers and casts (Sergio).
 20150411 compat/win32/distribution.mk: revert the use of variables for groff and
          man2html, escape variable substitution (thanks, Stuart) (Sergio).
+20150425 z80/z80_ops.c: fix timing of events when emulating Scorpion (Stuart).

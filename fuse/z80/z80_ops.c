@@ -227,7 +227,11 @@ z80_do_opcodes( void )
     /* Check to see if M1 cycles happen on even tstates */
     CHECK( evenm1, even_m1 )
 
-    if( tstates & 1 ) tstates++;
+    if( tstates & 1 ) {
+      if( ++tstates == event_next_event ) {
+	break;
+      }
+    }
 
     END_CHECK
 
