@@ -329,3 +329,17 @@ out_build_avi_mjpeg_frame( char **buffer, unsigned long *size )
   *size = mem_size;
   return 0;
 }
+
+void
+print_jpeg_version( void )
+{
+  printf( "  * libjpeg");
+
+#ifdef JPEG_LIB_VERSION_MAJOR
+  printf( " (version: %d.%d)", JPEG_LIB_VERSION_MAJOR, JPEG_LIB_VERSION_MINOR );
+#else
+  printf( " (version: %d)", JPEG_LIB_VERSION );
+#endif
+
+  printf( " support (JPEG, M-JPEG, AVI/M-JPEG output)\n" );
+}

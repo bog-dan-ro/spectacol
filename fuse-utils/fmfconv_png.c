@@ -139,3 +139,9 @@ out_write_png( void )
 
   return 0;
 }
+
+void
+print_png_version( void )
+{
+  printf( "  * libpng (version: " PNG_LIBPNG_VER_STRING ") support (PNG output)\n" );
+}

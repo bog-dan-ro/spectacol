@@ -1704,6 +1704,26 @@ prepare_next_file( void )		/* multiple input file */
   return 0;
 }
 
+static void
+print_version( void )
+{
+  printf( "fmfconv version " FMFCONV_VER_STRING "\n" );
+#if defined USE_FFMPEG || defined USE_LIBPNG || defined USE_LIBPNG
+  printf( "Compiled with:\n" );
+#else
+  printf( "Compiled without any external library support.\n" );
+#endif
+#ifdef USE_FFMPEG
+  print_ffmpeg_version();
+#endif
+#ifdef USE_LIBJPEG
+  print_jpeg_version();
+#endif
+#ifdef USE_LIBPNG
+  print_png_version();
+#endif
+}
+
 void
 print_help( void )
 {
@@ -2259,7 +2279,9 @@ parse_args( int argc, char *argv[] )
 	help_exit = 1;
 	break;
     case 'V':
-	break;
+      print_version();
+      help_exit = 1;
+      break;
     case 'v':
 	if( verbose < VERBOSE_MAX )
 	  verbose++;

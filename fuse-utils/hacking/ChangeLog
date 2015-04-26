@@ -469,3 +469,5 @@
          (thanks, Gergely Szasz) (Sergio).
 20150423 fmfconv.c: set output mode to AVI when using .avi file extension
          (Sergio).
+20150426 fmfconv.[c|h],fmfconv_[ff|jpg|png].c: implement --version option in
+         fmfconv (more from patch #329) (Gergely Szasz).

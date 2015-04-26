@@ -1220,4 +1220,17 @@ setup_x264_dict( AVDictionary ** dict )
 }
 #endif	/* ifdef HAVE_FFMPEG_AVDICTIONARY */
 
+void
+print_ffmpeg_version( void )
+{
+  printf( "  * ffmpeg/avconv libraries support:\n" );
+  printf( "    + libavformat (version: " AV_STRINGIFY( LIBAVFORMAT_VERSION ) ")\n");
+  printf( "    + libavcodec (version: " AV_STRINGIFY( LIBAVCODEC_VERSION ) ")\n");
+#if HAVE_LIBAVRESAMPLE_AVRESAMPLE_H
+  printf( "    + libavresample (version: " AV_STRINGIFY( LIBAVRESAMPLE_VERSION ) ")\n");
+#endif
+  printf( "    + libswscale (version: " AV_STRINGIFY( LIBSWSCALE_VERSION ) ")\n");
+  printf( "    + libavutil (version: " AV_STRINGIFY( LIBAVUTIL_VERSION ) ")\n");
+}
+
 #endif	/* ifdef USE_FFMPEG */

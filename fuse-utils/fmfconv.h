@@ -26,6 +26,12 @@
 #ifndef FMFCONV_H
 #define FMFCONV_H
 
+#define FMFCONV_VER_MAJOR 0
+#define FMFCONV_VER_MINOR 5
+#define __FMFCONV_VER_STRING(maj, min) #maj "." #min
+#define _FMFCONV_VER_STRING(maj, min) __FMFCONV_VER_STRING( maj, min )
+#define FMFCONV_VER_STRING _FMFCONV_VER_STRING( FMFCONV_VER_MAJOR, FMFCONV_VER_MINOR )
+
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
 #else
@@ -178,6 +184,7 @@ int out_write_scr( void );
 int out_write_ppm( void );
 #ifdef USE_LIBPNG
 int out_write_png( void );
+void print_png_version( void );
 #endif
 #ifdef USE_LIBJPEG
 int out_write_jpg( void );
@@ -185,6 +192,7 @@ int out_write_mjpeg( void );
 int out_build_avi_mjpeg_frame( char **frame_buff,
                                unsigned long int *frame_size );
 void out_finalize_mjpeg( void );
+void print_jpeg_version( void );
 #endif
 
 int snd_write_wav( void );
@@ -220,6 +228,7 @@ int ffmpeg_resample_audio( void );
 int ffmpeg_rescale_video( void );
 
 void ffmpeg_list_ffmpeg( int what );
+void print_ffmpeg_version( void );
 #endif
 
 
