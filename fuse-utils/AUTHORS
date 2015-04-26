@@ -2,7 +2,7 @@ The Fuse utilities have been brought to you by:
 
 * Darren Salt: listing multiple files in tzxlist, and the tzxlist man page.
 
-* Fredrick Meunier: scl2trd.
+* Fredrick Meunier: scl2trd and audio2tape.
 
 * Dmitry Sanarin: the original scl to trd conversion code, taken from
   Glukalka (http://www.sanarin.ru/glukalka/)
@@ -15,6 +15,10 @@ The Fuse utilities have been brought to you by:
 
 * Tomaz Kac: snap2tzx is very heavily based on his z802tzx utility
   (ftp://ftp.worldofspectrum.org/pub/sinclair/tools/pc/Z802TZXv11.zip)
+
+* Stuart Brady: profile2map.
+
+* Gergely Szasz: fmfconv.
 
 * Philip Kendall: everything else.
 
