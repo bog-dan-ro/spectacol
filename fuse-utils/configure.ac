@@ -19,7 +19,15 @@ dnl Author contact information:
 dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
-AC_INIT([fuse-utils],[1.1.0])
+dnl Package version
+m4_define([fuse_utils_version], [1.1.0])
+
+dnl Package info
+m4_define([fuse_url], [http://fuse-emulator.sourceforge.net/])
+m4_define([fuse_bugreport], [http://sourceforge.net/p/fuse-emulator/bugs/])
+
+AC_INIT([fuse-utils],[fuse_utils_version],[fuse_bugreport],
+        [fuse-utils],[fuse_url])
 AC_CONFIG_SRCDIR([tzxlist.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])

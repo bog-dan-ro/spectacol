@@ -23,9 +23,13 @@
 
 */
 
+#include <config.h>
+
 #include <errno.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <libspectrum.h>
 
@@ -36,6 +40,18 @@ char *progname;
 
 libspectrum_byte map[ 0x10000 / 8 ];
 
+static void
+show_version( void )
+{
+  printf(
+    "profile2map (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2007 Stuart Brady\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
+
 int main( int argc, char **argv )
 {
   char *profile, *mapfile;
@@ -43,15 +59,44 @@ int main( int argc, char **argv )
   long address, count;
   int ret;
 
+  int c;
+  int error = 0;
+
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
   progname = argv[0];
 
-  if( argc != 3 ) {
+  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
+
+    switch( c ) {
+
+    case 'V': show_version(); return 0;
+
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
+
+    }
+  }
+  argc -= optind;
+  argv += optind;
+
+  if( error || argc != 2 ) {
     fprintf( stderr, "%s: usage: %s <profile> <map>\n", progname, progname );
     return 1;
   }
 
-  profile = argv[1];
-  mapfile = argv[2];
+  profile = argv[0];
+  mapfile = argv[1];
 
   f = fopen( profile, "r" );
   if( !f ) {

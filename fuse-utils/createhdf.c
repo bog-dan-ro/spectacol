@@ -27,6 +27,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -40,6 +41,18 @@ const char *progname;
 
 #define CHUNK_LENGTH 1 << 20
 
+static void
+show_version( void )
+{
+  printf(
+    "createhdf (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2004-2006 Philip Kendall\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
+
 int
 parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
 	       size_t *sectors, int *compact, int *sparse,
@@ -48,7 +61,13 @@ parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
   int c;
   int error = 0;
 
-  while( ( c = getopt( argc, argv, "csv:" ) ) != -1 ) {
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
+  while( ( c = getopt_long( argc, argv, "csv:V", long_options,
+                            NULL ) ) != -1 ) {
 
     switch( c ) {
 
@@ -65,6 +84,10 @@ parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
       }
       break;
 
+    case 'V':
+      show_version();
+      exit( 0 );
+
     case '?':
       /* getopt prints an error message to stderr */
       error = 1;
@@ -74,7 +97,6 @@ parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
       error = 1;
       fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
       break;
-
     }
   }
 

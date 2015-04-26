@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include <errno.h>
+#include <getopt.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -321,6 +322,18 @@ add_action( GSList **actions, action_type_t type, const char *argument )
   return 0;
 }
 
+static void
+show_version( void )
+{
+  printf(
+    "rzxtool (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2007-2014 Philip Kendall\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
+
 static int
 parse_options( int argc, char **argv, GSList **actions,
 	       struct options_t *options )
@@ -330,7 +343,13 @@ parse_options( int argc, char **argv, GSList **actions,
 
   options->uncompressed = 0;
 
-  while( ( c = getopt( argc, argv, "d:e:i:uf" ) ) != EOF ) {
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
+  while( ( c = getopt_long( argc, argv, "d:e:i:ufV", long_options,
+                            NULL ) ) != -1 ) {
     switch( c ) {
     case 'd':
       error = add_action( actions, ACTION_DELETE_BLOCK, optarg );
@@ -351,6 +370,9 @@ parse_options( int argc, char **argv, GSList **actions,
       options->uncompressed = 1;
       output_needed = 1;
       break;
+    case 'V':
+      show_version();
+      exit( 0 );
     case '?':
       /* getopt prints an error message to stderr */
       error = 1;

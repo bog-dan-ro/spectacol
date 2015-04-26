@@ -27,7 +27,10 @@
 
 */
 
+#include <config.h>
+
 #include <errno.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -48,6 +51,7 @@ int betabasic = 0;
 typedef
   libspectrum_byte (*memory_read_fn)( libspectrum_word offset, void *data );
 
+static void show_version( void );
 int parse_snapshot_file( const unsigned char *buffer, size_t length,
 			 libspectrum_id_t type );
 libspectrum_byte read_snap_memory( libspectrum_word address, void *data );
@@ -70,13 +74,19 @@ int main(int argc, char* argv[])
   int c;
   int error = 0;
 
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
   progname = argv[0];
 
-  while( ( c = getopt( argc, argv, "b" ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "bV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
     case 'b': betabasic = 1; break;
+    case 'V': show_version(); return 0;
 
     case '?':
       /* getopt prints an error message to stderr */
@@ -135,6 +145,20 @@ int main(int argc, char* argv[])
   free( buffer );
 
   return 0;
+}
+
+static void
+show_version( void )
+{
+  printf(
+    "listbasic (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2002 Chris Cowley\n"
+    "Copyright (c) 2003 Philip Kendall, Darren Salt\n"
+    "Copyright (c) 2007 Stuart Brady\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
 int

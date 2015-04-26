@@ -25,6 +25,7 @@
 
 #include <config.h>
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -283,6 +284,18 @@ Abort:
   free(tmpscl);
 }
 
+static void
+show_version( void )
+{
+  printf(
+    "scl2trd (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2002-2007 Dmitry Sanarin, Philip Kendall and Fredrick Meunier\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
+
 static int
 parse_options(int argc, char **argv, struct options * options)
 {
@@ -293,25 +306,45 @@ parse_options(int argc, char **argv, struct options * options)
 
   int unknown = 0;
 
-  while ((c = getopt(argc, argv, "")) != EOF)
-    switch (c) {
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
+  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
+
+    switch( c ) {
+
+    case 'V': show_version(); exit( 0 );
+
     case '?':
-      unknown = c;
+      /* getopt prints an error message to stderr */
+      unknown = 1;
       break;
+
+    default:
+      unknown = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
+
     }
+  }
+  argc -= optind;
+  argv += optind;
 
   if( unknown ) return 1;
 
-  if (argv[optind] == NULL) {
+  if( argc < 1 ) {
     fprintf(stderr, "%s: no SCL file given\n", progname);
     return 1;
   }
-  options->sclfile = argv[optind];
-  if (argv[optind+1] == NULL) {
+  options->sclfile = argv[0];
+
+  if( argc < 2 ) {
     fprintf(stderr, "%s: no TRD file given\n", progname);
     return 1;
   }
-  options->trdfile = argv[optind+1];
+  options->trdfile = argv[1];
 
   return 0;
 }

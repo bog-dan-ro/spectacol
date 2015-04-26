@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
@@ -82,19 +83,59 @@ read_dword( unsigned char **ptr )
   return result;
 }
 
+static void
+show_version( void )
+{
+  printf(
+    "rzxdump (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2002-2014 Philip Kendall\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
 
 int main( int argc, char **argv )
 {
-  int i;
+  int i, c;
+  int error = 0;
+
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
 
   progname = argv[0];
 
-  if( argc < 2 ) {
+  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
+
+    switch( c ) {
+
+    case 'V':
+      show_version();
+      return 0;
+
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
+
+    }
+  }
+  argc -= optind;
+  argv += optind;
+
+  if( error || argc < 2 ) {
     fprintf( stderr, "%s: Usage: %s <rzx file(s)>\n", progname, progname );
     return 1;
   }
 
-  for( i=1; i<argc; i++ ) {
+  for( i = 0; i < argc; i++ ) {
     do_file( argv[i] );
   }    
 

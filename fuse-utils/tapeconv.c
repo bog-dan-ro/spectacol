@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include <errno.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -36,6 +37,7 @@
 
 #define DESCRIPTION_BUFFER_LEN 0x10
 
+static void show_version( void );
 static int get_type_from_string( libspectrum_id_t *type, const char *string );
 static int read_tape( char *filename, libspectrum_tape **tape );
 static int update_archive_file( char *archive_file, libspectrum_tape *tape );
@@ -62,9 +64,12 @@ main( int argc, char **argv )
 
   progname = argv[0];
 
-  error = init_libspectrum(); if( error ) return error;
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
 
-  while( ( c = getopt( argc, argv, "a:s:i:b" ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "a:s:i:bV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
@@ -72,6 +77,7 @@ main( int argc, char **argv )
     case 'b': beautify = 1; break;
     case 's': scr_file = optarg ; break;
     case 'i': inlay_file = optarg ; break;
+    case 'V': show_version(); return 0;
 
     case '?':
       /* getopt prints an error message to stderr */
@@ -98,6 +104,8 @@ main( int argc, char **argv )
 	     progname );
     return 1;
   }
+
+  error = init_libspectrum(); if( error ) return error;
 
   if( read_tape( argv[0], &tzx ) ) return 1;
 
@@ -129,6 +137,17 @@ main( int argc, char **argv )
   libspectrum_tape_free( tzx );
 
   return 0;
+}
+
+static void
+show_version( void )
+{
+  printf( "tapeconv (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2002-2008 Philip Kendall, Fredrick Meunier\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
 static int

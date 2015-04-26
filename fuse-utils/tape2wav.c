@@ -27,6 +27,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -37,6 +38,7 @@
 
 #include "utils.h"
 
+static void show_version( void );
 static int read_tape( char *filename, libspectrum_tape **tape );
 static int write_tape( char *filename, libspectrum_tape *tape );
 
@@ -51,13 +53,17 @@ main( int argc, char **argv )
 
   progname = argv[0];
 
-  error = init_libspectrum(); if( error ) return error;
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
 
-  while( ( c = getopt( argc, argv, "r:" ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "r:V", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
     case 'r': sample_rate = abs( atol( optarg ) ); break;
+    case 'V': show_version(); return 0;
 
     case '?':
       /* getopt prints an error message to stderr */
@@ -84,6 +90,8 @@ main( int argc, char **argv )
     return 1;
   }
 
+  error = init_libspectrum(); if( error ) return error;
+
   if( read_tape( argv[0], &tzx ) ) return 1;
 
   if( write_tape( argv[1], tzx ) ) {
@@ -94,6 +102,18 @@ main( int argc, char **argv )
   libspectrum_tape_free( tzx );
 
   return 0;
+}
+
+static void
+show_version( void )
+{
+  printf(
+    "tape2wav (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2007 Fredrick Meunier\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
 static int

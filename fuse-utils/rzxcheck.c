@@ -27,6 +27,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -38,6 +39,18 @@
 #include "utils.h"
 
 char *progname;			/* argv[0] */
+
+static void
+show_version( void )
+{
+  printf(
+    "rzxcheck (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2002-2003 Philip Kendall\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
 
 int
 main( int argc, char **argv )
@@ -53,15 +66,45 @@ main( int argc, char **argv )
   libspectrum_signature signature;
   struct rzx_key *key;
 
+  int c;
+  int bad_option = 0;
+
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
   progname = argv[0];
 
-  if( init_libspectrum() ) return 16;
+  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
 
-  if( argc < 2 ) {
+    switch( c ) {
+
+    case 'V': show_version(); exit( 0 );
+
+    case '?':
+      /* getopt prints an error message to stderr */
+      bad_option = 1;
+      break;
+
+    default:
+      bad_option = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
+
+    }
+  }
+  argc -= optind;
+  argv += optind;
+
+  if( bad_option || argc < 2 ) {
     fprintf( stderr, "%s: usage: %s <rzxfile>\n", progname, progname );
     return 2;
   }
-  rzxfile = argv[1];
+
+  if( init_libspectrum() ) return 16;
+
+  rzxfile = argv[0];
 
   rzx = libspectrum_rzx_alloc();
 

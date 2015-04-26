@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include <errno.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -51,6 +52,18 @@ fix_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_f_( snap, a );
 }
 
+static void
+show_version( void )
+{
+  printf(
+   "snapconv (" PACKAGE ") " PACKAGE_VERSION "\n"
+   "Copyright (c) 2003-2005 Philip Kendall\n"
+   "License GPLv2+: GNU GPL version 2 or later "
+   "<http://gnu.org/licenses/gpl.html>\n"
+   "This is free software: you are free to change and redistribute it.\n"
+   "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
+
 int
 main( int argc, char **argv )
 {
@@ -66,9 +79,14 @@ main( int argc, char **argv )
   int error = 0;
   int c;
 
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
   progname = argv[0];
 
-  while( ( c = getopt( argc, argv, "cnf" ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "cnfV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
@@ -80,6 +98,8 @@ main( int argc, char **argv )
 
     case 'f': fix = 1;
       break;
+
+    case 'V': show_version(); return 0;
 
     case '?':
       /* getopt prints an error message to stderr */

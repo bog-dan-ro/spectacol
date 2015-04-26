@@ -470,4 +470,9 @@
 20150423 fmfconv.c: set output mode to AVI when using .avi file extension
          (Sergio).
 20150426 fmfconv.[c|h],fmfconv_[ff|jpg|png].c: implement --version option in
-         fmfconv (more from patch #329) (Gergely Szasz).
+         fmfconv (more from patch #329) (partially fixes bug #320) (Gergely
+         Szasz).
+20150427 audio2tape.cc,configure.ac,createhdf.c,fmfconv.c,listbasic.c,
+         profile2map.c,raw2hdf.c,rzxcheck.c,rzxdump.c,rzxtool.c,scl2trd.c,
+         snap2tzx.c,snapconv.c,tape2wav.c,tapeconv.c,tzxlist.c: add --version
+         option to the utilities (partially fixes bug #320) (Sergio).

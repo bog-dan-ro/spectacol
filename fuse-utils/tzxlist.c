@@ -27,6 +27,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <getopt.h>
 #ifdef HAVE_ICONV
 #include <iconv.h>
 #endif /* #ifdef HAVE_ICONV */
@@ -536,16 +537,57 @@ process_tape( char *filename )
   return 0;
 }
 
+static void
+show_version( void )
+{
+  printf(
+    "tzxlist (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2001-2011 Philip Kendall, Darren Salt, Fredrick Meunier\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
+
 int
 main( int argc, char **argv )
 {
   int ret = 0;
   int arg = 0;
-  int error;
+  int c, error = 0;
+
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
 
   progname = argv[0];
 
-  if( argc < 2 ) {
+  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
+
+    switch( c ) {
+
+    case 'V':
+      show_version();
+      return 0;
+
+    case '?':
+      /* getopt prints an error message to stderr */
+      error = 1;
+      break;
+
+    default:
+      error = 1;
+      fprintf( stderr, "%s: unknown option `%c'\n", progname, (char) c );
+      break;
+
+    }
+  }
+
+  argc -= optind;
+  argv += optind;
+
+  if( error || argc < 2 ) {
     fprintf( stderr, "%s: usage: %s <tape files>...\n", progname, progname );
     return 1;
   }

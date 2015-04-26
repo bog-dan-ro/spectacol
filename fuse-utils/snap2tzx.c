@@ -28,6 +28,7 @@
 
 #include <config.h>
 
+#include <getopt.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -351,11 +352,27 @@ print_usage( int title )
 	  "  -s n  Set loading speed: 0: 1500 1: 2250 2:3000 3: 6000 bps\n"
 	  "  -v    Verbose output\n"
 	  "  -$ f  Use .scr file 'f' as the loading screen\n"
+	  "  -V    Output version information and exit\n"
 	  "\n"
 	  "In string parameters, the copyright symbol will be substituted for '~'.\n"
 	  "\n",
 	  buffer2
 	);
+}
+
+static void
+print_version( void )
+{
+  printf(
+   "snap2tzx (" PACKAGE ") " PACKAGE_VERSION "\n"
+   "Copyright (c) 1997-2001 ThunderWare Research Center, written by\n"
+   "                        Martijn van der Heide,\n"
+   "Copyright (c) 2003 Tomaz Kac,\n"
+   "Copyright (c) 2003 Philip Kendall\n"
+   "License GPLv2+: GNU GPL version 2 or later "
+   "<http://gnu.org/licenses/gpl.html>\n"
+   "This is free software: you are free to change and redistribute it.\n"
+   "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
 static int
@@ -364,11 +381,17 @@ parse_args( settings_t *settings, int argc, char **argv )
   int c, got_game_name, got_loader_name, got_out_filename, error;
   char *buffer, *buffer2, *last_dot;
 
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
   error = initialise_settings( settings ); if( error ) return error;
 
   got_game_name = got_loader_name = got_out_filename = 0;
 
-  while( ( c = getopt( argc, argv, "1:2:b:g:l:o:rs:v$:" ) ) != EOF ) {
+  while( ( c = getopt_long( argc, argv, "1:2:b:g:l:o:rs:v$:V", long_options,
+                            NULL ) ) != -1 ) {
     switch (c) {
 
     case '1':
@@ -426,6 +449,8 @@ parse_args( settings_t *settings, int argc, char **argv )
 
       /* External Loading Screen */
     case '$': settings->external_filename = optarg; break;
+
+    case 'V': print_version(); exit( 0 );
 
     case '?':
       /* getopt prints an error message to stderr */

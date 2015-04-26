@@ -23,7 +23,10 @@
 
 */
 
+#include <config.h>
+
 #include <errno.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -37,6 +40,19 @@ static const size_t MODEL_NUMBER_LENGTH = 40;
 
 #define CHUNK_LENGTH 1 << 20
 
+static void
+show_version( void )
+{
+  printf(
+    "raw2hdf (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2005 Matthew Westcott\n"
+    "Copyright (c) 2006 Philip Kendall\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
+
 int
 parse_options( int argc, char **argv, const char **raw_filename,
 	       const char **hdf_filename, enum hdf_version_t *version )
@@ -44,7 +60,12 @@ parse_options( int argc, char **argv, const char **raw_filename,
   int c;
   int error = 0;
 
-  while( ( c = getopt( argc, argv, "v:" ) ) != -1 ) {
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
+  while( ( c = getopt_long( argc, argv, "v:V", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
@@ -59,6 +80,10 @@ parse_options( int argc, char **argv, const char **raw_filename,
       }
       break;
 
+    case 'V':
+      show_version();
+      exit( 0 );
+
     case '?':
       /* getopt prints an error message to stderr */
       error = 1;
@@ -71,15 +96,17 @@ parse_options( int argc, char **argv, const char **raw_filename,
 
     }
   }
+  argc -= optind;
+  argv += optind;
 
-  if( error || argc - optind != 2 ) {
+  if( error || argc != 2 ) {
     fprintf( stderr, "%s: usage: %s [-v<version>] <raw-filename> <hdf-filename>\n",
              progname, progname );
     return 1;
   }
 
-  *raw_filename  = argv[ optind++ ];
-  *hdf_filename  = argv[ optind++ ];
+  *raw_filename  = argv[0];
+  *hdf_filename  = argv[1];
 
   return 0;
 }

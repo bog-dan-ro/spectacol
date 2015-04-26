@@ -31,6 +31,7 @@
 #include <sstream>
 
 #include <errno.h>
+#include <getopt.h>
 #include <math.h>
 #include <string.h>
 #include <unistd.h>
@@ -56,6 +57,8 @@ set_trigger_type_from_string( const std::string trigger_str,
                               libspectrum_byte schmitt_low2high_crossover_point,
                               libspectrum_byte schmitt_high2low_crossover_point
                             );
+static void
+show_version( void );
 
 std::string progname;
 
@@ -97,13 +100,19 @@ main( int argc, char **argv )
   bool show_stats = false;
   double source_machine_hz = 3500000.0;
 
+  struct option long_options[] = {
+    { "version", 0, NULL, 'V' },
+    { 0, 0, 0, 0 }
+  };
+
   progname = argv[0];
 
   error = init_libspectrum(); if( error ) return error;
 
   std::string trigger_type_string = schmitt_str;
 
-  while( ( c = getopt( argc, argv, "t:srkz:c:" ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "t:srkz:c:V", long_options,
+                            NULL ) ) != -1 ) {
 
     switch( c ) {
 
@@ -130,6 +139,10 @@ main( int argc, char **argv )
     case 'c':
       schmitt_noise_threshold = atol( optarg );
       break;
+
+    case 'V':
+      show_version();
+      return 0;
 
     case '?':
       /* getopt prints an error message to stderr */
@@ -284,4 +297,16 @@ get_pause_block( libspectrum_tape *tape, double source_machine_hz,
                           ( source_machine_hz * 1000 ) );
   libspectrum_tape_block_set_pause( block, pause_ms );
   libspectrum_tape_append_block( tape, block );
+}
+
+static void
+show_version( void )
+{
+  std::cout <<
+    "audio2tape (" PACKAGE ") " PACKAGE_VERSION "\n"
+    "Copyright (c) 2007-2008 Fredrick Meunier\n"
+    "License GPLv2+: GNU GPL version 2 or later "
+    "<http://gnu.org/licenses/gpl.html>\n"
+    "This is free software: you are free to change and redistribute it.\n"
+    "There is NO WARRANTY, to the extent permitted by law.\n";
 }
