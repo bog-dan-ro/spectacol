@@ -477,6 +477,15 @@ disciple_page( void )
   abort();
 }
 
+int usource_available = 0;
+int usource_active = 0;
+
+void
+usource_toggle( void )
+{
+  abort();
+}
+
 void
 if1_page( void )
 {

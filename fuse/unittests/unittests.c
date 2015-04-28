@@ -42,6 +42,7 @@
 #include "peripherals/if2.h"
 #include "peripherals/speccyboot.h"
 #include "peripherals/ula.h"
+#include "peripherals/usource.h"
 #include "settings.h"
 #include "unittests.h"
 
@@ -727,6 +728,7 @@ paging_test( void )
     r += if1_unittest();
     r += if2_unittest();
     r += speccyboot_unittest();
+    r += usource_unittest();
 
     r += beta_unittest();
     r += disciple_unittest();

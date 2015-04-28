@@ -49,7 +49,8 @@ libperipherals_a_SOURCES = \
   speccyboot.c \
   specdrum.c \
   spectranet.c \
-  ula.c
+  ula.c \
+  usource.c
 
 noinst_HEADERS = \
   ay.h \
@@ -65,4 +66,5 @@ noinst_HEADERS = \
   speccyboot.h \
   specdrum.h \
   spectranet.h \
-  ula.h
+  ula.h \
+  usource.h

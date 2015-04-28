@@ -1032,6 +1032,9 @@ Specify an RZX file to begin recording to.
 .br
 .B \-\-rom\-speccyboot
 .I file
+.br
+.B \-\-rom\-usource
+.I file
 .RS
 Specify the file to be used for ROM(s) used for each machine. The
 options respectively refer to the 16K\ Spectrum
@@ -1068,6 +1071,8 @@ the +D ROM
 .RI ( plusd.rom ),
 the TR-DOS ROM for Beta\ 128 emulation with the 48K, TC2048, 128K or +2
 .RI ( trdos.rom ),
+the \(mcSource ROM
+.RI ( usource.rom ),
 and the SpeccyBoot ROM
 .RI ( speccyboot\-1.4.rom ).
 The names in brackets denote the defaults. Note that not all these ROMs
@@ -1609,6 +1614,13 @@ you can use
 .RB ` \-\-no\-traps '
 to disable). Same as the Media Options dialog's
 .I "Use tape traps"
+option.
+.RE
+.PP
+.B \-\-usource
+.RS
+Emulate a \(mcSource interface. Same as the General Peripherals Options dialog's
+.I "\(mcSource"
 option.
 .RE
 .PP
@@ -2372,6 +2384,14 @@ This option controls the state of the Spectranet automatic page-in jumper
 (J2). See the
 .B "SPECTRANET EMULATION"
 section for more details.
+.RE
+.PP
+.I "\(mcSource"
+.RS
+If this option is selected, Fuse will emulate a Currah \(mcSource interface.
+See the World of Spectrum Infoseek web page at
+.I http://www.worldofspectrum.org/infoseekid.cgi?id=1000080
+for the manual.
 .RE
 .RE
 .PP

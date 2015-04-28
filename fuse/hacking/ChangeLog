@@ -4760,3 +4760,7 @@
 20150411 compat/win32/distribution.mk: revert the use of variables for groff and
          man2html, escape variable substitution (thanks, Stuart) (Sergio).
 20150425 z80/z80_ops.c: fix timing of events when emulating Scorpion (Stuart).
+20150428 fuse.c,machines/machines_periph.c,man/fuse.1,periph.h,
+         peripherals/{Makefile.am,usource.[ch],settings.dat,ui/options.dat,
+         unittests/unittests.c,z80/{coretest.c,z80_checks.h,z80_ops.c}:
+         add Currah µSource emulation (Stuart).

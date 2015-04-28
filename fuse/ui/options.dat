@@ -50,6 +50,7 @@ Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
 Checkbox, Spectra(n)et, spectranet, INPUT_KEY_n
 Checkbox, Spe(c)tranet disable, spectranet_disable, INPUT_KEY_c
 #endif
+Checkbox, uSo(u)rce, usource, INPUT_KEY_u
 Postcheck, periph_postcheck
 Posthook, periph_posthook
 

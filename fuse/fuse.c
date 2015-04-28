@@ -81,6 +81,7 @@
 #include "peripherals/speccyboot.h"
 #include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
+#include "peripherals/usource.h"
 #include "pokefinder/pokemem.h"
 #include "profile.h"
 #include "psg.h"
@@ -302,6 +303,7 @@ static int fuse_init(int argc, char **argv)
   speccyboot_init();
   specdrum_init();
   spectranet_init();
+  usource_init();
   machines_periph_init();
 
   z80_init();
@@ -854,6 +856,7 @@ static int fuse_end(void)
   disciple_end();
   spectranet_end();
   speccyboot_end();
+  usource_end();
 
   machine_end();
 
