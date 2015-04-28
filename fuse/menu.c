@@ -251,6 +251,7 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case 19: menu_select_roms_with_title( "DISCiPLE",        43, 1 ); return;
   case 20: menu_select_roms_with_title( "Opus Discovery",  44, 1 ); return;
   case 21: menu_select_roms_with_title( "SpeccyBoot",      45, 1 ); return;
+  case 22: menu_select_roms_with_title( "uSource",         46, 1 ); return;
 
   }
 

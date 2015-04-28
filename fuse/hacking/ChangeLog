@@ -4764,3 +4764,5 @@
          peripherals/{Makefile.am,usource.[ch],settings.dat,ui/options.dat,
          unittests/unittests.c,z80/{coretest.c,z80_checks.h,z80_ops.c}:
          add Currah µSource emulation (Stuart).
+20150429 menu.c,menu_data.c: add menu item for Currah µSource ROM selection
+         (Stuart).
