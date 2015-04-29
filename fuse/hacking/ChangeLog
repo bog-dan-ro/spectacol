@@ -4768,3 +4768,4 @@
          (Stuart).
 20150429 menu_data.c: split Select ROMs menu into Machines and Peripherals
          (part of patch #87) (Gergely Szasz).
+20150429 settings.pl: add Currah µSource ROM setting (Stuart).

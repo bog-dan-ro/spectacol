@@ -767,6 +767,7 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   case 43: return &( settings->rom_disciple );
   case 44: return &( settings->rom_opus );
   case 45: return &( settings->rom_speccyboot );
+  case 46: return &( settings->rom_usource );
   default: return NULL;
   }
 }
