@@ -4770,3 +4770,4 @@
          (part of patch #87) (Gergely Szasz).
 20150429 settings.pl: add Currah µSource ROM setting (Stuart).
 20150429 peripherals/disk/opus.c: clear all Opus RAM on hard reset (Stuart).
+20150429 peripherals/disk/opus.c: add provision for 2K page size (Stuart).
