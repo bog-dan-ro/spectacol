@@ -4766,3 +4766,5 @@
          add Currah µSource emulation (Stuart).
 20150429 menu.c,menu_data.c: add menu item for Currah µSource ROM selection
          (Stuart).
+20150429 menu_data.c: split Select ROMs menu into Machines and Peripherals
+         (part of patch #87) (Gergely Szasz).

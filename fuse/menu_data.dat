@@ -86,28 +86,32 @@ Options/Joysticks/Joystick _2..., Item,, menu_options_joysticks_select, menu_joy
 Options/Joysticks/_Keyboard..., Item,, menu_options_joysticks_select, menu_keyboard_joystick_detail, 3
 
 Options/S_elect ROMs, Branch
-Options/Select ROMs/Spectrum 1_6K..., Item,, menu_options_selectroms_select,, 1
-Options/Select ROMs/Spectrum _48K..., Item,, menu_options_selectroms_select,, 2
-Options/Select ROMs/Spectrum _128K..., Item,, menu_options_selectroms_select,, 3
-Options/Select ROMs/Spectrum +_2..., Item,, menu_options_selectroms_select,, 4
-Options/Select ROMs/Spectrum +2_A..., Item,, menu_options_selectroms_select,, 5
-Options/Select ROMs/Spectrum +_3..., Item,, menu_options_selectroms_select,, 6
-Options/Select ROMs/Spectrum +3_e..., Item,, menu_options_selectroms_select,, 7
-Options/Select ROMs/Timex _TC2048..., Item,, menu_options_selectroms_select,, 8
-Options/Select ROMs/Timex TC206_8..., Item,, menu_options_selectroms_select,, 9
-Options/Select ROMs/Ti_mex TS2068..., Item,, menu_options_selectroms_select,, 10
-Options/Select ROMs/_Pentagon 128K..., Item,, menu_options_selectroms_select,, 11
-Options/Select ROMs/Pe_ntagon 512K..., Item,, menu_options_selectroms_select,, 12
-Options/Select ROMs/Penta_gon 1024K..., Item,, menu_options_selectroms_select,, 13
-Options/Select ROMs/S_corpion ZS 256..., Item,, menu_options_selectroms_select,, 14
-Options/Select ROMs/Spectrum _SE..., Item,, menu_options_selectroms_select,, 15
-Options/Select ROMs/_Interface 1..., Item,, menu_options_selectroms_select,, 16
-Options/Select ROMs/_Beta 128..., Item,, menu_options_selectroms_select,, 17
-Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select,, 18
-Options/Select ROMs/DISCiP_LE..., Item,, menu_options_selectroms_select,, 19
-Options/Select ROMs/_Opus Discovery..., Item,, menu_options_selectroms_select,, 20
-Options/Select ROMs/Specc_yBoot..., Item,, menu_options_selectroms_select,, 21
-Options/Select ROMs/_uSource..., Item,, menu_options_selectroms_select,, 22
+
+Options/Select ROMs/_Machine ROMs, Branch
+Options/Select ROMs/Machine ROMs/Spectrum 1_6K..., Item,, menu_options_selectroms_select,, 1
+Options/Select ROMs/Machine ROMs/Spectrum _48K..., Item,, menu_options_selectroms_select,, 2
+Options/Select ROMs/Machine ROMs/Spectrum _128K..., Item,, menu_options_selectroms_select,, 3
+Options/Select ROMs/Machine ROMs/Spectrum +_2..., Item,, menu_options_selectroms_select,, 4
+Options/Select ROMs/Machine ROMs/Spectrum +2_A..., Item,, menu_options_selectroms_select,, 5
+Options/Select ROMs/Machine ROMs/Spectrum +_3..., Item,, menu_options_selectroms_select,, 6
+Options/Select ROMs/Machine ROMs/Spectrum +3_e..., Item,, menu_options_selectroms_select,, 7
+Options/Select ROMs/Machine ROMs/Timex _TC2048..., Item,, menu_options_selectroms_select,, 8
+Options/Select ROMs/Machine ROMs/Timex TC206_8..., Item,, menu_options_selectroms_select,, 9
+Options/Select ROMs/Machine ROMs/Ti_mex TS2068..., Item,, menu_options_selectroms_select,, 10
+Options/Select ROMs/Machine ROMs/_Pentagon 128K..., Item,, menu_options_selectroms_select,, 11
+Options/Select ROMs/Machine ROMs/Pe_ntagon 512K..., Item,, menu_options_selectroms_select,, 12
+Options/Select ROMs/Machine ROMs/Penta_gon 1024K..., Item,, menu_options_selectroms_select,, 13
+Options/Select ROMs/Machine ROMs/S_corpion ZS 256..., Item,, menu_options_selectroms_select,, 14
+Options/Select ROMs/Machine ROMs/Spectrum _SE..., Item,, menu_options_selectroms_select,, 15
+
+Options/Select ROMs/_Peripheral ROMs, Branch
+Options/Select ROMs/Peripheral ROMs/_Interface 1..., Item,, menu_options_selectroms_select,, 16
+Options/Select ROMs/Peripheral ROMs/_Beta 128..., Item,, menu_options_selectroms_select,, 17
+Options/Select ROMs/Peripheral ROMs/+_D..., Item,, menu_options_selectroms_select,, 18
+Options/Select ROMs/Peripheral ROMs/DISCiP_LE..., Item,, menu_options_selectroms_select,, 19
+Options/Select ROMs/Peripheral ROMs/_Opus Discovery..., Item,, menu_options_selectroms_select,, 20
+Options/Select ROMs/Peripheral ROMs/Specc_yBoot..., Item,, menu_options_selectroms_select,, 21
+Options/Select ROMs/Peripheral ROMs/_uSource..., Item,, menu_options_selectroms_select,, 22
 
 Options/_Filter..., Item,,, menu_filter_detail
 
