@@ -208,7 +208,7 @@ opus_reset( int hard_reset )
   opus_available = 1;
 
   if( hard_reset )
-    memset( opus_ram, 0, TRUE_OPUS_RAM_SIZE );
+    memset( opus_ram, 0, sizeof( opus_ram ) );
 
   wd_fdc_master_reset( opus_fdc );
 
