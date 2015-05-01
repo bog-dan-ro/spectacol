@@ -491,3 +491,4 @@
          rzxcheck.1,rzxdump.1,rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,
          tape2wav.1,tapeconv.1,tzxlist.1}: document --help and --version options
          (Sergio).
+20150502 rzxdump.c,scl2trd.c: fix exit code when passed bad operands (Sergio).

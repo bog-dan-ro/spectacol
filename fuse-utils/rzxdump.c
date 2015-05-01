@@ -164,7 +164,8 @@ int main( int argc, char **argv )
   }
 
   for( i = 0; i < argc; i++ ) {
-    do_file( argv[i] );
+    error = do_file( argv[i] );
+    if( error ) return error;
   }    
 
   return 0;

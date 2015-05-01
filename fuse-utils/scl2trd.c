@@ -83,7 +83,7 @@ ui2lsb(unsigned char *mem, unsigned int value)
   mem[3] = ret.b.b3;
 }
 
-static void 
+static int
 Scl2Trd(char *oldname, char *newname)
 {
   int TRD, SCL, i;
@@ -143,7 +143,7 @@ Scl2Trd(char *oldname, char *newname)
 
   if ((TRD = open(newname, O_RDWR | O_BINARY)) == -1) {
     printf("Error - cannot open TRD disk image %s !\n", newname);
-    return;
+    return 1;
   }
 
   TRDh = malloc(4096);
@@ -152,7 +152,7 @@ Scl2Trd(char *oldname, char *newname)
     printf("Error - cannot read TRD header from %s\n", newname);
     close(TRD);
     free(TRDh);
-    return;
+    return 1;
   }
 
   tmp = (char *) TRDh + 0x8E5;
@@ -270,18 +270,20 @@ Scl2Trd(char *oldname, char *newname)
 Finish:
   lseek(TRD, 0L, SEEK_SET);
   bytes_written = write(TRD, TRDh, 4096);
-  if (bytes_written < 4096) {
-    printf("Error - writing header to TRD file %s\n", newname);
-  }
   close(TRD);
   free(TRDh);
-  return;
+  if (bytes_written < 4096) {
+    printf("Error - writing header to TRD file %s\n", newname);
+    return 1;
+  }
+  return 0;
 
 Abort:
   close(SCL);
   close(TRD);
   free(TRDh);
   free(tmpscl);
+  return 1;
 }
 
 static void
@@ -391,7 +393,8 @@ main(int argc, char **argv)
     return error;
   }
 
-  Scl2Trd(options.sclfile, options.trdfile);
+  error = Scl2Trd( options.sclfile, options.trdfile );
+  if( error ) return error;
 
   return 0;
 }
