@@ -64,6 +64,27 @@ show_version( void )
    "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
+static void
+show_help( void )
+{
+  printf(
+    "Usage: snapconv [OPTION]... <infile> <outfile>\n"
+    "Sinclair ZX Spectrum snapshot converter.\n"
+    "\n"
+    "Options:\n"
+    "  -c             Force all data in the output snapshot to be compressed.\n"
+    "  -n             Store uncompressed data in the output snapshot.\n"
+    "  -f             Swap the A and F and A' and F' registers. Fix buggy snapshots\n"
+    "                   created by an old libspectrum version.\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report snapconv bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of snapconv.\n"
+  );
+}
+
 int
 main( int argc, char **argv )
 {
@@ -80,13 +101,14 @@ main( int argc, char **argv )
   int c;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
   progname = argv[0];
 
-  while( ( c = getopt_long( argc, argv, "cnfV", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "cnfhV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
@@ -98,6 +120,8 @@ main( int argc, char **argv )
 
     case 'f': fix = 1;
       break;
+
+    case 'h': show_help(); return 0;
 
     case 'V': show_version(); return 0;
 
@@ -116,9 +140,15 @@ main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( error || argc < 2 ) {
+  if( error ) {
+    fprintf( stderr, "Try `snapconv --help' for more information.\n" );
+    return error;
+  }
+
+  if( argc < 2 ) {
     fprintf( stderr, "%s: usage: %s [-c] [-n] [-f] <infile> <outfile>\n", progname,
 	     progname );
+    fprintf( stderr, "Try `snapconv --help' for more information.\n" );
     return 1;
   }
 

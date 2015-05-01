@@ -52,6 +52,23 @@ show_version( void )
     "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
+static void
+show_help( void )
+{
+  printf(
+    "Usage: profile2map [OPTION] <profile> <map>\n"
+    "Converts Fuse profiler output into Z80-style map format.\n"
+    "\n"
+    "Options:\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report profile2map bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of profile2map.\n"
+  );
+}
+
 int main( int argc, char **argv )
 {
   char *profile, *mapfile;
@@ -63,15 +80,18 @@ int main( int argc, char **argv )
   int error = 0;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
   progname = argv[0];
 
-  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "hV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
+
+    case 'h': show_help(); return 0;
 
     case 'V': show_version(); return 0;
 
@@ -90,8 +110,14 @@ int main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( error || argc != 2 ) {
+  if( error ) {
+    fprintf( stderr, "Try `profile2map --help' for more information.\n" );
+    return error;
+  }
+
+  if( argc != 2 ) {
     fprintf( stderr, "%s: usage: %s <profile> <map>\n", progname, progname );
+    fprintf( stderr, "Try `profile2map --help' for more information.\n" );
     return 1;
   }
 

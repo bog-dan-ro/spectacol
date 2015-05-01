@@ -549,23 +549,45 @@ show_version( void )
     "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
+static void
+show_help( void )
+{
+  printf(
+    "Usage: tzxlist [OPTION] <tapefile>...\n"
+    "Outputs a description of the contents of TZX, TAP, PZX and Warajevo tape files.\n"
+    "\n"
+    "Options:\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report tzxlist bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of tzxlist.\n"
+  );
+}
+
 int
 main( int argc, char **argv )
 {
   int ret = 0;
-  int arg = 0;
+  int i;
   int c, error = 0;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
   progname = argv[0];
 
-  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "hV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
+
+    case 'h':
+      show_help();
+      return 0;
 
     case 'V':
       show_version();
@@ -587,16 +609,23 @@ main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( error || argc < 2 ) {
+  if( error ) {
+    fprintf( stderr, "Try `tzxlist --help' for more information.\n" );
+    return error;
+  }
+
+  if( argc < 1 ) {
     fprintf( stderr, "%s: usage: %s <tape files>...\n", progname, progname );
+    fprintf( stderr, "Try `tzxlist --help' for more information.\n" );
     return 1;
   }
 
   error = init_libspectrum(); if( error ) return error;
 
 
-  while( ++arg < argc )
-    ret |= process_tape( argv[arg] );
+  for( i = 0; i < argc; i++ ) {
+    ret |= process_tape( argv[i] );
+  }
 
   return ret;
 }

@@ -1735,7 +1735,8 @@ void
 print_help( void )
 {
   printf ("\n"
-	  "Usage: fmfconv [options] [infile [outfile [soundfile]]]\n"
+	  "Usage: fmfconv [OPTION]... [infile [outfile [soundfile]]]\n"
+	  "Converts Fuse movie files to different multimedia files.\n"
 	  "\n"
 	  "Options:\n"
 	  "\n"
@@ -1856,7 +1857,11 @@ print_help( void )
 	  "  -v --verbose                 Increase the verbosity level by one.\n"
 	  "  -q --quiet                   Decrease the verbosity level by one.\n"
 	  "  -V --version                 Print the version number and exit.\n"
-	  "  -h --help                    Print this help.\n\n"
+	  "  -h --help                    Print this help.\n"
+	  "\n"
+	  "Report fmfconv bugs to <" PACKAGE_BUGREPORT ">\n"
+	  "fuse-utils home page: <" PACKAGE_URL ">\n"
+	  "For complete documentation, see the manual page of fmfconv.\n"
   );
 }
 

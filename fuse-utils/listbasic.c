@@ -51,6 +51,7 @@ int betabasic = 0;
 typedef
   libspectrum_byte (*memory_read_fn)( libspectrum_word offset, void *data );
 
+static void show_help( void );
 static void show_version( void );
 int parse_snapshot_file( const unsigned char *buffer, size_t length,
 			 libspectrum_id_t type );
@@ -75,17 +76,19 @@ int main(int argc, char* argv[])
   int error = 0;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
   progname = argv[0];
 
-  while( ( c = getopt_long( argc, argv, "bV", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "bhV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
     case 'b': betabasic = 1; break;
+    case 'h': show_help(); return 0;
     case 'V': show_version(); return 0;
 
     case '?':
@@ -103,8 +106,14 @@ int main(int argc, char* argv[])
   argc -= optind;
   argv += optind;
 
-  if( error || argc != 1 ) {
+  if( error ) {
+    fprintf( stderr, "Try `listbasic --help' for more information.\n" );
+    return error;
+  }
+
+  if( argc != 1 ) {
     fprintf( stderr, "%s: usage: %s [-b] <file>\n", progname, progname );
+    fprintf( stderr, "Try `listbasic --help' for more information.\n" );
     return 1;
   }
 
@@ -159,6 +168,24 @@ show_version( void )
     "<http://gnu.org/licenses/gpl.html>\n"
     "This is free software: you are free to change and redistribute it.\n"
     "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
+
+static void
+show_help( void )
+{
+  printf(
+    "Usage: listbasic [OPTION] <file>\n"
+    "Extracts the BASIC listing from a ZX Spectrum snapshot or tape file.\n"
+    "\n"
+    "Options:\n"
+    "  -b             Specifies that the program to list is a Beta BASIC program.\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report listbasic bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of listbasic.\n"
+  );
 }
 
 int

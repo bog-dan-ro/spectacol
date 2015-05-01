@@ -60,6 +60,9 @@ set_trigger_type_from_string( const std::string trigger_str,
 static void
 show_version( void );
 
+static void
+show_help( void );
+
 std::string progname;
 
 const std::string schmitt_str("schmitt");
@@ -102,6 +105,7 @@ main( int argc, char **argv )
 
   struct option long_options[] = {
     { "version", 0, NULL, 'V' },
+    { "help", 0, NULL, 'h' },
     { 0, 0, 0, 0 }
   };
 
@@ -111,7 +115,7 @@ main( int argc, char **argv )
 
   std::string trigger_type_string = schmitt_str;
 
-  while( ( c = getopt_long( argc, argv, "t:srkz:c:V", long_options,
+  while( ( c = getopt_long( argc, argv, "t:srkz:c:hV", long_options,
                             NULL ) ) != -1 ) {
 
     switch( c ) {
@@ -140,6 +144,10 @@ main( int argc, char **argv )
       schmitt_noise_threshold = atol( optarg );
       break;
 
+    case 'h':
+      show_help();
+      return 0;
+
     case 'V':
       show_version();
       return 0;
@@ -160,10 +168,17 @@ main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( error || argc < 2 ) {
+  if( error ) {
+    std::cerr <<  "Try `audio2tape --help' for more information.\n";
+    return error;
+  }
+
+  if( argc < 2 ) {
     std::cerr << progname << ": usage: " << progname <<
       " [-r] [-k] [-s] [-t <trigger type>] [-z <zero level>] "
       "[-c <schmitt noise threshold>] <infile> <outfile>\n";
+
+    std::cerr <<  "Try `audio2tape --help' for more information.\n";
     return 1;
   }
 
@@ -309,4 +324,31 @@ show_version( void )
     "<http://gnu.org/licenses/gpl.html>\n"
     "This is free software: you are free to change and redistribute it.\n"
     "There is NO WARRANTY, to the extent permitted by law.\n";
+}
+
+static void
+show_help( void )
+{
+  std::cout <<
+    "Usage: audio2tape [OPTION]... <infile> <outfile>\n"
+    "Converts audio files to ZX Spectrum tape images.\n"
+    "\n"
+    "Options:\n"
+    "  -t <type>      Set the level detection trigger: 'simple' or 'schmitt';\n"
+    "                   defaults to 'schmitt'.\n"
+    "  -s             Display frequency graph showing the sound levels.\n"
+    "  -r             Use idealised timing figures for ROM blocks that are\n"
+    "                   recognised.\n"
+    "  -k             Keep any audio data from the original audio file that isn't\n"
+    "                   recognised.\n"
+    "  -z <level>     Set the level to be used as zero point in the input file.\n"
+    "                   Defaults to 127 from a range of 0-255.\n"
+    "  -c <level>     Set the level to be used as as the Schmitt trigger noise\n"
+    "                   threshold. Defaults to 8 from a range of 0-127.\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report audio2tape bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of audio2tape.\n";
 }

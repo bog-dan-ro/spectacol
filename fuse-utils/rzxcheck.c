@@ -52,6 +52,23 @@ show_version( void )
     "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
+static void
+show_help( void )
+{
+  printf(
+    "Usage: rzxcheck [OPTION] <rzxfile>\n"
+    "Verifies the digital signature found in a ZX Spectrum RZX file.\n"
+    "\n"
+    "Options:\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report rzxcheck bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of rzxcheck.\n"
+  );
+}
+
 int
 main( int argc, char **argv )
 {
@@ -71,16 +88,19 @@ main( int argc, char **argv )
 
   struct option long_options[] = {
     { "version", 0, NULL, 'V' },
+    { "help", 0, NULL, 'h' },
     { 0, 0, 0, 0 }
   };
 
   progname = argv[0];
 
-  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "Vh", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
     case 'V': show_version(); exit( 0 );
+
+    case 'h': show_help(); exit( 0 );
 
     case '?':
       /* getopt prints an error message to stderr */
@@ -97,8 +117,14 @@ main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( bad_option || argc < 2 ) {
+  if( bad_option ) {
+    fprintf( stderr, "Try `rzxcheck --help' for more information.\n" );
+    return bad_option;
+  }
+
+  if( argc < 1 ) {
     fprintf( stderr, "%s: usage: %s <rzxfile>\n", progname, progname );
+    fprintf( stderr, "Try `rzxcheck --help' for more information.\n" );
     return 2;
   }
 

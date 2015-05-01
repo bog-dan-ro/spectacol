@@ -334,6 +334,32 @@ show_version( void )
     "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
+static void
+show_help( void )
+{
+  printf(
+    "Usage: rzxtool [OPTION]... <rzxfile> [<outfile>]\n"
+    "Modify Sinclair ZX Spectrum input recording files.\n"
+    "\n"
+    "Options:\n"
+    "  -d <block>     Delete block number.\n"
+    "  -e <block>,<filename>\n"
+    "                 The snapshot in the specified block number will be written\n"
+    "                   to the specified filename.\n"
+    "  -i <block>,<filename>\n"
+    "                 The snapshot specified in filename will be added to the file\n"
+    "                   at the position specified by block number.\n"
+    "  -f             Finalise the RZX file, removing any interspersed snapshot.\n"
+    "  -u             Write uncompressed data to the output RZX file.\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report rzxtool bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of rzxtool.\n"
+  );  
+}
+
 static int
 parse_options( int argc, char **argv, GSList **actions,
 	       struct options_t *options )
@@ -344,11 +370,12 @@ parse_options( int argc, char **argv, GSList **actions,
   options->uncompressed = 0;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
-  while( ( c = getopt_long( argc, argv, "d:e:i:ufV", long_options,
+  while( ( c = getopt_long( argc, argv, "d:e:i:ufhV", long_options,
                             NULL ) ) != -1 ) {
     switch( c ) {
     case 'd':
@@ -370,6 +397,9 @@ parse_options( int argc, char **argv, GSList **actions,
       options->uncompressed = 1;
       output_needed = 1;
       break;
+    case 'h':
+      show_help();
+      exit( 0 );
     case 'V':
       show_version();
       exit( 0 );
@@ -448,7 +478,10 @@ main( int argc, char *argv[] )
   error = get_creator( &creator, "rzxtool" ); if( error ) return error;
 
   error = parse_options( argc, argv, &actions, &options );
-  if( error ) return error;
+  if( error ) {
+    fprintf( stderr, "Try `rzxtool --help' for more information.\n" );
+    return error;
+  }
 
   error = read_file( options.rzxfile, &buffer, &length );
   if( error ) return error;

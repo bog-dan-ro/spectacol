@@ -483,3 +483,7 @@
          scl2trd_res.rc,snap2tzx_res.rc,snapconv_res.rc,tape2wav_res.rc,
          tapeconv_res.rc,tzxlist_res.rc: add version info to Windows executables
          (Sergio).
+20150502 audio2tape.cc,createhdf.c,fmfconv.c,listbasic.c,profile2map.c,
+         raw2hdf.c,rzxcheck.c,rzxdump.c,rzxtool.c,scl2trd.c,snap2tzx.c,
+         snapconv.c,tape2wav.c,tapeconv.c,tzxlist.c: add --help option to the
+         utilities (partially fixes bug #320) (Sergio).

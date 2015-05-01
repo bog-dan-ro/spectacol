@@ -95,21 +95,43 @@ show_version( void )
     "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
+static void
+show_help( void )
+{
+  printf(
+    "Usage: rzxdump [OPTION] <rzxfile>...\n"
+    "List contents of Sinclair ZX Spectrum input recording files.\n"
+    "\n"
+    "Options:\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report rzxdump bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of rzxdump.\n"
+  );
+}
+
 int main( int argc, char **argv )
 {
   int i, c;
   int error = 0;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
   progname = argv[0];
 
-  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "hV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
+
+    case 'h':
+      show_help();
+      return 0;
 
     case 'V':
       show_version();
@@ -130,8 +152,14 @@ int main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( error || argc < 2 ) {
+  if( error ) {
+    fprintf( stderr, "Try `rzxdump --help' for more information.\n" );
+    return error;
+  }
+
+  if( argc < 1 ) {
     fprintf( stderr, "%s: Usage: %s <rzx file(s)>\n", progname, progname );
+    fprintf( stderr, "Try `rzxdump --help' for more information.\n" );
     return 1;
   }
 

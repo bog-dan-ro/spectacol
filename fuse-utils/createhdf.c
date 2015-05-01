@@ -53,6 +53,35 @@ show_version( void )
     "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
+static void
+show_help( void )
+{
+  printf(
+    "Usage: createhdf [OPTION]... <cylinders> <heads> <sectors> <file>\n"
+    "Creates a blank image of an IDE hard disk in .hdf format.\n"
+    "\n"
+    "Options:\n"
+    "  -c             Create .hdf image in compact mode, where only the low byte\n"
+    "                   of every word is stored in the image.\n"
+    "  -s             Do not create .hdf image as a sparse file, i.e., empty\n"
+    "                   space synthesised by the operating system.\n"
+    "  -v <version>   Specifies the version of .hdf image to be created (values\n"
+    "                   1.0 or 1.1). Defaults to creating version 1.1 files.\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Non-option arguments:\n"
+    "  cylinders      Specifies the number of cylinders in the image.\n"
+    "  heads          Specifies the number of heads in the image.\n"
+    "  sectors        Specifies the number of sectors in the image.\n"
+    "  file           Specifies the file to which the image should be written.\n"
+    "\n"
+    "Report createhdf bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of createhdf.\n"
+  );
+}
+
 int
 parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
 	       size_t *sectors, int *compact, int *sparse,
@@ -62,11 +91,12 @@ parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
   int error = 0;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
-  while( ( c = getopt_long( argc, argv, "csv:V", long_options,
+  while( ( c = getopt_long( argc, argv, "csv:hV", long_options,
                             NULL ) ) != -1 ) {
 
     switch( c ) {
@@ -84,6 +114,10 @@ parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
       }
       break;
 
+    case 'h':
+      show_help();
+      exit( 0 );
+
     case 'V':
       show_version();
       exit( 0 );
@@ -100,7 +134,9 @@ parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
     }
   }
 
-  if( error || argc - optind < 4 ) {
+  if( error ) return error;
+
+  if( argc - optind != 4 ) {
     fprintf( stderr,
 	     "%s: usage: %s [-c] [-s] [-v<version>] <cylinders> <heads> <sectors> <hdf>\n",
 	     progname, progname );
@@ -227,7 +263,10 @@ main( int argc, char **argv )
   version = HDF_VERSION_11;
   error = parse_options( argc, argv, &cylinders, &heads, &sectors, &compact,
 			 &sparse, &filename, &version );
-  if( error ) return error;
+  if( error ) {
+    fprintf( stderr, "Try `createhdf --help' for more information.\n" );
+    return error;
+  }
 
   fd = open( filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY,
 			S_IRUSR | S_IWUSR |

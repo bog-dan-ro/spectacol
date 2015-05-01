@@ -296,6 +296,23 @@ show_version( void )
     "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
+static void
+show_help( void )
+{
+  printf(
+    "Usage: scl2trd [OPTION] <sclfile> <trdfile>\n"
+    "Convert .scl disk images to .trd disk images.\n"
+    "\n"
+    "Options:\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report scl2trd bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of scl2trd.\n"
+  );  
+}
+
 static int
 parse_options(int argc, char **argv, struct options * options)
 {
@@ -307,13 +324,16 @@ parse_options(int argc, char **argv, struct options * options)
   int unknown = 0;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
-  while( ( c = getopt_long( argc, argv, "V", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "hV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
+
+    case 'h': show_help(); exit( 0 );
 
     case 'V': show_version(); exit( 0 );
 
@@ -360,12 +380,16 @@ int
 main(int argc, char **argv)
 {
   struct options options;
+  int error;
 
   progname = argv[0];
 
   init_options(&options);
-  if (parse_options(argc, argv, &options))
-    return 1;
+  error = parse_options( argc, argv, &options );
+  if( error ) {
+    fprintf( stderr, "Try `scl2trd --help' for more information.\n" );
+    return error;
+  }
 
   Scl2Trd(options.sclfile, options.trdfile);
 

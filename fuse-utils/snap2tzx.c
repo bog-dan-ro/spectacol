@@ -308,37 +308,11 @@ setup_string( char *dest, size_t length, const char *src )
 }
 
 static void
-print_usage( int title )
+print_help( void )
 {
-  char *buffer, *buffer2;
-
-  buffer = strdup( progname );
-  if( !buffer ) {
-    print_error( "out of memory at %s:%d", __FILE__, __LINE__ );
-    return;
-  }
-
-  buffer2 = compat_basename( buffer );
-  
-  if( title ) {
-    printf(
-	    "\n"
-	    "snap2tzx: snapshot to TZX converter\n"
-	    "\n"
-	    "Copyright (c) 1997-2001 ThunderWare Research Center,\n"
-	    "              2003 Tomaz Kac,\n"
-	    "              2003 Philip Kendall.\n"
-	    "\n"
-	    "This program is distributed in the hope that it will be useful, but WITHOUT\n"
-	    "ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or\n"
-	    "FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for\n"
-	    "more details.\n"
-	  );
-  }
-
   printf(
-	 "\n"
-	  "Usage: %s [options] <snapshot>\n"
+	  "Usage: snap2tzx [OPTION...] <snapshot>\n"
+	  "Converts a ZX Spectrum snapshot into a .tzx tape image.\n"
 	  "\n"
 	  "Options:\n"
 	  "\n"
@@ -352,11 +326,14 @@ print_usage( int title )
 	  "  -s n  Set loading speed: 0: 1500 1: 2250 2:3000 3: 6000 bps\n"
 	  "  -v    Verbose output\n"
 	  "  -$ f  Use .scr file 'f' as the loading screen\n"
+	  "  -h    Display this help and exit\n"
 	  "  -V    Output version information and exit\n"
 	  "\n"
 	  "In string parameters, the copyright symbol will be substituted for '~'.\n"
-	  "\n",
-	  buffer2
+	  "\n"
+	  "Report snap2tzx bugs to <" PACKAGE_BUGREPORT ">\n"
+	  "fuse-utils home page: <" PACKAGE_URL ">\n"
+	  "For complete documentation, see the manual page of snap2tzx.\n"
 	);
 }
 
@@ -382,6 +359,7 @@ parse_args( settings_t *settings, int argc, char **argv )
   char *buffer, *buffer2, *last_dot;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
@@ -390,7 +368,7 @@ parse_args( settings_t *settings, int argc, char **argv )
 
   got_game_name = got_loader_name = got_out_filename = 0;
 
-  while( ( c = getopt_long( argc, argv, "1:2:b:g:l:o:rs:v$:V", long_options,
+  while( ( c = getopt_long( argc, argv, "1:2:b:g:l:o:rs:v$:hV", long_options,
                             NULL ) ) != -1 ) {
     switch (c) {
 
@@ -450,23 +428,23 @@ parse_args( settings_t *settings, int argc, char **argv )
       /* External Loading Screen */
     case '$': settings->external_filename = optarg; break;
 
+    case 'h': print_help(); exit( 0 );
+
     case 'V': print_version(); exit( 0 );
 
     case '?':
       /* getopt prints an error message to stderr */
-      print_usage( 0 );
       return 1;
 
     default:
       print_error( "%s: unknown option `%c'\n", progname, (char) c );
-      print_usage( 0 );
       return 1;
 
     }
   }
 
   if( argv[optind] == NULL ) {
-    print_usage( 1 );
+    fprintf( stderr, "%s: usage: snap2tzx [OPTION...] <snapshot>\n", progname );
     return 1;
   }
 
@@ -1542,7 +1520,11 @@ main( int argc, char **argv )
   progname = argv[0];
 
   error = init_libspectrum(); if( error ) return error;
-  error = parse_args( &settings, argc, argv ); if( error ) return error;
+  error = parse_args( &settings, argc, argv );
+  if( error ) {
+    fprintf( stderr, "Try `snap2tzx --help' for more information.\n" );
+    return error;
+  }
 
   error = load_snap( &snap, settings.input_filename );
   if( error ) return error;

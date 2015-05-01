@@ -37,6 +37,7 @@
 
 #define DESCRIPTION_BUFFER_LEN 0x10
 
+static void show_help( void );
 static void show_version( void );
 static int get_type_from_string( libspectrum_id_t *type, const char *string );
 static int read_tape( char *filename, libspectrum_tape **tape );
@@ -65,11 +66,12 @@ main( int argc, char **argv )
   progname = argv[0];
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
-  while( ( c = getopt_long( argc, argv, "a:s:i:bV", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "a:s:i:bhV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
@@ -77,6 +79,7 @@ main( int argc, char **argv )
     case 'b': beautify = 1; break;
     case 's': scr_file = optarg ; break;
     case 'i': inlay_file = optarg ; break;
+    case 'h': show_help(); return 0;
     case 'V': show_version(); return 0;
 
     case '?':
@@ -96,12 +99,18 @@ main( int argc, char **argv )
   argc -= optind;
   argv += optind;
 
-  if( error || argc < 2 ) {
+  if( error ) {
+    fprintf( stderr, "Try `tapeconv --help' for more information.\n" );
+    return error;
+  }
+
+  if( argc < 2 ) {
     fprintf( stderr,
              "%s: usage: %s [-s <scr file>] [-a <archive info tzx>] "
              "[-b] [-i <inlay image>] <infile> <outfile>\n",
              progname,
 	     progname );
+    fprintf( stderr, "Try `tapeconv --help' for more information.\n" );
     return 1;
   }
 
@@ -148,6 +157,34 @@ show_version( void )
     "<http://gnu.org/licenses/gpl.html>\n"
     "This is free software: you are free to change and redistribute it.\n"
     "There is NO WARRANTY, to the extent permitted by law.\n" );
+}
+
+static void
+show_help( void )
+{
+  printf(
+    "Usage: tapeconv [OPTION]... <infile> <outfile>\n"
+    "Converts between ZX Spectrum tape images.\n"
+    "\n"
+    "Options:\n"
+    "  -a <archive info TZX>\n"
+    "                 Scan the TZX supplied for a Archive  Info  block and dump\n"
+    "                   to the the output TZX.\n"
+    "  -b             Strip output TZX of any concatenation blocks that get created\n"
+    "                   when appending TZX files.\n"
+    "  -s <SCR loading screen>\n"
+    "                 Attach a .scr file to the TZX as a Custom Info block marked\n"
+    "                   as a loading screen\n"
+    "  -i <JPG or GIF inlay image>\n"
+    "                 Attach an image file to the TZX as a Custom Info block marked\n"
+    "                   as a cassette inlay.\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report tapeconv bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of tapeconv.\n"
+  );
 }
 
 static int

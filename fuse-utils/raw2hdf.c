@@ -53,6 +53,26 @@ show_version( void )
     "There is NO WARRANTY, to the extent permitted by law.\n" );
 }
 
+static void
+show_help( void )
+{
+  printf(
+    "Usage: raw2hdf [OPTION] <rawfile> <hdffile>\n"
+    "Converts a binary dump of a hard disk's data into an IDE disk image in .hdf \n"
+    "format.\n"
+    "\n"
+    "Options:\n"
+    "  -v <version>   Specifies the version of .hdf image to be created (values\n"
+    "                   1.0 or 1.1). Defaults to creating version 1.1 files.\n"
+    "  -h, --help     Display this help and exit.\n"
+    "  -V, --version  Output version information and exit.\n"
+    "\n"
+    "Report raw2hdf bugs to <" PACKAGE_BUGREPORT ">\n"
+    "fuse-utils home page: <" PACKAGE_URL ">\n"
+    "For complete documentation, see the manual page of raw2hdf.\n"
+  );
+}
+
 int
 parse_options( int argc, char **argv, const char **raw_filename,
 	       const char **hdf_filename, enum hdf_version_t *version )
@@ -61,11 +81,12 @@ parse_options( int argc, char **argv, const char **raw_filename,
   int error = 0;
 
   struct option long_options[] = {
+    { "help", 0, NULL, 'h' },
     { "version", 0, NULL, 'V' },
     { 0, 0, 0, 0 }
   };
 
-  while( ( c = getopt_long( argc, argv, "v:V", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "v:hV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
@@ -79,6 +100,10 @@ parse_options( int argc, char **argv, const char **raw_filename,
         fprintf( stderr, "%s: version not supported\n", progname );
       }
       break;
+
+    case 'h':
+      show_help();
+      exit( 0 );
 
     case 'V':
       show_version();
@@ -99,7 +124,9 @@ parse_options( int argc, char **argv, const char **raw_filename,
   argc -= optind;
   argv += optind;
 
-  if( error || argc != 2 ) {
+  if( error ) return error;
+
+  if( argc != 2 ) {
     fprintf( stderr, "%s: usage: %s [-v<version>] <raw-filename> <hdf-filename>\n",
              progname, progname );
     return 1;
@@ -247,7 +274,10 @@ main( int argc, char **argv )
   progname = argv[0];
 
   error = parse_options( argc, argv, &raw_filename, &hdf_filename, &version );
-  if( error ) return error;
+  if( error ) {
+    fprintf( stderr, "Try `raw2hdf --help' for more information.\n" );
+    return error;
+  }
 
   raw = fopen( raw_filename, "rb" );
   if( !raw ) {
