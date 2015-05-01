@@ -135,3 +135,24 @@ include compat/Makefile.am
 include hacking/Makefile.am
 include m4/Makefile.am
 include man/Makefile.am
+
+## Resources for Windows executables
+if HAVE_WINDRES
+audio2tape_SOURCES += audio2tape_res.rc
+createhdf_SOURCES += createhdf_res.rc
+fmfconv_SOURCES += fmfconv_res.rc
+listbasic_SOURCES += listbasic_res.rc
+profile2map_SOURCES += profile2map_res.rc
+raw2hdf_SOURCES += raw2hdf_res.rc
+rzxdump_SOURCES += rzxdump_res.rc
+rzxtool_SOURCES += rzxtool_res.rc
+scl2trd_SOURCES += scl2trd_res.rc
+snap2tzx_SOURCES += snap2tzx_res.rc
+snapconv_SOURCES += snapconv_res.rc
+tape2wav_SOURCES += tape2wav_res.rc
+tapeconv_SOURCES += tapeconv_res.rc
+tzxlist_SOURCES += tzxlist_res.rc
+
+.rc.o:
+	$(WINDRES) -I$(srcdir) -I$(top_builddir) $(CPPFLAGS) -o $@ $<
+endif

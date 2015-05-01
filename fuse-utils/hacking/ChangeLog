@@ -477,3 +477,9 @@
          snap2tzx.c,snapconv.c,tape2wav.c,tapeconv.c,tzxlist.c: add --version
          option to the utilities (partially fixes bug #320) (Sergio).
 20150427 AUTHORS: update authors list (Sergio).
+20150502 Makefile.am,audio2tape_res.rc,configure.ac,createhdf_res.rc,
+         fmfconv.h,fmfconv_res.rc,listbasic_res.rc,profile2map_res.rc,
+         raw2hdf_res.rc,rzxcheck_res.rc,rzxdump_res.rc,rzxtool_res.rc,
+         scl2trd_res.rc,snap2tzx_res.rc,snapconv_res.rc,tape2wav_res.rc,
+         tapeconv_res.rc,tzxlist_res.rc: add version info to Windows executables
+         (Sergio).

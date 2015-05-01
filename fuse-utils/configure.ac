@@ -22,6 +22,16 @@ dnl E-mail: philip-fuse@shadowmagic.org.uk
 dnl Package version
 m4_define([fuse_utils_version], [1.1.0])
 
+dnl Product full version
+m4_define([fuse_utils_major_version], [1])
+m4_define([fuse_utils_minor_version], [1])
+m4_define([fuse_utils_micro_version], [0])
+m4_define([fuse_utils_nano_version],  [0])
+m4_define([fuse_utils_full_version],
+          [fuse_utils_major_version.fuse_utils_minor_version.fuse_utils_micro_version.fuse_utils_nano_version])
+m4_define([fuse_utils_rc_version],
+          [fuse_utils_major_version,fuse_utils_minor_version,fuse_utils_micro_version,fuse_utils_nano_version])
+
 dnl Package info
 m4_define([fuse_url], [http://fuse-emulator.sourceforge.net/])
 m4_define([fuse_bugreport], [http://sourceforge.net/p/fuse-emulator/bugs/])
@@ -36,6 +46,10 @@ AC_CANONICAL_HOST
 dnl Use automake to produce `Makefile.in'
 AM_INIT_AUTOMAKE([subdir-objects])
 
+dnl Definitions for config.h
+AC_DEFINE([FUSE_UTILS_RC_VERSION], [fuse_utils_rc_version],
+          [Define version information for win32 executables])
+
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
@@ -44,11 +58,13 @@ LT_INIT
 dnl Check for host specific programs.
 case "$host_os" in
   mingw32*)
+    AC_CHECK_TOOL([WINDRES], [windres])
     AC_CHECK_PROGS([MAN2HTML], [man2html])
     AC_CHECK_PROGS([GROFF], [groff])
     AC_CHECK_PROGS([UNIX2DOS], [unix2dos])
     ;;
 esac
+AM_CONDITIONAL([HAVE_WINDRES], [test "$WINDRES" != ""])
 
 dnl Check non C89 functions
 AC_CHECK_FUNCS(fdopen signal)
