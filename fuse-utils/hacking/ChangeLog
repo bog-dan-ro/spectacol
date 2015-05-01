@@ -487,3 +487,7 @@
          raw2hdf.c,rzxcheck.c,rzxdump.c,rzxtool.c,scl2trd.c,snap2tzx.c,
          snapconv.c,tape2wav.c,tapeconv.c,tzxlist.c: add --help option to the
          utilities (partially fixes bug #320) (Sergio).
+20150502 man/{audio2tape.1,createhdf.1,listbasic.1,profile2map.1, raw2hdf.1,
+         rzxcheck.1,rzxdump.1,rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,
+         tape2wav.1,tapeconv.1,tzxlist.1}: document --help and --version options
+         (Sergio).

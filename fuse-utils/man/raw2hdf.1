@@ -33,6 +33,7 @@ raw2hdf \(em Create an .hdf hard disk image from a raw data file
 .\"
 .SH SYNOPSIS
 .B raw2hdf
+.RI [ OPTION ]
 .I rawfile hdffile
 .P
 .\"
@@ -46,13 +47,19 @@ image in .hdf format for use with Sinclair ZX Spectrum emulators.
 .\"
 .SH OPTIONS
 .TP
-.I \-v version
+.RI "\-v "version
 specifies the version of .hdf image to be created. Valid values are
 .RI ` 1.0 '
 for a version 1.0 file and
 .RI ` 1.1 '
 for a version 1.1 file. Defaults to creating version 1.1 files.
 .TP
+.TP
+.IR \-h ", " \-\-help
+give brief usage help, listing available options.
+.TP
+.IR \-V ", " \-\-version
+output version information.
 .I rawfile
 specifies a raw data file (or block device corresponding to an actual
 disk) to be converted.

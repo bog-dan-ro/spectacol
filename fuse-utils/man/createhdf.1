@@ -34,6 +34,7 @@ createhdf \(em Create a blank IDE hard disk image in .hdf format
 .SH SYNOPSIS
 .B createhdf
 [ \-c ] [ \-s ]
+.RI "[\-v " version ]
 .I cylinders heads sectors file
 .P
 .\"
@@ -71,6 +72,12 @@ specifies the version of .hdf image to be created. Valid values are
 for a version 1.0 file and
 .RI ` 1.1 '
 for a version 1.1 file. Defaults to creating version 1.1 files.
+.TP
+.IR \-h ", " \-\-help
+give brief usage help, listing available options.
+.TP
+.IR \-V ", " \-\-version
+output version information.
 .TP
 .I cylinders
 specifies the number of cylinders in the image.
