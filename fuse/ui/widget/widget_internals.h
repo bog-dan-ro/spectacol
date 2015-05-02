@@ -239,6 +239,7 @@ typedef struct widget_roms_info {
 
   const char *title;
   size_t start, count;
+  int is_peripheral;
 
 } widget_roms_info;
 

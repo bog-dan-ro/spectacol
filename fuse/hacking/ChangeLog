@@ -4771,3 +4771,6 @@
 20150429 settings.pl: add Currah µSource ROM setting (Stuart).
 20150429 peripherals/disk/opus.c: clear all Opus RAM on hard reset (Stuart).
 20150429 peripherals/disk/opus.c: add provision for 2K page size (Stuart).
+20150502 menu.[ch],menu_data.dat,settings-header.pl,settings.pl,ui/{gtk/roms.c,
+         widget/{menu.c,roms.c,widget_internals.h},win32/roms.c}: number
+         machine and peripheral ROMs separately (Stuart).

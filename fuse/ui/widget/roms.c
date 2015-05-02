@@ -38,6 +38,7 @@ static settings_info *widget_settings;
 static widget_roms_info *info;
 
 static size_t first_rom, rom_count;
+int is_peripheral;
 
 static void print_rom( int which );
 
@@ -67,6 +68,7 @@ widget_roms_draw( void *data )
 
   first_rom = info->start;
   rom_count = info->count;
+  is_peripheral = info->is_peripheral;
 
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, rom_count + 2 );
@@ -93,7 +95,7 @@ print_rom( int which )
   const char *setting;
 
   setting = *( settings_get_rom_setting( widget_settings,
-					 which + first_rom ) );
+					 which + first_rom, is_peripheral ) );
   while( widget_stringwidth( setting ) >= 232 - 68 )
     ++setting;
 
@@ -145,7 +147,8 @@ widget_roms_keyhandler( input_key key )
     widget_do_fileselector( &data );
     if( !widget_filesel_name ) return;
 
-    setting = settings_get_rom_setting( widget_settings, key + first_rom );
+    setting = settings_get_rom_setting( widget_settings, key + first_rom,
+					is_peripheral );
     settings_set_string( setting, widget_filesel_name );
 
     print_rom( key );

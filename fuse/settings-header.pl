@@ -106,7 +106,8 @@ void settings_defaults( settings_info *settings );
 void settings_copy( settings_info *dest, settings_info *src );
 
 #define SETTINGS_ROM_COUNT 30
-char **settings_get_rom_setting( settings_info *settings, size_t which );
+char **settings_get_rom_setting( settings_info *settings, size_t which,
+				 int is_peripheral );
 
 void settings_set_string( char **string_setting, const char *value );
 

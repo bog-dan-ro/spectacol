@@ -39,7 +39,8 @@
 #include "settings.h"
 #include "ui/ui.h"
 
-static void add_rom( GtkBox *parent, size_t start, gint row );
+static void add_rom( GtkBox *parent, size_t start, gint row,
+		     int is_peripheral );
 static void select_new_rom( GtkWidget *widget, gpointer data );
 static void roms_done( GtkButton *button, gpointer data );
 
@@ -49,11 +50,13 @@ GtkWidget *rom[ SETTINGS_ROM_COUNT ];
 struct callback_info {
 
   size_t start, n;
+  int is_peripheral;
 
 };
 
 int
-menu_select_roms_with_title( const char *title, size_t start, size_t n )
+menu_select_roms_with_title( const char *title, size_t start, size_t n,
+			     int is_peripheral )
 {
   GtkWidget *dialog;
   GtkBox *vbox;
@@ -72,6 +75,7 @@ menu_select_roms_with_title( const char *title, size_t start, size_t n )
 
   info.start = start;
   info.n = n;
+  info.is_peripheral = is_peripheral;
 
   /* Create the OK and Cancel buttons */
   gtkstock_create_ok_cancel( dialog, NULL, G_CALLBACK( roms_done ), &info,
@@ -81,7 +85,7 @@ menu_select_roms_with_title( const char *title, size_t start, size_t n )
   vbox = GTK_BOX( gtk_dialog_get_content_area( GTK_DIALOG( dialog ) ) );
 
   gtk_container_set_border_width( GTK_CONTAINER( vbox ), 5 );
-  for( i = 0; i < n; i++ ) add_rom( vbox, start, i );
+  for( i = 0; i < n; i++ ) add_rom( vbox, start, i, is_peripheral );
 
   /* Users shouldn't be able to resize this window */
   gtk_window_set_resizable( GTK_WINDOW( dialog ), FALSE );
@@ -99,7 +103,7 @@ menu_select_roms_with_title( const char *title, size_t start, size_t n )
 }
 
 static void
-add_rom( GtkBox *parent, size_t start, gint row )
+add_rom( GtkBox *parent, size_t start, gint row, int is_peripheral )
 {
   GtkWidget *frame, *hbox, *change_button;
   char buffer[ 80 ], **setting;
@@ -112,7 +116,8 @@ add_rom( GtkBox *parent, size_t start, gint row )
   gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
   gtk_container_add( GTK_CONTAINER( frame ), hbox );
 
-  setting = settings_get_rom_setting( &settings_current, start + row );
+  setting = settings_get_rom_setting( &settings_current, start + row,
+				      is_peripheral );
   rom[ row ] = gtk_entry_new();
   gtk_entry_set_text( GTK_ENTRY( rom[ row ] ), *setting );
   gtk_box_pack_start( GTK_BOX( hbox ), rom[ row ], FALSE, FALSE, 2 );
@@ -148,7 +153,8 @@ roms_done( GtkButton *button GCC_UNUSED, gpointer data )
 
   for( i = 0; i < info->n; i++ ) {
 
-    setting = settings_get_rom_setting( &settings_current, info->start + i );
+    setting = settings_get_rom_setting( &settings_current, info->start + i,
+				        info->is_peripheral );
     string = gtk_entry_get_text( GTK_ENTRY( rom[i] ) );
 
     settings_set_string( setting, string );

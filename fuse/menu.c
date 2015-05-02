@@ -57,6 +57,12 @@
 #include "utils.h"
 #include "z80/z80.h"
 
+static int menu_select_machine_roms( libspectrum_machine machine, size_t start,
+				     size_t n );
+
+static int menu_select_peripheral_roms( const char *peripheral_name,
+					size_t start, size_t n );
+
 MENU_CALLBACK( menu_file_open )
 {
   char *filename;
@@ -225,38 +231,49 @@ MENU_CALLBACK( menu_file_movie_pause )
   movie_pause();
 }
 
-MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
+MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_machine_select )
 {
   switch( action ) {
 
-  case  1: menu_select_roms( LIBSPECTRUM_MACHINE_16,        0, 1 ); return;
-  case  2: menu_select_roms( LIBSPECTRUM_MACHINE_48,        1, 1 ); return;
-  case  3: menu_select_roms( LIBSPECTRUM_MACHINE_128,       2, 2 ); return;
-  case  4: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS2,     4, 2 ); return;
-  case  5: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS2A,    6, 4 ); return;
-  case  6: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS3,    10, 4 ); return;
-  case  7: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS3E,   14, 4 ); return;
-  case  8: menu_select_roms( LIBSPECTRUM_MACHINE_TC2048,   18, 1 ); return;
-  case  9: menu_select_roms( LIBSPECTRUM_MACHINE_TC2068,   19, 2 ); return;
-  case 10: menu_select_roms( LIBSPECTRUM_MACHINE_TS2068,   21, 2 ); return;
-  case 11: menu_select_roms( LIBSPECTRUM_MACHINE_PENT,     23, 3 ); return;
-  case 12: menu_select_roms( LIBSPECTRUM_MACHINE_PENT512,  26, 4 ); return;
-  case 13: menu_select_roms( LIBSPECTRUM_MACHINE_PENT1024, 30, 4 ); return;
-  case 14: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,    34, 4 ); return;
-  case 15: menu_select_roms( LIBSPECTRUM_MACHINE_SE,       38, 2 ); return;
-
-  case 16: menu_select_roms_with_title( "Interface 1",     40, 1 ); return;
-  case 17: menu_select_roms_with_title( "Beta 128",        41, 1 ); return;
-  case 18: menu_select_roms_with_title( "+D",              42, 1 ); return;
-  case 19: menu_select_roms_with_title( "DISCiPLE",        43, 1 ); return;
-  case 20: menu_select_roms_with_title( "Opus Discovery",  44, 1 ); return;
-  case 21: menu_select_roms_with_title( "SpeccyBoot",      45, 1 ); return;
-  case 22: menu_select_roms_with_title( "uSource",         46, 1 ); return;
+  case  1: menu_select_machine_roms( LIBSPECTRUM_MACHINE_16,        0, 1 ); return;
+  case  2: menu_select_machine_roms( LIBSPECTRUM_MACHINE_48,        1, 1 ); return;
+  case  3: menu_select_machine_roms( LIBSPECTRUM_MACHINE_128,       2, 2 ); return;
+  case  4: menu_select_machine_roms( LIBSPECTRUM_MACHINE_PLUS2,     4, 2 ); return;
+  case  5: menu_select_machine_roms( LIBSPECTRUM_MACHINE_PLUS2A,    6, 4 ); return;
+  case  6: menu_select_machine_roms( LIBSPECTRUM_MACHINE_PLUS3,    10, 4 ); return;
+  case  7: menu_select_machine_roms( LIBSPECTRUM_MACHINE_PLUS3E,   14, 4 ); return;
+  case  8: menu_select_machine_roms( LIBSPECTRUM_MACHINE_TC2048,   18, 1 ); return;
+  case  9: menu_select_machine_roms( LIBSPECTRUM_MACHINE_TC2068,   19, 2 ); return;
+  case 10: menu_select_machine_roms( LIBSPECTRUM_MACHINE_TS2068,   21, 2 ); return;
+  case 11: menu_select_machine_roms( LIBSPECTRUM_MACHINE_PENT,     23, 3 ); return;
+  case 12: menu_select_machine_roms( LIBSPECTRUM_MACHINE_PENT512,  26, 4 ); return;
+  case 13: menu_select_machine_roms( LIBSPECTRUM_MACHINE_PENT1024, 30, 4 ); return;
+  case 14: menu_select_machine_roms( LIBSPECTRUM_MACHINE_SCORP,    34, 4 ); return;
+  case 15: menu_select_machine_roms( LIBSPECTRUM_MACHINE_SE,       38, 2 ); return;
 
   }
 
   ui_error( UI_ERROR_ERROR,
-	    "menu_options_selectroms_select: unknown action %d", action );
+	    "menu_options_selectroms_machine_select: unknown action %d", action );
+  fuse_abort();
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_peripheral_select )
+{
+  switch( action ) {
+
+  case  1: menu_select_peripheral_roms( "Interface 1",     0, 1 ); return;
+  case  2: menu_select_peripheral_roms( "Beta 128",        1, 1 ); return;
+  case  3: menu_select_peripheral_roms( "+D",              2, 1 ); return;
+  case  4: menu_select_peripheral_roms( "DISCiPLE",        3, 1 ); return;
+  case  5: menu_select_peripheral_roms( "Opus Discovery",  4, 1 ); return;
+  case  6: menu_select_peripheral_roms( "SpeccyBoot",      5, 1 ); return;
+  case  7: menu_select_peripheral_roms( "uSource",         6, 1 ); return;
+
+  }
+
+  ui_error( UI_ERROR_ERROR,
+	    "menu_options_selectroms_peripheral_select: unknown action %d", action );
   fuse_abort();
 }
 
@@ -924,11 +941,18 @@ menu_check_media_changed( void )
   return 0;
 }
 
-int
-menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
+static int
+menu_select_machine_roms( libspectrum_machine machine, size_t start, size_t n )
 {
   return menu_select_roms_with_title( libspectrum_machine_name( machine ),
-				      start, n );
+				      start, n, 0 );
+}
+
+static int
+menu_select_peripheral_roms( const char *peripheral_name, size_t start, size_t n )
+{
+  return menu_select_roms_with_title( peripheral_name,
+				      start, n, 1 );
 }
 
 const char*

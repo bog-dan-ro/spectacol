@@ -575,13 +575,15 @@ set_joystick_type( int action )
 
 /* Options/Select ROMs/<type> */
 int
-menu_select_roms_with_title( const char *title, size_t start, size_t count )
+menu_select_roms_with_title( const char *title, size_t start, size_t count,
+			     int is_peripheral )
 {
   widget_roms_info info;
 
   info.title = title;
   info.start = start;
   info.count = count;
+  info.is_peripheral = is_peripheral;
   info.initialised = 0;
 
   return widget_do_rom( &info );

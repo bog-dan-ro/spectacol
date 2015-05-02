@@ -68,7 +68,8 @@ MENU_CALLBACK( menu_file_openscrscreenshot );
 MENU_CALLBACK( menu_file_movie_stop );
 MENU_CALLBACK( menu_file_movie_pause );
 
-MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select );
+MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_machine_select );
+MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_peripheral_select );
 MENU_CALLBACK( menu_options_filter );
 MENU_DETAIL( menu_filter_detail );
 MENU_CALLBACK( menu_options_fullscreen );
@@ -172,10 +173,8 @@ MENU_CALLBACK( menu_help_about );
 /* Called from elsewhere (generally from one of the routines defined
    in menu.c) */
 
-int menu_select_roms( libspectrum_machine machine, size_t start,
-		      size_t count );
 int menu_select_roms_with_title( const char *title, size_t start,
-				 size_t count );
+				 size_t count, int is_peripheral );
 scaler_type menu_get_scaler( scaler_available_fn selector );
 int menu_check_media_changed( void );
 
