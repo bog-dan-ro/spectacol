@@ -35,6 +35,7 @@
 #include "module.h"
 #include "periph.h"
 #include "settings.h"
+#include "unittests/unittests.h"
 #include "usource.h"
 
 /* An 8 KiB memory chunk accessible by the Z80 when /ROMCS is low

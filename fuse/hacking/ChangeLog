@@ -4774,3 +4774,5 @@
 20150502 menu.[ch],menu_data.dat,settings-header.pl,settings.pl,ui/{gtk/roms.c,
          widget/{menu.c,roms.c,widget_internals.h},win32/roms.c}: number
          machine and peripheral ROMs separately (Stuart).
+20150502 peripherals/usource.c: add missing inclusion of unittests/unittests.h
+         (Stuart).
