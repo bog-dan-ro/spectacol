@@ -492,3 +492,5 @@
          tape2wav.1,tapeconv.1,tzxlist.1}: document --help and --version options
          (Sergio).
 20150502 rzxdump.c,scl2trd.c: fix exit code when passed bad operands (Sergio).
+20150503 tapeconv.c: remove double spacing and "the the" in help (thanks, 
+         Stuart) (Sergio).
