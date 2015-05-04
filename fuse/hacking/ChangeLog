@@ -4777,3 +4777,4 @@
 20150502 peripherals/usource.c: add missing inclusion of unittests/unittests.h
          (Stuart).
 20150504 memory.[ch],unittests/unittests.[ch]: switch to 2KB page size (Stuart).
+20150504 peripherals/disk/opus.c: remove workaround for 4KB page size (Stuart).

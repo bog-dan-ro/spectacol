@@ -46,20 +46,13 @@
 #include "options.h"	/* needed for get combo options */
 #include "z80/z80.h"
 
-#define TRUE_OPUS_RAM_SIZE 0x800
-
-/* FIXME: this is wrong. Opus has only 2 Kb of RAM, but we can't handle
-   anything less than our page size */
-#define OPUS_RAM_PAGES ( TRUE_OPUS_RAM_SIZE / MEMORY_PAGE_SIZE \
-  ? TRUE_OPUS_RAM_SIZE / MEMORY_PAGE_SIZE : 1 )
-
-#define OPUS_RAM_SIZE ( MEMORY_PAGE_SIZE * OPUS_RAM_PAGES )
+#define OPUS_RAM_SIZE 0x0800
 
 static int opus_rom_memory_source, opus_ram_memory_source;
 
 /* Two memory chunks accessible by the Z80 when /ROMCS is low */
 static memory_page opus_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
-static memory_page opus_memory_map_romcs_ram[ OPUS_RAM_PAGES ];
+static memory_page opus_memory_map_romcs_ram[ MEMORY_PAGES_IN_2K ];
 
 int opus_available = 0;
 int opus_active = 0;
@@ -119,13 +112,8 @@ opus_memory_map( void )
   if( !opus_active ) return;
 
   memory_map_romcs_8k( 0x0000, opus_memory_map_romcs_rom );
-#if OPUS_RAM_SIZE == TRUE_OPUS_RAM_SIZE
   memory_map_romcs_2k( 0x2000, opus_memory_map_romcs_ram );
   /* FIXME: should we add mirroring at 0x2800, 0x3000 and/or 0x3800? */
-#else
-  /* FIXME: remove this */
-  memory_map_romcs_4k( 0x2000, opus_memory_map_romcs_ram );
-#endif
 }
 
 static void
@@ -162,7 +150,7 @@ opus_init( void )
   opus_ram_memory_source = memory_source_register( "Opus RAM" );
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
     opus_memory_map_romcs_rom[i].source = opus_rom_memory_source;
-  for( i = 0; i < OPUS_RAM_PAGES; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_2K; i++ )
     opus_memory_map_romcs_ram[i].source = opus_ram_memory_source;
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
@@ -192,7 +180,7 @@ opus_reset( int hard_reset )
     return;
   }
 
-  for( i = 0; i < OPUS_RAM_PAGES; i++ ) {
+  for( i = 0; i < MEMORY_PAGES_IN_2K; i++ ) {
     struct memory_page *page =
       &opus_memory_map_romcs_ram[ i ];
     page->page = opus_ram + i * MEMORY_PAGE_SIZE;
@@ -201,7 +189,7 @@ opus_reset( int hard_reset )
 
   machine_current->ram.romcs = 0;
 
-  for( i = 0; i < OPUS_RAM_PAGES; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_2K; i++ )
     opus_memory_map_romcs_ram[ i ].writable = 1;
 
   data_reg_a = 0;
@@ -441,7 +429,7 @@ opus_from_snapshot( libspectrum_snap *snap )
 
   if( libspectrum_snap_opus_ram( snap, 0 ) ) {
     memcpy( opus_ram,
-            libspectrum_snap_opus_ram( snap, 0 ), TRUE_OPUS_RAM_SIZE );
+            libspectrum_snap_opus_ram( snap, 0 ), OPUS_RAM_SIZE );
   }
 
   /* ignore drive count for now, there will be an issue with loading snaps where
@@ -515,13 +503,8 @@ opus_unittest( void )
   opus_page();
 
   r += unittests_assert_8k_page( 0x0000, opus_rom_memory_source, 0 );
-#if OPUS_RAM_SIZE == TRUE_OPUS_RAM_SIZE
   r += unittests_assert_2k_page( 0x2000, opus_ram_memory_source, 0 );
   /* FIXME: should we add mirroring at 0x2800, 0x3000 and/or 0x3800? */
-#else
-  /* FIXME: remove this */
-  r += unittests_assert_4k_page( 0x2000, opus_ram_memory_source, 0 );
-#endif
   r += unittests_assert_4k_page( 0x3000, memory_source_rom, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
