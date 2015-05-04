@@ -323,6 +323,17 @@ memory_map_romcs_4k( libspectrum_word address, memory_page source[] )
     memory_map_read[ start + i ] = memory_map_write[ start + i ] = source[ i ];
 }
 
+/* Page in 2K from /ROMCS */
+void
+memory_map_romcs_2k( libspectrum_word address, memory_page source[] )
+{
+  int i, start;
+
+  start = address >> MEMORY_PAGE_SIZE_LOGARITHM;
+  for( i = 0; i < MEMORY_PAGES_IN_2K; i++ )
+    memory_map_read[ start + i ] = memory_map_write[ start + i ] = source[ i ];
+}
+
 libspectrum_byte
 readbyte( libspectrum_word address )
 {
@@ -379,7 +390,7 @@ memory_display_dirty_pentagon_16_col( libspectrum_word address,
   libspectrum_word offset = address & MEMORY_PAGE_SIZE_MASK;
   libspectrum_byte *memory = mapping->page;
 
-  /* The offset into the 16Kb RAM page (as opposed to the 8Kb chunk) */
+  /* The offset into the 16Kb RAM page (as opposed to the 2Kb chunk) */
   libspectrum_word offset2 = offset + mapping->offset;
 
   /* If this is a write to the current screen areas (and it actually changes
@@ -406,7 +417,7 @@ memory_display_dirty_sinclair( libspectrum_word address, libspectrum_byte b ) \
   libspectrum_word offset = address & MEMORY_PAGE_SIZE_MASK;
   libspectrum_byte *memory = mapping->page;
 
-  /* The offset into the 16Kb RAM page (as opposed to the 8Kb chunk) */
+  /* The offset into the 16Kb RAM page (as opposed to the 2Kb chunk) */
   libspectrum_word offset2 = offset + mapping->offset;
 
   /* If this is a write to the current screen (and it actually changes

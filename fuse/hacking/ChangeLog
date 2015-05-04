@@ -4776,3 +4776,4 @@
          machine and peripheral ROMs separately (Stuart).
 20150502 peripherals/usource.c: add missing inclusion of unittests/unittests.h
          (Stuart).
+20150504 memory.[ch],unittests/unittests.[ch]: switch to 2KB page size (Stuart).

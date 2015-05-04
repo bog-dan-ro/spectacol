@@ -302,6 +302,12 @@ assert_page( libspectrum_word base, libspectrum_word length, int source, int pag
 }
 
 int
+unittests_assert_2k_page( libspectrum_word base, int source, int page )
+{
+  return assert_page( base, 0x0800, source, page );
+}
+
+int
 unittests_assert_4k_page( libspectrum_word base, int source, int page )
 {
   return assert_page( base, 0x1000, source, page );
