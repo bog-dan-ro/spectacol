@@ -4781,3 +4781,6 @@
 20150505 man/fuse.1: split machine and peripheral ROM command line options into
          separate lists (Stuart).
 20150505 man/fuse.1: sort peripheral ROM options to match UI (Stuart).
+20150505 menu_data.pl,peripherals/{fuller.h,melodik.h}, ui/widget/mkfusefont.pl,
+         ui/win32/{installer,installer/fuse.nsi.in}: add missing properties and
+         adjust existing ones (Sergio).
