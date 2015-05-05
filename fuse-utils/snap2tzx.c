@@ -40,6 +40,8 @@
 #include "compat.h"
 #include "utils.h"
 
+#define PROGRAM_NAME "snap2tzx"
+
 char *progname;			/* argv[0] */
 
 typedef struct settings_t {
@@ -311,7 +313,7 @@ static void
 print_help( void )
 {
   printf(
-	  "Usage: snap2tzx [OPTION...] <snapshot>\n"
+	  "Usage: %s [OPTION...] <snapshot>\n"
 	  "Converts a ZX Spectrum snapshot into a .tzx tape image.\n"
 	  "\n"
 	  "Options:\n"
@@ -331,9 +333,11 @@ print_help( void )
 	  "\n"
 	  "In string parameters, the copyright symbol will be substituted for '~'.\n"
 	  "\n"
-	  "Report snap2tzx bugs to <" PACKAGE_BUGREPORT ">\n"
-	  "fuse-utils home page: <" PACKAGE_URL ">\n"
-	  "For complete documentation, see the manual page of snap2tzx.\n"
+	  "Report %s bugs to <%s>\n"
+	  "%s home page: <%s>\n"
+	  "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
 	);
 }
 
@@ -341,7 +345,7 @@ static void
 print_version( void )
 {
   printf(
-   "snap2tzx (" PACKAGE ") " PACKAGE_VERSION "\n"
+   PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
    "Copyright (c) 1997-2001 ThunderWare Research Center, written by\n"
    "                        Martijn van der Heide,\n"
    "Copyright (c) 2003 Tomaz Kac,\n"
@@ -444,7 +448,8 @@ parse_args( settings_t *settings, int argc, char **argv )
   }
 
   if( argv[optind] == NULL ) {
-    fprintf( stderr, "%s: usage: snap2tzx [OPTION...] <snapshot>\n", progname );
+    fprintf( stderr, "%s: usage: %s [OPTION...] <snapshot>\n", progname,
+             progname );
     return 1;
   }
 
@@ -1522,7 +1527,7 @@ main( int argc, char **argv )
   error = init_libspectrum(); if( error ) return error;
   error = parse_args( &settings, argc, argv );
   if( error ) {
-    fprintf( stderr, "Try `snap2tzx --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return error;
   }
 

@@ -38,6 +38,8 @@
 
 #include "utils.h"
 
+#define PROGRAM_NAME "tape2wav"
+
 static void show_help( void );
 static void show_version( void );
 static int read_tape( char *filename, libspectrum_tape **tape );
@@ -86,7 +88,7 @@ main( int argc, char **argv )
   argv += optind;
 
   if( error ) {
-    fprintf( stderr, "Try `tape2wav --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return error;
   }
 
@@ -95,7 +97,7 @@ main( int argc, char **argv )
              "%s: usage: %s [-r rate] <infile> <outfile>\n",
              progname,
 	     progname );
-    fprintf( stderr, "Try `tape2wav --help' for more information.\n" );       
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return 1;
   }
 
@@ -117,7 +119,7 @@ static void
 show_version( void )
 {
   printf(
-    "tape2wav (" PACKAGE ") " PACKAGE_VERSION "\n"
+    PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
     "Copyright (c) 2007 Fredrick Meunier\n"
     "License GPLv2+: GNU GPL version 2 or later "
     "<http://gnu.org/licenses/gpl.html>\n"
@@ -129,7 +131,7 @@ static void
 show_help( void )
 {
   printf(
-    "Usage: tape2wav [OPTION] <infile> <outfile>\n"
+    "Usage: %s [OPTION] <infile> <outfile>\n"
     "Converts ZX Spectrum tape images to audio files.\n"
     "\n"
     "Options:\n"
@@ -138,9 +140,11 @@ show_help( void )
     "  -h, --help     Display this help and exit.\n"
     "  -V, --version  Output version information and exit.\n"
     "\n"
-    "Report tape2wav bugs to <" PACKAGE_BUGREPORT ">\n"
-    "fuse-utils home page: <" PACKAGE_URL ">\n"
-    "For complete documentation, see the manual page of tape2wav.\n"
+    "Report %s bugs to <%s>\n"
+    "%s home page: <%s>\n"
+    "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );
 }
 

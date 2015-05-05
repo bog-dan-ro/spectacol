@@ -38,6 +38,8 @@
 #include "compat.h"
 #include "libspectrum.h"
 
+#define PROGRAM_NAME "scl2trd"
+
 struct options {
 
   char *sclfile;		/* The SCL file we'll operate on */
@@ -290,7 +292,7 @@ static void
 show_version( void )
 {
   printf(
-    "scl2trd (" PACKAGE ") " PACKAGE_VERSION "\n"
+    PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
     "Copyright (c) 2002-2007 Dmitry Sanarin, Philip Kendall and Fredrick Meunier\n"
     "License GPLv2+: GNU GPL version 2 or later "
     "<http://gnu.org/licenses/gpl.html>\n"
@@ -302,16 +304,18 @@ static void
 show_help( void )
 {
   printf(
-    "Usage: scl2trd [OPTION] <sclfile> <trdfile>\n"
+    "Usage: %s [OPTION] <sclfile> <trdfile>\n"
     "Convert .scl disk images to .trd disk images.\n"
     "\n"
     "Options:\n"
     "  -h, --help     Display this help and exit.\n"
     "  -V, --version  Output version information and exit.\n"
     "\n"
-    "Report scl2trd bugs to <" PACKAGE_BUGREPORT ">\n"
-    "fuse-utils home page: <" PACKAGE_URL ">\n"
-    "For complete documentation, see the manual page of scl2trd.\n"
+    "Report %s bugs to <%s>\n"
+    "%s home page: <%s>\n"
+    "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );  
 }
 
@@ -389,7 +393,7 @@ main(int argc, char **argv)
   init_options(&options);
   error = parse_options( argc, argv, &options );
   if( error ) {
-    fprintf( stderr, "Try `scl2trd --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return error;
   }
 

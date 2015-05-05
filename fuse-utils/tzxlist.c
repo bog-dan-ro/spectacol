@@ -43,6 +43,7 @@
 
 #include "utils.h"
 
+#define PROGRAM_NAME "tzxlist"
 #define DESCRIPTION_LENGTH 80
 
 const char *progname;
@@ -541,7 +542,7 @@ static void
 show_version( void )
 {
   printf(
-    "tzxlist (" PACKAGE ") " PACKAGE_VERSION "\n"
+    PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
     "Copyright (c) 2001-2011 Philip Kendall, Darren Salt, Fredrick Meunier\n"
     "License GPLv2+: GNU GPL version 2 or later "
     "<http://gnu.org/licenses/gpl.html>\n"
@@ -553,16 +554,18 @@ static void
 show_help( void )
 {
   printf(
-    "Usage: tzxlist [OPTION] <tapefile>...\n"
+    "Usage: %s [OPTION] <tapefile>...\n"
     "Outputs a description of the contents of TZX, TAP, PZX and Warajevo tape files.\n"
     "\n"
     "Options:\n"
     "  -h, --help     Display this help and exit.\n"
     "  -V, --version  Output version information and exit.\n"
     "\n"
-    "Report tzxlist bugs to <" PACKAGE_BUGREPORT ">\n"
-    "fuse-utils home page: <" PACKAGE_URL ">\n"
-    "For complete documentation, see the manual page of tzxlist.\n"
+    "Report %s bugs to <%s>\n"
+    "%s home page: <%s>\n"
+    "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );
 }
 
@@ -610,13 +613,13 @@ main( int argc, char **argv )
   argv += optind;
 
   if( error ) {
-    fprintf( stderr, "Try `tzxlist --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return error;
   }
 
   if( argc < 1 ) {
     fprintf( stderr, "%s: usage: %s <tape files>...\n", progname, progname );
-    fprintf( stderr, "Try `tzxlist --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return 1;
   }
 

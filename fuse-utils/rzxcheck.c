@@ -38,13 +38,15 @@
 
 #include "utils.h"
 
+#define PROGRAM_NAME "rzxcheck"
+
 char *progname;			/* argv[0] */
 
 static void
 show_version( void )
 {
   printf(
-    "rzxcheck (" PACKAGE ") " PACKAGE_VERSION "\n"
+    PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
     "Copyright (c) 2002-2003 Philip Kendall\n"
     "License GPLv2+: GNU GPL version 2 or later "
     "<http://gnu.org/licenses/gpl.html>\n"
@@ -56,16 +58,18 @@ static void
 show_help( void )
 {
   printf(
-    "Usage: rzxcheck [OPTION] <rzxfile>\n"
+    "Usage: %s [OPTION] <rzxfile>\n"
     "Verifies the digital signature found in a ZX Spectrum RZX file.\n"
     "\n"
     "Options:\n"
     "  -h, --help     Display this help and exit.\n"
     "  -V, --version  Output version information and exit.\n"
     "\n"
-    "Report rzxcheck bugs to <" PACKAGE_BUGREPORT ">\n"
-    "fuse-utils home page: <" PACKAGE_URL ">\n"
-    "For complete documentation, see the manual page of rzxcheck.\n"
+    "Report %s bugs to <%s>\n"
+    "%s home page: <%s>\n"
+    "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );
 }
 
@@ -118,13 +122,13 @@ main( int argc, char **argv )
   argv += optind;
 
   if( bad_option ) {
-    fprintf( stderr, "Try `rzxcheck --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return bad_option;
   }
 
   if( argc < 1 ) {
     fprintf( stderr, "%s: usage: %s <rzxfile>\n", progname, progname );
-    fprintf( stderr, "Try `rzxcheck --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return 2;
   }
 

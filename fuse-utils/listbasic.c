@@ -42,6 +42,8 @@
 
 #include "utils.h"
 
+#define PROGRAM_NAME "listbasic"
+
 /* argv[0] */
 char *progname;
 
@@ -107,13 +109,13 @@ int main(int argc, char* argv[])
   argv += optind;
 
   if( error ) {
-    fprintf( stderr, "Try `listbasic --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return error;
   }
 
   if( argc != 1 ) {
     fprintf( stderr, "%s: usage: %s [-b] <file>\n", progname, progname );
-    fprintf( stderr, "Try `listbasic --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return 1;
   }
 
@@ -160,7 +162,7 @@ static void
 show_version( void )
 {
   printf(
-    "listbasic (" PACKAGE ") " PACKAGE_VERSION "\n"
+    PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
     "Copyright (c) 2002 Chris Cowley\n"
     "Copyright (c) 2003 Philip Kendall, Darren Salt\n"
     "Copyright (c) 2007 Stuart Brady\n"
@@ -174,7 +176,7 @@ static void
 show_help( void )
 {
   printf(
-    "Usage: listbasic [OPTION] <file>\n"
+    "Usage: %s [OPTION] <file>\n"
     "Extracts the BASIC listing from a ZX Spectrum snapshot or tape file.\n"
     "\n"
     "Options:\n"
@@ -182,9 +184,11 @@ show_help( void )
     "  -h, --help     Display this help and exit.\n"
     "  -V, --version  Output version information and exit.\n"
     "\n"
-    "Report listbasic bugs to <" PACKAGE_BUGREPORT ">\n"
-    "fuse-utils home page: <" PACKAGE_URL ">\n"
-    "For complete documentation, see the manual page of listbasic.\n"
+    "Report %s bugs to <%s>\n"
+    "%s home page: <%s>\n"
+    "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );
 }
 

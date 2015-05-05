@@ -494,3 +494,7 @@
 20150502 rzxdump.c,scl2trd.c: fix exit code when passed bad operands (Sergio).
 20150503 tapeconv.c: remove double spacing and "the the" in help (thanks, 
          Stuart) (Sergio).
+20150505 createhdf.c,fmfconv.c,listbasic.c,profile2map.c,raw2hdf.c,rzxcheck.c,
+         rzxdump.c,rzxtool.c,scl2trd.c,snap2tzx.c,snapconv.c,tape2wav.c,
+         tapeconv.c,tzxlist.c: reduce the number of unique strings (thanks,
+         Stuart) (Sergio).

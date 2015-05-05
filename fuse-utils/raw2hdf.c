@@ -33,6 +33,8 @@
 
 #include "ide.h"
 
+#define PROGRAM_NAME "raw2hdf"
+
 const char *progname;
 
 static const char *MODEL_NUMBER = "rCaeet dybr wah2fd                      ";
@@ -44,7 +46,7 @@ static void
 show_version( void )
 {
   printf(
-    "raw2hdf (" PACKAGE ") " PACKAGE_VERSION "\n"
+    PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
     "Copyright (c) 2005 Matthew Westcott\n"
     "Copyright (c) 2006 Philip Kendall\n"
     "License GPLv2+: GNU GPL version 2 or later "
@@ -57,7 +59,7 @@ static void
 show_help( void )
 {
   printf(
-    "Usage: raw2hdf [OPTION] <rawfile> <hdffile>\n"
+    "Usage: %s [OPTION] <rawfile> <hdffile>\n"
     "Converts a binary dump of a hard disk's data into an IDE disk image in .hdf \n"
     "format.\n"
     "\n"
@@ -67,9 +69,11 @@ show_help( void )
     "  -h, --help     Display this help and exit.\n"
     "  -V, --version  Output version information and exit.\n"
     "\n"
-    "Report raw2hdf bugs to <" PACKAGE_BUGREPORT ">\n"
-    "fuse-utils home page: <" PACKAGE_URL ">\n"
-    "For complete documentation, see the manual page of raw2hdf.\n"
+    "Report %s bugs to <%s>\n"
+    "%s home page: <%s>\n"
+    "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );
 }
 
@@ -275,7 +279,7 @@ main( int argc, char **argv )
 
   error = parse_options( argc, argv, &raw_filename, &hdf_filename, &version );
   if( error ) {
-    fprintf( stderr, "Try `raw2hdf --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return error;
   }
 

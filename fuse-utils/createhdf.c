@@ -37,6 +37,8 @@
 #include "compat.h"
 #include "ide.h"
 
+#define PROGRAM_NAME "createhdf"
+
 const char *progname;
 
 #define CHUNK_LENGTH 1 << 20
@@ -45,7 +47,7 @@ static void
 show_version( void )
 {
   printf(
-    "createhdf (" PACKAGE ") " PACKAGE_VERSION "\n"
+    PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
     "Copyright (c) 2004-2006 Philip Kendall\n"
     "License GPLv2+: GNU GPL version 2 or later "
     "<http://gnu.org/licenses/gpl.html>\n"
@@ -57,7 +59,7 @@ static void
 show_help( void )
 {
   printf(
-    "Usage: createhdf [OPTION]... <cylinders> <heads> <sectors> <file>\n"
+    "Usage: %s [OPTION]... <cylinders> <heads> <sectors> <file>\n"
     "Creates a blank image of an IDE hard disk in .hdf format.\n"
     "\n"
     "Options:\n"
@@ -76,9 +78,11 @@ show_help( void )
     "  sectors        Specifies the number of sectors in the image.\n"
     "  file           Specifies the file to which the image should be written.\n"
     "\n"
-    "Report createhdf bugs to <" PACKAGE_BUGREPORT ">\n"
-    "fuse-utils home page: <" PACKAGE_URL ">\n"
-    "For complete documentation, see the manual page of createhdf.\n"
+    "Report %s bugs to <%s>\n"
+    "%s home page: <%s>\n"
+    "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );
 }
 
@@ -264,7 +268,7 @@ main( int argc, char **argv )
   error = parse_options( argc, argv, &cylinders, &heads, &sectors, &compact,
 			 &sparse, &filename, &version );
   if( error ) {
-    fprintf( stderr, "Try `createhdf --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return error;
   }
 

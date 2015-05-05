@@ -66,8 +66,12 @@
 #include "fmfconv.h"
 #include "movie_tables.h"
 
+#define PROGRAM_NAME "fmfconv"
+
 #define VERBOSE_MAX 3
 #define VERBOSE_MIN -1
+
+const char *progname;
 
 #ifdef USE_ZLIB
 #define ZBUF_SIZE 1024
@@ -1708,7 +1712,7 @@ static void
 print_version( void )
 {
   printf(
-    "fmfconv (" PACKAGE " " PACKAGE_VERSION ") " FMFCONV_VER_STRING "\n"
+    PROGRAM_NAME " (" PACKAGE " " PACKAGE_VERSION ") " FMFCONV_VER_STRING "\n"
     "Copyright (c) 2004-2005 Gergely Szasz\n"
     "License GPLv2+: GNU GPL version 2 or later "
     "<http://gnu.org/licenses/gpl.html>\n"
@@ -1735,7 +1739,7 @@ void
 print_help( void )
 {
   printf ("\n"
-	  "Usage: fmfconv [OPTION]... [infile [outfile [soundfile]]]\n"
+	  "Usage: %s [OPTION]... [infile [outfile [soundfile]]]\n"
 	  "Converts Fuse movie files to different multimedia files.\n"
 	  "\n"
 	  "Options:\n"
@@ -1859,9 +1863,11 @@ print_help( void )
 	  "  -V --version                 Print the version number and exit.\n"
 	  "  -h --help                    Print this help.\n"
 	  "\n"
-	  "Report fmfconv bugs to <" PACKAGE_BUGREPORT ">\n"
-	  "fuse-utils home page: <" PACKAGE_URL ">\n"
-	  "For complete documentation, see the manual page of fmfconv.\n"
+	  "Report %s bugs to <%s>\n"
+	  "%s home page: <%s>\n"
+	  "For complete documentation, see the manual page of %s.\n",
+	  progname,
+	  PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );
 }
 
@@ -2318,7 +2324,7 @@ parse_args( int argc, char *argv[] )
       return ERR_BAD_PARAM;
 
     default:
-      printe ("%s: getopt_long returned `%c'\n", "fmfconv", (char) c);
+      printe ("%s: getopt_long returned `%c'\n", progname, (char) c);
       return ERR_BAD_PARAM;
 
     }
@@ -2342,7 +2348,7 @@ parse_args( int argc, char *argv[] )
   ) {
     int fd = fileno( stdin );
     if( isatty( fd ) ) {
-      printe( "%s: no input file specified\n", "fmfconv" );
+      printe( "%s: no input file specified\n", progname );
       return ERR_BAD_PARAM;
     }
 #ifdef WIN32
@@ -2366,8 +2372,10 @@ main( int argc, char *argv[] )
 {
   int err, eop = 0;
 
+  progname = argv[0];
+
   if( ( err = parse_args( argc, argv ) ) ) {
-    fprintf( stderr, "Try `fmfconv --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return err;
   }
 

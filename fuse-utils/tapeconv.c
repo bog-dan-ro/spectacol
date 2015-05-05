@@ -35,6 +35,7 @@
 
 #include "utils.h"
 
+#define PROGRAM_NAME "tapeconv"
 #define DESCRIPTION_BUFFER_LEN 0x10
 
 static void show_help( void );
@@ -100,7 +101,7 @@ main( int argc, char **argv )
   argv += optind;
 
   if( error ) {
-    fprintf( stderr, "Try `tapeconv --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return error;
   }
 
@@ -110,7 +111,7 @@ main( int argc, char **argv )
              "[-b] [-i <inlay image>] <infile> <outfile>\n",
              progname,
 	     progname );
-    fprintf( stderr, "Try `tapeconv --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return 1;
   }
 
@@ -151,7 +152,7 @@ main( int argc, char **argv )
 static void
 show_version( void )
 {
-  printf( "tapeconv (" PACKAGE ") " PACKAGE_VERSION "\n"
+  printf( PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
     "Copyright (c) 2002-2008 Philip Kendall, Fredrick Meunier\n"
     "License GPLv2+: GNU GPL version 2 or later "
     "<http://gnu.org/licenses/gpl.html>\n"
@@ -163,7 +164,7 @@ static void
 show_help( void )
 {
   printf(
-    "Usage: tapeconv [OPTION]... <infile> <outfile>\n"
+    "Usage: %s [OPTION]... <infile> <outfile>\n"
     "Converts between ZX Spectrum tape images.\n"
     "\n"
     "Options:\n"
@@ -181,9 +182,11 @@ show_help( void )
     "  -h, --help     Display this help and exit.\n"
     "  -V, --version  Output version information and exit.\n"
     "\n"
-    "Report tapeconv bugs to <" PACKAGE_BUGREPORT ">\n"
-    "fuse-utils home page: <" PACKAGE_URL ">\n"
-    "For complete documentation, see the manual page of tapeconv.\n"
+    "Report %s bugs to <%s>\n"
+    "%s home page: <%s>\n"
+    "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );
 }
 

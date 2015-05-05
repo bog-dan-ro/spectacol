@@ -37,6 +37,7 @@
 #include "compat.h"
 #include "utils.h"
 
+#define PROGRAM_NAME "snapconv"
 char *progname;
 
 static void
@@ -56,7 +57,7 @@ static void
 show_version( void )
 {
   printf(
-   "snapconv (" PACKAGE ") " PACKAGE_VERSION "\n"
+   PROGRAM_NAME " (" PACKAGE ") " PACKAGE_VERSION "\n"
    "Copyright (c) 2003-2005 Philip Kendall\n"
    "License GPLv2+: GNU GPL version 2 or later "
    "<http://gnu.org/licenses/gpl.html>\n"
@@ -68,7 +69,7 @@ static void
 show_help( void )
 {
   printf(
-    "Usage: snapconv [OPTION]... <infile> <outfile>\n"
+    "Usage: %s [OPTION]... <infile> <outfile>\n"
     "Sinclair ZX Spectrum snapshot converter.\n"
     "\n"
     "Options:\n"
@@ -79,9 +80,11 @@ show_help( void )
     "  -h, --help     Display this help and exit.\n"
     "  -V, --version  Output version information and exit.\n"
     "\n"
-    "Report snapconv bugs to <" PACKAGE_BUGREPORT ">\n"
-    "fuse-utils home page: <" PACKAGE_URL ">\n"
-    "For complete documentation, see the manual page of snapconv.\n"
+    "Report %s bugs to <%s>\n"
+    "%s home page: <%s>\n"
+    "For complete documentation, see the manual page of %s.\n",
+    progname,
+    PROGRAM_NAME, PACKAGE_BUGREPORT, PACKAGE_NAME, PACKAGE_URL, PROGRAM_NAME
   );
 }
 
@@ -141,14 +144,14 @@ main( int argc, char **argv )
   argv += optind;
 
   if( error ) {
-    fprintf( stderr, "Try `snapconv --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return error;
   }
 
   if( argc < 2 ) {
     fprintf( stderr, "%s: usage: %s [-c] [-n] [-f] <infile> <outfile>\n", progname,
 	     progname );
-    fprintf( stderr, "Try `snapconv --help' for more information.\n" );
+    fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return 1;
   }
 
