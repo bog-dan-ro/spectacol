@@ -1014,30 +1014,10 @@ Specify an RZX file to begin recording to.
 .br
 .B \-\-rom\-spec\-se\-1
 .I file
-.br
-.B \-\-rom\-interface\-1
-.I file
-.br
-.B \-\-rom\-opus
-.I file
-.br
-.B \-\-rom\-plusd
-.I file
-.br
-.B \-\-rom\-disciple
-.I file
-.br
-.B \-\-rom\-beta128
-.I file
-.br
-.B \-\-rom\-speccyboot
-.I file
-.br
-.B \-\-rom\-usource
-.I file
 .RS
 Specify the file to be used for ROM(s) used for each machine. The
-options respectively refer to the 16K\ Spectrum
+options respectively refer to
+the 16K\ Spectrum
 .RI ( 48.rom ),
 48K\ Spectrum
 .RI ( 48.rom ),
@@ -1059,8 +1039,37 @@ the two main ROMs, the TR-DOS ROM and a reset service ROM for the Pentagon
 .RI ( 128p\-0.rom ", " 128p\-1.rom ", " trdos.rom " and " gluck.rom ),
 the four ROMs for the Scorpion 256
 .RI ( 256s\-0.rom ", " 256s\-1.rom ", " 256s\-2.rom " and " 256s\-3.rom ),
-the two ROMs for the Spectrum SE
-.RI ( se\-0.rom " and " se\-1.rom ),
+and the two ROMs for the Spectrum SE
+.RI ( se\-0.rom " and " se\-1.rom ).
+.PP
+The names in brackets denote the defaults. Note that not all these ROMs
+are supplied with Fuse \(em you must supply your own copies of those which
+are not.
+.RE
+.PP
+.B \-\-rom\-interface\-1
+.I file
+.br
+.B \-\-rom\-opus
+.I file
+.br
+.B \-\-rom\-plusd
+.I file
+.br
+.B \-\-rom\-disciple
+.I file
+.br
+.B \-\-rom\-beta128
+.I file
+.br
+.B \-\-rom\-speccyboot
+.I file
+.br
+.B \-\-rom\-usource
+.I file
+.RS
+Specify the file to be used for ROM(s) used for each peripheral. The
+options respectively refer to
 the Interface\ 1 ROM
 .RI ( if1\-2.rom ),
 the Opus Discovery ROM
@@ -1071,10 +1080,11 @@ the +D ROM
 .RI ( plusd.rom ),
 the TR-DOS ROM for Beta\ 128 emulation with the 48K, TC2048, 128K or +2
 .RI ( trdos.rom ),
-the \(mcSource ROM
-.RI ( usource.rom ),
-and the SpeccyBoot ROM
-.RI ( speccyboot\-1.4.rom ).
+the SpeccyBoot ROM
+.RI ( speccyboot\-1.4.rom ),
+and the \(mcSource ROM
+.RI ( usource.rom ).
+.PP
 The names in brackets denote the defaults. Note that not all these ROMs
 are supplied with Fuse \(em you must supply your own copies of those which
 are not.

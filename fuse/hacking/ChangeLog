@@ -4778,3 +4778,5 @@
          (Stuart).
 20150504 memory.[ch],unittests/unittests.[ch]: switch to 2KB page size (Stuart).
 20150504 peripherals/disk/opus.c: remove workaround for 4KB page size (Stuart).
+20150505 man/fuse.1: split machine and peripheral ROM command line options into
+         separate lists (Stuart).
