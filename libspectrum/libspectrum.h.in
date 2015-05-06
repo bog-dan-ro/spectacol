@@ -231,7 +231,11 @@ typedef enum libspectrum_id_t {
   LIBSPECTRUM_ID_DISK_SAD,		/* .sad generic disk image */
   LIBSPECTRUM_ID_DISK_TD0,		/* .td0 generic disk image */
 
+  /* Below here, present only in 1.0.0 and later */
+
   LIBSPECTRUM_ID_DISK_OPD,		/* .opu/.opd Opus Discovery disk image */
+
+  /* Below here, present only in 1.1.0 and later */
 
   LIBSPECTRUM_ID_TAPE_PZX,		/* PZX tape image */
 
@@ -272,6 +276,8 @@ typedef enum libspectrum_class_t {
   /* Below here, present only in 0.5.0 and later */
 
   LIBSPECTRUM_CLASS_DISK_GENERIC,	/* generic disk image */
+
+  /* Below here, present only in 1.1.0 and later */
 
   LIBSPECTRUM_CLASS_AUXILIARY,	        /* auxiliary supported file */
 

@@ -1005,3 +1005,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150318 crypto.c,csw.c,internals.h,libspectrum.c,pzx_read.c,rzx.c,szx.c,
          tzx_read.c: const and static cleanups (Stuart).
 20150418 internals.h: fix compilation on systems without stdint.h (Stuart).
+20150506 libspectrum.h.in: add missing compatibility comments (Stuart).
