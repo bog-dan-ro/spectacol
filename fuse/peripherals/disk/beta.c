@@ -126,7 +126,7 @@ beta_memory_map( void )
 {
   if( !beta_active ) return;
 
-  memory_map_romcs( beta_memory_map_romcs );
+  memory_map_romcs_full( beta_memory_map_romcs );
 }
 
 static void

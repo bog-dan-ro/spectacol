@@ -4793,3 +4793,6 @@
          (rest of patch #330) (Gergely Szasz).
 20150506 peripherals/disk/wd_fdc.h: use enums for status register bits and
          configuration flags (Stuart).
+20150507 memory.[ch],peripherals/{disk/beta.c,if2.c,spectranet.c}: rename
+         memory_map_romcs() to memory_map_romcs_full() (Stuart).
+

@@ -192,7 +192,7 @@ spectranet_memory_map( void )
 {
   if( !spectranet_paged ) return;
 
-  memory_map_romcs( spectranet_current_map );
+  memory_map_romcs_full( spectranet_current_map );
 }
 
 static void
@@ -291,7 +291,7 @@ spectranet_from_snapshot( libspectrum_snap *snap )
 
     if( libspectrum_snap_spectranet_paged( snap ) ) {
       spectranet_page( libspectrum_snap_spectranet_paged_via_io( snap ) );
-      memory_map_romcs( spectranet_current_map );
+      memory_map_romcs_full( spectranet_current_map );
     }
     else
       spectranet_unpage();
@@ -365,14 +365,14 @@ static void
 spectranet_page_a( libspectrum_word port, libspectrum_byte data )
 {
   spectranet_map_page( 1, data );
-  memory_map_romcs( spectranet_current_map );
+  memory_map_romcs_full( spectranet_current_map );
 }
 
 static void
 spectranet_page_b( libspectrum_word port, libspectrum_byte data )
 {
   spectranet_map_page( 2, data );
-  memory_map_romcs( spectranet_current_map );
+  memory_map_romcs_full( spectranet_current_map );
 }
 
 static libspectrum_byte

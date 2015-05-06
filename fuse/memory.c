@@ -291,9 +291,9 @@ memory_map_page( memory_page *source[], int page_num )
     *source[ page_num ];
 }
 
-/* Page in from /ROMCS */
+/* Page in 16k from /ROMCS */
 void
-memory_map_romcs( memory_page source[] )
+memory_map_romcs_full( memory_page source[] )
 {
   int i;
 

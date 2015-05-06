@@ -150,7 +150,7 @@ if2_memory_map( void )
 {
   if( !if2_active ) return;
 
-  memory_map_romcs( if2_memory_map_romcs );
+  memory_map_romcs_full( if2_memory_map_romcs );
 }
 
 static void
