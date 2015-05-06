@@ -47,7 +47,7 @@ static const int WD_FDC_SR_BUSY    = 1<<0; /* Busy (command under execution) */
 static const int WD_FLAG_NONE      = 0;
 static const int WD_FLAG_BETA128   = 1<<0; /* Beta128 connects HLD output pin to READY input pin and
 					      MOTOR ON pin on FDD interface */
-static const int WD_FLAG_OPUS      = 1<<1; /* Opus Discovery need `datarq' line for every byte */
+static const int WD_FLAG_DRQ       = 1<<1; /* Opus Discovery need `datarq' line for every byte */
 
 typedef enum wd_type_t {
   WD1773 = 0,		/* WD1773 */

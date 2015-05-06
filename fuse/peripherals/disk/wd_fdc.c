@@ -1031,7 +1031,7 @@ wd_fdc_dr_read( wd_fdc *f )
 {
   fdd_t *d = f->current_drive;
 
-  if( f->flags & WD_FLAG_OPUS &&
+  if( f->flags & WD_FLAG_DRQ &&
 	f->status_register & WD_FDC_SR_BUSY )
     event_remove_type( fdc_event );
 
@@ -1121,7 +1121,7 @@ wd_fdc_dr_read( wd_fdc *f )
       wd_fdc_reset_datarq( f );
     }
   }
-  if( ( f->flags & WD_FLAG_OPUS ) &&
+  if( ( f->flags & WD_FLAG_DRQ ) &&
 	( f->status_register & WD_FDC_SR_BUSY ) ) {	/* we need a next datarq */
     event_add_with_data( tstates + 30 * 		/* 30 us delay */
 			       machine_current->timings.processor_speed / 1000000,
@@ -1208,7 +1208,7 @@ wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b )
       wd_fdc_reset_datarq( f );
     }
   }
-  if( ( f->flags & WD_FLAG_OPUS ) &&
+  if( ( f->flags & WD_FLAG_DRQ ) &&
 	f->status_register & WD_FDC_SR_BUSY ) {	/* we need a next datarq */
 //    wd_fdc_reset_datarq( f );
     event_add_with_data( tstates + 30 * 		/* 30 us delay */

@@ -4786,3 +4786,5 @@
          adjust existing ones (Sergio).
 20150506 peripherals/disk/wd_fdc.c: refactor use of f->current_drive (thanks,
 	 Gergely) (Stuart).
+20150506 peripherals/disk/{opus.c,wd_fdc.[ch]}: rename WD_FLAG_OPUS to
+	 WD_FLAG_DRQ (part of patch #330) (Gergely Szasz).

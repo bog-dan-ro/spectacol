@@ -128,7 +128,7 @@ opus_init( void )
   int i;
   fdd_t *d;
 
-  opus_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_OPUS );
+  opus_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_DRQ );
 
   for( i = 0; i < OPUS_NUM_DRIVES; i++ ) {
     d = &opus_drives[ i ];
