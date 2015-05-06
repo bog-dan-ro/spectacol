@@ -4789,3 +4789,6 @@
 20150506 peripherals/disk/{opus.c,wd_fdc.[ch]}: rename WD_FLAG_OPUS to
 	 WD_FLAG_DRQ (part of patch #330) (Gergely Szasz).
 20150506 peripherals/disk/wd_fdc.h: tidy up comments (Stuart).
+20150506 peripherals/disk/{fdd.[ch],wd_fdc.[ch]}: implement WD2797 emulation
+         (rest of patch #330) (Gergely Szasz).
+

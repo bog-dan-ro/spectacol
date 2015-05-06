@@ -37,7 +37,7 @@ typedef enum fdd_error_t {
   FDD_DATA,
   FDD_RDONLY,
   FDD_NONE,		/* FDD not exist (disabled) */
-  
+
   FDD_LAST_ERROR,
 } fdd_error_t;
 
@@ -88,6 +88,8 @@ typedef struct fdd_t {
   int upsidedown;	/* flipped disk */
   int selected;		/* Drive Select line active */
   int ready;		/* some disk drive offer a ready signal */
+  int dskchg;		/* disk change signal */
+  int hdout;		/* High Density signal */
 
   fdd_error_t status;
 

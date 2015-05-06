@@ -141,6 +141,7 @@ fdd_init( fdd_t *d, fdd_type_t type, const fdd_params_t *dt, int reinit )
 
   d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = 0;
   d->upsidedown = d->unreadable = d->loaded = d->auto_geom = d->selected = 0;
+  d->dskchg = d->hdout = 0;
   d->ready = 0;
   d->do_read_weak = 0;
   if( type == FDD_TYPE_NONE )
@@ -192,7 +193,7 @@ fdd_motoron( fdd_t *d, int on )
     iii)The disk rotates at more than 50% of the rated speed.
     iv) Two index pulses have been counted after item iii) is
 	satisfied
-    
+
     Note: Pre-ready is the state that at least one INDEX
 	pulse has been detected after item iii) is satisfied
   */
@@ -268,6 +269,7 @@ fdd_load( fdd_t *d, int upsidedown )
   d->do_read_weak = d->disk.have_weak;
   fdd_set_data( d, FDD_LOAD_FACT );
   d->ready = ( d->motoron && d->loaded );
+  if( d->disk.density == DISK_HD ) d->hdout = 1;
 
   return d->status = FDD_OK;
 }
@@ -275,7 +277,7 @@ fdd_load( fdd_t *d, int upsidedown )
 void
 fdd_unload( fdd_t *d )
 {
-  d->ready = d->loaded = 0;
+  d->ready = d->loaded = d->dskchg = d->hdout = 0;
   d->index = d->wrprot = 1;
   fdd_motoron( d, 0 );
   if( d->type == FDD_SHUGART && d->selected )
@@ -314,6 +316,7 @@ fdd_step( fdd_t *d, fdd_dir_t direction )
     d->tr00 = 0;
 
   fdd_set_data( d, FDD_STEP_FACT );
+  if( d->loaded && d->selected ) d->dskchg = 1;
 }
 
 /* read/write next byte from/to sector */

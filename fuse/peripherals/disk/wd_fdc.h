@@ -35,34 +35,41 @@
 #include "fdd.h"
 #include "fuse.h"
 
-static const int WD_FDC_SR_MOTORON = 1<<7; /* Motor on */
+static const int WD_FDC_SR_MOTORON = 1<<7; /* Motor on or READY */
 static const int WD_FDC_SR_WRPROT  = 1<<6; /* Write-protect */
 static const int WD_FDC_SR_SPINUP  = 1<<5; /* Record type / Spin-up complete */
-static const int WD_FDC_SR_RNF     = 1<<4; /* Record Not Found */
+static const int WD_FDC_SR_RNF     = 1<<4; /* Record Not Found or SEEK Error */
 static const int WD_FDC_SR_CRCERR  = 1<<3; /* CRC error */
-static const int WD_FDC_SR_LOST    = 1<<2; /* Lost data */
+static const int WD_FDC_SR_LOST    = 1<<2; /* Lost data or TRACK00 */
 static const int WD_FDC_SR_IDX_DRQ = 1<<1; /* Index pulse / Data request */
 static const int WD_FDC_SR_BUSY    = 1<<0; /* Busy (command under execution) */
 
 /* Configuration flags (interface-specific) */
 static const int WD_FLAG_NONE      = 0;
-/* The Beta 128 connects HLD output pin to READY input pin and MOTOR ON pin
- * on the FDD interface */
+/* The Beta 128 connects the HLD output pin to the READY input pin and
+ * the MOTOR ON output pin on the FDD interface. */
 static const int WD_FLAG_BETA128   = 1<<0;
-/* The Opus Discovery needs a 'datarq' line for every byte */
+/* The Opus Discovery needs a pulse of the DRQ (data request) line for every
+ * byte transferred. */
 static const int WD_FLAG_DRQ       = 1<<1;
+/* The MB-02+ provides a READY signal to FDC instead of FDD, so we use
+ * 'extra_signal' for this */
+static const int WD_FLAG_RDY       = 1<<2;
+/* HLT (input) pin not connected at all, so we assume it is always 1. */
+static const int WD_FLAG_NOHLT     = 1<<3;
 
 typedef enum wd_type_t {
   WD1773 = 0,
   FD1793,
   WD1770,
   WD1772,
+  WD2797
 } wd_type_t;
 
 typedef struct wd_fdc {
   fdd_t *current_drive;
 
-  wd_type_t type;	/* WD1770, FD1793, WD1772, WD1773 */
+  wd_type_t type;	/* WD1770, FD1793, WD1772, WD1773, WD2797 */
 
   int rates[ 4 ];
   int spin_cycles;
@@ -78,6 +85,7 @@ typedef struct wd_fdc {
 			   if hlt_time > 0 it means trigger time in ms, if = 0
 			   then hlt should be set with wd_fdc_set_hlt()  */
   unsigned int flags;	/* Configuration flags (interface-specific) */
+  int extra_signal;	/* Extra line for boards with non-standard wiring */
 
   enum wd_fdc_state {
     WD_FDC_STATE_NONE = 0,
