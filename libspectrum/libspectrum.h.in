@@ -241,6 +241,10 @@ typedef enum libspectrum_id_t {
 
   LIBSPECTRUM_ID_AUX_POK,		/* POKE file */
 
+  /* Below here, present only in 1.2.0 and later */
+
+  LIBSPECTRUM_ID_DISK_D80,		/* .d80/.d40 Didaktik disk image */
+
 } libspectrum_id_t;
 
 /* And 'classes' of file */
@@ -280,6 +284,10 @@ typedef enum libspectrum_class_t {
   /* Below here, present only in 1.1.0 and later */
 
   LIBSPECTRUM_CLASS_AUXILIARY,	        /* auxiliary supported file */
+
+  /* Below here, present only in 1.2.0 and later */
+
+  LIBSPECTRUM_CLASS_DISK_DIDAKTIK,	/* Didaktik disk */
 
 } libspectrum_class_t;
 

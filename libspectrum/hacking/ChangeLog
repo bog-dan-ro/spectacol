@@ -1006,3 +1006,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          tzx_read.c: const and static cleanups (Stuart).
 20150418 internals.h: fix compilation on systems without stdint.h (Stuart).
 20150506 libspectrum.h.in: add missing compatibility comments (Stuart).
+20150507 libspectrum.{c,h.in}: add Didaktik disk class and image format (part of
+         patch #331) (Gergely Szasz).
