@@ -35,28 +35,33 @@
 #include "fdd.h"
 #include "fuse.h"
 
-static const int WD_FDC_SR_MOTORON = 1<<7; /* Motor on or READY */
-static const int WD_FDC_SR_WRPROT  = 1<<6; /* Write-protect */
-static const int WD_FDC_SR_SPINUP  = 1<<5; /* Record type / Spin-up complete */
-static const int WD_FDC_SR_RNF     = 1<<4; /* Record Not Found or SEEK Error */
-static const int WD_FDC_SR_CRCERR  = 1<<3; /* CRC error */
-static const int WD_FDC_SR_LOST    = 1<<2; /* Lost data or TRACK00 */
-static const int WD_FDC_SR_IDX_DRQ = 1<<1; /* Index pulse / Data request */
-static const int WD_FDC_SR_BUSY    = 1<<0; /* Busy (command under execution) */
+/* Status register bits */
+enum {
+  WD_FDC_SR_MOTORON = 1<<7, /* Motor on or READY */
+  WD_FDC_SR_WRPROT  = 1<<6, /* Write-protect */
+  WD_FDC_SR_SPINUP  = 1<<5, /* Record type / Spin-up complete */
+  WD_FDC_SR_RNF     = 1<<4, /* Record Not Found or SEEK Error */
+  WD_FDC_SR_CRCERR  = 1<<3, /* CRC error */
+  WD_FDC_SR_LOST    = 1<<2, /* Lost data or TRACK00 */
+  WD_FDC_SR_IDX_DRQ = 1<<1, /* Index pulse / Data request */
+  WD_FDC_SR_BUSY    = 1<<0  /* Busy (command under execution) */
+};
 
 /* Configuration flags (interface-specific) */
-static const int WD_FLAG_NONE      = 0;
-/* The Beta 128 connects the HLD output pin to the READY input pin and
- * the MOTOR ON output pin on the FDD interface. */
-static const int WD_FLAG_BETA128   = 1<<0;
-/* The Opus Discovery needs a pulse of the DRQ (data request) line for every
- * byte transferred. */
-static const int WD_FLAG_DRQ       = 1<<1;
-/* The MB-02+ provides a READY signal to FDC instead of FDD, so we use
- * 'extra_signal' for this */
-static const int WD_FLAG_RDY       = 1<<2;
-/* HLT (input) pin not connected at all, so we assume it is always 1. */
-static const int WD_FLAG_NOHLT     = 1<<3;
+enum {
+  WD_FLAG_NONE      = 0,
+  /* The Beta 128 connects the HLD output pin to the READY input pin and
+   * the MOTOR ON output pin on the FDD interface. */
+  WD_FLAG_BETA128   = 1<<0,
+  /* The Opus Discovery needs a pulse of the DRQ (data request) line for every
+   * byte transferred. */
+  WD_FLAG_DRQ       = 1<<1,
+  /* The MB-02+ provides a READY signal to FDC instead of FDD, so we use
+   * 'extra_signal' for this */
+  WD_FLAG_RDY       = 1<<2,
+  /* HLT (input) pin not connected at all, so we assume it is always 1. */
+  WD_FLAG_NOHLT     = 1<<3
+};
 
 typedef enum wd_type_t {
   WD1773 = 0,
