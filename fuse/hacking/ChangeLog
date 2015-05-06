@@ -4784,3 +4784,5 @@
 20150505 menu_data.pl,peripherals/{fuller.h,melodik.h}, ui/widget/mkfusefont.pl,
          ui/win32/{installer,installer/fuse.nsi.in}: add missing properties and
          adjust existing ones (Sergio).
+20150506 peripherals/disk/wd_fdc.c: refactor use of f->current_drive (thanks,
+	 Gergely) (Stuart).
