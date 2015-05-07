@@ -4790,9 +4790,10 @@
 	 WD_FLAG_DRQ (part of patch #330) (Gergely Szasz).
 20150506 peripherals/disk/wd_fdc.h: tidy up comments (Stuart).
 20150506 peripherals/disk/{fdd.[ch],wd_fdc.[ch]}: implement WD2797 emulation
-         (rest of patch #330) (Gergely Szasz).
+         (more of patch #330) (Gergely Szasz).
 20150506 peripherals/disk/wd_fdc.h: use enums for status register bits and
          configuration flags (Stuart).
 20150507 memory.[ch],peripherals/{disk/beta.c,if2.c,spectranet.c}: rename
          memory_map_romcs() to memory_map_romcs_full() (Stuart).
-
+20150507 peripherals/disk/wd_fdc.c: fix WD2797 side selection (more of patch
+         #330) (Gergely Szasz).

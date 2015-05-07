@@ -660,7 +660,7 @@ wd_fdc_type_ii( wd_fdc *f )
       wd_fdc_set_intrq( f );
       return;
     }
-    if( f->type == WD2797 ) fdd_set_head( d, b & 0x02 );
+    if( f->type == WD2797 ) fdd_set_head( d, b & 0x02 ? 1 : 0 );
     if( !f->hlt ) {
       event_add_with_data( tstates + 5 * 
     		    machine_current->timings.processor_speed / 1000,
