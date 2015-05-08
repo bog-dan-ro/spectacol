@@ -996,6 +996,8 @@ wd_fdc_cr_write( wd_fdc *f, libspectrum_byte b )
     }
     if( f->type == WD1773 && b & 0x02 )
       f->data_check_head = b & 0x08 ? 1 : 0;
+    else if( f->type == WD2797 )
+      f->data_check_head = b & 0x02 ? 1 : 0;
     else
       f->data_check_head = -1;
 

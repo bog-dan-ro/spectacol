@@ -4799,3 +4799,5 @@
          #330) (Gergely Szasz).
 20150508 peripherals/disk/wd_fdc.c: really fix WD2797 side selection (even more
          of patch #330) (Gergely Szasz).
+20150508 peripherals/disk/wd_fdc.c: implement WD2797 side comparison (rest of
+         patch #330) (Gergely Szasz).
