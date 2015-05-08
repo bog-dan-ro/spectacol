@@ -213,7 +213,7 @@ disk_ready( wd_fdc *f )
   return f->current_drive->ready;
 }
 
-/* return 0 if found an ID 
+/* return 0 if found an ID
    return 1 if not found ID
    return 2 if found but with CRC error (READ ADDRESS command)
 
@@ -270,7 +270,7 @@ read_id( wd_fdc *f )
     fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     f->id_length = d->data;
-    f->sector_length = 0x80 << d->data; 
+    f->sector_length = 0x80 << d->data;
     fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     fdd_read_data( d ); crc_add(f, d);
@@ -306,7 +306,7 @@ read_datamark( wd_fdc *f )
 	break;
 
       return 1;				/* something wrong... */
-    } 
+    }
     for( ; i > 0; i-- ) {
       crc_preset( f );
       fdd_read_data( d ); crc_add(f, d);
@@ -322,7 +322,7 @@ read_datamark( wd_fdc *f )
       fdd_read_data( d ); crc_add(f, d);
       if( d->data != 0xffa1 )
 	return 1;
-    } 
+    }
     fdd_read_data( d ); crc_add(f, d);
     if( d->data < 0x00f8 || d->data > 0x00fb )	/* !fb deleted mark */
       return 1;
@@ -342,7 +342,7 @@ read_datamark( wd_fdc *f )
 	break;
 
       return 1;				/* something wrong... */
-    } 
+    }
     for( ; i > 0; i-- ) {
       crc_preset( f );
       fdd_read_data( d ); crc_add(f, d);
@@ -492,7 +492,7 @@ wd_fdc_type_i( wd_fdc *f )
 
 type_i_loop:
   if( f->track_register != f->data_register ) {
-    f->direction = f->track_register < f->data_register ? 
+    f->direction = f->track_register < f->data_register ?
 			FDD_STEP_IN : FDD_STEP_OUT;
 
 type_i_update:
@@ -505,7 +505,7 @@ type_i_noupdate:
       fdd_step( d, f->direction );
       f->state = WD_FDC_STATE_SEEK_DELAY;
       event_remove_type( fdc_event );
-      event_add_with_data( tstates + f->rates[ b & 0x03 ] * 
+      event_add_with_data( tstates + f->rates[ b & 0x03 ] *
 			   machine_current->timings.processor_speed / 1000,
 			   fdc_event, f );
       return;
@@ -661,7 +661,7 @@ wd_fdc_type_ii( wd_fdc *f )
       return;
     }
     if( !f->hlt ) {
-      event_add_with_data( tstates + 5 * 
+      event_add_with_data( tstates + 5 *
     		    machine_current->timings.processor_speed / 1000,
 			fdc_event, f );
       return;
@@ -732,7 +732,7 @@ wd_fdc_type_iii( wd_fdc *f )
       while( f->rev ) {
         i = d->disk.i >= d->disk.bpt ? 0 : d->disk.i;	/* start position */
         read_id( f );
-        i = d->disk.bpt ? 
+        i = d->disk.bpt ?
 	    ( d->disk.i - i ) * 200 / d->disk.bpt : 200;
 	if( i > 0 ) {
           event_add_with_data( tstates + i *		/* i * 1/20 revolution */
@@ -763,7 +763,7 @@ wd_fdc_type_iii( wd_fdc *f )
 
 static void
 wd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
-	      void *user_data ) 
+	      void *user_data )
 {
   wd_fdc *f = user_data;
   fdd_t *d = f->current_drive;
@@ -803,7 +803,7 @@ wd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
     f->hlt = 1;
 
   if( ( ( f->type == WD1770 || f->type == WD1772 ) &&
-	( f->status_register & WD_FDC_SR_MOTORON ) && 
+	( f->status_register & WD_FDC_SR_MOTORON ) &&
 	f->status_type == WD_FDC_STATUS_TYPE1 ) ||
       ( ( f->type == WD1773 || f->type == FD1793 || f->type == WD2797 ) &&
 	( f->state == WD_FDC_STATE_SEEK ||
@@ -924,7 +924,7 @@ wd_fdc_spinup( wd_fdc *f, libspectrum_byte b )
 
   if( delay ) {
     event_remove_type( fdc_event );
-    event_add_with_data( tstates + delay * 
+    event_add_with_data( tstates + delay *
     		    machine_current->timings.processor_speed / 1000,
 			fdc_event, f );
     return 1;
@@ -1024,7 +1024,7 @@ wd_fdc_cr_write( wd_fdc *f, libspectrum_byte b )
       }
     }
 
-    f->state = b & 0x20 ? ( b & 0x10 ? 
+    f->state = b & 0x20 ? ( b & 0x10 ?
 			    WD_FDC_STATE_WRITETRACK : WD_FDC_STATE_READTRACK ) :
 		WD_FDC_STATE_READID;
     f->status_type = WD_FDC_STATUS_TYPE2;
