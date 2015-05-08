@@ -660,7 +660,6 @@ wd_fdc_type_ii( wd_fdc *f )
       wd_fdc_set_intrq( f );
       return;
     }
-    if( f->type == WD2797 ) fdd_set_head( d, b & 0x02 ? 1 : 0 );
     if( !f->hlt ) {
       event_add_with_data( tstates + 5 * 
     		    machine_current->timings.processor_speed / 1000,
@@ -918,6 +917,11 @@ wd_fdc_spinup( wd_fdc *f, libspectrum_byte b )
         delay += f->hlt_time;
     }
   }
+
+  /* For Type III commands on WD2797 */
+  if( f->type == WD2797 && ( b & 0xc0 ) == 0xc0 && ( b & 0x30 ) != 0x10 )
+    fdd_set_head( d, b & 0x02 ? 1 : 0 );
+
   if( delay ) {
     event_remove_type( fdc_event );
     event_add_with_data( tstates + delay * 
@@ -1000,6 +1004,9 @@ wd_fdc_cr_write( wd_fdc *f, libspectrum_byte b )
     f->status_register &= ~( WD_FDC_SR_WRPROT | WD_FDC_SR_RNF |
 			     WD_FDC_SR_IDX_DRQ| WD_FDC_SR_LOST|
 			     WD_FDC_SR_SPINUP );
+
+    if( f->type == WD2797 ) fdd_set_head( d, b & 0x02 ? 1 : 0 );
+
     f->rev = 5;
     if( wd_fdc_spinup( f, b ) )
       return;
@@ -1014,8 +1021,6 @@ wd_fdc_cr_write( wd_fdc *f, libspectrum_byte b )
         return;
       }
     }
-
-    if( f->type == WD2797 ) fdd_set_head( d, b & 0x02 );
 
     f->state = b & 0x20 ? ( b & 0x10 ? 
 			    WD_FDC_STATE_WRITETRACK : WD_FDC_STATE_READTRACK ) :
