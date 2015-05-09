@@ -298,15 +298,10 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 #endif				/* #ifdef WIN32 */
 
   while( !done ) {
-    
-#ifndef WIN32
-    char name[ NAME_MAX + 1 ];
-#else				/* #ifndef WIN32 */
-     /* mingw's dirent implementation doesn't have NAME_MAX */
-     char name[ FILENAME_MAX ];
-#endif				/* #ifndef WIN32 */
+    char name[ PATH_MAX ];
 
-    compat_dir_result_t result = compat_readdir( directory, name, sizeof( name ) );
+    compat_dir_result_t result =
+      compat_readdir( directory, name, sizeof( name ) );
 
     switch( result )
     {

@@ -4804,3 +4804,5 @@
 20150508 peripherals/disk/wd_fdc.c: remove trailing whitespace (Stuart).
 20150509 machine.c: only try to load the fallback ROM if it is different to the
          standard one (Fred).
+20150510 ui/widget/filesel.c: use PATH_MAX instead of FILENAME_MAX as our
+         standard compatibility define (thanks, Brian Ruthven) (Fred).
