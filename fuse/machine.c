@@ -309,7 +309,7 @@ machine_load_rom_bank( memory_page* bank_map, int page_num,
 
   retval = machine_load_rom_bank_from_file( bank_map, page_num, filename,
     expected_length, custom );
-  if( retval && fallback )
+  if( retval && fallback && custom )
     retval = machine_load_rom_bank_from_file( bank_map, page_num, fallback,
       expected_length, 0 );
   return retval;

@@ -4802,3 +4802,5 @@
 20150508 peripherals/disk/wd_fdc.c: implement WD2797 side comparison (rest of
          patch #330) (Gergely Szasz).
 20150508 peripherals/disk/wd_fdc.c: remove trailing whitespace (Stuart).
+20150509 machine.c: only try to load the fallback ROM if it is different to the
+         standard one (Fred).
