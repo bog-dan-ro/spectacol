@@ -1008,3 +1008,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150506 libspectrum.h.in: add missing compatibility comments (Stuart).
 20150507 libspectrum.{c,h.in}: add Didaktik disk class and image format (part of
          patch #331) (Gergely Szasz).
+20150510 Makefile.am,m4/pkg.m4: add pkg.m4 for PKG_CHECK_MODULES in case the
+         platform doesn't have pkg-config installed (Sergio).

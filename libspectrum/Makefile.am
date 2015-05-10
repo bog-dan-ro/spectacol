@@ -107,6 +107,7 @@ EXTRA_DIST = accessor.pl \
 	     dll.c \
 	     generate.pl.in \
 	     m4/audiofile.m4 \
+	     m4/pkg.m4 \
 	     make-perl.c \
 	     tape_accessors.pl \
 	     tape_accessors.txt \
