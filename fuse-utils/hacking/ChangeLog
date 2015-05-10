@@ -500,3 +500,5 @@
          Stuart) (Sergio).
 20150510 Makefile.am: use variables for flags rather than direct substitutions
          (Sergio).
+20150510 m4/{Makefile.am,pkg.m4}: add pkg.m4 for PKG_CHECK_MODULES in case the
+         platform doesn't have pkg-config installed (Sergio).
