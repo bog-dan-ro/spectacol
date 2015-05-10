@@ -48,7 +48,7 @@ endif
 
 EXTRA_PROGRAMS = rzxcheck audio2tape tape2wav
 
-AM_CPPFLAGS = @LIBSPEC_CFLAGS@ @AUDIOFILE_CFLAGS@ @GLIB_CFLAGS@
+AM_CPPFLAGS = $(LIBSPEC_CFLAGS) $(AUDIOFILE_CFLAGS) $(GLIB_CFLAGS)
 
 createhdf_SOURCES = ide.c createhdf.c
 
@@ -74,49 +74,49 @@ if HAVE_LIBPNG
 fmfconv_SOURCES += fmfconv_png.c
 endif
 
-fmfconv_LDADD = @JPEG_LIBS@ @PNG_LIBS@ @FFMPEG_LIBS@ compat/libcompatos.a
+fmfconv_LDADD = $(JPEG_LIBS) $(PNG_LIBS) $(FFMPEG_LIBS) compat/libcompatos.a
 
 listbasic_SOURCES = listbasic.c utils.c
-listbasic_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
+listbasic_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
 
 profile2map_SOURCES = profile2map.c utils.c
-profile2map_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
+profile2map_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
 
 raw2hdf_SOURCES = ide.c raw2hdf.c
 
 rzxcheck_SOURCES = rzxcheck.c keys.c utils.c
-rzxcheck_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
+rzxcheck_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
 
 rzxdump_SOURCES = rzxdump.c utils.c
-rzxdump_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
+rzxdump_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
 
 rzxtool_SOURCES = rzxtool.c utils.c
-rzxtool_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
+rzxtool_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
 
 scl2trd_SOURCES = scl2trd.c
 
 snap2tzx_SOURCES = snap2tzx.c utils.c
-snap2tzx_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
+snap2tzx_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
 
 snapconv_SOURCES = snapconv.c utils.c
-snapconv_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
+snapconv_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
 
 tapeconv_SOURCES = tapeconv.c utils.c
-tapeconv_LDADD = @LIBSPEC_LIBS@ compat/libcompatos.a
+tapeconv_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
 
 tzxlist_SOURCES = tzxlist.c utils.c
-tzxlist_LDADD = @LIBSPEC_LIBS@ @LTLIBICONV@ compat/libcompatos.a
+tzxlist_LDADD = $(LIBSPEC_LIBS) $(LTLIBICONV) compat/libcompatos.a
 
 audio2tape_SOURCES = audio2tape.cc importer/soundfile.cc importer/trigger.cc \
                      converter/findpilot.cc converter/findsync1.cc \
                      converter/getpulse1.cc converter/getpulse2.cc \
                      converter/getsync2.cc converter/romloader.cc \
                      converter/romloaderstate.cc utils.c
-audio2tape_LDADD = @LIBSPEC_LIBS@ @AUDIOFILE_LIBS@ \
+audio2tape_LDADD = $(LIBSPEC_LIBS) $(AUDIOFILE_LIBS) \
                    compat/libcompatos.a
 
 tape2wav_SOURCES = tape2wav.c utils.c
-tape2wav_LDADD = @LIBSPEC_LIBS@ @AUDIOFILE_LIBS@ \
+tape2wav_LDADD = $(LIBSPEC_LIBS) $(AUDIOFILE_LIBS) \
                  compat/libcompatos.a
 
 noinst_HEADERS = compat.h ide.h utils.h audio2tape.h importer/interpolator.h \

@@ -498,3 +498,5 @@
          rzxdump.c,rzxtool.c,scl2trd.c,snap2tzx.c,snapconv.c,tape2wav.c,
          tapeconv.c,tzxlist.c: reduce the number of unique strings (thanks,
          Stuart) (Sergio).
+20150510 Makefile.am: use variables for flags rather than direct substitutions
+         (Sergio).
