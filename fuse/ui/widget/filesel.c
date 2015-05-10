@@ -82,7 +82,7 @@ static int is_drivesel = 0;
 static int is_rootdir;
 #endif				/* #ifdef WIN32 */
 
-#define PAGESIZE (is_saving ? 32 : 36)
+#define ENTRIES_PER_SCREEN (is_saving ? 32 : 36)
 
 /* The number of the filename in the top-left corner of the current
    display, that of the filename which the `cursor' is on, and that
@@ -598,7 +598,7 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
 
   /* Print the filenames, mostly normally, but with the currently
      selected file inverted */
-  for( i = top_left; i < n && i < top_left + PAGESIZE; i++ ) {
+  for( i = top_left; i < n && i < top_left + ENTRIES_PER_SCREEN; i++ ) {
     if( i == current ) {
       widget_print_filename( filenames[i], i-top_left, 1 );
     } else {
@@ -861,13 +861,13 @@ widget_filesel_keyhandler( input_key key )
     break;
 
   case INPUT_KEY_Page_Up:
-    new_current_file = ( current_file > PAGESIZE ) ?
-                       current_file - PAGESIZE     :
+    new_current_file = ( current_file > ENTRIES_PER_SCREEN ) ?
+                       current_file - ENTRIES_PER_SCREEN     :
                        0;
     break;
 
   case INPUT_KEY_Page_Down:
-    new_current_file = current_file + PAGESIZE;
+    new_current_file = current_file + ENTRIES_PER_SCREEN;
     if( new_current_file >= widget_numfiles )
       new_current_file = widget_numfiles - 1;
     break;
@@ -960,9 +960,10 @@ widget_filesel_keyhandler( input_key key )
       widget_print_all_filenames( widget_filenames, widget_numfiles,
 				  top_left_file, new_current_file, dirtitle );
 
-    } else if( new_current_file >= top_left_file+PAGESIZE ) {
+    } else if( new_current_file >= top_left_file+ENTRIES_PER_SCREEN ) {
 
-      top_left_file = new_current_file & ~1; top_left_file -= PAGESIZE - 2;
+      top_left_file = new_current_file & ~1;
+      top_left_file -= ENTRIES_PER_SCREEN - 2;
       widget_print_all_filenames( widget_filenames, widget_numfiles,
 				  top_left_file, new_current_file, dirtitle );
 

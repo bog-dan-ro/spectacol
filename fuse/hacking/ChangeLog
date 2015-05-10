@@ -4806,3 +4806,5 @@
          standard one (Fred).
 20150510 ui/widget/filesel.c: use PATH_MAX instead of FILENAME_MAX as our
          standard compatibility define (thanks, Brian Ruthven) (Fred).
+20150510 ui/widget/filesel.c: use ENTRIES_PER_SCREEN rather than PAGESIZE due
+         to name clash on Solaris (thanks, Brian Ruthven) (Fred).
