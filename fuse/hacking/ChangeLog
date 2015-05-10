@@ -4808,3 +4808,5 @@
          standard compatibility define (thanks, Brian Ruthven) (Fred).
 20150510 ui/widget/filesel.c: use ENTRIES_PER_SCREEN rather than PAGESIZE due
          to name clash on Solaris (thanks, Brian Ruthven) (Fred).
+20150510 Makefile.am,m4/pkg.m4: update pkg.m4 and add explicit distribution rule
+         for ax_pthread.m4 (Sergio).
