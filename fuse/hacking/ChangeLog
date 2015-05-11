@@ -4816,3 +4816,5 @@
          uimedia.h},utils.c,z80/{coretest.c,z80_checks.h,z80_ops.c}: add
          Didaktik 80/40 emulation (part of patch #331) (Gergely Szasz).
 20150511 man/fuse.1: add initial Didaktik 80/40 documentation (Stuart).
+20150511 AUTHORS,man/fuse.1: note authorship of ALSA driver and Didaktik 80
+         emulation (Stuart).
