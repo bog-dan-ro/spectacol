@@ -57,11 +57,11 @@ static void scld_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t scld_module_info = {
 
-  scld_reset,
-  NULL,
-  NULL,
-  scld_from_snapshot,
-  scld_to_snapshot,
+  /* .reset = */ scld_reset,
+  /* .romcs = */ NULL,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ scld_from_snapshot,
+  /* .snapshot_to = */ scld_to_snapshot,
 
 };
 
@@ -75,10 +75,10 @@ static const periph_port_t scld_ports[] = {
 };
 
 static const periph_t scld_periph = {
-  NULL,
-  scld_ports,
-  0,
-  NULL
+  /* .option = */ NULL,
+  /* .ports = */ scld_ports,
+  /* .hard_reset = */ 0,
+  /* .activate = */ NULL,
 };
 
 void

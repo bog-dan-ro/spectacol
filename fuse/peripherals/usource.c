@@ -56,11 +56,11 @@ static void usource_memory_map( void );
 
 static module_info_t usource_module_info = {
 
-  usource_reset,
-  usource_memory_map,
-  NULL, /* enabled_snapshot */
-  NULL, /* from_snapshot */
-  NULL, /* to_snapshot */
+  /* .reset = */ usource_reset,
+  /* .romcs = */ usource_memory_map,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ NULL,
+  /* .snapshot_to = */ NULL,
 
 };
 
@@ -71,10 +71,10 @@ static const periph_port_t usource_ports[] = {
 };
 
 static const periph_t usource_periph = {
-  &settings_current.usource,
-  usource_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.usource,
+  /* .ports = */ usource_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 int

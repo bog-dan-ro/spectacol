@@ -93,10 +93,10 @@ static const periph_port_t zxatasp_ports[] = {
 };
 
 static const periph_t zxatasp_periph = {
-  &settings_current.zxatasp_active,
-  zxatasp_ports,
-  1,
-  zxatasp_activate
+  /* .option = */ &settings_current.zxatasp_active,
+  /* .ports = */ zxatasp_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ zxatasp_activate,
 };
 
 static libspectrum_byte zxatasp_control;
@@ -155,11 +155,11 @@ static void zxatasp_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t zxatasp_module_info = {
 
-  zxatasp_reset,
-  zxatasp_memory_map,
-  NULL,
-  zxatasp_from_snapshot,
-  zxatasp_to_snapshot,
+  /* .reset = */ zxatasp_reset,
+  /* .romcs = */ zxatasp_memory_map,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ zxatasp_from_snapshot,
+  /* .snapshot_to = */ zxatasp_to_snapshot,
 
 };
 

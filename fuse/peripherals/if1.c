@@ -203,11 +203,11 @@ static void if1_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t if1_module_info = {
 
-  if1_reset,
-  if1_memory_map,
-  if1_enabled_snapshot,
-  if1_from_snapshot,
-  if1_to_snapshot,
+  /* .reset = */ if1_reset,
+  /* .romcs = */ if1_memory_map,
+  /* .snapshot_enabled = */ if1_enabled_snapshot,
+  /* .snapshot_from = */ if1_from_snapshot,
+  /* .snapshot_to = */ if1_to_snapshot,
 
 };
 
@@ -219,10 +219,10 @@ static const periph_port_t if1_ports[] = {
 };
 
 static const periph_t if1_periph = {
-  &settings_current.interface1,
-  if1_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.interface1,
+  /* .ports = */ if1_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 /* Memory source */

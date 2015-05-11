@@ -40,11 +40,11 @@ static void melodik_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t melodik_module_info = {
 
-  NULL,
-  NULL,
-  melodik_enabled_snapshot,
-  melodik_from_snapshot,
-  melodik_to_snapshot,
+  /* .reset = */ NULL,
+  /* .romcs = */ NULL,
+  /* .snapshot_enabled = */ melodik_enabled_snapshot,
+  /* .snapshot_from = */ melodik_from_snapshot,
+  /* .snapshot_to = */ melodik_to_snapshot,
 
 };
 
@@ -55,10 +55,10 @@ static const periph_port_t melodik_ports[] = {
 };
 
 static const periph_t melodik_periph = {
-  &settings_current.melodik,
-  melodik_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.melodik,
+  /* .ports = */ melodik_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 static void

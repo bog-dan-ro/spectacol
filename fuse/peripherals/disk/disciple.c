@@ -78,11 +78,11 @@ static void disciple_activate( void );
 
 static module_info_t disciple_module_info = {
 
-  disciple_reset,
-  disciple_memory_map,
-  NULL,
-  NULL,
-  NULL,
+  /* .reset = */ disciple_reset,
+  /* .romcs = */ disciple_memory_map,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ NULL,
+  /* .snapshot_to = */ NULL,
 
 };
 
@@ -151,10 +151,10 @@ static const periph_port_t disciple_ports[] = {
 };
 
 static const periph_t disciple_periph = {
-  &settings_current.disciple,
-  disciple_ports,
-  1,
-  disciple_activate
+  /* .option = */ &settings_current.disciple,
+  /* .ports = */ disciple_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ disciple_activate,
 };
 
 void

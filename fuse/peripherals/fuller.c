@@ -41,11 +41,11 @@ static void fuller_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t fuller_module_info = {
 
-  NULL,
-  NULL,
-  fuller_enabled_snapshot,
-  fuller_from_snapshot,
-  fuller_to_snapshot,
+  /* .reset = */ NULL,
+  /* .romcs = */ NULL,
+  /* .snapshot_enabled = */ fuller_enabled_snapshot,
+  /* .snapshot_from = */ fuller_from_snapshot,
+  /* .snapshot_to = */ fuller_to_snapshot,
 
 };
 
@@ -57,10 +57,10 @@ static const periph_port_t fuller_ports[] = {
 };
 
 static const periph_t fuller_periph = {
-  &settings_current.fuller,
-  fuller_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.fuller,
+  /* .ports = */ fuller_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 static void

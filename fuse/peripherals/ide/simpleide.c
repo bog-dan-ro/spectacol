@@ -49,10 +49,10 @@ static const periph_port_t simpleide_ports[] = {
 };
 
 static const periph_t simpleide_periph = {
-  &settings_current.simpleide_active,
-  simpleide_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.simpleide_active,
+  /* .ports = */ simpleide_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 static libspectrum_ide_channel *simpleide_idechn;
@@ -62,11 +62,11 @@ static void simpleide_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t simpleide_module_info = {
 
-  simpleide_reset,
-  NULL,
-  NULL,
-  simpleide_from_snapshot,
-  simpleide_to_snapshot,
+  /* .reset = */ simpleide_reset,
+  /* .romcs = */ NULL,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ simpleide_from_snapshot,
+  /* .snapshot_to = */ simpleide_to_snapshot,
 
 };
 

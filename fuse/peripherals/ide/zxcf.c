@@ -69,10 +69,10 @@ static const periph_port_t zxcf_ports[] = {
 };
 
 static const periph_t zxcf_periph = {
-  &settings_current.zxcf_active,
-  zxcf_ports,
-  1,
-  zxcf_activate
+  /* .option = */ &settings_current.zxcf_active,
+  /* .ports = */ zxcf_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ zxcf_activate,
 };
 
 static int zxcf_writeenable;
@@ -93,11 +93,11 @@ static void zxcf_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t zxcf_module_info = {
 
-  zxcf_reset,
-  zxcf_memory_map,
-  NULL,
-  zxcf_from_snapshot,
-  zxcf_to_snapshot,
+  /* .reset = */ zxcf_reset,
+  /* .romcs = */ zxcf_memory_map,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ zxcf_from_snapshot,
+  /* .snapshot_to = */ zxcf_to_snapshot,
 
 };
 

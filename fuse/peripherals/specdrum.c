@@ -44,12 +44,14 @@ static void specdrum_from_snapshot( libspectrum_snap *snap );
 static void specdrum_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t specdrum_module_info = {
-    specdrum_reset,
-    NULL,
-    specdrum_enabled_snapshot,
-    specdrum_from_snapshot,
-    specdrum_to_snapshot
-} ;
+
+  /* .reset = */ specdrum_reset,
+  /* .romcs = */ NULL,
+  /* .snapshot_enabled = */ specdrum_enabled_snapshot,
+  /* .snapshot_from = */ specdrum_from_snapshot,
+  /* .snapshot_to = */ specdrum_to_snapshot,
+
+};
 
 static const periph_port_t specdrum_ports[] = {
   { 0x00ff, 0x00df, NULL, sound_specdrum_write },
@@ -57,10 +59,10 @@ static const periph_port_t specdrum_ports[] = {
 };
 
 static const periph_t specdrum_periph = {
-  &settings_current.specdrum,
-  specdrum_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.specdrum,
+  /* .ports = */ specdrum_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 void

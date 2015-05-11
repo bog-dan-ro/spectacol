@@ -354,11 +354,13 @@ spectranet_to_snapshot( libspectrum_snap *snap )
 }
 
 static module_info_t spectranet_module_info = {
-  spectranet_reset,
-  spectranet_memory_map,
-  spectranet_enabled_snapshot,
-  spectranet_from_snapshot,
-  spectranet_to_snapshot
+
+  /* .reset = */ spectranet_reset,
+  /* .romcs = */ spectranet_memory_map,
+  /* .snapshot_enabled = */ spectranet_enabled_snapshot,
+  /* .snapshot_from = */ spectranet_from_snapshot,
+  /* .snapshot_to = */ spectranet_to_snapshot,
+
 };
 
 static void
@@ -431,10 +433,10 @@ static const periph_port_t spectranet_ports[] = {
 };
 
 static const periph_t spectranet_periph = {
-  &settings_current.spectranet,
-  spectranet_ports,
-  1,
-  spectranet_activate
+  /* .option = */ &settings_current.spectranet,
+  /* .ports = */ spectranet_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ spectranet_activate,
 };
 
 void

@@ -83,10 +83,10 @@ static const periph_port_t beta_ports[] = {
 };
 
 static const periph_t beta_peripheral = {
-  &settings_current.beta128,  
-  beta_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.beta128,  
+  /* .ports = */ beta_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 static void beta_reset( int hard_reset );
@@ -97,11 +97,11 @@ static void beta_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t beta_module_info = {
 
-  beta_reset,
-  beta_memory_map,
-  beta_enabled_snapshot,
-  beta_from_snapshot,
-  beta_to_snapshot,
+  /* .reset = */ beta_reset,
+  /* .romcs = */ beta_memory_map,
+  /* .snapshot_enabled = */ beta_enabled_snapshot,
+  /* .snapshot_from = */ beta_from_snapshot,
+  /* .snapshot_to = */ beta_to_snapshot,
 
 };
 

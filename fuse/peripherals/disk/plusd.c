@@ -69,11 +69,11 @@ static void plusd_activate( void );
 
 static module_info_t plusd_module_info = {
 
-  plusd_reset,
-  plusd_memory_map,
-  plusd_enabled_snapshot,
-  plusd_from_snapshot,
-  plusd_to_snapshot,
+  /* .reset = */ plusd_reset,
+  /* .romcs = */ plusd_memory_map,
+  /* .snapshot_enabled = */ plusd_enabled_snapshot,
+  /* .snapshot_from = */ plusd_from_snapshot,
+  /* .snapshot_to = */ plusd_to_snapshot,
 
 };
 
@@ -125,10 +125,10 @@ static const periph_port_t plusd_ports[] = {
 };
 
 static const periph_t plusd_periph = {
-  &settings_current.plusd,
-  plusd_ports,
-  1,
-  plusd_activate
+  /* .option = */ &settings_current.plusd,
+  /* .ports = */ plusd_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ plusd_activate,
 };
 
 void

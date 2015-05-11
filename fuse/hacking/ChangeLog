@@ -4818,3 +4818,8 @@
 20150511 man/fuse.1: add initial Didaktik 80/40 documentation (Stuart).
 20150511 AUTHORS,man/fuse.1: note authorship of ALSA driver and Didaktik 80
          emulation (Stuart).
+20150511 peripherals/{ay.c,disk/{beta.c,didaktik.c,disciple.c,opus.c,plusd.c},
+         fuller.c,ide/{divide.c,simpleide.c,zxatasp.c,zxcf.c},if1.c,if2.c,
+         joystick.c,kempmouse.c,melodik.c,printer.c,scld.c,speccyboot.c,
+         specdrum.c,spectranet.c,ula.c,usource.c}: add C99-style named
+         initialisers in comments (Stuart).

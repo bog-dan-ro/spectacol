@@ -76,11 +76,13 @@ static void zx_printer_from_snapshot( libspectrum_snap *snap );
 static void zx_printer_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t printer_zxp_module_info = {
-  printer_zxp_reset,
-  NULL,
-  NULL,
-  zx_printer_from_snapshot,
-  zx_printer_to_snapshot,
+
+  /* .reset = */ printer_zxp_reset,
+  /* .romcs = */ NULL,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ zx_printer_from_snapshot,
+  /* .snapshot_to = */ zx_printer_to_snapshot,
+
 };
 
 static const periph_port_t printer_zxp_ports[] = {
@@ -89,10 +91,10 @@ static const periph_port_t printer_zxp_ports[] = {
 };
 
 static const periph_t printer_zxp_periph = {
-  &settings_current.zxprinter,
-  printer_zxp_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.zxprinter,
+  /* .ports = */ printer_zxp_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 static const periph_port_t printer_zxp_ports_full_decode[] = {
@@ -101,10 +103,10 @@ static const periph_port_t printer_zxp_ports_full_decode[] = {
 };
 
 static const periph_t printer_zxp_periph_full_decode = {
-  &settings_current.zxprinter,
-  printer_zxp_ports_full_decode,
-  0,
-  NULL
+  /* .option = */ &settings_current.zxprinter,
+  /* .ports = */ printer_zxp_ports_full_decode,
+  /* .hard_reset = */ 0,
+  /* .activate = */ NULL,
 };
 
 static const periph_port_t printer_parallel_ports[] = {
@@ -113,10 +115,10 @@ static const periph_port_t printer_parallel_ports[] = {
 };
 
 static const periph_t printer_parallel_periph = {
-  &settings_current.printer,
-  printer_parallel_ports,
-  0,
-  NULL
+  /* .option = */ &settings_current.printer,
+  /* .ports = */ printer_parallel_ports,
+  /* .hard_reset = */ 0,
+  /* .activate = */ NULL,
 };
 
 static void printer_zxp_init(void)

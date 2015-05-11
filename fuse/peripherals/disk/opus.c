@@ -75,19 +75,19 @@ static void opus_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t opus_module_info = {
 
-  opus_reset,
-  opus_memory_map,
-  opus_enabled_snapshot,
-  opus_from_snapshot,
-  opus_to_snapshot,
+  /* .reset = */ opus_reset,
+  /* .romcs = */ opus_memory_map,
+  /* .snapshot_enabled = */ opus_enabled_snapshot,
+  /* .snapshot_from = */ opus_from_snapshot,
+  /* .snapshot_to = */ opus_to_snapshot,
 
 };
 
 static const periph_t opus_periph = {
-  &settings_current.opus,
-  NULL,
-  1,
-  NULL
+  /* .option = */ &settings_current.opus,
+  /* .ports = */ NULL,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 void

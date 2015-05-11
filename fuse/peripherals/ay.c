@@ -50,11 +50,11 @@ static void ay_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t ay_module_info = {
 
-  ay_reset,
-  NULL,
-  NULL,
-  ay_from_snapshot,
-  ay_to_snapshot,
+  /* .reset = */ ay_reset,
+  /* .romcs = */ NULL,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ ay_from_snapshot,
+  /* .snapshot_to = */ ay_to_snapshot,
 
 };
 
@@ -65,10 +65,10 @@ static periph_port_t ay_ports[] = {
 };
 
 static periph_t ay_periph = {
-  NULL,
-  ay_ports,
-  0,
-  NULL
+  /* .option = */ NULL,
+  /* .ports = */ ay_ports,
+  /* .hard_reset = */ 0,
+  /* .actinate = */ NULL,
 };
 
 static periph_port_t ay_ports_plus3[] = {
@@ -78,10 +78,10 @@ static periph_port_t ay_ports_plus3[] = {
 };
 
 static periph_t ay_periph_plus3 = {
-  NULL,
-  ay_ports_plus3,
-  0,
-  NULL
+  /* .option = */ NULL,
+  /* .ports = */ ay_ports_plus3,
+  /* .hard_reset = */ 0,
+  /* .activate = */ NULL,
 };
 
 static periph_port_t ay_ports_full_decode[] = {
@@ -91,10 +91,10 @@ static periph_port_t ay_ports_full_decode[] = {
 };
 
 static periph_t ay_periph_full_decode = {
-  NULL,
-  ay_ports_full_decode,
-  0,
-  NULL
+  /* .option = */ NULL,
+  /* .ports = */ ay_ports_full_decode,
+  /* .hard_reset = */ 0,
+  /* .activate = */ NULL,
 };
 
 static periph_port_t ay_ports_timex[] = {
@@ -104,10 +104,10 @@ static periph_port_t ay_ports_timex[] = {
 };
 
 static periph_t ay_periph_timex = {
-  NULL,
-  ay_ports_timex,
-  0,
-  NULL
+  /* .option = */ NULL,
+  /* .ports = */ ay_ports_timex,
+  /* .hard_reset = */ 0,
+  /* .activate = */ NULL,
 };
 
 void

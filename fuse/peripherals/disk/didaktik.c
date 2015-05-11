@@ -83,11 +83,11 @@ static void didaktik_aux_write( libspectrum_word port GCC_UNUSED, libspectrum_by
 
 static module_info_t didaktik_module_info = {
 
-  didaktik_reset,
-  didaktik_memory_map,
-  NULL,
-  NULL,
-  NULL,
+  /* .reset = */ didaktik_reset,
+  /* .romcs = */ didaktik_memory_map,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ NULL,
+  /* .snapshot_to = */ NULL,
 
 };
 
@@ -111,10 +111,10 @@ static const periph_port_t didaktik_ports[] = {
 };
 
 static const periph_t didaktik_periph = {
-  &settings_current.didaktik80,
-  didaktik_ports,
-  1,
-  NULL,
+  /* .option = */ &settings_current.didaktik80,
+  /* .ports = */ didaktik_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 void

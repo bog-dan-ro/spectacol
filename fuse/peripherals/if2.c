@@ -55,19 +55,19 @@ static void if2_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t if2_module_info = {
 
-  if2_reset,
-  if2_memory_map,
-  NULL,
-  if2_from_snapshot,
-  if2_to_snapshot,
+  /* .reset = */ if2_reset,
+  /* .romcs = */ if2_memory_map,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ if2_from_snapshot,
+  /* .snapshot_to = */ if2_to_snapshot,
 
 };
 
 static const periph_t if2_periph = {
-  &settings_current.interface2,
-  NULL,
-  0,
-  NULL
+  /* .option = */ &settings_current.interface2,
+  /* .ports = */ NULL,
+  /* .hard_reset = */ 0,
+  /* .activate = */ NULL,
 };
 
 void

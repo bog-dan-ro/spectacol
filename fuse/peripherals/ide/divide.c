@@ -59,10 +59,10 @@ static const periph_port_t divide_ports[] = {
 };
 
 static const periph_t divide_periph = {
-  &settings_current.divide_enabled,
-  divide_ports,
-  1,
-  divide_activate
+  /* .option = */ &settings_current.divide_enabled,
+  /* .ports = */ divide_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ divide_activate,
 };
 
 static const libspectrum_byte DIVIDE_CONTROL_CONMEM = 0x80;
@@ -98,11 +98,11 @@ static void divide_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t divide_module_info = {
 
-  divide_reset,
-  divide_memory_map,
-  divide_enabled_snapshot,
-  divide_from_snapshot,
-  divide_to_snapshot,
+  /* .reset = */ divide_reset,
+  /* .romcs = */ divide_memory_map,
+  /* .snapshot_enabled = */ divide_enabled_snapshot,
+  /* .snapshot_from = */ divide_from_snapshot,
+  /* .snapshot_to = */ divide_to_snapshot,
 
 };
 

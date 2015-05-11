@@ -73,10 +73,10 @@ static const periph_port_t speccyboot_ports[] = {
 };
 
 static const periph_t speccyboot_periph = {
-  &settings_current.speccyboot,
-  speccyboot_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.speccyboot,
+  /* .ports = */ speccyboot_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 /* ---------------------------------------------------------------------------
@@ -190,11 +190,13 @@ speccyboot_init( void )
   nic = nic_enc28j60_alloc();
 
   static module_info_t speccyboot_module_info = {
-    speccyboot_reset,
-    speccyboot_memory_map,
-    NULL,
-    NULL,
-    NULL
+
+    /* .reset = */ speccyboot_reset,
+    /* .romcs = */ speccyboot_memory_map,
+    /* .snapshot_enabled = */ NULL,
+    /* .snapshot_from = */ NULL,
+    /* .snapshot_to = */ NULL,
+
   };
 
   module_register( &speccyboot_module_info );

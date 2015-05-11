@@ -38,11 +38,11 @@ static void kempmouse_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t kempmouse_module_info = {
 
-  NULL,
-  NULL,
-  NULL,
-  kempmouse_from_snapshot,
-  kempmouse_to_snapshot,
+  /* .reset = */ NULL,
+  /* .romcs = */ NULL,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ kempmouse_from_snapshot,
+  /* .snapshot_to = */ kempmouse_to_snapshot,
 
 };
 
@@ -71,10 +71,10 @@ static const periph_port_t kempmouse_ports[] = {
 };
 
 static const periph_t kempmouse_periph = {
-  &settings_current.kempston_mouse,
-  kempmouse_ports,
-  1,
-  NULL
+  /* .option = */ &settings_current.kempston_mouse,
+  /* .ports = */ kempmouse_ports,
+  /* .hard_reset = */ 1,
+  /* .activate = */ NULL,
 };
 
 void
