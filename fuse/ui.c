@@ -232,6 +232,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MACHINE_PROFILER, "/Machine/Profiler/Stop",
     "/Machine/Profiler/Start", 1 },
   
+  { UI_MENU_ITEM_MACHINE_DIDAKTIK80_SNAP, "/Machine/Didaktik SNAP" },
+
   { UI_MENU_ITEM_MEDIA_CARTRIDGE, "/Media/Cartridge" },
 
   { UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, "/Media/Cartridge/Timex Dock" },
@@ -476,6 +478,42 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
     "/Media/Disk/+D/Drive 2/Write protect/Enable",
     "/Media/Disk/+D/Drive 2/Write protect/Disable", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DIDAKTIK, "/Media/Disk/Didaktik 80" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DIDAKTIK_A, "/Media/Disk/Didaktik 80/Drive A" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DIDAKTIK_A_EJECT,
+    "/Media/Disk/Didaktik 80/Drive A/Eject",
+    "/Media/Disk/Didaktik 80/Drive A/Save As...", 0,
+    "/Media/Disk/Didaktik 80/Drive A/Save", 0,
+    "/Media/Disk/Didaktik 80/Drive A/Flip disk", 0,
+    "/Media/Disk/Didaktik 80/Drive A/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DIDAKTIK_A_FLIP_SET,
+    "/Media/Disk/Didaktik 80/Drive A/Flip disk/Turn upside down",
+    "/Media/Disk/Didaktik 80/Drive A/Flip disk/Turn back", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DIDAKTIK_A_WP_SET,
+    "/Media/Disk/Didaktik 80/Drive A/Write protect/Enable",
+    "/Media/Disk/Didaktik 80/Drive A/Write protect/Disable", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DIDAKTIK_B, "/Media/Disk/Didaktik 80/Drive B" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DIDAKTIK_B_EJECT,
+    "/Media/Disk/Didaktik 80/Drive B/Eject",
+    "/Media/Disk/Didaktik 80/Drive B/Save As...", 0,
+    "/Media/Disk/Didaktik 80/Drive B/Save", 0,
+    "/Media/Disk/Didaktik 80/Drive B/Flip disk", 0,
+    "/Media/Disk/Didaktik 80/Drive B/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DIDAKTIK_B_FLIP_SET,
+    "/Media/Disk/Didaktik 80/Drive B/Flip disk/Turn upside down",
+    "/Media/Disk/Didaktik 80/Drive B/Flip disk/Turn back", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DIDAKTIK_B_WP_SET,
+    "/Media/Disk/Didaktik 80/Drive B/Write protect/Enable",
+    "/Media/Disk/Didaktik 80/Drive B/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE, "/Media/Disk/DISCiPLE" },
 

@@ -78,6 +78,7 @@ MENU_CALLBACK( menu_options_save );
 MENU_CALLBACK( menu_machine_profiler_start );
 MENU_CALLBACK( menu_machine_profiler_stop );
 MENU_CALLBACK( menu_machine_nmi );
+MENU_CALLBACK( menu_machine_didaktiksnap );
 
 MENU_CALLBACK( menu_media_tape_browse );
 MENU_CALLBACK( menu_media_tape_open );
@@ -151,6 +152,8 @@ MENU_DETAIL( menu_opus1_detail );
 MENU_DETAIL( menu_opus2_detail );
 MENU_DETAIL( menu_plusd1_detail );
 MENU_DETAIL( menu_plusd2_detail );
+MENU_DETAIL( menu_didaktik_a_detail );
+MENU_DETAIL( menu_didaktik_b_detail );
 MENU_DETAIL( menu_disciple1_detail );
 MENU_DETAIL( menu_disciple2_detail );
 MENU_CALLBACK_WITH_ACTION( menu_options_joysticks_select );

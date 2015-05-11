@@ -4810,3 +4810,8 @@
          to name clash on Solaris (thanks, Brian Ruthven) (Fred).
 20150510 Makefile.am,m4/pkg.m4: update pkg.m4 and add explicit distribution rule
          for ax_pthread.m4 (Sergio).
+20150511 fuse.c,hacking/ChangeLog,machines/machines_periph.c,menu.[ch],
+         menu_data.dat,periph.h,peripherals/disk/{Makefile.am,didaktik.[ch],
+         disk.[ch],wd_fdc.c},settings.{dat,pl},ui.c,ui/{options.dat,ui.h,
+         uimedia.h},utils.c,z80/{coretest.c,z80_checks.h,z80_ops.c}: add
+         Didaktik 80/40 emulation (part of patch #331) (Gergely Szasz).

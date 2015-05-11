@@ -69,6 +69,7 @@ movie_compr, string, NULL
 movie_start, string, NULL
 movie_stop_after_rzx, boolean, 1
 plusd, boolean, 0
+didaktik80, boolean, 0
 disciple, boolean, 0
 beta128, boolean, 0
 beta128_48boot, boolean, 1
@@ -150,6 +151,7 @@ opusdisk_file, string, NULL,, opusdisk
 playback_file, string, NULL, 'p', playback, playbackfile
 plus3disk_file, string, NULL,, plus3disk
 plusddisk_file, string, NULL,, plusddisk
+didaktik80disk_file, string, NULL,, didaktik80disk
 discipledisk_file, string, NULL,, discipledisk
 betadisk_file, string, NULL,, betadisk
 dck_file, string, NULL,, dock
@@ -235,6 +237,7 @@ rom_spec_se_1, string, "se-1.rom",
 rom_interface_i, string, "if1-2.rom",
 rom_beta128, string, "trdos.rom",
 rom_plusd, string, "plusd.rom",
+rom_didaktik80, string, "didaktik80.rom",
 rom_disciple, string, "disciple.rom",
 rom_opus, string, "opus.rom",
 rom_speccyboot, string, "speccyboot-1.4.rom",
@@ -249,6 +252,8 @@ drive_beta128c_type, string, NULL
 drive_beta128d_type, string, NULL
 drive_plusd1_type, string, NULL
 drive_plusd2_type, string, NULL
+drive_didaktik80a_type, string, NULL
+drive_didaktik80b_type, string, NULL
 drive_disciple1_type, string, NULL
 drive_disciple2_type, string, NULL
 drive_opus1_type, string, NULL

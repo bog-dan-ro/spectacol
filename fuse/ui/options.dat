@@ -65,6 +65,7 @@ Checkbox, ZXCF (u)pload, zxcf_upload, INPUT_KEY_u
 Checkbox, Div(I)DE interface, divide_enabled, INPUT_KEY_i
 Checkbox, DivIDE (w)rite protect, divide_wp, INPUT_KEY_w
 Checkbox, +(D) interface, plusd, INPUT_KEY_d
+Checkbox, Didaktik (8)0 interface, didaktik80, INPUT_KEY_8
 Checkbox, DISCi(P)LE interf(a)ce, disciple, INPUT_KEY_p
 Checkbox, (B)eta 128 interface, beta128, INPUT_KEY_b
 Checkbox, Beta 128 (a)uto-boot in 48K machines, beta128_48boot, INPUT_KEY_a
@@ -102,6 +103,8 @@ Combo, Beta 128 Drive (C), drive_beta128c_type, INPUT_KEY_c, Disabled|Single-sid
 Combo, Beta 128 Drive (D), drive_beta128d_type, INPUT_KEY_d, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, +D Drive (1), drive_plusd1_type, INPUT_KEY_1, Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, +D Drive (2), drive_plusd2_type, INPUT_KEY_2, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
+Combo, Didaktik (8)0 Drive A, drive_didaktik80a_type, INPUT_KEY_0, Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
+Combo, Didaktik 8(0) Drive B, drive_didaktik80b_type, INPUT_KEY_4, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, DISCiPLE Drive (1), drive_disciple1_type, INPUT_KEY_1, Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, DISCiPLE Drive (2), drive_disciple2_type, INPUT_KEY_2, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, (O)pus Drive 1, drive_opus1_type, INPUT_KEY_o, *Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track

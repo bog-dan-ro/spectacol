@@ -770,10 +770,11 @@ settings_get_rom_setting( settings_info *settings, size_t which,
     case  0: return &( settings->rom_interface_i );
     case  1: return &( settings->rom_beta128 );
     case  2: return &( settings->rom_plusd );
-    case  3: return &( settings->rom_disciple );
-    case  4: return &( settings->rom_opus );
-    case  5: return &( settings->rom_speccyboot );
-    case  6: return &( settings->rom_usource );
+    case  3: return &( settings->rom_didaktik80 );
+    case  4: return &( settings->rom_disciple );
+    case  5: return &( settings->rom_opus );
+    case  6: return &( settings->rom_speccyboot );
+    case  7: return &( settings->rom_usource );
     default: return NULL;
     }
   }

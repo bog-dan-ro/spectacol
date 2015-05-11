@@ -34,6 +34,7 @@
 #include "machines/specplus3.h"
 #include "peripherals/dck.h"
 #include "peripherals/disk/beta.h"
+#include "peripherals/disk/didaktik.h"
 #include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
@@ -265,10 +266,11 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_peripheral_select )
   case  1: menu_select_peripheral_roms( "Interface 1",     0, 1 ); return;
   case  2: menu_select_peripheral_roms( "Beta 128",        1, 1 ); return;
   case  3: menu_select_peripheral_roms( "+D",              2, 1 ); return;
-  case  4: menu_select_peripheral_roms( "DISCiPLE",        3, 1 ); return;
-  case  5: menu_select_peripheral_roms( "Opus Discovery",  4, 1 ); return;
-  case  6: menu_select_peripheral_roms( "SpeccyBoot",      5, 1 ); return;
-  case  7: menu_select_peripheral_roms( "uSource",         6, 1 ); return;
+  case  4: menu_select_peripheral_roms( "Didaktik 80",     3, 1 ); return;
+  case  5: menu_select_peripheral_roms( "DISCiPLE",        4, 1 ); return;
+  case  6: menu_select_peripheral_roms( "Opus Discovery",  5, 1 ); return;
+  case  7: menu_select_peripheral_roms( "SpeccyBoot",      6, 1 ); return;
+  case  8: menu_select_peripheral_roms( "uSource",         7, 1 ); return;
 
   }
 
@@ -1094,6 +1096,22 @@ menu_plusd2_detail( void )
 }
 
 const char*
+menu_didaktik_a_detail( void )
+{
+  fdd_t *f = didaktik80_get_fdd( DIDAKTIK80_DRIVE_A );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_didaktik_b_detail( void )
+{
+  fdd_t *f = didaktik80_get_fdd( DIDAKTIK80_DRIVE_B );
+
+  return menu_disk_detail( f );
+}
+
+const char*
 menu_disciple1_detail( void )
 {
   fdd_t *f = disciple_get_fdd( DISCIPLE_DRIVE_1 );
@@ -1107,4 +1125,11 @@ menu_disciple2_detail( void )
   fdd_t *f = disciple_get_fdd( DISCIPLE_DRIVE_2 );
 
   return menu_disk_detail( f );
+}
+
+MENU_CALLBACK( menu_machine_didaktiksnap )
+{
+  ui_widget_finish();
+  didaktik80_snap = 1;
+  event_add( 0, z80_nmi_event );
 }

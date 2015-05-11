@@ -33,6 +33,7 @@
 #include "memory.h"
 #include "periph.h"
 #include "peripherals/disk/beta.h"
+#include "peripherals/disk/didaktik.h"
 #include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
@@ -186,6 +187,16 @@ z80_do_opcodes( void )
 
     END_CHECK
 
+    CHECK( didaktik80, didaktik80_available )
+
+    if( PC == 0x0000 || PC == 0x0008 ) {
+      didaktik80_page();
+    } else if( PC == 0x1700 ) {
+      didaktik80_unpage();
+    }
+
+    END_CHECK
+
     CHECK( disciple, disciple_available )
 
     if( PC == 0x0001 || PC == 0x0008 || PC == 0x0066 || PC == 0x028e ) {
@@ -300,6 +311,15 @@ z80_do_opcodes( void )
     z80.iff2_read = 0;
     /* Execute *one* instruction before reevaluating the checks */
     event_add( tstates, z80_nmos_iff2_event );
+
+    END_CHECK
+
+    CHECK( didaktik80snap, didaktik80_snap )
+
+    if( PC == 0x0066 && !didaktik80_active ) {
+      opcode = 0xc7;	/* RST 00 */
+      didaktik80_snap = 0; /* FIXME: this should be a time-based reset */
+    }
 
     END_CHECK
 

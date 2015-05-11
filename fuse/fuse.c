@@ -65,6 +65,7 @@
 #include "peripherals/ay.h"
 #include "peripherals/dck.h"
 #include "peripherals/disk/beta.h"
+#include "peripherals/disk/didaktik.h"
 #include "peripherals/disk/fdd.h"
 #include "peripherals/fuller.h"
 #include "peripherals/ide/divide.h"
@@ -123,6 +124,7 @@ typedef struct start_files_t {
   const char *disk_opus;
   const char *disk_plusd;
   const char *disk_beta;
+  const char *disk_didaktik80;
   const char *disk_disciple;
   const char *dock;
   const char *if2;
@@ -284,6 +286,7 @@ static int fuse_init(int argc, char **argv)
   beta_init();
   opus_init();
   plusd_init();
+  didaktik80_init();
   disciple_init();
   fdd_init_events();
   if( simpleide_init() ) return 1;
@@ -490,6 +493,7 @@ setup_start_files( start_files_t *start_files )
   start_files->disk_plus3 = settings_current.plus3disk_file;
   start_files->disk_opus = settings_current.opusdisk_file;
   start_files->disk_plusd = settings_current.plusddisk_file;
+  start_files->disk_didaktik80 = settings_current.didaktik80disk_file;
   start_files->disk_disciple = settings_current.discipledisk_file;
   start_files->disk_beta = settings_current.betadisk_file;
   start_files->dock = settings_current.dck_file;
@@ -589,6 +593,9 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     case LIBSPECTRUM_CLASS_DISK_OPUS:
       start_files->disk_opus = filename; break;
 
+    case LIBSPECTRUM_CLASS_DISK_DIDAKTIK:
+      start_files->disk_didaktik80 = filename; break;
+
     case LIBSPECTRUM_CLASS_DISK_PLUSD:
       if( periph_is_active( PERIPH_TYPE_DISCIPLE ) )
         start_files->disk_disciple = filename;
@@ -613,6 +620,8 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
           start_files->disk_beta = filename; 
         else if( periph_is_active( PERIPH_TYPE_PLUSD ) )
           start_files->disk_plusd = filename;
+        else if( periph_is_active( PERIPH_TYPE_DIDAKTIK80 ) )
+          start_files->disk_didaktik80 = filename;
         else if( periph_is_active( PERIPH_TYPE_DISCIPLE ) )
           start_files->disk_disciple = filename;
         else if( periph_is_active( PERIPH_TYPE_OPUS ) )
@@ -721,6 +730,11 @@ do_start_files( start_files_t *start_files )
 
   if( start_files->disk_plusd ) {
     error = utils_open_file( start_files->disk_plusd, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->disk_didaktik80 ) {
+    error = utils_open_file( start_files->disk_didaktik80, autoload, NULL );
     if( error ) return error;
   }
 
@@ -853,6 +867,7 @@ static int fuse_end(void)
   beta_end();
   opus_end();
   plusd_end();
+  didaktik80_end();
   disciple_end();
   spectranet_end();
   speccyboot_end();

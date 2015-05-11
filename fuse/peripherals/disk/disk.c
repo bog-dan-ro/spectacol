@@ -1146,6 +1146,42 @@ open_img_mgt_opd( buffer_t *buffer, disk_t *d )
 }
 
 static int
+open_d40_d80( buffer_t *buffer, disk_t *d )
+{
+  int i, j, sectors, seclen;
+
+  if( buffavail( buffer ) < 180 )
+    return d->status = DISK_OPEN;
+
+  /* guess geometry of disk */
+  d->sides =     buff[0xb1] & 0x10 ? 2 : 1;
+  d->cylinders = buff[0xb2];
+  sectors =      buff[0xb3];
+
+  if( d->sides < 1 || d->sides > 2 || d->cylinders > 83 || sectors > 127 )
+    return d->status = DISK_GEOM;
+
+  seclen = 512;
+
+  buffer->index = 0;
+
+  /* create a DD disk */
+  d->density = DISK_DD;
+  if( disk_alloc( d ) != DISK_OK )
+    return d->status;
+
+  for( i = 0; i < d->cylinders; i++ ) {
+      for( j = 0; j < d->sides; j++ ) {
+        if( trackgen( d, buffer, j, i, 1, sectors, seclen,
+		      NO_PREINDEX, GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
+	  return d->status = DISK_GEOM;
+      }
+  }
+
+  return d->status = DISK_OK;
+}
+
+static int
 open_sad( buffer_t *buffer, disk_t *d, int preindex )
 {
   int i, j, sectors, seclen;
@@ -1899,6 +1935,10 @@ disk_open2( disk_t *d, const char *filename, int preindex )
     d->type = DISK_TD0;
     open_td0( &buffer, d, preindex );
     break;
+  case LIBSPECTRUM_ID_DISK_D80:
+    d->type = DISK_D80;
+    open_d40_d80( &buffer, d );
+    break;
   default:
     utils_close_file( &buffer.file );
     return d->status = DISK_OPEN;
@@ -2156,6 +2196,30 @@ write_img_mgt_opd( FILE *file, disk_t *d )
 	    sectors, seclen ) )
 	  return d->status = DISK_GEOM;
       }
+    }
+  }
+  return d->status = DISK_OK;
+}
+
+static int
+write_d40_d80( FILE *file, disk_t *d )
+{
+  int i, j, sbase, sectors, seclen, mfm, cyl;
+
+  if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm, &cyl ) ||
+      ( sbase != 1 ) )
+    return d->status = DISK_GEOM;
+
+  if( cyl == -1 ) cyl = d->cylinders;
+  if( ( d->type == DISK_D40 && cyl > 43 ) ||
+      ( d->type == DISK_D80 && cyl > 83 ) )
+    return d->status = DISK_GEOM;
+
+  for( i = 0; i < cyl; i++ ) {
+    for( j = 0; j < d->sides; j++ ) {
+      if( savetrack( d, file, j, i, 1,
+	    sectors, seclen ) )
+	  return d->status = DISK_GEOM;
     }
   }
   return d->status = DISK_OK;
@@ -2588,6 +2652,10 @@ disk_write( disk_t *d, const char *filename )
       d->type = DISK_SAD;
     else if( !strcasecmp( ext, ".fdi" ) )		/* ALT */
       d->type = DISK_FDI;
+    else if( !strcasecmp( ext, ".d40" ) )		/* ALT side */
+      d->type = DISK_D40;
+    else if( !strcasecmp( ext, ".d80" ) )		/* ALT side */
+      d->type = DISK_D80;
     else if( !strcasecmp( ext, ".scl" ) )		/* not really a disk image */
       d->type = DISK_SCL;
     else if( !strcasecmp( ext, ".log" ) )		/* ALT */
@@ -2612,6 +2680,10 @@ disk_write( disk_t *d, const char *filename )
   case DISK_MGT:
   case DISK_OPD:
     write_img_mgt_opd( file, d );
+    break;
+  case DISK_D40:
+  case DISK_D80:
+    write_d40_d80( file, d );
     break;
   case DISK_TRD:
     write_trd( file, d );

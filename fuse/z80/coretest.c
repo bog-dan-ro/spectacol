@@ -477,6 +477,22 @@ disciple_page( void )
   abort();
 }
 
+int didaktik80_available = 0;
+int didaktik80_active = 0;
+int didaktik80_snap = 0;
+
+void
+didaktik80_page( void )
+{
+  abort();
+}
+
+void
+didaktik80_unpage( void )
+{
+  abort();
+}
+
 int usource_available = 0;
 int usource_active = 0;
 

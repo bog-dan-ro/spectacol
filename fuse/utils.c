@@ -116,6 +116,11 @@ utils_open_file( const char *filename, int autoload,
     error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename, autoload );
     break;
 
+  case LIBSPECTRUM_CLASS_DISK_DIDAKTIK:
+
+    error = didaktik80_disk_insert( DIDAKTIK80_DRIVE_A, filename, autoload );
+    break;
+
   case LIBSPECTRUM_CLASS_DISK_PLUSD:
 
     if( periph_is_active( PERIPH_TYPE_DISCIPLE ) )

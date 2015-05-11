@@ -31,6 +31,7 @@ AM_CPPFLAGS += @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@
 
 libdisk_a_SOURCES = beta.c \
 		    crc.c \
+		    didaktik.c \
 		    disciple.c \
 		    disk.c \
 		    fdd.c \
@@ -41,6 +42,7 @@ libdisk_a_SOURCES = beta.c \
 
 noinst_HEADERS = beta.h \
 		 crc.h \
+		 didaktik.h \
 		 disciple.h \
 		 disk.h \
 		 fdd.h \

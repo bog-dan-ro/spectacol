@@ -570,7 +570,7 @@ wd_fdc_type_ii_seek( wd_fdc *f )
     while( f->rev ) {
       i = d->disk.i >= d->disk.bpt ? 0 : d->disk.i;	/* start position */
       if( !read_id( f ) ) {
-        if( ( f->data_check_head != -1 && f->data_check_head != f->id_head ) ||
+        if( ( f->data_check_head != -1 && f->data_check_head != !!( f->id_head ) ) ||
 	    ( f->id_track != f->track_register || f->id_sector != f->sector_register ) ) {
           f->id_mark = WD_FDC_AM_NONE;
 	}

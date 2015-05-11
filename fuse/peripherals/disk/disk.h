@@ -70,6 +70,10 @@ typedef enum disk_type_t {
   /* Opus Discovery */
   DISK_OPD,
 
+  /* Didaktik 40/80 */
+  DISK_D40,
+  DISK_D80,
+
   /* Log disk structure (.log) */
   DISK_LOG,
 

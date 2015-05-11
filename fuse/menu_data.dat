@@ -108,10 +108,11 @@ Options/Select ROMs/_Peripheral ROMs, Branch
 Options/Select ROMs/Peripheral ROMs/_Interface 1..., Item,, menu_options_selectroms_peripheral_select,, 1
 Options/Select ROMs/Peripheral ROMs/_Beta 128..., Item,, menu_options_selectroms_peripheral_select,, 2
 Options/Select ROMs/Peripheral ROMs/+_D..., Item,, menu_options_selectroms_peripheral_select,, 3
-Options/Select ROMs/Peripheral ROMs/DISCiP_LE..., Item,, menu_options_selectroms_peripheral_select,, 4
-Options/Select ROMs/Peripheral ROMs/_Opus Discovery..., Item,, menu_options_selectroms_peripheral_select,, 5
-Options/Select ROMs/Peripheral ROMs/Specc_yBoot..., Item,, menu_options_selectroms_peripheral_select,, 6
-Options/Select ROMs/Peripheral ROMs/_uSource..., Item,, menu_options_selectroms_peripheral_select,, 7
+Options/Select ROMs/Peripheral ROMs/Didaktik _80..., Item,, menu_options_selectroms_peripheral_select,, 4
+Options/Select ROMs/Peripheral ROMs/DISCiP_LE..., Item,, menu_options_selectroms_peripheral_select,, 5
+Options/Select ROMs/Peripheral ROMs/_Opus Discovery..., Item,, menu_options_selectroms_peripheral_select,, 6
+Options/Select ROMs/Peripheral ROMs/Specc_yBoot..., Item,, menu_options_selectroms_peripheral_select,, 7
+Options/Select ROMs/Peripheral ROMs/_uSource..., Item,, menu_options_selectroms_peripheral_select,, 8
 
 Options/_Filter..., Item,,, menu_filter_detail
 
@@ -143,6 +144,7 @@ Machine/Profiler/_Start, Item
 Machine/Profiler/_Stop, Item
 
 Machine/_NMI, Item
+Machine/Didaktik SNA_P, Item
 
 M_edia, Branch
 
@@ -405,6 +407,32 @@ Media/Disk/Opus/Drive 2/Flip disk/Turn _back, Item,, menu_media_flip,, 0x042
 Media/Disk/Opus/Drive 2/Write _protect, Branch
 Media/Disk/Opus/Drive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x142
 Media/Disk/Opus/Drive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x042
+
+Media/Disk/_Didaktik 80, Branch
+Media/Disk/Didaktik 80/Drive _A, Branch,,,menu_didaktik_a_detail
+Media/Disk/Didaktik 80/Drive A/Insert _New, Item,, menu_media_insert_new,, 0x61
+Media/Disk/Didaktik 80/Drive A/_Insert..., Item,, menu_media_insert,, 0x61
+Media/Disk/Didaktik 80/Drive A/_Eject, Item,, menu_media_eject,, 0x61
+Media/Disk/Didaktik 80/Drive A/_Save, Item,, menu_media_save,, 0x061
+Media/Disk/Didaktik 80/Drive A/Save _As..., Item,, menu_media_save,, 0x161
+Media/Disk/Didaktik 80/Drive A/_Flip disk, Branch
+Media/Disk/Didaktik 80/Drive A/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x161
+Media/Disk/Didaktik 80/Drive A/Flip disk/Turn _back, Item,, menu_media_flip,, 0x061
+Media/Disk/Didaktik 80/Drive A/Write _protect, Branch
+Media/Disk/Didaktik 80/Drive A/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x161
+Media/Disk/Didaktik 80/Drive A/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x061
+Media/Disk/Didaktik 80/Drive _B, Branch,,,menu_didaktik_b_detail
+Media/Disk/Didaktik 80/Drive B/Insert _New, Item,, menu_media_insert_new,, 0x62
+Media/Disk/Didaktik 80/Drive B/_Insert..., Item,, menu_media_insert,, 0x62
+Media/Disk/Didaktik 80/Drive B/_Eject, Item,, menu_media_eject,, 0x62
+Media/Disk/Didaktik 80/Drive B/_Save, Item,, menu_media_save,, 0x062
+Media/Disk/Didaktik 80/Drive B/Save _As..., Item,, menu_media_save,, 0x162
+Media/Disk/Didaktik 80/Drive B/_Flip disk, Branch
+Media/Disk/Didaktik 80/Drive B/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x162
+Media/Disk/Didaktik 80/Drive B/Flip disk/Turn _back, Item,, menu_media_flip,, 0x062
+Media/Disk/Didaktik 80/Drive B/Write _protect, Branch
+Media/Disk/Didaktik 80/Drive B/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x162
+Media/Disk/Didaktik 80/Drive B/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x062
 
 Media/_Cartridge, Branch
 Media/Cartridge/_Timex Dock, Branch
