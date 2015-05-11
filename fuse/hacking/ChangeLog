@@ -4815,3 +4815,4 @@
          disk.[ch],wd_fdc.c},settings.{dat,pl},ui.c,ui/{options.dat,ui.h,
          uimedia.h},utils.c,z80/{coretest.c,z80_checks.h,z80_ops.c}: add
          Didaktik 80/40 emulation (part of patch #331) (Gergely Szasz).
+20150511 man/fuse.1: add initial Didaktik 80/40 documentation (Stuart).

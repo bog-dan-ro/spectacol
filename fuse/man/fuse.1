@@ -52,13 +52,15 @@ The emulator can load any of the formats supported by
 virtual-tape files. Saving to SZX, Z80 and SNA snapshots and TZX and
 TAP tape files is supported. The SLT extension to the Z80 format is
 partly supported (enough for multi-load games); however, loading of
-the old DAT-file variant is not. DSK, UDI, FDI, TR0, SDF, MGT, IMG,
-SAD, TRD, SCL and OPD disk images are supported when a disk interface
-is being emulated, including the integrated disk drives on +3,
-Pentagon or Scorpion machines as well as the +D, DISCiPLE,
-Opus Discovery and Beta\ 128 interfaces. DCK cartridge images are
-supported when emulating a Timex\ 2068 variant. Interface\ 2 ROM
-cartridges are also supported.
+the old DAT-file variant is not.
+.PP
+DSK, UDI, FDI, TR0, SDF, MGT, IMG, D40, D80, SAD, TRD, SCL and OPD
+disk images are supported when a disk interface is being emulated,
+including the integrated disk drives on +3, Pentagon or Scorpion
+machines as well as the +D, DISCiPLE, Opus Discovery, Beta\ 128 and
+Didaktik\ 80 interfaces. DCK cartridge images are supported when
+emulating a Timex\ 2068 variant. Interface\ 2 ROM cartridges are
+also supported.
 .PP
 Finally, there is also support for reading and writing the RZX input recording
 format.
@@ -237,6 +239,21 @@ option.
 .I file
 .RS
 Insert the specified file into the emulated DISCiPLE's drive\ 1.
+.RE
+.PP
+.B \-\-didaktik80
+.RS
+Emulate a Didaktik 80 (or Didaktik 40) disk interface. Same as the
+Disk Peripherals Options dialog's
+.I "Didaktik 80 interface"
+option.
+.RE
+.PP
+.B \-\-didaktik80disk
+.I file
+.RS
+Insert the specified file into the emulated Didaktik\ 80
+(or Didaktik\ 40)'s drive\ A.
 .RE
 .PP
 .B \-\-disk\-ask\-merge
@@ -1056,6 +1073,9 @@ are not.
 .B \-\-rom\-plusd
 .I file
 .br
+.B \-\-rom\-didaktik80
+.I file
+.br
 .B \-\-rom\-disciple
 .I file
 .br
@@ -1076,6 +1096,8 @@ the TR-DOS ROM for Beta\ 128 emulation with the 48K, TC2048, 128K or +2
 .RI ( trdos.rom ),
 the +D ROM
 .RI ( plusd.rom ),
+the Didaktik 80 ROM
+.RI ( didaktik80.rom ),
 the DISCiPLE ROM
 .RI ( disciple.rom ),
 the Opus Discovery ROM
@@ -2489,6 +2511,14 @@ If this option is selected, Fuse will emulate the +D interface.  See the
 section for more details.
 .RE
 .PP
+.I "Didaktik 80 interface"
+.RS
+If this option is selected, Fuse will emulate the Didaktik\ 80
+(or Didaktik\ 40) interface.  See the
+.B "DIDAKTIK\ 80 EMULATION"
+section for more details.
+.RE
+.PP
 .I "DISCiPLE interface"
 .RS
 If this option is selected, Fuse will emulate the DISCiPLE interface.  See the
@@ -2804,6 +2834,16 @@ Defaults to a double-sided 80 track drive.
 Defaults to a double-sided 80 track drive.
 .RE
 .PP
+.I "Didaktik 80 Drive A"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "Didaktik 80 Drive B"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
 .I "Opus Drive 1"
 .RS
 Defaults to a single-sided 40 track drive.
@@ -3051,6 +3091,11 @@ causes corruption of saved snapshots, and a failure to return from the
 NMI menu correctly.  This bug is not present in G+DOS on the +D.
 .RE
 .PP
+.I "Machine, Didaktik SNAP"
+.RS
+Presses the Didaktik 80 (or Didaktik 40)'s `SNAP' button.
+.RE
+.PP
 .I F7
 .br
 .I "Media, Tape, Open..."
@@ -3239,9 +3284,10 @@ Pentagon or Scorpion, or when the Beta\ 128, Opus Discovery, +D or
 DISCiPLE interface options are enabled and a machine compatible with
 the chosen interface is selected. (See
 .BR "THE .DSK FORMAT" ,
-.B "BETA\ 128 EMULATION"
-.B "OPUS DISCOVERY EMULATION"
-.B "+D EMULATION"
+.BR "BETA\ 128 EMULATION" ,
+.BR "OPUS DISCOVERY EMULATION" ,
+.BR "+D EMULATION" ,
+.B "DIDAKTIK\ 80 EMULATION"
 and
 .B "DISCIPLE EMULATION"
 sections below for notes on the file formats supported).
@@ -3368,6 +3414,25 @@ As above, but for the emulated Opus Discovery drives.
 .I "Media, Disk, +D, Drive\ 2, ..."
 .RS
 As above, but for the emulated +D drives.
+.RE
+.PP
+.I "Media, Disk, Didaktik 80, Drive\ A, Insert New"
+.br
+.I "Media, Disk, Didaktik 80, Drive\ A, Insert..."
+.br
+.I "Media, Disk, Didaktik 80, Drive\ A, Eject"
+.br
+.I "Media, Disk, Didaktik 80, Drive\ A, Save"
+.br
+.I "Media, Disk, Didaktik 80, Drive\ A, Save as..."
+.br
+.I "Media, Disk, Didaktik 80, Drive\ A, Write protect, Enable"
+.br
+.I "Media, Disk, Didaktik 80, Drive\ A, Write protect, Disable"
+.br
+.I "Media, Disk, Didaktik 80, Drive\ B, ..."
+.RS
+As above, but for the emulated Didaktik 80 drives.
 .RE
 .PP
 .I "Media, Disk, DISCiPLE, Drive\ 1, Insert New"
@@ -4388,6 +4453,8 @@ sources (e.g. offset 0x1234 in ROM\ 1 is specified as
 .RI ` ROM:1:0x1234 "')."
 Another available sources are:
 .RI ` Betadisk "',"
+.RI ` "Didaktik RAM" "',"
+.RI ` "Didaktik ROM" "',"
 .RI ` "DISCiPLE RAM" "',"
 .RI ` "DISCiPLE ROM" "',"
 .RI ` "DivIDE EPROM" "',"
@@ -4627,6 +4694,20 @@ Finally, `X' will return from the NMI menu.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH DIDAKTIK 80 EMULATION
+.PP
+Fuse supports Didaktik 80 (and Didaktik 40) emulation.  It emulates
+the original version of the Didaktik 80, running MDOS\ 1 and with a
+WD2797 floppy controller.  See the
+.B "DISK FILE FORMATS"
+section for more details on supported disk file formats.
+The Didaktik 80 may only be used with 16K, 48K and TC2048 emulation.
+To press the Didaktik 80's `SNAP' button, choose the
+.I "Machine, Didaktik SNAP"
+menu option.
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH DISCIPLE EMULATION
 .PP
 Fuse supports emulating the DISCiPLE disk and printer interface, although
@@ -4715,6 +4796,12 @@ For compatibility with SAM Coup\('e disk images using these formats.
 Note that SAM Coup\('e `.DSK' images share the same format as `.MGT'.
 .RE
 .PP
+.I .D80
+.I .D40
+.RS
+Didaktik 80 and Didaktik 40 file formats.
+.RE
+.PP
 .I .TRD
 .RS
 TR-DOS disk image; for detailed information please see
@@ -4753,7 +4840,7 @@ Opus Discovery file formats.
 .RE
 .PP
 Fuse supports most of the above formats for writing:
-.I ".UDI .FDI .MGT .IMG .SAD .TRD .SCL .OPD .OPU .DSK"
+.I ".UDI .FDI .MGT .IMG .SAD .D80 .D40 .TRD .SCL .OPD .OPU .DSK"
 (only the old CPC format).
 .PP
 You can save disk images with any output
