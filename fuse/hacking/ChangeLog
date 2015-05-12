@@ -4823,3 +4823,7 @@
          joystick.c,kempmouse.c,melodik.c,printer.c,scld.c,speccyboot.c,
          specdrum.c,spectranet.c,ula.c,usource.c}: add C99-style named
          initialisers in comments (Stuart).
+20150512 event.c,machines/{spec16.c,tc2068.c},periph.c,peripherals/{nic/{
+         w5100.c,w5100_socket.c},spectranet.c},ui.c,ui/{sdl/sdldisplay.c,
+         widget/{filesel.c,pokemem.c}}: avoid mixing declarations and code for
+         C89 compilers (Adrien Destugues).

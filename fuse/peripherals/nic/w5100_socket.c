@@ -141,10 +141,10 @@ nic_w5100_socket_reset( nic_w5100_socket_t *socket )
 static void
 w5100_write_socket_mr( nic_w5100_socket_t *socket, libspectrum_byte b )
 {
-  nic_w5100_debug( "w5100: writing 0x%02x to S%d_MR\n", b, socket->id );
-
   w5100_socket_mode mode = b & 0x0f;
   libspectrum_byte flags = b & 0xf0;
+
+  nic_w5100_debug( "w5100: writing 0x%02x to S%d_MR\n", b, socket->id );
 
   switch( mode ) {
     case W5100_SOCKET_MODE_CLOSED:

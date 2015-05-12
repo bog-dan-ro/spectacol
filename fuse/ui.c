@@ -164,9 +164,9 @@ static int mouse_grab_suspended = 0;
 void
 ui_mouse_button( int button, int down )
 {
-  if( !ui_mouse_grabbed && !mouse_grab_suspended ) button = 2;
-
   int kempston_button = !settings_current.mouse_swap_buttons;
+
+  if( !ui_mouse_grabbed && !mouse_grab_suspended ) button = 2;
 
   /* Possibly we'll end up handling _more_ than one mouse interface... */
   switch( button ) {

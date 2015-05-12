@@ -120,8 +120,9 @@ event_do_events( void )
   event_t *ptr;
 
   while(event_next_event <= tstates) {
+    event_descriptor_t descriptor;
     ptr = event_list->data;
-    event_descriptor_t descriptor =
+    descriptor =
       g_array_index( registered_events, event_descriptor_t, ptr->type );
 
     /* Remove the event from the list *before* processing */

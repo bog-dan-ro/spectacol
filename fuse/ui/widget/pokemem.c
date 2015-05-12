@@ -183,6 +183,8 @@ widget_pokemem_print_trainer( unsigned int left_edge, unsigned int width,
   char buffer[128];
   size_t l, w;
   int colour = WIDGET_COLOUR_BACKGROUND;
+  int x;
+  int y;
 
   if( number == highlight_line ) colour = WIDGET_COLOUR_HIGHLIGHT;
   widget_rectangle( left_edge * 8 + 1, number * 8 + 24, width * 8 - 2, 1 * 8,
@@ -202,8 +204,8 @@ widget_pokemem_print_trainer( unsigned int left_edge, unsigned int width,
     widget_putpixel( w, number * 8 + 31, 0 );
 
   /* print check */
-  int x = ( left_edge + width - 2 ) * 8 - 2;
-  int y = number * 8 + 24;
+  x = ( left_edge + width - 2 ) * 8 - 2;
+  y = number * 8 + 24;
 
   widget_rectangle( x, y, 8, 8, colour );
   widget_print_checkbox( x, y,

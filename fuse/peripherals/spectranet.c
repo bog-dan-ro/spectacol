@@ -201,6 +201,8 @@ spectranet_activate( void )
   if( !spectranet_memory_allocated ) {
 
     int i, j;
+    libspectrum_byte *rom;
+    libspectrum_byte *ram;
 
     libspectrum_byte *fake_bank =
       memory_pool_allocate_persistent( 0x1000, 1 );
@@ -220,8 +222,7 @@ spectranet_activate( void )
       }
 
     /* Pages 0x00 to 0x1f are the flash ROM */
-    libspectrum_byte *rom =
-      memory_pool_allocate_persistent( SPECTRANET_ROM_LENGTH, 1 );
+    rom = memory_pool_allocate_persistent( SPECTRANET_ROM_LENGTH, 1 );
     memset( rom, 0xff, SPECTRANET_ROM_LENGTH );
 
     for( i = 0; i < SPECTRANET_ROM_LENGTH / SPECTRANET_PAGE_LENGTH; i++ ) {
@@ -238,8 +239,7 @@ spectranet_activate( void )
        and writebyte() */
 
     /* Pages 0xc0 to 0xff are the RAM */
-    libspectrum_byte *ram =
-      memory_pool_allocate_persistent( SPECTRANET_RAM_LENGTH, 1 );
+    ram = memory_pool_allocate_persistent( SPECTRANET_RAM_LENGTH, 1 );
 
     for( i = 0; i < SPECTRANET_RAM_LENGTH / SPECTRANET_PAGE_LENGTH; i++ ) {
       int base = (SPECTRANET_RAM_BASE + i) * MEMORY_PAGES_IN_4K;

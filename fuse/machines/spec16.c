@@ -69,10 +69,11 @@ static void
 ensure_empty_mapping( void )
 {
   int i;
+  libspectrum_byte *empty_chunk;
 
   if( empty_mapping_allocated ) return;
 
-  libspectrum_byte *empty_chunk = memory_pool_allocate_persistent( 0x4000, 1 );
+  empty_chunk = memory_pool_allocate_persistent( 0x4000, 1 );
   memset( empty_chunk, 0xff, 0x4000 );
 
   for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {

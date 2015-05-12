@@ -292,9 +292,10 @@ sdldisplay_find_best_fullscreen_scaler( void )
      fullscreen to avoid the "postage stamp" on machines that don't support
      320x240 anymore e.g. Mac notebooks */
   if( settings_current.full_screen ) {
+    int i = 0;
+
     if( searching_fullscreen_scaler ) return;
     searching_fullscreen_scaler = 1;
-    int i = 0;
     while( i < SCALER_NUM &&
            ( image_height*sdldisplay_current_size <= min_fullscreen_height/2 ||
              image_height*sdldisplay_current_size > max_fullscreen_height ) ) {

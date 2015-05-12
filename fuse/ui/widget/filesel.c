@@ -799,6 +799,11 @@ http://thread.gmane.org/gmane.comp.gnu.mingw.user/9197
 void
 widget_filesel_keyhandler( input_key key )
 {
+#if !defined AMIGA && !defined __MORPHOS__
+  char *fn, *ptr;
+  char *dirtitle;
+#endif
+
   /* If there are no files (possible on the Wii), can't really do anything */
   if( widget_numfiles == 0 ) {
     if( key == INPUT_KEY_Escape ) widget_end_widget( WIDGET_FINISHED_CANCEL );
@@ -812,8 +817,6 @@ widget_filesel_keyhandler( input_key key )
     widget_end_widget( err );
   }
 #else  /* ifndef AMIGA */
-  char *fn, *ptr;
-  char *dirtitle;
 
   new_current_file = current_file;
 
