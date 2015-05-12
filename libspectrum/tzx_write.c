@@ -971,6 +971,7 @@ tzx_write_data_block( libspectrum_tape_block *block, libspectrum_byte **buffer,
 {
   libspectrum_tape_block *pure_data;
   size_t data_length;
+  libspectrum_byte *data;
 
   /* Pure data block can only have two identical pulses for bit 0 and bit 1 */
   if( libspectrum_tape_block_bit0_pulse_count( block ) != 2 ||
@@ -999,7 +1000,7 @@ tzx_write_data_block( libspectrum_tape_block *block, libspectrum_byte **buffer,
   /* And the actual data */
   data_length = libspectrum_tape_block_data_length( block );
   libspectrum_tape_block_set_data_length( pure_data, data_length );
-  libspectrum_byte *data = libspectrum_new( libspectrum_byte, data_length );
+  data = libspectrum_new( libspectrum_byte, data_length );
   memcpy( data, libspectrum_tape_block_data( block ), data_length );
   libspectrum_tape_block_set_data( pure_data, data );
 

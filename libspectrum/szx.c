@@ -577,10 +577,12 @@ read_crtr_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   /* This is ugly, but I can't see a better way to do it */
   if( sizeof( libspectrum_byte ) == sizeof( char ) ) {
     char *custom = libspectrum_new( char, data_length + 1 );
+    char *libspectrum;
+
     memcpy( custom, *buffer, data_length );
     custom[data_length] = 0;
 
-    char *libspectrum = strstr( custom, libspectrum_string );
+    libspectrum = strstr( custom, libspectrum_string );
     if( libspectrum ) {
       int matches, v1, v2, v3;
       libspectrum += strlen( libspectrum_string );

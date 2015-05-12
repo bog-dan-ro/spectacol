@@ -1010,3 +1010,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          patch #331) (Gergely Szasz).
 20150510 Makefile.am,m4/pkg.m4: add pkg.m4 for PKG_CHECK_MODULES in case the
          platform doesn't have pkg-config installed (Sergio).
+20150512 pzx_read.c,szx.c,tzx_write.c: avoid mixing declarations and code for
+         C89 compilers (Adrien Destugues)

@@ -235,6 +235,15 @@ read_data_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   libspectrum_byte *data;
 
   libspectrum_error error;
+  libspectrum_dword count;
+  int initial_level;
+  size_t count_bytes;
+  size_t bits_in_last_byte;
+  libspectrum_word tail;
+  libspectrum_byte p0_count;
+  libspectrum_byte p1_count;
+  libspectrum_word *p0_pulses;
+  libspectrum_word *p1_pulses;
 
   /* Check there's enough left in the buffer for all the metadata */
   if( data_length < 8 ) {
@@ -246,16 +255,16 @@ read_data_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   }
 
   /* Get the metadata */
-  libspectrum_dword count = libspectrum_read_dword( buffer );
-  int initial_level = !!(count & 0x80000000);
+  count = libspectrum_read_dword( buffer );
+  initial_level = !!(count & 0x80000000);
   count &= 0x7fffffff;
-  size_t count_bytes = ceil( count / (double)LIBSPECTRUM_BITS_IN_BYTE );
-  size_t bits_in_last_byte =
+  count_bytes = ceil( count / (double)LIBSPECTRUM_BITS_IN_BYTE );
+  bits_in_last_byte =
     count % LIBSPECTRUM_BITS_IN_BYTE ?
       count % LIBSPECTRUM_BITS_IN_BYTE : LIBSPECTRUM_BITS_IN_BYTE;
-  libspectrum_word tail = libspectrum_read_word( buffer );
-  libspectrum_byte p0_count = **buffer; (*buffer)++;
-  libspectrum_byte p1_count = **buffer; (*buffer)++;
+  tail = libspectrum_read_word( buffer );
+  p0_count = **buffer; (*buffer)++;
+  p1_count = **buffer; (*buffer)++;
 
   /* need to confirm that we have enough length left for the pulse definitions
    */
@@ -267,13 +276,11 @@ read_data_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  libspectrum_word *p0_pulses;
   error = pzx_read_data( buffer, block_end,
                          p0_count * sizeof( libspectrum_word ),
                          (libspectrum_byte**)&p0_pulses );
   if( error ) return error;
 
-  libspectrum_word *p1_pulses;
   error = pzx_read_data( buffer, block_end,
                          p1_count * sizeof( libspectrum_word ),
                          (libspectrum_byte**)&p1_pulses );
@@ -455,6 +462,7 @@ read_stop_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
                  pzx_context *ctx )
 {
   libspectrum_tape_block *block;
+  libspectrum_word flags;
 
   if( data_length < 2 ) {
     libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
@@ -462,7 +470,7 @@ read_stop_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  libspectrum_word flags = libspectrum_read_word( buffer );
+  flags = libspectrum_read_word( buffer );
 
   if( flags == PZXF_STOP48 ) {
     block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_STOP48 );
