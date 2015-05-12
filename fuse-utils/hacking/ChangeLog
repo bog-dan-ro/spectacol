@@ -502,3 +502,6 @@
          (Sergio).
 20150510 m4/{Makefile.am,pkg.m4}: add pkg.m4 for PKG_CHECK_MODULES in case the
          platform doesn't have pkg-config installed (Sergio).
+20150512 fmfconv_ff.c,rzxtool.c: avoid mixing declarations and code for C89
+         compilers (Adrien Destugues).
+

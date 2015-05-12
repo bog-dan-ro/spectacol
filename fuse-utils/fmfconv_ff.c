@@ -696,15 +696,17 @@ open_video( AVCodec *codec )
   }
 
 #ifdef HAVE_FFMPEG_AVCODEC_OPEN2
-  AVDictionary *options = NULL;
-  if( ffmpeg_libx264 ) {
-    setup_x264_dict( &options );
-  }
+  {
+    AVDictionary *options = NULL;
+    if( ffmpeg_libx264 ) {
+      setup_x264_dict( &options );
+    }
 
     /* open the codec */
-  ret = avcodec_open2( c, codec, &options );
+    ret = avcodec_open2( c, codec, &options );
 
-  av_dict_free( &options );
+    av_dict_free( &options );
+  }
 #else
   ret = avcodec_open( c, codec );
 #endif

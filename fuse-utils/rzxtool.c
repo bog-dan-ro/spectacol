@@ -470,12 +470,13 @@ write_rzx( const char *filename, libspectrum_rzx *rzx, int compressed )
 int
 main( int argc, char *argv[] )
 {
-  progname = argv[0];
   GSList *actions = NULL;
   options_t options;
   unsigned char *buffer = NULL; size_t length = 0;
   libspectrum_rzx *rzx;
   int error;
+
+  progname = argv[0];
 
   error = init_libspectrum(); if( error ) return error;
 
