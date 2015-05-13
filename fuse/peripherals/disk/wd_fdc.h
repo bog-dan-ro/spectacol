@@ -122,6 +122,7 @@ typedef struct wd_fdc {
   int id_head;
   int id_sector;
   int id_length;	/* sector length code 0, 1, 2, 3 */
+  int non_ibm_len_code;	/* WD2797 can use alternative sector len code set */
   int sector_length;	/* sector length from length code */
   int ddam;		/* read a deleted data mark */
   int rev;		/* revolution counter */

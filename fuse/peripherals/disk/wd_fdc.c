@@ -270,7 +270,11 @@ read_id( wd_fdc *f )
     fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     f->id_length = d->data;
-    f->sector_length = 0x80 << d->data;
+    if( f->non_ibm_len_code ) {		/* 00->256 01->512 10->1024 11->128 */
+      f->sector_length = 0x80 << ( ( d->data + 1 ) & 0x03 );
+    } else {				/* 00->128 01->256 10->512 11->1024 */
+      f->sector_length = 0x80 << ( d->data & 0x03 );
+    }
     fdd_read_data( d ); crc_add(f, d);
     if( d->index ) f->rev--;
     fdd_read_data( d ); crc_add(f, d);
@@ -1000,6 +1004,10 @@ wd_fdc_cr_write( wd_fdc *f, libspectrum_byte b )
       f->data_check_head = b & 0x02 ? 1 : 0;
     else
       f->data_check_head = -1;
+
+    /* WD2797 (and FD1797) can read sectors with non-IBM-compatible
+       sector length codes */
+    f->non_ibm_len_code = ( f->type == WD2797 && !( b & 0x08 ) ) ? 1 : 0;
 
     f->state = b & 0x20 ? WD_FDC_STATE_WRITE : WD_FDC_STATE_READ;
     f->status_type = WD_FDC_STATUS_TYPE2;
