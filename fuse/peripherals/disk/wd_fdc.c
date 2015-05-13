@@ -1254,7 +1254,7 @@ wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b )
   }
   if( ( f->flags & WD_FLAG_DRQ ) &&
 	f->status_register & WD_FDC_SR_BUSY ) {	/* we need a next datarq */
-//    wd_fdc_reset_datarq( f );
+    /* wd_fdc_reset_datarq( f ); */
     event_add_with_data( tstates + 30 * 		/* 30 us delay */
 			       machine_current->timings.processor_speed / 1000000,
 			       fdc_event, f );

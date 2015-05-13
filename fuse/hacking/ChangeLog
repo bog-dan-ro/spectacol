@@ -4831,3 +4831,6 @@
          to patch #330) (Gergely Szasz).
 20150513 compat.h: fix ARRAY_SIZE when using a modern GCC with strict C89 syntax
          (Sergio).
+20150513 compat.h: fix ARRAY_SIZE when using a modern GCC with strict C89 syntax
+20150513 peripherals/disk/wd_fdc.c,ui/svga/svgadisplay.c: avoid C99 comments
+         (Stuart).

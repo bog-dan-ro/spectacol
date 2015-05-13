@@ -133,7 +133,7 @@ static void register_scalers( void );
 
 typedef struct svga_mode_t {
   int n;
-//  vga_modeinfo *inf;
+  /* vga_modeinfo *inf; */
   int width, height, bytesperpixel, colors;
   int depth;
 } svga_mode_t;
