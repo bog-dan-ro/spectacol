@@ -62,14 +62,14 @@
 #define BUILD_BUG_ON_ZERO(e) \
   (sizeof(struct { int:-!!(e) * 1234; }))
 
-#if GNUC_PREREQ(3, 1)
+#if !GNUC_PREREQ(3, 1) || defined( __STRICT_ANSI__ )
+  #define MUST_BE_ARRAY(a) \
+    BUILD_BUG_ON_ZERO(sizeof(a) % sizeof(*a))
+#else
   #define SAME_TYPE(a, b) \
     __builtin_types_compatible_p(typeof(a), typeof(b))
   #define MUST_BE_ARRAY(a) \
     BUILD_BUG_ON_ZERO(SAME_TYPE((a), &(*a)))
-#else
-  #define MUST_BE_ARRAY(a) \
-    BUILD_BUG_ON_ZERO(sizeof(a) % sizeof(*a))
 #endif
 
 #define ARRAY_SIZE(a) ( \

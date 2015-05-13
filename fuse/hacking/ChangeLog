@@ -4829,3 +4829,5 @@
          C89 compilers (Adrien Destugues).
 20150513 peripherals/disk/wd_fdc.[ch]: add WD2797 non-IBM sector sizes (addition
          to patch #330) (Gergely Szasz).
+20150513 compat.h: fix ARRAY_SIZE when using a modern GCC with strict C89 syntax
+         (Sergio).
