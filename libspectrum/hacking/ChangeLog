@@ -1012,3 +1012,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          platform doesn't have pkg-config installed (Sergio).
 20150512 pzx_read.c,szx.c,tzx_write.c: avoid mixing declarations and code for
          C89 compilers (Adrien Destugues)
+20150513 internals.h: fix ARRAY_SIZE when using a modern GCC with strict C89
+         syntax (Sergio).
