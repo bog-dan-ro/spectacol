@@ -36,6 +36,8 @@
 
 #include <libspectrum.h>
 
+#define NUM_JOY_BUTTONS 15
+
 int ui_joystick_init( void ); /* returns no. of joysticks initialised */
 void ui_joystick_end( void );
 

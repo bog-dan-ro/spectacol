@@ -60,7 +60,7 @@
 
 static js_data_struct jsd[2];
 
-static int js_button_states[2][10];
+static int js_button_states[2][NUM_JOY_BUTTONS];
 
 static void poll_joystick( int which );
 static void do_axis( int which, double position, input_key negative,
@@ -155,8 +155,8 @@ ui_joystick_init( void )
 
   sprintf( calibration, "%s/%s", home, JSDefaultCalibration );
 
-  for( i = 0; i<2; i++ ) {
-    for( j = 0; j<10; j++ ) {
+  for( i = 0; i < 2; i++ ) {
+    for( j = 0; j < NUM_JOY_BUTTONS; j++ ) {
       js_button_states[i][j] = 0;
     }
   }
@@ -216,7 +216,7 @@ poll_joystick( int which )
   event.types.joystick.which = which;
 
   buttons = joystick->total_buttons;
-  if( buttons > 15 ) buttons = 15;	/* We support 'only' 15 fire buttons */
+  if( buttons > NUM_JOY_BUTTONS ) buttons = NUM_JOY_BUTTONS;	/* We support 'only' NUM_JOY_BUTTONS (15 as defined in ui/uijoystick.h) fire buttons */
 
   for( i = 0; i < buttons; i++ ) {
 

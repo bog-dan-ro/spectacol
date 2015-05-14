@@ -63,8 +63,6 @@ struct button_info {
   keyboard_key_name key;
 };
 
-#define NUM_JOY_BUTTONS 15
-
 struct joystick_info {
 
   int *type;

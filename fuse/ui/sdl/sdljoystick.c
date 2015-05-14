@@ -138,7 +138,7 @@ button_action( SDL_JoyButtonEvent *buttonevent, input_event_type type )
   input_event_t event;
   
   button = buttonevent->button;
-  if( button > 14 ) return;	/* We support 'only' 15 fire buttons */
+  if( button >= NUM_JOY_BUTTONS ) return;	/* We support 'only' NUM_JOY_BUTTONS (15 as defined in ui/uijoystick.h) fire buttons */
 
   event.type = type;
   event.types.joystick.which = buttonevent->which;
