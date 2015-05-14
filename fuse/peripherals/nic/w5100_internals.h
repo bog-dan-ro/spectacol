@@ -31,6 +31,10 @@
 
 #include <signal.h>
 
+#ifndef WIN32
+#include <sys/select.h>
+#endif
+
 typedef enum w5100_socket_mode {
   W5100_SOCKET_MODE_CLOSED = 0x00,
   W5100_SOCKET_MODE_TCP,
