@@ -102,7 +102,7 @@ static const periph_port_t didaktik_ports[] = {
   { 0x00ff, 0x0087, didaktik_dr_read, didaktik_dr_write },
 
   /* ---- ---- 0xx- ---- */
-  { 0x0080, 0x0080, didaktik_8255_read, didaktik_8255_write },
+  { 0x0080, 0x0000, didaktik_8255_read, didaktik_8255_write },
 
   /* ---- ---- 1000 1--1 */
   { 0x00f9, 0x0089, NULL, didaktik_aux_write },

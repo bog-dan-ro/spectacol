@@ -4838,3 +4838,5 @@
          number of joystick buttons across UIs (fixes bug #332) (UB880D).
 20150514 peripherals/nic/w5100_internals.h: #include <sys/select.h> for POSIX
          systems (Adrien Destugues).
+20150515 peripherals/disk/didaktik.c: fix address of i8255 port (more of patch
+         #331) (thanks, UB880D) (Gergely Szasz).
