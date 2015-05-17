@@ -66,7 +66,7 @@ main( int argc, char **argv )
 
     switch( c ) {
 
-    case 'r': sample_rate = abs( atol( optarg ) ); break;
+    case 'r': sample_rate = abs( atoi( optarg ) ); break;
     case 'h': show_help(); return 0;
     case 'V': show_version(); return 0;
 
