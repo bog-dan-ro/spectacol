@@ -37,6 +37,7 @@
 #include "periph.h"
 #include "peripherals/ula.h"
 #include "settings.h"
+#include "spectranet.h"
 #include "ui/ui.h"
 
 #ifdef BUILD_SPECTRANET
