@@ -504,4 +504,5 @@
          platform doesn't have pkg-config installed (Sergio).
 20150512 fmfconv_ff.c,rzxtool.c: avoid mixing declarations and code for C89
          compilers (Adrien Destugues).
-
+20150517 audio2tape.cc: use char* for progname for consistency with utils.c
+         (thanks, Stuart) (Fred).

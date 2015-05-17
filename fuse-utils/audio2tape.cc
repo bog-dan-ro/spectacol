@@ -63,7 +63,7 @@ show_version( void );
 static void
 show_help( void );
 
-std::string progname;
+char *progname;
 
 const std::string schmitt_str("schmitt");
 const std::string simple_str("simple");
