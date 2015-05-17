@@ -4842,3 +4842,4 @@
          #331) (thanks, UB880D) (Gergely Szasz).
 20150517 peripherals/spectranet.[ch]: add missing inclusion of spectranet.h and
          fix declaration of spectranet_programmable_trap (thanks, LTO) (Stuart).
+20150518 peripherals/disk/disk.c: fix use of uninitialized variable (Sergio).

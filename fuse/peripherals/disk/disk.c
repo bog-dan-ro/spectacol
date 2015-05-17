@@ -262,7 +262,7 @@ guess_track_geom( disk_t *d, int head, int track, int *sector_base,
 {
   int r = 0;
   int h, t, s, sl;
-  int del;
+  int del = 0;
   *sector_base = -1;
   *sectors = 0;
   *seclen = -1;
