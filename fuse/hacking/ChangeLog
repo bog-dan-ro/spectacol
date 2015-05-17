@@ -4843,3 +4843,5 @@
 20150517 peripherals/spectranet.[ch]: add missing inclusion of spectranet.h and
          fix declaration of spectranet_programmable_trap (thanks, LTO) (Stuart).
 20150518 peripherals/disk/disk.c: fix use of uninitialized variable (Sergio).
+20150518 peripherals/speccyboot.c,ui/widget/options.pl: avoid mixing
+         declarations and code for C89 compilers (Sergio).

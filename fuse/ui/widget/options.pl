@@ -364,6 +364,7 @@ int
 widget_options_finish( widget_finish_state finished )
 {
   int error;
+  int needs_hard_reset;
 
   /* If we exited normally, actually set the options */
   if( finished == WIDGET_FINISHED_OK ) {
@@ -375,7 +376,7 @@ widget_options_finish( widget_finish_state finished )
     /* Apply new options */
     settings_copy( &settings_current, &widget_options_settings );
 
-    int needs_hard_reset = periph_postcheck();
+    needs_hard_reset = periph_postcheck();
 
     if( needs_hard_reset ) {
       error = widget_do_query( "Some options need to reset the machine. Reset?" );

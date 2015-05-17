@@ -60,12 +60,28 @@ static nic_enc28j60_t *nic;
 static libspectrum_byte out_register_state;
 static libspectrum_byte in_register_state;
 
+static void
+speccyboot_reset( int hard_reset GCC_UNUSED );
+
+static void
+speccyboot_memory_map( void );
+
 static libspectrum_byte
 speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached );
 
 static void
 speccyboot_register_write( libspectrum_word port GCC_UNUSED,
                            libspectrum_byte val );
+
+static module_info_t speccyboot_module_info = {
+
+  /* .reset = */ speccyboot_reset,
+  /* .romcs = */ speccyboot_memory_map,
+  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_from = */ NULL,
+  /* .snapshot_to = */ NULL,
+
+};
 
 static const periph_port_t speccyboot_ports[] = {
   { 0x00e0, 0x0080, speccyboot_register_read, speccyboot_register_write },
@@ -188,16 +204,6 @@ speccyboot_init( void )
   int i;
 
   nic = nic_enc28j60_alloc();
-
-  static module_info_t speccyboot_module_info = {
-
-    /* .reset = */ speccyboot_reset,
-    /* .romcs = */ speccyboot_memory_map,
-    /* .snapshot_enabled = */ NULL,
-    /* .snapshot_from = */ NULL,
-    /* .snapshot_to = */ NULL,
-
-  };
 
   module_register( &speccyboot_module_info );
 
