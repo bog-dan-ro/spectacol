@@ -658,7 +658,7 @@ resample_sound( void )
   new_len = ( snd_enc == TYPE_PCM ? (void *)snd16_w : (void *)snd8_w ) -
             (void *)sound8;
   new_len -= snd_frg;
-  printi( 3, "resample_sound(): %d sample converted to %d (%dHz -> %dHz)\n",
+  printi( 3, "resample_sound(): %d sample converted to %ld (%dHz -> %dHz)\n",
               snd_len / snd_fsz, new_len / snd_fsz, snd_rte, out_rte );
   snd_len = new_len;
   fmf_rte += out_rte - snd_rte;

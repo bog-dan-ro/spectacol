@@ -248,9 +248,9 @@ out_write_avi( void )
 #ifdef USE_LIBJPEG
   if( avi_subtype != TYPE_AVI_DIB )
     err = out_build_avi_mjpeg_frame( &frame_buffer, &frame_size );
+  if( err ) return err;
 #endif
 
-  if( err ) return err;
   W2DWORD( vid_stream_id, frame_size );
   if( fwrite( frame_buffer, frame_size, 1, out ) != 1 ) return ERR_WRITE_OUT;
 

@@ -506,3 +506,4 @@
          compilers (Adrien Destugues).
 20150517 audio2tape.cc: use char* for progname for consistency with utils.c
          (thanks, Stuart) (Fred).
+20150517 fmfconv.c,fmfconv_avi.c: remove a couple more warnings (Fred).
