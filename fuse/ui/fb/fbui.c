@@ -81,14 +81,14 @@ ui_init( int *argc, char ***argv )
   return 0;
 }
 
-int ui_event()
+int ui_event( void )
 {
   keyboard_update();
   mouse_update();
   return 0;
 }
 
-int ui_end(void)
+int ui_end( void )
 {
   /* Cleanup handled by atexit function */
   int error;

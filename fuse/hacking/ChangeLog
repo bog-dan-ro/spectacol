@@ -4845,3 +4845,6 @@
 20150518 peripherals/disk/disk.c: fix use of uninitialized variable (Sergio).
 20150518 peripherals/speccyboot.c,ui/widget/options.pl: avoid mixing
          declarations and code for C89 compilers (Sergio).
+20150524 movie.c,ui/{fb/fbui.c,win32/{debugger.c,pokefinder.c},xlib/{xdisplay.c,
+         xstatusbar.pl}},unittests/unittests.c: use C90 parameter lists
+         (Stuart).

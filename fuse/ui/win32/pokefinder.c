@@ -268,21 +268,21 @@ menu_machine_pokefinder( int action GCC_UNUSED )
 }
 
 static void
-win32ui_pokefinder_incremented()
+win32ui_pokefinder_incremented( void )
 {
   pokefinder_incremented();
   update_pokefinder();
 }
 
 static void
-win32ui_pokefinder_decremented()
+win32ui_pokefinder_decremented( void )
 {
   pokefinder_decremented();
   update_pokefinder();
 }
 
 static void
-win32ui_pokefinder_search()
+win32ui_pokefinder_search( void )
 {
   long value;
   TCHAR *buffer;
@@ -318,14 +318,14 @@ win32ui_pokefinder_search()
 }
 
 static void
-win32ui_pokefinder_reset()
+win32ui_pokefinder_reset( void )
 {
   pokefinder_clear();
   update_pokefinder();
 }
 
 static void
-win32ui_pokefinder_close()
+win32ui_pokefinder_close( void )
 {
   DestroyWindow( fuse_hPFWnd );
   fuse_hPFWnd = NULL;

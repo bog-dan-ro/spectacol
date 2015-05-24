@@ -364,7 +364,7 @@ assert_all_ram( int ram0000, int ram4000, int ram8000, int ramc000 )
 }
 
 static int
-paging_test_16()
+paging_test_16( void )
 {
   int r = 0;
 

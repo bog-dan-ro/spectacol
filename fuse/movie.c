@@ -142,7 +142,7 @@ void movie_start_frame( void );
 void movie_init_sound( int f, int s );
 
 static char
-get_timing()
+get_timing( void )
 {
   switch( machine_current->machine ) {
   case LIBSPECTRUM_MACHINE_16:
@@ -178,7 +178,7 @@ get_timing()
 }
 
 static char
-get_screentype()
+get_screentype( void )
 {
   if( machine_current->timex ) { /* ALTDFILE and default */
     if( scld_last_dec.name.hires )
@@ -486,7 +486,7 @@ movie_start_frame( void )
 }
 
 void
-movie_init()
+movie_init( void )
 {
   /* start movie recording if user requested... */
   if( settings_current.movie_start )

@@ -279,7 +279,7 @@ ui_debugger_deactivate( int interruptable )
 }
 
 static int
-create_dialog()
+create_dialog( void )
 {
   int error;
   debugger_pane i;
@@ -358,7 +358,7 @@ create_register_display( HFONT font )
 }
 
 static int
-create_breakpoints()
+create_breakpoints( void )
 {
   size_t i;
 
@@ -522,7 +522,7 @@ stack_click( LPNMITEMACTIVATE lpnmitem )
 }
 
 static int
-create_events()
+create_events( void )
 {
   size_t i;
   LPCTSTR titles[] = { _T( "Time" ), _T( "Type" ) };
@@ -900,7 +900,7 @@ update_breakpoints( void )
 }
 
 static void
-update_disassembly()
+update_disassembly( void )
 {
   size_t i, length; libspectrum_word address;
   TCHAR buffer[80];
