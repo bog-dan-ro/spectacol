@@ -4848,3 +4848,5 @@
 20150524 movie.c,ui/{fb/fbui.c,win32/{debugger.c,pokefinder.c},xlib/{xdisplay.c,
          xstatusbar.pl}},unittests/unittests.c: use C90 parameter lists
          (Stuart).
+20150525 z80/coretest.c: fix parameter list of spectranet_page() definition in
+         coretest (Stuart).

@@ -523,7 +523,7 @@ divide_set_automap( int state GCC_UNUSED )
 int spectranet_available = 0;
 
 void
-spectranet_page( void )
+spectranet_page( int via_io GCC_UNUSED )
 {
   abort();
 }
