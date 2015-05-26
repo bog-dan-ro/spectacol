@@ -153,25 +153,20 @@ get_timing( void )
   case LIBSPECTRUM_MACHINE_SCORP:
   case LIBSPECTRUM_MACHINE_SE:
     return 'A';
-    break;
   case LIBSPECTRUM_MACHINE_128:
   case LIBSPECTRUM_MACHINE_PLUS2:
   case LIBSPECTRUM_MACHINE_PLUS2A:
   case LIBSPECTRUM_MACHINE_PLUS3:
   case LIBSPECTRUM_MACHINE_PLUS3E:
     return 'B';
-    break;
   case LIBSPECTRUM_MACHINE_TS2068:
     return 'C';
-    break;
   case LIBSPECTRUM_MACHINE_PENT:
   case LIBSPECTRUM_MACHINE_PENT512:
   case LIBSPECTRUM_MACHINE_PENT1024:
     return 'D';
-    break;
   case LIBSPECTRUM_MACHINE_48_NTSC:
     return 'E';
-    break;
   case LIBSPECTRUM_MACHINE_UNKNOWN:
   default:
     return '?';

@@ -248,12 +248,10 @@ rzx_get_initial_snapshot( void )
       /* If we get this then there can't have been an initial snap to start
          from */
       return NULL;
-      break;
       
     case LIBSPECTRUM_RZX_SNAPSHOT_BLOCK:
       /* Got initial snap */
       return libspectrum_rzx_iterator_get_snap( it );
-      break;
       
     default:
       continue;

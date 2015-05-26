@@ -342,7 +342,6 @@ add_joystick( libspectrum_snap *snap, joystick_type_t fuse_type, int inputs )
   case JOYSTICK_TYPE_NONE:
   default:
     return;
-    break;
   }
 
   for( i = 0; i < num_joysticks; i++ ) {

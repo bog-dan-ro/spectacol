@@ -87,13 +87,10 @@ dck_get_memory_page( libspectrum_dck_bank bank, size_t index )
     switch( bank ) {
     case LIBSPECTRUM_DCK_BANK_HOME:
       return timex_home[ index ];
-      break;
     case LIBSPECTRUM_DCK_BANK_DOCK:
       return &timex_dock[ index ];
-      break;
     case LIBSPECTRUM_DCK_BANK_EXROM:
       return &timex_exrom[ index ];
-      break;
     default:
       return NULL;
     }

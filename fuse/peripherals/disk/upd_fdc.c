@@ -1303,7 +1303,6 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
     case UPD_CMD_READ_ID:
       head_load( f );
       return;
-      break;
     case UPD_CMD_READ_DATA:
     /* Speedlock hack */
       if( f->speedlock != -1 && !d->do_read_weak ) {	/* do not conflict with fdd weak read */
@@ -1328,14 +1327,12 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       f->first_rw = 1;		/* always read at least one sector */
       head_load( f );
       return;
-      break;
     case UPD_CMD_READ_DIAG:		/* READ TRACK */
       f->rlen = 0x80 << ( f->data_register[4] > MAX_SIZE_CODE ? MAX_SIZE_CODE : f->data_register[4] );
       if( f->data_register[4] == 0 && f->data_register[7] < 128 )
         f->rlen = f->data_register[7];
       head_load( f );
       return;
-      break;
 
     case UPD_CMD_WRITE_DATA:
       if( d->wrprot ) {
@@ -1350,7 +1347,6 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       f->first_rw = 1;		/* always write at least one sector */
       head_load( f );
       return;
-      break;
     case UPD_CMD_WRITE_ID:			/* FORMAT TRACK */
       if( d->wrprot ) {
         f->status_register[1] |= UPD_FDC_ST1_NOT_WRITEABLE;
@@ -1361,7 +1357,6 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       f->rlen = 0x80 << ( f->data_register[1] > MAX_SIZE_CODE ? MAX_SIZE_CODE : f->data_register[1] ); /* max 8192 byte/sector */
       head_load( f );
       return;
-      break;
     case UPD_CMD_SCAN:			/* & 0x0c >> 2 == 00 - equal, 10 - low, 11 - high */
       f->scan = ( f->command_register & 0x0c ) >> 2 == 0 ? UPD_SCAN_EQ : 
 		( f->command_register & 0x0c ) >> 2 == 0x03 ? UPD_SCAN_HI :
@@ -1370,7 +1365,6 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       f->rlen = 0x80 << ( f->data_register[4] > MAX_SIZE_CODE ? MAX_SIZE_CODE : f->data_register[4] );
       head_load( f );
       return;
-      break;
     }
 
     if( f->cmd->id < UPD_CMD_READ_ID && !terminated ) {	/* we have execution phase */

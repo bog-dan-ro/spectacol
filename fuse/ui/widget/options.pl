@@ -629,7 +629,6 @@ widget_$_->{name}_keyhandler( input_key key )
     options_$_->{name}\[highlight_line+1\].click();
     options_$_->{name}\[highlight_line+1\].draw( menu_left_edge_x, menu_width, options_$_->{name} + highlight_line + 1, &widget_options_settings );
     return;
-    break;
 
   case INPUT_KEY_Return:
   case INPUT_KEY_KP_Enter:
@@ -638,7 +637,6 @@ widget_$_->{name}_keyhandler( input_key key )
     widget_$_->{name}_running = 0;
     display_refresh_all();
     return;
-    break;
 
   default:	/* Keep gcc happy */
     break;

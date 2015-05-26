@@ -264,7 +264,6 @@ widget_query_generic_keyhandler( widget_query_entry *query, int num_entries,
     widget_end_all( WIDGET_FINISHED_OK );
     display_refresh_all();
     return;
-    break;
 
   default:	/* Keep gcc happy */
     break;
