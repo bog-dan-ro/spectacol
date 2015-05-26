@@ -39,7 +39,7 @@
 #include "ui/scaler/scaler.h"
 #include "menu.h"
 
-void
+static void
 atexit_proc( void )
 { 
   SDL_ShowCursor( SDL_ENABLE );

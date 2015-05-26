@@ -4850,3 +4850,7 @@
          (Stuart).
 20150525 z80/coretest.c: fix parameter list of spectranet_page() definition in
          coretest (Stuart).
+20150526 event.c,menu_data.pl,peripherals/disk/disciple.c,rzx.c,ui/{gtk/{
+         binary.c,browse.c,gtkjoystick.c,memory.c,pokefinder.c},sdl/sdlui.c,
+         widget/{menu.c,query.c,widget.c},xlib/xstatusbar.pl}: add static to
+         functions where appropriate (Stuart).

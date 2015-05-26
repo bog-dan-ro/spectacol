@@ -293,7 +293,7 @@ sub _dump_gtk ($$$$$) {
 
     if( $mode eq 'callbacks' ) {
       if( $item->{type} eq 'Item' && $item->{action} ) {
-        print "MENU_CALLBACK( ", $function, " )\n{\n";
+        print "static MENU_CALLBACK( ", $function, " )\n{\n";
         print "  $binded_function( gtk_action, $item->{action} );\n}\n\n";
       }
     } elsif( $mode eq 'ui' ) {

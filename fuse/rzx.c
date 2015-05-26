@@ -231,7 +231,7 @@ int rzx_stop_recording( void )
   return 0;
 }
 
-libspectrum_snap*
+static libspectrum_snap*
 rzx_get_initial_snapshot( void )
 {
   libspectrum_rzx_iterator it;

@@ -254,7 +254,7 @@ event_name( int type )
   return g_array_index( registered_events, event_descriptor_t, type ).description;
 }
 
-void
+static void
 registered_events_free( void )
 {
   int i;

@@ -88,7 +88,7 @@ menu_media_tape_browse( GtkAction *gtk_action GCC_UNUSED,
   fuse_emulation_unpause();
 }
 
-GtkWidget *
+static GtkWidget *
 create_block_list( void )
 {
   GtkWidget *view;

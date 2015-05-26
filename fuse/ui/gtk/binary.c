@@ -57,7 +57,7 @@ static void load_data( GtkEntry *entry, gpointer user_data );
 static void change_save_filename( GtkButton *button, gpointer user_data );
 static void save_data( GtkEntry *entry, gpointer user_data );
 
-void
+static void
 create_binary_dialog( struct binary_info *info, const char *title )
 {
   GtkWidget *table, *button, *content_area;

@@ -57,14 +57,14 @@ static int *current_settings[ 16 ];
 
 #define GET_SET_KEY_FUNCTIONS( which ) \
 \
-void \
+static void \
 set_key_for_button_ ## which ( int action ) \
 { \
   *current_settings[ which ] = action; \
   widget_end_all( WIDGET_FINISHED_OK ); \
 } \
 \
-const char* \
+static const char* \
 get_key_name_for_button_ ## which ( void ) \
 { \
   return keyboard_key_text( *current_settings[ which ] ); \
@@ -236,7 +236,7 @@ SUBMENU_DEVICE_SELECTIONS( joystick )
 #endif  /* #ifdef USE_JOYSTICK */
 SUBMENU_DEVICE_SELECTIONS( keyboard )
 
-void
+static void
 print_items( void )
 {
   int i;

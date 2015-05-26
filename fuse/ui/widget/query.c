@@ -214,7 +214,7 @@ widget_query_save_draw( void *data )
   return internal_query_draw( query_save, 1, (const char *) data );
 }
 
-void
+static void
 widget_query_generic_keyhandler( widget_query_entry *query, int num_entries,
                                  input_key key )
 {

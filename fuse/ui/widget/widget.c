@@ -167,7 +167,7 @@ widget_char( int pp )
   return &widget_font[ pp >> 8 ][ pp & 255 ];
 }
 
-size_t
+static size_t
 widget_left_one_char( const char *s, size_t index )
 {
   if( index == -1 ) index = strlen( s );
@@ -596,7 +596,7 @@ int widget_dialog( int x, int y, int width, int height )
   return 0;
 }
 
-void
+static void
 widget_draw_speccy_rainbow_bar(int x, int y)
 {
   int i = 0;

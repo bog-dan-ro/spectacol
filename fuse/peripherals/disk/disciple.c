@@ -257,7 +257,7 @@ disciple_reset( int hard_reset )
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
 }
 
-void
+static void
 disciple_inhibit( void )
 {
   /* TODO: check how this affects the hardware */

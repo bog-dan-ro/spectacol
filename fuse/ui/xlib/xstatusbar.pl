@@ -79,7 +79,7 @@ static ui_statusbar_state $xstates;
 static int status_updated;
 static int icon_size = 0;
 
-void
+static void
 xstatusbar_add_pixmap(int x, int pw, int h, libspectrum_word *colors)
 {
   int y = 3 * DISPLAY_SCREEN_HEIGHT;
@@ -111,7 +111,7 @@ xstatusbar_init( int size )
 
 $add_pixmap}
 
-void
+static void
 xstatusbar_put_icon( int x, int w, int h )
 {
   static int dx = 0;

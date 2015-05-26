@@ -148,7 +148,7 @@ static key_menu_t key_menu[] = {
 
 };
 
-GtkTreeModel *
+static GtkTreeModel *
 create_joystick_options_store( void )
 {
   GtkTreeIter iter, iter2;

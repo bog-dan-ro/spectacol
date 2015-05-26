@@ -91,7 +91,7 @@ menu_machine_pokefinder( GtkAction *gtk_action GCC_UNUSED,
   update_pokefinder();
 }
 
-GtkWidget *
+static GtkWidget *
 create_location_list( void )
 {
   GtkWidget *view;

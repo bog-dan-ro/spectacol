@@ -101,7 +101,7 @@ scroller( GtkAdjustment *adjustment, gpointer user_data )
   update_display( model, base );
 }
 
-GtkWidget *
+static GtkWidget *
 create_mem_list( void )
 {
   GtkWidget *view;
