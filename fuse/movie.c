@@ -41,6 +41,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "machine.h"
+#include "movie.h"
 #include "movie_tables.h"
 #include "options.h"
 #include "peripherals/scld.h"

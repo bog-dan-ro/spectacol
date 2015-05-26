@@ -4855,3 +4855,4 @@
          widget/{menu.c,query.c,widget.c},xlib/xstatusbar.pl}: add static to
          functions where appropriate (Stuart).
 20150526 ui/{gtk,win32}/roms.c: add static to roms[] arrays (Stuart).
+20150526 movie.c,z80/coretest.c: add missing includes (Stuart).

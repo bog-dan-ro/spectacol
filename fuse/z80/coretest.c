@@ -30,6 +30,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "fuse.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/disk/didaktik.h"
+#include "peripherals/disk/disciple.h"
+#include "peripherals/disk/opus.h"
+#include "peripherals/disk/plusd.h"
+#include "peripherals/ide/divide.h"
+#include "peripherals/if1.h"
+#include "peripherals/spectranet.h"
+#include "peripherals/ula.h"
+#include "peripherals/usource.h"
+#include "profile.h"
+#include "rzx.h"
+#include "slt.h"
+#include "tape.h"
+
 #include "event.h"
 #include "module.h"
 #include "spectrum.h"
