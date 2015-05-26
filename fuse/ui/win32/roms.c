@@ -47,7 +47,7 @@ static void roms_init( HWND hwndDlg, LPARAM lParam );
           dialog for example */
 
 /* The edit boxes used to display the current ROMs */
-HWND rom[ SETTINGS_ROM_COUNT ];
+static HWND rom[ SETTINGS_ROM_COUNT ];
 
 struct callback_info {
 

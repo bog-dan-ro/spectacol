@@ -45,7 +45,7 @@ static void select_new_rom( GtkWidget *widget, gpointer data );
 static void roms_done( GtkButton *button, gpointer data );
 
 /* The labels used to display the current ROMs */
-GtkWidget *rom[ SETTINGS_ROM_COUNT ];
+static GtkWidget *rom[ SETTINGS_ROM_COUNT ];
 
 struct callback_info {
 

@@ -4854,3 +4854,4 @@
          binary.c,browse.c,gtkjoystick.c,memory.c,pokefinder.c},sdl/sdlui.c,
          widget/{menu.c,query.c,widget.c},xlib/xstatusbar.pl}: add static to
          functions where appropriate (Stuart).
+20150526 ui/{gtk,win32}/roms.c: add static to roms[] arrays (Stuart).
