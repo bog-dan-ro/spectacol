@@ -435,7 +435,6 @@ wd_fdc_seek_verify_read_id( wd_fdc *f )
   f->status_register &= ~WD_FDC_SR_BUSY;
   wd_fdc_set_intrq( f );
   f->read_id = 0;
-  return;
 }
 
 static void
