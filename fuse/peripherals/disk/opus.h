@@ -52,8 +52,6 @@ void opus_unpage( void );
 libspectrum_byte opus_read( libspectrum_word address );
 void opus_write( libspectrum_word address, libspectrum_byte b );
 
-libspectrum_byte opus_joy_read( libspectrum_word port, int *attached );
-
 int opus_disk_insert( opus_drive_number which, const char *filename,
 		       int autoload );
 int opus_disk_eject( opus_drive_number which );
