@@ -4860,3 +4860,5 @@
          function (Stuart).
 20150526 movie.c,peripherals/{dck.c,disk/upd_fdc.c,joystick.c},rzx.c,ui/widget/{
          options.pl,query.c}: remove unreachable breaks after returns (Stuart).
+20150527 peripherals/disk/plusd.h: remove unused plusd_joy_read() prototype
+         (Stuart).

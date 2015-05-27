@@ -61,7 +61,6 @@ void plusd_sec_write( libspectrum_word port, libspectrum_byte b );
 libspectrum_byte plusd_dr_read( libspectrum_word port, int *attached );
 void plusd_dr_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte plusd_joy_read( libspectrum_word port, int *attached );
 void plusd_cn_write( libspectrum_word port, libspectrum_byte b );
 
 libspectrum_byte plusd_patch_read( libspectrum_word port, int *attached );
