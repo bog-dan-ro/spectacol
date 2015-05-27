@@ -26,6 +26,8 @@
 #ifndef FUSE_UTILS_COMPAT_H
 #define FUSE_UTILS_COMPAT_H
 
+#include <stdlib.h>
+
 /* Remove the gcc-specific incantations if we're not using gcc */
 #ifdef __GNUC__
 #define GCC_PRINTF( fmtstring, args ) __attribute__ ((format( printf, fmtstring, args )))

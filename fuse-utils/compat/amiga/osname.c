@@ -31,6 +31,8 @@
 #include <proto/exec.h>
 #include <proto/expansion.h>
 
+#include "compat.h"
+
 struct Library *ExpansionBase;
 struct ExpansionIFace *IExpansion;
 

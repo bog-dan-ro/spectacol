@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <windows.h>
 
+#include "compat.h"
+
 extern char *progname;
 
 int compat_osname( char *osname, size_t length )

@@ -27,6 +27,8 @@
 
 #include <libgen.h>
 
+#include "compat.h"
+
 char *
 compat_basename( char *path )
 {

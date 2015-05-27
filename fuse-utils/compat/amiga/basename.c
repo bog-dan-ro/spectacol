@@ -27,6 +27,8 @@
 
 #include <proto/dos.h>
 
+#include "compat.h"
+
 char *
 compat_basename( char *path )
 {

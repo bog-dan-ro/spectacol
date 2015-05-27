@@ -508,3 +508,5 @@
          (thanks, Stuart) (Fred).
 20150517 fmfconv.c,fmfconv_avi.c: remove a couple more warnings (Fred).
 20150517 tape2wav.c: abs() takes an int so use atoi() to match types (Fred).
+20150527 compat.h,compat/{amiga/{basename.c,osname.c},unix/{basename.c,
+         osname.c},win32/osname.c}: add missing includes (Stuart).

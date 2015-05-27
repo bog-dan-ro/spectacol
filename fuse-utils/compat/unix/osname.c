@@ -31,6 +31,8 @@
 #include <string.h>
 #include <sys/utsname.h>
 
+#include "compat.h"
+
 extern char *progname;
 
 int compat_osname( char *buffer, size_t length )
