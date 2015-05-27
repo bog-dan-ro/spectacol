@@ -49,31 +49,6 @@ void disciple_end( void );
 void disciple_page( void );
 void disciple_unpage( void );
 
-libspectrum_byte disciple_sr_read( libspectrum_word port, int *attached );
-void disciple_cr_write( libspectrum_word port, libspectrum_byte b );
-
-libspectrum_byte disciple_tr_read( libspectrum_word port, int *attached );
-void disciple_tr_write( libspectrum_word port, libspectrum_byte b );
-
-libspectrum_byte disciple_sec_read( libspectrum_word port, int *attached );
-void disciple_sec_write( libspectrum_word port, libspectrum_byte b );
-
-libspectrum_byte disciple_dr_read( libspectrum_word port, int *attached );
-void disciple_dr_write( libspectrum_word port, libspectrum_byte b );
-
-libspectrum_byte disciple_joy_read( libspectrum_word port, int *attached );
-void disciple_cn_write( libspectrum_word port, libspectrum_byte b );
-
-void disciple_net_write( libspectrum_word port, libspectrum_byte b);
-
-libspectrum_byte disciple_boot_read( libspectrum_word port, int *attached );
-void disciple_boot_write( libspectrum_word port, libspectrum_byte b );
-
-libspectrum_byte disciple_patch_read( libspectrum_word port, int *attached );
-void disciple_patch_write( libspectrum_word port, libspectrum_byte b );
-
-void disciple_printer_write( libspectrum_word port, libspectrum_byte b );
-
 int disciple_disk_insert( disciple_drive_number which, const char *filename,
                           int autoload );
 int disciple_disk_eject( disciple_drive_number which );

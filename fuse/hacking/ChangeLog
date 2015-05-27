@@ -4862,3 +4862,5 @@
          options.pl,query.c}: remove unreachable breaks after returns (Stuart).
 20150527 peripherals/disk/plusd.h: remove unused plusd_joy_read() prototype
          (Stuart).
+20150527 peripherals/{disk/{disciple.[ch],plusd.[ch]},if1.[ch]}: make DISCiPLE,
+         +D and IF1 port handlers be static (Stuart).

@@ -201,6 +201,9 @@ static void if1_enabled_snapshot( libspectrum_snap *snap );
 static void if1_from_snapshot( libspectrum_snap *snap );
 static void if1_to_snapshot( libspectrum_snap *snap );
 
+static void if1_port_out( libspectrum_word port, libspectrum_byte val );
+static libspectrum_byte if1_port_in( libspectrum_word port, int *attached );
+
 static module_info_t if1_module_info = {
 
   /* .reset = */ if1_reset,
@@ -770,7 +773,7 @@ no_snet_in:
   return ret;
 }
 
-libspectrum_byte
+static libspectrum_byte
 if1_port_in( libspectrum_word port GCC_UNUSED, int *attached )
 {
   libspectrum_byte ret = 0xff;
@@ -1005,7 +1008,7 @@ port_net_out( libspectrum_byte val )
   microdrives_restart();
 }
 
-void
+static void
 if1_port_out( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 {
 #ifdef IF1_DEBUG_NET_1

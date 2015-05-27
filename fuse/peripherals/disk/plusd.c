@@ -67,6 +67,22 @@ static void plusd_from_snapshot( libspectrum_snap *snap );
 static void plusd_to_snapshot( libspectrum_snap *snap );
 static void plusd_activate( void );
 
+/* WD1770 registers */
+static libspectrum_byte plusd_sr_read( libspectrum_word port, int *attached );
+static void plusd_cr_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte plusd_tr_read( libspectrum_word port, int *attached );
+static void plusd_tr_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte plusd_sec_read( libspectrum_word port, int *attached );
+static void plusd_sec_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte plusd_dr_read( libspectrum_word port, int *attached );
+static void plusd_dr_write( libspectrum_word port, libspectrum_byte b );
+
+static void plusd_cn_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte plusd_patch_read( libspectrum_word port, int *attached );
+static void plusd_patch_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte plusd_printer_read( libspectrum_word port, int *attached );
+static void plusd_printer_write( libspectrum_word port, libspectrum_byte b );
+
 static module_info_t plusd_module_info = {
 
   /* .reset = */ plusd_reset,
@@ -223,59 +239,59 @@ plusd_end( void )
   libspectrum_free( plusd_fdc );
 }
 
-libspectrum_byte
+static libspectrum_byte
 plusd_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return wd_fdc_sr_read( plusd_fdc );
 }
 
-void
+static void
 plusd_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   wd_fdc_cr_write( plusd_fdc, b );
 }
 
-libspectrum_byte
+static libspectrum_byte
 plusd_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return wd_fdc_tr_read( plusd_fdc );
 }
 
-void
+static void
 plusd_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   wd_fdc_tr_write( plusd_fdc, b );
 }
 
-libspectrum_byte
+static libspectrum_byte
 plusd_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return wd_fdc_sec_read( plusd_fdc );
 }
 
-void
+static void
 plusd_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   wd_fdc_sec_write( plusd_fdc, b );
 }
 
-libspectrum_byte
+static libspectrum_byte
 plusd_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return wd_fdc_dr_read( plusd_fdc );
 }
 
-void
+static void
 plusd_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   wd_fdc_dr_write( plusd_fdc, b );
 }
 
-void
+static void
 plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   int drive, side;
@@ -304,7 +320,7 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   printer_parallel_strobe_write( b & 0x40 );
 }
 
-libspectrum_byte
+static libspectrum_byte
 plusd_patch_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
 {
   /* should we set *attached = 1? */
@@ -313,13 +329,13 @@ plusd_patch_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
   return 0;
 }
 
-void
+static void
 plusd_patch_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
 {
   plusd_unpage();
 }
 
-libspectrum_byte
+static libspectrum_byte
 plusd_printer_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
@@ -332,7 +348,7 @@ plusd_printer_read( libspectrum_word port GCC_UNUSED, int *attached )
   return(0x7f);   /* never busy */
 }
 
-void
+static void
 plusd_printer_write( libspectrum_word port, libspectrum_byte b )
 {
   printer_parallel_write( port, b );

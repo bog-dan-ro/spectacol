@@ -76,6 +76,25 @@ static void disciple_reset( int hard_reset );
 static void disciple_memory_map( void );
 static void disciple_activate( void );
 
+/* WD1770 registers */
+static libspectrum_byte disciple_sr_read( libspectrum_word port, int *attached );
+static void disciple_cr_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte disciple_tr_read( libspectrum_word port, int *attached );
+static void disciple_tr_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte disciple_sec_read( libspectrum_word port, int *attached );
+static void disciple_sec_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte disciple_dr_read( libspectrum_word port, int *attached );
+static void disciple_dr_write( libspectrum_word port, libspectrum_byte b );
+
+static libspectrum_byte disciple_joy_read( libspectrum_word port, int *attached );
+static void disciple_cn_write( libspectrum_word port, libspectrum_byte b );
+static void disciple_net_write( libspectrum_word port, libspectrum_byte b);
+static libspectrum_byte disciple_boot_read( libspectrum_word port, int *attached );
+static void disciple_boot_write( libspectrum_word port, libspectrum_byte b );
+static libspectrum_byte disciple_patch_read( libspectrum_word port, int *attached );
+static void disciple_patch_write( libspectrum_word port, libspectrum_byte b );
+static void disciple_printer_write( libspectrum_word port, libspectrum_byte b );
+
 static module_info_t disciple_module_info = {
 
   /* .reset = */ disciple_reset,
@@ -271,59 +290,59 @@ disciple_end( void )
   libspectrum_free( disciple_fdc );
 }
 
-libspectrum_byte
+static libspectrum_byte
 disciple_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return wd_fdc_sr_read( disciple_fdc );
 }
 
-void
+static void
 disciple_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   wd_fdc_cr_write( disciple_fdc, b );
 }
 
-libspectrum_byte
+static libspectrum_byte
 disciple_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return wd_fdc_tr_read( disciple_fdc );
 }
 
-void
+static void
 disciple_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   wd_fdc_tr_write( disciple_fdc, b );
 }
 
-libspectrum_byte
+static libspectrum_byte
 disciple_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return wd_fdc_sec_read( disciple_fdc );
 }
 
-void
+static void
 disciple_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   wd_fdc_sec_write( disciple_fdc, b );
 }
 
-libspectrum_byte
+static libspectrum_byte
 disciple_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return wd_fdc_dr_read( disciple_fdc );
 }
 
-void
+static void
 disciple_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   wd_fdc_dr_write( disciple_fdc, b );
 }
 
-libspectrum_byte
+static libspectrum_byte
 disciple_joy_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
@@ -335,7 +354,7 @@ disciple_joy_read( libspectrum_word port GCC_UNUSED, int *attached )
   return 0xff;   /* never busy */
 }
 
-void
+static void
 disciple_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   int drive, side;
@@ -369,14 +388,14 @@ disciple_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
     disciple_inhibit();
 }
 
-void
+static void
 disciple_net_write( libspectrum_word port GCC_UNUSED,
 		    libspectrum_byte b GCC_UNUSED )
 {
   /* TODO: implement network emulation */
 }
 
-libspectrum_byte
+static libspectrum_byte
 disciple_boot_read( libspectrum_word port GCC_UNUSED,
 		    int *attached GCC_UNUSED )
 {
@@ -385,7 +404,7 @@ disciple_boot_read( libspectrum_word port GCC_UNUSED,
   return 0;
 }
 
-void
+static void
 disciple_boot_write( libspectrum_word port GCC_UNUSED,
 		     libspectrum_byte b GCC_UNUSED )
 {
@@ -393,7 +412,7 @@ disciple_boot_write( libspectrum_word port GCC_UNUSED,
   machine_current->memory_map();
 }
 
-libspectrum_byte
+static libspectrum_byte
 disciple_patch_read( libspectrum_word port GCC_UNUSED,
 		     int *attached GCC_UNUSED )
 {
@@ -401,14 +420,14 @@ disciple_patch_read( libspectrum_word port GCC_UNUSED,
   return 0;
 }
 
-void
+static void
 disciple_patch_write( libspectrum_word port GCC_UNUSED,
 		    libspectrum_byte b GCC_UNUSED )
 {
   disciple_unpage();
 }
 
-void
+static void
 disciple_printer_write( libspectrum_word port, libspectrum_byte b )
 {
   printer_parallel_write( port, b );
