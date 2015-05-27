@@ -69,15 +69,15 @@ static libspectrum_byte aux_register;
 
 static void didaktik_reset( int hard_reset );
 static void didaktik_memory_map( void );
-static libspectrum_byte didaktik_sr_read( libspectrum_word port GCC_UNUSED, int *attached );
+static libspectrum_byte didaktik_sr_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached );
 static void didaktik_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b );
-static libspectrum_byte didaktik_tr_read( libspectrum_word port GCC_UNUSED, int *attached );
+static libspectrum_byte didaktik_tr_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached );
 static void didaktik_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b );
-static libspectrum_byte didaktik_sec_read( libspectrum_word port GCC_UNUSED, int *attached );
+static libspectrum_byte didaktik_sec_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached );
 static void didaktik_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b );
-static libspectrum_byte didaktik_dr_read( libspectrum_word port GCC_UNUSED, int *attached );
+static libspectrum_byte didaktik_dr_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached );
 static void didaktik_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b );
-static libspectrum_byte didaktik_8255_read( libspectrum_word port GCC_UNUSED, int *attached );
+static libspectrum_byte didaktik_8255_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached );
 static void didaktik_8255_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b );
 static void didaktik_aux_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b );
 
@@ -258,9 +258,9 @@ didaktik80_end( void )
 }
 
 static libspectrum_byte
-didaktik_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
+didaktik_sr_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff;
   return wd_fdc_sr_read( didaktik_fdc );
 }
 
@@ -271,9 +271,9 @@ didaktik_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 static libspectrum_byte
-didaktik_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
+didaktik_tr_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff;
   return wd_fdc_tr_read( didaktik_fdc );
 }
 
@@ -284,9 +284,9 @@ didaktik_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 static libspectrum_byte
-didaktik_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
+didaktik_sec_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff;
   return wd_fdc_sec_read( didaktik_fdc );
 }
 
@@ -297,9 +297,9 @@ didaktik_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 static libspectrum_byte
-didaktik_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
+didaktik_dr_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff;
   return wd_fdc_dr_read( didaktik_fdc );
 }
 
@@ -310,9 +310,9 @@ didaktik_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 static libspectrum_byte
-didaktik_8255_read( libspectrum_word port, int *attached )
+didaktik_8255_read( libspectrum_word port, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   return 0xff;
 }
 

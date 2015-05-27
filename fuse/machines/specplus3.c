@@ -365,16 +365,16 @@ specplus3_menu_items( void )
 }
 
 libspectrum_byte
-specplus3_fdc_status( libspectrum_word port GCC_UNUSED, int *attached )
+specplus3_fdc_status( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   return upd_fdc_read_status( specplus3_fdc );
 }
 
 libspectrum_byte
-specplus3_fdc_read( libspectrum_word port GCC_UNUSED, int *attached )
+specplus3_fdc_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   return upd_fdc_read_data( specplus3_fdc );
 }
 

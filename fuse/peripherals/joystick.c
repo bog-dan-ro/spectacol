@@ -226,9 +226,9 @@ joystick_press( int which, joystick_button button, int press )
 /* Read functions for specific interfaces */
 
 libspectrum_byte
-joystick_kempston_read( libspectrum_word port GCC_UNUSED, int *attached )
+joystick_kempston_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   return kempston_value;
 }
 
@@ -239,9 +239,9 @@ joystick_timex_read( libspectrum_word port GCC_UNUSED, libspectrum_byte which )
 }
 
 libspectrum_byte
-joystick_fuller_read( libspectrum_word port GCC_UNUSED, int *attached )
+joystick_fuller_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   return fuller_value;
 }
 

@@ -52,18 +52,18 @@ void beta_unpage( void );
 
 void beta_cr_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte beta_sr_read( libspectrum_word port, int *attached );
+libspectrum_byte beta_sr_read( libspectrum_word port, libspectrum_byte *attached );
 
-libspectrum_byte beta_tr_read( libspectrum_word port, int *attached );
+libspectrum_byte beta_tr_read( libspectrum_word port, libspectrum_byte *attached );
 void beta_tr_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte beta_sec_read( libspectrum_word port, int *attached );
+libspectrum_byte beta_sec_read( libspectrum_word port, libspectrum_byte *attached );
 void beta_sec_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte beta_dr_read( libspectrum_word port, int *attached );
+libspectrum_byte beta_dr_read( libspectrum_word port, libspectrum_byte *attached );
 void beta_dr_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte beta_sp_read( libspectrum_word port, int *attached );
+libspectrum_byte beta_sp_read( libspectrum_word port, libspectrum_byte *attached );
 void beta_sp_write( libspectrum_word port, libspectrum_byte b );
 
 typedef enum beta_drive_number {

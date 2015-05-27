@@ -58,17 +58,19 @@ static module_info_t pentagon_module_info = {
 static int pentagon_reset( void );
 
 libspectrum_byte
-pentagon_select_1f_read( libspectrum_word port, int *attached )
+pentagon_select_1f_read( libspectrum_word port, libspectrum_byte *attached )
 {
   libspectrum_byte data;
-  int tmpattached = 0;
+  libspectrum_byte tmpattached = 0x00;
+
+  /* TODO: fine-grained attachment handling */
 
   data = beta_sr_read( port, &tmpattached );
   if( !tmpattached && settings_current.joy_kempston )
     data = joystick_kempston_read( port, &tmpattached );
 
   if( tmpattached ) {
-    *attached = 1;
+    *attached = 0xff; /* TODO: check this */
     return data;
   }
 
@@ -76,16 +78,18 @@ pentagon_select_1f_read( libspectrum_word port, int *attached )
 }
 
 libspectrum_byte
-pentagon_select_ff_read( libspectrum_word port, int *attached )
+pentagon_select_ff_read( libspectrum_word port, libspectrum_byte *attached )
 {
   libspectrum_byte data;
-  int tmpattached = 0;
+  libspectrum_byte tmpattached = 0x00;
   
+  /* TODO: fine-grained attachment handling */
+
   data = beta_sp_read( port, &tmpattached );
   if( !tmpattached )
     data = spectrum_unattached_port();
 
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   return data;
 }
 

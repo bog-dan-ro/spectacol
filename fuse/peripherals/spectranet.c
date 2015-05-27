@@ -379,9 +379,9 @@ spectranet_page_b( libspectrum_word port, libspectrum_byte data )
 }
 
 static libspectrum_byte
-spectranet_cpld_version( libspectrum_word port, int *attached )
+spectranet_cpld_version( libspectrum_word port, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   return SPECTRANET_CPLD_VERSION;
 }
 
@@ -399,7 +399,7 @@ spectranet_trap( libspectrum_word port, libspectrum_byte data )
 }
 
 static libspectrum_byte
-spectranet_control_read( libspectrum_word port, int *attached )
+spectranet_control_read( libspectrum_word port, libspectrum_byte *attached )
 {
   libspectrum_byte b = ula_last_byte() & 0x07;
   if( spectranet_programmable_trap_active )
@@ -409,7 +409,7 @@ spectranet_control_read( libspectrum_word port, int *attached )
     machine_current->ram.last_byte & 0x08 )
     b |= 0x10;
 
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
 
   return b;
 }

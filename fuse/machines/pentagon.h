@@ -31,9 +31,9 @@
 #include "machine.h"
 
 libspectrum_byte pentagon_select_1f_read( libspectrum_word port,
-					  int *attached );
+					  libspectrum_byte *attached );
 libspectrum_byte pentagon_select_ff_read( libspectrum_word port,
-					  int *attached );
+					  libspectrum_byte *attached );
 int pentagon_port_from_ula( libspectrum_word port );
 int pentagon_port_contended( libspectrum_word port );
 

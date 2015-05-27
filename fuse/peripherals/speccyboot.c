@@ -67,7 +67,7 @@ static void
 speccyboot_memory_map( void );
 
 static libspectrum_byte
-speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached );
+speccyboot_register_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached );
 
 static void
 speccyboot_register_write( libspectrum_word port GCC_UNUSED,
@@ -144,9 +144,9 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
 }
 
 static libspectrum_byte
-speccyboot_register_read( libspectrum_word port GCC_UNUSED, int *attached )
+speccyboot_register_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   return in_register_state;
 }
 

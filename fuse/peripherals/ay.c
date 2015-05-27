@@ -132,12 +132,12 @@ ay_reset( int hard_reset GCC_UNUSED )
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
    machines) is read from */
 libspectrum_byte
-ay_registerport_read( libspectrum_word port GCC_UNUSED, int *attached )
+ay_registerport_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
   int current;
   const libspectrum_byte port_input = 0xbf; /* always allow serial output */
 
-  *attached = 1;
+  *attached = 0xff;
 
   current = machine_current->ay.current_register;
 

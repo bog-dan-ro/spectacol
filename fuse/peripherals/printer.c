@@ -67,10 +67,10 @@ static unsigned char parallel_data=0;
 #define PARALLEL_STROBE_MAX_CYCLES	10000
 
 static void printer_zxp_reset(int hard_reset);
-static libspectrum_byte printer_zxp_read( libspectrum_word port, int *attached );
+static libspectrum_byte printer_zxp_read( libspectrum_word port, libspectrum_byte *attached );
 static void printer_zxp_write( libspectrum_word port, libspectrum_byte b );
 static libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED,
-				              int *attached);
+				              libspectrum_byte *attached);
 
 static void zx_printer_from_snapshot( libspectrum_snap *snap );
 static void zx_printer_to_snapshot( libspectrum_snap *snap );
@@ -433,7 +433,7 @@ frames++;
  * It works wonderfully though.
  */
 static libspectrum_byte printer_zxp_read(libspectrum_word port GCC_UNUSED,
-				         int *attached)
+				         libspectrum_byte *attached)
 {
 if(!settings_current.printer)
   return(0xff);
@@ -442,7 +442,7 @@ if(!printer_graphics_enabled)
 if(plusd_available)
   return(0xff);
 
-*attached=1;
+*attached = 0xff; /* TODO: check this */
 
 if(!zxpspeed)
   return 0x3e;
@@ -684,12 +684,12 @@ old_on=on;
 
 
 static libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED,
-				              int *attached)
+				              libspectrum_byte *attached)
 {
 if(!settings_current.printer)
   return(0xff);
 
-*attached = 1;
+*attached = 0xff; /* TODO: check this */
 
 /* bit 0 = busy. other bits high? */
 

@@ -41,7 +41,7 @@
 
 /* Private function prototypes */
 
-static libspectrum_byte divide_ide_read( libspectrum_word port, int *attached );
+static libspectrum_byte divide_ide_read( libspectrum_word port, libspectrum_byte *attached );
 static void divide_ide_write( libspectrum_word port, libspectrum_byte data );
 static void divide_control_write( libspectrum_word port, libspectrum_byte data );
 static void divide_control_write_internal( libspectrum_byte data );
@@ -279,11 +279,11 @@ port_to_ide_register( libspectrum_byte port )
 }
 
 libspectrum_byte
-divide_ide_read( libspectrum_word port, int *attached )
+divide_ide_read( libspectrum_word port, libspectrum_byte *attached )
 {
   int ide_register;
 
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   ide_register = port_to_ide_register( port );
 
   return libspectrum_ide_read( divide_idechn0, ide_register );

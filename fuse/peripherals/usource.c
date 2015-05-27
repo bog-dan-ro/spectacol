@@ -49,7 +49,7 @@ int usource_available = 0;
 static void usource_toggle_write( libspectrum_word port,
 				  libspectrum_byte val );
 static libspectrum_byte usource_toggle_read( libspectrum_word port,
-					     int *attached );
+					     libspectrum_byte *attached );
 
 static void usource_reset( int hard_reset );
 static void usource_memory_map( void );
@@ -140,7 +140,7 @@ usource_memory_map( void )
 
 static libspectrum_byte
 usource_toggle_read( libspectrum_word port GCC_UNUSED,
-		     int *attached GCC_UNUSED )
+		     libspectrum_byte *attached GCC_UNUSED )
 {
   usource_toggle();
 

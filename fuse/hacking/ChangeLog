@@ -4866,3 +4866,8 @@
          +D and IF1 port handlers be static (Stuart).
 20150527 peripherals/disk/opus.h: remove unused opus_joy_read() prototype
          (Stuart).
+20150527 machines/{pentagon.[ch],specplus3.[ch],tc2068.[ch]},periph.[ch],
+         peripherals/{ay.[ch],disk/{beta.[ch],didaktik.c,disciple.c,plusd.c},
+         ide/{divide.c,simpleide.c,zxatasp.c,zxcf.c},if1.c,joystick.[ch],
+         kempmouse.c,printer.c,scld.c,speccyboot.c,spectranet.c,ula.c,
+         usource.c}: track port attachment for each data bus line (Stuart).

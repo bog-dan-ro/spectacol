@@ -38,7 +38,7 @@
 
 /* Private function prototypes */
 
-static libspectrum_byte simpleide_read( libspectrum_word port, int *attached );
+static libspectrum_byte simpleide_read( libspectrum_word port, libspectrum_byte *attached );
 static void simpleide_write( libspectrum_word port, libspectrum_byte data );
 
 /* Data */
@@ -175,11 +175,11 @@ simpleide_eject( libspectrum_ide_unit unit )
 /* Port read/writes */
 
 static libspectrum_byte
-simpleide_read( libspectrum_word port, int *attached )
+simpleide_read( libspectrum_word port, libspectrum_byte *attached )
 {
   libspectrum_ide_register idereg;
   
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   
   idereg = ( ( port >> 8 ) & 0x01 ) | ( ( port >> 11 ) & 0x06 );
   

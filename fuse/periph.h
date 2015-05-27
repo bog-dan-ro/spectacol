@@ -88,7 +88,7 @@ typedef enum periph_present {
 } periph_present;
 
 typedef libspectrum_byte (*periph_port_read_function)( libspectrum_word port,
-						       int *attached );
+						       libspectrum_byte *attached );
 typedef void (*periph_port_write_function)( libspectrum_word port,
 					    libspectrum_byte data );
 

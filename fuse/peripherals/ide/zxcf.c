@@ -54,9 +54,9 @@ static int zxcf_memory_source;
 
 static void set_zxcf_bank( int bank );
 static libspectrum_byte zxcf_memctl_read( libspectrum_word port,
-					  int *attached );
+					  libspectrum_byte *attached );
 static void zxcf_memctl_write( libspectrum_word port, libspectrum_byte data );
-static libspectrum_byte zxcf_ide_read( libspectrum_word port, int *attached );
+static libspectrum_byte zxcf_ide_read( libspectrum_word port, libspectrum_byte *attached );
 static void zxcf_ide_write( libspectrum_word port, libspectrum_byte data );
 static void zxcf_activate( void );
 
@@ -219,9 +219,9 @@ set_zxcf_bank( int bank )
 /* Port read/writes */
 
 static libspectrum_byte
-zxcf_memctl_read( libspectrum_word port GCC_UNUSED, int *attached )
+zxcf_memctl_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
 
   return 0xff;
 }
@@ -255,11 +255,11 @@ zxcf_last_memctl( void )
 }
 
 static libspectrum_byte
-zxcf_ide_read( libspectrum_word port, int *attached )
+zxcf_ide_read( libspectrum_word port, libspectrum_byte *attached )
 {
   libspectrum_ide_register idereg = ( port >> 8 ) & 0x07;
   
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
 
   return libspectrum_ide_read( zxcf_idechn, idereg ); 
 }

@@ -37,7 +37,7 @@ typedef struct ayinfo {
 
 void ay_init( void );
 
-libspectrum_byte ay_registerport_read( libspectrum_word port, int *attached );
+libspectrum_byte ay_registerport_read( libspectrum_word port, libspectrum_byte *attached );
 void ay_registerport_write( libspectrum_word port, libspectrum_byte b );
 
 void ay_dataport_write( libspectrum_word port, libspectrum_byte b );

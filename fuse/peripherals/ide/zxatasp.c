@@ -58,19 +58,19 @@ static int page_event, unpage_event;
 /* Private function prototypes */
 
 static libspectrum_byte zxatasp_portA_read( libspectrum_word port,
-					    int *attached );
+					    libspectrum_byte *attached );
 static void zxatasp_portA_write( libspectrum_word port,
 				 libspectrum_byte data );
 static libspectrum_byte zxatasp_portB_read( libspectrum_word port,
-					    int *attached );
+					    libspectrum_byte *attached );
 static void zxatasp_portB_write( libspectrum_word port,
 				 libspectrum_byte data );
 static libspectrum_byte zxatasp_portC_read( libspectrum_word port,
-					    int *attached );
+					    libspectrum_byte *attached );
 static void zxatasp_portC_write( libspectrum_word port,
 				 libspectrum_byte data );
 static libspectrum_byte zxatasp_control_read( libspectrum_word port,
-					      int *attached );
+					      libspectrum_byte *attached );
 static void zxatasp_control_write( libspectrum_word port,
 				   libspectrum_byte data );
 static void zxatasp_resetports( void );
@@ -292,9 +292,9 @@ zxatasp_eject( libspectrum_ide_unit unit )
 /* Port read/writes */
 
 libspectrum_byte
-zxatasp_portA_read( libspectrum_word port GCC_UNUSED, int *attached )
+zxatasp_portA_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   
   return zxatasp_portA;
 }
@@ -306,9 +306,9 @@ zxatasp_portA_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 }
 
 libspectrum_byte
-zxatasp_portB_read( libspectrum_word port GCC_UNUSED, int *attached )
+zxatasp_portB_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   
   return zxatasp_portB;
 }
@@ -320,9 +320,9 @@ zxatasp_portB_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 }
 
 libspectrum_byte
-zxatasp_portC_read( libspectrum_word port GCC_UNUSED, int *attached )
+zxatasp_portC_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   
   return zxatasp_portC;
 }
@@ -392,9 +392,9 @@ zxatasp_portC_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 }
 
 libspectrum_byte
-zxatasp_control_read( libspectrum_word port GCC_UNUSED, int *attached )
+zxatasp_control_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
   
   return zxatasp_control;
 }

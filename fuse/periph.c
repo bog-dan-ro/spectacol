@@ -248,7 +248,7 @@ struct peripheral_data_t {
 
   libspectrum_word port;
 
-  int attached;
+  libspectrum_byte attached;
   libspectrum_byte value;
 };
 
@@ -280,13 +280,16 @@ read_peripheral( gpointer data, gpointer user_data )
 {
   periph_port_private_t *private = data;
   struct peripheral_data_t *callback_info = user_data;
+  libspectrum_byte last_attached;
 
   periph_port_t *port = &( private->port );
 
   if( port->read &&
       ( ( callback_info->port & port->mask ) == port->value ) ) {
-    callback_info->value &= port->read( callback_info->port,
-					&( callback_info->attached ) );
+    last_attached = callback_info->attached;
+    callback_info->value &= (   port->read( callback_info->port,
+					    &( callback_info->attached ) )
+			      | last_attached );
   }
 }
 
@@ -321,13 +324,14 @@ readport_internal( libspectrum_word port )
 
   /* If we're not doing RZX playback, get the byte normally */
   callback_info.port = port;
-  callback_info.attached = 0;
+  callback_info.attached = 0x00;
   callback_info.value = 0xff;
 
   g_slist_foreach( ports, read_peripheral, &callback_info );
 
-  if( !callback_info.attached )
-    callback_info.value = machine_current->unattached_port();
+  if( callback_info.attached != 0xff )
+    callback_info.value |=
+      machine_current->unattached_port() & ~callback_info.attached;
 
   /* If we're RZX recording, store this byte */
   if( rzx_recording ) rzx_store_byte( callback_info.value );

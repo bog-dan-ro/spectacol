@@ -51,7 +51,7 @@ libspectrum_byte ula_default_value;
 
 static void ula_from_snapshot( libspectrum_snap *snap );
 static void ula_to_snapshot( libspectrum_snap *snap );
-static libspectrum_byte ula_read( libspectrum_word port, int *attached );
+static libspectrum_byte ula_read( libspectrum_word port, libspectrum_byte *attached );
 static void ula_write( libspectrum_word port, libspectrum_byte b );
 
 static module_info_t ula_module_info = {
@@ -100,11 +100,11 @@ ula_init( void )
 }
 
 static libspectrum_byte
-ula_read( libspectrum_word port, int *attached )
+ula_read( libspectrum_word port, libspectrum_byte *attached )
 {
   libspectrum_byte r = ula_default_value;
 
-  *attached = 1;
+  *attached = 0xff;
 
   loader_detect_loader();
 

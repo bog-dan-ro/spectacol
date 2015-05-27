@@ -53,9 +53,9 @@ static struct {
 
 #define READ(name,item) \
   static libspectrum_byte \
-  read_##name( libspectrum_word port GCC_UNUSED, int *attached ) \
+  read_##name( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached ) \
   { \
-    *attached = 1; \
+    *attached = 0xff; /* TODO: check this */ \
     return kempmouse.item; \
   }
 

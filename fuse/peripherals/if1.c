@@ -202,7 +202,7 @@ static void if1_from_snapshot( libspectrum_snap *snap );
 static void if1_to_snapshot( libspectrum_snap *snap );
 
 static void if1_port_out( libspectrum_word port, libspectrum_byte val );
-static libspectrum_byte if1_port_in( libspectrum_word port, int *attached );
+static libspectrum_byte if1_port_in( libspectrum_word port, libspectrum_byte *attached );
 
 static module_info_t if1_module_info = {
 
@@ -774,11 +774,11 @@ no_snet_in:
 }
 
 static libspectrum_byte
-if1_port_in( libspectrum_word port GCC_UNUSED, int *attached )
+if1_port_in( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
   libspectrum_byte ret = 0xff;
 
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
 
   switch( decode_port( port ) )
   {

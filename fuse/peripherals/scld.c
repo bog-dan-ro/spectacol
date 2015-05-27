@@ -65,8 +65,8 @@ static module_info_t scld_module_info = {
 
 };
 
-static libspectrum_byte scld_dec_read( libspectrum_word port, int *attached );
-static libspectrum_byte scld_hsr_read( libspectrum_word port, int *attached );
+static libspectrum_byte scld_dec_read( libspectrum_word port, libspectrum_byte *attached );
+static libspectrum_byte scld_hsr_read( libspectrum_word port, libspectrum_byte *attached );
 
 static const periph_port_t scld_ports[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
@@ -89,9 +89,9 @@ scld_init( void )
 }
 
 static libspectrum_byte
-scld_dec_read( libspectrum_word port GCC_UNUSED, int *attached )
+scld_dec_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
 
   return scld_last_dec.byte;
 }
@@ -147,9 +147,9 @@ scld_hsr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 static libspectrum_byte
-scld_hsr_read( libspectrum_word port GCC_UNUSED, int *attached )
+scld_hsr_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
 {
-  *attached = 1;
+  *attached = 0xff; /* TODO: check this */
 
   return scld_last_hsr;
 }

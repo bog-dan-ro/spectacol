@@ -48,7 +48,7 @@ memory_page tc2068_empty_mapping[MEMORY_PAGES_IN_8K];
 static int empty_mapping_allocated = 0;
 
 libspectrum_byte
-tc2068_ay_registerport_read( libspectrum_word port, int *attached )
+tc2068_ay_registerport_read( libspectrum_word port, libspectrum_byte *attached )
 {
   if( machine_current->ay.current_register == 14 ) return 0xff;
 
@@ -56,7 +56,7 @@ tc2068_ay_registerport_read( libspectrum_word port, int *attached )
 }
 
 libspectrum_byte
-tc2068_ay_dataport_read( libspectrum_word port, int *attached )
+tc2068_ay_dataport_read( libspectrum_word port, libspectrum_byte *attached )
 {
   if (machine_current->ay.current_register != 14) {
     return ay_registerport_read( port, attached );
@@ -68,7 +68,7 @@ tc2068_ay_dataport_read( libspectrum_word port, int *attached )
        is returned here and were it isn't. In practice, this doesn't
        matter for the TC2068 as it doesn't have a floating bus, so we'll
        get 0xff in both cases anyway */
-    *attached = 1;
+    *attached = 0xff; /* TODO: check this */
 
     ret =   machine_current->ay.registers[7] & 0x40
 	  ? machine_current->ay.registers[14]
