@@ -166,7 +166,8 @@ static void crunch_z80 (libspectrum_byte *BufferIn, libspectrum_word BlLength, l
   *CrunchedLength = IndexOut;
 }
 
-int test_decz80(libspectrum_byte *source, int final_len, int source_len)
+static int
+test_decz80(libspectrum_byte *source, int final_len, int source_len)
 {
   /* source is not reversed !!! */
 

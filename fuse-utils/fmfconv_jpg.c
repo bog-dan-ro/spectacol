@@ -59,7 +59,7 @@ static libspectrum_byte *row_pointers[480];
 void jpeg_avi_mem_dest( j_compress_ptr cinfo, unsigned char **outbuffer,
                         unsigned long *outsize );
 
-int
+static int
 out_write_jpegheader( void )
 {
   size_t y;

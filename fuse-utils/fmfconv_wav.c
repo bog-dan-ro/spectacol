@@ -68,7 +68,7 @@ Offset   Length   Contents
 #define WAV_POS_LAWLEN 54L
 #define WAV_POS_SAMPLES 46L
 
-int
+static int
 snd_write_wavheader( void )
 {
   libspectrum_byte buff[4];

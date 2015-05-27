@@ -88,7 +88,7 @@ Byte order: Little-endian
 #define W4DWORD( dw1, dw2, dw3, dw4 ) \
   idx = 0; DWORD4( dw1, dw2, dw3, dw4 ); fwrite( buffer, 16, 1, out )
 
-int
+static int
 out_write_aviheader( void )
 {
   int diBitCount;

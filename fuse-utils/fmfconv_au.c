@@ -31,7 +31,7 @@
 #include "fmfconv.h"
 
 
-int
+static int
 snd_write_auheader( void )
 {
   const char str[] =

@@ -381,7 +381,7 @@ open_audio( AVCodec *codec )
 }
 
 /* add an audio frame to the stream */
-int
+static int
 ffmpeg_add_sound_ffmpeg( int len )
 {
   AVCodecContext *c;
@@ -741,7 +741,7 @@ open_video( AVCodec *codec )
   return 0;
 }
 
-void
+static void
 ffmpeg_add_frame_ffmpeg( void )
 {
   int ret;
@@ -1115,7 +1115,7 @@ show_formats( void )
     printf( "-------------------------------------------------------------------------------\n" );
 }
 
-void
+static void
 show_codecs( int what )
 {
   AVCodec *p = NULL, *p2;
@@ -1166,7 +1166,7 @@ show_codecs( int what )
     printf( "-------------------------------------------------------------------------------\n" );
 }
 
-void
+static void
 ffmpeg_print_idents( void )
 {
   if( verbose > 0 ) {

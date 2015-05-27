@@ -93,7 +93,7 @@ aiff_int_2_80bitfloat( libspectrum_byte head[], libspectrum_word num )
   head[8] = ( frac >>  8 ) & 0xff; head[9] = frac & 0xff;
 }
 
-int
+static int
 snd_write_aiffheader( void )
 {
   libspectrum_byte buff[10];

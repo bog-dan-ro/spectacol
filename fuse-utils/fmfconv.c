@@ -239,8 +239,6 @@ libspectrum_signed_word alaw_table[256] = { ALAW_TAB };
 
 libspectrum_byte fhead[32];		/* fmf file/frame/slice header */
 
-void close_out( void );
-
 #define FBUFF_SIZE 32
 libspectrum_byte fbuff[FBUFF_SIZE];		/* file buffer used for check file type... */
 size_t fbuff_size = 0;
@@ -270,7 +268,7 @@ fopen_overwr( const char *path, const char *mode, int rw )
 #endif
 }
 
-size_t
+static size_t
 fread_buff( libspectrum_byte *ptr, size_t size, int how )	/* read from inp, how -> into buff or buff + file */
 {
   size_t s;
@@ -307,7 +305,7 @@ fread_buff( libspectrum_byte *ptr, size_t size, int how )	/* read from inp, how 
 }
 
 #ifdef USE_ZLIB
-int
+static int
 feof_compr( FILE *f )
 {
   if( fmf_compr ) {
@@ -324,7 +322,7 @@ feof_compr( FILE *f )
 
 int fget_read = 0;
 
-int
+static int
 fgetc_compr( FILE *f )
 {
   int s;
@@ -353,7 +351,7 @@ fgetc_compr( FILE *f )
   }
 }
 
-int
+static int
 fread_compr( void *buff, size_t n, size_t m, FILE *f )
 {
   size_t i;
@@ -386,7 +384,7 @@ swap_endian_dword( libspectrum_dword d )
 	        ( d >> 24 );
 }
 
-int
+static int
 alloc_sound_buff( size_t len )
 {
   libspectrum_signed_byte *ptr = NULL;
@@ -412,7 +410,7 @@ alloc_sound_buff( size_t len )
   return 0;
 }
 
-int
+static int
 law_2_pcm( void )
 {
   int err;
@@ -464,7 +462,7 @@ pcm_swap_endian( void )	/* buff == sound */
 /*
   [1][2][3][4][5] -> [1][2][3][4][5][ ][ ][ ][5][5][6][6] ->  [1][1][2][2][3][3][4][4][5][5][6][6]
 */
-int
+static int
 mono_2_stereo( void )
 {
   int err;
@@ -500,7 +498,7 @@ mono_2_stereo( void )
 /*
   [1][1][2][2][3][3][4][4][5][5][6][6] -> [1][2][3][4][5][ ][ ][ ][5][5][6][6] -> [1][2][3][4][5]
 */
-int
+static int
 stereo_2_mono( void )
 {
   void *buff_end;
@@ -547,7 +545,7 @@ stereo_2_mono( void )
   snd_rte
   out_rte
 */
-int
+static int
 resample_sound( void )
 {
   int err, nsamples;
@@ -666,7 +664,7 @@ resample_sound( void )
   return 0;
 }
 
-char *
+static char *
 find_filename_ext( const char *filename )
 {
   char *extension = NULL;
@@ -678,7 +676,7 @@ find_filename_ext( const char *filename )
   return extension;
 }
 
-int
+static int
 inp_get_cut_value( char *s, libspectrum_qword *value, type_t *type )
 {
   int n = 0;
@@ -705,7 +703,7 @@ inp_get_cut_value( char *s, libspectrum_qword *value, type_t *type )
   return 0;
 }
 
-int
+static int
 inp_get_next_cut( void )
 {
   char *mns, *tmp;
@@ -753,7 +751,7 @@ inp_get_next_cut( void )
 %08d -> %08llu
 */
 
-int
+static int
 parse_outname( void )
 {
   const char *f = out_name, *perc;
@@ -984,7 +982,7 @@ open_out( void )
   return 0;
 }
 
-int
+static int
 open_snd( void )
 {
   char *ext;
@@ -1051,7 +1049,7 @@ open_snd( void )
   return 0;
 }
 
-int
+static int
 open_inp( void )
 {
   if( inp_file ) {				/* we have to close before last */
@@ -1101,7 +1099,7 @@ open_inp( void )
   return 0;
 }
 
-void
+static void
 setup_frame_wh( void )
 {
   if( ( scr_t = fhead[5] ) == TYPE_HRE ) {	/* screen type => $ R C X */
@@ -1120,7 +1118,7 @@ setup_frame_wh( void )
   yuv_uvlen = yuv_ylen = frm_w * frm_h;
 }
 
-int
+static int
 check_fmf_head( void )
 {
   if( memcmp( fhead, "FMF_", 4 ) ) {
@@ -1198,14 +1196,14 @@ check_fmf_head( void )
   return 0;
 }
 
-int
+static int
 fmf_read_head( void )
 {
   fread_buff( fhead, 4, FROM_BUFF );
   return check_fmf_head();
 }
 
-int
+static int
 fmf_read_frame_head( void )
 {
   if( fread_compr( fhead, 3, 1, inp_file ) != 1 ) {
@@ -1247,7 +1245,7 @@ fmf_read_frame_head( void )
   return 0;
 }
 
-int
+static int
 fmf_read_chunk_head( void )
 {
   if( fread_compr( fhead, 1, 1, inp_file ) != 1 ) {	/* */
@@ -1265,7 +1263,7 @@ fmf_read_chunk_head( void )
   return 0;
 }
 
-int
+static int
 fmf_read_init( void )		/* read first N */
 {
   int err;
@@ -1278,7 +1276,7 @@ fmf_read_init( void )		/* read first N */
   return fmf_read_frame_head();
 }
 
-int
+static int
 fmf_read_sound( void )
 {
   int err;
@@ -1337,7 +1335,7 @@ fmf_read_sound( void )
   return 0;
 }
 
-int
+static int
 snd_write_sound( void )
 {
   int err;
@@ -1368,7 +1366,7 @@ snd_write_sound( void )
   return 0;
 }
 
-int
+static int
 fmf_gen_sound( void )
 {
   int err;
@@ -1395,7 +1393,7 @@ fmf_gen_sound( void )
   return 0;
 }
 
-void
+static void
 close_snd( void )
 {
   snd_write_sound(); /* write pending sound data */
@@ -1411,7 +1409,7 @@ close_snd( void )
   snd = NULL;
 }
 
-int
+static int
 fmf_read_slice_blokk( libspectrum_byte *scrl, int w, int h )
 {
   int last = -1, d = -1, width = w, len = 0, i;
@@ -1447,7 +1445,7 @@ fmf_read_slice_blokk( libspectrum_byte *scrl, int w, int h )
   return 0;
 }
 
-int
+static int
 fmf_read_screen( void )
 {
   int err;
@@ -1496,7 +1494,7 @@ fmf_read_screen( void )
   return 0;
 }
 
-int
+static int
 fmf_read_slice( void )
 {
   int err = 0;
@@ -1533,14 +1531,14 @@ we have to handle cut here
   return err;
 }
 
-int
+static int
 scr_read_scr( void )
 {
   return 0;
 }
 
 /* store RGB/YUV/Paletted color/grayscale pixel*/
-void
+static void
 pix_pix( int *idx, int xx, int i )
 {
   if( out_t >= TYPE_YUV ) {
@@ -1576,7 +1574,7 @@ pix_pix( int *idx, int xx, int i )
   }
 }
 
-void
+static void
 out_2_pix( void )
 {
   libspectrum_byte *bitmap, *attr;
@@ -1613,7 +1611,7 @@ out_2_pix( void )
   }
 }
 
-int
+static int
 out_write_frame( void )
 {
   static int fmf_fps = 0;
@@ -1698,7 +1696,7 @@ close_out( void )
   out = NULL;
 }
 
-int
+static int
 prepare_next_file( void )		/* multiple input file */
 {
   if( input_no > input_last_no )
@@ -1735,7 +1733,7 @@ print_version( void )
 #endif
 }
 
-void
+static void
 print_help( void )
 {
   printf ("\n"
@@ -1871,7 +1869,7 @@ print_help( void )
   );
 }
 
-void
+static void
 print_progress( int force )
 {
   static long int fpos = 0;
@@ -1922,7 +1920,7 @@ print_progress( int force )
 #define ARG_PROGRESSIVE		0x114
 #define ARG_GREYSCALE		0x115
 
-int
+static int
 parse_args( int argc, char *argv[] )
 {
   struct option long_options[] = {
@@ -2361,7 +2359,7 @@ parse_args( int argc, char *argv[] )
 }
 
 #ifdef HAVE_SIGNAL
-void
+static void
 fmfconv_exit( int signal )
 {
   fmfconv_stop = 1;

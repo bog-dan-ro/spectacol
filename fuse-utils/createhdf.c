@@ -86,7 +86,7 @@ show_help( void )
   );
 }
 
-int
+static int
 parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
 	       size_t *sectors, int *compact, int *sparse,
 	       const char **filename, enum hdf_version_t *version )
@@ -155,7 +155,7 @@ parse_options( int argc, char **argv, size_t *cylinders, size_t *heads,
   return 0;
 }
 
-int
+static int
 write_header( int fd, size_t cylinders, size_t heads, size_t sectors,
 	      int compact, const char *filename, enum hdf_version_t version )
 {
@@ -203,7 +203,7 @@ write_header( int fd, size_t cylinders, size_t heads, size_t sectors,
   return 0;
 }
 
-int
+static int
 write_data( int fd, size_t cylinders, size_t heads, size_t sectors,
 	    int compact, int sparse, const char *filename,
 	    enum hdf_version_t version )

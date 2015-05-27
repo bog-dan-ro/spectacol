@@ -203,7 +203,7 @@ uv_subsample( void )
 }
 
 
-int
+static int
 out_write_yuvheader( void )
 {
   const char *yuv4mpeg2[] = {

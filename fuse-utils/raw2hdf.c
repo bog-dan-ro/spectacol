@@ -77,7 +77,7 @@ show_help( void )
   );
 }
 
-int
+static int
 parse_options( int argc, char **argv, const char **raw_filename,
 	       const char **hdf_filename, enum hdf_version_t *version )
 {
@@ -142,7 +142,7 @@ parse_options( int argc, char **argv, const char **raw_filename,
   return 0;
 }
 
-int
+static int
 write_header( FILE *f, size_t byte_count, const char *filename,
 	      enum hdf_version_t version )
 {
@@ -231,7 +231,7 @@ write_header( FILE *f, size_t byte_count, const char *filename,
   return 0;
 }
 
-int
+static int
 copy_data( FILE *from, FILE *to, size_t *byte_count, const char *from_filename,
 	   const char *to_filename, enum hdf_version_t version )
 {
