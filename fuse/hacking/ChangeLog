@@ -1619,7 +1619,7 @@
 20070512 ui/scaler/scalers.c: make sure ABS is correctly defined
          (Release-0_8_0-branch) (Fred).
 20070512 hacking/cvs-tags: document merge to trunk (Release-0_8_0-branch).
-20070512 Merge from Release-0_8_0-branch).
+20070512 Merge from Release-0_8_0-branch.
 20070512 TAG: Release-0_8_0-merge-1
 20070513 dck.h,if1.[ch],if2.h,snapshot.h,debugger/{debugger.c,disassemble.c},
          ui/{ggi/ggidisplay.c,gtk/rollback.c,xlib/xjoystick.c},z80/z80.pl:
@@ -2475,7 +2475,7 @@
 20080227 disk/disk.c: auto disk density selection fix (part of patch #1894441)
          (Gergely Szasz).
 20080227 disk/disk.c: track length calculation fixes (include gap lengths and
-         use sector headers rather than file header lengths (part of patch
+         use sector headers rather than file header lengths) (part of patch
          #1894441) (Gergely Szasz).
 20080227 disk/disk.c: add support for DSK/EDSK files with weak sectors, use the
          first 'copy' of the weak sector and fix sector lengths when there are
@@ -2582,7 +2582,7 @@
          than 6144 bytes (primarily Coin Op Hits with 6500 bytes per track)
          (part of patch #1882836) (Gergely Szasz).
 20080325 README,Makefile.am,configure.in,
-         disk/{Makefile.am,upd_fdc.[ch]},event.[ch]},machine.c,
+         disk/{Makefile.am,upd_fdc.[ch]},event.[ch],machine.c,
          machines/{specplus3.[ch],specplus3e.c},man/fuse.1,menu.c,
          menu_data.dat,ui.c,ui/ui.h,utils.c: replace lib765 and libdsk with
          new upd765 FDC emulation for +3 (remainder of patch #1882836)
@@ -2714,7 +2714,7 @@
 20080610 ui/{fb/fbdisplay.c,sdl/sdldisplay.c,svga/svgadisplay.c,uidisplay.h,
          widget/{browse.c,debugger.c,error.c,filesel.c,menu.c,options.pl,
          pokefinder.c,query.c,roms.c,select.c,text.c,widget.[ch],
-         widget_internals.h,xlib/xdisplay.c}: modify widget UI to have a
+         widget_internals.h},xlib/xdisplay.c}: modify widget UI to have a
          Spectrum 128 style look and feel based on FuseX (Fred).
 20080612 ui/widget/{widget_internals.h,widget.c,options.pl}: allow options
          dialogs to be navigated by cursor keys (Fred).
@@ -2918,7 +2918,7 @@
          works (bug #2212424) (Gergely Szasz; thanks, Mark Woodmass).
 20081102 ui/win32/win32ui.c: Win32: Made ui_error_specific function work
 	 similarly to the gtk ui equivalent (Marek).
-20081102 ui/win32/{win32ui.c,win32internals.h,win32joystick.[ch}: Win32:
+20081102 ui/win32/{win32ui.c,win32internals.h,win32joystick.[ch]}: Win32:
 	 Implemented joystick handling using mmsystem API (and tested using
          PPJoy joystick emulator, hope it works with real hardware) (Marek).
 20081108 disk/disk.c: prevent array overrun (bug #2240211) (Gergely Szasz).
@@ -3074,7 +3074,7 @@
          ui/win32/{options-resource.pl,options-header.pl}: add a new "Combo"
          type for options entry, for a selection from a defined list (patch
          #2637346) (Gergely Szasz).
-20090329 disk/{beta.c,fdd.[ch],plusd.c},machines/{specplus3.[ch},specplus3e.c},
+20090329 disk/{beta.c,fdd.[ch],plusd.c},machines/{specplus3.[ch],specplus3e.c},
          menu.h,menu_data.dat,settings.dat,ui.c,ui/gtk/options.pl,
          ui/{options.dat,ui.h},ui/widget/{menu.c,options.pl,widget.[ch]}:
          allow the configuration of the drives attached to the various disk
@@ -3644,7 +3644,7 @@
 20110509 machine.[ch],machines/{pentagon1024.c,pentagon512.c,pentagon.c,
          scorpion.c,spec128.c,spec16.c,spec48.c,spec48_ntsc.c,specplus2a.c,
          specplus2.c,specplus3.c,specplus3e.c,spec_se.c,tc2048.c,tc2068.c,
-         ts2068.c},memory.[ch], peripherals/{disk/beta.c,disciple.c,opus.c,
+         ts2068.c},memory.[ch],peripherals/{disk/{beta.c,disciple.c,opus.c,
          plusd.c},if1.c,if2.c,speccyboot.c}: get 128K machine working with 4Kb
          pages.
 20110509 machines/machines_periph.c,peripherals/ay.c,periph.h: reading from
@@ -4761,7 +4761,7 @@
          man2html, escape variable substitution (thanks, Stuart) (Sergio).
 20150425 z80/z80_ops.c: fix timing of events when emulating Scorpion (Stuart).
 20150428 fuse.c,machines/machines_periph.c,man/fuse.1,periph.h,
-         peripherals/{Makefile.am,usource.[ch],settings.dat,ui/options.dat,
+         peripherals/{Makefile.am,usource.[ch]},settings.dat,ui/options.dat,
          unittests/unittests.c,z80/{coretest.c,z80_checks.h,z80_ops.c}:
          add Currah µSource emulation (Stuart).
 20150429 menu.c,menu_data.c: add menu item for Currah µSource ROM selection
