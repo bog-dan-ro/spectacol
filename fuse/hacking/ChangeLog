@@ -4873,3 +4873,4 @@
          usource.c}: track port attachment for each data bus line (Stuart).
 20150601 man/fuse.1: sort fbmode and sound-freq options. Remove duplicate
          doublescan-mode option (Sergio).
+20150601 man/fuse.1: add available values for --drive-*-type options (Sergio).
