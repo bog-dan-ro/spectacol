@@ -322,10 +322,22 @@ Insert the specified file into the emulated Timex\ 2068 variant dock;
 also select the TC2068 on startup if available.
 .RE
 .PP
+.B \-D
+.I mode
+.br
 .B \-\-doublescan\-mode
+.I mode
 .RS
-Specify that the framebuffer UI should attempt to use a double scan mode
-(where each line is displayed twice).
+Specify whether to use doublescan modes in the FB UI.
+Available values for
+.I mode
+are 0, 1 and 2. 0 means `never doublescan' (use 640\(mu480 at either 72\ Hz or
+60\ Hz), whereas 1 and 2 both mean `try to use doublescan' and will fall back
+on the 640\(mu480 modes. 1 selects 72\ Hz modes (the same size and shape as
+your typical 640\(mu480), and 2 selects 60\ Hz modes (overscan).
+.PP
+If your monitor displays a blank screen when using 1 or 2, press F10 then
+try a different option or say `\-\-fbmode 640'.
 .RE
 .PP
 .B \-\-drive\-plus3a\-type
@@ -399,16 +411,16 @@ to disable). The same as the Media Options dialog's
 option.
 .RE
 .PP
-.B \-f
-.I frequency
+.B \-v
+.I mode
 .br
-.B \-\-sound\-freq
-.I frequency
+.B \-\-fbmode
+.I mode
 .RS
-Specify what frequency Fuse should use for the sound
-device, the default is 32\ kHz, but some devices only
-support a single frequency or a limited range (e.g.
-48\ kHz or up to 22\ kHz).
+Specify which mode to use for the FB UI. Available values for
+.I mode
+are `320' (which corresponds to a 320\(mu240\(mu256 mode), the default and
+`640' (a 640\(mu480\(mu256 mode).
 .RE
 .PP
 .B \-\-fuller
@@ -1487,6 +1499,18 @@ Sound Options dialog's
 option.
 .RE
 .PP
+.B \-f
+.I frequency
+.br
+.B \-\-sound\-freq
+.I frequency
+.RS
+Specify what frequency Fuse should use for the sound
+device, the default is 32\ kHz, but some devices only
+support a single frequency or a limited range (e.g.
+48\ kHz or up to 22\ kHz).
+.RE
+.PP
 .B \-\-speaker\-type
 .I type
 .RS
@@ -1572,18 +1596,6 @@ prevent others (for example,
 from being able resize the window away from square.
 .RE
 .PP
-.B \-v
-.I mode
-.br
-.B \-\-fbmode
-.I mode
-.RS
-Specify which mode to use for the FB UI. Available values for
-.I mode
-are `320' (which corresponds to a 320\(mu240\(mu256 mode), the default and
-`640' (a 640\(mu480\(mu256 mode).
-.RE
-.PP
 .B \-\-svga\-modes
 .I mode1,mode2,mode3
 .RS
@@ -1601,24 +1613,6 @@ Fuse use the specified 1024\(mu768\(mu256 SVGA mode for triple size filters,
 but select SVGA modes automatically for normal or double size filters.
 The above mode number is just an example, and mode numbers and their
 meanings may vary graphics card by graphics card.
-.RE
-.PP
-.B \-D
-.I mode
-.br
-.B \-\-doublescan\-mode
-.I mode
-.RS
-Specify whether to use doublescan modes in the FB UI.
-Available values for
-.I mode
-are 0, 1 and 2. 0 means `never doublescan' (use 640\(mu480 at either 72\ Hz or
-60\ Hz), whereas 1 and 2 both mean `try to use doublescan' and will fall back
-on the 640\(mu480 modes. 1 selects 72\ Hz modes (the same size and shape as
-your typical 640\(mu480), and 2 selects 60\ Hz modes (overscan).
-.PP
-If your monitor displays a blank screen when using 1 or 2, press F10 then
-try a different option or say `\-\-fbmode 640'.
 .RE
 .PP
 .B \-t

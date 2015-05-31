@@ -4871,3 +4871,5 @@
          ide/{divide.c,simpleide.c,zxatasp.c,zxcf.c},if1.c,joystick.[ch],
          kempmouse.c,printer.c,scld.c,speccyboot.c,spectranet.c,ula.c,
          usource.c}: track port attachment for each data bus line (Stuart).
+20150601 man/fuse.1: sort fbmode and sound-freq options. Remove duplicate
+         doublescan-mode option (Sergio).
