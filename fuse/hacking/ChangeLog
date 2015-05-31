@@ -4874,3 +4874,4 @@
 20150601 man/fuse.1: sort fbmode and sound-freq options. Remove duplicate
          doublescan-mode option (Sergio).
 20150601 man/fuse.1: add available values for --drive-*-type options (Sergio).
+20150601 configure.ac: fix GTK+2 detection when GTK+3 is not available (Sergio).

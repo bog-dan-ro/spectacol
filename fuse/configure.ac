@@ -378,9 +378,7 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
       )
 
     elif test "$gtk3" = auto; then
-      PKG_CHECK_MODULES(GTK, [gtk+-3.0],
-        gtk3=yes
-      )
+      PKG_CHECK_MODULES([GTK], [gtk+-3.0], [gtk3=yes], [true])
 
       if test "$gtk3" = auto; then
         AM_PATH_GTK_2_0(2.18.0,
