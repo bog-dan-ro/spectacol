@@ -4875,3 +4875,5 @@
          doublescan-mode option (Sergio).
 20150601 man/fuse.1: add available values for --drive-*-type options (Sergio).
 20150601 configure.ac: fix GTK+2 detection when GTK+3 is not available (Sergio).
+20150601 peripherals/ide/zxatasp.c: replace bitwise operators with logical
+         operators (Stuart).

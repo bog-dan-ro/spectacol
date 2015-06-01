@@ -347,25 +347,25 @@ zxatasp_portC_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
   if( zxatasp_control & MC8255_PORT_C_HI_IO ) return;
   
   /* Check for any I/O action */
-  if(  ( ZXATASP_READ_PRIMARY( newC ) ) &
+  if(  ( ZXATASP_READ_PRIMARY( newC ) ) &&
       !( ZXATASP_READ_PRIMARY( oldC ) )   ) {
     zxatasp_readide( zxatasp_idechn0, ( newC & ZXATASP_IDE_REG ) );
     return;
   }
   
-  if(  ( ZXATASP_READ_SECONDARY( newC ) ) &
+  if(  ( ZXATASP_READ_SECONDARY( newC ) ) &&
       !( ZXATASP_READ_SECONDARY( oldC ) )   ) {
     zxatasp_readide( zxatasp_idechn1, ( newC & ZXATASP_IDE_REG ) );
     return;
   }
   
-  if(  ( ZXATASP_WRITE_PRIMARY( newC ) ) &
+  if(  ( ZXATASP_WRITE_PRIMARY( newC ) ) &&
       !( ZXATASP_WRITE_PRIMARY( oldC ) )   ) {
     zxatasp_writeide( zxatasp_idechn0, ( newC & ZXATASP_IDE_REG ) );
     return;
   }
   
-  if(  ( ZXATASP_WRITE_SECONDARY( newC ) ) &
+  if(  ( ZXATASP_WRITE_SECONDARY( newC ) ) &&
       !( ZXATASP_WRITE_SECONDARY( oldC ) )   ) {
     zxatasp_writeide( zxatasp_idechn1, ( newC & ZXATASP_IDE_REG ) );
     return;
