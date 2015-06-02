@@ -531,6 +531,7 @@ if test "$libpng" = yes; then
     LDFLAGS="$ac_save_LDFLAGS"
   fi
 
+  AC_SUBST(PNG_CFLAGS)
   AC_SUBST(PNG_LIBS)
 fi
 
