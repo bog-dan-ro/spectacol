@@ -378,12 +378,14 @@ try a different option or say `\-\-fbmode 640'.
 .RS
 Specify a disk drive type to emulate with the associated interface. 
 The available options are
-.IR "Single\-sided 40 track" ,
+.IR "Disabled" ,
 .IR "Single\-sided 40 track" ,
 .IR "Double\-sided 40 track" ,
 .IR "Single\-sided 80 track" " and"
 .IR "Double\-sided 80 track" .
-See the Disk Options dialog for more information.
+See the Disk Options dialog for more information.  The
+.I Disabled
+option is not supported for Drive 1 or Drive A of any interface.
 .RE
 .PP
 .B \-\-drive\-40\-max\-track
@@ -2762,6 +2764,8 @@ physical drive units attached to the emulated interface. Each drive
 can be set to be one of the following types:
 .RS
 .PP
+.I Disabled
+.PP
 .I Single\-sided 40 track
 .PP
 .I Double\-sided 40 track
@@ -2770,6 +2774,10 @@ can be set to be one of the following types:
 .PP
 .I Double\-sided 80 track
 .RE
+.PP
+The
+.I Disabled
+option is not supported for Drive 1 or Drive A of any interface.
 .PP
 The available options that can be set are:
 .PP
