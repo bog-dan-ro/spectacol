@@ -123,8 +123,6 @@ slt_to_snapshot( libspectrum_snap *snap )
 
     if( slt_length[i] ) {
 
-      libspectrum_byte *buffer;
-
       buffer = libspectrum_new( libspectrum_byte, slt_length[i] );
 
       memcpy( buffer, slt[i], slt_length[i] );
