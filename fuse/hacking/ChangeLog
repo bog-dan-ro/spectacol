@@ -4880,3 +4880,5 @@
 20150602 Makefile.am,configure.ac: handle libpng being in a non-default
          directory (Fred).
 20150603 man/fuse.1: document disabling of disk drives (Stuart).
+20150603 utils.c: ensure we have successfully selected a Pentagon or a Timex
+         machine before inserting the media (Fred).

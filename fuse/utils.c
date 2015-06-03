@@ -142,7 +142,12 @@ utils_open_file( const char *filename, int autoload,
       error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
     }
 
-    error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
+    /* Check that we actually got a Beta capable machine to insert the disk */
+    if( ( machine_current->capabilities & 
+          LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) ||
+        periph_is_active( PERIPH_TYPE_BETA128 ) ) {
+      error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
+    }
     break;
 
   case LIBSPECTRUM_CLASS_DISK_GENERIC:
@@ -176,7 +181,11 @@ utils_open_file( const char *filename, int autoload,
 	   LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) ) {
       error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
     }
-    error = dck_insert( filename );
+    /* Check that we actually got a Dock capable machine to insert the cart */
+    if( machine_current->capabilities &
+	   LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
+      error = dck_insert( filename );
+    }
     break;
 
   case LIBSPECTRUM_CLASS_HARDDISK:
