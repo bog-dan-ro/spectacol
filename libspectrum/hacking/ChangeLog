@@ -1014,3 +1014,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          C89 compilers (Adrien Destugues)
 20150513 internals.h: fix ARRAY_SIZE when using a modern GCC with strict C89
          syntax (Sergio).
+20150606 doc/libspectrum.txt: sync with snap_accessors.txt (Stuart).

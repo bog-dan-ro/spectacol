@@ -575,6 +575,9 @@ The available properties (along with their types) are:
 * libspectrum_byte out_ay_registerport
 * libspectrum_byte ay_registers[16]
 
+* libspectrum_byte out_scld_hsr
+* libspectrum_byte out_scld_dec
+
 * int interface1_active
 * int interface1_paged
 * int interface1_drive_count
@@ -584,6 +587,7 @@ The available properties (along with their types) are:
 
 * int beta_active
 * int beta_paged
+* int beta_autoboot
 * int beta_drive_count
 * int beta_custom_rom
 * int beta_direction
@@ -625,9 +629,6 @@ The available properties (along with their types) are:
 * libspectrum_byte* opus_rom[1]
 * libspectrum_byte* opus_ram[1]
 
-* libspectrum_byte out_scld_hsr
-* libspectrum_byte out_scld_dec
-
 * int custom_rom
 * size_t custom_rom_pages
 * libspectrum_byte* roms[1]
@@ -660,11 +661,13 @@ The available properties (along with their types) are:
 * int interface2_active
 * libspectrum_byte* interface2_rom[1]
 
-* size_t dock_active
+* int dock_active
 * libspectrum_byte exrom_ram[8]
 * libspectrum_byte* exrom_cart[8]
 * libspectrum_byte dock_ram[8]
 * libspectrum_byte* dock_cart[8]
+
+* int issue2
 
 * size_t joystick_active_count
 * libspectrum_joystick joystick_list[ SNAPSHOT_JOYSTICKS ]
@@ -683,6 +686,7 @@ The available properties (along with their types) are:
 * libspectrum_byte* divide_ram[4]
 
 * int fuller_box_active
+
 * int melodik_active
 
 * int specdrum_active
@@ -691,6 +695,7 @@ The available properties (along with their types) are:
 * int spectranet_active
 * int spectranet_paged
 * int spectranet_paged_via_io
+* int spectranet_nmi_flipflop
 * int spectranet_programmable_trap_active
 * int spectranet_programmable_trap_msb
 * int spectranet_all_traps_disabled
@@ -705,7 +710,7 @@ The available properties (along with their types) are:
 
 * int late_timings
 
-* int zx_printer_enabled
+* int zx_printer_active
 
 Most of those should be fairly self-explanatory; those which may not
 be are:
@@ -731,7 +736,7 @@ be are:
   should use timings 1 t-state later than usual as in some machines
   that have warmed up.
 
-* `zx_printer_enabled' being non-zero signals that the emulated Spectrum
+* `zx_printer_active' being non-zero signals that the emulated Spectrum
   has a ZX Printer connected.
 
 * The `beta_*' functions represent the Betadisk
