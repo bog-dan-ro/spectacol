@@ -4883,3 +4883,5 @@
 20150603 utils.c: ensure we have successfully selected a Pentagon or a Timex
          machine before inserting the media (Fred).
 20150603 slt.c: remove redundant declaration of buffer (Fred).
+20150607 pokefinder/pokemem.c: recognise that libspectrum memory alloation never
+         fails (Fred).

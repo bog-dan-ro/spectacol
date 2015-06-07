@@ -258,17 +258,11 @@ pokemem_read_trainer( const libspectrum_byte **ptr,
   length = clast - *ptr + 1;
   if( length > 80 ) length = 80;
   title = libspectrum_new( char, length + 1 );
-  if( !title ) return 1;
 
   memcpy( title, *ptr, length );
   title[ length ] = '\0';
 
-  current_trainer = libspectrum_new( trainer_t, 1 );
-  if( !current_trainer ) {
-    libspectrum_free( title );
-    return 1;
-  }
-  memset( current_trainer, 0, sizeof( trainer_t ) );
+  current_trainer = libspectrum_new0( trainer_t, 1 );
   current_trainer->name = title;
   trainer_list = g_slist_append( trainer_list, current_trainer );
 
@@ -334,10 +328,6 @@ pokemem_poke_add( trainer_t *trainer, int bank, int address, int value,
 
   /* store data */
   current_poke = libspectrum_new( poke_t, 1 );
-  if( !current_poke ) {
-    trainer->disabled = 1;
-    return NULL;
-  }
 
   current_poke->bank = bank;
   current_poke->address = address;
@@ -385,16 +375,10 @@ pokemem_trainer_list_add( libspectrum_byte bank, libspectrum_word address,
   char *title;
 
   title = libspectrum_new( char, 17 );
-  if( !title ) return NULL;
   snprintf( title, 17, "Custom %u,%u", address, value );
 
   /* Create trainer */
-  current_trainer = libspectrum_new( trainer_t, 1 );
-  if( !current_trainer ) {
-    libspectrum_free( title );
-    return NULL;
-  }
-  memset( current_trainer, 0, sizeof( trainer_t ) );
+  current_trainer = libspectrum_new0( trainer_t, 1 );
   current_trainer->name = title;
 
   trainer_list = g_slist_append( trainer_list, current_trainer );
@@ -497,7 +481,6 @@ pokemem_find_pokfile( const char *path )
   if( !length ) return 1; /* Nothing to search */
 
   test_file = libspectrum_new( char, length + 11 );
-  if( !test_file ) return 1;
 
   memcpy( test_file, path, length + 1 );
 
