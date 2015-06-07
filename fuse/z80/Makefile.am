@@ -74,10 +74,10 @@ coretest_SOURCES = coretest.c z80.c
 coretest_LDADD = z80_coretest.o @LIBSPEC_LIBS@
 
 coretest.o: $(srcdir)/coretest.c
-	$(COMPILE) -DCORETEST -c $(srcdir)/coretest.c -o $@
+	$(AM_V_CC) $(COMPILE) -DCORETEST -c $(srcdir)/coretest.c -o $@
 
 z80_coretest.o: z80_ops.c
-	$(COMPILE) -DCORETEST -c $(srcdir)/z80_ops.c -o $@
+	$(AM_V_CC) $(COMPILE) -DCORETEST -c $(srcdir)/z80_ops.c -o $@
 
 test: coretest
 	./coretest $(srcdir)/tests/tests.in > tests.actual

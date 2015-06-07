@@ -4887,3 +4887,5 @@
          fails (Fred).
 20150607 pokefinder/pokemem.c: change functions that cannot fail to return type
          void and make local functions static (Fred).
+20150607 ui/scaler/Makefile.am,z80/Makefile.am: use AM_V_CC verbosity for custom
+         built sources (thanks, Stuart) (Sergio).
