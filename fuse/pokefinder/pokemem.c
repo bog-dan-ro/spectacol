@@ -53,21 +53,22 @@ char *pokfile = NULL;              /* Path of a .pok file to load */
 GSList *trainer_list = NULL;       /* Trainers loaded from a file */
 trainer_t *current_trainer = NULL; /* Last trainer parsed */
 
-int pokemem_read_from_buffer( const libspectrum_byte *buffer, size_t length );
-int pokemem_read_poke( const libspectrum_byte **ptr,
-                       const libspectrum_byte *end );
-int pokemem_read_trainer( const libspectrum_byte **ptr,
-                          const libspectrum_byte *end );
-void pokemem_skip_line( const libspectrum_byte **ptr,
-                        const libspectrum_byte *end );
-poke_t *pokemem_poke_add( trainer_t *trainer, int bank, int address,
-                          int value, int restore );
+static void pokemem_read_from_buffer( const libspectrum_byte *buffer,
+                                      size_t length );
+static void pokemem_read_poke( const libspectrum_byte **ptr,
+                               const libspectrum_byte *end );
+static void pokemem_read_trainer( const libspectrum_byte **ptr,
+                                  const libspectrum_byte *end );
+static void pokemem_skip_line( const libspectrum_byte **ptr,
+                               const libspectrum_byte *end );
+static poke_t *pokemem_poke_add( trainer_t *trainer, int bank, int address,
+                                 int value, int restore );
 
 static void pokemem_poke_activate( gpointer data, gpointer user_data );
 static void pokemem_poke_deactivate( gpointer data, gpointer user_data );
 
-libspectrum_byte pokemem_mem_value( libspectrum_word bank,
-                                    libspectrum_word address );
+static libspectrum_byte pokemem_mem_value( libspectrum_word bank,
+                                           libspectrum_word address );
 
 static void
 pokemem_poke_free( gpointer data, gpointer user_data GCC_UNUSED )
@@ -127,18 +128,18 @@ pokemem_read_from_file( const char *filename )
   if( error ) return error;
 
   pokfile = utils_safe_strdup( filename );
-  error = pokemem_read_from_buffer( file.buffer, file.length );
+  pokemem_read_from_buffer( file.buffer, file.length );
 
   utils_close_file( &file );
-  return error;
+  return 0;
 }
 
-int
+static void
 pokemem_read_from_buffer( const libspectrum_byte *buffer, size_t length )
 {
   const libspectrum_byte *ptr, *end;
   libspectrum_byte id;
-  int eop, error;
+  int eop;
   do_t do_now;
 
   trainer_list = NULL;
@@ -160,13 +161,8 @@ pokemem_read_from_buffer( const libspectrum_byte *buffer, size_t length )
         if( current_trainer ) current_trainer->disabled = 1;
       }
 
-      error = pokemem_read_trainer( &ptr, end );
-      if( error ) {
-        if( current_trainer ) current_trainer->disabled = 1;
-        pokemem_skip_line( &ptr, end );
-        do_now = DO_TRAINER;
-      } else
-        do_now = DO_POKE;
+      pokemem_read_trainer( &ptr, end );
+      do_now = DO_POKE;
       break;
 
     case POKEFILE_MORE_POKE:
@@ -217,11 +213,9 @@ pokemem_read_from_buffer( const libspectrum_byte *buffer, size_t length )
   if( do_now != DO_EOF ) {
     if( current_trainer ) current_trainer->disabled = 1;
   }
-
-  return 0;
 }
 
-void
+static void
 pokemem_skip_line( const libspectrum_byte **ptr,
                    const libspectrum_byte *end )
 {
@@ -236,7 +230,7 @@ pokemem_skip_line( const libspectrum_byte **ptr,
   *ptr = cpos;
 }
 
-int
+static void
 pokemem_read_trainer( const libspectrum_byte **ptr,
                       const libspectrum_byte *end )
 {
@@ -270,11 +264,9 @@ pokemem_read_trainer( const libspectrum_byte **ptr,
   while( cpos < end && ( *cpos == '\r' || *cpos == '\n' ) ) cpos++;
 
   *ptr = cpos;
-
-  return 0;
 }
 
-int
+static void
 pokemem_read_poke( const libspectrum_byte **ptr, const libspectrum_byte *end )
 {
   int bank, address, value, restore;
@@ -290,15 +282,13 @@ pokemem_read_poke( const libspectrum_byte **ptr, const libspectrum_byte *end )
   /* validate data */
   if( items < 4 ) {
     current_trainer->disabled = 1;
-    return 1;
+    return;
   }
 
   pokemem_poke_add( current_trainer, bank, address, value, restore );
-
-  return 0;
 }
 
-poke_t *
+static poke_t *
 pokemem_poke_add( trainer_t *trainer, int bank, int address, int value,
                   int restore )
 {
@@ -354,7 +344,7 @@ pokemem_poke_add( trainer_t *trainer, int bank, int address, int value,
   return current_poke;
 }
 
-libspectrum_byte
+static libspectrum_byte
 pokemem_mem_value( libspectrum_word bank, libspectrum_word address )
 {
   libspectrum_byte value;
@@ -566,8 +556,8 @@ pokemem_autoload_pokfile( void )
   error = utils_read_file( pokfile, &file );
   if( error ) return error;
 
-  error = pokemem_read_from_buffer( file.buffer, file.length );
+  pokemem_read_from_buffer( file.buffer, file.length );
   utils_close_file( &file );
 
-  return error;
+  return 0;
 }
