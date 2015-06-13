@@ -513,3 +513,5 @@
 20150527 createhdf.c,fmfconv.c,fmfconv_aiff.c,fmfconv_au.c,fmfconv_avi.c,
          fmfconv_ff.c,fmfconv_jpg.c,fmfconv_wav.c,fmfconv_yuv.c,raw2hdf.c,
          snap2tzx.c: add static to functions where appropriate (Stuart).
+20150613 m4/ax_create_stdint_h.m4: Add AX_CREATE_STDINT_H macro from the GNU
+         Autoconf Archive (Stuart).
