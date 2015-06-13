@@ -4891,3 +4891,5 @@
          built sources (thanks, Stuart) (Sergio).
 20150613 m4/ax_create_stdint_h.m4: Add AX_CREATE_STDINT_H macro from the GNU
          Autoconf Archive (Stuart).
+20150613 peripherals/specdrum.h: remove unused specdrum_present member of
+         specdrum_info (Fred).
