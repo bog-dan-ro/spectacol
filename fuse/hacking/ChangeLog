@@ -4889,3 +4889,5 @@
          void and make local functions static (Fred).
 20150607 ui/scaler/Makefile.am,z80/Makefile.am: use AM_V_CC verbosity for custom
          built sources (thanks, Stuart) (Sergio).
+20150613 m4/ax_create_stdint_h.m4: Add AX_CREATE_STDINT_H macro from the GNU
+         Autoconf Archive (Stuart).
