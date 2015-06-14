@@ -21,32 +21,27 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+fuse_SOURCES += \
+                debugger/breakpoint.c \
+                debugger/command.c \
+                debugger/commandl.l \
+                debugger/commandy.y \
+                debugger/debugger.c \
+                debugger/disassemble.c \
+                debugger/event.c \
+                debugger/expression.c \
+                debugger/variable.c
 
-AM_CPPFLAGS = -I$(srcdir)/..
+debugger/commandl.c: debugger/commandy.c
+debugger/commandy.h: debugger/commandy.c
 
-AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
+noinst_HEADERS += \
+                  debugger/breakpoint.h \
+                  debugger/commandy.h \
+                  debugger/debugger.h \
+                  debugger/debugger_internals.h
 
-noinst_LIBRARIES = libdebugger.a
-
-libdebugger_a_SOURCES = breakpoint.c \
-		        command.c \
-			commandl.l \
-			commandy.y \
-			debugger.c \
-			disassemble.c \
-			event.c \
-			expression.c \
-			variable.c
-
-commandl.c: commandy.c
-commandy.h: commandy.c
-
-noinst_HEADERS = breakpoint.h \
-		 commandy.h \
-		 debugger.h \
-		 debugger_internals.h
-
-CLEANFILES = commandl.c \
-	     commandy.c \
-	     commandy.h
+CLEANFILES += \
+              debugger/commandl.c \
+              debugger/commandy.c \
+              debugger/commandy.h

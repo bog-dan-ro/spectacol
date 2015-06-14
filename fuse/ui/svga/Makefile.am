@@ -21,25 +21,27 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+if UI_SVGA
 
-AM_CPPFLAGS = -I$(srcdir)/../..
+fuse_SOURCES += $(ui_svga_files)
 
-noinst_LIBRARIES = libuisvga.a
+BUILT_SOURCES += $(ui_svga_built)
 
-AM_CPPFLAGS += @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+endif
 
-libuisvga_a_SOURCES = svgadisplay.c \
-		      svgajoystick.c \
-		      svgakeyboard.c \
-		      svgaui.c \
-		      keysyms.c
 
-BUILT_SOURCES = keysyms.c
+CLEANFILES += $(ui_svga_built)
 
-keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
-	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl svga $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
+ui_svga_files = \
+                ui/svga/keysyms.c \
+                ui/svga/svgadisplay.c \
+                ui/svga/svgadisplay.h \
+                ui/svga/svgajoystick.c \
+                ui/svga/svgakeyboard.c \
+                ui/svga/svgakeyboard.h \
+                ui/svga/svgaui.c
 
-noinst_HEADERS = svgadisplay.h svgakeyboard.h
+ui_svga_built = ui/svga/keysyms.c
 
-CLEANFILES = keysyms.c
+ui/svga/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
+	$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl svga $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@

@@ -21,45 +21,11 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
-
 ACLOCAL_AMFLAGS = -I m4
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = compat \
-	  data \
-	  debugger \
-	  hacking \
-	  lib \
-	  machines \
-	  man \
-          peripherals \
-	  perl \
-	  pokefinder \
-	  roms \
-	  sound \
-	  timer \
-	  ui \
-	  unittests \
-	  z80
-
-DIST_SUBDIRS = compat \
-	       data \
-	       debugger \
-	       hacking \
-	       lib \
-	       machines \
-	       man \
-               peripherals \
-	       perl \
-	       pokefinder \
-	       roms \
-	       sound \
-	       timer \
-	       ui \
-	       unittests \
-	       z80
+noinst_PROGRAMS =
 
 fuse_SOURCES = display.c \
 	event.c \
@@ -90,76 +56,38 @@ fuse_SOURCES = display.c \
 	uimedia.c \
 	utils.c
 
-if COMPAT_WIN32
-fuse_SOURCES += windres.rc
-endif
+fuse_LDADD = \
+             $(LIBSPEC_LIBS) \
+             $(GTK_LIBS) \
+             $(GLIB_LIBS) \
+             $(PNG_LIBS) \
+             $(SDL_LIBS) \
+             $(X_LIBS) \
+             $(XML_LIBS)
 
-EXTRA_fuse_SOURCES = windres.rc
+fuse_DEPENDENCIES =
 
-fuse_LDADD = debugger/libdebugger.a \
-@UI_LIBS@ \
-debugger/libdebugger.a \
-machines/libmachines.a \
-peripherals/libperipherals.a \
-peripherals/disk/libdisk.a \
-peripherals/flash/libflash.a \
-peripherals/ide/libide.a \
-peripherals/nic/libnic.a \
-pokefinder/libpokefinder.a \
-sound/libsound.a \
-timer/libtimer.a \
-ui/scaler/libscaler.a \
-unittests/libunittests.a \
-z80/libz80.a \
-@LIBSPEC_LIBS@ \
-@GLIB_LIBS@ \
-@PNG_LIBS@ \
-@SOUND_LIBS@ \
-@SDL_LIBS@ \
-@X_LIBS@ \
-@XML_LIBS@ \
-compat/libcompatos.a \
-@WINDRES_OBJ@
-
-fuse_DEPENDENCIES = debugger/libdebugger.a \
-@UI_LIBS@ \
-debugger/libdebugger.a \
-machines/libmachines.a \
-peripherals/libperipherals.a \
-peripherals/disk/libdisk.a \
-peripherals/flash/libflash.a \
-peripherals/ide/libide.a \
-peripherals/nic/libnic.a \
-pokefinder/libpokefinder.a \
-sound/libsound.a \
-timer/libtimer.a \
-ui/scaler/libscaler.a \
-unittests/libunittests.a \
-z80/libz80.a \
-compat/libcompatos.a \
-@WINDRES_OBJ@
+EXTRA_fuse_SOURCES =
 
 BUILT_SOURCES = options.h settings.c settings.h
 
-windres.o: windres.rc winfuse.ico ui/win32/*.rc
-	@WINDRES@ -I$(srcdir) -I. $(srcdir)/windres.rc @LIBSPEC_CFLAGS@ @CPPFLAGS@ windres.o
-
 settings.c: settings.pl settings.dat
-	@PERL@ -I$(srcdir)/perl $(srcdir)/settings.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
+	$(PERL) -I$(srcdir)/perl $(srcdir)/settings.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
 
 settings.h: settings-header.pl settings.dat
-	@PERL@ -I$(srcdir)/perl $(srcdir)/settings-header.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
+	$(PERL) -I$(srcdir)/perl $(srcdir)/settings-header.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
 
-if WIDGET
-options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@WIDGET@/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
-	@PERL@ $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | @PERL@ -I$(srcdir)/perl $(srcdir)/ui/@WIDGET@/options-header.pl - public > $@.tmp && mv $@.tmp $@
-else
-options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@UI@/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
-	@PERL@ $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | @PERL@ -I$(srcdir)/perl $(srcdir)/ui/@UI@/options-header.pl - public > $@.tmp && mv $@.tmp $@
-endif
+options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@OPTIONS_DIR@/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
+	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/@OPTIONS_DIR@/options-header.pl - public > $@.tmp && mv $@.tmp $@
 
-AM_CPPFLAGS = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
-@XML_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\"" @SDL_CFLAGS@ @PNG_CFLAGS@
+AM_CPPFLAGS = \
+              $(GLIB_CFLAGS) \
+              $(GTK_CFLAGS) \
+              $(LIBSPEC_CFLAGS) \
+              $(XML_CFLAGS) \
+              -DFUSEDATADIR="\"${pkgdatadir}\"" \
+              $(SDL_CFLAGS) \
+              $(PNG_CFLAGS)
 
 noinst_HEADERS = bitmap.h \
 	compat.h \
@@ -206,15 +134,55 @@ EXTRA_DIST = AUTHORS \
 	     m4/sdl.m4 \
 	     menu_data.dat \
 	     menu_data.pl \
+	     settings.dat \
 	     settings.pl \
 	     settings-header.pl \
-	     settings.dat \
 	     winfuse.ico
 
 CLEANFILES = options.h \
 	     settings.c \
 	     settings.h
 
+DISTCLEANFILES =
+
+pkgdata_DATA =
+
+
+## Resources for Windows executables
 if COMPAT_WIN32
-include compat/win32/distribution.mk
+
+fuse_SOURCES += windres.rc
+fuse_LDADD += windres.o
+fuse_DEPENDENCIES += windres.o
+
+windres.o: windres.rc winfuse.ico ui/win32/fuse.manifest $(ui_win32_res)
+	$(WINDRES) -I$(srcdir) -I. $(srcdir)/windres.rc $(LIBSPEC_CFLAGS) $(CPPFLAGS) windres.o
+
 endif
+
+
+include compat/Makefile.am
+include data/Makefile.am
+include debugger/Makefile.am
+include hacking/Makefile.am
+include lib/Makefile.am
+include machines/Makefile.am
+include man/Makefile.am
+include peripherals/Makefile.am
+include perl/Makefile.am
+include pokefinder/Makefile.am
+include roms/Makefile.am
+include sound/Makefile.am
+include timer/Makefile.am
+include ui/Makefile.am
+include ui/fb/Makefile.am
+include ui/gtk/Makefile.am
+include ui/scaler/Makefile.am
+include ui/sdl/Makefile.am
+include ui/svga/Makefile.am
+include ui/widget/Makefile.am
+include ui/wii/Makefile.am
+include ui/win32/Makefile.am
+include ui/xlib/Makefile.am
+include unittests/Makefile.am
+include z80/Makefile.am

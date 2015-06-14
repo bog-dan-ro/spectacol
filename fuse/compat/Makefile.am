@@ -21,104 +21,98 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
-
-AM_CPPFLAGS = -I$(srcdir)/..
-
-noinst_HEADERS = getopt.h
-
-noinst_LIBRARIES = libcompatos.a
-
-libcompatos_a_SOURCES =
+noinst_HEADERS += compat/getopt.h
 
 if COMPAT_DIRNAME
-libcompatos_a_SOURCES += dirname.c
+fuse_SOURCES += compat/dirname.c
 endif
 
 if COMPAT_GETOPT
-libcompatos_a_SOURCES += getopt.c getopt1.c
+fuse_SOURCES += compat/getopt.c compat/getopt1.c
 endif
 
 if COMPAT_MKSTEMP
-libcompatos_a_SOURCES += mkstemp.c
+fuse_SOURCES += compat/mkstemp.c
 endif
 
 ## Amiga routines
 if COMPAT_AMIGA
-libcompatos_a_SOURCES += \
-                         unix/dir.c \
-                         unix/file.c \
-                         amiga/osname.c \
-                         amiga/paths.c \
-                         unix/timer.c
+fuse_SOURCES += \
+                compat/unix/dir.c \
+                compat/unix/file.c \
+                compat/amiga/osname.c \
+                compat/amiga/paths.c \
+                compat/unix/timer.c
 endif
 
 ## Linux routines
 if COMPAT_LINUX
-libcompatos_a_SOURCES += \
-                         unix/dir.c \
-                         unix/file.c \
-                         unix/osname.c \
-                         linux/paths.c \
-                         unix/timer.c
+fuse_SOURCES += \
+                compat/unix/dir.c \
+                compat/unix/file.c \
+                compat/unix/osname.c \
+                compat/linux/paths.c \
+                compat/unix/timer.c
 
 if HAVE_SOCKETS
-libcompatos_a_SOURCES += unix/socket.c
+fuse_SOURCES += compat/unix/socket.c
 endif
 endif
 
 ## Morphos routines
 if COMPAT_MORPHOS
-libcompatos_a_SOURCES += \
-                         unix/dir.c \
-                         unix/file.c \
-                         morphos/osname.c \
-                         amiga/paths.c \
-                         unix/timer.c
+fuse_SOURCES += \
+                compat/unix/dir.c \
+                compat/unix/file.c \
+                compat/morphos/osname.c \
+                compat/amiga/paths.c \
+                compat/unix/timer.c
 endif
 
 ## Unix routines
 if COMPAT_UNIX
-libcompatos_a_SOURCES += \
-                         unix/dir.c \
-                         unix/file.c \
-                         unix/osname.c \
-                         unix/paths.c \
-                         unix/timer.c
+fuse_SOURCES += \
+                compat/unix/dir.c \
+                compat/unix/file.c \
+                compat/unix/osname.c \
+                compat/unix/paths.c \
+                compat/unix/timer.c
 
 if HAVE_SOCKETS
-libcompatos_a_SOURCES += unix/socket.c
+fuse_SOURCES += compat/unix/socket.c
 endif
 endif
 
 ## Wii routines
 if COMPAT_WII
-libcompatos_a_SOURCES += \
-                         wii/dir.c \
-                         unix/file.c \
-                         wii/osname.c \
-                         wii/paths.c \
-                         wii/timer.c
+fuse_SOURCES += \
+                compat/wii/dir.c \
+                compat/unix/file.c \
+                compat/wii/osname.c \
+                compat/wii/paths.c \
+                compat/wii/timer.c
 endif
 
 ## Windows routines
 if COMPAT_WIN32
-libcompatos_a_SOURCES += \
-                         unix/dir.c \
-                         unix/file.c \
-                         win32/osname.c \
-                         win32/paths.c \
-                         win32/timer.c
+fuse_SOURCES += \
+                compat/unix/dir.c \
+                compat/unix/file.c \
+                compat/win32/osname.c \
+                compat/win32/paths.c \
+                compat/win32/timer.c
 
 if HAVE_SOCKETS
-libcompatos_a_SOURCES += win32/socket.c
+fuse_SOURCES += compat/win32/socket.c
 endif
 endif
 
 ## SpeccyBoot routines
 if HAVE_TUNTAP
-libcompatos_a_SOURCES += unix/tuntap.c
+fuse_SOURCES += compat/unix/tuntap.c
 endif
 
-AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
--DFUSEDATADIR="\"${pkgdatadir}\""
+## Windows distribution rules
+if COMPAT_WIN32
+include compat/win32/distribution.mk
+endif

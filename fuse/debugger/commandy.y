@@ -31,8 +31,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "debugger.h"
-#include "debugger_internals.h"
+#include "debugger/debugger.h"
+#include "debugger/debugger_internals.h"
 #include "mempool.h"
 #include "ui/ui.h"
 #include "z80/z80.h"

@@ -21,58 +21,59 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+if USE_WIDGET
 
-AM_CPPFLAGS = -I$(srcdir)/../..
+fuse_SOURCES += $(ui_widget_files)
 
-noinst_LIBRARIES = libwidget.a
+BUILT_SOURCES += $(ui_widget_built)
 
-libwidget_a_SOURCES = \
-	browse.c \
-	debugger.c \
-	error.c \
-	filesel.c \
-	memory.c \
-	menu.c \
-	menu_data.c \
-	options.c \
-	picture.c \
-	pokemem.c \
-	pokefinder.c \
-	query.c \
-	roms.c \
-	select.c \
-	text.c \
-	widget.c
+pkgdata_DATA += ui/widget/fuse.font
 
-AM_CPPFLAGS += @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@ @SDL_CFLAGS@
+endif
 
-BUILT_SOURCES = menu_data.c \
-		options.c \
-		options_internals.h \
-		fuse.font
 
-menu_data.c: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.dat $(srcdir)/../../menu_data.pl ../../config.h
-	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl widget > $@.tmp && mv $@.tmp $@
+CLEANFILES += $(ui_widget_built)
 
-options.c: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options.pl $(srcdir)/../options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
-	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options.pl - > $@.tmp && mv $@.tmp $@
+ui_widget_files = \
+                  ui/widget/browse.c \
+                  ui/widget/debugger.c \
+                  ui/widget/error.c \
+                  ui/widget/filesel.c \
+                  ui/widget/memory.c \
+                  ui/widget/menu.c \
+                  ui/widget/menu_data.c \
+                  ui/widget/options.c \
+                  ui/widget/picture.c \
+                  ui/widget/pokefinder.c \
+                  ui/widget/pokemem.c \
+                  ui/widget/query.c \
+                  ui/widget/roms.c \
+                  ui/widget/select.c \
+                  ui/widget/text.c \
+                  ui/widget/widget_internals.h \
+                  ui/widget/widget.c \
+                  ui/widget/widget.h
 
-options_internals.h: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-header.pl $(srcdir)/../options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
-	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options-header.pl - > $@.tmp && mv $@.tmp $@
+ui_widget_built = \
+                  ui/widget/fuse.font \
+                  ui/widget/menu_data.c \
+                  ui/widget/options.c \
+                  ui/widget/options_internals.h
 
-fuse.font: $(srcdir)/mkfusefont.pl $(srcdir)/fuse.font.sbf
-	@PERL@ $(srcdir)/mkfusefont.pl $(srcdir)/fuse.font.sbf > $@.tmp && mv $@.tmp $@
+EXTRA_DIST += \
+              ui/widget/fuse.font.sbf \
+              ui/widget/mkfusefont.pl \
+              ui/widget/options.pl \
+              ui/widget/options-header.pl
 
-noinst_HEADERS = widget.h widget_internals.h \
-		 options_internals.h options.pl options-header.pl
+ui/widget/menu_data.c: $(srcdir)/perl/cpp-perl.pl $(srcdir)/menu_data.dat $(srcdir)/menu_data.pl config.h
+	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl widget > $@.tmp && mv $@.tmp $@
 
-pkgdata_DATA = fuse.font
+ui/widget/options.c: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/widget/options.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
+	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/widget/options.pl - > $@.tmp && mv $@.tmp $@
 
-EXTRA_DIST = mkfusefont.pl \
-	     fuse.font.sbf
+ui/widget/options_internals.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/widget/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
+	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/widget/options-header.pl - > $@.tmp && mv $@.tmp $@
 
-CLEANFILES = menu_data.c \
-	     options.c \
-	     options_internals.h \
-	     fuse.font
+ui/widget/fuse.font: $(srcdir)/ui/widget/mkfusefont.pl $(srcdir)/ui/widget/fuse.font.sbf
+	$(PERL) $(srcdir)/ui/widget/mkfusefont.pl $(srcdir)/ui/widget/fuse.font.sbf > $@.tmp && mv $@.tmp $@

@@ -21,20 +21,13 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+fuse_SOURCES += timer/timer.c
 
-AM_CPPFLAGS = -I$(srcdir)/..
+EXTRA_fuse_SOURCES += \
+                      timer/native.c \
+                      timer/sdl.c
 
-AM_CPPFLAGS += @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@ @SDL_CFLAGS@
+fuse_DEPENDENCIES += $(TIMER_LIBADD)
+fuse_LDADD += $(TIMER_LIBADD)
 
-noinst_LIBRARIES = libtimer.a
-
-libtimer_a_SOURCES = timer.c
-
-EXTRA_libtimer_a_SOURCES = native.c \
-			   sdl.c
-
-libtimer_a_LIBADD = $(TIMER_LIBADD)
-libtimer_a_DEPENDENCIES = $(TIMER_LIBADD)
-
-noinst_HEADERS = timer.h
+noinst_HEADERS += timer/timer.h

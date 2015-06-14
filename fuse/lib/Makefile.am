@@ -21,67 +21,77 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+lib_files = \
+            lib/cassette.bmp \
+            lib/keyboard.scr \
+            lib/microdrive.bmp \
+            lib/plus3disk.bmp
 
-FILES = cassette.bmp \
-	keyboard.scr \
-	microdrive.bmp \
-	plus3disk.bmp \
-	@AUTOLOAD_SNAPS@/disk_plus3.szx \
-	@AUTOLOAD_SNAPS@/tape_128.szx \
-	@AUTOLOAD_SNAPS@/tape_16.szx \
-	@AUTOLOAD_SNAPS@/tape_2048.szx \
-	@AUTOLOAD_SNAPS@/tape_2068.szx \
-	@AUTOLOAD_SNAPS@/tape_48.szx \
-	@AUTOLOAD_SNAPS@/tape_48_ntsc.szx \
-	@AUTOLOAD_SNAPS@/tape_plus2.szx \
-	@AUTOLOAD_SNAPS@/tape_plus2a.szx \
-	@AUTOLOAD_SNAPS@/tape_plus3.szx \
-	@AUTOLOAD_SNAPS@/tape_plus3e.szx \
-	@AUTOLOAD_SNAPS@/tape_pentagon.szx \
-	@AUTOLOAD_SNAPS@/tape_scorpion.szx \
-	@AUTOLOAD_SNAPS@/tape_se.szx \
-	@AUTOLOAD_SNAPS@/tape_ts2068.szx
+lib_snaps = \
+            disk_plus3.szx \
+            tape_128.szx \
+            tape_16.szx \
+            tape_2048.szx \
+            tape_2068.szx \
+            tape_48.szx \
+            tape_48_ntsc.szx \
+            tape_plus2.szx \
+            tape_plus2a.szx \
+            tape_plus3.szx \
+            tape_plus3e.szx \
+            tape_pentagon.szx \
+            tape_scorpion.szx \
+            tape_se.szx \
+            tape_ts2068.szx
 
-pkgdata_DATA = $(FILES)
+lib_compressed_snaps = \
+                       lib/compressed/disk_plus3.szx \
+                       lib/compressed/tape_128.szx \
+                       lib/compressed/tape_16.szx \
+                       lib/compressed/tape_2048.szx \
+                       lib/compressed/tape_2068.szx \
+                       lib/compressed/tape_48.szx \
+                       lib/compressed/tape_48_ntsc.szx \
+                       lib/compressed/tape_plus2.szx \
+                       lib/compressed/tape_plus2a.szx \
+                       lib/compressed/tape_plus3.szx \
+                       lib/compressed/tape_plus3e.szx \
+                       lib/compressed/tape_pentagon.szx \
+                       lib/compressed/tape_scorpion.szx \
+                       lib/compressed/tape_se.szx \
+                       lib/compressed/tape_ts2068.szx
 
-EXTRA_DIST = $(FILES) \
-	compressed/disk_plus3.szx \
-	compressed/tape_128.szx \
-	compressed/tape_16.szx \
-	compressed/tape_2048.szx \
-	compressed/tape_2068.szx \
-	compressed/tape_48.szx \
-	compressed/tape_48_ntsc.szx \
-	compressed/tape_plus2.szx \
-	compressed/tape_plus2a.szx \
-	compressed/tape_plus3.szx \
-	compressed/tape_plus3e.szx \
-	compressed/tape_pentagon.szx \
-	compressed/tape_scorpion.szx \
-	compressed/tape_se.szx \
-	compressed/tape_ts2068.szx \
- 	tests/fatware-success.hdf.bz2 \
- 	tests/idedos-success.hdf.bz2 \
-        tests/success.mdr \
-	tests/success.mgt.bz2 \
-	tests/success.opd \
-	tests/success.udi \
-	uncompressed/disk_plus3.szx \
-	uncompressed/tape_128.szx \
-	uncompressed/tape_16.szx \
-	uncompressed/tape_2048.szx \
-	uncompressed/tape_2068.szx \
-	uncompressed/tape_48.szx \
-	uncompressed/tape_48_ntsc.szx \
-	uncompressed/tape_plus2.szx \
-	uncompressed/tape_plus2a.szx \
-	uncompressed/tape_plus3.szx \
-	uncompressed/tape_plus3e.szx \
-	uncompressed/tape_pentagon.szx \
-	uncompressed/tape_scorpion.szx \
-	uncompressed/tape_se.szx \
-	uncompressed/tape_ts2068.szx
+lib_uncompressed_snaps = \
+                         lib/uncompressed/disk_plus3.szx \
+                         lib/uncompressed/tape_128.szx \
+                         lib/uncompressed/tape_16.szx \
+                         lib/uncompressed/tape_2048.szx \
+                         lib/uncompressed/tape_2068.szx \
+                         lib/uncompressed/tape_48.szx \
+                         lib/uncompressed/tape_48_ntsc.szx \
+                         lib/uncompressed/tape_plus2.szx \
+                         lib/uncompressed/tape_plus2a.szx \
+                         lib/uncompressed/tape_plus3.szx \
+                         lib/uncompressed/tape_plus3e.szx \
+                         lib/uncompressed/tape_pentagon.szx \
+                         lib/uncompressed/tape_scorpion.szx \
+                         lib/uncompressed/tape_se.szx \
+                         lib/uncompressed/tape_ts2068.szx
 
-distclean-local:
-	rm -f *.szx
+lib_tests = \
+            lib/tests/fatware-success.hdf.bz2 \
+            lib/tests/idedos-success.hdf.bz2 \
+            lib/tests/success.mdr \
+            lib/tests/success.mgt.bz2 \
+            lib/tests/success.opd \
+            lib/tests/success.udi
+
+pkgdata_DATA += \
+                $(lib_@AUTOLOAD_SNAPS@_snaps) \
+                $(lib_files)
+
+EXTRA_DIST += \
+              $(lib_compressed_snaps) \
+              $(lib_files) \
+              $(lib_tests) \
+              $(lib_uncompressed_snaps)

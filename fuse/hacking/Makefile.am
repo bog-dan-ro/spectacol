@@ -21,17 +21,15 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
-
-EXTRA_DIST = \
-	coding_style.txt \
-	cvs-tags \
-	implementation_notes.txt \
-	input.txt \
-	peripheral_tests.txt \
-	sound.txt \
-	spectranet.txt \
-	tc2048_tech_notes.txt \
-	timer.txt \
-	ui.txt \
-	valgrind.supp
+EXTRA_DIST += \
+              hacking/coding_style.txt \
+              hacking/cvs-tags \
+              hacking/implementation_notes.txt \
+              hacking/input.txt \
+              hacking/peripheral_tests.txt \
+              hacking/sound.txt \
+              hacking/spectranet.txt \
+              hacking/tc2048_tech_notes.txt \
+              hacking/timer.txt \
+              hacking/ui.txt \
+              hacking/valgrind.supp

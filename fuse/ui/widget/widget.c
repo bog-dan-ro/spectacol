@@ -43,14 +43,14 @@
 #include "ui/uidisplay.h"
 #include "keyboard.h"
 #include "menu.h"
-#include "options_internals.h"
 #include "periph.h"
 #include "peripherals/joystick.h"
 #include "pokefinder/pokefinder.h"
 #include "screenshot.h"
 #include "timer/timer.h"
+#include "ui/widget/options_internals.h"
+#include "ui/widget/widget_internals.h"
 #include "utils.h"
-#include "widget_internals.h"
 
 #ifdef WIN32
 #include <windows.h>

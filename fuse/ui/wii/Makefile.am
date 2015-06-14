@@ -21,29 +21,30 @@
 ##
 ## E-mail: bjoern@giesler.de
 
-AUTOMAKE_OPTIONS = foreign
+if UI_WII
 
-AM_CPPFLAGS = -I$(srcdir)/../..
+fuse_SOURCES += $(ui_wii_files)
 
-noinst_LIBRARIES = libuiwii.a
+BUILT_SOURCES += $(ui_wii_built)
 
-AM_CPPFLAGS += @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+endif
 
-libuiwii_a_SOURCES = wiidisplay.c \
-		    wiijoystick.c \
-	 	    wiikeyboard.c \
-	 	    wiimouse.c \
-		    wiiui.c \
-		    keysyms.c
 
-BUILT_SOURCES = keysyms.c
+CLEANFILES += $(ui_wii_built)
 
-keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
-	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl wii $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
+ui_wii_files = \
+                ui/wii/keysyms.c \
+                ui/wii/wiidisplay.c \
+                ui/wii/wiidisplay.h \
+                ui/wii/wiijoystick.c \
+                ui/wii/wiikeyboard.c \
+                ui/wii/wiikeyboard.h \
+                ui/wii/wiikeysyms.h \
+                ui/wii/wiimouse.c \
+                ui/wii/wiimouse.h \
+                ui/wii/wiiui.c
 
-noinst_HEADERS = wiidisplay.h \
-	         wiikeyboard.h \
-	         wiikeysyms.h \
-	         wiimouse.h
+ui_wii_built = ui/wii/keysyms.c
 
-CLEANFILES = keysyms.c
+ui/wii/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
+	$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl wii $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@

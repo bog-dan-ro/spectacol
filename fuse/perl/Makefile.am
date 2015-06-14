@@ -21,9 +21,7 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
-
-SUBDIRS = Fuse
-
-EXTRA_DIST = cpp-perl.pl \
-	     Fuse.pm
+EXTRA_DIST += \
+              perl/cpp-perl.pl \
+              perl/Fuse.pm \
+              perl/Fuse/Dialog.pm

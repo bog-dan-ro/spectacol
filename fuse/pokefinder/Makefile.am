@@ -21,16 +21,10 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+fuse_SOURCES += \
+                pokefinder/pokefinder.c \
+                pokefinder/pokemem.c
 
-AM_CPPFLAGS = -I$(srcdir)/..
-
-noinst_LIBRARIES = libpokefinder.a
-
-libpokefinder_a_SOURCES = pokefinder.c \
-  pokemem.c
-
-noinst_HEADERS = pokefinder.h \
-  pokemem.h
-
-AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
+noinst_HEADERS += \
+                  pokefinder/pokefinder.h \
+                  pokefinder/pokemem.h

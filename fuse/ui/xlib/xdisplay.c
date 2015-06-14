@@ -159,7 +159,7 @@ static xdisplay_putpixel_t xdisplay_putpixel_15;
 static xdisplay_putpixel_t xdisplay_putpixel_16;
 static xdisplay_putpixel_t xdisplay_putpixel_24;
 
-#include "xpixmaps.c"
+#include "ui/xlib/xpixmaps.c"
 void xstatusbar_overlay( void );
 
 static libspectrum_word pal_colour[16] = {

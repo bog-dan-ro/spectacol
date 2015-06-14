@@ -52,8 +52,8 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "options_internals.h"
 #include "periph.h"
 #include "settings.h"
+#include "ui/win32/win32internals.h"
 #include "utils.h"
-#include "win32internals.h"
 
 static int
 option_enumerate_combo( const char * const *options, char *value, int count,

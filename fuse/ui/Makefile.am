@@ -21,26 +21,12 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+noinst_HEADERS += \
+                  ui/ui.h \
+                  ui/uidisplay.h \
+                  ui/uijoystick.h \
+                  ui/uimedia.h
 
-AM_CPPFLAGS = -I$(srcdir)/..
-
-SUBDIRS = @UI@ @WIDGET@ scaler
-
-DIST_SUBDIRS = fb \
-	       gtk \
-	       scaler \
-	       sdl \
-	       svga \
-	       widget \
-	       wii \
-	       win32 \
-	       xlib
-
-noinst_HEADERS = ui.h \
-		 uidisplay.h \
-		 uijoystick.h \
-		 uimedia.h
-
-EXTRA_DIST = options.dat \
-	     uijoystick.c
+EXTRA_DIST += \
+              ui/options.dat \
+              ui/uijoystick.c

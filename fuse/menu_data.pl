@@ -152,8 +152,8 @@ sub dump_widget ($) {
 
     print << "HEADERS";
 #include "input.h"
-#include "options_internals.h"
-#include "widget_internals.h"
+#include "ui/widget/options_internals.h"
+#include "ui/widget/widget_internals.h"
 
 HEADERS
 
@@ -341,7 +341,7 @@ sub dump_win32 ($$) {
 
     if( $mode eq 'c' ) {
 	print << "CODE";
-#include "menu_data.h"
+#include "ui/win32/menu_data.h"
 
 int handle_menu( DWORD cmd, HWND window )
 {
@@ -356,7 +356,7 @@ CODE
     } elsif( $mode eq 'rc' ) {
 	print << "CODE";
 #include <windows.h>
-#include "menu_data.h"
+#include "ui/win32/menu_data.h"
 
 win32_menu MENU
 {

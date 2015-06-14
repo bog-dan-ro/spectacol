@@ -21,14 +21,6 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+fuse_SOURCES += unittests/unittests.c
 
-AM_CPPFLAGS = -I$(srcdir)/..
-
-AM_CPPFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
-
-noinst_LIBRARIES = libunittests.a
-
-libunittests_a_SOURCES = unittests.c
-
-noinst_HEADERS = unittests.h
+noinst_HEADERS += unittests/unittests.h

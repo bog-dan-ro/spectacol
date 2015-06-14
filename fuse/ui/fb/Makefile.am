@@ -21,28 +21,29 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+if UI_FB
 
-AM_CPPFLAGS = -I$(srcdir)/../..
+fuse_SOURCES += $(ui_fb_files)
 
-noinst_LIBRARIES = libuifb.a
+BUILT_SOURCES += $(ui_fb_built)
 
-AM_CPPFLAGS += @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+endif
 
-libuifb_a_SOURCES = fbdisplay.c \
-		    fbjoystick.c \
-	 	    fbkeyboard.c \
-	 	    fbmouse.c \
-		    fbui.c \
-		    keysyms.c
 
-BUILT_SOURCES = keysyms.c
+CLEANFILES += $(ui_fb_built)
 
-keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
-	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl fb $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
+ui_fb_files = \
+              ui/fb/fbdisplay.c \
+              ui/fb/fbdisplay.h \
+              ui/fb/fbjoystick.c \
+              ui/fb/fbkeyboard.c \
+              ui/fb/fbkeyboard.h \
+              ui/fb/fbmouse.c \
+              ui/fb/fbmouse.h \
+              ui/fb/fbui.c \
+              ui/fb/keysyms.c
 
-noinst_HEADERS = fbdisplay.h \
-	         fbkeyboard.h \
-	         fbmouse.h
+ui_fb_built = ui/fb/keysyms.c
 
-CLEANFILES = keysyms.c
+ui/fb/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
+	$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl fb $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@

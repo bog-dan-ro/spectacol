@@ -4893,3 +4893,20 @@
          Autoconf Archive (Stuart).
 20150613 peripherals/specdrum.h: remove unused specdrum_present member of
          specdrum_info (Fred).
+20150614 Makefile.am,compat,compat/{Makefile.am,amiga,linux,morphos,unix,wii,
+         win32},configure.ac,data,data/Makefile.am,debugger,
+         debugger/{Makefile.am,commandl.l,commandy.y},hacking,
+         hacking/Makefile.am,keysyms.pl,lib,lib/Makefile.am,machines,
+         machines/Makefile.am,man,man/Makefile.am,menu_data.pl,peripherals,
+         peripherals/{Makefile.am,disk,disk/Makefile.am,flash,
+         flash/Makefile.am,ide,ide/Makefile.am,nic,nic/Makefile.am},perl,
+         perl/{Fuse,Fuse/Makefile.am,Makefile.am},pokefinder,
+         pokefinder/Makefile.am,roms,roms/Makefile.am,sound,sound/Makefile.am,
+         timer,timer/Makefile.am,ui,ui/{Makefile.am,fb,fb/Makefile.am,gtk,
+         gtk/{Makefile.am,options.pl},scaler,scaler/Makefile.am,sdl,
+         sdl/Makefile.am,svga,svga/Makefile.am,widget,widget/{Makefile.am,
+         widget.c},wii,wii/Makefile.am,win32,win32/{Makefile.am,icons,
+         icons/Makefile.am,options.pl,win32ui.c},xlib,xlib/{Makefile.am,
+         xdisplay.c}},unittests,unittests/Makefile.am,z80,
+         z80/{Makefile.am,tests,tests/Makefile.am,z80_ops.c}: switch to using
+         non-recursive makefile (patch #321) (thanks, Stuart) (Sergio).

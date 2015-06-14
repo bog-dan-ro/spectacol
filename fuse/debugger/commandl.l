@@ -29,8 +29,8 @@
 
 #include <ctype.h>
 
-#include "debugger.h"
-#include "debugger_internals.h"
+#include "debugger/debugger.h"
+#include "debugger/debugger_internals.h"
 #include "mempool.h"
 
 #include "commandy.h"

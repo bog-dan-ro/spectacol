@@ -42,7 +42,8 @@ AC_CONFIG_HEADERS(config.h)
 AC_CANONICAL_HOST
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE([foreign subdir-objects -Wall])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 
 dnl Substitutions for .in files
 FUSE_FULL_VERSION=fuse_full_version
@@ -67,19 +68,17 @@ AC_PROG_YACC
 LT_INIT
 
 dnl Check for host specific programs
-WINDRES_OBJ=
 case "$host_os" in
   mingw32*)
-    AC_CHECK_TOOL([WINDRES], [windres], [no])
-    if test "$WINDRES" != no; then
-      WINDRES_OBJ="windres.o"
+    AC_CHECK_TOOL([WINDRES], [windres])
+    if test -z "$WINDRES" ; then
+      AC_MSG_ERROR([windres is required to compile Fuse for $host hosts])
     fi
     AC_CHECK_PROGS([MAN2HTML], [man2html])
     AC_CHECK_PROGS([GROFF], [groff])
     AC_CHECK_PROGS([UNIX2DOS], [unix2dos])
     ;;
 esac
-AC_SUBST(WINDRES_OBJ)
 
 dnl Generate commandy.h
 YFLAGS="$YFLAGS -d"
@@ -237,7 +236,7 @@ if test "$win32" = yes; then
                   AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
                   AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
                   AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Exclude rarely used stuff from Windows headers <windows.h>])
-                  UI=win32; UI_LIBS="ui/win32/libuiwin32.a",
+                  UI=win32,
                   AC_MSG_ERROR([Win32 UI not found]))
 fi
 
@@ -255,8 +254,7 @@ if test -z "$UI"; then
                     AC_DEFINE([UI_SVGA], 1, [Defined if svgalib UI in use])
                     AC_DEFINE([USE_WIDGET], 1,
                               [Defined if we're using a widget-based UI])
-                    UI=svga; WIDGET=widget;
-                    UI_LIBS="ui/svga/libuisvga.a ui/widget/libwidget.a",
+                    UI=svga; WIDGET=widget,
                     AC_MSG_ERROR([svgalib not found]))
   fi
 fi
@@ -273,7 +271,6 @@ if test -z "$UI"; then
     AC_DEFINE([UI_FB], 1, [Defined if framebuffer UI in use])
     AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
     UI=fb; WIDGET=widget;
-    UI_LIBS="ui/fb/libuifb.a ui/widget/libwidget.a"
     dnl Look for libgpm (default=yes)
     AC_MSG_CHECKING(whether gpm requested)
     AC_ARG_WITH(gpm,
@@ -284,7 +281,7 @@ if test -z "$UI"; then
     dnl Note: we use libdl to get libgpm at runtime
     if test "$gpm" = yes; then
       AC_CHECK_HEADER(gpm.h,
-		      UI_LIBS="$UI_LIBS -ldl";
+		      LIBS="$LIBS -ldl";
 		      AC_DEFINE([HAVE_GPM_H], 1, [Defined if gpm in use]),
 		      AC_MSG_ERROR([libgpm not found]))
     fi
@@ -304,7 +301,6 @@ if test -z "$UI"; then
     AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
     AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
     UI=wii; WIDGET=widget;
-    UI_LIBS="ui/wii/libuiwii.a ui/widget/libwidget.a"
     host_os=wii
     dnl Look for libgpm (default=yes)
     AC_MSG_CHECKING(whether gpm requested)
@@ -316,7 +312,7 @@ if test -z "$UI"; then
     dnl Note: we use libdl to get libgpm at runtime
     if test "$gpm" = yes; then
       AC_CHECK_HEADER(gpm.h,
-		      UI_LIBS="$UI_LIBS -ldl";
+		      LIBS="$LIBS -ldl";
 		      AC_DEFINE([HAVE_GPM_H], 1, [Defined if gpm in use]),
 		      AC_MSG_ERROR([libgpm not found]))
     fi
@@ -337,8 +333,7 @@ if test -z "$UI"; then
 		AC_DEFINE([UI_SDL], 1, [Defined if the SDL UI in use])
 		AC_DEFINE([USE_WIDGET], 1,
 		          [Defined if we're using a widget-based UI])
-		UI=sdl; WIDGET=widget;
-	        UI_LIBS="ui/sdl/libuisdl.a ui/widget/libwidget.a", 
+		UI=sdl; WIDGET=widget,
                 AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
   fi
 fi
@@ -394,7 +389,8 @@ library (i.e. do not pass --with-fake-glib) instead of its own replacement.])
 
   if test "$gtk" = yes; then
     AC_DEFINE([UI_GTK], 1, [Defined if GTK+ UI is in use])
-    UI=gtk; UI_LIBS="ui/gtk/libuigtk.la"
+    UI=gtk;
+    LIBS="$LIBS -lX11";
   fi
 fi
 
@@ -439,13 +435,24 @@ if test -z "$UI"; then
   AC_DEFINE([UI_X], 1, [Defined if Xlib UI in use])
   UI=xlib; WIDGET=widget;
   AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
-  UI_LIBS="ui/xlib/libuixlib.a ui/widget/libwidget.a"
 fi
 
-AC_SUBST(UI)
-AC_SUBST(UI_LIBS)
-AC_SUBST(WIDGET)
-AM_CONDITIONAL(WIDGET, test x$WIDGET != x)
+AM_CONDITIONAL(UI_FB, test "$UI" = fb)
+AM_CONDITIONAL(UI_GTK, test "$UI" = gtk)
+AM_CONDITIONAL(UI_SDL, test "$UI" = sdl)
+AM_CONDITIONAL(UI_SVGA, test "$UI" = svga)
+AM_CONDITIONAL(UI_WII, test "$UI" = wii)
+AM_CONDITIONAL(UI_WIN32, test "$UI" = win32)
+AM_CONDITIONAL(UI_X, test "$UI" = xlib)
+AM_CONDITIONAL(USE_WIDGET, test x$WIDGET != x)
+
+dnl Locate common options for widget UIs
+if test -n "$WIDGET"; then
+  OPTIONS_DIR="$WIDGET"
+else
+  OPTIONS_DIR="$UI"
+fi
+AC_SUBST(OPTIONS_DIR)
 
 dnl Check whether to use zlib (the UNIX version is called z, Win32 zdll)
 AC_MSG_CHECKING(whether to use zlib)
@@ -599,40 +606,40 @@ dnl
 
 AC_MSG_CHECKING(which sound routines to use)
 if test "$UI" = sdl; then
-  SOUND_LIBADD='sdlsound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
+  SOUND_LIBADD='sound/sdlsound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
   AC_MSG_RESULT(SDL)
 elif test "$dxsound_available" = yes; then
-  SOUND_LIBADD='dxsound.$(OBJEXT)' SOUND_LIBS='-ldsound -lole32 -ldxguid'
+  SOUND_LIBADD='sound/dxsound.$(OBJEXT)' SOUND_LIBS='-ldsound -lole32 -ldxguid'
   AC_MSG_RESULT(DirectX)
   AC_DEFINE([DIRECTSOUND_VERSION], 0x0700, [DirectX 7 or higher is required])
 elif test "$win32sound_available" = yes; then
-  SOUND_LIBADD='win32sound.$(OBJEXT)' SOUND_LIBS='-lwinmm'
+  SOUND_LIBADD='sound/win32sound.$(OBJEXT)' SOUND_LIBS='-lwinmm'
   AC_MSG_RESULT(win32sound)
 elif test "$alsa_available" = yes; then
-  SOUND_LIBADD='alsasound.$(OBJEXT)' SOUND_LIBS='-lasound'
+  SOUND_LIBADD='sound/alsasound.$(OBJEXT)' SOUND_LIBS='-lasound'
   AC_MSG_RESULT(ALSA)
 elif test "$ao_available" = yes; then
-  SOUND_LIBADD='aosound.$(OBJEXT)' SOUND_LIBS='-lao'
+  SOUND_LIBADD='sound/aosound.$(OBJEXT)' SOUND_LIBS='-lao'
   AC_MSG_RESULT(libao)
 elif test "$ac_cv_header_dsound_h" = yes; then
   # Later selection between these two
-  SOUND_LIBADD='sunsound.$(OBJEXT) hpsound.$(OBJEXT)' SOUND_LIBS=''
+  SOUND_LIBADD='sound/sunsound.$(OBJEXT) sound/hpsound.$(OBJEXT)' SOUND_LIBS=''
   AC_MSG_RESULT(Solaris or HP/UX)
 elif test "$ac_cv_header_sys_soundcard_h" = yes; then
-  SOUND_LIBADD='osssound.$(OBJEXT)' SOUND_LIBS=''
+  SOUND_LIBADD='sound/osssound.$(OBJEXT)' SOUND_LIBS=''
   AC_MSG_RESULT(OSS)
 elif test "$ac_cv_header_sys_audioio_h" = yes; then
   dnl OpenBSD
-  SOUND_LIBADD='sunsound.$(OBJEXT)' SOUND_LIBS=''
+  SOUND_LIBADD='sound/sunsound.$(OBJEXT)' SOUND_LIBS=''
   AC_MSG_RESULT(OpenBSD)
 elif test "$coreaudio_available" = yes; then
-  SOUND_LIBADD='coreaudiosound.$(OBJEXT)' SOUND_LIBS='-framework CoreAudio -framework AudioUnit -framework CoreServices' sound_fifo=yes
+  SOUND_LIBADD='sound/coreaudiosound.$(OBJEXT)' SOUND_LIBS='-framework CoreAudio -framework AudioUnit -framework CoreServices' sound_fifo=yes
   AC_MSG_RESULT(CoreAudio)
 elif test "$wii" = yes; then
-  SOUND_LIBADD='wiisound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
+  SOUND_LIBADD='sound/wiisound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
   AC_MSG_RESULT(Wii)
 else
-  SOUND_LIBADD='nullsound.$(OBJEXT)' SOUND_LIBS=''
+  SOUND_LIBADD='sound/nullsound.$(OBJEXT)' SOUND_LIBS=''
   AC_MSG_RESULT(none)
   AC_DEFINE([NO_SOUND], 1, [Defined if no sound code is present])
   AC_MSG_WARN(No sound library has been found)
@@ -640,7 +647,7 @@ fi
 
 if test "$sound_fifo" = yes; then
   dnl Strange construct used here as += doesn't seem to work on OS X
-  SOUND_LIBADD="$SOUND_LIBADD"' sfifo.$(OBJEXT)'
+  SOUND_LIBADD="$SOUND_LIBADD"' sound/sfifo.$(OBJEXT)'
   AC_DEFINE([SOUND_FIFO], 1, [Defined if the sound code uses a fifo])
 fi
 
@@ -741,10 +748,10 @@ fi
 dnl Work out which timer routines to use
 AC_MSG_CHECKING(which timer routines to use)
 if test "$UI" = sdl; then
-  TIMER_LIBADD='sdl.$(OBJEXT)'
+  TIMER_LIBADD='timer/sdl.$(OBJEXT)'
   AC_MSG_RESULT(SDL)
 else
-  TIMER_LIBADD='native.$(OBJEXT)'
+  TIMER_LIBADD='timer/native.$(OBJEXT)'
   AC_MSG_RESULT(native)
 fi
 AC_SUBST(TIMER_LIBADD)
@@ -932,39 +939,8 @@ fi
 
 AC_CONFIG_FILES([
 Makefile
-compat/Makefile
-data/Makefile
-debugger/Makefile
-hacking/Makefile
-lib/Makefile
-machines/Makefile
-man/Makefile
-peripherals/Makefile
-peripherals/disk/Makefile
-peripherals/ide/Makefile
-peripherals/nic/Makefile
-peripherals/flash/Makefile
-perl/Makefile
-perl/Fuse/Makefile
-pokefinder/Makefile
-roms/Makefile
-sound/Makefile
-timer/Makefile
-ui/Makefile
-ui/fb/Makefile
-ui/wii/Makefile
-ui/gtk/Makefile
-ui/svga/Makefile
-ui/sdl/Makefile
-ui/scaler/Makefile
-ui/widget/Makefile
 ui/win32/fuse.manifest
-ui/win32/Makefile
-ui/win32/icons/Makefile
 ui/win32/installer/fuse.nsi
-ui/xlib/Makefile
-unittests/Makefile
-z80/Makefile
-z80/tests/Makefile])
+])
 
 AC_OUTPUT

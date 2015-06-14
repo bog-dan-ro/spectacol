@@ -21,27 +21,28 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+if UI_SDL
 
-AM_CPPFLAGS = -I$(srcdir)/../..
+fuse_SOURCES += $(ui_sdl_files)
 
-noinst_LIBRARIES = libuisdl.a
+BUILT_SOURCES += $(ui_sdl_built)
 
-AM_CPPFLAGS += @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@ @SDL_CFLAGS@
+endif
 
-libuisdl_a_SOURCES = sdldisplay.c \
-		     sdljoystick.c \
-		     sdlkeyboard.c \
-		     sdlui.c \
-		     keysyms.c
 
-BUILT_SOURCES = keysyms.c
+CLEANFILES += $(ui_sdl_built)
 
-keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
-	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl sdl $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
+ui_sdl_files = \
+               ui/sdl/sdldisplay.c \
+               ui/sdl/sdldisplay.h \
+               ui/sdl/sdljoystick.c \
+               ui/sdl/sdljoystick.h \
+               ui/sdl/sdlkeyboard.c \
+               ui/sdl/sdlkeyboard.h \
+               ui/sdl/sdlui.c \
+               ui/sdl/keysyms.c
 
-noinst_HEADERS = sdldisplay.h \
-		 sdljoystick.h \
-		 sdlkeyboard.h
+ui_sdl_built = ui/sdl/keysyms.c
 
-CLEANFILES = keysyms.c
+ui/sdl/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
+	$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl sdl $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@

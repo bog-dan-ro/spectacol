@@ -21,50 +21,81 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+fuse_SOURCES += \
+                peripherals/ay.c \
+                peripherals/dck.c \
+                peripherals/fuller.c \
+                peripherals/if1.c \
+                peripherals/if2.c \
+                peripherals/joystick.c \
+                peripherals/kempmouse.c \
+                peripherals/melodik.c \
+                peripherals/printer.c \
+                peripherals/scld.c \
+                peripherals/speccyboot.c \
+                peripherals/specdrum.c \
+                peripherals/spectranet.c \
+                peripherals/ula.c \
+                peripherals/usource.c \
+                peripherals/disk/beta.c \
+                peripherals/disk/crc.c \
+                peripherals/disk/didaktik.c \
+                peripherals/disk/disciple.c \
+                peripherals/disk/disk.c \
+                peripherals/disk/fdd.c \
+                peripherals/disk/opus.c \
+                peripherals/disk/plusd.c \
+                peripherals/disk/upd_fdc.c \
+                peripherals/disk/wd_fdc.c \
+                peripherals/ide/divide.c \
+                peripherals/ide/ide.c \
+                peripherals/ide/simpleide.c \
+                peripherals/ide/zxatasp.c \
+                peripherals/ide/zxcf.c
 
-AM_CPPFLAGS = -I$(srcdir)/..
+if BUILD_SPECCYBOOT
+fuse_SOURCES += peripherals/nic/enc28j60.c
+endif
 
-SUBDIRS = \
-  disk \
-  flash \
-  ide \
-  nic
+if BUILD_SPECTRANET
+fuse_SOURCES += \
+                peripherals/flash/am29f010.c \
+                peripherals/nic/w5100.c \
+                peripherals/nic/w5100_socket.c
+endif
 
-noinst_LIBRARIES = libperipherals.a
-
-AM_CPPFLAGS += @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
-
-libperipherals_a_SOURCES = \
-  ay.c \
-  dck.c \
-  fuller.c \
-  if1.c \
-  if2.c \
-  joystick.c \
-  kempmouse.c \
-  melodik.c \
-  printer.c \
-  scld.c \
-  speccyboot.c \
-  specdrum.c \
-  spectranet.c \
-  ula.c \
-  usource.c
-
-noinst_HEADERS = \
-  ay.h \
-  dck.h \
-  fuller.h \
-  if1.h \
-  if2.h \
-  joystick.h \
-  kempmouse.h \
-  melodik.h \
-  printer.h \
-  scld.h \
-  speccyboot.h \
-  specdrum.h \
-  spectranet.h \
-  ula.h \
-  usource.h
+noinst_HEADERS += \
+                  peripherals/ay.h \
+                  peripherals/dck.h \
+                  peripherals/fuller.h \
+                  peripherals/if1.h \
+                  peripherals/if2.h \
+                  peripherals/joystick.h \
+                  peripherals/kempmouse.h \
+                  peripherals/melodik.h \
+                  peripherals/printer.h \
+                  peripherals/scld.h \
+                  peripherals/speccyboot.h \
+                  peripherals/specdrum.h \
+                  peripherals/spectranet.h \
+                  peripherals/ula.h \
+                  peripherals/usource.h \
+                  peripherals/disk/beta.h \
+                  peripherals/disk/crc.h \
+                  peripherals/disk/didaktik.h \
+                  peripherals/disk/disciple.h \
+                  peripherals/disk/disk.h \
+                  peripherals/disk/fdd.h \
+                  peripherals/disk/opus.h \
+                  peripherals/disk/plusd.h \
+                  peripherals/disk/upd_fdc.h \
+                  peripherals/disk/wd_fdc.h \
+                  peripherals/ide/divide.h \
+                  peripherals/ide/ide.h \
+                  peripherals/ide/simpleide.h \
+                  peripherals/ide/zxatasp.h \
+                  peripherals/ide/zxcf.h \
+                  peripherals/flash/am29f010.h \
+                  peripherals/nic/enc28j60.h \
+                  peripherals/nic/w5100.h \
+                  peripherals/nic/w5100_internals.h

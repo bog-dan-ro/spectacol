@@ -326,7 +326,7 @@ z80_do_opcodes( void )
   end_opcode:
     PC++; R++;
     switch(opcode) {
-#include "opcodes_base.c"
+#include "z80/opcodes_base.c"
     }
 
   }
@@ -339,7 +339,7 @@ static int
 z80_cbxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
-#include "z80_cb.c"
+#include "z80/z80_cb.c"
   }
   return 0;
 }
@@ -351,7 +351,7 @@ z80_ddxx( libspectrum_byte opcode2 )
 #define REGISTER  IX
 #define REGISTERL IXL
 #define REGISTERH IXH
-#include "z80_ddfd.c"
+#include "z80/z80_ddfd.c"
 #undef REGISTERH
 #undef REGISTERL
 #undef REGISTER
@@ -363,7 +363,7 @@ static int
 z80_edxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
-#include "z80_ed.c"
+#include "z80/z80_ed.c"
   }
   return 0;
 }
@@ -375,7 +375,7 @@ z80_fdxx( libspectrum_byte opcode2 )
 #define REGISTER  IY
 #define REGISTERL IYL
 #define REGISTERH IYH
-#include "z80_ddfd.c"
+#include "z80/z80_ddfd.c"
 #undef REGISTERH
 #undef REGISTERL
 #undef REGISTER
@@ -387,7 +387,7 @@ static void
 z80_ddfdcbxx( libspectrum_byte opcode3, libspectrum_word tempaddr )
 {
   switch(opcode3) {
-#include "z80_ddfdcb.c"
+#include "z80/z80_ddfdcb.c"
   }
 }
 
