@@ -33,19 +33,19 @@ BUILT_SOURCES += \
                  z80/z80_ed.c
 
 z80/opcodes_base.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_base.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_base.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_base.dat > $@.tmp && mv $@.tmp $@
 
 z80/z80_cb.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_cb.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_cb.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_cb.dat > $@.tmp && mv $@.tmp $@
 
 z80/z80_ddfd.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfd.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfd.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfd.dat > $@.tmp && mv $@.tmp $@
 
 z80/z80_ddfdcb.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfd.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfdcb.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfdcb.dat > $@.tmp && mv $@.tmp $@
 
 z80/z80_ed.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ed.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ed.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ed.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS += \
                   z80/z80.h \

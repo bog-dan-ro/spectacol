@@ -76,16 +76,16 @@ EXTRA_DIST += \
               ui/gtk/options-header.pl
 
 ui/gtk/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl gtk $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl gtk $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@
 
 ui/gtk/menu_data.c: $(srcdir)/perl/cpp-perl.pl $(srcdir)/menu_data.pl $(srcdir)/menu_data.dat config.h
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl gtk c > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl gtk c > $@.tmp && mv $@.tmp $@
 
 ui/gtk/menu_data.ui: $(srcdir)/perl/cpp-perl.pl $(srcdir)/menu_data.pl $(srcdir)/menu_data.dat config.h
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl gtk ui > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl gtk ui > $@.tmp && mv $@.tmp $@
 
 ui/gtk/options.c: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/gtk/options.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/gtk/options.pl - > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/gtk/options.pl - > $@.tmp && mv $@.tmp $@
 
 ui/gtk/options_internals.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/gtk/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/gtk/options-header.pl - > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/gtk/options-header.pl - > $@.tmp && mv $@.tmp $@

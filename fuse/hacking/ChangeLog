@@ -4910,3 +4910,6 @@
          xdisplay.c}},unittests,unittests/Makefile.am,z80,
          z80/{Makefile.am,tests,tests/Makefile.am,z80_ops.c}: switch to using
          non-recursive makefile (patch #321) (thanks, Stuart) (Sergio).
+20150617 Makefile.am,data/Makefile.am,ui/{fb,gtk,sdl,svga,widget,wii,win32,
+         xlib}/Makefile.am,z80/Makefile.am: enable silent rules for perl and 
+         windres commands (Sergio).

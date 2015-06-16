@@ -46,4 +46,4 @@ ui_fb_files = \
 ui_fb_built = ui/fb/keysyms.c
 
 ui/fb/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl fb $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl fb $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@

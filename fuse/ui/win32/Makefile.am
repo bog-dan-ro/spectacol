@@ -117,22 +117,22 @@ EXTRA_DIST += \
               $(ui_win32_rc_files)
 
 ui/win32/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl win32 $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl win32 $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@
 
 ui/win32/menu_data.c: $(srcdir)/perl/cpp-perl.pl $(srcdir)/menu_data.pl $(srcdir)/menu_data.dat config.h
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl win32 c > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl win32 c > $@.tmp && mv $@.tmp $@
 
 ui/win32/menu_data.h: $(srcdir)/perl/cpp-perl.pl $(srcdir)/menu_data.pl $(srcdir)/menu_data.dat config.h
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl win32 h > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl win32 h > $@.tmp && mv $@.tmp $@
 
 ui/win32/menu_data.rc: $(srcdir)/perl/cpp-perl.pl $(srcdir)/menu_data.pl $(srcdir)/menu_data.dat config.h
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl win32 rc > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/menu_data.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/menu_data.pl win32 rc > $@.tmp && mv $@.tmp $@
 
 ui/win32/options.c: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/win32/options.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/win32/options.pl - > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/win32/options.pl - > $@.tmp && mv $@.tmp $@
 
 ui/win32/options_internals.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/win32/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/win32/options-header.pl - > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/win32/options-header.pl - > $@.tmp && mv $@.tmp $@
 
 ui/win32/options.rc: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/win32/options-resource.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/win32/options-resource.pl - > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/win32/options-resource.pl - > $@.tmp && mv $@.tmp $@

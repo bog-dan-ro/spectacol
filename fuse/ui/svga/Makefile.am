@@ -44,4 +44,4 @@ ui_svga_files = \
 ui_svga_built = ui/svga/keysyms.c
 
 ui/svga/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl svga $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl svga $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@

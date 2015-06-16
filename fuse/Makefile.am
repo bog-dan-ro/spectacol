@@ -72,13 +72,13 @@ EXTRA_fuse_SOURCES =
 BUILT_SOURCES = options.h settings.c settings.h
 
 settings.c: settings.pl settings.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/settings.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/settings.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
 
 settings.h: settings-header.pl settings.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/settings-header.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/settings-header.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
 
 options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@OPTIONS_DIR@/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
-	$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/@OPTIONS_DIR@/options-header.pl - public > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/@OPTIONS_DIR@/options-header.pl - public > $@.tmp && mv $@.tmp $@
 
 AM_CPPFLAGS = \
               $(GLIB_CFLAGS) \
@@ -156,7 +156,7 @@ fuse_LDADD += windres.o
 fuse_DEPENDENCIES += windres.o
 
 windres.o: windres.rc winfuse.ico ui/win32/fuse.manifest $(ui_win32_res)
-	$(WINDRES) -I$(srcdir) -I. $(srcdir)/windres.rc $(LIBSPEC_CFLAGS) $(CPPFLAGS) windres.o
+	$(AM_V_GEN)$(WINDRES) -I$(srcdir) -I. $(srcdir)/windres.rc $(LIBSPEC_CFLAGS) $(CPPFLAGS) windres.o
 
 endif
 

@@ -54,7 +54,7 @@ EXTRA_DIST += \
               ui/xlib/xstatusbar.pl
 
 ui/xlib/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
-	$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl x $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl x $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@
 
 ui/xlib/xpixmaps.c: ui/xlib/xstatusbar.pl $(srcdir)/ui/gtk/pixmaps.c
-	$(PERL) -I$(srcdir)/perl $(srcdir)/ui/xlib/xstatusbar.pl $(srcdir)/ui/gtk/pixmaps.c > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/ui/xlib/xstatusbar.pl $(srcdir)/ui/gtk/pixmaps.c > $@.tmp && mv $@.tmp $@
