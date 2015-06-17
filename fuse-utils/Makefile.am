@@ -154,5 +154,5 @@ tapeconv_SOURCES += tapeconv_res.rc
 tzxlist_SOURCES += tzxlist_res.rc
 
 .rc.o:
-	$(WINDRES) -I$(srcdir) -I$(top_builddir) $(CPPFLAGS) -o $@ $<
+	$(AM_V_GEN)$(WINDRES) -I$(srcdir) -I$(top_builddir) $(CPPFLAGS) -o $@ $<
 endif
