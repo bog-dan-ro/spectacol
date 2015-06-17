@@ -1015,5 +1015,7 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150513 internals.h: fix ARRAY_SIZE when using a modern GCC with strict C89
          syntax (Sergio).
 20150606 doc/libspectrum.txt: sync with snap_accessors.txt (Stuart).
-20150613 m4/ax_create_stdint_h.m4: Add AX_CREATE_STDINT_H macro from the GNU
+20150613 m4/ax_create_stdint_h.m4: add AX_CREATE_STDINT_H macro from the GNU
          Autoconf Archive (Stuart).
+20150617 Makefile.am,test/Makefile.am: enable silent rules for perl and windres
+         commands (Sergio).

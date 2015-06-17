@@ -35,7 +35,7 @@ noinst_DATA += test/complete-tzx.tzx
 noinst_HEADERS += test/test.h
 
 test/complete-tzx.tzx: test/complete-tzx.pl
-	perl $< > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $< > $@.tmp && mv $@.tmp $@
 
 test_test_LDADD = libspectrum.la
 

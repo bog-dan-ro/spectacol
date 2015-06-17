@@ -80,26 +80,26 @@ noinst_DATA =
 AM_CFLAGS = -DLIBSPECTRUM_EXPORTS
 
 make-perl$(EXEEXT): $(srcdir)/make-perl.c config.h
-	$(CC_FOR_BUILD) -I. $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(AM_V_CC)$(CC_FOR_BUILD) -I. $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
 libspectrum.h: libspectrum.h.in generate.pl snap_accessors.txt tape_accessors.txt config.h
-	@PERL@ -p generate.pl $(srcdir) $(srcdir)/libspectrum.h.in > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) -p generate.pl $(srcdir) $(srcdir)/libspectrum.h.in > $@.tmp && mv $@.tmp $@
 
 generate.pl: make-perl$(EXEEXT) generate.pl.in
-	./make-perl$(EXEEXT) > $@
-	cat $(srcdir)/generate.pl.in >> $@
+	$(AM_V_GEN)./make-perl$(EXEEXT) > $@
+	$(AM_V_at)cat $(srcdir)/generate.pl.in >> $@
 
 snap_accessors.c: accessor.pl snap_accessors.txt
-	@PERL@ $(srcdir)/accessor.pl $(srcdir)/snap_accessors.txt > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/accessor.pl $(srcdir)/snap_accessors.txt > $@.tmp && mv $@.tmp $@
 
 tape_accessors.c: tape_accessors.pl tape_accessors.txt
-	@PERL@ $(srcdir)/tape_accessors.pl $(srcdir)/tape_accessors.txt > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/tape_accessors.pl $(srcdir)/tape_accessors.txt > $@.tmp && mv $@.tmp $@
 
 tape_set.c: tape_set.pl tape_accessors.txt
-	@PERL@ $(srcdir)/tape_set.pl $(srcdir)/tape_accessors.txt > $@.tmp && mv $@.tmp $@
+	$(AM_V_GEN)$(PERL) $(srcdir)/tape_set.pl $(srcdir)/tape_accessors.txt > $@.tmp && mv $@.tmp $@
 
 windres.o: windres.rc
-	@WINDRES@ -I. $(srcdir)/windres.rc windres.o
+	$(AM_V_GEN)$(WINDRES) -I. $(srcdir)/windres.rc windres.o
 
 AM_CPPFLAGS = @GLIB_CFLAGS@ @AUDIOFILE_CFLAGS@
 
