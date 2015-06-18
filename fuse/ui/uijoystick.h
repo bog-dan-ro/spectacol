@@ -34,8 +34,6 @@
 #ifndef FUSE_UI_UIJOYSTICK_H
 #define FUSE_UI_UIJOYSTICK_H
 
-#include <libspectrum.h>
-
 #define NUM_JOY_BUTTONS 15
 
 int ui_joystick_init( void ); /* returns no. of joysticks initialised */

@@ -49,6 +49,7 @@
 #include "spectrum.h"
 #include "machine.h"
 #include "ui/ui.h"
+#include "ui/uijoystick.h"
 
 static int sticks = 0;
 static int buttons[2];

@@ -4913,3 +4913,6 @@
 20150617 Makefile.am,data/Makefile.am,ui/{fb,gtk,sdl,svga,widget,wii,win32,
          xlib}/Makefile.am,z80/Makefile.am: enable silent rules for perl and 
          windres commands (Sergio).
+20150618 ui/{svga/svgajoystick.c,uijoystick.h,widget/menu.c}: define
+         NUM_JOY_BUTTONS for SVGAlib UI and avoid generation of unused functions
+         (Sergio).
