@@ -92,7 +92,8 @@ static size_t top_left_file, current_file, new_current_file;
 static char *widget_get_filename( const char *title, int saving );
 
 static int widget_add_filename( int *allocated, int *number,
-				struct widget_dirent ***namelist, char *name );
+                                struct widget_dirent ***namelist,
+                                const char *name );
 static void widget_scan( char *dir );
 static int widget_select_file( const char *name );
 static int widget_scan_compare( const widget_dirent **a,
@@ -161,8 +162,8 @@ ui_get_save_filename( const char *title )
 }
 
 static int widget_add_filename( int *allocated, int *number,
-				struct widget_dirent ***namelist,
-				char *name ) {
+                                struct widget_dirent ***namelist,
+                                const char *name ) {
   int i; size_t length;
 
   if( ++*number > *allocated ) {
@@ -365,7 +366,7 @@ static int widget_scandrives( struct widget_dirent ***namelist )
   unsigned long drivemask;
   int i;
   char drive[3];
-  char *driveletters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const char *driveletters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   drive[1] = ':';
   drive[2] = '\0';

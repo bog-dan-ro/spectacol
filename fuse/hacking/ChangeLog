@@ -4920,3 +4920,4 @@
          data/win32,data/win32/{distribution.mk,fuse.manifest.in,
          installer.nsi.in,winfuse.ico},windres.rc: move Windows resources that
          are UI-independent to data/win32 (Sergio).
+20150622 ui/widget/filesel.c: add missing const qualifiers (Sergio).
