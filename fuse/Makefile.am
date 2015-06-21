@@ -136,8 +136,7 @@ EXTRA_DIST = AUTHORS \
 	     menu_data.pl \
 	     settings.dat \
 	     settings.pl \
-	     settings-header.pl \
-	     winfuse.ico
+	     settings-header.pl
 
 CLEANFILES = options.h \
 	     settings.c \
@@ -155,7 +154,7 @@ fuse_SOURCES += windres.rc
 fuse_LDADD += windres.o
 fuse_DEPENDENCIES += windres.o
 
-windres.o: windres.rc winfuse.ico ui/win32/fuse.manifest $(ui_win32_res)
+windres.o: windres.rc data/win32/winfuse.ico data/win32/fuse.manifest $(ui_win32_res)
 	$(AM_V_GEN)$(WINDRES) -I$(srcdir) -I. $(srcdir)/windres.rc $(LIBSPEC_CFLAGS) $(CPPFLAGS) windres.o
 
 endif

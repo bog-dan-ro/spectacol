@@ -108,8 +108,16 @@ endif
 
 EXTRA_DIST += \
               data/fuse.desktop.in \
-              data/fuse.xml.in
+              data/fuse.xml.in \
+              data/win32/fuse.manifest.in \
+              data/win32/installer.nsi.in \
+              data/win32/winfuse.ico
 
 CLEANFILES += \
               data/fuse.desktop \
               data/fuse.xml
+
+## Windows distribution rules
+if COMPAT_WIN32
+include data/win32/distribution.mk
+endif

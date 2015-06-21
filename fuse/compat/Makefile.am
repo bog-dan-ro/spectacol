@@ -111,8 +111,3 @@ endif
 if HAVE_TUNTAP
 fuse_SOURCES += compat/unix/tuntap.c
 endif
-
-## Windows distribution rules
-if COMPAT_WIN32
-include compat/win32/distribution.mk
-endif

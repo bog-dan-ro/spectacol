@@ -939,8 +939,8 @@ fi
 
 AC_CONFIG_FILES([
 Makefile
-ui/win32/fuse.manifest
-ui/win32/installer/fuse.nsi
+data/win32/fuse.manifest
+data/win32/installer.nsi
 ])
 
 AC_OUTPUT

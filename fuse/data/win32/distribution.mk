@@ -86,7 +86,7 @@ dist-win32-exe: dist-win32-dir
 	@test `find $(top_win32dir) -type f -name \*.dll -print | wc -l` -ne 0 || \
 	{ echo "ERROR: external libraries not found in $(top_win32dir). Please, manually copy them."; exit 1; }
 #	Locate NSIS in system path, MSYS drive or Cygwin drive
-	@NSISFILE="$(abs_top_builddir)/ui/win32/installer/fuse.nsi"; \
+	@NSISFILE="$(abs_top_builddir)/data/win32/installer.nsi"; \
 	if makensis -VERSION > /dev/null 2>&1; then \
 	  MAKENSIS="makensis"; \
 	elif [ -x "/c/Program Files/NSIS/makensis" ]; then \

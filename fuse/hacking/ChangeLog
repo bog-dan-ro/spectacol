@@ -4916,3 +4916,7 @@
 20150618 ui/{svga/svgajoystick.c,uijoystick.h,widget/menu.c}: define
          NUM_JOY_BUTTONS for SVGAlib UI and avoid generation of unused functions
          (Sergio).
+20150621 Makefile.am,compat/Makefile.am,configure.ac,data/Makefile.am,
+         data/win32,data/win32/{distribution.mk,fuse.manifest.in,
+         installer.nsi.in,winfuse.ico},windres.rc: move Windows resources that
+         are UI-independent to data/win32 (Sergio).

@@ -27,7 +27,7 @@
 
 #include <windows.h>
 
-win32_icon ICON "winfuse.ico"
+win32_icon ICON "data/win32/winfuse.ico"
 
 #ifdef UI_WIN32
 
@@ -84,5 +84,5 @@ END
 /* Reference a manifest for visual styles. It must happen at the end.
    Visual Studio generates the manifest automatically */
 #ifdef __GNUC__
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "ui/win32/fuse.manifest"
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "data/win32/fuse.manifest"
 #endif
