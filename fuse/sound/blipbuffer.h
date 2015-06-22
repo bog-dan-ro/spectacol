@@ -39,11 +39,6 @@ The source now almost according to C89. (except of course `inline')
 #ifndef BLIP_BUFFER_H
 #define BLIP_BUFFER_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-
 /*
  Time unit at source clock rate
 */

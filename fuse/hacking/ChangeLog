@@ -4921,3 +4921,6 @@
          installer.nsi.in,winfuse.ico},windres.rc: move Windows resources that
          are UI-independent to data/win32 (Sergio).
 20150622 ui/widget/filesel.c: add missing const qualifiers (Sergio).
+20150623 peripherals/{nic/{enc28j60.c,w5100.c,w5100_socket.c},speccyboot.c,
+         spectranet.c},sound/blipbuffer.h: use '#include <config.h>' instead of
+         '#include "config.h"' (thanks, Stuart) (Sergio).
