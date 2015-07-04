@@ -359,6 +359,12 @@ int tape_load_trap( void )
     return -1;
   }
 
+  /* Verify? For now don't run the traps in that situation */
+  if( !(F_ & FLAG_C) ) {
+    tape_play( 1 );
+    return -1;
+  }
+
   /* We don't properly handle the case of partial loading, so don't run
      the traps in that situation */
   if( libspectrum_tape_block_data_length( block ) != DE + 2 ) {

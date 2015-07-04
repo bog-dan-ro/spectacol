@@ -4924,3 +4924,4 @@
 20150623 peripherals/{nic/{enc28j60.c,w5100.c,w5100_socket.c},speccyboot.c,
          spectranet.c},sound/blipbuffer.h: use '#include <config.h>' instead of
          '#include "config.h"' (thanks, Stuart) (Sergio).
+20150704 tape.c: skip tape traps if VERIFY is requested (patch #337) (UB880D).
