@@ -172,8 +172,7 @@ tc2068_reset( void )
       exrom_page->page_num = i;
     }
 
-  error = tc2068_tc2048_common_reset();
-  if( error ) return error;
+  tc2068_tc2048_common_reset();
 
   error = dck_reset();
   if( error ) {
@@ -184,9 +183,11 @@ tc2068_reset( void )
   return 0;
 }
 
-int
+void
 tc2068_tc2048_common_reset( void )
 {
+  scld_set_exrom_dock_contention();
+
   memory_current_screen = 5;
   memory_screen_mask = 0xdfff;
 
@@ -194,8 +195,6 @@ tc2068_tc2048_common_reset( void )
   scld_hsr_write( 0x00f4, 0x00 );
 
   tc2068_tc2048_common_display_setup();
-
-  return 0;
 }
 
 int

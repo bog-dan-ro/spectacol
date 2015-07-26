@@ -139,4 +139,8 @@ libspectrum_byte hires_convert_dec( libspectrum_byte attr );
 void scld_home_map_16k( libspectrum_word address, memory_page source[],
                         int page_num );
 
+/* Set contention for SCLD, contended in home, Dock and Exrom in the 0x4000 -
+   0x7FFF range */
+void scld_set_exrom_dock_contention( void );
+
 #endif                  /* #ifndef FUSE_SCLD_H */

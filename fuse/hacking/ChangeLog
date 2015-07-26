@@ -4925,3 +4925,7 @@
          spectranet.c},sound/blipbuffer.h: use '#include <config.h>' instead of
          '#include "config.h"' (thanks, Stuart) (Sergio).
 20150704 tape.c: skip tape traps if VERIFY is requested (patch #337) (UB880D).
+20150726 machines/{spec_se.c,tc2048.c,tc2068.[ch],ts2068.c},
+         peripherals/{dck.c,scld.[ch]}: The Timex SCLD (on daughterboard in
+         the TS2068) is contended in all of the home, Dock and Exrom banks in
+         the 0x4000 - 0x7FFF range (thanks, rga24 from WoS) (Fred).

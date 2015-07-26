@@ -221,6 +221,9 @@ scld_dock_exrom_from_snapshot( memory_page *dest, int page_num, int writable,
     page->page = data + page->offset;
     page->save_to_snapshot = 1;
   }
+
+  /* Reset contention for pages */
+  scld_set_exrom_dock_contention();
 }
 
 static void
@@ -328,5 +331,19 @@ scld_home_map_16k( libspectrum_word address, memory_page source[],
   for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
     int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
     timex_home[ page ] = &source[ page_num * MEMORY_PAGES_IN_16K + i ];
+  }
+}
+
+/* Set contention for SCLD, contended in home, Dock and Exrom in the 0x4000 -
+   0x7FFF range */
+void
+scld_set_exrom_dock_contention( void )
+{
+  int i;
+  const int page_num = 1;
+
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
+    timex_exrom[ page_num * MEMORY_PAGES_IN_16K + i ].contended = 1;
+    timex_dock[ page_num * MEMORY_PAGES_IN_16K + i ].contended = 1;
   }
 }

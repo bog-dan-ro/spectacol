@@ -134,5 +134,7 @@ tc2048_reset( void )
       exrom_page->page_num = i;
     }
 
-  return tc2068_tc2048_common_reset();
+  tc2068_tc2048_common_reset();
+
+  return 0;
 }

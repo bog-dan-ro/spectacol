@@ -202,6 +202,9 @@ dck_reset( void )
 
   dck_active = 1;
 
+  /* Reset contention for pages */
+  scld_set_exrom_dock_contention();
+
   /* Make the menu item to eject the cartridge active */
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 1 );
 

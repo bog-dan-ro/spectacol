@@ -156,6 +156,8 @@ spec_se_reset( void )
     }
   }
 
+  scld_set_exrom_dock_contention();
+
   /* The dock and exrom aren't cleared by the reset routine, so do
      so manually (only really necessary to keep snapshot sizes down) */
   for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {

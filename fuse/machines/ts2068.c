@@ -112,8 +112,7 @@ ts2068_reset( void )
       exrom_page->page_num = i;
     }
 
-  error = tc2068_tc2048_common_reset();
-  if( error ) return error;
+  tc2068_tc2048_common_reset();
 
   error = dck_reset();
   if( error ) {
