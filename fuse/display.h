@@ -30,6 +30,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* The width and height of the Speccy's screen */
 #define DISPLAY_WIDTH_COLS  32
 #define DISPLAY_HEIGHT_ROWS 24
@@ -118,5 +122,9 @@ void display_refresh_all(void);
 int display_getpixel( int x, int y );
 
 void display_update_critical( int x, int y );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_DISPLAY_H */

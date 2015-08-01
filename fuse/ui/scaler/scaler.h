@@ -27,6 +27,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif              /* #ifdef __cplusplus */
+
 typedef enum scaler_type {
   SCALER_HALF = 0,
   SCALER_HALFSKIP,
@@ -87,5 +91,9 @@ float scaler_get_scaling_factor( scaler_type scaler );
 scaler_expand_fn* scaler_get_expander( scaler_type scaler );
 
 int scaler_select_bitformat( libspectrum_dword BitFormat );
+
+#ifdef __cplusplus
+};
+#endif              /* #ifdef __cplusplus */
 
 #endif

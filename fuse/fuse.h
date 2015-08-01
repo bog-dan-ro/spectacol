@@ -32,6 +32,10 @@
 
 #include "compat.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 extern const char *fuse_progname;	/* argv[0] */
 
 extern int fuse_exiting;		/* Shall we exit now? */
@@ -48,5 +52,9 @@ void fuse_abort( void ) GCC_NORETURN;	/* Emergency shutdown */
 
 extern libspectrum_creator *fuse_creator; /* Creator information for file
 					     formats which support this */
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_FUSE_H */

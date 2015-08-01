@@ -28,6 +28,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* User interface specific functions */
 
 int uidisplay_init( int width, int height );
@@ -54,5 +58,9 @@ void uidisplay_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
                       libspectrum_byte paper );
 void uidisplay_plot16( int x, int y, libspectrum_word data, libspectrum_byte ink,
                        libspectrum_byte paper);
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_UIDISPLAY_H */

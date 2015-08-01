@@ -30,6 +30,10 @@
 #include <libspectrum.h>
 #endif				/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 int snapshot_read( const char *filename );
 int snapshot_read_buffer( const unsigned char *buffer, size_t length,
 			  libspectrum_id_t type );
@@ -38,5 +42,9 @@ int snapshot_copy_from( libspectrum_snap *snap );
 
 int snapshot_write( const char *filename );
 int snapshot_copy_to( libspectrum_snap *snap );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif

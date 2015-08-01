@@ -30,6 +30,11 @@
 
 #include "compat.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
+
 typedef struct utils_file {
 
   unsigned char *buffer;
@@ -50,7 +55,7 @@ void utils_close_file( utils_file *file );
 int utils_write_file( const char *filename, const unsigned char *buffer,
 		      size_t length );
 int utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
-			  const char *template );
+                          const char *template_ );
 
 int utils_find_file_path( const char *filename, char *path,
                           utils_aux_type type );
@@ -61,5 +66,9 @@ char* utils_safe_strdup( const char *src );
 
 void utils_networking_init( void );
 void utils_networking_end( void );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_UTILS_H */

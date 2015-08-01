@@ -23,10 +23,12 @@
 
 */
 
-#include <config.h>
-
 #ifndef FUSE_INPUT_H
 #define FUSE_INPUT_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
 
 typedef enum input_event_type {
 
@@ -235,5 +237,9 @@ typedef struct input_event_t {
 } input_event_t;
 
 int input_event( const input_event_t *event );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_INPUT_H */

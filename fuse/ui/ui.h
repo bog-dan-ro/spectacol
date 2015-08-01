@@ -43,6 +43,10 @@
 #include "peripherals/disk/plusd.h"
 #include "ui/scaler/scaler.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* The various severities of error level, increasing downwards */
 typedef enum ui_error_level {
 
@@ -311,5 +315,9 @@ void ui_popup_menu( int native_key );
 void ui_widget_keyhandler( int native_key );
 
 void ui_pokemem_selector( const char *filename );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_UI_H */

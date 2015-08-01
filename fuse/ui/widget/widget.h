@@ -30,6 +30,10 @@
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* Code called at start and end of emulation */
 int widget_init( void );
 int widget_end( void );
@@ -260,5 +264,9 @@ static inline int widget_do_diskoptions( void )
 {
   return widget_do( WIDGET_TYPE_DISKOPTIONS, NULL );
 }
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_WIDGET_H */
