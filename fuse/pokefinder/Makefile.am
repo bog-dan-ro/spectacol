@@ -21,7 +21,7 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-fuse_SOURCES += \
+libfuse_a_SOURCES += \
                 pokefinder/pokefinder.c \
                 pokefinder/pokemem.c
 

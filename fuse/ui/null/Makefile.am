@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2008 Philip Kendall
+## Copyright (c) 2001-2004 Philip Kendall
 
 ## $Id$
 
@@ -21,27 +21,13 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-libfuse_a_SOURCES += \
-                debugger/breakpoint.c \
-                debugger/command.c \
-                debugger/commandl.l \
-                debugger/commandy.y \
-                debugger/debugger.c \
-                debugger/disassemble.c \
-                debugger/event.c \
-                debugger/expression.c \
-                debugger/variable.c
+if UI_NULL
 
-debugger/commandl.c: debugger/commandy.c
-debugger/commandy.h: debugger/commandy.c
+fuse_SOURCES += $(ui_null_files)
 
-noinst_HEADERS += \
-                  debugger/breakpoint.h \
-                  debugger/commandy.h \
-                  debugger/debugger.h \
-                  debugger/debugger_internals.h
+BUILT_SOURCES += $(ui_null_built)
 
-CLEANFILES += \
-              debugger/commandl.c \
-              debugger/commandy.c \
-              debugger/commandy.h
+endif
+
+ui_null_files = \
+               ui/null/null.c

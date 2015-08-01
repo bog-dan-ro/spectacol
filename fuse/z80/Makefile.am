@@ -21,7 +21,7 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-fuse_SOURCES += \
+libfuse_a_SOURCES += \
                 z80/z80.c \
                 z80/z80_ops.c
 

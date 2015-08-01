@@ -23,11 +23,9 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-bin_PROGRAMS = fuse
+noinst_LIBRARIES = libfuse.a
 
-noinst_PROGRAMS =
-
-fuse_SOURCES = display.c \
+libfuse_a_SOURCES = display.c \
 	event.c \
 	fuse.c \
 	input.c \
@@ -56,18 +54,10 @@ fuse_SOURCES = display.c \
 	uimedia.c \
 	utils.c
 
-fuse_LDADD = \
-             $(LIBSPEC_LIBS) \
-             $(GTK_LIBS) \
-             $(GLIB_LIBS) \
-             $(PNG_LIBS) \
-             $(SDL_LIBS) \
-             $(X_LIBS) \
-             $(XML_LIBS)
+EXTRA_libfuse_a_SOURCES =
 
-fuse_DEPENDENCIES =
-
-EXTRA_fuse_SOURCES =
+libfuse_a_LIBADD =
+libfuse_a_DEPENDENCIES =
 
 BUILT_SOURCES = options.h settings.c settings.h
 
@@ -79,6 +69,7 @@ settings.h: settings-header.pl settings.dat
 
 options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@OPTIONS_DIR@/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
 	$(AM_V_GEN)$(PERL) $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | $(PERL) -I$(srcdir)/perl $(srcdir)/ui/@OPTIONS_DIR@/options-header.pl - public > $@.tmp && mv $@.tmp $@
+
 
 AM_CPPFLAGS = \
               $(GLIB_CFLAGS) \
@@ -146,6 +137,25 @@ DISTCLEANFILES =
 
 pkgdata_DATA =
 
+bin_PROGRAMS = fuse
+
+noinst_PROGRAMS =
+
+fuse_SOURCES = fuse-main.c
+
+fuse_LDADD = libfuse.a \
+             $(LIBSPEC_LIBS) \
+             $(GTK_LIBS) \
+             $(GLIB_LIBS) \
+             $(PNG_LIBS) \
+             $(SDL_LIBS) \
+             $(X_LIBS) \
+             $(XML_LIBS)
+
+fuse_DEPENDENCIES =
+
+EXTRA_fuse_SOURCES =
+
 
 ## Resources for Windows executables
 if COMPAT_WIN32
@@ -176,6 +186,7 @@ include timer/Makefile.am
 include ui/Makefile.am
 include ui/fb/Makefile.am
 include ui/gtk/Makefile.am
+include ui/null/Makefile.am
 include ui/scaler/Makefile.am
 include ui/sdl/Makefile.am
 include ui/svga/Makefile.am
@@ -185,3 +196,5 @@ include ui/win32/Makefile.am
 include ui/xlib/Makefile.am
 include unittests/Makefile.am
 include z80/Makefile.am
+
+fuse_DEPENDENCIES += libfuse.a

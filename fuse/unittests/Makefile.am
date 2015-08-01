@@ -21,6 +21,6 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-fuse_SOURCES += unittests/unittests.c
+libfuse_a_SOURCES += unittests/unittests.c
 
 noinst_HEADERS += unittests/unittests.h

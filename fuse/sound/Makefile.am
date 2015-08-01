@@ -21,7 +21,7 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-fuse_SOURCES += sound/blipbuffer.c
+libfuse_a_SOURCES += sound/blipbuffer.c
 
 EXTRA_fuse_SOURCES += \
                       sound/alsasound.c \

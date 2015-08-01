@@ -43,7 +43,7 @@
    bootstrapping by redefining main. As we now allow SDL joystick code to be
    used in the GTK+ and Xlib UIs we need to also do the magic when that code is
    in use, feel free to look away for the next line */
-#if defined UI_SDL || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) )
+#if defined UI_SDL || (defined USE_JOYSTICK && !defined UI_NULL && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) )
 #include <SDL.h>		/* Needed on MacOS X and Windows */
 #endif /* #if defined UI_SDL || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) ) */
 
@@ -155,11 +155,7 @@ static int do_start_files( start_files_t *start_files );
 
 static int fuse_end(void);
 
-#ifdef UI_WIN32
-int fuse_main(int argc, char **argv)
-#else
-int main(int argc, char **argv)
-#endif
+int fuse_main(int argc, const char **argv)
 {
   int r;
 
