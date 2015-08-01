@@ -28,8 +28,6 @@
 #ifndef FUSE_PLUSD_H
 #define FUSE_PLUSD_H
 
-#include <config.h>
-
 typedef enum plusd_drive_number {
   PLUSD_DRIVE_1 = 0,
   PLUSD_DRIVE_2,

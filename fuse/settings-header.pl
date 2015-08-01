@@ -67,8 +67,6 @@ print << 'CODE';
 #ifndef FUSE_SETTINGS_H
 #define FUSE_SETTINGS_H
 
-#include <config.h>
-
 #include <sys/types.h>
 
 typedef struct settings_info {

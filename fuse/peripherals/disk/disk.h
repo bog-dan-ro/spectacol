@@ -26,8 +26,6 @@
 #ifndef FUSE_DISK_H
 #define FUSE_DISK_H
 
-#include <config.h>
-
 static const unsigned int DISK_FLAG_NONE = 0x00;
 static const unsigned int DISK_FLAG_PLUS3_CPC = 0x01;	/* try to fix some CPC issue */
 static const unsigned int DISK_FLAG_OPEN_DS = 0x02;	/* try to open the other side too */

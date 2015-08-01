@@ -28,8 +28,6 @@
 #ifndef FUSE_OPUS_H
 #define FUSE_OPUS_H
 
-#include <config.h>
-
 #include <libspectrum.h>
 
 #include "fdd.h"

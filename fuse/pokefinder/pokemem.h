@@ -26,12 +26,6 @@
 #ifndef POKEMEM_H
 #define POKEMEM_H
 
-#include <config.h>
-
-#ifdef HAVE_LIB_GLIB
-#include <glib.h>
-#endif				/* #ifdef HAVE_LIB_GLIB */
-
 #include <libspectrum.h>
 
 extern GSList *trainer_list;

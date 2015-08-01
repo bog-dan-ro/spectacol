@@ -26,8 +26,6 @@
 #ifndef FUSE_FDD_H
 #define FUSE_FDD_H
 
-#include <config.h>
-
 #include "event.h"
 #include "disk.h"
 

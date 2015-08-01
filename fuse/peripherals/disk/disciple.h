@@ -28,8 +28,6 @@
 #ifndef FUSE_DISCIPLE_H
 #define FUSE_DISCIPLE_H
 
-#include <config.h>
-
 typedef enum disciple_drive_number {
   DISCIPLE_DRIVE_1 = 0,
   DISCIPLE_DRIVE_2,
