@@ -278,7 +278,6 @@ utils_find_file_path( const char *filename, char *ret_path,
 		      utils_aux_type type )
 {
   path_context ctx;
-  struct stat stat_info;
 
   /* If given an absolute path, just look there */
   if( compat_is_absolute_path( filename ) ) {
@@ -297,7 +296,7 @@ utils_find_file_path( const char *filename, char *ret_path,
     snprintf( ret_path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", ctx.path,
               filename );
 #endif
-    if( !stat( ret_path, &stat_info ) ) return 0;
+    if( compat_file_exists(ret_path) ) return 0;
 
   }
 
