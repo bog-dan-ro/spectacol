@@ -400,10 +400,13 @@ QRect FuseTexture::updateGlPixels()
         w = m_width;
     if (!h)
         h = m_height;
-
+    int copy_x = x;
+    int copy_y = y;
+    int copy_w = w;
+    int copy_h = h;
     uint16_t *glPixels = m_glPixels;
     uint16_t *spectrumPixels = nullptr;
-    int specPitch = m_width * m_scale;;
+    int specPitch = m_width * m_scale;
 
     if (m_scale != 1) {
         /* Extend the dirty region by 1 pixel for scalers
@@ -414,23 +417,25 @@ QRect FuseTexture::updateGlPixels()
         QMutexLocker lockCopy(&m_copyPixelsMutex);
         int dest_x = x * m_scale;
         int dest_y = y * m_scale;
-        const libspectrum_byte * src = (const libspectrum_byte *)(m_spectrumPixels + x + y * m_width);
+        const libspectrum_byte *src = (const libspectrum_byte *)(m_spectrumPixels + x + y * m_width);
         spectrumPixels = m_spectrumScaledPixels + dest_x + dest_y * specPitch;
-        libspectrum_byte * dst = (libspectrum_byte *)(spectrumPixels);
+        libspectrum_byte *dst = (libspectrum_byte *)(spectrumPixels);
         scaler_proc16(src, m_width * sizeof(uint16_t), dst, specPitch * sizeof(uint16_t), w, h);
+        spectrumPixels += abs(copy_y - y) * m_scale * specPitch;
+        spectrumPixels += abs(copy_x - x) * m_scale;
     } else {
         spectrumPixels = m_spectrumPixels + x + y * specPitch;
     }
 
-    int glPitch = m_recreate ? m_texSize.width() : w * m_scale;
-    for (u_int32_t i = 0; i < h * m_scale; i++) {
+    int glPitch = m_recreate ? m_texSize.width() : copy_w * m_scale;
+    for (u_int32_t i = 0; i < copy_h * m_scale; i++) {
         memcpy(glPixels, spectrumPixels, glPitch * sizeof(uint16_t));
         glPixels += glPitch;
         spectrumPixels += specPitch;
     }
     m_update = false;
     m_recreate = false;
-    return QRect(x * m_scale, y * m_scale, w * m_scale, h * m_scale);
+    return QRect(copy_x * m_scale, copy_y * m_scale, copy_w * m_scale, copy_h * m_scale);
 }
 
 
