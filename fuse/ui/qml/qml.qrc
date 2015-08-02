@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>rom/48.rom</file>
+        <file>rom/128-0.rom</file>
+        <file>rom/128-1.rom</file>
+        <file>rom/disciple.rom</file>
+        <file>rom/plus2-0.rom</file>
+        <file>rom/plus2-1.rom</file>
+        <file>rom/plus3-0.rom</file>
+        <file>rom/plus3-1.rom</file>
+        <file>rom/plus3-2.rom</file>
+        <file>rom/plus3-3.rom</file>
+        <file>rom/plus3e-0.rom</file>
+        <file>rom/plus3e-1.rom</file>
+        <file>rom/plus3e-2.rom</file>
+        <file>rom/plus3e-3.rom</file>
+        <file>rom/plusd.rom</file>
+        <file>rom/se-0.rom</file>
+        <file>rom/se-1.rom</file>
+        <file>rom/speccyboot-1.4.rom</file>
+        <file>rom/tc2048.rom</file>
+        <file>rom/tc2068-0.rom</file>
+        <file>rom/tc2068-1.rom</file>
+        <file>ui/fuse.font</file>
+        <file>NavigationDrawer.qml</file>
+    </qresource>
+</RCC>

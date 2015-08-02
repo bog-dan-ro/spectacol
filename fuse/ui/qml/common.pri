@@ -1,0 +1,11 @@
+TEMPLATE = lib
+
+CONFIG += staticlib
+
+QT =
+
+OBJECTS_DIR =.$$TARGET
+
+INCLUDEPATH += $$SRCS_PATH
+
+QMAKE_POST_LINK += $$QMAKE_DEL_FILE $$OUT_PWD/*fuse-qml*
