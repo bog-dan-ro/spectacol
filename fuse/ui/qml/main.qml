@@ -7,8 +7,8 @@ import Fuse 1.0
 ApplicationWindow {
     id: mainWindow
     visible: true
-    width: 320*3
-    height: 240*3
+
+    visibility: Window.FullScreen
 
     title: qsTr("Hello World")
 

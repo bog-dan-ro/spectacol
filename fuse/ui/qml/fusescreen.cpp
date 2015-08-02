@@ -35,7 +35,6 @@ FuseScreen::FuseScreen()
     setFocus(true);
 }
 
-
 void FuseScreen::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
@@ -58,9 +57,9 @@ QSGNode *FuseScreen::updatePaintNode(QSGNode *n, QQuickItem::UpdatePaintNodeData
         QSizeF spectrumSize(FuseTexture::instance()->imageSize());
         m_aspectRatio = spectrumSize.width()/spectrumSize.height();
         connect(texture, &FuseTexture::needsUpdate, this, &FuseScreen::update, Qt::QueuedConnection);
-        connect(texture, &FuseTexture::sizeChanged, this, [this](const QSizeF&size) {
-            setImplicitSize(size.width(), size.height());
+        connect(texture, &FuseTexture::sizeChanged, this, [this](const QSizeF &size) {
             m_aspectRatio = size.width()/size.height();
+            geometryChanged(boundingRect(), boundingRect());
         } );
     }
     node->setSourceRect(QRect(QPoint(0, 0), texture->imageSize()));
