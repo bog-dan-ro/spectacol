@@ -4929,3 +4929,5 @@
          peripherals/{dck.c,scld.[ch]}: The Timex SCLD (on daughterboard in
          the TS2068) is contended in all of the home, Dock and Exrom banks in
          the 0x4000 - 0x7FFF range (thanks, rga24 from WoS) (Fred).
+20150803 peripherals/printer.c: make the partial decode ZX Printer not require a
+         hard reset to enable (thanks, RMartins) (Fred).

@@ -93,7 +93,7 @@ static const periph_port_t printer_zxp_ports[] = {
 static const periph_t printer_zxp_periph = {
   /* .option = */ &settings_current.zxprinter,
   /* .ports = */ printer_zxp_ports,
-  /* .hard_reset = */ 1,
+  /* .hard_reset = */ 0,
   /* .activate = */ NULL,
 };
 
