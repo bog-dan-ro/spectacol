@@ -24,6 +24,8 @@
 #include <fuse.h>
 #include <input.h>
 #include <keyboard.h>
+#include <utils.h>
+
 #include <ui/ui.h>
 
 #include <QDebug>
@@ -80,6 +82,16 @@ void FuseScreen::setPaused(bool paused)
         else
             fuse_emulation_unpause();
         emit pausedChanged();
+    });
+}
+
+void FuseScreen::load(QString path)
+{
+    pokeEvent([path]() {
+        fuse_emulation_pause();
+        utils_open_file( path.toUtf8().constData(), 1 , NULL );
+        display_refresh_all();
+        fuse_emulation_unpause();
     });
 }
 

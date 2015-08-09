@@ -44,6 +44,8 @@ Item
                 fileSelected(model.filePath);
             }
         }
+        onEscapePressed: fileSelected("")
+
         onUpPressed: folderUp()
 
         delegate: Component {

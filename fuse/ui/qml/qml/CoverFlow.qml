@@ -4,6 +4,8 @@ PathView
 {
     signal returnPressed()
     signal upPressed()
+    signal escapePressed();
+
     anchors.fill: parent
     pathItemCount: mainScreen.portrait ? 5 : 10
     cacheItemCount: pathItemCount * 2
@@ -17,7 +19,7 @@ PathView
     Keys.onEnterPressed: returnPressed()
     Keys.onReturnPressed: returnPressed()
     Keys.onUpPressed: upPressed()
-
+    Keys.onEscapePressed: escapePressed()
     path : Path  {
         // LEFT
         startX : parent.x

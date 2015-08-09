@@ -31,6 +31,9 @@ public:
     bool paused() const;
     void setPaused(bool paused);
 
+public slots:
+    void load(QString path);
+
 signals:
     void pausedChanged();
 
