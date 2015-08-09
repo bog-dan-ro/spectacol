@@ -39,7 +39,7 @@
 int snapshot_read( const char *filename )
 {
   utils_file file;
-  libspectrum_snap *snap = libspectrum_snap_alloc();
+  libspectrum_snap *snap = libspectrum_snap_alloc( libspectrum_context );
   int error;
 
   error = utils_read_file( filename, &file );
@@ -66,7 +66,7 @@ int
 snapshot_read_buffer( const unsigned char *buffer, size_t length,
 		      libspectrum_id_t type )
 {
-  libspectrum_snap *snap = libspectrum_snap_alloc();
+  libspectrum_snap *snap = libspectrum_snap_alloc( libspectrum_context );
   int error;
 
   error = libspectrum_snap_read( snap, buffer, length, type, NULL );
@@ -124,14 +124,14 @@ int snapshot_write( const char *filename )
 
   /* Work out what sort of file we want from the filename; default to
      .szx if we couldn't guess */
-  error = libspectrum_identify_file_with_class( &type, &class, filename, NULL,
+  error = libspectrum_identify_file_with_class( libspectrum_context, &type, &class, filename, NULL,
 						0 );
   if( error ) return error;
 
   if( class != LIBSPECTRUM_CLASS_SNAPSHOT || type == LIBSPECTRUM_ID_UNKNOWN )
     type = LIBSPECTRUM_ID_SNAPSHOT_SZX;
 
-  snap = libspectrum_snap_alloc();
+  snap = libspectrum_snap_alloc( libspectrum_context );
 
   error = snapshot_copy_to( snap );
   if( error ) { libspectrum_snap_free( snap ); return error; }

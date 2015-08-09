@@ -33,7 +33,7 @@
 #define PLUSD_HEADER_LENGTH 22
 
 static libspectrum_error
-identify_machine( size_t buffer_length, libspectrum_snap *snap );
+identify_machine( libspectrum_context_t *context, size_t buffer_length, libspectrum_snap *snap );
 static libspectrum_error
 libspectrum_plusd_read_header( const libspectrum_byte *buffer,
 			       size_t buffer_length, libspectrum_snap *snap );
@@ -52,7 +52,7 @@ libspectrum_plusd_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
 {
   int error;
 
-  error = identify_machine( buffer_length, snap );
+  error = identify_machine( libspectrum_snap_context(snap), buffer_length, snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   error = libspectrum_plusd_read_header( buffer, buffer_length, snap );
@@ -67,7 +67,7 @@ libspectrum_plusd_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
 }
 
 static libspectrum_error
-identify_machine( size_t buffer_length, libspectrum_snap *snap )
+identify_machine( libspectrum_context_t *context, size_t buffer_length, libspectrum_snap *snap )
 {
   switch( buffer_length ) {
   case PLUSD_HEADER_LENGTH + 0xc000:
@@ -77,7 +77,7 @@ identify_machine( size_t buffer_length, libspectrum_snap *snap )
     libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_128 );
     break;
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			     "plusd identify_machine: unknown length" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
@@ -125,6 +125,7 @@ libspectrum_plusd_read_data( const libspectrum_byte *buffer,
      registers */
   if( sp < 0x4000 || sp > 0xfffa ) {
     libspectrum_print_error(
+      libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_plusd_read_data: SP invalid (0x%04x)", sp
     );
@@ -150,7 +151,9 @@ libspectrum_plusd_read_data( const libspectrum_byte *buffer,
     break;
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error(
+                libspectrum_snap_context(snap),
+                LIBSPECTRUM_ERROR_LOGIC,
 			     "libspectrum_plusd_read_data: unknown machine" );
     return LIBSPECTRUM_ERROR_LOGIC;
 

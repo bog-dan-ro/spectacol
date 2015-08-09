@@ -44,16 +44,16 @@
 #include "internals.h"
 
 static libspectrum_error
-skip_gzip_header( const libspectrum_byte **gzptr, size_t *gzlength );
+skip_gzip_header( libspectrum_context_t *context, const libspectrum_byte **gzptr, size_t *gzlength );
 static libspectrum_error
-skip_null_terminated_string( const libspectrum_byte **ptr, size_t *length,
-			     const char *name );
+skip_null_terminated_string(libspectrum_context_t *context, const libspectrum_byte **ptr, size_t *length,
+                 const char *name );
 static libspectrum_error
-zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
+zlib_inflate( libspectrum_context_t *context, const libspectrum_byte *gzptr, size_t gzlength,
 	      libspectrum_byte **outptr, size_t *outlength, int gzip_hack );
 
 libspectrum_error 
-libspectrum_zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
+libspectrum_zlib_inflate( libspectrum_context_t *context, const libspectrum_byte *gzptr, size_t gzlength,
 			  libspectrum_byte **outptr, size_t *outlength )
 /* Inflates a block of data.
  * Input:	gzptr		-> source (deflated) data
@@ -63,23 +63,23 @@ libspectrum_zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
  * Returns:	error flag (libspectrum_error)
  */
 {
-  return zlib_inflate( gzptr, gzlength, outptr, outlength, 0 );
+  return zlib_inflate( context, gzptr, gzlength, outptr, outlength, 0 );
 }
 
 libspectrum_error
-libspectrum_gzip_inflate( const libspectrum_byte *gzptr, size_t gzlength,
+libspectrum_gzip_inflate( libspectrum_context_t *context, const libspectrum_byte *gzptr, size_t gzlength,
 			  libspectrum_byte **outptr, size_t *outlength )
 {
   int error;
 
-  error = skip_gzip_header( &gzptr, &gzlength ); if( error ) return error;
+  error = skip_gzip_header( context, &gzptr, &gzlength ); if( error ) return error;
 
-  return zlib_inflate( gzptr, gzlength, outptr, outlength, 1 );
+  return zlib_inflate( context, gzptr, gzlength, outptr, outlength, 1 );
 }
 
 static libspectrum_error
-zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
-	      libspectrum_byte **outptr, size_t *outlength, int gzip_hack )
+zlib_inflate(libspectrum_context_t *context, const libspectrum_byte *gzptr, size_t gzlength,
+          libspectrum_byte **outptr, size_t *outlength, int gzip_hack )
 {
   z_stream stream;
   int error;
@@ -114,13 +114,13 @@ zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
   case Z_OK: break;
 
   case Z_MEM_ERROR: 
-    libspectrum_print_error( LIBSPECTRUM_ERROR_MEMORY,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_MEMORY,
 			     "out of memory at %s:%d", __FILE__, __LINE__ );
     inflateEnd( &stream );
     return LIBSPECTRUM_ERROR_MEMORY;
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_LOGIC,
 			     "error from inflateInit2: %s", stream.msg );
     inflateEnd( &stream );
     return LIBSPECTRUM_ERROR_MEMORY;
@@ -161,34 +161,34 @@ zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
   case Z_STREAM_END: break;
 
   case Z_NEED_DICT:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_UNKNOWN,
 			     "gzip inflation needs dictionary" );
     libspectrum_free( *outptr );
     inflateEnd( &stream );
     return LIBSPECTRUM_ERROR_UNKNOWN;
 
   case Z_DATA_ERROR:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT, "corrupt gzip data" );
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT, "corrupt gzip data" );
     libspectrum_free( *outptr );
     inflateEnd( &stream );
     return LIBSPECTRUM_ERROR_CORRUPT;
 
   case Z_MEM_ERROR:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_MEMORY,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_MEMORY,
 			     "out of memory at %s:%d", __FILE__, __LINE__ );
     libspectrum_free( *outptr );
     inflateEnd( &stream );
     return LIBSPECTRUM_ERROR_MEMORY;
 
   case Z_BUF_ERROR:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			     "not enough space in gzip output buffer" );
     libspectrum_free( *outptr );
     inflateEnd( &stream );
     return LIBSPECTRUM_ERROR_CORRUPT;
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_LOGIC,
 			     "gzip error from inflate: %s",
 			     stream.msg );
     libspectrum_free( *outptr );
@@ -199,7 +199,7 @@ zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
 
   error = inflateEnd( &stream );
   if( error != Z_OK ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_LOGIC,
 			     "gzip error from inflateEnd: %s", stream.msg );
     libspectrum_free( *outptr );
     inflateEnd( &stream );
@@ -210,25 +210,25 @@ zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
 }
 
 static libspectrum_error
-skip_gzip_header( const libspectrum_byte **gzptr, size_t *gzlength )
+skip_gzip_header( libspectrum_context_t *context, const libspectrum_byte **gzptr, size_t *gzlength )
 {
   libspectrum_byte flags;
   libspectrum_error error;
 
   if( *gzlength < 10 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			     "not enough data for gzip header" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
   if( (*gzptr)[0] != 0x1f || (*gzptr)[1] != 0x8b ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			     "gzip header missing" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
   if( (*gzptr)[2] != 8 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_UNKNOWN,
 			     "unknown gzip compression method %d",
 			     (*gzptr)[2] );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -243,7 +243,7 @@ skip_gzip_header( const libspectrum_byte **gzptr, size_t *gzlength )
     size_t length;
 
     if( *gzlength < 2 ) {
-      libspectrum_print_error(
+      libspectrum_print_error( context,
         LIBSPECTRUM_ERROR_CORRUPT,
 	"not enough data for gzip extra header length"
       );
@@ -254,7 +254,7 @@ skip_gzip_header( const libspectrum_byte **gzptr, size_t *gzlength )
     (*gzptr) += 2; (*gzlength) -= 2;
 
     if( *gzlength < length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+      libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			       "not enough data for gzip extra header" );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
@@ -262,19 +262,19 @@ skip_gzip_header( const libspectrum_byte **gzptr, size_t *gzlength )
   }
 
   if( flags & 0x08 ) {		/* original file name present */
-    error = skip_null_terminated_string( gzptr, gzlength, "original name" );
+    error = skip_null_terminated_string( context, gzptr, gzlength, "original name" );
     if( error ) return error;
   }
 
   if( flags & 0x10 ) {		/* comment present */
-    error = skip_null_terminated_string( gzptr, gzlength, "comment" );
+    error = skip_null_terminated_string( context, gzptr, gzlength, "comment" );
     if( error ) return error;
   }
 
   if( flags & 0x02 ) {		/* header CRC present */
 
     if( *gzlength < 2 ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+      libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			       "not enough data for gzip header CRC" );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
@@ -287,13 +287,13 @@ skip_gzip_header( const libspectrum_byte **gzptr, size_t *gzlength )
 }
 
 static libspectrum_error
-skip_null_terminated_string( const libspectrum_byte **ptr, size_t *length,
+skip_null_terminated_string( libspectrum_context_t *context, const libspectrum_byte **ptr, size_t *length,
 			     const char *name )
 {
   while( **ptr && *length ) { (*ptr)++; (*length)--; }
 
   if( !( *length ) ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			     "not enough data for gzip %s", name );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
@@ -305,7 +305,7 @@ skip_null_terminated_string( const libspectrum_byte **ptr, size_t *length,
 }
 
 libspectrum_error
-libspectrum_zlib_compress( const libspectrum_byte *data, size_t length,
+libspectrum_zlib_compress( libspectrum_context_t *context, const libspectrum_byte *data, size_t length,
 			   libspectrum_byte **gzptr, size_t *gzlength )
 /* Deflates a block of data.
  * Input:	data		-> source data
@@ -329,26 +329,26 @@ libspectrum_zlib_compress( const libspectrum_byte *data, size_t length,
 
   case Z_MEM_ERROR:		/* out of memory */
     libspectrum_free( *gzptr ); *gzptr = 0;
-    libspectrum_print_error( LIBSPECTRUM_ERROR_MEMORY,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_MEMORY,
 			     "libspectrum_zlib_compress: out of memory" );
     return LIBSPECTRUM_ERROR_MEMORY;
 
   case Z_VERSION_ERROR:		/* unrecognised version */
     libspectrum_free( *gzptr ); *gzptr = 0;
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_UNKNOWN,
 			     "libspectrum_zlib_compress: unknown version" );
     return LIBSPECTRUM_ERROR_UNKNOWN;
 
   case Z_BUF_ERROR:		/* Not enough space in output buffer.
 				   Shouldn't happen */
     libspectrum_free( *gzptr ); *gzptr = 0;
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_LOGIC,
 			     "libspectrum_zlib_compress: out of space?" ); 
     return LIBSPECTRUM_ERROR_LOGIC;
 
   default:			/* some other error */
     libspectrum_free( *gzptr ); *gzptr = 0;
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_LOGIC,
 			     "libspectrum_zlib_compress: unexpected error?" ); 
     return LIBSPECTRUM_ERROR_LOGIC;
   }

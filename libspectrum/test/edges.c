@@ -9,15 +9,17 @@ check_edges( const char *filename, test_edge_sequence_t *edges,
   libspectrum_tape *tape;
   test_return_t r = TEST_FAIL;
   test_edge_sequence_t *ptr = edges;
-
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  tape = libspectrum_tape_alloc();
+  tape = libspectrum_tape_alloc(init.context);
 
   if( libspectrum_tape_read( tape, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename ) != LIBSPECTRUM_ERROR_NONE ) {
     libspectrum_tape_free( tape );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -32,6 +34,7 @@ check_edges( const char *filename, test_edge_sequence_t *edges,
     e = libspectrum_tape_get_next_edge( &tstates, &flags, tape );
     if( e ) {
       libspectrum_tape_free( tape );
+      libspectrum_end( init.context );
       return TEST_INCOMPLETE;
     }
 
@@ -58,8 +61,12 @@ check_edges( const char *filename, test_edge_sequence_t *edges,
     }
   }
 
-  if( libspectrum_tape_free( tape ) ) return TEST_INCOMPLETE;
+  if( libspectrum_tape_free( tape ) ) {
+      libspectrum_end( init.context );
+      return TEST_INCOMPLETE;
+  }
 
+  libspectrum_end( init.context );
   return r;
 }
 

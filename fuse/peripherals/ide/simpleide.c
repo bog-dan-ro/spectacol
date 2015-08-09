@@ -29,6 +29,7 @@
 
 #include <libspectrum.h>
 
+#include "fuse.h"
 #include "ide.h"
 #include "module.h"
 #include "periph.h"
@@ -77,7 +78,7 @@ simpleide_init( void )
 {
   int error;
 
-  simpleide_idechn = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA8 );
+  simpleide_idechn = libspectrum_ide_alloc( libspectrum_context, LIBSPECTRUM_IDE_DATA8 );
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT, 0 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT, 0 );

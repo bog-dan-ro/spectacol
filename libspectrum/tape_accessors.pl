@@ -67,7 +67,7 @@ sub trailer ($) {
     return << "CODE";
 
     default:
-      libspectrum_print_error(
+      libspectrum_print_error( block->context,
         LIBSPECTRUM_ERROR_INVALID,
         "invalid block type 0x%02x given to %s", block->type, __func__
       );
@@ -85,7 +85,7 @@ while( <> ) {
     next if /^\s*$/;
 
     if( /^\s/ ) {
-	
+
 	my( $type, $member ) = split;
 
 	$member ||= $name;

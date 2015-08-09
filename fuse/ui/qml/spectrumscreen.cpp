@@ -70,24 +70,33 @@ QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString 
 {
     QImage ret;
     libspectrum_id_t fileType;
-    libspectrum_error error = libspectrum_identify_file(&fileType, fileName.toUtf8().constData(), buffer, bufferSize);
-    if (error != LIBSPECTRUM_ERROR_NONE)
+    libspectrum_init_t init = libspectrum_default_init();
+    libspectrum_init(&init);
+    libspectrum_error error = libspectrum_identify_file(init.context, &fileType, fileName.toUtf8().constData(), buffer, bufferSize);
+    if (error != LIBSPECTRUM_ERROR_NONE) {
+        libspectrum_end(init.context);
         return ret;
+    }
 
     libspectrum_class_t fileClass;
-    error = libspectrum_identify_class(&fileClass, fileType);
-    if (error != LIBSPECTRUM_ERROR_NONE || fileClass != LIBSPECTRUM_CLASS_SNAPSHOT)
+    error = libspectrum_identify_class(init.context, &fileClass, fileType);
+    if (error != LIBSPECTRUM_ERROR_NONE || fileClass != LIBSPECTRUM_CLASS_SNAPSHOT) {
+        libspectrum_end(init.context);
         return ret;
+    }
 
-    libspectrum_snap *snap = libspectrum_snap_alloc();
-    if (!snap)
+    libspectrum_snap *snap = libspectrum_snap_alloc(init.context);
+    if (!snap) {
+        libspectrum_end(init.context);
         return ret;
+    }
 
     error = libspectrum_snap_read(snap, buffer, bufferSize, fileType, fileName.toUtf8().constData());
     if (error == LIBSPECTRUM_ERROR_NONE)
         ret = spectrumScreen2Image(libspectrum_snap_pages(snap, 5));
 
     libspectrum_snap_free(snap);
+    libspectrum_end(init.context);
     return ret;
 }
 

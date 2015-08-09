@@ -101,7 +101,7 @@
 #include "utils.h"
 
 #include "z80/z80.h"
-
+#include "libspectrum.h"
 /* What name were we called under? */
 const char *fuse_progname;
 
@@ -117,6 +117,7 @@ libspectrum_creator *fuse_creator;
 /* The earliest version of libspectrum we need */
 static const char * const LIBSPECTRUM_MIN_VERSION = "0.5.0";
 
+libspectrum_context_t *libspectrum_context;
 /* The various types of file we may want to run on startup */
 typedef struct start_files_t {
 
@@ -167,7 +168,7 @@ int fuse_main(int argc, const char **argv)
   fatInitDefault();
 #endif				/* #ifdef GEKKO */
   
-  if(fuse_init(argc,argv)) {
+  if(fuse_init(argc, (char**)argv)) {
     fprintf(stderr,"%s: error initialising -- giving up!\n", fuse_progname);
     return 1;
   }
@@ -207,8 +208,6 @@ static int fuse_init(int argc, char **argv)
   else
     fuse_progname = "fuse";
   
-  libspectrum_error_function = ui_libspectrum_error;
-
 #ifdef GEKKO
   /* On the Wii, init the display first so we have a way of outputting
      messages */
@@ -233,6 +232,19 @@ static int fuse_init(int argc, char **argv)
   fuse_show_copyright();
 #endif
 
+  if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
+    libspectrum_init_t init = libspectrum_default_init();
+    init.error_function = ui_libspectrum_error;
+    if( libspectrum_init(&init) ) return 1;
+    libspectrum_context = init.context;
+  } else {
+    ui_error( UI_ERROR_ERROR,
+              "libspectrum version %s found, but %s required",
+	      libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
+    return 1;
+  }
+
+  /* Must be called after libspectrum_init() */
   /* FIXME: order of these initialisation calls. Work out what depends on
      what */
   /* FIXME FIXME 20030407: really do this soon. This is getting *far* too
@@ -241,19 +253,10 @@ static int fuse_init(int argc, char **argv)
   fuse_keyboard_init();
 
   event_init();
-  
+
 #ifndef GEKKO
   if( display_init(&argc,&argv) ) return 1;
 #endif
-
-  if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
-    if( libspectrum_init() ) return 1;
-  } else {
-    ui_error( UI_ERROR_ERROR,
-              "libspectrum version %s found, but %s required",
-	      libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
-    return 1;
-  }
 
   /* Must be called after libspectrum_init() so we can get the gcrypt
      version */
@@ -552,7 +555,7 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     error = utils_read_file( filename, &file );
     if( error ) return error;
 
-    error = libspectrum_identify_file_with_class( &type, &class, filename,
+    error = libspectrum_identify_file_with_class( libspectrum_context, &type, &class, filename,
 						  file.buffer, file.length );
     if( error ) {
       utils_close_file( &file );
@@ -886,7 +889,7 @@ static int fuse_end(void)
   pokemem_end();
 
   libspectrum_creator_free( fuse_creator );
-  libspectrum_end();
+  libspectrum_end(libspectrum_context);
 
   return 0;
 }

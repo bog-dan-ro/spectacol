@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include "internals.h"
+#include "tape_block.h"
 
 /* Used for passing internal data around */
 
@@ -97,8 +98,8 @@ typedef libspectrum_error (*read_block_fn)( libspectrum_tape *tape,
                                             pzx_context *ctx );
 
 static libspectrum_error
-pzx_read_data( const libspectrum_byte **ptr, const libspectrum_byte *end,
-	       size_t length, libspectrum_byte **data );
+pzx_read_data(libspectrum_context_t *context, const libspectrum_byte **ptr, const libspectrum_byte *end,
+           size_t length, libspectrum_byte **data );
 
 static libspectrum_error
 pzx_read_string( const libspectrum_byte **ptr, const libspectrum_byte *end,
@@ -137,7 +138,9 @@ read_pzxt_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   const libspectrum_byte *block_end = *buffer + data_length;
 
   if( data_length < 2 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error(
+                tape->context,
+                LIBSPECTRUM_ERROR_CORRUPT,
 			     "read_pzxt_block: length %lu too short",
 			     (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_CORRUPT;
@@ -147,7 +150,8 @@ read_pzxt_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   ctx->version |= **buffer; (*buffer)++;
 
   if( ctx->version < 0x0100 || ctx->version >= 0x0200 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( tape->context,
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "read_pzxt_block: only version 1 pzx files are "
                              "supported" );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -212,7 +216,7 @@ read_pzxt_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
 
   if( count ) {
     libspectrum_tape_block* block =
-      libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO );
+      libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO );
 
     libspectrum_tape_block_set_count( block, count );
     libspectrum_tape_block_set_ids( block, ids );
@@ -248,6 +252,7 @@ read_data_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   /* Check there's enough left in the buffer for all the metadata */
   if( data_length < 8 ) {
     libspectrum_print_error(
+      tape->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "read_data_block: not enough data in buffer"
     );
@@ -270,31 +275,32 @@ read_data_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
    */
   if( data_length < 8 + 2*(p0_count + p1_count) ) {
     libspectrum_print_error(
+      tape->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "read_data_block: not enough data in buffer"
     );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  error = pzx_read_data( buffer, block_end,
+  error = pzx_read_data( tape->context, buffer, block_end,
                          p0_count * sizeof( libspectrum_word ),
                          (libspectrum_byte**)&p0_pulses );
   if( error ) return error;
 
-  error = pzx_read_data( buffer, block_end,
+  error = pzx_read_data( tape->context, buffer, block_end,
                          p1_count * sizeof( libspectrum_word ),
                          (libspectrum_byte**)&p1_pulses );
   if( error ) { libspectrum_free( p0_pulses ); return error; }
 
   /* And the actual data */
-  error = pzx_read_data( buffer, block_end, count_bytes, &data );
+  error = pzx_read_data( tape->context, buffer, block_end, count_bytes, &data );
   if( error ) {
     libspectrum_free( p0_pulses );
     libspectrum_free( p1_pulses );
     return error;
   }
 
-  block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK );
+  block = libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK );
 
   libspectrum_tape_block_set_count( block, count );
   libspectrum_tape_block_set_tail_length( block, tail );
@@ -313,7 +319,7 @@ read_data_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
 }
 
 static libspectrum_error
-read_next_pulse( const libspectrum_byte **buffer, const libspectrum_byte *end,
+read_next_pulse( libspectrum_context_t *context, const libspectrum_byte **buffer, const libspectrum_byte *end,
                  size_t *pulse_repeats, libspectrum_dword *length )
 {
   /* While we have at least one int 16 left try to extract the next pulse */
@@ -337,7 +343,8 @@ read_next_pulse( const libspectrum_byte **buffer, const libspectrum_byte *end,
   return LIBSPECTRUM_ERROR_NONE;
 
 pzx_corrupt:
-  libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+  libspectrum_print_error( context,
+                           LIBSPECTRUM_ERROR_CORRUPT,
                            "read_next_pulse: not enough data in buffer" );
   return LIBSPECTRUM_ERROR_CORRUPT;
 }
@@ -360,7 +367,7 @@ read_puls_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   const libspectrum_byte *block_end = *buffer + data_length;
 
   while( ( block_end - (*buffer) ) > (ptrdiff_t)0 ) {
-    error = read_next_pulse( buffer, block_end, &pulse_repeats, &length );
+    error = read_next_pulse( tape->context, buffer, block_end, &pulse_repeats, &length );
     if( error ) {
       libspectrum_free( pulse_repeats_buffer );
       libspectrum_free( lengths_buffer );
@@ -379,7 +386,7 @@ read_puls_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   }
 
   if( count == 0 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_CORRUPT,
                            "read_puls_block: no pulses found in pulse block" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
@@ -391,7 +398,7 @@ read_puls_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
       libspectrum_renew( libspectrum_dword, lengths_buffer, count );
   }
 
-  block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE );
+  block = libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE );
 
   libspectrum_tape_block_set_count( block, count );
   libspectrum_tape_block_set_pulse_lengths( block, lengths_buffer );
@@ -414,12 +421,12 @@ read_paus_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
 
   /* Check the pause actually exists */
   if( data_length < 2 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_CORRUPT,
 			     "read_paus_block: not enough data in buffer" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PAUSE );
+  block = libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_PAUSE );
 
   pause_tstates = libspectrum_read_dword( buffer );
   initial_level = !!(pause_tstates & 0x80000000);
@@ -444,7 +451,7 @@ read_brws_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   char *text;
   libspectrum_error error;
 
-  block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_COMMENT );
+  block = libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_COMMENT );
 
   /* Get the actual comment */
   error = pzx_read_string( buffer, *buffer + data_length, &text );
@@ -465,7 +472,7 @@ read_stop_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   libspectrum_word flags;
 
   if( data_length < 2 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_CORRUPT,
 			     "tzx_read_stop: not enough data in buffer" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
@@ -473,10 +480,10 @@ read_stop_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   flags = libspectrum_read_word( buffer );
 
   if( flags == PZXF_STOP48 ) {
-    block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_STOP48 );
+    block = libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_STOP48 );
   } else {
     /* General stop is a 0 duration pause */
-    block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_PAUSE );
+    block = libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_PAUSE );
     libspectrum_tape_block_set_pause( block, 0 );
   }
 
@@ -516,12 +523,13 @@ static struct read_block_t read_blocks[] = {
 };
 
 static libspectrum_error
-read_block_header( char *id, libspectrum_dword *data_length, 
+read_block_header( libspectrum_context_t *context, char *id, libspectrum_dword *data_length,
 		   const libspectrum_byte **buffer,
 		   const libspectrum_byte *end )
 {
   if( end - *buffer < 8 ) {
     libspectrum_print_error(
+      context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "read_block_header: not enough data for block header"
     );
@@ -543,11 +551,12 @@ read_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   libspectrum_error error;
   size_t i; int done;
 
-  error = read_block_header( id, &data_length, buffer, end );
+  error = read_block_header( tape->context, id, &data_length, buffer, end );
   if( error ) return error;
 
   if( end - *buffer < data_length ) {
     libspectrum_print_error(
+      tape->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "read_block: block length goes beyond end of file"
     );
@@ -567,7 +576,8 @@ read_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   }
 
   if( !done ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( tape->context,
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "read_block: unknown block id '%s'", id );
     *buffer += data_length;
   }
@@ -587,6 +597,7 @@ internal_pzx_read( libspectrum_tape *tape, const libspectrum_byte *buffer,
 
   if( end - buffer < 8 ) {
     libspectrum_print_error(
+      tape->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "internal_pzx_read: not enough data for PZX header"
     );
@@ -595,6 +606,7 @@ internal_pzx_read( libspectrum_tape *tape, const libspectrum_byte *buffer,
 
   if( memcmp( buffer, signature, signature_length ) ) {
     libspectrum_print_error(
+      tape->context,
       LIBSPECTRUM_ERROR_SIGNATURE,
       "internal_pzx_read: wrong signature"
     );
@@ -617,12 +629,12 @@ internal_pzx_read( libspectrum_tape *tape, const libspectrum_byte *buffer,
 }
 
 static libspectrum_error
-pzx_read_data( const libspectrum_byte **ptr, const libspectrum_byte *end,
+pzx_read_data( libspectrum_context_t *context, const libspectrum_byte **ptr, const libspectrum_byte *end,
 	       size_t length, libspectrum_byte **data )
 {
   /* Have we got enough bytes left in buffer? */
   if( ( end - (*ptr) ) < (ptrdiff_t)(length) ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			     "pzx_read_data: not enough data in buffer" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }

@@ -27,6 +27,8 @@
 #ifndef LIBSPECTRUM_INTERNALS_H
 #define LIBSPECTRUM_INTERNALS_H
 
+#include "config.h"
+
 #ifdef HAVE_LIB_GLIB		/* Only if we've got the real glib */
 #include <glib.h>
 #endif				/* #ifdef HAVE_LIB_GLIB */
@@ -104,8 +106,8 @@
 
 /* Print using the user-provided error function */
 libspectrum_error
-libspectrum_print_error( libspectrum_error error, const char *format, ... )
-     GCC_PRINTF( 2, 3 );
+libspectrum_print_error( libspectrum_context_t *context, libspectrum_error error, const char *format, ... )
+     GCC_PRINTF( 3, 4 );
 
 /* Acquire more memory for a buffer */
 void libspectrum_make_room( libspectrum_byte **dest, size_t requested,
@@ -120,17 +122,17 @@ int libspectrum_write_dword( libspectrum_byte **buffer, libspectrum_dword d );
 /* (de)compression routines */
 
 libspectrum_error
-libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
+libspectrum_uncompress_file( libspectrum_context_t *context, unsigned char **new_buffer, size_t *new_length,
 			     char **new_filename, libspectrum_id_t type,
 			     const unsigned char *old_buffer,
 			     size_t old_length, const char *old_filename );
 
 libspectrum_error
-libspectrum_gzip_inflate( const libspectrum_byte *gzptr, size_t gzlength,
-			  libspectrum_byte **outptr, size_t *outlength );
+libspectrum_gzip_inflate(libspectrum_context_t *context, const libspectrum_byte *gzptr, size_t gzlength,
+                          libspectrum_byte **outptr, size_t *outlength );
 
 libspectrum_error
-libspectrum_bzip2_inflate( const libspectrum_byte *bzptr, size_t bzlength,
+libspectrum_bzip2_inflate( libspectrum_context_t *context, const libspectrum_byte *bzptr, size_t bzlength,
 			   libspectrum_byte **outptr, size_t *outlength );
 
 /* The TZX file signature */
@@ -153,7 +155,7 @@ int libspectrum_split_to_48k_pages( libspectrum_snap *snap,
 
 /* Get memory for a snap */
 
-libspectrum_snap* libspectrum_snap_alloc_internal( void );
+libspectrum_snap* libspectrum_snap_alloc_internal(libspectrum_context_t *context );
 
 /* Format specific snapshot routines */
 
@@ -176,9 +178,9 @@ libspectrum_error
 libspectrum_szx_read( libspectrum_snap *snap,
 		      const libspectrum_byte *buffer, size_t buffer_length );
 libspectrum_error
-libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
-		       int *out_flags, libspectrum_snap *snap,
-		       libspectrum_creator *creator, int in_flags );
+libspectrum_szx_write(libspectrum_byte **buffer, size_t *length,
+                       int *out_flags, libspectrum_snap *snap,
+                       libspectrum_creator *creator, int in_flags );
 libspectrum_error
 internal_z80_read( libspectrum_snap *snap,
 		   const libspectrum_byte *buffer, size_t buffer_length );
@@ -207,7 +209,7 @@ libspectrum_error libspectrum_tape_block_read_symbol_table_parameters(
   libspectrum_tape_block *block, int pilot, const libspectrum_byte **ptr );
 
 libspectrum_error
-libspectrum_tape_block_read_symbol_table(
+libspectrum_tape_block_read_symbol_table(libspectrum_context_t *context,
   libspectrum_tape_generalised_data_symbol_table *table,
   const libspectrum_byte **ptr, size_t length );
 
@@ -260,14 +262,15 @@ libspectrum_tape_block_internal_init(
                                 libspectrum_tape *tape );
 
 libspectrum_error
-libspectrum_tape_get_next_edge_internal( libspectrum_dword *tstates, int *flags,
+libspectrum_tape_get_next_edge_internal(libspectrum_dword *tstates, int *flags,
                                          libspectrum_tape *tape,
                                          libspectrum_tape_block_state *it );
 
 /* Crypto functions */
 
 libspectrum_error
-libspectrum_sign_data( libspectrum_byte **signature, size_t *signature_length,
+libspectrum_sign_data( libspectrum_context_t *context,
+                       libspectrum_byte **signature, size_t *signature_length,
 		       libspectrum_byte *data, size_t data_length,
 		       libspectrum_rzx_dsa_key *key );
 
@@ -293,10 +296,27 @@ extern const int LIBSPECTRUM_BITS_IN_BYTE;
 
 #ifndef HAVE_LIB_GLIB		/* Only if we are using glib replacement */
 void
+libspectrum_slist_init( void );
+void
 libspectrum_slist_cleanup( void );
+
+void
+libspectrum_hashtable_init( void );
 
 void
 libspectrum_hashtable_cleanup( void );
 #endif				/* #ifndef HAVE_LIB_GLIB */
+
+
+// fuse context structure
+struct libspectrum_context_t{
+    libspectrum_error_function_t error_function;
+    void *user_data;
+};
+
+extern libspectrum_create_mutex_fn_t libspectrum_create_mutex_fn;
+extern libspectrum_lock_mutex_fn_t libspectrum_lock_mutex_fn;
+extern libspectrum_unlock_mutex_fn_t libspectrum_unlock_mutex_fn;
+extern libspectrum_destory_mutex_fn_t libspectrum_destory_mutex_fn;
 
 #endif				/* #ifndef LIBSPECTRUM_INTERNALS_H */

@@ -240,13 +240,23 @@ struct libspectrum_snap {
 
   /* Printer emulation */
   int zx_printer_active;
+
+  libspectrum_context_t *context;
 };
 
 /* Initialise a libspectrum_snap structure */
 libspectrum_snap*
-libspectrum_snap_alloc_internal( void )
+libspectrum_snap_alloc_internal( libspectrum_context_t *context )
 {
-  return libspectrum_new( libspectrum_snap, 1 );
+  libspectrum_snap *ret = libspectrum_new( libspectrum_snap, 1 );
+  ret->context = context;
+  return ret;
+}
+
+libspectrum_context_t *
+libspectrum_snap_context( libspectrum_snap *snap )
+{
+  return snap->context;
 }
 CODE
 

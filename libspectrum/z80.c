@@ -150,14 +150,14 @@ read_block( const libspectrum_byte *buffer, libspectrum_snap *snap,
 	    const libspectrum_byte **next_block, const libspectrum_byte *end,
 	    int version, int compressed );
 static libspectrum_error
-read_v1_block( const libspectrum_byte *buffer, int is_compressed,
+read_v1_block( libspectrum_context_t *context, const libspectrum_byte *buffer, int is_compressed,
 	       libspectrum_byte **uncompressed,
 	       const libspectrum_byte **next_block,
 	       const libspectrum_byte *end );
 static libspectrum_error
-read_v2_block( const libspectrum_byte *buffer, libspectrum_byte **block,
-	       size_t *length, int *page, const libspectrum_byte **next_block,
-	       const libspectrum_byte *end );
+read_v2_block(libspectrum_context_t *context, const libspectrum_byte *buffer, libspectrum_byte **block,
+           size_t *length, int *page, const libspectrum_byte **next_block,
+           const libspectrum_byte *end );
 
 static libspectrum_error
 write_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
@@ -277,7 +277,7 @@ read_header( const libspectrum_byte *buffer, libspectrum_snap *snap,
       *version = 3;
       break;
     default:
-      libspectrum_print_error(
+      libspectrum_print_error( libspectrum_snap_context(snap),
         LIBSPECTRUM_ERROR_UNKNOWN,
         "libspectrum_read_z80_header: unknown header length %d",
 	(int)extra_length
@@ -434,7 +434,7 @@ get_machine_type( libspectrum_snap *snap, libspectrum_byte type,
       break;
 
     default:
-      libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+      libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_LOGIC,
 			       "%s:get_machine_type: unknown version %d",
 			       __FILE__, version );
       return LIBSPECTRUM_ERROR_LOGIC;
@@ -464,7 +464,7 @@ get_machine_type_v2( libspectrum_snap *snap, libspectrum_byte type )
     libspectrum_snap_set_interface1_active( snap, 1 );
     libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_128 ); break;
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:get_machine_type: unknown v2 machine type %d",
 			     __FILE__, type );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -487,7 +487,7 @@ get_mgt_type( libspectrum_snap *snap, libspectrum_byte type )
     break;
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:get_mgt_type: unknown mgt type %d",
 			     __FILE__, type );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -526,7 +526,7 @@ get_machine_type_v3( libspectrum_snap *snap, libspectrum_byte type,
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
     break;
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:get_machine_type: unknown v3 machine type %d",
 			     __FILE__, type );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -558,7 +558,7 @@ get_machine_type_extension( libspectrum_snap *snap, libspectrum_byte type )
   case Z80_MACHINE_TS2068:
     libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_TS2068 ); break;
   default:
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_UNKNOWN,
       "%s:get_machine_type: unknown extension machine type %d", __FILE__, type
     );
@@ -592,7 +592,7 @@ get_joystick_type( libspectrum_snap *snap,
     break;
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_LOGIC,
                              "%s:get_joystick_type: unknown version %d",
                              __FILE__, version );
     return LIBSPECTRUM_ERROR_LOGIC;
@@ -621,7 +621,8 @@ get_joystick_type_v1( libspectrum_snap *snap, libspectrum_byte type )
     break;
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:get_joystick_type_v1: unknown v1 "
                              "joystick type %d",
 			     __FILE__, type );
@@ -667,7 +668,8 @@ get_joystick_type_v3( libspectrum_snap *snap,
     break;
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:get_joystick_type_v3: unknown v3 joystick "
                              "type %d",
 			     __FILE__, type );
@@ -700,7 +702,8 @@ read_blocks( const libspectrum_byte *buffer, size_t buffer_length,
       
       /* If we haven't reached the end, return with error */
       if( next_block != end ) {
-	libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 				 "read_blocks: .slt data does not end file" );
 	return LIBSPECTRUM_ERROR_CORRUPT;
       }
@@ -737,7 +740,8 @@ read_slt( libspectrum_snap *snap, const libspectrum_byte **next_block,
 
     /* Check we've got enough data left */
     if( *next_block + 8 > end ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_CORRUPT,
 			       "read_slt: out of data in directory" );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
@@ -758,7 +762,8 @@ read_slt( libspectrum_snap *snap, const libspectrum_byte **next_block,
     case LIBSPECTRUM_SLT_TYPE_LEVEL:	/* Level data */
 
       if( level >= 0x100 ) {
-	libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 				 "read_slt: unexpected level number %d",
 				 level );
 	return LIBSPECTRUM_ERROR_CORRUPT;
@@ -766,7 +771,8 @@ read_slt( libspectrum_snap *snap, const libspectrum_byte **next_block,
 
       /* Each level should appear once only */
       if( slt_length[ level ] ) {
-	libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 				 "read_slt: level %d is duplicated", level );
         return LIBSPECTRUM_ERROR_CORRUPT;
       }
@@ -779,7 +785,8 @@ read_slt( libspectrum_snap *snap, const libspectrum_byte **next_block,
 
       /* Allow only one loading screen per .slt file */
       if( screen_length != 0 ) {
-	libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 				 "read_slt: duplicated loading screen" );
 	return LIBSPECTRUM_ERROR_CORRUPT;
       }
@@ -791,7 +798,8 @@ read_slt( libspectrum_snap *snap, const libspectrum_byte **next_block,
 
     default:
 
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "read_slt: unknown data type %d", type );
       return LIBSPECTRUM_ERROR_UNKNOWN;
 
@@ -811,7 +819,8 @@ read_slt( libspectrum_snap *snap, const libspectrum_byte **next_block,
 
       /* Check this data actually exists */
       if( *next_block + offsets[i] + slt_length[i] > end ) {
-	libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 				 "read_slt: out of data reading level %d", i );
 	return LIBSPECTRUM_ERROR_CORRUPT;
       }
@@ -844,7 +853,8 @@ read_slt( libspectrum_snap *snap, const libspectrum_byte **next_block,
 
       /* A screen should be 6912 bytes long */
       if( screen_length != 6912 ) {
-	libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 				 "read_slt: screen is not 6912 bytes long" );
 	libspectrum_free( buffer );
 	return LIBSPECTRUM_ERROR_CORRUPT;
@@ -873,7 +883,7 @@ read_block( const libspectrum_byte *buffer, libspectrum_snap *snap,
   
   if( version == 1 ) {
 
-    error = read_v1_block( buffer, compressed, &uncompressed, next_block,
+    error = read_v1_block( libspectrum_snap_context(snap), buffer, compressed, &uncompressed, next_block,
 			   end );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -886,12 +896,13 @@ read_block( const libspectrum_byte *buffer, libspectrum_snap *snap,
     size_t length;
     int page;
 
-    error = read_v2_block( buffer, &uncompressed, &length, &page, next_block,
+    error = read_v2_block( libspectrum_snap_context(snap), buffer, &uncompressed, &length, &page, next_block,
 			   end );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
     if( page <= 0 || page > 18 ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "read_block: unknown page %d", page );
       libspectrum_free( uncompressed );
       return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -959,7 +970,8 @@ read_block( const libspectrum_byte *buffer, libspectrum_snap *snap,
       libspectrum_snap_set_pages( snap, page, uncompressed );
     } else {
       libspectrum_free( uncompressed );
-      libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_CORRUPT,
 			       "read_block: page %d duplicated", page );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
@@ -971,7 +983,7 @@ read_block( const libspectrum_byte *buffer, libspectrum_snap *snap,
 }
 
 static libspectrum_error
-read_v1_block( const libspectrum_byte *buffer, int is_compressed, 
+read_v1_block( libspectrum_context_t *context, const libspectrum_byte *buffer, int is_compressed,
 	       libspectrum_byte **uncompressed,
 	       const libspectrum_byte **next_block,
 	       const libspectrum_byte *end )
@@ -987,7 +999,8 @@ read_v1_block( const libspectrum_byte *buffer, int is_compressed,
     while( state != 4 ) {
 
       if( ptr == end ) {
-	libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( context,
+                             LIBSPECTRUM_ERROR_CORRUPT,
 				 "read_v1_block: end marker not found" );
 	return LIBSPECTRUM_ERROR_CORRUPT;
       }
@@ -1020,7 +1033,8 @@ read_v1_block( const libspectrum_byte *buffer, int is_compressed,
 	}
 	break;
       default:
-	libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( context,
+                             LIBSPECTRUM_ERROR_LOGIC,
 				 "read_v1_block: unknown state %d", state );
 	return LIBSPECTRUM_ERROR_LOGIC;
       }
@@ -1034,7 +1048,7 @@ read_v1_block( const libspectrum_byte *buffer, int is_compressed,
     /* Uncompressed data must be exactly 48Kb long */
     if( uncompressed_length != 0xc000 ) {
       libspectrum_free( *uncompressed );
-      libspectrum_print_error(
+      libspectrum_print_error( context,
         LIBSPECTRUM_ERROR_CORRUPT,
         "read_v1_block: data does not uncompress to 48Kb"
       );
@@ -1047,7 +1061,7 @@ read_v1_block( const libspectrum_byte *buffer, int is_compressed,
 
     /* Check we've got enough bytes to read */
     if( end - *next_block < 0xc000 ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+      libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			       "read_v1_block: not enough data in buffer" );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
@@ -1062,7 +1076,7 @@ read_v1_block( const libspectrum_byte *buffer, int is_compressed,
 }
 
 static libspectrum_error
-read_v2_block( const libspectrum_byte *buffer, libspectrum_byte **block,
+read_v2_block( libspectrum_context_t *context, const libspectrum_byte *buffer, libspectrum_byte **block,
 	       size_t *length, int *page, const libspectrum_byte **next_block,
 	       const libspectrum_byte *end )
 {
@@ -1086,7 +1100,7 @@ read_v2_block( const libspectrum_byte *buffer, libspectrum_byte **block,
 
     /* Check we're not going to run over the end of the buffer */
     if( buffer + 3 + length2 > end ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+      libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			       "read_v2_block: not enough data in buffer" );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
@@ -1100,7 +1114,7 @@ read_v2_block( const libspectrum_byte *buffer, libspectrum_byte **block,
 
     /* Check we're not going to run over the end of the buffer */
     if( buffer + 3 + 0x4000 > end ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+      libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			       "read_v2_block: not enough data in buffer" );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
@@ -1357,7 +1371,7 @@ write_extended_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
     machine_byte = Z80_MACHINE_TS2068; break;
 
   case LIBSPECTRUM_MACHINE_UNKNOWN:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:write_extended_header: machine type unknown",
 			     __FILE__ );
     return LIBSPECTRUM_ERROR_UNKNOWN;

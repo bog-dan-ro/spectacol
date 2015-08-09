@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "debugger/debugger.h"
+#include "fuse.h"
 #include "ide.h"
 #include "machine.h"
 #include "module.h"
@@ -117,8 +118,8 @@ divide_init( void )
 {
   int error, i, j;
 
-  divide_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
-  divide_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
+  divide_idechn0 = libspectrum_ide_alloc( libspectrum_context, LIBSPECTRUM_IDE_DATA16 );
+  divide_idechn1 = libspectrum_ide_alloc( libspectrum_context, LIBSPECTRUM_IDE_DATA16 );
   
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT, 0 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE_SLAVE_EJECT, 0 );

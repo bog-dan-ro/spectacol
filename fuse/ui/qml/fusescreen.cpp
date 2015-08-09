@@ -30,8 +30,37 @@
 #include <QSGSimpleTextureNode>
 #include <QtMath>
 
+#include <mutex>
+
+static libspectrum_mutex_t create_mutex()
+{
+    return new std::mutex;
+}
+
+static void lock_mutex(libspectrum_mutex_t mutex)
+{
+    reinterpret_cast<std::mutex*>(mutex)->lock();
+}
+
+static void unlock_mutex(libspectrum_mutex_t mutex)
+{
+    reinterpret_cast<std::mutex*>(mutex)->unlock();
+}
+
+static void destroy_mutex(libspectrum_mutex_t mutex)
+{
+    delete reinterpret_cast<std::mutex*>(mutex);
+}
+
 FuseScreen::FuseScreen()
 {
+    libspectrum_mutex_vtable_t t;
+    t.create = create_mutex;
+    t.lock = lock_mutex;
+    t.unlock = unlock_mutex;
+    t.destroy = destroy_mutex;
+    libspectrum_mutex_set_vtable( &t );
+
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
 }

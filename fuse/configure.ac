@@ -135,7 +135,10 @@ CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
 AC_COMPILE_IFELSE(
   [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
     [[
+      libspectrum_init_t init = libspectrum_default_init();
+      libspectrum_init( &init );
       int test = LIBSPECTRUM_HAS_GLIB_REPLACEMENT;
+      libspectrum_end( init.context );
     ]])
   ],
   [AC_MSG_RESULT(yes)],
@@ -722,7 +725,7 @@ if test "$stick" = yes; then
       else
         AC_MSG_RESULT(yes)
         SDL_VERSION=1.2.4
-        AM_PATH_SDL($SDL_VERSION,		    
+        AM_PATH_SDL($SDL_VERSION,
           LIBS="$LIBS `sdl-config --libs`"
           CPPFLAGS="$CPPFLAGS `sdl-config --cflags`"
           AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks]),

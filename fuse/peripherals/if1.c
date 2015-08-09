@@ -35,6 +35,7 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
+#include "fuse.h"
 #include "if1.h"
 #include "machine.h"
 #include "memory.h"
@@ -315,7 +316,7 @@ if1_init( void )
   if1_ula.esc_in = 0; /* empty */
 
   for( m = 0; m < 8; m++ ) {
-    microdrive[m].cartridge = libspectrum_microdrive_alloc();
+    microdrive[m].cartridge = libspectrum_microdrive_alloc( libspectrum_context );
     microdrive[m].inserted = 0;
     microdrive[m].modified = 0;
   }

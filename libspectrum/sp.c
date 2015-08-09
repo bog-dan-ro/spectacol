@@ -41,7 +41,7 @@ libspectrum_sp_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
 
   /* Length must be at least 48K of RAM plus the 'trailer' */
   if( length < SP_HEADER_LENGTH ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_sp_read: not enough bytes for .sp header"
     );
@@ -50,7 +50,7 @@ libspectrum_sp_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
 
   /* Check the signature */
   if( buffer[0] != 'S' || buffer[1] != 'P' ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_SIGNATURE,
       "libspectrum_sp_read: 'SP' signature not present"
     );
@@ -63,7 +63,7 @@ libspectrum_sp_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
 
   /* Check for overrun of 48K memory */
   if( start + (libspectrum_dword)memory_length > 0x10000 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_sp_read: memory dump extends beyond 0xffff"
     );

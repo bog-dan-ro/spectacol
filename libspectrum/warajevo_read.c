@@ -31,6 +31,7 @@
 #include <string.h>
 
 #include "internals.h"
+#include "tape_block.h"
 
 static const libspectrum_word RECORD_SAMPLES = 0xfffe;
 static const libspectrum_word COMPRESSED_BLOCK = 0xffff;
@@ -116,9 +117,9 @@ static libspectrum_dword lsb2dword( const libspectrum_byte *mem );
 static libspectrum_word lsb2word( const libspectrum_byte *mem ); 
 
 static libspectrum_error
-exec_command( libspectrum_byte *dest, const libspectrum_byte *src,
-	      const libspectrum_byte *end, size_t *sp, size_t *pc,
-	      size_t *bytes_written, const size_t to_write );
+exec_command(libspectrum_context_t *context, libspectrum_byte *dest, const libspectrum_byte *src,
+          const libspectrum_byte *end, size_t *sp, size_t *pc,
+          size_t *bytes_written, const size_t to_write );
 
 static libspectrum_error
 get_next_block( size_t *offset, const libspectrum_byte *buffer,
@@ -133,17 +134,17 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
 	       const libspectrum_byte *end, size_t offset );
 
 static libspectrum_error
-add_bit_to_copy_command( libspectrum_byte *dest, const libspectrum_byte *src,
-			 const libspectrum_byte *end, libspectrum_byte bit,
-			 size_t *sp, size_t *bytes_written );
+add_bit_to_copy_command(libspectrum_context_t *context, libspectrum_byte *dest, const libspectrum_byte *src,
+             const libspectrum_byte *end, libspectrum_byte bit,
+             size_t *sp, size_t *bytes_written );
 
 static void
 reset_copy_command( void );
 
 static libspectrum_error
-decompress_block( libspectrum_byte *dest, const libspectrum_byte *src,
-		  const libspectrum_byte *end, size_t signature,
-		  size_t length );
+decompress_block(libspectrum_context_t *context, libspectrum_byte *dest, const libspectrum_byte *src,
+          const libspectrum_byte *end, size_t signature,
+          size_t length );
 
 /*** Function definitions ***/
 
@@ -179,7 +180,7 @@ internal_warajevo_read( libspectrum_tape *tape,
   /* Must be at least as many bytes as the signature, the initial block pointer
      and source pointer block */
   if( length < 12 ) {
-    libspectrum_print_error(
+    libspectrum_print_error(tape->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_warajevo_read: not enough data in buffer"
     );
@@ -188,7 +189,7 @@ internal_warajevo_read( libspectrum_tape *tape,
 
   /* Now check the signature */
   if( lsb2dword( ptr + 8 ) != warajevo_signature ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_SIGNATURE,
+    libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_SIGNATURE,
 			     "libspectrum_warajevo_read: wrong signature" );
     return LIBSPECTRUM_ERROR_SIGNATURE;
   }
@@ -213,7 +214,7 @@ get_next_block( size_t *offset, const libspectrum_byte *buffer,
 
   /* Check we have enough data */
   if( end - buffer < *offset || end - buffer - *offset < 8 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( tape->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_warajevo_read: not enough data in buffer"
     );
@@ -244,7 +245,7 @@ get_next_block( size_t *offset, const libspectrum_byte *buffer,
 
 /* Executes a bytes worth of commands */
 static libspectrum_error
-exec_command( libspectrum_byte *dest, const libspectrum_byte *src,
+exec_command( libspectrum_context_t *context, libspectrum_byte *dest, const libspectrum_byte *src,
 	      const libspectrum_byte *end GCC_UNUSED, size_t *sp, size_t *pc,
 	      size_t *bytes_written, const size_t to_write )
 {
@@ -258,7 +259,7 @@ exec_command( libspectrum_byte *dest, const libspectrum_byte *src,
   for( i = 0; i < 8; i++ ) {
     bit = ( command_byte & ( 0x80 >> i ) ) ? 1 : 0;
 
-    error = add_bit_to_copy_command( dest, src, dest + to_write, bit, sp,
+    error = add_bit_to_copy_command( context, dest, src, dest + to_write, bit, sp,
                                      bytes_written );
     if( error ) { return error; }
 
@@ -269,12 +270,12 @@ exec_command( libspectrum_byte *dest, const libspectrum_byte *src,
 }
 
 static libspectrum_error
-execute_copy_command( libspectrum_byte *dest, const libspectrum_byte *end,
+execute_copy_command( libspectrum_context_t *context, libspectrum_byte *dest, const libspectrum_byte *end,
                       size_t *bytes_written )
 {
   if( ( (*bytes_written + 1) < command.offset ) ||
       ( dest + *bytes_written - command.offset + 1 + command.size > end ) ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
                      "execute_copy_command: corrupt compressed block in file" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
@@ -290,7 +291,7 @@ execute_copy_command( libspectrum_byte *dest, const libspectrum_byte *end,
 }
 
 static libspectrum_error
-add_bit_to_copy_command( libspectrum_byte *dest, const libspectrum_byte *src,
+add_bit_to_copy_command( libspectrum_context_t *context, libspectrum_byte *dest, const libspectrum_byte *src,
 			 const libspectrum_byte *end, libspectrum_byte bit,
 			 size_t *sp, size_t *bytes_written )
 {
@@ -324,7 +325,7 @@ add_bit_to_copy_command( libspectrum_byte *dest, const libspectrum_byte *src,
         command.size=2;
         command.mode=3;
         command.offset = src[(*sp)++];
-        return execute_copy_command( dest, end, bytes_written );
+        return execute_copy_command( context, dest, end, bytes_written );
       } else { /* b011 */
         command.size=10 + src[(*sp)++];
         command.mode=2;
@@ -423,7 +424,7 @@ add_bit_to_copy_command( libspectrum_byte *dest, const libspectrum_byte *src,
   }
 
   if( command.mode == 3 ) {
-    return execute_copy_command( dest, end, bytes_written );
+    return execute_copy_command( context, dest, end, bytes_written );
   }
 
   return LIBSPECTRUM_ERROR_NONE;
@@ -440,7 +441,7 @@ read_rom_block( libspectrum_tape *tape, const libspectrum_byte *ptr,
 		const libspectrum_byte *end, size_t offset )
 {
   libspectrum_tape_block *block =
-    libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_ROM );
+    libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_ROM );
   libspectrum_error error;
   libspectrum_word size;
   libspectrum_word block_size;
@@ -465,7 +466,7 @@ read_rom_block( libspectrum_tape *tape, const libspectrum_byte *ptr,
   /* Have we got enough bytes left in buffer? */
   if( end - data < (ptrdiff_t)block_size ) {
     libspectrum_free( block );
-    libspectrum_print_error(
+    libspectrum_print_error( tape->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "warajevo_read_rom_block: not enough data in buffer"
     );
@@ -481,7 +482,7 @@ read_rom_block( libspectrum_tape *tape, const libspectrum_byte *ptr,
 
   if( size == COMPRESSED_BLOCK ) {
 
-    error = decompress_block( block_data + 1, data, end,
+    error = decompress_block( tape->context, block_data + 1, data, end,
 			      lsb2word( ptr + offset + 15 ), length - 2 );
     if( error ) { libspectrum_free( block_data ); libspectrum_free( block ); return error; }
   } else {
@@ -509,7 +510,7 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
 	       const libspectrum_byte *end, size_t offset )
 {
   libspectrum_tape_block *block =
-    libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_RAW_DATA );
+    libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_RAW_DATA );
   libspectrum_tape_block *last_block;
   libspectrum_error error;
   libspectrum_word compressed_size, decompressed_size;
@@ -526,7 +527,7 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
   /* Have we got enough bytes left in buffer? */
   if( end - data < (ptrdiff_t)compressed_size ) {
     libspectrum_free( block );
-    libspectrum_print_error(
+    libspectrum_print_error( tape->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "warajevo_read_raw_data: not enough data in buffer"
     );
@@ -539,7 +540,7 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
 
   if( compressed_size != decompressed_size ) {
 
-    error = decompress_block( block_data, data, end,
+    error = decompress_block( tape->context, block_data, data, end,
 			      lsb2word( ptr + offset + 15 ), length );
     if( error ) {
       libspectrum_free( block_data ); libspectrum_free( block ); return error;
@@ -558,7 +559,7 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
   case HZ30303: bit_length = 115; break;
   case HZ44100: bit_length =  79; break;
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_LOGIC,
 			     "read_raw_data: unknown frequency %d",
 			     status.bits.frequency );
     libspectrum_free( block_data ); libspectrum_free( block );
@@ -615,7 +616,7 @@ read_raw_data( libspectrum_tape *tape, const libspectrum_byte *ptr,
 }
 
 static libspectrum_error
-decompress_block( libspectrum_byte *dest, const libspectrum_byte *src,
+decompress_block( libspectrum_context_t *context, libspectrum_byte *dest, const libspectrum_byte *src,
 		  const libspectrum_byte *end, size_t signature,
 		  size_t length )
 {
@@ -627,7 +628,7 @@ decompress_block( libspectrum_byte *dest, const libspectrum_byte *src,
   reset_copy_command();
     
   while( ( pc <= signature ) && ( bytes_written != length ) ) {
-    error = exec_command( dest, src, end, &sp, &pc, &bytes_written, length );
+    error = exec_command( context, dest, src, end, &sp, &pc, &bytes_written, length );
     if( error ) return error;
   }
 

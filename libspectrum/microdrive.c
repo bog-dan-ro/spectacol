@@ -36,7 +36,7 @@ struct libspectrum_microdrive {
   libspectrum_byte data[ LIBSPECTRUM_MICRODRIVE_CARTRIDGE_LENGTH ];
   int write_protect;
   libspectrum_byte cartridge_len;
-
+  libspectrum_context_t *context;
 };
 
 typedef struct libspectrum_microdrive_block {
@@ -64,9 +64,11 @@ static const size_t MDR_LENGTH = LIBSPECTRUM_MICRODRIVE_CARTRIDGE_LENGTH + 1;
 
 /* Allocate a microdrive image */
 libspectrum_microdrive*
-libspectrum_microdrive_alloc( void )
+libspectrum_microdrive_alloc(libspectrum_context_t *context )
 {
-  return libspectrum_new( libspectrum_microdrive, 1 );
+  libspectrum_microdrive *ret = libspectrum_new( libspectrum_microdrive, 1 );
+  ret->context = context;
+  return ret;
 }
 
 /* Free a microdrive image */
@@ -262,7 +264,7 @@ libspectrum_microdrive_mdr_read( libspectrum_microdrive *microdrive,
   if( length < LIBSPECTRUM_MICRODRIVE_BLOCK_LEN * 10 ||
      ( length % LIBSPECTRUM_MICRODRIVE_BLOCK_LEN ) > 1 ||
        length > MDR_LENGTH ) {
-    libspectrum_print_error(
+    libspectrum_print_error(microdrive->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_microdrive_mdr_read: not enough data in buffer"
     );

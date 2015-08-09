@@ -43,6 +43,7 @@ static const char * const MIN_GCRYPT_VERSION = "1.1.42";
 static const char *gcrypt_version;
 
 #include "internals.h"
+#include "libspectrum.h"
 
 #if defined AMIGA || defined __MORPHOS__
 #include <proto/exec.h>
@@ -64,13 +65,15 @@ const int LIBSPECTRUM_JOYSTICK_INPUT_KEYBOARD         = 1 << 0;
 const int LIBSPECTRUM_JOYSTICK_INPUT_JOYSTICK_1       = 1 << 1;
 const int LIBSPECTRUM_JOYSTICK_INPUT_JOYSTICK_2       = 1 << 2;
 
+#ifndef HAVE_LIB_GLIB
+static libspectrum_mutex_t init_mutex = NULL;
+static int init_count = 0;
+#endif				/* #ifndef HAVE_LIB_GLIB */
+
 libspectrum_error
-libspectrum_default_error_function( libspectrum_error error,
+libspectrum_default_error_function( void *user_data, libspectrum_error error,
 				    const char *format, va_list ap );
 
-/* The function to call on errors */
-libspectrum_error_function_t libspectrum_error_function =
-  libspectrum_default_error_function;
 
 #ifdef HAVE_GCRYPT_H
 static void
@@ -79,7 +82,7 @@ gcrypt_log_handler( void *opaque, int level, const char *format, va_list ap );
 
 /* Initialise the library */
 libspectrum_error
-libspectrum_init( void )
+libspectrum_init( libspectrum_init_t *init )
 {
 #ifdef HAVE_GCRYPT_H
 
@@ -88,6 +91,7 @@ libspectrum_init( void )
     gcrypt_version = gcry_check_version( MIN_GCRYPT_VERSION );
     if( !gcrypt_version ) {
       libspectrum_print_error(
+        init->context,
         LIBSPECTRUM_ERROR_LOGIC,
 	"libspectrum_init: found libgcrypt %s, but need %s",
 	gcry_check_version( NULL ), MIN_GCRYPT_VERSION
@@ -116,18 +120,41 @@ libspectrum_init( void )
 
 #endif				/* #ifdef HAVE_GCRYPT_H */
 
+#ifndef HAVE_LIB_GLIB
+  if (!init_mutex)
+      init_mutex = libspectrum_create_mutex_fn();
+
+  libspectrum_lock_mutex_fn(init_mutex);
+  if (!init_count++) {
+      libspectrum_slist_init();
+      libspectrum_hashtable_init();
+  }
+  libspectrum_unlock_mutex_fn(init_mutex);
+#endif				/* #ifndef HAVE_LIB_GLIB */
   libspectrum_init_bits_set();
+  init->context = libspectrum_new(libspectrum_context_t  ,1);
+  init->context->error_function = init->error_function;
+  init->context->user_data = init->user_data;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
 
 void
-libspectrum_end( void )
+libspectrum_end(libspectrum_context_t *context )
 {
 #ifndef HAVE_LIB_GLIB
-  libspectrum_slist_cleanup();
-  libspectrum_hashtable_cleanup();
+  libspectrum_lock_mutex_fn(init_mutex);
+  if (init_count && !(--init_count)) {
+    libspectrum_slist_cleanup();
+    libspectrum_hashtable_cleanup();
+  }
+  libspectrum_unlock_mutex_fn(init_mutex);
+  if (!init_count) {
+      libspectrum_destory_mutex_fn(init_mutex);
+      init_mutex = NULL;
+  }
 #endif				/* #ifndef HAVE_LIB_GLIB */
+  libspectrum_free(context);
 }
 
 #ifdef HAVE_GCRYPT_H
@@ -177,16 +204,16 @@ libspectrum_gcrypt_version( void )
 }
 
 libspectrum_error
-libspectrum_print_error( libspectrum_error error, const char *format, ... )
+libspectrum_print_error( libspectrum_context_t *context, libspectrum_error error, const char *format, ... )
 {
   va_list ap;
 
   /* If we don't have an error function, do nothing */
-  if( !libspectrum_error_function ) return LIBSPECTRUM_ERROR_NONE;
+  if( !context->error_function ) return LIBSPECTRUM_ERROR_NONE;
 
   /* Otherwise, call that error function */
   va_start( ap, format );
-  libspectrum_error_function( error, format, ap );
+  context->error_function( context->user_data, error, format, ap );
   va_end( ap );
 
   return LIBSPECTRUM_ERROR_NONE;
@@ -194,8 +221,8 @@ libspectrum_print_error( libspectrum_error error, const char *format, ... )
 
 /* Default error action is just to print a message to stderr */
 libspectrum_error
-libspectrum_default_error_function( libspectrum_error error,
-				    const char *format, va_list ap )
+libspectrum_default_error_function(void *user_data, libspectrum_error error,
+                    const char *format, va_list ap )
 {
    fprintf( stderr, "libspectrum error: " );
   vfprintf( stderr, format, ap );
@@ -451,27 +478,27 @@ libspectrum_machine_capabilities( libspectrum_machine type )
 /* Given a buffer and optionally a filename, make a best guess as to
    what sort of file this is */
 libspectrum_error
-libspectrum_identify_file_with_class(
+libspectrum_identify_file_with_class(libspectrum_context_t *context,
   libspectrum_id_t *type, libspectrum_class_t *libspectrum_class,
   const char *filename, const unsigned char *buffer, size_t length )
 {
   libspectrum_error error;
   char *new_filename = NULL; unsigned char *new_buffer; size_t new_length;
 
-  error = libspectrum_identify_file_raw( type, filename, buffer, length );
+  error = libspectrum_identify_file_raw( context, type, filename, buffer, length );
   if( error ) return error;
 
-  error = libspectrum_identify_class( libspectrum_class, *type );
+  error = libspectrum_identify_class( context, libspectrum_class, *type );
   if( error ) return error;
 
   if( *libspectrum_class != LIBSPECTRUM_CLASS_COMPRESSED )
     return LIBSPECTRUM_ERROR_NONE;
 
-  error = libspectrum_uncompress_file( &new_buffer, &new_length, &new_filename,
+  error = libspectrum_uncompress_file( context, &new_buffer, &new_length, &new_filename,
 				       *type, buffer, length, filename );
   if( error ) return error;
 
-  error = libspectrum_identify_file_with_class( type, libspectrum_class,
+  error = libspectrum_identify_file_with_class( context, type, libspectrum_class,
 						new_filename, new_buffer,
 						new_length );
 
@@ -485,19 +512,19 @@ libspectrum_identify_file_with_class(
 
 /* Identify a file, but without worrying about its class */
 libspectrum_error
-libspectrum_identify_file( libspectrum_id_t *type, const char *filename,
-			   const unsigned char *buffer, size_t length )
+libspectrum_identify_file(libspectrum_context_t *context, libspectrum_id_t *type, const char *filename,
+               const unsigned char *buffer, size_t length )
 {
   libspectrum_class_t class;
 
-  return libspectrum_identify_file_with_class( type, &class, filename,
+  return libspectrum_identify_file_with_class( context, type, &class, filename,
 					       buffer, length );
 }
 
 /* Identify a file without attempting to decompress it */
 libspectrum_error
-libspectrum_identify_file_raw( libspectrum_id_t *type, const char *filename,
-			       const unsigned char *buffer, size_t length )
+libspectrum_identify_file_raw(libspectrum_context_t *context, libspectrum_id_t *type, const char *filename,
+                   const unsigned char *buffer, size_t length )
 {
   struct type {
 
@@ -668,8 +695,8 @@ libspectrum_identify_file_raw( libspectrum_id_t *type, const char *filename,
 
 /* What generic 'class' of file is this file */
 libspectrum_error
-libspectrum_identify_class( libspectrum_class_t *libspectrum_class,
-			    libspectrum_id_t type )
+libspectrum_identify_class(libspectrum_context_t *context, libspectrum_class_t *libspectrum_class,
+                libspectrum_id_t type )
 {
   switch( type ) {
 
@@ -746,25 +773,27 @@ libspectrum_identify_class( libspectrum_class_t *libspectrum_class,
     *libspectrum_class = LIBSPECTRUM_CLASS_AUXILIARY; return 0;
   }
 
-  libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+  libspectrum_print_error( context,
+                           LIBSPECTRUM_ERROR_UNKNOWN,
 			   "Unknown file type %d", type );
   return LIBSPECTRUM_ERROR_UNKNOWN;
 }
 
 libspectrum_error
-libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
-			     char **new_filename, libspectrum_id_t type,
-			     const unsigned char *old_buffer,
-			     size_t old_length, const char *old_filename )
+libspectrum_uncompress_file(libspectrum_context_t *context, unsigned char **new_buffer, size_t *new_length,
+                 char **new_filename, libspectrum_id_t type,
+                 const unsigned char *old_buffer,
+                 size_t old_length, const char *old_filename )
 {
   libspectrum_class_t class;
   libspectrum_error error;
 
-  error = libspectrum_identify_class( &class, type );
+  error = libspectrum_identify_class( context, &class, type );
   if( error ) return error;
 
   if( class != LIBSPECTRUM_CLASS_COMPRESSED ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( context,
+                             LIBSPECTRUM_ERROR_LOGIC,
 			     "file type %d is not a compressed type", type );
     return LIBSPECTRUM_ERROR_LOGIC;
   }
@@ -772,7 +801,8 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
   if( new_filename && old_filename ) {
     *new_filename = strdup( old_filename );
     if( !*new_filename ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_MEMORY,
+      libspectrum_print_error( context,
+                               LIBSPECTRUM_ERROR_MEMORY,
 			       "out of memory at %s:%d", __FILE__, __LINE__ );
       return LIBSPECTRUM_ERROR_MEMORY;
     }
@@ -794,7 +824,7 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
 	(*new_filename)[ strlen( *new_filename ) - 4 ] = '\0';
     }
 
-    error = libspectrum_bzip2_inflate( old_buffer, old_length,
+    error = libspectrum_bzip2_inflate( context, old_buffer, old_length,
 				       new_buffer, new_length );
     if( error ) {
       if( new_filename ) libspectrum_free( *new_filename );
@@ -804,6 +834,7 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
 #else				/* #ifdef HAVE_LIBBZ2 */
 
     libspectrum_print_error(
+      context->context,
       LIBSPECTRUM_ERROR_UNKNOWN,
       "libbz2 not available to decompress bzipped file"
     );
@@ -825,7 +856,7 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
 	(*new_filename)[ strlen( *new_filename ) - 3 ] = '\0';
     }
       
-    error = libspectrum_gzip_inflate( old_buffer, old_length,
+    error = libspectrum_gzip_inflate( context, old_buffer, old_length,
 				      new_buffer, new_length );
     if( error ) {
       if( new_filename ) libspectrum_free( *new_filename );
@@ -834,7 +865,8 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
 
 #else				/* #ifdef HAVE_ZLIB_H */
 
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( context->context,
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "zlib not available to decompress gzipped file" );
     if( new_filename ) libspectrum_free( *new_filename );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -887,6 +919,7 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
 #endif				/* #ifndef __MORPHOS__ */
               } else {
                 libspectrum_print_error(
+                             context->context,
                              LIBSPECTRUM_ERROR_UNKNOWN,
                              "xfdmaster.library not able to decrunch %s file",
                              xfdobj->xfdbi_PackerName );
@@ -894,6 +927,7 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
               }
             } else {
               libspectrum_print_error(
+                                 context->context,
                                  LIBSPECTRUM_ERROR_UNKNOWN,
                                  "xfdmaster.library does not recognise file" );
               return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -917,7 +951,8 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
 #endif /* #ifdef AMIGA */
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( context,
+                             LIBSPECTRUM_ERROR_LOGIC,
 			     "unknown compressed type %d", type );
     if( new_filename ) libspectrum_free( *new_filename );
     return LIBSPECTRUM_ERROR_LOGIC;
@@ -1006,4 +1041,36 @@ int libspectrum_write_dword( libspectrum_byte **buffer, libspectrum_dword d )
   *(*buffer)++ = ( d & 0x00ff0000 ) >> 16;
   *(*buffer)++ = ( d & 0xff000000 ) >> 24;
   return LIBSPECTRUM_ERROR_NONE;
+}
+
+
+libspectrum_init_t libspectrum_default_init()
+{
+    libspectrum_init_t init;
+    init.error_function = libspectrum_default_error_function;
+    init.user_data = NULL;
+    init.context = NULL;
+    return init;
+}
+
+libspectrum_mutex_t libspectrum_default_create_mutext()
+{
+    return NULL;
+}
+
+void libspectrum_default_do_nothing_mutext(libspectrum_mutex_t mutex GCC_UNUSED)
+{
+}
+
+libspectrum_create_mutex_fn_t libspectrum_create_mutex_fn = libspectrum_default_create_mutext;
+libspectrum_lock_mutex_fn_t libspectrum_lock_mutex_fn = libspectrum_default_do_nothing_mutext;
+libspectrum_unlock_mutex_fn_t libspectrum_unlock_mutex_fn = libspectrum_default_do_nothing_mutext;
+libspectrum_destory_mutex_fn_t libspectrum_destory_mutex_fn = libspectrum_default_do_nothing_mutext;
+
+void libspectrum_mutex_set_vtable(libspectrum_mutex_vtable_t *table )
+{
+  libspectrum_create_mutex_fn = table->create;
+  libspectrum_lock_mutex_fn = table->lock;
+  libspectrum_unlock_mutex_fn = table->unlock;
+  libspectrum_destory_mutex_fn = table->destroy;
 }

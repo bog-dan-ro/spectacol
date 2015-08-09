@@ -47,7 +47,8 @@ libspectrum_csw_read( libspectrum_tape *tape,
   if( length < signature_length + 2 ) goto csw_short;
 
   if( memcmp( csw_signature, buffer, signature_length ) ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_SIGNATURE,
+    libspectrum_print_error( tape->context,
+                  LIBSPECTRUM_ERROR_SIGNATURE,
 			     "libspectrum_csw_read: wrong signature" );
     return LIBSPECTRUM_ERROR_SIGNATURE;
   }
@@ -92,7 +93,7 @@ libspectrum_csw_read( libspectrum_tape *tape,
     break;
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_MEMORY,
+    libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_MEMORY,
 			     "libspectrum_csw_read: unknown CSW version" );
     return LIBSPECTRUM_ERROR_SIGNATURE;
   }
@@ -101,7 +102,7 @@ libspectrum_csw_read( libspectrum_tape *tape,
     csw_block->scale = 3500000 / csw_block->scale; /* approximate CPU speed */
 
   if( csw_block->scale < 0 || csw_block->scale >= 0x80000 ) {
-    libspectrum_print_error (LIBSPECTRUM_ERROR_MEMORY,
+    libspectrum_print_error ( tape->context, LIBSPECTRUM_ERROR_MEMORY,
 			     "libspectrum_csw_read: bad sample rate" );
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
@@ -115,11 +116,11 @@ libspectrum_csw_read( libspectrum_tape *tape,
 
     csw_block->data = NULL;
     csw_block->length = 0;
-    error = libspectrum_zlib_inflate( buffer, length, &csw_block->data,
+    error = libspectrum_zlib_inflate( tape->context, buffer, length, &csw_block->data,
                                       &csw_block->length );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 #else
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_UNKNOWN,
                              "zlib not available to decompress gzipped file" );
     return LIBSPECTRUM_ERROR_UNKNOWN;
 #endif
@@ -141,13 +142,13 @@ libspectrum_csw_read( libspectrum_tape *tape,
 
  csw_bad_compress:
   libspectrum_free( block );
-  libspectrum_print_error( LIBSPECTRUM_ERROR_MEMORY,
+  libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_MEMORY,
 			   "libspectrum_csw_read: unknown compression type" );
   return LIBSPECTRUM_ERROR_CORRUPT;
 
  csw_short:
   libspectrum_free( block );
-  libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+  libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_CORRUPT,
 			   "libspectrum_csw_read: not enough data in buffer" );
   return LIBSPECTRUM_ERROR_CORRUPT;
 
@@ -181,7 +182,7 @@ find_sample_rate( libspectrum_tape *tape )
 
       if( found ) {
         if( block_rate != sample_rate ) {
-          libspectrum_print_error(
+          libspectrum_print_error( tape->context,
             LIBSPECTRUM_ERROR_WARNING,
             "find_sample_rate: converting tape with mixed sample rates; conversion may well not work"
           );
@@ -215,7 +216,7 @@ find_sample_rate( libspectrum_tape *tape )
       break;
 
     default:
-      libspectrum_print_error(
+      libspectrum_print_error( tape->context,
         LIBSPECTRUM_ERROR_LOGIC,
         "libspectrum_csw_write: unknown block type 0x%02x",
 	libspectrum_tape_block_type( block )
@@ -291,7 +292,7 @@ csw_write_body( libspectrum_byte **buffer, size_t *length,
     libspectrum_byte *compressed_data = NULL;
     size_t compressed_length;
 
-    error = libspectrum_zlib_compress( data, data_length,
+    error = libspectrum_zlib_compress( tape->context, data, data_length,
                                        &compressed_data, &compressed_length );
     libspectrum_free( data );
     if( error ) return error;

@@ -140,7 +140,7 @@ print_error_to_stderr( ui_error_level severity, const char *message )
 }
 
 libspectrum_error
-ui_libspectrum_error( libspectrum_error error GCC_UNUSED, const char *format,
+ui_libspectrum_error( void *user_data, libspectrum_error error GCC_UNUSED, const char *format,
 		      va_list ap )
 {
   char new_format[ 257 ];

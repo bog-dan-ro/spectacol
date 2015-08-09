@@ -35,6 +35,7 @@
 #include <libspectrum.h>
 
 #include "dck.h"
+#include "fuse.h"
 #include "machine.h"
 #include "memory.h"
 #include "settings.h"
@@ -111,7 +112,7 @@ dck_reset( void )
     return 0;
   }
 
-  dck = libspectrum_dck_alloc();
+  dck = libspectrum_dck_alloc( libspectrum_context );
 
   error = utils_read_file( settings_current.dck_file, &file );
   if( error ) { libspectrum_dck_free( dck, 0 ); return error; }

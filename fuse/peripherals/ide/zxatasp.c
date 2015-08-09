@@ -30,6 +30,7 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "fuse.h"
 #include "ide.h"
 #include "machine.h"
 #include "memory.h"
@@ -170,8 +171,8 @@ zxatasp_init( void )
 {
   int error, i;
 
-  zxatasp_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
-  zxatasp_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
+  zxatasp_idechn0 = libspectrum_ide_alloc( libspectrum_context, LIBSPECTRUM_IDE_DATA16 );
+  zxatasp_idechn1 = libspectrum_ide_alloc( libspectrum_context, LIBSPECTRUM_IDE_DATA16 );
   
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT, 0 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT, 0 );

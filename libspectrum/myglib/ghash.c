@@ -36,6 +36,7 @@
 
 #ifndef HAVE_LIB_GLIB		/* Use this iff we're not using the 
 				   `proper' glib */
+#include <assert.h>
 #include <string.h>
 
 #include "internals.h"
@@ -63,6 +64,8 @@ struct _GHashTable
 
 static GHashNode *node_free_list = NULL;
 static GHashNode *node_allocated_list = NULL;
+
+static libspectrum_mutex_t hash_mutex = NULL;
 
 guint
 g_direct_hash (gconstpointer v)
@@ -124,8 +127,10 @@ g_hash_nodes_destroy (GHashNode *hash_node,
       if (value_destroy_func)
         value_destroy_func (node->value);
 
+      libspectrum_lock_mutex_fn(hash_mutex);
       node->next = node_free_list;
       node_free_list = hash_node;
+      libspectrum_unlock_mutex_fn(hash_mutex);
     }
 }
 
@@ -183,6 +188,7 @@ g_hash_node_new (gpointer key,
   GHashNode *hash_node;
   guint i;
 
+  libspectrum_lock_mutex_fn(hash_mutex);
   if (!node_free_list)
     {
       node_free_list = libspectrum_malloc (1024 * sizeof (GHashNode));
@@ -196,7 +202,8 @@ g_hash_node_new (gpointer key,
   
   hash_node = node_free_list;
   node_free_list = node_free_list->next;
-  
+  libspectrum_unlock_mutex_fn(hash_mutex);
+
   hash_node->key = key;
   hash_node->value = value;
   hash_node->next = NULL;
@@ -241,8 +248,10 @@ g_hash_node_destroy (GHashNode *hash_node,
   if (value_destroy_func)
     value_destroy_func (hash_node->value);
 
+  libspectrum_lock_mutex_fn(hash_mutex);
   hash_node->next = node_free_list;
   node_free_list = hash_node;
+  libspectrum_unlock_mutex_fn(hash_mutex);
 }
 
 guint
@@ -348,10 +357,20 @@ g_str_equal (gconstpointer v1,
 }
 
 void
+libspectrum_hashtable_init( void )
+{
+    assert(!hash_mutex);
+    hash_mutex = libspectrum_create_mutex_fn();
+}
+
+void
 libspectrum_hashtable_cleanup( void )
 {
+  libspectrum_lock_mutex_fn(hash_mutex);
   libspectrum_free( node_allocated_list );
   node_allocated_list = NULL;
   node_free_list = NULL;
+  libspectrum_unlock_mutex_fn(hash_mutex);
+  libspectrum_destory_mutex_fn(hash_mutex);
 }
 #endif				/* #ifndef HAVE_LIB_GLIB */

@@ -75,6 +75,9 @@ LIBSPECTRUM_INCLUDE_GCRYPT
 /* Standard typedefs */
 LIBSPECTRUM_DEFINE_TYPES
 
+// session context, present only in 2.0.0 and later
+typedef struct libspectrum_context_t libspectrum_context_t;
+
 /* glib replacement (if necessary) */
 LIBSPECTRUM_GLIB_REPLACEMENT
 
@@ -105,11 +108,6 @@ typedef enum libspectrum_error {
 /* Library capabilities */
 LIBSPECTRUM_CAPABILITIES
 
-/* Initialisation */
-
-WIN32_DLL libspectrum_error libspectrum_init( void );
-WIN32_DLL void libspectrum_end( void );
-
 /* Version checking */
 
 WIN32_DLL int libspectrum_check_version( const char *version );
@@ -118,13 +116,11 @@ WIN32_DLL const char *libspectrum_gcrypt_version( void );
 
 /* Error handling */
 typedef libspectrum_error
-(*libspectrum_error_function_t)( libspectrum_error error,
+(*libspectrum_error_function_t)( void *user_data, libspectrum_error error,
 				 const char *format, va_list ap );
 
-extern WIN32_DLL libspectrum_error_function_t libspectrum_error_function;
-
 WIN32_DLL libspectrum_error
-libspectrum_default_error_function( libspectrum_error error,
+libspectrum_default_error_function( void *user_data, libspectrum_error error,
 				    const char *format, va_list ap );
 
 /* Memory allocators */
@@ -161,6 +157,34 @@ WIN32_DLL void libspectrum_mem_set_vtable( libspectrum_mem_vtable_t *table );
 
 /* Deprecated */
 #define libspectrum_calloc libspectrum_malloc0_n
+
+/* Thread sync */
+
+typedef void* libspectrum_mutex_t;
+typedef libspectrum_mutex_t (*libspectrum_create_mutex_fn_t)();
+typedef void (*libspectrum_lock_mutex_fn_t)(libspectrum_mutex_t mutex);
+typedef void (*libspectrum_unlock_mutex_fn_t)(libspectrum_mutex_t mutex);
+typedef void (*libspectrum_destory_mutex_fn_t)(libspectrum_mutex_t mutex);
+typedef struct libspectrum_mutex_vtable_t {
+    libspectrum_create_mutex_fn_t create;
+    libspectrum_lock_mutex_fn_t lock;
+    libspectrum_unlock_mutex_fn_t unlock;
+    libspectrum_destory_mutex_fn_t destroy;
+} libspectrum_mutex_vtable_t;
+
+WIN32_DLL void libspectrum_mutex_set_vtable( libspectrum_mutex_vtable_t *table );
+
+/* Initialisation */
+
+typedef struct libspectrum_init_t {
+    libspectrum_error_function_t error_function; // filled by the user
+    void *user_data; // will be passed to various function pointers
+    libspectrum_context_t *context; // filled by libspectrum_init
+} libspectrum_init_t;
+
+WIN32_DLL libspectrum_init_t libspectrum_default_init();
+WIN32_DLL libspectrum_error libspectrum_init(libspectrum_init_t *init );
+WIN32_DLL void libspectrum_end( libspectrum_context_t *context );
 
 /* Attempt to identify a given file */
 
@@ -292,20 +316,20 @@ typedef enum libspectrum_class_t {
 } libspectrum_class_t;
 
 WIN32_DLL libspectrum_error
-libspectrum_identify_file( libspectrum_id_t *type, const char *filename,
+libspectrum_identify_file( libspectrum_context_t *context, libspectrum_id_t *type, const char *filename,
                            const unsigned char *buffer, size_t length );
 
 WIN32_DLL libspectrum_error
-libspectrum_identify_file_with_class(
+libspectrum_identify_file_with_class( libspectrum_context_t *context,
   libspectrum_id_t *type, libspectrum_class_t *libspectrum_class,
   const char *filename, const unsigned char *buffer, size_t length );
 
 WIN32_DLL libspectrum_error
-libspectrum_identify_file_raw( libspectrum_id_t *type, const char *filename,
+libspectrum_identify_file_raw( libspectrum_context_t *context, libspectrum_id_t *type, const char *filename,
 			       const unsigned char *buffer, size_t length );
 
 WIN32_DLL libspectrum_error
-libspectrum_identify_class( libspectrum_class_t *libspectrum_class,
+libspectrum_identify_class( libspectrum_context_t *context, libspectrum_class_t *libspectrum_class,
                             libspectrum_id_t type );
 
 /* Different Spectrum variants and their capabilities */
@@ -467,7 +491,7 @@ libspectrum_creator_custom_length( libspectrum_creator *creator );
 
 typedef struct libspectrum_snap libspectrum_snap;
 
-WIN32_DLL libspectrum_snap* libspectrum_snap_alloc( void );
+WIN32_DLL libspectrum_snap* libspectrum_snap_alloc( libspectrum_context_t *context );
 WIN32_DLL libspectrum_error libspectrum_snap_free( libspectrum_snap *snap );
 
 /* Read in a snapshot, optionally guessing what type it is */
@@ -514,6 +538,7 @@ extern WIN32_DLL const int LIBSPECTRUM_JOYSTICK_INPUT_JOYSTICK_1;
 extern WIN32_DLL const int LIBSPECTRUM_JOYSTICK_INPUT_JOYSTICK_2;
 
 /* Accessor functions */
+WIN32_DLL libspectrum_context_t *libspectrum_snap_context( libspectrum_snap *snap );
 LIBSPECTRUM_SNAP_ACCESSORS
 
 /*
@@ -602,7 +627,7 @@ typedef enum libspectrum_tape_state_type {
 
 /* Routines to manipulate tape blocks */
 WIN32_DLL libspectrum_tape_block*
-libspectrum_tape_block_alloc( libspectrum_tape_type type );
+libspectrum_tape_block_alloc( libspectrum_context_t *context, libspectrum_tape_type type );
 WIN32_DLL libspectrum_error
 libspectrum_tape_block_free( libspectrum_tape_block *block );
 WIN32_DLL libspectrum_tape_type
@@ -631,7 +656,7 @@ LIBSPECTRUM_TAPE_ACCESSORS
 /* A linked list of tape blocks */
 typedef struct libspectrum_tape libspectrum_tape;
 
-WIN32_DLL libspectrum_tape* libspectrum_tape_alloc( void );
+WIN32_DLL libspectrum_tape* libspectrum_tape_alloc( libspectrum_context_t *context );
 WIN32_DLL libspectrum_error libspectrum_tape_clear( libspectrum_tape *tape );
 WIN32_DLL libspectrum_error libspectrum_tape_free( libspectrum_tape *tape );
 
@@ -742,7 +767,7 @@ WIN32_DLL libspectrum_word libspectrum_tape_generalised_data_symbol_pulse( const
 
 typedef struct libspectrum_rzx libspectrum_rzx;
 
-WIN32_DLL libspectrum_rzx* libspectrum_rzx_alloc( void );
+WIN32_DLL libspectrum_rzx* libspectrum_rzx_alloc( libspectrum_context_t *context );
 WIN32_DLL libspectrum_error libspectrum_rzx_free( libspectrum_rzx *rzx );
 
 WIN32_DLL void
@@ -870,7 +895,7 @@ typedef struct libspectrum_microdrive libspectrum_microdrive;
 /* Constructor/destructor */
 
 WIN32_DLL libspectrum_microdrive*
-libspectrum_microdrive_alloc( void );
+libspectrum_microdrive_alloc( libspectrum_context_t *context );
 WIN32_DLL libspectrum_error
 libspectrum_microdrive_free( libspectrum_microdrive *microdrive );
 
@@ -937,9 +962,10 @@ typedef struct libspectrum_dck_block {
 /* FIXME: Remove the arbitrary limit on the number of banks */
 typedef struct libspectrum_dck {
   libspectrum_dck_block *dck[256];	/* dck block data */
+  libspectrum_context_t *context;
 } libspectrum_dck;
 
-WIN32_DLL libspectrum_dck* libspectrum_dck_alloc( void );
+WIN32_DLL libspectrum_dck* libspectrum_dck_alloc( libspectrum_context_t *context );
 WIN32_DLL libspectrum_error
 libspectrum_dck_free( libspectrum_dck *dck, int keep_pages );
 
@@ -958,7 +984,8 @@ libspectrum_dck_read2( libspectrum_dck *dck, const libspectrum_byte *buffer,
  */
 
 WIN32_DLL libspectrum_error
-libspectrum_verify_signature( libspectrum_signature *signature,
+libspectrum_verify_signature( libspectrum_context_t *context,
+                              libspectrum_signature *signature,
 			      libspectrum_rzx_dsa_key *key );
 WIN32_DLL libspectrum_error
 libspectrum_signature_free( libspectrum_signature *signature );
@@ -1000,7 +1027,8 @@ typedef enum libspectrum_ide_register {
 typedef struct libspectrum_ide_channel libspectrum_ide_channel;
 
 WIN32_DLL libspectrum_ide_channel*
-libspectrum_ide_alloc( libspectrum_ide_databus databus );
+libspectrum_ide_alloc( libspectrum_context_t *context,
+                       libspectrum_ide_databus databus );
 WIN32_DLL libspectrum_error
 libspectrum_ide_free( libspectrum_ide_channel *chn );
 

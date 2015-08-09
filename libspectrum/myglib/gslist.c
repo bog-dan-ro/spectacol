@@ -28,6 +28,7 @@
 #ifndef HAVE_LIB_GLIB		/* Use this iff we're not using the 
 				   `proper' glib */
 
+#include <assert.h>
 #include <stdlib.h>
 
 #include "internals.h"
@@ -45,8 +46,11 @@ static int FREE_LIST_ALLOCATE_CHUNK = 1024;
 GSList * free_list = NULL;
 GSList * allocated_list = NULL;
 
+static libspectrum_mutex_t list_mutex = NULL;
+
 static
 void    allocate_free   ( void ) {
+    libspectrum_lock_mutex_fn(list_mutex);
     if(!free_list) {
         int i;
         free_list=libspectrum_malloc(FREE_LIST_ALLOCATE_CHUNK*sizeof(GSList));
@@ -55,6 +59,7 @@ void    allocate_free   ( void ) {
             free_list[i].next=&free_list[i+1];
         free_list[FREE_LIST_ALLOCATE_CHUNK-1].next=NULL;
     }
+    libspectrum_unlock_mutex_fn(list_mutex);
 }
 
 
@@ -73,8 +78,10 @@ GSList* g_slist_insert	(GSList		*list,
 
   allocate_free();
 
+  libspectrum_lock_mutex_fn(list_mutex);
   new_list = free_list;
   free_list=free_list->next;
+  libspectrum_unlock_mutex_fn(list_mutex);
   new_list->data = data;
   new_list->next=NULL;
 
@@ -121,8 +128,10 @@ GSList* g_slist_insert_sorted	(GSList		*list,
 
   if (!list)
     {
+      libspectrum_lock_mutex_fn(list_mutex);
       new_list = free_list;
       free_list=free_list->next;
+      libspectrum_unlock_mutex_fn(list_mutex);
       new_list->data = data;
       new_list->next=NULL;
       return new_list;
@@ -137,8 +146,10 @@ GSList* g_slist_insert_sorted	(GSList		*list,
       cmp = (*func) (data, tmp_list->data);
     }
 
+  libspectrum_lock_mutex_fn(list_mutex);
   new_list = free_list;
   free_list=free_list->next;
+  libspectrum_unlock_mutex_fn(list_mutex);
   new_list->data = data;
 
   if ((!tmp_list->next) && (cmp > 0))
@@ -294,8 +305,10 @@ void	g_slist_free		(GSList		*list) {
       while( last_node->next )
 	last_node = last_node->next;
 
+      libspectrum_lock_mutex_fn(list_mutex);
       last_node->next = free_list;
       free_list = list;
+      libspectrum_unlock_mutex_fn(list_mutex);
     }
 }
 
@@ -355,11 +368,21 @@ gint	g_slist_position	(GSList		*list,
 }
 
 void
+libspectrum_slist_init( void )
+{
+    assert(!list_mutex);
+    list_mutex = libspectrum_create_mutex_fn();
+}
+
+void
 libspectrum_slist_cleanup( void )
 {
+  libspectrum_lock_mutex_fn(list_mutex);
   libspectrum_free( allocated_list );
   allocated_list = NULL;
   free_list = NULL;
+  libspectrum_unlock_mutex_fn(list_mutex);
+  libspectrum_destory_mutex_fn(list_mutex);
 }
 
 #endif				/* #ifndef HAVE_LIB_GLIB */

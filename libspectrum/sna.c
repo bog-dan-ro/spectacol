@@ -92,7 +92,8 @@ identify_machine( size_t buffer_length, libspectrum_snap *snap )
     libspectrum_snap_set_machine( snap, LIBSPECTRUM_MACHINE_PENT );
     break;
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_CORRUPT,
 			     "libspectrum_sna_identify: unknown length" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
@@ -107,7 +108,7 @@ libspectrum_sna_read_header( const libspectrum_byte *buffer,
   int iff;
 
   if( buffer_length < LIBSPECTRUM_SNA_HEADER_LENGTH ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_sna_read_header: not enough data in buffer"
     );
@@ -149,7 +150,7 @@ libspectrum_sna_read_data( const libspectrum_byte *buffer,
   libspectrum_word sp, offset;
 
   if( buffer_length < 0xc000 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_sna_read_data: not enough data in buffer"
     );
@@ -162,7 +163,7 @@ libspectrum_sna_read_data( const libspectrum_byte *buffer,
 
     sp = libspectrum_snap_sp( snap );
     if( sp < 0x4000 || sp == 0xffff ) {
-      libspectrum_print_error(
+      libspectrum_print_error( libspectrum_snap_context(snap),
         LIBSPECTRUM_ERROR_CORRUPT,
         "libspectrum_sna_read_data: SP invalid (0x%04x)", sp
       );
@@ -200,7 +201,7 @@ libspectrum_sna_read_data( const libspectrum_byte *buffer,
     if( page == 5 || page == 2 ) {
       if( memcmp( libspectrum_snap_pages( snap, page ),
 		  &buffer[0x8000], 0x4000 ) ) {
-	libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
           LIBSPECTRUM_ERROR_CORRUPT,
 	  "libspectrum_sna_read_data: duplicated page not identical"
 	);
@@ -218,7 +219,8 @@ libspectrum_sna_read_data( const libspectrum_byte *buffer,
     break;
 
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error(  libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_LOGIC,
 			     "libspectrum_sna_read_data: unknown machine" );
     return LIBSPECTRUM_ERROR_LOGIC;
   }
@@ -231,7 +233,7 @@ libspectrum_sna_read_128_header( const libspectrum_byte *buffer,
 				 size_t buffer_length, libspectrum_snap *snap )
 {
   if( buffer_length < 4 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_sna_read_128_header: not enough data in buffer"
     );
@@ -258,7 +260,7 @@ libspectrum_sna_read_128_data( const libspectrum_byte *buffer,
 
     /* Check we've still got some data to read */
     if( buffer_length < 0x4000 ) {
-      libspectrum_print_error(
+      libspectrum_print_error( libspectrum_snap_context(snap),
         LIBSPECTRUM_ERROR_CORRUPT,
         "libspectrum_sna_read_128_data: not enough data in buffer"
       );
@@ -369,7 +371,8 @@ libspectrum_sna_write( libspectrum_byte **buffer, size_t *length,
     break;
 
   case LIBSPECTRUM_MACHINE_UNKNOWN:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error(  libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_LOGIC,
 			     "Emulated machine type is set to 'unknown'!" );
     return LIBSPECTRUM_ERROR_LOGIC;
   }
@@ -421,7 +424,8 @@ write_48k_sna( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   /* Must have somewhere in RAM to store PC */
   if( libspectrum_snap_sp( snap ) < 0x4002 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_INVALID,
+    libspectrum_print_error(  libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_INVALID,
 			     "SP is too low (0x%04x) to stack PC",
 			     libspectrum_snap_sp( snap ) );
     return LIBSPECTRUM_ERROR_INVALID;

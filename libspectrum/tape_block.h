@@ -467,7 +467,7 @@ struct libspectrum_tape_block {
     libspectrum_tape_data_block data_block;
 
   } types;
-
+  libspectrum_context_t *context;
 };
 
 struct libspectrum_tape_block_state {
@@ -496,6 +496,22 @@ struct libspectrum_tape_block_state {
 
 };
 
+/* The tape type itself */
+struct libspectrum_tape {
+
+  /* All the blocks */
+  GSList* blocks;
+
+  /* The last block */
+  GSList* last_block;
+
+  /* The state of the current block */
+  libspectrum_tape_block_state state;
+
+  libspectrum_context_t *context;
+};
+
+
 /* Functions needed by both tape.c and tape_block.c */
 libspectrum_error
 libspectrum_tape_pure_data_next_bit( libspectrum_tape_pure_data_block *block,
@@ -504,10 +520,10 @@ void
 libspectrum_tape_raw_data_next_bit( libspectrum_tape_raw_data_block *block,
                              libspectrum_tape_raw_data_block_state *state );
 libspectrum_error
-generalised_data_edge( libspectrum_tape_generalised_data_block *block,
+generalised_data_edge( libspectrum_context_t *context, libspectrum_tape_generalised_data_block *block,
                        libspectrum_tape_generalised_data_block_state *state,
-		       libspectrum_dword *tstates, int *end_of_block,
-		       int *flags );
+                       libspectrum_dword *tstates, int *end_of_block,
+                       int *flags );
 libspectrum_error
 libspectrum_tape_data_block_next_bit( libspectrum_tape_data_block *block,
                                     libspectrum_tape_data_block_state *state );

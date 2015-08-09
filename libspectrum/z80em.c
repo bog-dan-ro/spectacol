@@ -40,7 +40,7 @@ libspectrum_z80em_read( libspectrum_tape *tape,
   static const char id[] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0Raw tape sample";
 
   if( length < sizeof( id ) ) {
-    libspectrum_print_error(
+    libspectrum_print_error( tape->context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_z80em_read: not enough data in buffer"
     );
@@ -48,12 +48,12 @@ libspectrum_z80em_read( libspectrum_tape *tape,
   }
 
   if( memcmp( id, buffer, sizeof( id ) ) ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_SIGNATURE,
+    libspectrum_print_error( tape->context, LIBSPECTRUM_ERROR_SIGNATURE,
 			     "libspectrum_z80em_read: wrong signature" );
     return LIBSPECTRUM_ERROR_SIGNATURE;
   }
 
-  block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE );
+  block = libspectrum_tape_block_alloc( tape->context, LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE );
 
   z80em_block = &block->types.rle_pulse;
   z80em_block->scale = 7; /* 1 time unit == 7 clock ticks */

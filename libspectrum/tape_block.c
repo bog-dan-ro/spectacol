@@ -61,10 +61,11 @@ data_block_init( libspectrum_tape_data_block *block,
                  libspectrum_tape_data_block_state *state );
 
 libspectrum_tape_block*
-libspectrum_tape_block_alloc( libspectrum_tape_type type )
+libspectrum_tape_block_alloc(libspectrum_context_t *context, libspectrum_tape_type type )
 {
   libspectrum_tape_block *block = libspectrum_new( libspectrum_tape_block, 1 );
   libspectrum_tape_block_set_type( block, type );
+  block->context = context;
   return block;
 }
 
@@ -185,7 +186,8 @@ libspectrum_tape_block_free( libspectrum_tape_block *block )
 
   case LIBSPECTRUM_TAPE_BLOCK_CONCAT: /* This should never occur */
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error(  block->context,
+                              LIBSPECTRUM_ERROR_LOGIC,
 			     "%s: unknown block type %d", __func__,
 			     block->type );
     return LIBSPECTRUM_ERROR_LOGIC;
@@ -268,7 +270,7 @@ libspectrum_tape_block_init( libspectrum_tape_block *block,
     return LIBSPECTRUM_ERROR_NONE;
 
   default:
-    libspectrum_print_error(
+    libspectrum_print_error( block->context,
       LIBSPECTRUM_ERROR_LOGIC,
       "libspectrum_tape_init_block: unknown block type 0x%02x",
       block->type
@@ -453,7 +455,7 @@ libspectrum_tape_block_read_symbol_table_parameters(
 }
 
 libspectrum_error
-libspectrum_tape_block_read_symbol_table(
+libspectrum_tape_block_read_symbol_table(libspectrum_context_t *context,
   libspectrum_tape_generalised_data_symbol_table *table,
   const libspectrum_byte **ptr, size_t length )
 {
@@ -464,7 +466,7 @@ libspectrum_tape_block_read_symbol_table(
 
     /* Sanity check */
     if( length < ( 2 * table->max_pulses + 1 ) * table->symbols_in_table ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+      libspectrum_print_error( context, LIBSPECTRUM_ERROR_CORRUPT,
 			       "%s: not enough data in buffer", __func__ );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
@@ -671,7 +673,7 @@ rle_pulse_block_length( libspectrum_tape_rle_pulse_block *rle_pulse )
 }
 
 static libspectrum_dword
-generalised_data_block_length(
+generalised_data_block_length(libspectrum_context_t *context,
                     libspectrum_tape_generalised_data_block *generalised_data )
 {
   libspectrum_dword length = 0;
@@ -687,7 +689,7 @@ generalised_data_block_length(
 
   /* just reuse tape iteration for this as it is so nasty */
   while( !end_of_block ) {
-    error = generalised_data_edge( generalised_data, &state, &tstates,
+    error = generalised_data_edge( context, generalised_data, &state, &tstates,
                                    &end_of_block, &flags );
     if( error ) return -1;
 
@@ -776,7 +778,7 @@ libspectrum_tape_block_length( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:
     return rle_pulse_block_length( &block->types.rle_pulse );
   case LIBSPECTRUM_TAPE_BLOCK_GENERALISED_DATA:
-    return generalised_data_block_length( &block->types.generalised_data );
+    return generalised_data_block_length( block->context, &block->types.generalised_data );
   case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
     return pulse_sequence_block_length( &block->types.pulse_sequence );
   case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:

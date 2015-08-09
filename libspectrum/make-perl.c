@@ -324,10 +324,10 @@ int main(void)
   printf( "#define	LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION	(1)\n\n" );
   printf( "/* zlib (de)compression routines */\n\n" );
   printf( "WIN32_DLL libspectrum_error\n" );
-  printf( "libspectrum_zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,\n" );
+  printf( "libspectrum_zlib_inflate( libspectrum_context_t *context, const libspectrum_byte *gzptr, size_t gzlength,\n" );
   printf( "			  libspectrum_byte **outptr, size_t *outlength );\n\n" );
   printf( "WIN32_DLL libspectrum_error\n" );
-  printf( "libspectrum_zlib_compress( const libspectrum_byte *data, size_t length,\n" );
+  printf( "libspectrum_zlib_compress( libspectrum_context_t *context, const libspectrum_byte *data, size_t length,\n" );
   printf( "			   libspectrum_byte **gzptr, size_t *gzlength );\n\n" );
 
 #endif				/* #ifdef HAVE_ZLIB_H */

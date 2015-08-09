@@ -35,8 +35,8 @@
 #include "internals.h"
 
 libspectrum_error
-libspectrum_bzip2_inflate( const libspectrum_byte *bzptr, size_t bzlength,
-			   libspectrum_byte **outptr, size_t *outlength )
+libspectrum_bzip2_inflate(libspectrum_context_t *context, const libspectrum_byte *bzptr, size_t bzlength,
+               libspectrum_byte **outptr, size_t *outlength )
 {
   int error;
   unsigned int length2;
@@ -50,7 +50,7 @@ libspectrum_bzip2_inflate( const libspectrum_byte *bzptr, size_t bzlength,
     error = BZ2_bzBuffToBuffDecompress( (char*)*outptr, &length2, (char*)bzptr,
 					bzlength, 0, 0 );
     if( error != BZ_OK ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+      libspectrum_print_error( context, LIBSPECTRUM_ERROR_LOGIC,
 			       "error decompressing bzip data" );
       return LIBSPECTRUM_ERROR_LOGIC;
     }
@@ -76,14 +76,14 @@ libspectrum_bzip2_inflate( const libspectrum_byte *bzptr, size_t bzlength,
       switch( error ) {
 
       case BZ_MEM_ERROR:
-	libspectrum_print_error( LIBSPECTRUM_ERROR_MEMORY,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_MEMORY,
 				 "out of memory at %s:%d",
 				 __FILE__, __LINE__ );
 	libspectrum_free( *outptr );
 	return LIBSPECTRUM_ERROR_MEMORY;
 
       default:
-	libspectrum_print_error(
+    libspectrum_print_error( context,
           LIBSPECTRUM_ERROR_LOGIC,
 	  "bzip2_inflate: serious error from BZ2_bzDecompressInit: %d", error
 	);
@@ -105,7 +105,7 @@ libspectrum_bzip2_inflate( const libspectrum_byte *bzptr, size_t bzlength,
       case BZ_STREAM_END:	/* Finished decompression */
 	error = BZ2_bzDecompressEnd( &stream );
 	if( error ) {
-	  libspectrum_print_error(
+      libspectrum_print_error( context,
 	    LIBSPECTRUM_ERROR_LOGIC,
 	    "bzip2_inflate: error from BZ2_bzDecompressEnd: %d", error
 	  );
@@ -126,7 +126,7 @@ libspectrum_bzip2_inflate( const libspectrum_byte *bzptr, size_t bzlength,
 	break;
 
       default:
-	libspectrum_print_error(
+    libspectrum_print_error( context,
 	  LIBSPECTRUM_ERROR_LOGIC,
 	  "bzip2_inflate: serious error from BZ2_bzDecompress: %d", error
 	);

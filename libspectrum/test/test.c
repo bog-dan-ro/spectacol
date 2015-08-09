@@ -7,10 +7,10 @@
 #include <unistd.h>
 
 #include "internals.h"
+#include "tape_block.h"
 #include "test.h"
 
 const char *progname;
-static const char *LIBSPECTRUM_MIN_VERSION = "0.4.0";
 
 typedef test_return_t (*test_fn)( void );
 
@@ -70,7 +70,9 @@ load_tape( libspectrum_tape **tape, const char *filename,
 
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  *tape = libspectrum_tape_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  *tape = libspectrum_tape_alloc(init.context);
 
   if( libspectrum_tape_read( *tape, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename ) != expected_result ) {
@@ -78,6 +80,7 @@ load_tape( libspectrum_tape **tape, const char *filename,
 	     progname, filename );
     libspectrum_tape_free( *tape );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -95,8 +98,14 @@ read_tape( const char *filename, libspectrum_error expected_result )
   r = load_tape( &tape, filename, expected_result );
   if( r != TEST_PASS ) return r;
 
-  if( libspectrum_tape_free( tape ) ) return TEST_INCOMPLETE;
+  libspectrum_context_t *context = tape->context;
 
+  if( libspectrum_tape_free( tape ) ){
+      libspectrum_end( context );
+      return TEST_INCOMPLETE;
+  }
+
+  libspectrum_end( context );
   return TEST_PASS;
 }
 
@@ -110,7 +119,9 @@ read_snap( const char *filename, const char *filename_to_pass,
 
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  snap = libspectrum_snap_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  snap = libspectrum_snap_alloc(init.context);
 
   if( libspectrum_snap_read( snap, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename_to_pass ) != expected_result ) {
@@ -118,13 +129,18 @@ read_snap( const char *filename, const char *filename_to_pass,
 	     progname, filename );
     libspectrum_snap_free( snap );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
   libspectrum_free( buffer );
 
-  if( libspectrum_snap_free( snap ) ) return TEST_INCOMPLETE;
+  if( libspectrum_snap_free( snap ) ) {
+      libspectrum_end( init.context );
+      return TEST_INCOMPLETE;
+  }
 
+  libspectrum_end( init.context );
   return TEST_PASS;
 }
 
@@ -139,12 +155,15 @@ play_tape( const char *filename )
 
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  tape = libspectrum_tape_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  tape = libspectrum_tape_alloc(init.context);
 
   if( libspectrum_tape_read( tape, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename ) ) {
     libspectrum_tape_free( tape );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -154,13 +173,18 @@ play_tape( const char *filename )
 
     if( libspectrum_tape_get_next_edge( &tstates, &flags, tape ) ) {
       libspectrum_tape_free( tape );
+      libspectrum_end( init.context );
       return TEST_INCOMPLETE;
     }
 
   } while( !( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) );
 
-  if( libspectrum_tape_free( tape ) ) return TEST_INCOMPLETE;
+  if( libspectrum_tape_free( tape ) ) {
+      libspectrum_end( init.context );
+      return TEST_INCOMPLETE;
+  }
 
+  libspectrum_end( init.context );
   return TEST_PASS;
 }
 
@@ -188,12 +212,15 @@ test_2( void )
 
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  tape = libspectrum_tape_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  tape = libspectrum_tape_alloc(init.context);
 
   if( libspectrum_tape_read( tape, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename ) ) {
     libspectrum_tape_free( tape );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -201,6 +228,7 @@ test_2( void )
 
   if( libspectrum_tape_get_next_edge( &tstates, &flags, tape ) ) {
     libspectrum_tape_free( tape );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -208,6 +236,7 @@ test_2( void )
     fprintf( stderr, "%s: reading first edge of `%s' gave unexpected flags 0x%04x; expected 0x0000\n",
 	     progname, filename, flags );
     libspectrum_tape_free( tape );
+    libspectrum_end( init.context );
     return TEST_FAIL;
   }
 
@@ -215,11 +244,16 @@ test_2( void )
     fprintf( stderr, "%s: first edge of `%s' was %d tstates; expected 667\n",
 	     progname, filename, tstates );
     libspectrum_tape_free( tape );
+    libspectrum_end( init.context );
     return TEST_FAIL;
   }
 
-  if( libspectrum_tape_free( tape ) ) return TEST_INCOMPLETE;
+  if( libspectrum_tape_free( tape ) ) {
+      libspectrum_end( init.context );
+      return TEST_INCOMPLETE;
+  }
 
+  libspectrum_end( init.context );
   return TEST_PASS;
 }
 
@@ -231,10 +265,13 @@ test_3( void )
   libspectrum_byte *buffer = (libspectrum_byte*)1;
   size_t length = 0;
 
-  tape = libspectrum_tape_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  tape = libspectrum_tape_alloc(init.context);
 
   if( libspectrum_tape_write( &buffer, &length, tape, LIBSPECTRUM_ID_TAPE_TAP ) ) {
     libspectrum_tape_free( tape );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -242,11 +279,16 @@ test_3( void )
   if( buffer ) {
     fprintf( stderr, "%s: `buffer' was not NULL after libspectrum_tape_write()\n", progname );
     libspectrum_tape_free( tape );
+    libspectrum_end( init.context );
     return TEST_FAIL;
   }
 
-  if( libspectrum_tape_free( tape ) ) return TEST_INCOMPLETE;
+  if( libspectrum_tape_free( tape ) ) {
+      libspectrum_end( init.context );
+      return TEST_INCOMPLETE;
+  }
 
+  libspectrum_end( init.context );
   return TEST_PASS;
 }
 
@@ -329,12 +371,15 @@ test_13( void )
 
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  tape = libspectrum_tape_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  tape = libspectrum_tape_alloc(init.context);
 
   if( libspectrum_tape_read( tape, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename ) ) {
     libspectrum_tape_free( tape );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -342,11 +387,16 @@ test_13( void )
 
   if( libspectrum_tape_get_next_edge( &tstates, &flags, tape ) ) {
     libspectrum_tape_free( tape );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
-  if( libspectrum_tape_free( tape ) ) return TEST_INCOMPLETE;
+  if( libspectrum_tape_free( tape ) ) {
+      libspectrum_end( init.context );
+      return TEST_INCOMPLETE;
+  }
 
+  libspectrum_end( init.context );
   return TEST_PASS;
 }
 
@@ -391,18 +441,24 @@ test_19( void )
   r = load_tape( &tape, filename, LIBSPECTRUM_ERROR_NONE );
   if( r ) return r;
 
+  libspectrum_context_t *context = tape->context;
   if( libspectrum_tape_write( &buffer, &length, tape,
                               LIBSPECTRUM_ID_TAPE_TAP ) ) {
     fprintf( stderr, "%s: writing `%s' to a .tap file was not successful\n",
              progname, filename );
     libspectrum_tape_free( tape );
+    libspectrum_end( context );
     return TEST_INCOMPLETE;
   }
 
   libspectrum_free( buffer );
 
-  if( libspectrum_tape_free( tape ) ) return TEST_INCOMPLETE;
+  if( libspectrum_tape_free( tape ) ) {
+      libspectrum_end( context );
+      return TEST_INCOMPLETE;
+  }
 
+  libspectrum_end( context );
   return TEST_PASS;
 }
 
@@ -440,11 +496,14 @@ test_22( void )
      end of the file; however, we don't want it in the length */
   filesize--;
 
-  mdr = libspectrum_microdrive_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  mdr = libspectrum_microdrive_alloc(init.context);
 
   if( libspectrum_microdrive_mdr_read( mdr, buffer, filesize ) ) {
     libspectrum_microdrive_free( mdr );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -453,6 +512,7 @@ test_22( void )
   r = libspectrum_microdrive_write_protect( mdr ) ? TEST_PASS : TEST_FAIL;
 
   libspectrum_microdrive_free( mdr );
+  libspectrum_end( init.context );
 
   return r;
 }
@@ -473,7 +533,9 @@ test_23( void )
      end of the file; however, we don't want it in the length */
   filesize--;
 
-  mdr = libspectrum_microdrive_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  mdr = libspectrum_microdrive_alloc(init.context);
 
   if( libspectrum_microdrive_mdr_read( mdr, buffer, filesize ) ) {
     libspectrum_microdrive_free( mdr );
@@ -490,6 +552,7 @@ test_23( void )
   r = ( length == filesize && buffer[ length - 1 ] == 1 ) ? TEST_PASS : TEST_FAIL;
 
   libspectrum_free( buffer );
+  libspectrum_end( init.context );
 
   return r;
 }
@@ -530,12 +593,15 @@ test_24( void )
 
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  tape = libspectrum_tape_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  tape = libspectrum_tape_alloc(init.context);
 
   if( libspectrum_tape_read( tape, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename ) ) {
     libspectrum_tape_free( tape );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -558,8 +624,12 @@ test_24( void )
     next_size++;
   }
 
-  if( libspectrum_tape_free( tape ) ) return TEST_INCOMPLETE;
+  if( libspectrum_tape_free( tape ) ) {
+      libspectrum_end( init.context );
+      return TEST_INCOMPLETE;
+  }
 
+  libspectrum_end( init.context );
   return r;
 }
 
@@ -575,13 +645,16 @@ test_25( void )
 
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  snap = libspectrum_snap_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  snap = libspectrum_snap_alloc( init.context );
 
   if( libspectrum_snap_read( snap, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename ) != LIBSPECTRUM_ERROR_NONE ) {
     fprintf( stderr, "%s: reading `%s' failed\n", progname, filename );
     libspectrum_snap_free( snap );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -593,17 +666,19 @@ test_25( void )
       LIBSPECTRUM_ERROR_NONE ) {
     fprintf( stderr, "%s: serialising to SNA failed\n", progname );
     libspectrum_snap_free( snap );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
   libspectrum_snap_free( snap );
-  snap = libspectrum_snap_alloc();
+  snap = libspectrum_snap_alloc(init.context);
 
   if( libspectrum_snap_read( snap, buffer, length, LIBSPECTRUM_ID_SNAPSHOT_SNA,
                              NULL ) != LIBSPECTRUM_ERROR_NONE ) {
     fprintf( stderr, "%s: restoring from SNA failed\n", progname );
     libspectrum_snap_free( snap );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -622,6 +697,7 @@ test_25( void )
   }
 
   libspectrum_snap_free( snap );
+  libspectrum_end( init.context );
 
   return r;
 }
@@ -640,13 +716,16 @@ test_26( void )
 
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  snap = libspectrum_snap_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  snap = libspectrum_snap_alloc( init.context );
 
   if( libspectrum_snap_read( snap, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename ) != LIBSPECTRUM_ERROR_NONE ) {
     fprintf( stderr, "%s: reading `%s' failed\n", progname, filename );
     libspectrum_snap_free( snap );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -658,17 +737,19 @@ test_26( void )
       LIBSPECTRUM_ERROR_NONE ) {
     fprintf( stderr, "%s: serialising to Z80 failed\n", progname );
     libspectrum_snap_free( snap );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
   libspectrum_snap_free( snap );
-  snap = libspectrum_snap_alloc();
+  snap = libspectrum_snap_alloc( init.context );
 
   if( libspectrum_snap_read( snap, buffer, length, LIBSPECTRUM_ID_SNAPSHOT_Z80,
                              NULL ) != LIBSPECTRUM_ERROR_NONE ) {
     fprintf( stderr, "%s: restoring from Z80 failed\n", progname );
     libspectrum_snap_free( snap );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -682,6 +763,8 @@ test_26( void )
   }
 
   libspectrum_snap_free( snap );
+  libspectrum_free( buffer );
+  libspectrum_end( init.context );
 
   return r;
 }
@@ -698,13 +781,16 @@ test_27( void )
 
   if( read_file( &buffer, &filesize, filename ) ) return TEST_INCOMPLETE;
 
-  snap = libspectrum_snap_alloc();
+  libspectrum_init_t init = libspectrum_default_init();
+  libspectrum_init(&init);
+  snap = libspectrum_snap_alloc( init.context );
 
   if( libspectrum_snap_read( snap, buffer, filesize, LIBSPECTRUM_ID_UNKNOWN,
 			     filename ) != LIBSPECTRUM_ERROR_NONE ) {
     fprintf( stderr, "%s: reading `%s' failed\n", progname, filename );
     libspectrum_snap_free( snap );
     libspectrum_free( buffer );
+    libspectrum_end( init.context );
     return TEST_INCOMPLETE;
   }
 
@@ -730,6 +816,8 @@ test_27( void )
     r = TEST_PASS;
   }
 
+  libspectrum_snap_free( snap );
+  libspectrum_end( init.context );
   return r;
 }
 
@@ -806,14 +894,6 @@ main( int argc, char *argv[] )
   int pass = 0, fail = 0, incomplete = 0;
 
   progname = argv[0];
-
-  if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
-    if( libspectrum_init() ) return 2;
-  } else {
-    fprintf( stderr, "%s: libspectrum version %s found, but %s required",
-	     progname, libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
-    return 2;
-  }
 
   if( argc < 2 ) {
     for( i = 0; i < test_count; i++ ) tests[i].active = 1;

@@ -260,12 +260,12 @@ write_ramp_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length, libspectrum_snap *snap, int page,
 		  int compress );
 static libspectrum_error
-write_ram_page( libspectrum_byte **buffer, libspectrum_byte **ptr,
-		size_t *length, const char *id, const libspectrum_byte *data,
-		size_t data_length, int page, int compress, int extra_flags );
+write_ram_page(libspectrum_context_t *context, libspectrum_byte **buffer, libspectrum_byte **ptr,
+        size_t *length, const char *id, const libspectrum_byte *data,
+        size_t data_length, int page, int compress, int extra_flags );
 static libspectrum_error
-write_rom_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
-		 size_t *length, int *out_flags, libspectrum_snap *snap,
+write_rom_chunk(libspectrum_context_t *context, libspectrum_byte **buffer, libspectrum_byte **ptr,
+         size_t *length, int *out_flags, libspectrum_snap *snap,
                  int compress );
 static libspectrum_error
 write_ay_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
@@ -345,7 +345,7 @@ write_chunk_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		    libspectrum_dword block_length );
 
 static libspectrum_error
-read_ram_page( libspectrum_byte **data, size_t *page,
+read_ram_page( libspectrum_context_t *context, libspectrum_byte **data, size_t *page,
 	       const libspectrum_byte **buffer, size_t data_length,
 	       size_t uncompressed_length, libspectrum_word *flags )
 {
@@ -356,7 +356,7 @@ read_ram_page( libspectrum_byte **data, size_t *page,
 #endif			/* #ifdef HAVE_ZLIB_H */
 
   if( data_length < 3 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( context, LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:read_ram_page: length %lu too short",
 			     __FILE__, (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -370,7 +370,7 @@ read_ram_page( libspectrum_byte **data, size_t *page,
 
 #ifdef HAVE_ZLIB_H
 
-    error = libspectrum_zlib_inflate( *buffer, data_length - 3, data,
+    error = libspectrum_zlib_inflate(context, *buffer, data_length - 3, data,
 				      &uncompressed_length );
     if( error ) return error;
 
@@ -390,7 +390,7 @@ read_ram_page( libspectrum_byte **data, size_t *page,
   } else {
 
     if( data_length < 3 + uncompressed_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( context, LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_ram_page: length %lu too short",
 			       __FILE__, (unsigned long)data_length );
       return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -416,11 +416,11 @@ read_atrp_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_error error;
   libspectrum_word flags;
 
-  error = read_ram_page( &data, &page, buffer, data_length, 0x4000, &flags );
+  error = read_ram_page( libspectrum_snap_context(snap), &data, &page, buffer, data_length, 0x4000, &flags );
   if( error ) return error;
 
   if( page >= SNAPSHOT_ZXATASP_PAGES ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_CORRUPT,
 			     "%s:read_atrp_chunk: unknown page number %lu",
 			     __FILE__, (unsigned long)page );
     libspectrum_free( data );
@@ -442,7 +442,8 @@ read_ay_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_byte flags;
 
   if( data_length != 18 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_UNKNOWN,
 			     "szx_read_ay_chunk: unknown length %lu",
 			     (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -475,7 +476,8 @@ read_b128_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   const size_t expected_length = 0x4000;
 
   if( data_length < 10 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_UNKNOWN,
 			     "szx_read_b128_chunk: length %lu too short",
 			     (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -506,12 +508,14 @@ read_b128_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 
       size_t uncompressed_length = 0;
 
-      error = libspectrum_zlib_inflate( *buffer, data_length - 10, &rom_data,
+      error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                        *buffer, data_length - 10, &rom_data,
 					&uncompressed_length );
       if( error ) return error;
 
       if( uncompressed_length != expected_length ) {
-	libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_UNKNOWN,
 				 "%s:read_b128_chunk: invalid ROM length "
 				 "in compressed file, should be %lu, file "
 				 "has %lu",
@@ -535,7 +539,8 @@ read_b128_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     } else {
 
       if( data_length < 10 + expected_length ) {
-        libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+        libspectrum_print_error( libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_UNKNOWN,
 				 "%s:read_b128_chunk: length %lu too short, "
 				 "expected %lu",
 				 __FILE__, (unsigned long)data_length,
@@ -565,7 +570,8 @@ read_crtr_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
                  szx_context *ctx )
 {
   if( data_length < 36 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:read_crtr_chunk: length %lu too short",
 			     __FILE__, (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -620,7 +626,8 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   size_t expected_length = 0x800;
 
   if( data_length < 23 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_UNKNOWN,
 			     "szx_read_opus_chunk: length %lu too short",
 			     (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -638,7 +645,8 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 
   libspectrum_snap_set_opus_custom_rom( snap, flags & ZXSTOPUSF_CUSTOMROM );
   if( libspectrum_snap_opus_custom_rom( snap ) && !disc_rom_length ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                 LIBSPECTRUM_ERROR_UNKNOWN,
 			     "szx_read_opus_chunk: block flagged as custom "
                              "ROM but there is no custom ROM stored in the "
                              "snapshot" );
@@ -667,7 +675,8 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
          disc_rom_length != 0 ) ||
         (libspectrum_snap_opus_custom_rom( snap ) &&
          disc_rom_length == 0 ) ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                   LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_opus_chunk: invalid ROM length "
                                "in compressed file, should be %lu, file "
                                "has %lu",
@@ -678,7 +687,8 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     }
 
     if( data_length < 23 + disc_ram_length + disc_rom_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                   LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_opus_chunk: length %lu too short, "
 			       "expected %lu" ,
 			       __FILE__, (unsigned long)data_length,
@@ -687,12 +697,14 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
       return LIBSPECTRUM_ERROR_UNKNOWN;
     }
 
-    error = libspectrum_zlib_inflate( *buffer, disc_ram_length, &ram_data,
+    error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                      *buffer, disc_ram_length, &ram_data,
 				      &uncompressed_length );
     if( error ) return error;
 
     if( uncompressed_length != expected_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                   LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_opus_chunk: invalid RAM length "
                                "in compressed file, should be %lu, file "
                                "has %lu",
@@ -705,14 +717,16 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     *buffer += disc_ram_length;
 
     if( libspectrum_snap_opus_custom_rom( snap ) ) {
-      error = libspectrum_zlib_inflate( *buffer, disc_rom_length, &rom_data,
+      error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                        *buffer, disc_rom_length, &rom_data,
                                         &uncompressed_length );
       if( error ) return error;
 
       expected_length = 0x2000;
 
       if( uncompressed_length != expected_length ) {
-        libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+        libspectrum_print_error( libspectrum_snap_context(snap),
+                                 LIBSPECTRUM_ERROR_UNKNOWN,
                                  "%s:read_plsd_chunk: invalid ROM length "
                                  "in compressed file, should be %lu, file "
                                  "has %lu",
@@ -739,7 +753,8 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   } else {
 
     if( disc_ram_length != expected_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                   LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_opus_chunk: invalid RAM length "
                                "in uncompressed file, should be %lu, file "
                                "has %lu",
@@ -755,7 +770,8 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
          disc_rom_length != expected_length ) ||
         (!libspectrum_snap_opus_custom_rom( snap ) &&
          disc_rom_length != 0 ) ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_opus_chunk: invalid ROM length "
                                "in uncompressed file, should be %lu, file "
                                "has %lu",
@@ -767,7 +783,8 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     }
 
     if( data_length < 23 + disc_ram_length + disc_rom_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_opus_chunk: length %lu too short, "
 			       "expected %lu" ,
 			       __FILE__, (unsigned long)data_length,
@@ -813,7 +830,8 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   const size_t expected_length = 0x2000;
 
   if( data_length < 19 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "szx_read_plusd_chunk: length %lu too short",
 			     (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -832,7 +850,8 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 
   libspectrum_snap_set_plusd_custom_rom( snap, rom_type == ZXSTPDRT_CUSTOM );
   if( libspectrum_snap_plusd_custom_rom( snap ) && !disc_rom_length ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "szx_read_plusd_chunk: block flagged as custom "
                              "ROM but there is no custom ROM stored in the "
                              "snapshot" );
@@ -856,7 +875,8 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
          disc_rom_length != 0 ) ||
         (libspectrum_snap_plusd_custom_rom( snap ) &&
          disc_rom_length == 0 ) ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_plsd_chunk: invalid ROM length "
                                "in compressed file, should be %lu, file "
                                "has %lu",
@@ -867,7 +887,8 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     }
 
     if( data_length < 19 + disc_ram_length + disc_rom_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_plsd_chunk: length %lu too short, "
 			       "expected %lu" ,
 			       __FILE__, (unsigned long)data_length,
@@ -876,12 +897,14 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
       return LIBSPECTRUM_ERROR_UNKNOWN;
     }
 
-    error = libspectrum_zlib_inflate( *buffer, disc_ram_length, &ram_data,
+    error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                      *buffer, disc_ram_length, &ram_data,
 				      &uncompressed_length );
     if( error ) return error;
 
     if( uncompressed_length != expected_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_plsd_chunk: invalid RAM length "
                                "in compressed file, should be %lu, file "
                                "has %lu",
@@ -894,12 +917,14 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     *buffer += disc_ram_length;
 
     if( libspectrum_snap_plusd_custom_rom( snap ) ) {
-      error = libspectrum_zlib_inflate( *buffer, disc_rom_length, &rom_data,
+      error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                        *buffer, disc_rom_length, &rom_data,
                                         &uncompressed_length );
       if( error ) return error;
 
       if( uncompressed_length != expected_length ) {
-        libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+        libspectrum_print_error( libspectrum_snap_context(snap),
+                                 LIBSPECTRUM_ERROR_UNKNOWN,
                                  "%s:read_plsd_chunk: invalid ROM length "
                                  "in compressed file, should be %lu, file "
                                  "has %lu",
@@ -926,7 +951,8 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   } else {
 
     if( disc_ram_length != expected_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_plsd_chunk: invalid RAM length "
                                "in uncompressed file, should be %lu, file "
                                "has %lu",
@@ -940,7 +966,8 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
          disc_rom_length != expected_length ) ||
         (!libspectrum_snap_plusd_custom_rom( snap ) &&
          disc_rom_length != 0 ) ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_plsd_chunk: invalid ROM length "
                                "in uncompressed file, should be %lu, file "
                                "has %lu",
@@ -952,7 +979,8 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     }
 
     if( data_length < 19 + disc_ram_length + disc_rom_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
 			       "%s:read_plsd_chunk: length %lu too short, "
 			       "expected %lu" ,
 			       __FILE__, (unsigned long)data_length,
@@ -989,11 +1017,12 @@ read_cfrp_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_error error;
   libspectrum_word flags;
 
-  error = read_ram_page( &data, &page, buffer, data_length, 0x4000, &flags );
+  error = read_ram_page( libspectrum_snap_context(snap), &data, &page, buffer, data_length, 0x4000, &flags );
   if( error ) return error;
 
   if( page >= SNAPSHOT_ZXCF_PAGES ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 			     "%s:read_cfrp_chunk: unknown page number %lu",
 			     __FILE__, (unsigned long)page );
     libspectrum_free( data );
@@ -1012,7 +1041,8 @@ read_side_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
                  szx_context *ctx GCC_UNUSED )
 {
   if( data_length ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:read_side_chunk: unknown length %lu",
 			     __FILE__, (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1030,7 +1060,8 @@ read_drum_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
                  szx_context *ctx GCC_UNUSED )
 {
   if( data_length != 1 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:read_drum_chunk: unknown length %lu",
 			     __FILE__, (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1072,7 +1103,8 @@ read_joy_chunk( libspectrum_snap *snap, libspectrum_word version,
   libspectrum_dword flags;
 
   if( data_length != 6 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:read_joy_chunk: unknown length %lu",
 			     __FILE__, (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1167,7 +1199,8 @@ read_keyb_chunk( libspectrum_snap *snap, libspectrum_word version,
   expected_length = version >= 0x0101 ? 5 : 4;
 
   if( data_length != expected_length ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:read_keyb_chunk: unknown length %lu",
 			     __FILE__, (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1222,7 +1255,8 @@ read_amxm_chunk( libspectrum_snap *snap, libspectrum_word version,
                  szx_context *ctx GCC_UNUSED )
 {
   if( data_length != 7 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "read_amxm_chunk: unknown length %lu",
 			     (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1261,11 +1295,12 @@ read_ramp_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_word flags;
 
 
-  error = read_ram_page( &data, &page, buffer, data_length, 0x4000, &flags );
+  error = read_ram_page( libspectrum_snap_context(snap), &data, &page, buffer, data_length, 0x4000, &flags );
   if( error ) return error;
 
   if( page > 63 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 			     "%s:read_ramp_chunk: unknown page number %lu",
 			     __FILE__, (unsigned long)page );
     libspectrum_free( data );
@@ -1284,7 +1319,8 @@ read_scld_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
                  szx_context *ctx GCC_UNUSED )
 {
   if( data_length != 2 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "szx_read_scld_chunk: unknown length %lu",
 			     (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1306,7 +1342,7 @@ read_spcr_chunk( libspectrum_snap *snap, libspectrum_word version,
   int capabilities;
 
   if( data_length != 8 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_UNKNOWN,
       "szx_read_spcr_chunk: unknown length %lu", (unsigned long)data_length
     );
@@ -1343,7 +1379,7 @@ read_z80r_chunk( libspectrum_snap *snap, libspectrum_word version,
                  szx_context *ctx )
 {
   if( data_length != 37 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_UNKNOWN,
 			     "szx_read_z80r_chunk: unknown length %lu",
 			     (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1418,7 +1454,7 @@ read_zxat_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_word flags;
 
   if( data_length != 8 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:read_zxat_chunk: unknown length %lu",
 			     __FILE__, (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1450,7 +1486,7 @@ read_zxcf_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_word flags;
 
   if( data_length != 4 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap), LIBSPECTRUM_ERROR_UNKNOWN,
 			     "read_zxcf_chunk: unknown length %lu",
 			     (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1478,7 +1514,7 @@ read_if1_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_byte *rom_data = NULL; 
 
   if( data_length < 40 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_UNKNOWN,
       "read_if1_chunk: length %lu too short", (unsigned long)data_length
     );
@@ -1497,7 +1533,8 @@ read_if1_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 
   if( expected_length ) {
     if( expected_length != 0x2000 && expected_length != 0x4000 ) {
-        libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+        libspectrum_print_error( libspectrum_snap_context(snap),
+                                 LIBSPECTRUM_ERROR_UNKNOWN,
                                  "%s:read_if1_chunk: invalid ROM length "
                                  "in file, should be 8192 or 16384 bytes, "
                                  "file has %lu",
@@ -1515,12 +1552,14 @@ read_if1_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
       size_t uncompressed_length = 0;
 
       libspectrum_error error =
-              libspectrum_zlib_inflate( *buffer, data_length - 40, &rom_data,
+              libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                        *buffer, data_length - 40, &rom_data,
                                         &uncompressed_length );
       if( error ) return error;
 
       if( uncompressed_length != expected_length ) {
-        libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+        libspectrum_print_error( libspectrum_snap_context(snap),
+                                 LIBSPECTRUM_ERROR_UNKNOWN,
                                  "%s:read_if1_chunk: invalid ROM length "
                                  "in compressed file, should be %lu, file "
                                  "has %lu",
@@ -1550,7 +1589,8 @@ read_if1_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     } else {
 
       if( data_length < 40 + expected_length ) {
-        libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+        libspectrum_print_error( libspectrum_snap_context(snap),
+                                 LIBSPECTRUM_ERROR_UNKNOWN,
                                  "%s:read_if1_chunk: length %lu too short, "
                                  "expected %lu" ,
                                  __FILE__, (unsigned long)data_length,
@@ -1593,7 +1633,8 @@ szx_extract_roms( libspectrum_snap *snap, libspectrum_byte *rom_data,
   size_t num_16k_roms, additional_rom_length;
 
   if( length != expected_length ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
                              "%s:szx_extract_roms: invalid ROM length %u, "
                              "expected %u",
                              __FILE__, length, expected_length );
@@ -1629,7 +1670,7 @@ read_rom_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_error retval = LIBSPECTRUM_ERROR_NONE;
 
   if( data_length < 6 ) {
-    libspectrum_print_error(
+    libspectrum_print_error(libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_UNKNOWN,
       "read_rom_chunk: length %lu too short", (unsigned long)data_length
     );
@@ -1646,12 +1687,14 @@ read_rom_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     size_t uncompressed_length = 0;
 
     libspectrum_error error =
-            libspectrum_zlib_inflate( *buffer, data_length - 6, &rom_data,
+            libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                      *buffer, data_length - 6, &rom_data,
                                       &uncompressed_length );
     if( error ) return error;
 
     if( uncompressed_length != expected_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
                                "%s:read_rom_chunk: invalid ROM length "
                                "in compressed file, should be %lu, file "
                                "has %lu",
@@ -1677,7 +1720,8 @@ read_rom_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   } else {
 
     if( data_length < 6 + expected_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
                                "%s:read_rom_chunk: length %lu too short, "
                                "expected %lu" ,
                                __FILE__, (unsigned long)data_length,
@@ -1723,7 +1767,8 @@ read_rom_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     retval = szx_extract_roms( snap, rom_data, expected_length, 0x10000 );
     break;
   default:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
                              "%s:read_rom_chunk: don't know correct custom ROM "
                              "length for this machine",
                              __FILE__ );
@@ -1745,7 +1790,8 @@ read_zxpr_chunk( libspectrum_snap *snap, libspectrum_word version,
   libspectrum_word flags;
 
   if( data_length != 2 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:read_zxpr_chunk: unknown length %lu",
 			     __FILE__, (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1773,7 +1819,7 @@ read_if2r_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_error error;
 
   if( data_length < 4 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_UNKNOWN,
       "read_if2r_chunk: length %lu too short", (unsigned long)data_length
     );
@@ -1785,7 +1831,8 @@ read_if2r_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 
   uncompressed_length = 0x4000;
 
-  error = libspectrum_zlib_inflate( *buffer, data_length - 4, &buffer2,
+  error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                    *buffer, data_length - 4, &buffer2,
                                     &uncompressed_length );
   if( error ) return error;
 
@@ -1822,11 +1869,12 @@ read_dock_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_word flags;
   libspectrum_byte writeable;
 
-  error = read_ram_page( &data, &page, buffer, data_length, 0x2000, &flags );
+  error = read_ram_page( libspectrum_snap_context(snap), &data, &page, buffer, data_length, 0x2000, &flags );
   if( error ) return error;
 
   if( page > 7 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 			     "%s:read_dock_chunk: unknown page number %ld",
 			     __FILE__, (unsigned long)page );
     libspectrum_free( data );
@@ -1862,7 +1910,8 @@ read_dide_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   const size_t expected_length = 0x2000;
 
   if( data_length < 4 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "%s:read_dide_chunk: unknown length %lu",
 			     __FILE__, (unsigned long)data_length );
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -1885,12 +1934,14 @@ read_dide_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 
     size_t uncompressed_length = 0;
 
-    error = libspectrum_zlib_inflate( *buffer, data_length - 4, &eprom_data,
+    error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                      *buffer, data_length - 4, &eprom_data,
                                       &uncompressed_length );
     if( error ) return error;
 
     if( uncompressed_length != expected_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
                                "%s:read_dide_chunk: invalid EPROM length "
                                "in compressed file, should be %lu, file "
                                "has %lu",
@@ -1916,7 +1967,8 @@ read_dide_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   } else {
 
     if( data_length < 4 + expected_length ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
                                "%s:read_dide_chunk: length %lu too short, "
                                "expected %lu",
                                __FILE__, (unsigned long)data_length,
@@ -1947,11 +1999,12 @@ read_dirp_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_error error;
   libspectrum_word flags;
 
-  error = read_ram_page( &data, &page, buffer, data_length, 0x2000, &flags );
+  error = read_ram_page( libspectrum_snap_context(snap), &data, &page, buffer, data_length, 0x2000, &flags );
   if( error ) return error;
 
   if( page >= SNAPSHOT_DIVIDE_PAGES ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_CORRUPT,
 			     "%s:read_dirp_chunk: unknown page number %lu",
 			     __FILE__, (unsigned long)page );
     libspectrum_free( data );
@@ -1973,7 +2026,8 @@ read_snet_memory( libspectrum_snap *snap, const libspectrum_byte **buffer,
   const libspectrum_byte *data;
 
   if( *data_remaining < 4 ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
       "%s:read_snet_memory: not enough data for length", __FILE__ );
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
@@ -1982,7 +2036,8 @@ read_snet_memory( libspectrum_snap *snap, const libspectrum_byte **buffer,
   *data_remaining -= 4;
 
   if( *data_remaining < data_length ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
       "%s:read_snet_memory: not enough data", __FILE__ );
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
@@ -1995,14 +2050,16 @@ read_snet_memory( libspectrum_snap *snap, const libspectrum_byte **buffer,
     size_t uncompressed_length = 0;
     libspectrum_byte *uncompressed_data;
 
-    error = libspectrum_zlib_inflate( *buffer, data_length, &uncompressed_data,
+    error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
+                                      *buffer, data_length, &uncompressed_data,
         &uncompressed_length );
     if( error ) return error;
 
     *buffer += data_length;
 
     if( uncompressed_length != 0x20000 ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
           "%s:read_snet_memory: data decompressed to %lu but should be 0x20000",
           __FILE__, (unsigned long)uncompressed_length );
       libspectrum_free( uncompressed_data );
@@ -2021,7 +2078,8 @@ read_snet_memory( libspectrum_snap *snap, const libspectrum_byte **buffer,
 
   } else {
     if( data_length != 0x20000 ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_UNKNOWN,
           "%s:read_snet_memory: data has length %lu but should be 0x20000",
           __FILE__, (unsigned long)data_length );
       return LIBSPECTRUM_ERROR_NONE;
@@ -2048,7 +2106,7 @@ read_snet_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   libspectrum_byte *w5100;
 
   if( data_length < 54 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_UNKNOWN,
       "read_snet_chunk: length %lu too short", (unsigned long)data_length
     );
@@ -2095,7 +2153,7 @@ read_snef_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   size_t data_remaining;
 
   if( data_length < 5 ) {
-    libspectrum_print_error(
+    libspectrum_print_error(libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_UNKNOWN,
       "read_snef_chunk: length %lu too short", (unsigned long)data_length
     );
@@ -2127,7 +2185,7 @@ read_sner_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
   size_t data_remaining;
 
   if( data_length < 5 ) {
-    libspectrum_print_error(
+    libspectrum_print_error(libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_UNKNOWN,
       "read_sner_chunk: length %lu too short", (unsigned long)data_length
     );
@@ -2214,12 +2272,12 @@ static struct read_chunk_t read_chunks[] = {
 };
 
 static libspectrum_error
-read_chunk_header( char *id, libspectrum_dword *data_length, 
+read_chunk_header( libspectrum_context_t *context, char *id, libspectrum_dword *data_length,
 		   const libspectrum_byte **buffer,
 		   const libspectrum_byte *end )
 {
   if( end - *buffer < 8 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( context,
       LIBSPECTRUM_ERROR_CORRUPT,
       "szx_read_chunk_header: not enough data for chunk header"
     );
@@ -2242,11 +2300,11 @@ read_chunk( libspectrum_snap *snap, libspectrum_word version,
   libspectrum_error error;
   size_t i; int done;
 
-  error = read_chunk_header( id, &data_length, buffer, end );
+  error = read_chunk_header( libspectrum_snap_context(snap), id, &data_length, buffer, end );
   if( error ) return error;
 
   if( end - *buffer < data_length ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_CORRUPT,
       "szx_read_chunk: chunk length goes beyond end of file"
     );
@@ -2267,7 +2325,8 @@ read_chunk( libspectrum_snap *snap, libspectrum_word version,
   }
 
   if( !done ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_UNKNOWN,
 			     "szx_read_chunk: unknown chunk id '%s'", id );
     *buffer += data_length;
   }
@@ -2288,7 +2347,7 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
   szx_context *ctx;
 
   if( end - buffer < 8 ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_szx_read: not enough data for SZX header"
     );
@@ -2296,7 +2355,7 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
   }
 
   if( memcmp( buffer, signature, signature_length ) ) {
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_SIGNATURE,
       "libspectrum_szx_read: wrong signature"
     );
@@ -2379,7 +2438,7 @@ libspectrum_szx_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
     break;
 
   default:
-    libspectrum_print_error(
+    libspectrum_print_error( libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_UNKNOWN,
       "libspectrum_szx_read: unknown machine type %d", (int)*buffer
     );
@@ -2454,7 +2513,7 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
   if( error ) return error;
 
   if( libspectrum_snap_custom_rom( snap ) ) {
-    error = write_rom_chunk( buffer, &ptr, length, out_flags, snap, compress );
+    error = write_rom_chunk( libspectrum_snap_context( snap ), buffer, &ptr, length, out_flags, snap, compress );
     if( error ) return error;
   }
 
@@ -2620,7 +2679,8 @@ write_file_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
   case LIBSPECTRUM_MACHINE_PENT1024: **ptr = SZX_MACHINE_PENTAGON1024; break;
 
   case LIBSPECTRUM_MACHINE_UNKNOWN:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_LOGIC,
 			     "Emulated machine type is set to 'unknown'!" );
     return LIBSPECTRUM_ERROR_LOGIC;
   }
@@ -2875,7 +2935,7 @@ write_zxpr_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 }
   
 static libspectrum_error
-write_rom_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr, size_t *length,
+write_rom_chunk( libspectrum_context_t *context, libspectrum_byte **buffer, libspectrum_byte **ptr, size_t *length,
                  int *out_flags, libspectrum_snap *snap, int compress )
 {
 #ifdef HAVE_ZLIB_H
@@ -2954,7 +3014,8 @@ write_rom_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr, size_t *leng
     break;
 
   case LIBSPECTRUM_MACHINE_UNKNOWN:
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_LOGIC,
 			     "Emulated machine type is set to 'unknown'!" );
     return LIBSPECTRUM_ERROR_LOGIC;
   }
@@ -2978,7 +3039,7 @@ write_rom_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr, size_t *leng
     libspectrum_byte *compressed_data;
     size_t compressed_length;
 
-    error = libspectrum_zlib_compress( data, data_length,
+    error = libspectrum_zlib_compress( context, data, data_length,
 				       &compressed_data, &compressed_length );
     if( error ) return error;
 
@@ -3081,7 +3142,7 @@ write_ramp_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   data = libspectrum_snap_pages( snap, page );
 
-  error = write_ram_page( buffer, ptr, length, ZXSTBID_RAMPAGE, data, 0x4000,
+  error = write_ram_page( libspectrum_snap_context( snap ), buffer, ptr, length, ZXSTBID_RAMPAGE, data, 0x4000,
 			  page, compress, 0x00 );
   if( error ) return error;
 
@@ -3089,7 +3150,7 @@ write_ramp_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 }
 
 static libspectrum_error
-write_ram_page( libspectrum_byte **buffer, libspectrum_byte **ptr,
+write_ram_page(libspectrum_context_t *context, libspectrum_byte **buffer, libspectrum_byte **ptr,
 		size_t *length, const char *id, const libspectrum_byte *data,
 		size_t data_length, int page, int compress, int extra_flags )
 {
@@ -3123,7 +3184,7 @@ write_ram_page( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
     size_t compressed_length;
 
-    error = libspectrum_zlib_compress( data, data_length,
+    error = libspectrum_zlib_compress( context, data, data_length,
 				       &compressed_data, &compressed_length );
     if( error ) return error;
 
@@ -3210,7 +3271,8 @@ write_b128_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
       size_t compressed_rom_length;
 
-      error = libspectrum_zlib_compress( rom_data, uncompressed_rom_length,
+      error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                         rom_data, uncompressed_rom_length,
                                          &compressed_rom_data,
                                          &compressed_rom_length );
       if( error ) return error;
@@ -3274,7 +3336,8 @@ write_if1_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   if( libspectrum_snap_interface1_custom_rom( snap ) ) {
     if( !(libspectrum_snap_interface1_rom_length( snap, 0 ) == 0x2000 ||
           libspectrum_snap_interface1_rom_length( snap, 0 ) == 0x4000 )) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_LOGIC,
                                "Interface 1 custom ROM must be 8192 or 16384 "
                                "bytes, supplied ROM is %lu bytes",
                                (unsigned long)
@@ -3284,7 +3347,8 @@ write_if1_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
     }
     rom_data = libspectrum_snap_interface1_rom( snap, 0 );
     if( rom_data == NULL ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+      libspectrum_print_error( libspectrum_snap_context(snap),
+                               LIBSPECTRUM_ERROR_LOGIC,
                               "Interface 1 custom ROM specified to be %lu "
                               "bytes but NULL pointer provided",
                               (unsigned long)
@@ -3304,7 +3368,8 @@ write_if1_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
     size_t compressed_rom_length;
 
-    error = libspectrum_zlib_compress( rom_data, disk_rom_length,
+    error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                       rom_data, disk_rom_length,
 				       &compressed_rom_data, &compressed_rom_length );
     if( error ) return error;
 
@@ -3374,11 +3439,13 @@ write_opus_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
     size_t compressed_rom_length, compressed_ram_length;
 
-    error = libspectrum_zlib_compress( rom_data, disk_rom_length,
+    error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                       rom_data, disk_rom_length,
 				       &compressed_rom_data, &compressed_rom_length );
     if( error ) return error;
 
-    error = libspectrum_zlib_compress( ram_data, disk_ram_length,
+    error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                       ram_data, disk_ram_length,
 				       &compressed_ram_data, &compressed_ram_length );
     if( error ) {
       if( compressed_rom_data ) libspectrum_free( compressed_rom_data );
@@ -3468,11 +3535,13 @@ write_plsd_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
     size_t compressed_rom_length, compressed_ram_length;
 
-    error = libspectrum_zlib_compress( rom_data, disk_rom_length,
+    error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                       rom_data, disk_rom_length,
 				       &compressed_rom_data, &compressed_rom_length );
     if( error ) return error;
 
-    error = libspectrum_zlib_compress( ram_data, disk_ram_length,
+    error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                       ram_data, disk_ram_length,
 				       &compressed_ram_data, &compressed_ram_length );
     if( error ) {
       if( compressed_rom_data ) libspectrum_free( compressed_rom_data );
@@ -3566,7 +3635,8 @@ write_atrp_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   data = libspectrum_snap_zxatasp_ram( snap, page );
 
-  error = write_ram_page( buffer, ptr, length, ZXSTBID_ZXATASPRAMPAGE, data,
+  error = write_ram_page( libspectrum_snap_context( snap ),
+                          buffer, ptr, length, ZXSTBID_ZXATASPRAMPAGE, data,
 			  0x4000, page, compress, 0x00 );
   if( error ) return error;
 
@@ -3601,7 +3671,8 @@ write_cfrp_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   data = libspectrum_snap_zxcf_ram( snap, page );
 
-  error = write_ram_page( buffer, ptr, length, ZXSTBID_ZXCFRAMPAGE, data,
+  error = write_ram_page( libspectrum_snap_context( snap ),
+                          buffer, ptr, length, ZXSTBID_ZXCFRAMPAGE, data,
 			  0x4000, page, compress, 0x00 );
   if( error ) return error;
 
@@ -3632,7 +3703,8 @@ write_if2r_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   data = libspectrum_snap_interface2_rom( snap, 0 ); data_length = 0x4000;
   compressed_data = NULL;
 
-  error = libspectrum_zlib_compress( data, data_length,
+  error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                     data, data_length,
                                      &compressed_data, &compressed_length );
   if( error ) return error;
 
@@ -3663,7 +3735,8 @@ write_dock_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   if( writeable  ) extra_flags |= ZXSTDOCKF_RAM;
   if( exrom_dock ) extra_flags |= ZXSTDOCKF_EXROMDOCK;
 
-  error = write_ram_page( buffer, ptr, length, ZXSTBID_DOCK, data, 0x2000,
+  error = write_ram_page( libspectrum_snap_context( snap ),
+                          buffer, ptr, length, ZXSTBID_DOCK, data, 0x2000,
 			  page, compress, extra_flags );
   if( error ) return error;
 
@@ -3706,7 +3779,8 @@ write_dide_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   eprom_data = libspectrum_snap_divide_eprom( snap, 0 );
   if( !eprom_data ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_LOGIC,
+    libspectrum_print_error( libspectrum_snap_context(snap),
+                             LIBSPECTRUM_ERROR_LOGIC,
                              "DivIDE EPROM data is missing" );
     return LIBSPECTRUM_ERROR_LOGIC;
   }
@@ -3718,7 +3792,8 @@ write_dide_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
     size_t compressed_eprom_length;
 
-    error = libspectrum_zlib_compress( eprom_data, uncompressed_eprom_length,
+    error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                       eprom_data, uncompressed_eprom_length,
                                        &compressed_eprom_data,
                                        &compressed_eprom_length );
     if( error ) return error;
@@ -3764,7 +3839,8 @@ write_dirp_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   data = libspectrum_snap_divide_ram( snap, page );
 
-  error = write_ram_page( buffer, ptr, length, ZXSTBID_DIVIDERAMPAGE, data,
+  error = write_ram_page( libspectrum_snap_context( snap ),
+                          buffer, ptr, length, ZXSTBID_DIVIDERAMPAGE, data,
 			  0x2000, page, compress, 0x00 );
   if( error ) return error;
 
@@ -3833,7 +3909,8 @@ write_snef_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   if( compress ) {
     size_t compressed_length;
 
-    error = libspectrum_zlib_compress( flash_data, flash_length,
+    error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                       flash_data, flash_length,
       &compressed_flash_data, &compressed_length );
     if( error ) return error;
 
@@ -3889,7 +3966,8 @@ write_sner_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
   if( compress ) {
     size_t compressed_length;
 
-    error = libspectrum_zlib_compress( ram_data, ram_length,
+    error = libspectrum_zlib_compress( libspectrum_snap_context( snap ),
+                                       ram_data, ram_length,
       &compressed_ram_data, &compressed_length );
     if( error ) return error;
 

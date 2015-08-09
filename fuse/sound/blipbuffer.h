@@ -220,7 +220,7 @@ typedef struct blip_eq_s {
 
 #define BLIP_UNSCALED 65535
 
-inline long blip_buffer_samples_avail( Blip_Buffer * buff );
+long blip_buffer_samples_avail( Blip_Buffer * buff );
 
 #define BLIP_MAX_LENGTH 0
 

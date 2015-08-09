@@ -38,6 +38,7 @@ libspectrum_snp_read( libspectrum_snap *snap, const libspectrum_byte *buffer,
   /* Length must be at least 48K of RAM plus the 'trailer' */
   if( length < 0xc000 + SNP_TRAILER_LENGTH ) {
     libspectrum_print_error(
+      libspectrum_snap_context(snap),
       LIBSPECTRUM_ERROR_CORRUPT,
       "libspectrum_snp_read: not enough bytes for a .snp file"
     );

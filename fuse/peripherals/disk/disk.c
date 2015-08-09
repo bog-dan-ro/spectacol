@@ -35,6 +35,7 @@
 #include "bitmap.h"
 #include "crc.h"
 #include "disk.h"
+#include "fuse.h"
 #include "settings.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -800,7 +801,7 @@ udi_read_compressed( const libspectrum_byte *buffer,
 
   tmp = NULL;
 
-  error = libspectrum_zlib_inflate( buffer, compr_size, &tmp, &olength );
+  error = libspectrum_zlib_inflate( libspectrum_context, buffer, compr_size, &tmp, &olength );
   if( error ) return error;
 
   if( *data_size < uncompr_size ) {
@@ -822,7 +823,7 @@ udi_write_compressed( const libspectrum_byte *buffer,
   libspectrum_byte *tmp;
 
   tmp = NULL;
-  error = libspectrum_zlib_compress( buffer, uncompr_size,
+  error = libspectrum_zlib_compress( libspectrum_context, buffer, uncompr_size,
                                      &tmp, compr_size );
   if( error ) return error;
 
@@ -1892,7 +1893,7 @@ disk_open2( disk_t *d, const char *filename, int preindex )
 
   buffer.index = 0;
 
-  error = libspectrum_identify_file_raw( &type, filename,
+  error = libspectrum_identify_file_raw( libspectrum_context, &type, filename,
 					 buffer.file.buffer, buffer.file.length );
   if( error ) return d->status = DISK_OPEN;
   d->type = DISK_TYPE_NONE;

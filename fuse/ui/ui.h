@@ -64,9 +64,9 @@ int ui_end(void);
 /* Error handling routines */
 int ui_error( ui_error_level severity, const char *format, ... )
      GCC_PRINTF( 2, 3 );
-libspectrum_error ui_libspectrum_error( libspectrum_error error,
+libspectrum_error ui_libspectrum_error( void * user_data, libspectrum_error error,
 					const char *format, va_list ap )
-     GCC_PRINTF( 2, 0 );
+     GCC_PRINTF( 3, 0 );
 int ui_verror( ui_error_level severity, const char *format, va_list ap )
      GCC_PRINTF( 2, 0 );
 int ui_error_specific( ui_error_level severity, const char *message );
