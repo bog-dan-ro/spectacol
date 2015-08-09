@@ -16,11 +16,45 @@
 */
 
 #include "fusescreen.h"
+#include "spectrumscreen.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQuick>
-#include <fuse.h>
+
+class SpectrumScreenImageProvider : public QQuickImageProvider
+{
+public:
+    SpectrumScreenImageProvider()
+        : QQuickImageProvider(Image, ForceAsynchronousImageLoading)
+    {}
+
+    // QQuickImageProvider interface
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+};
+
+QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+{
+    Q_UNUSED(size)
+    Q_UNUSED(requestedSize)
+    if (id == QLatin1Literal(".."))
+        return QImage(":/images/folder_up.png");
+    QFileInfo inf(id);
+    if (inf.isDir())
+        return QImage(":/images/folder.svg");
+    if (!inf.isFile())
+        return QImage(":/images/zx_broken_cassette.png");
+
+    QFile file(id);
+    if (!file.open(QIODevice::ReadOnly))
+        return QImage(":/images/zx_broken_cassette.png");
+
+    QImage ret = buff2Image(file.readAll(), inf.fileName());
+    if (ret.isNull())
+        return QImage(":/images/zx_cassette_unknown.png");
+    return ret;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -29,7 +63,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<FuseScreen>("Fuse", 1, 0, "FuseScreen");
 
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    engine.addImageProvider("spectrum", new SpectrumScreenImageProvider);
+    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
     return app.exec();
 }

@@ -24,8 +24,15 @@
 class FuseScreen : public QQuickItem
 {
     Q_OBJECT
+    Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
+
 public:
     FuseScreen();
+    bool paused() const;
+    void setPaused(bool paused);
+
+signals:
+    void pausedChanged();
 
     // QQuickItem interface
 protected:

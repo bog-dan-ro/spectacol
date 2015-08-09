@@ -21,6 +21,7 @@
 #include "fusetexture.h"
 #include "qmlui.h"
 
+#include <fuse.h>
 #include <input.h>
 #include <keyboard.h>
 #include <ui/ui.h>
@@ -33,6 +34,24 @@ FuseScreen::FuseScreen()
 {
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
+}
+
+bool FuseScreen::paused() const
+{
+    return bool(fuse_emulation_paused);
+}
+
+void FuseScreen::setPaused(bool paused)
+{
+    pokeEvent([this, paused]() {
+        if (paused == bool(fuse_emulation_paused))
+            return;
+        if (paused)
+            fuse_emulation_pause();
+        else
+            fuse_emulation_unpause();
+        emit pausedChanged();
+    });
 }
 
 void FuseScreen::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)

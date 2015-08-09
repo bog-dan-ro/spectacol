@@ -21,12 +21,14 @@ SOURCES += main.cpp \
     ../../timer/native.c \
     ../../sound/alsasound.c \
     ../../timer/timer.c \
-    ../../compat/unix/tuntap.c
+    ../../compat/unix/tuntap.c \
+    spectrumscreen.cpp
 
 HEADERS += \
     fusetexture.h \
     fusescreen.h \
-    qmlui.h
+    qmlui.h \
+    spectrumscreen.h
 
 RESOURCES += qml.qrc
 
