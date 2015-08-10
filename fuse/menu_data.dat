@@ -120,6 +120,10 @@ Options/_Filter..., Item,,, menu_filter_detail
 Options/F_ull screen, Item, F11
 #endif
 
+#ifdef UI_NULL
+Options/F_ull screen, Item, F11
+#endif
+
 Options/_Disk options..., Item
 
 Options/separator, Separator

@@ -24,6 +24,7 @@
 #include <fuse.h>
 #include <input.h>
 #include <keyboard.h>
+#include <settings.h>
 #include <utils.h>
 
 #include <ui/ui.h>
@@ -85,6 +86,11 @@ void FuseScreen::setPaused(bool paused)
     });
 }
 
+bool FuseScreen::fullScreen() const
+{
+    return settings_current.full_screen;
+}
+
 void FuseScreen::load(QString path)
 {
     pokeEvent([path]() {
@@ -116,11 +122,12 @@ QSGNode *FuseScreen::updatePaintNode(QSGNode *n, QQuickItem::UpdatePaintNodeData
         node->setOwnsTexture(false);
         QSizeF spectrumSize(FuseTexture::instance()->imageSize());
         m_aspectRatio = spectrumSize.width()/spectrumSize.height();
+        connect(texture, &FuseTexture::screenGeometryChanged, this, &FuseScreen::screenChanged);
         connect(texture, &FuseTexture::needsUpdate, this, &FuseScreen::update, Qt::QueuedConnection);
         connect(texture, &FuseTexture::sizeChanged, this, [this](const QSizeF &size) {
             m_aspectRatio = size.width()/size.height();
             geometryChanged(boundingRect(), boundingRect());
-        } );
+        });
     }
     node->setSourceRect(QRect(QPoint(0, 0), texture->imageSize()));
 

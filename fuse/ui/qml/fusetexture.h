@@ -68,6 +68,7 @@ private:
 signals:
     void needsUpdate();
     void sizeChanged(const QSizeF&);
+    void screenGeometryChanged();
 
 private:
     GLuint m_textureId = 0;
@@ -77,6 +78,7 @@ private:
     QRect m_updateRect;
     bool m_recreate = false;
     bool m_update = false;
+    bool m_fullScreen = false;
     FuseThread m_fuseThread;
     QMutex m_copyPixelsMutex;
     QMutex m_syncVars;

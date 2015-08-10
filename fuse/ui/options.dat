@@ -15,6 +15,9 @@ Checkbox, (P)AL-TV use TV2x effect, pal_tv2x, INPUT_KEY_p
 #ifdef UI_SDL
 Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
 #endif
+#ifdef UI_NULL
+Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
+#endif
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Checkbox, Snap (j)oystick prompt, joy_prompt, INPUT_KEY_j
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c

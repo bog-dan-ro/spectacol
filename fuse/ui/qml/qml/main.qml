@@ -48,6 +48,8 @@ ApplicationWindow {
             id: fuse
             focus: true
             anchors.fill: parent
+            onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
+
             Loader {
                 id: pageLoader
                 anchors.fill: parent

@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <fuse.h>
+#include <settings.h>
 #include <ui/uidisplay.h>
 #include <ui/widget/widget.h>
 
@@ -181,6 +182,7 @@ void FuseTexture::resize(uint32_t w, uint32_t h)
 
 void FuseTexture::rescale()
 {
+
     uint32_t scale = scaler_get_scaling_factor( current_scaler );
     if (!scale)
         scale = 1;
@@ -188,6 +190,7 @@ void FuseTexture::rescale()
     QMutexLocker lock(&m_syncVars);
     if (m_scale == scale)
         return;
+
     m_scale = scale;
     delete[] m_spectrumScaledPixels;
     if (m_scale == 1) {
@@ -292,6 +295,11 @@ void FuseTexture::update(int x, int y, int w, int h)
 
 void FuseTexture::frameEnd()
 {
+    if (m_fullScreen != bool(settings_current.full_screen)) {
+        m_fullScreen = settings_current.full_screen;
+        emit screenGeometryChanged();
+    }
+
     QMutexLocker lock(&m_syncVars);
     if (m_update || m_recreate)
         emit needsUpdate();

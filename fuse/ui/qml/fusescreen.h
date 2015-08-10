@@ -25,17 +25,21 @@ class FuseScreen : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
+    Q_PROPERTY(bool fullScreen READ fullScreen NOTIFY screenChanged)
 
 public:
     FuseScreen();
     bool paused() const;
     void setPaused(bool paused);
 
+    bool fullScreen() const;
+
 public slots:
     void load(QString path);
 
 signals:
     void pausedChanged();
+    void screenChanged();
 
     // QQuickItem interface
 protected:
@@ -46,8 +50,10 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+
 private:
     qreal m_aspectRatio = 4/3;
+    bool m_fullScreen = false;
 };
 
 #endif // FUSESCREEN_H
