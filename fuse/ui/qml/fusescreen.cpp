@@ -76,13 +76,12 @@ bool FuseScreen::paused() const
 void FuseScreen::setPaused(bool paused)
 {
     pokeEvent([this, paused]() {
-        if (paused == bool(fuse_emulation_paused))
-            return;
         if (paused)
             fuse_emulation_pause();
         else
             fuse_emulation_unpause();
-        emit pausedChanged();
+        if (paused != bool(fuse_emulation_paused))
+            emit pausedChanged();
     });
 }
 
