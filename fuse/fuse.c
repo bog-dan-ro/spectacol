@@ -180,8 +180,13 @@ int fuse_main(int argc, const char **argv)
     r = unittests_run();
   } else {
     while( !fuse_exiting ) {
-      z80_do_opcodes();
-      event_do_events();
+      if (fuse_emulation_paused) {
+        timer_sleep(100);
+        ui_event();
+      } else {
+        z80_do_opcodes();
+        event_do_events();
+      }
     }
     r = 0;
   }
