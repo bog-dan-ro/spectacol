@@ -14,12 +14,14 @@ PathView
     preferredHighlightEnd : 0.5
     highlightRangeMode : PathView.StrictlyEnforceRange
     focus: true
+
     Keys.onLeftPressed: decrementCurrentIndex()
     Keys.onRightPressed: incrementCurrentIndex()
     Keys.onEnterPressed: returnPressed()
     Keys.onReturnPressed: returnPressed()
     Keys.onUpPressed: upPressed()
     Keys.onEscapePressed: escapePressed()
+
     path : Path  {
         // LEFT
         startX : parent.x

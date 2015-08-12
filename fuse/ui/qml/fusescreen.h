@@ -24,22 +24,48 @@
 class FuseScreen : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
-    Q_PROPERTY(bool fullScreen READ fullScreen NOTIFY screenChanged)
 
+    Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
+    Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY screenChanged)
+    Q_PROPERTY(QUrl dataPath READ dataPath WRITE setDataPath NOTIFY dataPathChanged)
+    Q_PROPERTY(bool saveSnapshotEnabled READ saveSnapshotEnabled NOTIFY saveSnapshotEnabledChanged)
+
+public:
+    enum ErrorLevel {
+        Info,
+        Warning,
+        Error
+    };
+
+    Q_ENUMS(ErrorLevel)
 public:
     FuseScreen();
     bool paused() const;
     void setPaused(bool paused);
 
     bool fullScreen() const;
+    void setFullScreen(bool fullScreen);
+
+    QUrl dataPath() const;
+    void setDataPath(const QUrl &dataPath);
+
+    bool saveSnapshotEnabled() const;
 
 public slots:
-    void load(QString path);
+    QUrl snapshotsPath() const;
+    void load(const QUrl &filePath);
+    void save(const QUrl &filePath);
+    void quickSaveSnapshot();
+    void quickLoadSnapshot();
+    QString snapshotFileName(bool addExtension = true) const;
 
 signals:
     void pausedChanged();
     void screenChanged();
+    void dataPathChanged();
+    void saveSnapshotEnabledChanged();
+
+    void error(ErrorLevel level, const QString &message);
 
     // QQuickItem interface
 protected:
@@ -54,6 +80,9 @@ protected:
 private:
     qreal m_aspectRatio = 4/3;
     bool m_fullScreen = false;
+    QString m_loadedFileName;
 };
+
+extern FuseScreen *g_fuseEmulator;
 
 #endif // FUSESCREEN_H

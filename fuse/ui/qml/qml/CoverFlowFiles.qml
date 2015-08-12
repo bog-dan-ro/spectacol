@@ -4,8 +4,9 @@ import Qt.labs.folderlistmodel 2.1
 Item
 {
     id : fileList
-    anchors.fill: parent
     signal fileSelected(string filePath);
+    property alias rootFolder: filesModel.rootFolder
+    property alias folder: filesModel.folder
 
     transform: Rotation {
         angle : 0
@@ -17,7 +18,7 @@ Item
     FolderListModel {
         id: filesModel
         rootFolder: "file:///"
-        folder: "file:///root/oldies/spectrum"
+        folder: "file:///"
         showDirs: true
         showDirsFirst: true
         showOnlyReadable: true
@@ -38,11 +39,10 @@ Item
         model : filesModel
 
         onReturnPressed: {
-            if (model.isFolder(currentIndex)) {
+            if (model.isFolder(currentIndex))
                 filesModel.folder = model.get(currentIndex, "fileURL");
-            } else {
-                fileSelected(model.filePath);
-            }
+            else
+                fileSelected(model.get(currentIndex, "fileURL"));
         }
         onEscapePressed: fileSelected("")
 
@@ -83,7 +83,6 @@ Item
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    font.capitalization: Font.Capitalize
                     anchors
                     {
                         top : parent.bottom
@@ -98,9 +97,9 @@ Item
                         if (isCurrentItem)
                         {
                             if (model.fileIsDir) {
-                                filesModel.folder = "file://" + model.filePath
+                                filesModel.folder = model.fileURL
                             } else {
-                                fileSelected(model.filePath);
+                                fileSelected(model.fileURL);
                             }
                         }
                         else
@@ -132,7 +131,6 @@ Item
         width : parent.width
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        font.capitalization: Font.Capitalize
         MouseArea {
             anchors.fill: parent
             onClicked: folderUp()
@@ -145,8 +143,8 @@ Item
         property variant source : ShaderEffectSource {
             sourceItem: filesView
             live : true
-            width : fileList.parent.width
-            height : fileList.parent.height
+            width : fileList.width
+            height : fileList.height
         }
         z : -5
         anchors

@@ -4,6 +4,7 @@ TEMPLATE = app
 CONFIG += c++11
 
 QT += qml quick
+!no_desktop: QT += widgets
 
 INCLUDEPATH += $$PWD/../../ $$PWD/../../../libspectrum
 

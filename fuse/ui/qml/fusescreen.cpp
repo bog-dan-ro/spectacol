@@ -25,13 +25,18 @@
 #include <input.h>
 #include <keyboard.h>
 #include <settings.h>
+#include <snapshot.h>
 #include <utils.h>
 
 #include <ui/ui.h>
 
 #include <QDebug>
-#include <QSGSimpleTextureNode>
 #include <QtMath>
+#include <QSGSimpleTextureNode>
+#include <QStandardPaths>
+#include <QSettings>
+#include <QDir>
+#include <QDateTime>
 
 #include <mutex>
 
@@ -55,8 +60,13 @@ static void destroy_mutex(libspectrum_mutex_t mutex)
     delete reinterpret_cast<std::mutex*>(mutex);
 }
 
+FuseScreen *g_fuseEmulator = nullptr;
 FuseScreen::FuseScreen()
 {
+    g_fuseEmulator = this; // remove me when FUSE will be context aware
+
+    qRegisterMetaType<ErrorLevel>("ErrorLevel");
+
     libspectrum_mutex_vtable_t t;
     t.create = create_mutex;
     t.lock = lock_mutex;
@@ -66,6 +76,7 @@ FuseScreen::FuseScreen()
 
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
+    setDataPath(dataPath());
 }
 
 bool FuseScreen::paused() const
@@ -85,19 +96,91 @@ void FuseScreen::setPaused(bool paused)
     });
 }
 
+QUrl FuseScreen::dataPath() const
+{
+    QSettings s;
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+# define DATA_LOCATION QStandardPaths::GenericDataLocation
+#else
+# define DATA_LOCATION QStandardPaths::HomeLocation
+#endif
+    return QUrl::fromLocalFile(s.value("dataPath", QStandardPaths::writableLocation(DATA_LOCATION) + "/Spectrum/").toString());
+}
+
+void FuseScreen::setDataPath(const QUrl &dataPath)
+{
+    {
+        QSettings s;
+        s.setValue("dataPath", dataPath.toLocalFile());
+    }
+    QDir dir(dataPath.toLocalFile());
+    dir.mkpath("Snapshots");
+    emit dataPathChanged();
+}
+
+bool FuseScreen::saveSnapshotEnabled() const
+{
+    return !m_loadedFileName.isEmpty();
+}
+
+QUrl FuseScreen::snapshotsPath() const
+{
+    return QUrl::fromLocalFile(dataPath().toLocalFile() + QLatin1Literal("/Snapshots/"));
+}
+
 bool FuseScreen::fullScreen() const
 {
     return settings_current.full_screen;
 }
 
-void FuseScreen::load(QString path)
+void FuseScreen::setFullScreen(bool fullScreen)
 {
-    pokeEvent([path]() {
+    if (settings_current.full_screen == fullScreen)
+        return;
+
+    settings_current.full_screen = fullScreen;
+}
+
+void FuseScreen::load(const QUrl &filePath)
+{
+    m_loadedFileName = QFileInfo(filePath.toLocalFile()).baseName();
+    pokeEvent([this, filePath]() {
         fuse_emulation_pause();
-        utils_open_file( path.toUtf8().constData(), 1 , NULL );
+        if (utils_open_file(filePath.path().toUtf8().constData(), 1 , nullptr))
+            m_loadedFileName = "";
+        emit saveSnapshotEnabledChanged();
         display_refresh_all();
         fuse_emulation_unpause();
     });
+}
+
+void FuseScreen::save(const QUrl &filePath)
+{
+    pokeEvent([filePath]() {
+        fuse_emulation_pause();
+        snapshot_write(filePath.path().toUtf8().constData());
+        fuse_emulation_unpause();
+    });
+}
+
+void FuseScreen::quickSaveSnapshot()
+{
+    save(snapshotsPath().toLocalFile() + snapshotFileName(false) + QLatin1Char(' ') +
+         QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") +
+         QLatin1Literal(".szx"));
+}
+
+void FuseScreen::quickLoadSnapshot()
+{
+    QDir dir(snapshotsPath().toLocalFile());
+    const auto &list = dir.entryInfoList(QDir::Files, QDir::Time);
+    if (list.size())
+        load(QUrl::fromLocalFile(list.first().filePath()));
+}
+
+QString FuseScreen::snapshotFileName(bool addExtension) const
+{
+    return m_loadedFileName + (addExtension ? QLatin1Literal(".szx") : QLatin1Literal(""));
 }
 
 void FuseScreen::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
@@ -141,6 +224,7 @@ void FuseScreen::keyPressEvent(QKeyEvent *event)
     event->accept();
     if (ui_widget_level ==-1 && event->isAutoRepeat())
         return;
+
     input_key key = keysyms_remap(event->key() + event->modifiers());
     if (key == INPUT_KEY_NONE)
         key = keysyms_remap(event->key());
@@ -161,6 +245,7 @@ void FuseScreen::keyReleaseEvent(QKeyEvent *event)
     event->accept();
     if (ui_widget_level ==-1 && event->isAutoRepeat())
         return;
+
     input_key key = keysyms_remap(event->key() + event->modifiers());
     if (key == INPUT_KEY_NONE)
         key = keysyms_remap(event->key());

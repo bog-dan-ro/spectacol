@@ -69,7 +69,6 @@ extern "C" int compat_file_close(compat_fd fd)
 
 extern "C" int compat_file_exists(const char *path)
 {
-    qDebug() << "compat_file_exists" << path;
     return QFile(path).exists() ? 1 : 0;
 }
 

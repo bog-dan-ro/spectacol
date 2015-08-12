@@ -1,6 +1,6 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
-import QtQuick.Layouts 1.1
+import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
 import Fuse 1.0
 
@@ -11,33 +11,40 @@ ApplicationWindow {
     width: 320 * 3
     height: 256 * 3
 
-    title: qsTr("Hello World")
+    title: qsTr("Fuse QML")
 
     property int dpiMultiplier: 1
     property bool portrait: false
+
+    MessageDialog {
+        id: quitDialog
+        icon: StandardIcon.Question
+        title: "Fuse QML"
+        text: "Quit ?"
+        standardButtons: StandardButton.Yes | StandardButton.No
+        onYes: Qt.quit()
+    }
 
     NavigationDrawer {
         id: menuBar
         color: Qt.rgba(0, 0, 0, 0.5)
         width: parent.width / 4
-        ColumnLayout {
-            Button {
-                text: "Toggle Full screen"
-                onClicked: {
-                    if (mainScreen.visibility === Window.FullScreen)
-                        mainScreen.visibility = Window.AutomaticVisibility
-                    else
-                        mainScreen.visibility = Window.FullScreen
-                    menuBar.open = false;
-                }
+
+        Flickable {
+            anchors.fill: parent
+            contentHeight: menuView.height; contentWidth: menuView.width
+            flickableDirection: Flickable.VerticalFlick
+            MenuView {
+                anchors.fill: parent
+                id: menuView
+                rootMenu: FuseMenu {}
+                parentWidth: menuBar.width
             }
-            Button {
-                text: "Browse files"
-                onClicked: {
-                    pageLoader.sourceComponent = fileBrowser;
-                    menuBar.open = false;
-                }
-            }
+        }
+        onOpenChanged: {
+            menuView.reset();
+            if (open)
+                pageLoader.source = "";
         }
     }
 
@@ -49,6 +56,7 @@ ApplicationWindow {
             focus: true
             anchors.fill: parent
             onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
+            onError: messagePage.showMessage(level, message);
 
             Loader {
                 id: pageLoader
@@ -57,19 +65,22 @@ ApplicationWindow {
                 visible: status === Loader.Ready
                 focus: visible
                 enabled: visible
-                onSourceComponentChanged: fuse.paused = (status === Loader.Ready)
+                onStatusChanged: {
+                    switch (status) {
+                    case Loader.Ready:
+                        fuse.paused = true;
+                        break;
+                    case Loader.Null:
+                        fuse.paused = false;
+                        break;
+                    }
+                }
             }
         }
-    }
-    Component {
-        id: fileBrowser
-        CoverFlowFiles {
-            anchors.fill: parent
-            onFileSelected: {
-                if (filePath)
-                    fuse.load(filePath);
-                pageLoader.sourceComponent = null
-            }
+
+        MessagePage {
+            id: messagePage
+            z: 100
         }
     }
 }

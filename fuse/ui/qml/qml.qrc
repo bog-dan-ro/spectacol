@@ -23,12 +23,36 @@
         <file>rom/tc2068-1.rom</file>
         <file>ui/fuse.font</file>
         <file>qml/main.qml</file>
-        <file>qml/NavigationDrawer.qml</file>
         <file>qml/CoverFlow.qml</file>
         <file>qml/CoverFlowFiles.qml</file>
+        <file>qml/FancyText.qml</file>
+        <file>qml/MenuView.qml</file>
+        <file>qml/NavigationDrawer.qml</file>
         <file>images/zx_broken_cassette.png</file>
         <file>images/zx_cassette_unknown.png</file>
         <file>images/zx_cassette.png</file>
         <file>images/folder.svg</file>
+        <file>qml/FuseMenu.qml</file>
+        <file>qml/FileBrowserPage.qml</file>
+        <file>qml/SaveSnapshotPage.qml</file>
+        <file>qml/FancyTextField.qml</file>
+        <file>qml/SaveFilePage.qml</file>
+        <file>qml/MessagePage.qml</file>
+        <file>lib/disk_plus3.szx</file>
+        <file>lib/tape_128.szx</file>
+        <file>lib/tape_16.szx</file>
+        <file>lib/tape_2048.szx</file>
+        <file>lib/tape_2068.szx</file>
+        <file>lib/tape_48_ntsc.szx</file>
+        <file>lib/tape_48.szx</file>
+        <file>lib/tape_pentagon.szx</file>
+        <file>lib/tape_plus2.szx</file>
+        <file>lib/tape_plus2a.szx</file>
+        <file>lib/tape_plus3.szx</file>
+        <file>lib/tape_plus3e.szx</file>
+        <file>lib/tape_scorpion.szx</file>
+        <file>lib/tape_se.szx</file>
+        <file>lib/tape_ts2068.szx</file>
+        <file>rom/if1-2.rom</file>
     </qresource>
 </RCC>

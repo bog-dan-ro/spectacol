@@ -17,6 +17,7 @@
 */
 
 #include "qmlui.h"
+#include "fusescreen.h"
 
 #include <fuse.h>
 #include <ui/uidisplay.h>
@@ -50,7 +51,15 @@ extern "C" int ui_mouse_release( int /*suspend*/ )
     return 0;
 }
 
-SpectrumEventFunction peekEvent()
+extern "C" int ui_error_specific( ui_error_level severity, const char *message )
+{
+    fuse_emulation_pause();
+    emit g_fuseEmulator->error(FuseScreen::ErrorLevel(severity), QLatin1String(message));
+    fuse_emulation_unpause();
+    return 0;
+}
+
+inline SpectrumEventFunction peekEvent()
 {
     SpectrumEventFunction event;
     s_eventsMutex.lock();

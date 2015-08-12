@@ -1,5 +1,6 @@
 #include "spectrumscreen.h"
 
+#include <QFileInfo>
 #include <libspectrum.h>
 
 constexpr uint16_t rgb16(int r, int g, int b)
@@ -105,3 +106,28 @@ QImage buff2Image(const QByteArray &buffer, const QString &fileName)
 {
     return buff2Image((const unsigned char *)buffer.constData(), buffer.size(), fileName);
 }
+
+
+QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+{
+    Q_UNUSED(size)
+    Q_UNUSED(requestedSize)
+    if (id == QLatin1Literal(".."))
+        return QImage(":/images/folder_up.png");
+
+    QFileInfo inf(id);
+    if (inf.isDir())
+        return QImage(":/images/folder.svg");
+    if (!inf.isFile())
+        return QImage(":/images/zx_broken_cassette.png");
+
+    QFile file(id);
+    if (!file.open(QIODevice::ReadOnly))
+        return QImage(":/images/zx_broken_cassette.png");
+
+    QImage ret = buff2Image(file.readAll(), inf.fileName());
+    if (ret.isNull())
+        return QImage(":/images/zx_cassette_unknown.png");
+    return ret;
+}
+
