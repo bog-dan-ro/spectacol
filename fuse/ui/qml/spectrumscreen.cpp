@@ -1,7 +1,12 @@
 #include "spectrumscreen.h"
 
 #include <QFileInfo>
+#include <QDebug>
 #include <libspectrum.h>
+
+enum {
+    SPECTRUM_TAPE_BLOCK_SCREEN_SIZE = 1/*first byte*/ + 32 * 24 * 8 + 32 * 24 /*screen data */ + 1 /* last byte */
+};
 
 constexpr uint16_t rgb16(int r, int g, int b)
 {
@@ -82,6 +87,24 @@ QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString 
     libspectrum_class_t fileClass;
     error = libspectrum_identify_class(init.context, &fileClass, fileType);
     if (error != LIBSPECTRUM_ERROR_NONE || fileClass != LIBSPECTRUM_CLASS_SNAPSHOT) {
+        if (fileClass == LIBSPECTRUM_CLASS_TAPE) {
+            // try to find first block that has the screen size
+
+            libspectrum_tape *tape = libspectrum_tape_alloc(init.context);
+            libspectrum_tape_iterator iterator;
+
+            libspectrum_tape_read(tape, buffer, bufferSize, LIBSPECTRUM_ID_UNKNOWN, fileName.toUtf8().constData());
+
+            for (auto block = libspectrum_tape_iterator_init(&iterator, tape); block;
+                 block = libspectrum_tape_iterator_next( &iterator )) {
+                if (libspectrum_tape_block_data_length(block) == SPECTRUM_TAPE_BLOCK_SCREEN_SIZE) {
+                    ret = spectrumScreen2Image(libspectrum_tape_block_data(block) + 1);
+                    break;
+                }
+            }
+            libspectrum_tape_free(tape);
+        }
+
         libspectrum_end(init.context);
         return ret;
     }
@@ -130,4 +153,3 @@ QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size,
         return QImage(":/images/zx_cassette_unknown.png");
     return ret;
 }
-
