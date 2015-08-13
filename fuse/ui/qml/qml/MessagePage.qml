@@ -14,9 +14,12 @@ Rectangle {
     visible: false
 
     FancyText {
+        fontSize: 4
         id: message
+        anchors.fill: parent
+        elide: Text.ElideRight
+        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         horizontalAlignment: Text.AlignHCenter
-        anchors.centerIn: parent
     }
 
     Timer {
@@ -34,18 +37,22 @@ Rectangle {
         var msg = "";
         switch(level) {
         case FuseScreen.Info:
-            msg = qsTr("Info: ");
+            msg = qsTr("<b>Info:</b> ");
             break;
 
         case FuseScreen.Warning:
-            msg = qsTr("Warning: ");
+            msg = qsTr("<b>Warning:</b> ");
             break;
 
         case FuseScreen.Error:
-            msg = qsTr("Error: ");
+            msg = qsTr("<b>Error:</b> ");
             break;
         }
+
         message.text = msg + text;
+
+        timer.interval = 5000 + 1000 * (text.length / 20)
+
         timer.restart();
         msgDialog.visible = true;
     }

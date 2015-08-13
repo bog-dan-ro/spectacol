@@ -54,5 +54,8 @@
         <file>lib/tape_se.szx</file>
         <file>lib/tape_ts2068.szx</file>
         <file>rom/if1-2.rom</file>
+        <file>qml/FiltersPage.qml</file>
+        <file>qml/DebuggerPage.qml</file>
+        <file>qml/DisassembleView.qml</file>
     </qresource>
 </RCC>

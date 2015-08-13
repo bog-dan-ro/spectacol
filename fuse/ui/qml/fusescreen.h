@@ -20,6 +20,7 @@
 #define FUSESCREEN_H
 
 #include <QQuickItem>
+#include <vector>
 
 class FuseScreen : public QQuickItem
 {
@@ -29,6 +30,8 @@ class FuseScreen : public QQuickItem
     Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY screenChanged)
     Q_PROPERTY(QUrl dataPath READ dataPath WRITE setDataPath NOTIFY dataPathChanged)
     Q_PROPERTY(bool saveSnapshotEnabled READ saveSnapshotEnabled NOTIFY saveSnapshotEnabledChanged)
+    Q_PROPERTY(QStringList filtersModel READ filtersModel)
+    Q_PROPERTY(int selectedFilterIndex READ selectedFilterIndex WRITE setSelectedFilterIndex NOTIFY selectedFilterIndexChanged)
 
 public:
     enum ErrorLevel {
@@ -51,6 +54,11 @@ public:
 
     bool saveSnapshotEnabled() const;
 
+    QStringList filtersModel() const;
+
+    int selectedFilterIndex() const;
+    void setSelectedFilterIndex(int selectedFilterIndex);
+
 public slots:
     QUrl snapshotsPath() const;
     void load(const QUrl &filePath);
@@ -64,6 +72,7 @@ signals:
     void screenChanged();
     void dataPathChanged();
     void saveSnapshotEnabledChanged();
+    void selectedFilterIndexChanged();
 
     void error(ErrorLevel level, const QString &message);
 
@@ -78,9 +87,13 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
 private:
+    void updateScalers() const;
+
+private:
     qreal m_aspectRatio = 4/3;
     bool m_fullScreen = false;
     QString m_loadedFileName;
+    mutable std::vector<int> m_supportedScalers;
 };
 
 extern FuseScreen *g_fuseEmulator;

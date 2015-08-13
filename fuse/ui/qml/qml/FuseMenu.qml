@@ -29,6 +29,7 @@ Menu {
                 pageLoader.source = "FileBrowserPage.qml";
             }
         }
+
         MenuItem {
             text: "Save snapshot as ..."
             onTriggered: {
@@ -36,15 +37,104 @@ Menu {
                 pageLoader.source = "SaveSnapshotPage.qml";
             }
         }
+
+        Menu {
+            title: qsTr("Recording")
+            MenuItem {
+                text: "Record"
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "StartRecordingPage.qml";
+                }
+            }
+            MenuItem {
+                text: "Record from snapshot"
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "StartRecordingPage.qml";
+                }
+            }
+            MenuItem {
+                text: "Continue recording"
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "StartRecordingPage.qml";
+                }
+            }
+            MenuItem {
+                text: "Insert snapshot"
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "StartRecordingPage.qml";
+                }
+            }
+            MenuItem {
+                text: "Rollback"
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "StartRecordingPage.qml";
+                }
+            }
+            MenuItem {
+                text: "Rollback to ..."
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "StartRecordingPage.qml";
+                }
+            }
+            MenuItem {
+                text: "Play"
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "StartRecordingPage.qml";
+                }
+            }
+            MenuItem {
+                text: "Stop"
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "StartRecordingPage.qml";
+                }
+            }
+            MenuItem {
+                text: "Finalise ..."
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "StartRecordingPage.qml";
+                }
+            }
+        }
+    }
+    Menu {
+        title: qsTr("Input")
     }
 
     Menu {
         title: "Screen"
+
+        MenuItem {
+            text: "Filter"
+            onTriggered: {
+                menuBar.open = false;
+                pageLoader.source = "FiltersPage.qml";
+            }
+        }
         MenuItem {
             text: "Toggle Full Screen"
             onTriggered: {
                 menuBar.open = false;
                 fuse.fullScreen = !fuse.fullScreen;
+            }
+        }
+    }
+
+    Menu {
+        title: "Advanced"
+        MenuItem {
+            text: "Debugger"
+            onTriggered: {
+                menuBar.open = false;
+                pageLoader.source = "DebuggerPage.qml";
             }
         }
     }

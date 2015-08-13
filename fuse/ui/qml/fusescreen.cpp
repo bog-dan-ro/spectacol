@@ -29,6 +29,7 @@
 #include <utils.h>
 
 #include <ui/ui.h>
+#include <ui/scaler/scaler.h>
 
 #include <QDebug>
 #include <QtMath>
@@ -121,6 +122,32 @@ void FuseScreen::setDataPath(const QUrl &dataPath)
 bool FuseScreen::saveSnapshotEnabled() const
 {
     return !m_loadedFileName.isEmpty();
+}
+
+QStringList FuseScreen::filtersModel() const
+{
+    updateScalers();
+    QStringList ret;
+    for (int scaller : m_supportedScalers)
+        ret.push_back(QLatin1String(scaler_name(scaler_type(scaller))));
+    return ret;
+}
+
+int FuseScreen::selectedFilterIndex() const
+{
+    auto it = std::find(m_supportedScalers.begin(), m_supportedScalers.end(), current_scaler);
+    if (it != m_supportedScalers.end())
+        return it - m_supportedScalers.begin();
+    return -1;
+}
+
+void FuseScreen::setSelectedFilterIndex(int selectedFilterIndex)
+{
+    const scaler_type scaler = scaler_type(m_supportedScalers[selectedFilterIndex]);
+    pokeEvent([scaler, this]{
+        scaler_select_scaler(scaler);
+        emit selectedFilterIndexChanged();
+    });
 }
 
 QUrl FuseScreen::snapshotsPath() const
@@ -280,4 +307,14 @@ void FuseScreen::mouseReleaseEvent(QMouseEvent *event)
     pokeEvent([button]{
         ui_mouse_button( button, 0 );
     });
+}
+
+void FuseScreen::updateScalers() const
+{
+    if (!m_supportedScalers.empty())
+        return;
+
+    for (int i = SCALER_HALF; i < SCALER_NUM; ++i)
+        if (scaler_is_supported(scaler_type(i)))
+            m_supportedScalers.push_back(i);
 }

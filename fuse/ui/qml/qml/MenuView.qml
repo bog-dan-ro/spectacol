@@ -34,7 +34,7 @@ Column {
 
     function showParentMenu()
     {
-        title.text = menus.length > 1 ? "&lt;/../" : "&lt;/" + _menuText(currentMenu.title);
+        title.text = (menus.length > 1 ? "&lt;/../" : "&lt;/") + _menuText(currentMenu.title);
     }
 
     function _menuText(text)

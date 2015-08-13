@@ -206,6 +206,8 @@ void FuseTexture::rescale()
     m_recreate = true;
     m_updateRect = QRect(0, 0, m_width, m_height);
     emit sizeChanged(imageSize());
+    emit screenGeometryChanged();
+    emit needsUpdate();
 }
 
 
