@@ -21,12 +21,15 @@
 #include "fusetexture.h"
 #include "qmlui.h"
 
+#include <debugger/debugger.h>
 #include <fuse.h>
 #include <input.h>
 #include <keyboard.h>
+#include <machine.h>
 #include <settings.h>
 #include <snapshot.h>
 #include <utils.h>
+#include <z80/z80.h>
 
 #include <ui/ui.h>
 #include <ui/scaler/scaler.h>
@@ -60,6 +63,33 @@ static void destroy_mutex(libspectrum_mutex_t mutex)
 {
     delete reinterpret_cast<std::mutex*>(mutex);
 }
+
+template <typename T>
+inline QString formatNumber(T nr)
+{
+    if (debugger_output_base == 10)
+        return QString::number(nr);
+    return QString(QLatin1Literal("%1")).arg(nr, sizeof(T) * 2, 16, QLatin1Char('0')).toUpper();
+}
+
+#define setRegisterValue(reg) \
+    bool ok; \
+    int val = value.toInt(&ok); \
+    if (!ok) \
+        val = value.toInt(&ok, 16); \
+    if (!ok) { \
+        emit error(Warning, tr("Value \"%1\" is not a number").arg(value)); \
+        return; \
+    } \
+    if (fuse_emulation_paused || debugger_mode == DEBUGGER_MODE_HALTED) { \
+        reg = val; \
+        emit registersChanged(); \
+    } else { \
+        pokeEvent([this, val]{ \
+            reg = val; \
+            emit registersChanged(); \
+        }); \
+    }
 
 FuseScreen *g_fuseEmulator = nullptr;
 FuseScreen::FuseScreen()
@@ -150,6 +180,202 @@ void FuseScreen::setSelectedFilterIndex(int selectedFilterIndex)
     });
 }
 
+QString FuseScreen::PC() const
+{
+    return formatNumber(z80.pc.w);
+}
+
+void FuseScreen::setPC(const QString &value)
+{
+    setRegisterValue(z80.pc.w);
+}
+
+QString FuseScreen::SP() const
+{
+    return formatNumber(z80.sp.w);
+}
+
+void FuseScreen::setSP(const QString &value)
+{
+    setRegisterValue(z80.sp.w);
+}
+
+QString FuseScreen::IX() const
+{
+    return formatNumber(z80.ix.w);
+}
+
+void FuseScreen::setIX(const QString &value)
+{
+    setRegisterValue(z80.ix.w);
+}
+
+QString FuseScreen::IY() const
+{
+    return formatNumber(z80.iy.w);
+}
+
+void FuseScreen::setIY(const QString &value)
+{
+    setRegisterValue(z80.iy.w);
+}
+
+QString FuseScreen::R() const
+{
+    return formatNumber(libspectrum_byte(z80.r));
+}
+
+void FuseScreen::setR(const QString &value)
+{
+    setRegisterValue(z80.r);
+}
+
+QString FuseScreen::I() const
+{
+    return formatNumber(z80.i);
+}
+
+void FuseScreen::setI(const QString &value)
+{
+    setRegisterValue(z80.i);
+}
+
+QString FuseScreen::R7() const
+{
+    return formatNumber(z80.r7);
+}
+
+void FuseScreen::setR7(const QString &value)
+{
+    setRegisterValue(z80.r7);
+}
+
+QString FuseScreen::IFF1() const
+{
+    return formatNumber(z80.iff1);
+}
+
+void FuseScreen::setIFF1(const QString &value)
+{
+    setRegisterValue(z80.iff1);
+}
+
+QString FuseScreen::IFF2() const
+{
+    return formatNumber(z80.iff2);
+}
+
+void FuseScreen::setIFF2(const QString &value)
+{
+    setRegisterValue(z80.iff2);
+}
+
+QString FuseScreen::IM() const
+{
+    return formatNumber(z80.im);
+}
+
+void FuseScreen::setIM(const QString &value)
+{
+    setRegisterValue(z80.im);
+}
+
+QString FuseScreen::AF() const
+{
+    return formatNumber(z80.af.w);
+}
+
+void FuseScreen::setAF(const QString &value)
+{
+    setRegisterValue(z80.af.w);
+}
+
+QString FuseScreen::BC() const
+{
+    return formatNumber(z80.bc.w);
+}
+
+void FuseScreen::setBC(const QString &value)
+{
+    setRegisterValue(z80.bc.w);
+}
+
+QString FuseScreen::DE() const
+{
+    return formatNumber(z80.de.w);
+}
+
+void FuseScreen::setDE(const QString &value)
+{
+    setRegisterValue(z80.de.w);
+}
+
+QString FuseScreen::HL() const
+{
+    return formatNumber(z80.hl.w);
+}
+
+void FuseScreen::setHL(const QString &value)
+{
+    setRegisterValue(z80.hl.w);
+}
+
+QString FuseScreen::AF_() const
+{
+    return formatNumber(z80.af_.w);
+}
+
+void FuseScreen::setAF_(const QString &value)
+{
+    setRegisterValue(z80.af_.w);
+}
+
+QString FuseScreen::BC_() const
+{
+    return formatNumber(z80.bc_.w);
+}
+
+void FuseScreen::setBC_(const QString &value)
+{
+    setRegisterValue(z80.bc_.w);
+}
+
+QString FuseScreen::DE_() const
+{
+    return formatNumber(z80.de_.w);
+}
+
+void FuseScreen::setDE_(const QString &value)
+{
+    setRegisterValue(z80.de_.w);
+}
+
+QString FuseScreen::HL_() const
+{
+    disassemble();
+    return formatNumber(z80.hl_.w);
+}
+
+void FuseScreen::setHL_(const QString &value)
+{
+    setRegisterValue(z80.hl_.w);
+}
+
+QStringList FuseScreen::disassemble() const
+{
+    QStringList ret;
+    libspectrum_word address = z80.pc.w;
+    char buff[100];
+    size_t len;
+    for (int i = 0; i< 0xffff; i++) {
+        debugger_disassemble(buff, sizeof(buff), &len, address);
+        ret.push_back(formatNumber(address) + QLatin1Literal(" ") + buff);
+        qDebug() << len << ret.last();
+        address += len;
+    }
+    return ret;
+}
+
 QUrl FuseScreen::snapshotsPath() const
 {
     return QUrl::fromLocalFile(dataPath().toLocalFile() + QLatin1Literal("/Snapshots/"));
@@ -188,6 +414,16 @@ void FuseScreen::save(const QUrl &filePath)
         snapshot_write(filePath.path().toUtf8().constData());
         fuse_emulation_unpause();
     });
+}
+
+void FuseScreen::reset()
+{
+    machine_reset(0);
+}
+
+void FuseScreen::hardReset()
+{
+    machine_reset(1);
 }
 
 void FuseScreen::quickSaveSnapshot()

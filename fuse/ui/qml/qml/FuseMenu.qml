@@ -129,12 +129,191 @@ Menu {
     }
 
     Menu {
-        title: "Advanced"
+        title: qsTr("Machine")
         MenuItem {
-            text: "Debugger"
+            text: qsTr("Reset")
+            onTriggered: {
+                menuBar.open = false;
+                fuse.reset();
+            }
+        }
+        MenuItem {
+            text: qsTr("Hard reset")
+            onTriggered: {
+                menuBar.open = false;
+                fuse.hardReset();
+            }
+        }
+        MenuItem {
+            text: qsTr("Debugger")
             onTriggered: {
                 menuBar.open = false;
                 pageLoader.source = "DebuggerPage.qml";
+            }
+        }
+        MenuItem {
+            text: qsTr("Poke finder")
+            onTriggered: {
+                menuBar.open = false;
+                pageLoader.source = "PokeFinderPage.qml";
+            }
+        }
+        MenuItem {
+            text: qsTr("Poke memory")
+            onTriggered: {
+                menuBar.open = false;
+                pageLoader.source = "PokeMemoryPage.qml";
+            }
+        }
+        MenuItem {
+            text: qsTr("Memory Browser")
+            onTriggered: {
+                menuBar.open = false;
+                pageLoader.source = "MemoryBrowserPage.qml";
+            }
+        }
+
+        MenuItem {
+            text: qsTr("Memory Browser")
+            onTriggered: {
+                menuBar.open = false;
+                pageLoader.source = "MemoryBrowserPage.qml";
+            }
+        }
+
+        Menu {
+            title: qsTr("Profiler")
+            MenuItem {
+                text: qsTr("Start")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.startProfiler();
+                }
+            }
+            MenuItem {
+                text: qsTr("Stop")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.stopProfiler();
+                }
+            }
+        }
+
+        MenuItem {
+            text: qsTr("NMI")
+            onTriggered: {
+                menuBar.open = false;
+                fuse.nmi();
+            }
+        }
+
+        MenuItem {
+            text: qsTr("Didaktik SNAP")
+            onTriggered: {
+                menuBar.open = false;
+                fuse.nmi();
+            }
+        }
+    }
+
+    Menu {
+        title: qsTr("Options")
+
+        MenuItem {
+            text: qsTr("General")
+            onTriggered: {
+                menuBar.open = false;
+                pageLoader.source = "OptionsGeneralPage.qml";
+            }
+        }
+
+        MenuItem {
+            text: qsTr("Media")
+            onTriggered: {
+                menuBar.open = false;
+                pageLoader.source = "OptionsMediaPage.qml";
+            }
+        }
+
+        MenuItem {
+            text: qsTr("Sound")
+            onTriggered: {
+                menuBar.open = false;
+                pageLoader.source = "OptionsSoundPage.qml";
+            }
+        }
+
+        Menu {
+            title: qsTr("Machine")
+            MenuItem {
+                text: qsTr("Reset")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.reset();
+                }
+            }
+        }
+    }
+
+    Menu {
+        title: qsTr("Media")
+        Menu {
+            title: qsTr("Tape")
+            MenuItem {
+                text: qsTr("Open")
+                onTriggered: {
+                    menuBar.open = false;
+                    pageLoader.source = "FileBrowserPage.qml";
+                }
+            }
+            MenuItem {
+                text: qsTr("Play")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.playTape();
+                }
+            }
+            MenuItem {
+                text: qsTr("Browse")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.browseTape();
+                }
+            }
+            MenuItem {
+                text: qsTr("Rewind")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.rewindTape();
+                }
+            }
+            MenuItem {
+                text: qsTr("Clear")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.clearTape();
+                }
+            }
+            MenuItem {
+                text: qsTr("Write")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.writeTape();
+                }
+            }
+            MenuItem {
+                text: qsTr("Record Start")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.recordStartTape();
+                }
+            }
+            MenuItem {
+                text: qsTr("Record Stop")
+                onTriggered: {
+                    menuBar.open = false;
+                    fuse.recordStopTape();
+                }
             }
         }
     }
