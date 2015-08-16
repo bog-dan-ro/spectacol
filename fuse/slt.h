@@ -28,8 +28,16 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 void slt_init( void );
 
 int slt_trap( libspectrum_word address, libspectrum_byte level );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_SLT_H */

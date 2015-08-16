@@ -36,6 +36,10 @@
 
 #include "breakpoint.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* The current state of the debugger */
 enum debugger_mode_t
 {
@@ -84,5 +88,9 @@ void debugger_event( int event_code );
 
 /* Exit the emulator */
 void debugger_exit_emulator( void );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_DEBUGGER_H */

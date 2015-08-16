@@ -30,6 +30,10 @@
 #include "ui/scaler/scaler.h"
 #endif				/* #ifndef SCALER_H */
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 #ifdef USE_LIBPNG
 
 int screenshot_write( const char *filename, scaler_type scaler );
@@ -41,5 +45,9 @@ int screenshot_scr_write( const char *filename );
 int screenshot_scr_read( const char *filename );
 
 #define STANDARD_SCR_SIZE 6912
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_SCREENSHOT_H */

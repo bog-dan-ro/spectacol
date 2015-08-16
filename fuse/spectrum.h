@@ -32,6 +32,10 @@
 
 #include "memory.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* How many tstates have elapsed since the last interrupt? (or more
    precisely, since the ULA last pulled the /INT line to the Z80 low) */
 extern libspectrum_dword tstates;
@@ -83,5 +87,9 @@ extern int spectrum_frame_event;
 
 void spectrum_init( void );
 int spectrum_frame( void );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_SPECTRUM_H */

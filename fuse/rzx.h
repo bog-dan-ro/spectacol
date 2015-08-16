@@ -32,6 +32,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* The offset used to get the count of instructions from the R register */
 extern int rzx_instructions_offset;
 
@@ -81,5 +85,9 @@ int rzx_end( void );
 int rzx_rollback( void );
 
 int rzx_rollback_to( void );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_RZX_H */

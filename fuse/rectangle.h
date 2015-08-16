@@ -28,6 +28,10 @@
 #ifndef FUSE_RECTANGLE_H
 #define FUSE_RECTANGLE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* Used for grouping screen writes together */
 struct rectangle { int x,y; int w,h; };
 
@@ -37,5 +41,9 @@ extern size_t rectangle_inactive_count, rectangle_inactive_allocated;
 
 void rectangle_add( int y, int x, int w );
 void rectangle_end_line( int y );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_RECTANGLE_H */

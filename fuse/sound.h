@@ -28,6 +28,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 void sound_init( const char *device );
 void sound_pause( void );
 void sound_unpause( void );
@@ -61,5 +65,9 @@ extern int sound_stereo_ay;
 int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr );
 void sound_lowlevel_end( void );
 void sound_lowlevel_frame( libspectrum_signed_word *data, int len );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_SOUND_H */

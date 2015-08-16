@@ -28,6 +28,10 @@
 
 #include "memory.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* Types of breakpoint */
 typedef enum debugger_breakpoint_type {
   DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
@@ -148,5 +152,9 @@ debugger_breakpoint_add_event(
 /* Add events corresponding to all the time breakpoints to happen
    during this frame */
 int debugger_add_time_events( void );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_DEBUGGER_BREAKPOINT_H */

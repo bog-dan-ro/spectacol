@@ -28,6 +28,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 void tape_init( void );
 void tape_end( void );
 
@@ -79,5 +83,9 @@ extern int tape_playing;
 extern int tape_recording;
 
 extern int tape_edge_event;
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif

@@ -28,6 +28,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 typedef void (*module_reset_fn)( int hard_reset );
 typedef void (*module_romcs_fn)( void );
 typedef void (*module_snapshot_enabled_fn)( libspectrum_snap *snap );
@@ -53,5 +57,9 @@ void module_romcs( void );
 void module_snapshot_enabled( libspectrum_snap *snap );
 void module_snapshot_from( libspectrum_snap *snap );
 void module_snapshot_to( libspectrum_snap *snap );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_MODULE_H */

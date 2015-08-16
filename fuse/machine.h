@@ -35,6 +35,10 @@
 #include "peripherals/specdrum.h"
 #include "spectrum.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 typedef libspectrum_byte (*spectrum_unattached_port_fn)( void );
 
 /* How long do things take to happen; fields are pulled from libspectrum
@@ -107,5 +111,9 @@ int machine_load_rom( int page_num, const char *filename, const char *fallback,
 
 int machine_reset( int hard_reset );
 int machine_end( void );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_MACHINE_H */

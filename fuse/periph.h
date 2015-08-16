@@ -28,6 +28,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* The types of peripheral Fuse knows about */
 typedef enum periph_type {
   PERIPH_TYPE_UNKNOWN,
@@ -161,5 +165,9 @@ int periph_postcheck( void );
 /* Register debugger page/unpage events for a peripheral */
 void periph_register_paging_events( const char *type_string, int *page_event,
 				    int *unpage_event );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_PERIPH_H */

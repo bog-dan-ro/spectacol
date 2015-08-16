@@ -32,6 +32,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* Information about an event */
 typedef struct event_t {
   libspectrum_dword tstates;
@@ -90,5 +94,9 @@ const char *event_name( int type );
 
 /* Called on exit to clean up */
 void event_end( void );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_EVENT_H */

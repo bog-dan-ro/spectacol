@@ -28,6 +28,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* Are we currently recording a .psg file? */
 extern int psg_recording;
 
@@ -41,5 +45,9 @@ int psg_frame( void );
 int psg_write_register( libspectrum_byte reg, libspectrum_byte value );
 
 int psg_end( void );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_PSG_H */

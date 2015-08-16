@@ -28,6 +28,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 /* Register a new memory source */
 int memory_source_register( const char *description );
 
@@ -177,5 +181,9 @@ void memory_display_dirty_sinclair( libspectrum_word address,
                                     libspectrum_byte b );
 void memory_display_dirty_pentagon_16_col( libspectrum_word address,
                                            libspectrum_byte b );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_MEMORY_H */

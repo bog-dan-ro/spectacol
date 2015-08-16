@@ -26,6 +26,10 @@
 #ifndef FUSE_PROFILE_H
 #define FUSE_PROFILE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 extern int profile_active;
 
 void profile_init( void );
@@ -33,5 +37,9 @@ void profile_start( void );
 void profile_map( libspectrum_word pc );
 void profile_frame( libspectrum_dword frame_length );
 void profile_finish( const char *filename );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif			/* #ifndef FUSE_PROFILE_H */

@@ -26,6 +26,10 @@
 #ifndef FUSE_MEMPOOL_H
 #define FUSE_MEMPOOL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 extern const int MEMPOOL_UNTRACKED;
 
 void mempool_init( void );
@@ -43,5 +47,9 @@ void mempool_end( void );
 
 int mempool_get_pools( void );
 int mempool_get_pool_size( int pool );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_MEMPOOL_H */
