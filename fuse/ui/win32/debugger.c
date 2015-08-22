@@ -162,6 +162,11 @@ ui_debugger_activate( void )
   return 0;
 }
 
+void ui_breakpoints_updated( void )
+{
+    // TODO: Refreash debugger list here
+}
+
 static int
 hide_hidden_panes( void )
 {

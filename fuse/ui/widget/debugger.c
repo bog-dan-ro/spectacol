@@ -104,6 +104,11 @@ int ui_debugger_disassemble( libspectrum_word addr )
   return 0;
 }
 
+void ui_breakpoints_updated( void )
+{
+    // TODO: Refreash debugger list here
+}
+
 int widget_debugger_draw( void *data )
 {
   static const char state[][8] = {
