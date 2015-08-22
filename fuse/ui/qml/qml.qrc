@@ -57,5 +57,6 @@
         <file>qml/FiltersPage.qml</file>
         <file>qml/DebuggerPage.qml</file>
         <file>qml/DisassembleView.qml</file>
+        <file>qml/RegistersView.qml</file>
     </qresource>
 </RCC>

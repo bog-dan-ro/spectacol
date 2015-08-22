@@ -21,6 +21,9 @@
 
 #include <QQuickItem>
 #include <vector>
+class DisassambleModel;
+class BreakpointsModel;
+class QAbstractItemModel;
 
 class FuseScreen : public QQuickItem
 {
@@ -54,8 +57,6 @@ class FuseScreen : public QQuickItem
     Q_PROPERTY(QString DE_ READ DE_ WRITE setDE_ NOTIFY registersChanged)
     Q_PROPERTY(QString HL_ READ HL_ WRITE setHL_ NOTIFY registersChanged)
 
-    Q_PROPERTY(QStringList disassemble READ disassemble NOTIFY disassembleChanged)
-
 public:
     enum ErrorLevel {
         Info,
@@ -67,6 +68,7 @@ public:
 
 public:
     FuseScreen();
+    ~FuseScreen();
     bool paused() const;
     void setPaused(bool paused);
 
@@ -121,8 +123,6 @@ public:
     QString HL_() const;
     void setHL_(const QString &value);
 
-    QStringList disassemble() const;
-
 public slots:
     QUrl snapshotsPath() const;
     void load(const QUrl &filePath);
@@ -131,7 +131,12 @@ public slots:
     void hardReset();
     void quickSaveSnapshot();
     void quickLoadSnapshot();
+    void disassamble();
+    void disassamble(uint16_t address, uint16_t delta = -10, uint16_t length = 0xff);
     QString snapshotFileName(bool addExtension = true) const;
+    QAbstractItemModel *disassambleModel() const;
+    QAbstractItemModel *breakpointsModel() const;
+
 
 signals:
     void pausedChanged();
@@ -140,7 +145,8 @@ signals:
     void saveSnapshotEnabledChanged();
     void selectedFilterIndexChanged();
     void registersChanged();
-    void disassembleChanged();
+    void showDebugger();
+    void hideDebugger();
 
     void error(ErrorLevel level, const QString &message);
 
@@ -162,6 +168,8 @@ private:
     bool m_fullScreen = false;
     QString m_loadedFileName;
     mutable std::vector<int> m_supportedScalers;
+    DisassambleModel *m_disassambleModel;
+    BreakpointsModel *m_breakpointsModel;
 };
 
 extern FuseScreen *g_fuseEmulator;

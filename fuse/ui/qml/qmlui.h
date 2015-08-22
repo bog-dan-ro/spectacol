@@ -19,10 +19,22 @@
 #ifndef QMLUI_H
 #define QMLUI_H
 
+#include <QString>
+
 #include <functional>
+
+#include <debugger/debugger.h>
 
 typedef std::function<void()> SpectrumEventFunction;
 
 void pokeEvent(const SpectrumEventFunction &event);
+
+template <typename T>
+inline QString formatNumber(T nr)
+{
+    if (debugger_output_base == 10)
+        return QString::number(nr);
+    return QString(QLatin1Literal("%1")).arg(nr, sizeof(T) * 2, 16, QLatin1Char('0')).toUpper();
+}
 
 #endif // QMLUI_H

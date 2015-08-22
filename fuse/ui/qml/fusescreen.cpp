@@ -18,10 +18,11 @@
 
 #include "fusescreen.h"
 
+#include "breakpointsmodel.h"
+#include "disassamblemodel.h"
 #include "fusetexture.h"
 #include "qmlui.h"
 
-#include <debugger/debugger.h>
 #include <fuse.h>
 #include <input.h>
 #include <keyboard.h>
@@ -64,14 +65,6 @@ static void destroy_mutex(libspectrum_mutex_t mutex)
     delete reinterpret_cast<std::mutex*>(mutex);
 }
 
-template <typename T>
-inline QString formatNumber(T nr)
-{
-    if (debugger_output_base == 10)
-        return QString::number(nr);
-    return QString(QLatin1Literal("%1")).arg(nr, sizeof(T) * 2, 16, QLatin1Char('0')).toUpper();
-}
-
 #define setRegisterValue(reg) \
     bool ok; \
     int val = value.toInt(&ok); \
@@ -108,6 +101,14 @@ FuseScreen::FuseScreen()
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
     setDataPath(dataPath());
+    m_disassambleModel = new DisassambleModel(this);
+    m_breakpointsModel = new BreakpointsModel(this);
+}
+
+FuseScreen::~FuseScreen()
+{
+    delete m_disassambleModel;
+    delete m_breakpointsModel;
 }
 
 bool FuseScreen::paused() const
@@ -352,7 +353,6 @@ void FuseScreen::setDE_(const QString &value)
 
 QString FuseScreen::HL_() const
 {
-    disassemble();
     return formatNumber(z80.hl_.w);
 }
 
@@ -361,20 +361,30 @@ void FuseScreen::setHL_(const QString &value)
     setRegisterValue(z80.hl_.w);
 }
 
-QStringList FuseScreen::disassemble() const
+QAbstractItemModel *FuseScreen::disassambleModel() const
 {
-    QStringList ret;
-    libspectrum_word address = z80.pc.w;
-    char buff[100];
-    size_t len;
-    for (int i = 0; i< 0xffff; i++) {
-        debugger_disassemble(buff, sizeof(buff), &len, address);
-        ret.push_back(formatNumber(address) + QLatin1Literal(" ") + buff);
-        qDebug() << len << ret.last();
-        address += len;
-    }
-    return ret;
+    return m_disassambleModel;
 }
+
+QAbstractItemModel *FuseScreen::breakpointsModel() const
+{
+    return m_breakpointsModel;
+}
+
+//QStringList FuseScreen::disassemble() const
+//{
+//    QStringList ret;
+//    libspectrum_word address = z80.pc.w;
+//    char buff[100];
+//    size_t len;
+//    for (int i = 0; i< 0xffff; i++) {
+//        debugger_disassemble(buff, sizeof(buff), &len, address);
+//        ret.push_back(formatNumber(address) + QLatin1Literal(" ") + buff);
+//        qDebug() << len << ret.last();
+//        address += len;
+//    }
+//    return ret;
+//}
 
 QUrl FuseScreen::snapshotsPath() const
 {
@@ -418,12 +428,16 @@ void FuseScreen::save(const QUrl &filePath)
 
 void FuseScreen::reset()
 {
-    machine_reset(0);
+    pokeEvent([]() {
+        machine_reset(0);
+    });
 }
 
 void FuseScreen::hardReset()
 {
-    machine_reset(1);
+    pokeEvent([]() {
+        machine_reset(1);
+    });
 }
 
 void FuseScreen::quickSaveSnapshot()
@@ -439,6 +453,20 @@ void FuseScreen::quickLoadSnapshot()
     const auto &list = dir.entryInfoList(QDir::Files, QDir::Time);
     if (list.size())
         load(QUrl::fromLocalFile(list.first().filePath()));
+}
+
+void FuseScreen::disassamble()
+{
+    disassamble(z80.pc.w);
+}
+
+void FuseScreen::disassamble(uint16_t address, uint16_t delta, uint16_t length)
+{
+    pokeEvent([address, delta, length, this]{
+        fuse_emulation_pause();
+        m_disassambleModel->disassamble(address, delta, length);
+        fuse_emulation_unpause();
+    });
 }
 
 QString FuseScreen::snapshotFileName(bool addExtension) const

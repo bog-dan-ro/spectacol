@@ -23,13 +23,17 @@ SOURCES += main.cpp \
     ../../sound/alsasound.c \
     ../../timer/timer.c \
     ../../compat/unix/tuntap.c \
-    spectrumscreen.cpp
+    spectrumscreen.cpp \
+    disassamblemodel.cpp \
+    breakpointsmodel.cpp
 
 HEADERS += \
     fusetexture.h \
     fusescreen.h \
     qmlui.h \
-    spectrumscreen.h
+    spectrumscreen.h \
+    disassamblemodel.h \
+    breakpointsmodel.h
 
 RESOURCES += qml.qrc
 
