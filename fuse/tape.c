@@ -81,7 +81,6 @@ static int record_event;
 static int tape_autoload( libspectrum_machine hardware );
 static int trap_load_block( libspectrum_tape_block *block );
 static int tape_play( int autoplay );
-static int trap_check_rom( void );
 static void make_name( unsigned char *name, const unsigned char *data );
 static void
 tape_event_record_sample( libspectrum_dword last_tstates, int type,
@@ -337,7 +336,7 @@ int tape_load_trap( void )
   if( !settings_current.tape_traps || tape_playing ) return 2;
 
   /* Do nothing if we're not in the correct ROM */
-  if( ! trap_check_rom() ) return 3;
+  if( !trap_check_rom( CHECK_TAPE_ROM ) ) return 3;
 
   /* Return with error if no tape file loaded */
   if( !libspectrum_tape_present( tape ) ) return 1;
@@ -513,7 +512,7 @@ int tape_save_trap( void )
   if( !settings_current.tape_traps || tape_recording ) return 2;
 
   /* Check we're in the right ROM */
-  if( ! trap_check_rom() ) return 3;
+  if( !trap_check_rom( CHECK_TAPE_ROM ) ) return 3;
 
   block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_ROM );
   
@@ -555,74 +554,6 @@ int tape_save_trap( void )
 
   return 0;
 
-}
-
-/* Check whether we're actually in the right ROM when a tape trap hit */
-static int
-trap_check_rom( void )
-{
-  if( plusd_available && plusd_active )
-    return 0;		/* +D must not be active */
-
-  if( disciple_available && disciple_active )
-    return 0;		/* DISCiPLE must not be active */
-
-  if( opus_available && opus_active )
-    return 0;		/* Opus must not be active */
-
-  if( memory_custom_rom() )
-    return 0;           /* and we can't be using a custom ROM */
-
-  switch( machine_current->machine ) {
-  case LIBSPECTRUM_MACHINE_16:
-  case LIBSPECTRUM_MACHINE_48:
-  case LIBSPECTRUM_MACHINE_48_NTSC:
-  case LIBSPECTRUM_MACHINE_SE:
-  case LIBSPECTRUM_MACHINE_TC2048:
-    return 1;		/* Always OK here */
-
-  case LIBSPECTRUM_MACHINE_TC2068:
-  case LIBSPECTRUM_MACHINE_TS2068:
-    /* OK if we're in the EXROM (location of the tape routines) */
-    return( memory_map_read[0].source == memory_source_exrom );
-
-  case LIBSPECTRUM_MACHINE_128:
-  case LIBSPECTRUM_MACHINE_PLUS2:
-    /* OK if we're in ROM 1 */
-    return( machine_current->ram.current_rom == 1 );
-
-  case LIBSPECTRUM_MACHINE_PLUS2A:
-  case LIBSPECTRUM_MACHINE_PLUS3:
-  case LIBSPECTRUM_MACHINE_PLUS3E:
-    /* OK if we're not in a 64Kb RAM configuration and we're in
-       ROM 3 */
-    return( ! machine_current->ram.special &&
-	    machine_current->ram.current_rom == 3 );
-
-  case LIBSPECTRUM_MACHINE_128E:
-    /* OK if we're not in a 64Kb RAM configuration and we're in
-       either ROM 1 or ROM 3 (which are the same) */
-    return( ! machine_current->ram.special &&
-	    ( machine_current->ram.current_rom == 1 ||
-              machine_current->ram.current_rom == 3    ));
-
-  case LIBSPECTRUM_MACHINE_PENT:
-  case LIBSPECTRUM_MACHINE_PENT512:
-  case LIBSPECTRUM_MACHINE_PENT1024:
-  case LIBSPECTRUM_MACHINE_SCORP:
-    /* OK if we're in ROM 1 and the Beta disk interface is not active */
-    return( machine_current->ram.current_rom == 1 && !beta_active );
-
-  case LIBSPECTRUM_MACHINE_UNKNOWN:	/* should never happen */
-    ui_error( UI_ERROR_ERROR,
-	      "trap_check_rom: machine type is LIBSPECTRUM_MACHINE_UNKNOWN" );
-    fuse_abort();
-
-  }
-
-  ui_error( UI_ERROR_ERROR, "trap_check_rom: unknown machine type %d",
-	    machine_current->machine );
-  fuse_abort();
 }
 
 static int

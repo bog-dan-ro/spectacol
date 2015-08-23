@@ -4931,3 +4931,7 @@
          the 0x4000 - 0x7FFF range (thanks, rga24 from WoS) (Fred).
 20150803 peripherals/printer.c: make the partial decode ZX Printer not require a
          hard reset to enable (thanks, RMartins) (Fred).
+20150824 Makefile.am,fuse.c,man/fuse.1,memory.[c|h],menu.[c|h],menu_data.dat,
+         svg.[c|h],tape.c,ui.c,ui/{gtk/gtkui.c,ui.h,widget/widget.c,
+         win32/win32ui.c},z80/{coretest.c,z80_checks.h,z80_ops.c}: capture BASIC
+         video functions to SVG file (patch #322) (Stefano Bodrato).

@@ -46,6 +46,7 @@
 #include "rzx.h"
 #include "settings.h"
 #include "slt.h"
+#include "svg.h"
 #include "tape.h"
 #include "z80.h"
 
@@ -320,6 +321,12 @@ z80_do_opcodes( void )
       opcode = 0xc7;	/* RST 00 */
       didaktik80_snap = 0; /* FIXME: this should be a time-based reset */
     }
+
+    END_CHECK
+
+    CHECK( svg_capture, svg_capture_active )
+
+    svg_capture();
 
     END_CHECK
 

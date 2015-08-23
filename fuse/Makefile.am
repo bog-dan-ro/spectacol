@@ -50,6 +50,7 @@ fuse_SOURCES = display.c \
 	snapshot.c \
 	sound.c \
 	spectrum.c \
+	svg.c \
 	tape.c \
 	ui.c \
 	uidisplay.c \
@@ -114,6 +115,7 @@ noinst_HEADERS = bitmap.h \
 	snapshot.h \
 	sound.h \
 	spectrum.h \
+	svg.h \
 	tape.h \
 	utils.h \
 	options.h \

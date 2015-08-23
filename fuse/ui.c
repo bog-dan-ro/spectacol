@@ -49,8 +49,10 @@ int ui_widget_level = -1;
 static char last_message[ MESSAGE_MAX_LENGTH ] = "";
 static size_t frames_since_last_message = 0;
 
+#ifndef UI_WIN32
 static int
 print_error_to_stderr( ui_error_level severity, const char *message );
+#endif			/* #ifndef UI_WIN32 */
 
 int
 ui_error( ui_error_level severity, const char *format, ... )
@@ -217,6 +219,12 @@ struct menu_item_entries {
 };
 
 static const struct menu_item_entries menu_item_lookup[] = {
+
+  { UI_MENU_ITEM_FILE_SVG_CAPTURE,
+    "/File/Scalable Vector Graphics/Stop capture",
+    "/File/Scalable Vector Graphics/Start capture in dot mode...", 1,
+    "/File/Scalable Vector Graphics/Start capture in line mode...", 1
+  },
 
   { UI_MENU_ITEM_FILE_MOVIE_RECORDING, "/File/Movie/Stop",
     "/File/Movie/Pause", 0,

@@ -294,7 +294,9 @@ gtkui_make_menu(GtkAccelGroup **accel_group,
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
   ui_menu_activate( UI_MENU_ITEM_TAPE_RECORDING, 0 );
-
+#ifdef HAVE_LIB_XML2
+  ui_menu_activate( UI_MENU_ITEM_FILE_SVG_CAPTURE, 0 );
+#endif
   return FALSE;
 }
 

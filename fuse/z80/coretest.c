@@ -567,6 +567,14 @@ spectranet_nmi_flipflop( void )
   return 0;
 }
 
+int svg_capture_active = 0;     /* SVG capture enabled? */
+
+void
+svg_capture( void )
+{
+  abort();
+}
+
 int
 rzx_frame( void )
 {

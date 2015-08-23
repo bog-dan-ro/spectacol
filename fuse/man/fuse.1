@@ -1954,6 +1954,35 @@ Save the current screen as a PNG file. You will be prompted for a
 filename to save the screenshot to.
 .RE
 .PP
+.I "File, Scalable Vector Graphics, Start capture in line mode..."
+.RS
+Start trapping the video output functions present in ROM to copy the
+picture to SVG files, thus creating vectorized scalable picture; it is
+expected to be fully operational in BASIC only, but few machine code
+programs could work, if they use the ROM addresses to output text or
+graphics. The initial picture size is 256\(mu176, but it is increased
+everytime a `scroll' happens. On every CLS a new file will be created,
+with an increasing sequence number. CIRCLEs will be described as a
+sequence of lines, so the original `imprecisions' will be still visible.
+The text output will be fully understood and decoded: normal ASCII
+characters will be converted into COURIER scalable fonts, UDG graphics
+into dot matrix areas, GRAPHICS blocky characters into small squares.
+A slightly transparent output permits to show a bit of the overlapped
+text and graphics elements. Lower portion of the screen (normally bound
+to stream #0 and #1) won't be captured.
+.RE
+.PP
+.I "File, Scalable Vector Graphics, Start capture in dot mode..."
+.RS
+As above, but line capture is disabled. A line will be rendered as a
+sequence of dots.
+.RE
+.PP
+.I "File, Scalable Vector Graphics, Stop capture"
+.RS
+Stop the SVG capture function.
+.RE
+.PP
 .I "File, Movie, Record..."
 .RS
 Fuse can record movie (video and audio) into a file with special format 

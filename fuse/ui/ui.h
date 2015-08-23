@@ -41,6 +41,7 @@
 #include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
+#include "svg.h"
 #include "ui/scaler/scaler.h"
 
 /* The various severities of error level, increasing downwards */
@@ -134,6 +135,7 @@ int ui_get_rollback_point( GSList *points );
 typedef enum ui_menu_item {
 
   UI_MENU_ITEM_INVALID = 0,
+  UI_MENU_ITEM_FILE_SVG_CAPTURE,
   UI_MENU_ITEM_FILE_MOVIE_RECORDING,
   UI_MENU_ITEM_FILE_MOVIE_PAUSE,
   UI_MENU_ITEM_MACHINE_PROFILER,

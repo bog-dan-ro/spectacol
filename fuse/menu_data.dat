@@ -50,6 +50,13 @@ File/S_ave Screen as SCR..., Item
 File/Save S_creen as PNG..., Item
 #endif
 
+#ifdef HAVE_LIB_XML2
+File/Scalable _Vector Graphics, Branch
+File/Scalable Vector Graphics/Start capture in _line mode..., Item
+File/Scalable Vector Graphics/Start capture in _dot mode..., Item
+File/Scalable Vector Graphics/_Stop capture, Item
+#endif
+
 File/_Movie, Branch
 File/Movie/_Record..., Item
 File/Movie/R_ecord from RZX..., Item,, menu_file_movie_record_recordfromrzx

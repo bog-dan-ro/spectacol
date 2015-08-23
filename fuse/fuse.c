@@ -51,6 +51,10 @@
 #include <fat.h>
 #endif				/* #ifdef GEKKO */
 
+#ifdef HAVE_LIB_XML2
+#include <libxml/encoding.h>
+#endif
+
 #include "debugger/debugger.h"
 #include "display.h"
 #include "event.h"
@@ -276,6 +280,10 @@ static int fuse_init(int argc, char **argv)
 
   mempool_init();
   memory_init();
+
+#ifdef HAVE_LIB_XML2
+LIBXML_TEST_VERSION
+#endif
 
   debugger_init();
 
@@ -888,6 +896,8 @@ static int fuse_end(void)
   mempool_end();
   module_end();
   pokemem_end();
+
+  svg_capture_end();
 
   libspectrum_creator_free( fuse_creator );
   libspectrum_end();
