@@ -9,35 +9,63 @@ ListView {
 
     snapMode: ListView.SnapToItem
     highlightFollowsCurrentItem: true
-    highlightRangeMode: ListView.ApplyRange
 
-    Keys.onLeftPressed: decrementCurrentIndex()
-    Keys.onRightPressed: incrementCurrentIndex()
+    currentIndex: disassambleModel.delta
 
-    model: fuse.disassambleModel()
-//    currentIndex: fuse.selectedFilterIndex
-//    onCurrentIndexChanged: fuse.selectedFilterIndex = currentIndex
+    Keys.onUpPressed: {
+        if (view.currentIndex !== 0)
+            decrementCurrentIndex();
+        else
+            fuse.disassambleFetchUp(1);
+    }
+
+    Keys.onDownPressed: incrementCurrentIndex()
+
+    model: disassambleModel
 
     delegate: Rectangle {
+        property color paper: view.currentIndex !== index ? background : selectedBackground
+        property color ink: view.currentIndex !== index ? foreground : selectedForeground
+
         width: view.width
         height: 7 * Screen.pixelDensity
-        color: backgroud
+        color: paper
         RowLayout {
             anchors.fill: parent
             FancyText {
                 Layout.fillHeight: true
+                Layout.fillWidth: false
                 horizontalAlignment: Text.AlignRight
                 fontSize: 4
-                color: foreground
-                text: addressText
+                style: Text.Normal
+                Layout.preferredWidth: 14 * Screen.pixelDensity
+                color: ink
+                text: model.address
             }
+
+            Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
+
+            FancyText {
+                Layout.fillHeight: true
+                Layout.fillWidth: false
+                Layout.preferredWidth: 15 * Screen.pixelDensity
+                horizontalAlignment: Text.AlignHCenter
+                fontSize: 2.5
+                style: Text.Normal
+                color: ink
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                text: model.bytes
+            }
+
+            Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
+
             FancyText {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignLeft
                 fontSize: 4
-                color: foreground
-                text: disassable
+                color: ink
+                text: model.disassable
             }
         }
         MouseArea {

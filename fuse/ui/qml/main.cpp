@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "fuseemulator.h"
 #include "fusescreen.h"
 #include "spectrumscreen.h"
 
@@ -42,6 +43,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<FuseScreen>("Fuse", 1, 0, "FuseScreen");
 
     QQmlApplicationEngine engine;
+    FuseEmulator fuse(engine.rootContext());
     engine.addImageProvider("spectrum", new SpectrumScreenImageProvider);
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 

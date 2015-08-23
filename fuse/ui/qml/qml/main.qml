@@ -52,11 +52,10 @@ ApplicationWindow {
         anchors.fill: parent
         color: "black"
         FuseScreen {
-            id: fuse
+            id: fuseScreen
             focus: true
             anchors.fill: parent
             onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
-            onError: messagePage.showMessage(level, message);
 
             Loader {
                 id: pageLoader
@@ -81,6 +80,20 @@ ApplicationWindow {
         MessagePage {
             id: messagePage
             z: 100
+            Connections {
+                target: fuse
+                onError: messagePage.showMessage(level, message);
+            }
         }
+    }
+
+    Connections {
+        target: fuse
+        onShowDebugger: pageLoader.source = "DebuggerPage.qml";
+    }
+
+    Connections {
+        target: fuse
+        onHideDebugger: pageLoader.source = "";
     }
 }

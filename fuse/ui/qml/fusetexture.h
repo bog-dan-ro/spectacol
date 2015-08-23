@@ -24,15 +24,8 @@
 #include <qopengl.h>
 #include <QMutex>
 #include <QSGTexture>
-#include <QThread>
 
 #include <memory>
-
-class FuseThread : public QThread
-{
-protected:
-    void run();
-};
 
 class FuseTexture : public QSGTexture
 {
@@ -79,7 +72,6 @@ private:
     bool m_recreate = false;
     bool m_update = false;
     bool m_fullScreen = false;
-    FuseThread m_fuseThread;
     QMutex m_copyPixelsMutex;
     QMutex m_syncVars;
 };

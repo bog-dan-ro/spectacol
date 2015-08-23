@@ -5,7 +5,8 @@ import QtQuick.Layouts 1.1
 import QtQuick.Window 2.0
 
 Item {
-    Component.onCompleted: fuse.disassamble();
+    Component.onDestruction: fuse.debuggerRun()
+
     readonly property color backgroudColor : Qt.rgba(0, 0, 0, 0.85);
     ColumnLayout {
         spacing: 2.5 * Screen.pixelDensity
@@ -18,32 +19,19 @@ Item {
                 id: dissasambleRect
                 color: backgroudColor
                 radius: Screen.pixelDensity
-                border.width: (focus ? 1 : 0.5) * Screen.pixelDensity
+                border.width: (disassembleView.focus ? 1 : 0.5) * Screen.pixelDensity
                 border.color: "white"
-                activeFocusOnTab: true
-                focus: true
 
-                width: 50 * Screen.pixelDensity
+                width: 65 * Screen.pixelDensity
                 Layout.fillHeight: true
 
-                ListView {
-                    id: view
-                    clip: true
-                    model: fuse.disassambleModel()
-                    delegate: Rectangle {
-                        width: view.width
-                        height: 7 * Screen.pixelDensity
-                        color: "black"
-                        Text {
-                            text: qsTr("text");
-                            color: "white"
-                        }
-                    }
+                DisassembleView {
+                    id: disassembleView
+                    anchors.fill: parent
+                    anchors.margins: parent.border.width
+                    activeFocusOnTab: true
+                    focus: true
                 }
-//                DisassembleView {
-//                    id: disassembleView
-//                    anchors.fill: parent
-//                }
             }
             Item {
                 Layout.fillWidth: true

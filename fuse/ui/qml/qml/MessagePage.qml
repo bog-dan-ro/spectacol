@@ -36,15 +36,15 @@ Rectangle {
     function showMessage(level, text) {
         var msg = "";
         switch(level) {
-        case FuseScreen.Info:
+        case fuse.Info:
             msg = qsTr("<b>Info:</b> ");
             break;
 
-        case FuseScreen.Warning:
+        case fuse.Warning:
             msg = qsTr("<b>Warning:</b> ");
             break;
 
-        case FuseScreen.Error:
+        case fuse.Error:
             msg = qsTr("<b>Error:</b> ");
             break;
         }

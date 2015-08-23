@@ -12,7 +12,9 @@
 class DisassambleModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_ENUMS(Origin)
 
+    Q_PROPERTY(int delta READ delta NOTIFY deltaChanged)
     enum {
         Background = Qt::BackgroundColorRole + 1,
         Foreground = Qt::ForegroundRole + 1,
@@ -40,8 +42,7 @@ class DisassambleModel : public QAbstractListModel
         DisassambleData(uint16_t address,
                         const QString &bytes,
                         const QString &disassamble,
-                        DisassambleDataType type
-                        );
+                        DisassambleDataType type);
         QColor background, foreground;
         uint16_t address;
         QString bytes;
@@ -49,26 +50,40 @@ class DisassambleModel : public QAbstractListModel
     };
 
 public:
+    enum Origin {
+        Start,
+        End
+    };
+
+public:
     DisassambleModel(QObject *parent);
 
-    void disassamble(uint16_t address, uint16_t delta = -10, uint16_t length = 0xff);
+    void disassamble(uint16_t address, int delta = -10, uint16_t length = 0xff);
     void refresh();
+    void disassambleMore(Origin origin, int size);
 
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
+    bool canFetchMore(const QModelIndex &parent) const;
+    void fetchMore(const QModelIndex &parent);
+
+    int delta() const { return -m_delta; }
+
+signals:
+    void deltaChanged();
+
+protected:
     QHash<int, QByteArray> roleNames() const;
 
 private:
     static QColor color(ColorType colorType, DisassambleDataType type);
-
-signals:
-    void rowCountChanged() const;
+    void disassambleTemp(uint16_t address, int delta, uint16_t length);
 
 private:
-    uint16_t m_address;
-    uint16_t m_delta;
-    uint16_t m_length;
+    uint16_t m_address = 0;
+    int m_delta = 0;
+    uint16_t m_length = 0;
     mutable std::mutex m_mutex;
     std::vector<DisassambleData> m_disassambleData, m_disassambleDataTemp;
 };

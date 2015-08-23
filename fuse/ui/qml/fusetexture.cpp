@@ -17,8 +17,8 @@
 */
 
 #include "fusetexture.h"
+#include "fuseemulator.h"
 
-#include <QCoreApplication>
 #include <QSemaphore>
 #include <QDebug>
 #include <QTimer>
@@ -138,13 +138,11 @@ extern "C" void uidisplay_frame_restore( void )
 
 FuseTexture::FuseTexture()
 {
-    m_fuseThread.start(QThread::HighPriority);
+    g_fuseEmulator->startFuseThread();
 }
 
 FuseTexture::~FuseTexture()
 {
-    fuse_exiting = 1;
-    m_fuseThread.wait();
     delete[] m_spectrumPixels;
     delete[] m_spectrumScaledPixels;
     delete[] m_savedSpectrumPixels;
@@ -406,6 +404,11 @@ QRect FuseTexture::updateGlPixels()
 
     int x = m_updateRect.x(), y = m_updateRect.y(), w = m_updateRect.width(), h = m_updateRect.height();
     m_updateRect = QRect();
+    Q_ASSERT(x>= 0);
+    Q_ASSERT(y>= 0);
+    Q_ASSERT(w<= w);
+    Q_ASSERT(h<= h);
+
     if (!w)
         w = m_width;
     if (!h)
@@ -438,27 +441,13 @@ QRect FuseTexture::updateGlPixels()
     }
 
     int glPitch = m_recreate ? m_texSize.width() : copy_w * m_scale;
+    const size_t copy_sz = copy_w * m_scale * sizeof(uint16_t);
     for (u_int32_t i = 0; i < copy_h * m_scale; i++) {
-        memcpy(glPixels, spectrumPixels, glPitch * sizeof(uint16_t));
+        memcpy(glPixels, spectrumPixels, copy_sz);
         glPixels += glPitch;
         spectrumPixels += specPitch;
     }
     m_update = false;
     m_recreate = false;
     return QRect(copy_x * m_scale, copy_y * m_scale, copy_w * m_scale, copy_h * m_scale);
-}
-
-
-void FuseThread::run()
-{
-    int argc = 0;
-    auto args = QCoreApplication::arguments();
-    std::vector<QByteArray> argsVector(args.size());
-    const char *argv[args.size()];
-    foreach (const QString &arg, args) {
-        argsVector.push_back(arg.toLocal8Bit());
-        argv[argc++] = argsVector.back().constData();
-    }
-    fuse_main(argc, argv);
-    qApp->quit();
 }

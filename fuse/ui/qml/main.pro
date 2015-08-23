@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     ../../compat/unix/tuntap.c \
     spectrumscreen.cpp \
     disassamblemodel.cpp \
-    breakpointsmodel.cpp
+    breakpointsmodel.cpp \
+    fuseemulator.cpp
 
 HEADERS += \
     fusetexture.h \
@@ -33,7 +34,8 @@ HEADERS += \
     qmlui.h \
     spectrumscreen.h \
     disassamblemodel.h \
-    breakpointsmodel.h
+    breakpointsmodel.h \
+    fuseemulator.h
 
 RESOURCES += qml.qrc
 
@@ -41,3 +43,7 @@ RESOURCES += qml.qrc
 QML_IMPORT_PATH =
 
 LIBS = $$PWD/../../libfuse.a $$PWD/../../../install/lib/libspectrum.a -lxml2 -lz -lpng -lbz2 -lasound
+
+QMAKE_CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+QMAKE_CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+QMAKE_LFLAGS += -fsanitize=address

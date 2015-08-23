@@ -123,7 +123,7 @@ Menu {
             text: "Toggle Full Screen"
             onTriggered: {
                 menuBar.open = false;
-                fuse.fullScreen = !fuse.fullScreen;
+                fuseScreen.fullScreen = !fuseScreen.fullScreen;
             }
         }
     }
@@ -148,7 +148,7 @@ Menu {
             text: qsTr("Debugger")
             onTriggered: {
                 menuBar.open = false;
-                pageLoader.source = "DebuggerPage.qml";
+                fuse.debuggerTrap();
             }
         }
         MenuItem {

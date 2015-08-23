@@ -1,7 +1,7 @@
 #include "breakpointsmodel.h"
 
 #include "disassamblemodel.h"
-#include "fusescreen.h"
+#include "fuseemulator.h"
 #include "machine.h"
 #include "qmlui.h"
 
@@ -12,20 +12,23 @@
 DisassambleModel::DisassambleModel(QObject *parent)
     : QAbstractListModel(parent)
 {
+    qRegisterMetaType<Origin>("Origin");
 }
 
-void DisassambleModel::disassamble(uint16_t address, uint16_t delta, uint16_t length)
+void DisassambleModel::disassamble(uint16_t address, int delta, uint16_t length)
 {
-    if (delta)
+    if (address && delta)
         address = debugger_search_instruction(address, delta);
+    else
+        delta = 0;
 
-    BreakpointsModel* breakpointsModel = static_cast<BreakpointsModel*>(g_fuseEmulator->breakpointsModel());
+    BreakpointsModel* breakpointsModel = g_fuseEmulator->breakpointsModel();
     std::lock_guard<std::mutex> lock(m_mutex);
     std::lock_guard<std::mutex> lockBreakpoints(breakpointsModel->breakpointsMutex());
     m_address = address;
     m_delta = delta;
     m_length = length;
-    m_disassambleData.clear();
+    m_disassambleDataTemp.clear();
 
     char buff[100];
     size_t len = 0;
@@ -56,13 +59,14 @@ void DisassambleModel::disassamble(uint16_t address, uint16_t delta, uint16_t le
         address += len;
         length -= len;
     }
+
     QTimer::singleShot(0, this, [this](){
         beginResetModel();
         std::lock_guard<std::mutex> lock(m_mutex);
         m_disassambleData = std::move(m_disassambleDataTemp);
         m_disassambleDataTemp.clear();
         endResetModel();
-        emit rowCountChanged();
+        emit deltaChanged();
     });
 }
 
@@ -71,9 +75,14 @@ void DisassambleModel::refresh()
     disassamble(m_address, m_delta, m_length);
 }
 
+void DisassambleModel::disassambleMore(DisassambleModel::Origin origin, int size)
+{
+
+}
+
 int DisassambleModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent)
+    Q_ASSERT(!parent.isValid());
     return m_disassambleData.size();
 }
 
@@ -91,8 +100,11 @@ QVariant DisassambleModel::data(const QModelIndex &index, int role) const
     case SelectedBackground:
         return dd.foreground;
 
+    case AddressText:
+        return formatNumber(dd.address);
+
     case Address:
-        return dd.address;
+        return (int)dd.address;
 
     case Bytes:
         return dd.bytes;
@@ -103,6 +115,20 @@ QVariant DisassambleModel::data(const QModelIndex &index, int role) const
         break;
     }
     return QVariant();
+}
+
+bool DisassambleModel::canFetchMore(const QModelIndex &parent) const
+{
+    Q_ASSERT(!parent.isValid());
+    return m_address + m_length < 0xffff;
+}
+
+void DisassambleModel::fetchMore(const QModelIndex &parent)
+{
+    Q_ASSERT(!parent.isValid());
+    pokeEvent([this]{
+        disassambleMore(End, 50);
+    });
 }
 
 QHash<int, QByteArray> DisassambleModel::roleNames() const
@@ -136,7 +162,7 @@ QColor DisassambleModel::color(DisassambleModel::ColorType colorType, Disassambl
     case Paper:
         switch (type) {
         case NormalLine:
-            return Qt::black;
+            return QColor(0, 0, 0, 200);
         case BreakExec:
             return Qt::red;
         case BreakRead:
@@ -148,6 +174,11 @@ QColor DisassambleModel::color(DisassambleModel::ColorType colorType, Disassambl
     }
     Q_ASSERT(false);
     return QColor();
+}
+
+void DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t length)
+{
+
 }
 
 DisassambleModel::DisassambleData::DisassambleData(uint16_t address, const QString &bytes, const QString &disassamble, DisassambleModel::DisassambleDataType type)
