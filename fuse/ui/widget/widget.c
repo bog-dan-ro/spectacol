@@ -167,14 +167,6 @@ widget_char( int pp )
   return &widget_font[ pp >> 8 ][ pp & 255 ];
 }
 
-static size_t
-widget_left_one_char( const char *s, size_t index )
-{
-  if( index == -1 ) index = strlen( s );
-  if( !index ) return 0;
-  return index - 1;
-}
-
 static int
 printchar( int x, int y, int col, int ch )
 {

@@ -4935,3 +4935,4 @@
          svg.[c|h],tape.c,ui.c,ui/{gtk/gtkui.c,ui.h,widget/widget.c,
          win32/win32ui.c},z80/{coretest.c,z80_checks.h,z80_ops.c}: capture BASIC
          video functions to SVG file (patch #322) (Stefano Bodrato).
+20150824 ui/widget/widget.c: remove unused function (Sergio).
