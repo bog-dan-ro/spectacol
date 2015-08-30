@@ -1019,3 +1019,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          Autoconf Archive (Stuart).
 20150617 Makefile.am,test/Makefile.am: enable silent rules for perl and windres
          commands (Sergio).
+20150831 test/turbo-zeropilot.tzx: add mime-type property (Sergio).
