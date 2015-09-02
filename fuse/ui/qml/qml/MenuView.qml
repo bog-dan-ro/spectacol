@@ -3,22 +3,69 @@ import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 
-Column {
+ColumnLayout {
     property Menu rootMenu: null
     property Menu currentMenu: rootMenu
     property var menus: []
     property real parentWidth: 50
 
+    function decrementCurrentIndex()
+    {
+        menuView.decrementCurrentIndex();
+    }
+
+    function incrementCurrentIndex()
+    {
+        menuView.incrementCurrentIndex();
+    }
+
+    function openMenu(menu, index)
+    {
+        if (menu.type === MenuItemType.Menu)
+            pushMenu(menu, index);
+        else if (menu.type === MenuItemType.Item)
+            menu.trigger();
+    }
+
+    function openSelectedMenu()
+    {
+        if (menuView.currentIndex !== -1)
+            openMenu(menuModel.get(menuView.currentIndex).modelData, menuView.currentIndex);
+    }
+
+    ListModel {
+        id: menuModel
+    }
+
+    onCurrentMenuChanged: {
+        menuModel.clear();
+        if (currentMenu !== null) {
+            var i, items = currentMenu.items, len = currentMenu.items.length;
+            var currentIndex = -1;
+            for (i = 0; i < len; ++i) {
+                var item = items[i];
+                if (currentIndex == -1 && item.visible)
+                    currentIndex = i;
+                menuModel.append({"modelData": item});
+            }
+            menuView.currentIndex = currentIndex;
+        } else {
+            menuView.currentIndex = -1;
+        }
+    }
+
+
     function reset()
     {
+        currentMenu = null;
         currentMenu = rootMenu;
         menus = [];
         showParentMenu();
     }
 
-    function pushMenu(menu)
+    function pushMenu(menu, index)
     {
-        menus.push(currentMenu);
+        menus.push({"menu": currentMenu, "index": index});
         currentMenu = menu;
         showParentMenu();
     }
@@ -27,8 +74,12 @@ Column {
     {
         if (menus.length) {
             var menu = menus.pop();
-            currentMenu = menu;
+            currentMenu = menu.menu;
+            menuView.currentIndex = menu.index;
             showParentMenu();
+        } else {
+            reset();
+            menuBar.open = false;
         }
     }
 
@@ -48,8 +99,8 @@ Column {
     spacing: 0.5 * Screen.pixelDensity
 
     Rectangle {
-        width: parentWidth
-        height: 10 * Screen.pixelDensity
+        Layout.fillWidth: true
+        Layout.preferredHeight: 10 * Screen.pixelDensity
         border.width: 0.25 * Screen.pixelDensity
         border.color: "black"
         color: Qt.rgba(0.25, 0.25, 0.25, 0.75);
@@ -65,17 +116,24 @@ Column {
         }
     }
 
-    Repeater {
-        id: repeater
-        model: currentMenu.items
+    ListView {
+        id: menuView
+        clip: true
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
+        snapMode: ListView.SnapToItem
+        highlightFollowsCurrentItem: true
+
+        model: menuModel
         delegate: Rectangle {
-            visible: modelData.visible
             id: menuItemRect
+            visible: modelData.visible
             width: parentWidth
-            height: 9 * Screen.pixelDensity
+            height: visible ? 9 * Screen.pixelDensity : 0
             border.width: 0.25 * Screen.pixelDensity
-            border.color: "black"
-            color: Qt.rgba(0.25, 0.25, 0.25, 0.75);
+            border.color: (index !== menuView.currentIndex) ? "black" : "lightgreen"
+            color: (index !== menuView.currentIndex) ? Qt.rgba(0.25, 0.25, 0.25, 0.75) : Qt.rgba(0.0, 0.85, 0.0, 0.75)
 
             RowLayout {
                 anchors.fill: parent
@@ -95,13 +153,7 @@ Column {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: {
-                    if (modelData.type === MenuItemType.Menu) {
-                        pushMenu(modelData);
-                    } else if (modelData.type === MenuItemType.Item) {
-                        modelData.trigger();
-                    }
-                }
+                onClicked: openMenu(menuData, index)
             }
         }
     }

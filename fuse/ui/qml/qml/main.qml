@@ -30,17 +30,13 @@ ApplicationWindow {
         color: Qt.rgba(0, 0, 0, 0.5)
         width: parent.width / 4
 
-        Flickable {
+        MenuView {
             anchors.fill: parent
-            contentHeight: menuView.height; contentWidth: menuView.width
-            flickableDirection: Flickable.VerticalFlick
-            MenuView {
-                anchors.fill: parent
-                id: menuView
-                rootMenu: FuseMenu {}
-                parentWidth: menuBar.width
-            }
+            id: menuView
+            rootMenu: FuseMenu {}
+            parentWidth: menuBar.width
         }
+
         onOpenChanged: {
             menuView.reset();
             if (open)
@@ -57,8 +53,51 @@ ApplicationWindow {
             anchors.fill: parent
             onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
             Keys.onPressed: {
-                if (event.key === Qt.Key_F11)
+                switch (event.key) {
+                case Qt.Key_F1:
+                    menuBar.open = !menuBar.open;
+                    event.accepted = true;
+                    break;
+
+                case Qt.Key_F10:
+                    quitDialog.open();
+                    event.accepted = true;
+                    break;
+
+                case Qt.Key_F11:
                     fullScreen = !fullScreen;
+                    event.accepted = true;
+                    break;
+
+                case Qt.Key_Down:
+                    if (menuBar.open) {
+                        menuView.incrementCurrentIndex();
+                        event.accepted = true;
+                    }
+                    break;
+
+                case Qt.Key_Up:
+                    if (menuBar.open) {
+                        menuView.decrementCurrentIndex();
+                        event.accepted = true;
+                    }
+                    break;
+
+                case Qt.Key_Return:
+                case Qt.Key_Enter:
+                    if (menuBar.open) {
+                        menuView.openSelectedMenu();
+                        event.accepted = true;
+                    }
+                    break;
+
+                case Qt.Key_Escape:
+                    if (menuBar.open) {
+                        menuView.popMenu();
+                        event.accepted = true;
+                    }
+                    break;
+                }
             }
             MouseArea {
                 anchors.fill: parent
