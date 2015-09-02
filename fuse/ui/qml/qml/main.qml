@@ -56,6 +56,14 @@ ApplicationWindow {
             focus: true
             anchors.fill: parent
             onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
+            Keys.onPressed: {
+                if (event.key === Qt.Key_F11)
+                    fullScreen = !fullScreen;
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: pageLoader.source = "";
+            }
 
             Loader {
                 id: pageLoader

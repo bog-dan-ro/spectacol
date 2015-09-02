@@ -1,7 +1,7 @@
 #ifndef BEAKPOINTSMODEL_H
 #define BEAKPOINTSMODEL_H
 
-#include <QAbstractListModel>
+#include "fuselistmodel.h"
 
 #include <vector>
 #include <mutex>
@@ -9,7 +9,7 @@
 
 #include <debugger/breakpoint.h>
 
-class BreakpointsModel : public QAbstractListModel
+class BreakpointsModel : public FuseListModel
 {
     Q_OBJECT
     Q_ENUMS(BreakpointType BreakpointLife)

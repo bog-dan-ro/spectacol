@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     spectrumscreen.cpp \
     disassamblemodel.cpp \
     breakpointsmodel.cpp \
-    fuseemulator.cpp
+    fuseemulator.cpp \
+    fuselistmodel.cpp
 
 HEADERS += \
     fusetexture.h \
@@ -35,7 +36,8 @@ HEADERS += \
     spectrumscreen.h \
     disassamblemodel.h \
     breakpointsmodel.h \
-    fuseemulator.h
+    fuseemulator.h \
+    fuselistmodel.h
 
 RESOURCES += qml.qrc
 

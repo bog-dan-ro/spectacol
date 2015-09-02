@@ -5,62 +5,18 @@
 #include "machine.h"
 #include "qmlui.h"
 
-#include <QTimer>
-
 #include <debugger/debugger.h>
 
 DisassambleModel::DisassambleModel(QObject *parent)
-    : QAbstractListModel(parent)
+    : FuseListModel(parent)
 {
     qRegisterMetaType<Origin>("Origin");
 }
 
-void DisassambleModel::disassamble(uint16_t address, int delta, uint16_t length)
+void DisassambleModel::disassamble(uint16_t address, int delta, uint16_t instructions)
 {
-    if (address && delta)
-        address = debugger_search_instruction(address, delta);
-    else
-        delta = 0;
-
-    BreakpointsModel* breakpointsModel = g_fuseEmulator->breakpointsModel();
-    std::lock_guard<std::mutex> lock(m_mutex);
-    std::lock_guard<std::mutex> lockBreakpoints(breakpointsModel->breakpointsMutex());
-    m_address = address;
-    m_delta = delta;
-    m_length = length;
-    m_disassambleDataTemp.clear();
-
-    char buff[100];
-    size_t len = 0;
-    const auto &addresses = breakpointsModel->addresses();
-    while (length > len) {
-        debugger_disassemble(buff, sizeof(buff), &len, address);
-        QString bytes;
-        for (size_t i = 0; i < len; ++i)
-            bytes += formatNumber(readbyte(address + i)) + QLatin1Char(' ');
-        bytes = bytes.trimmed();
-
-        auto it = addresses.find(address);
-        if (it != addresses.end()) { // we have a breakpoint
-            if (it->second.second.source == memory_source_ram) { // we need to check if is the current page
-                if (it->second.second.page == 5 ||
-                        it->second.second.page == 2 ||
-                        it->second.second.page == machine_current->ram.current_page) {
-                    m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), DisassambleDataType(it->second.first)));
-                } else {
-                    m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), NormalLine));
-                }
-            }
-            m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), DisassambleDataType(it->second.first)));
-        } else {
-            m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), NormalLine));
-        }
-
-        address += len;
-        length -= len;
-    }
-
-    QTimer::singleShot(0, this, [this](){
+    disassambleTemp(address, delta, instructions);
+    callFunction([this](){
         beginResetModel();
         std::lock_guard<std::mutex> lock(m_mutex);
         m_disassambleData = std::move(m_disassambleDataTemp);
@@ -70,14 +26,27 @@ void DisassambleModel::disassamble(uint16_t address, int delta, uint16_t length)
     });
 }
 
-void DisassambleModel::refresh()
-{
-    disassamble(m_address, m_delta, m_length);
-}
-
 void DisassambleModel::disassambleMore(DisassambleModel::Origin origin, int size)
 {
-
+    uint16_t addr = 0;
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (!m_disassambleData.empty()) {
+            if (origin == Start)
+                addr = m_disassambleData.front().address;
+            else
+                addr = m_disassambleData.back().address;
+            if (!addr)
+                return;
+        }
+    }
+    disassambleTemp(addr, origin == Start ? -size : 0, size);
+    callFunction([this, size, origin]{
+        int first = (origin == Start) ? 0 : m_disassambleData.size();
+        beginInsertRows(QModelIndex(), first, first + size -1);
+        m_disassambleData.insert(origin == Start ? m_disassambleData.begin() : m_disassambleData.end(), m_disassambleDataTemp.begin(), m_disassambleDataTemp.end());
+        endInsertRows();
+    });
 }
 
 int DisassambleModel::rowCount(const QModelIndex &parent) const
@@ -176,9 +145,50 @@ QColor DisassambleModel::color(DisassambleModel::ColorType colorType, Disassambl
     return QColor();
 }
 
-void DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t length)
+void DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t instructions)
 {
+    if (address && delta)
+        address = debugger_search_instruction(address, delta);
+    else
+        delta = 0;
 
+    BreakpointsModel* breakpointsModel = g_fuseEmulator->breakpointsModel();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lockBreakpoints(breakpointsModel->breakpointsMutex());
+    m_address = address;
+    m_delta = delta;
+    m_length = 0;
+    m_disassambleDataTemp.clear();
+
+    char buff[100];
+    const auto &addresses = breakpointsModel->addresses();
+    while (instructions--) {
+        size_t len;
+        debugger_disassemble(buff, sizeof(buff), &len, address);
+        QString bytes;
+        for (size_t i = 0; i < len; ++i)
+            bytes += formatNumber(readbyte(address + i)) + QLatin1Char(' ');
+        bytes = bytes.trimmed();
+
+        auto it = addresses.find(address);
+        if (it != addresses.end()) { // we have a breakpoint
+            if (it->second.second.source == memory_source_ram) { // we need to check if is the current page
+                if (it->second.second.page == 5 ||
+                        it->second.second.page == 2 ||
+                        it->second.second.page == machine_current->ram.current_page) {
+                    m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), DisassambleDataType(it->second.first)));
+                } else {
+                    m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), NormalLine));
+                }
+            }
+            m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), DisassambleDataType(it->second.first)));
+        } else {
+            m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), NormalLine));
+        }
+
+        address += len;
+        m_length += len;
+    }
 }
 
 DisassambleModel::DisassambleData::DisassambleData(uint16_t address, const QString &bytes, const QString &disassamble, DisassambleModel::DisassambleDataType type)

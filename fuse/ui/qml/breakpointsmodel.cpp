@@ -3,8 +3,6 @@
 
 #include <set>
 
-#include <QTimer>
-
 static inline uint32_t absoluteAddress(uint16_t page, uint16_t address)
 {
     uint32_t absAdd = 0;
@@ -22,7 +20,7 @@ static inline uint32_t absoluteAddress(uint16_t page, uint16_t address)
 }
 
 BreakpointsModel::BreakpointsModel(QObject *parent)
-    : QAbstractListModel(parent)
+    : FuseListModel(parent)
 {
     qRegisterMetaType<BreakpointType>("BreakpointType");
 }
@@ -49,7 +47,8 @@ void BreakpointsModel::breakpointsUpdated()
             break;
         }
     }
-    QTimer::singleShot(0, this, [this](){
+
+    callFunction([this](){
         beginResetModel();
         std::lock_guard<std::mutex> lock(m_mutex);
         m_breakPoints = std::move(m_breakPointsTmp);

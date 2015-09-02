@@ -1,7 +1,7 @@
 #ifndef DISASSAMBLEMODEL_H
 #define DISASSAMBLEMODEL_H
 
-#include <QAbstractListModel>
+#include <fuselistmodel.h>
 
 #include <debugger/breakpoint.h>
 
@@ -9,7 +9,7 @@
 #include <mutex>
 #include <QColor>
 
-class DisassambleModel : public QAbstractListModel
+class DisassambleModel : public FuseListModel
 {
     Q_OBJECT
     Q_ENUMS(Origin)
@@ -44,7 +44,7 @@ class DisassambleModel : public QAbstractListModel
                         const QString &disassamble,
                         DisassambleDataType type);
         QColor background, foreground;
-        uint16_t address;
+        uint16_t address = 0;
         QString bytes;
         QString disassamble;
     };
@@ -58,8 +58,7 @@ public:
 public:
     DisassambleModel(QObject *parent);
 
-    void disassamble(uint16_t address, int delta = -10, uint16_t length = 0xff);
-    void refresh();
+    void disassamble(uint16_t address, int delta = -10, uint16_t instructions = 50);
     void disassambleMore(Origin origin, int size);
 
     // QAbstractItemModel interface
@@ -78,7 +77,7 @@ protected:
 
 private:
     static QColor color(ColorType colorType, DisassambleDataType type);
-    void disassambleTemp(uint16_t address, int delta, uint16_t length);
+    void disassambleTemp(uint16_t address, int delta, uint16_t instructions);
 
 private:
     uint16_t m_address = 0;

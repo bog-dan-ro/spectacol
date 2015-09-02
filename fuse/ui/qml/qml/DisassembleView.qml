@@ -13,10 +13,12 @@ ListView {
     currentIndex: disassambleModel.delta
 
     Keys.onUpPressed: {
-        if (view.currentIndex !== 0)
+        if (view.currentIndex > 1)
             decrementCurrentIndex();
-        else
-            fuse.disassambleFetchUp(1);
+        else {
+            fuse.disassambleFetchUp(10);
+            decrementCurrentIndex();
+        }
     }
 
     Keys.onDownPressed: incrementCurrentIndex()
@@ -40,7 +42,7 @@ ListView {
                 style: Text.Normal
                 Layout.preferredWidth: 14 * Screen.pixelDensity
                 color: ink
-                text: model.address
+                text: model.addressText
             }
 
             Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
@@ -65,6 +67,7 @@ ListView {
                 horizontalAlignment: Text.AlignLeft
                 fontSize: 4
                 color: ink
+                style: Text.Normal
                 text: model.disassable
             }
         }

@@ -425,14 +425,13 @@ void FuseEmulator::disassamble()
     disassamble(z80.pc.w);
 }
 
-void FuseEmulator::disassambleMore(int delta)
+void FuseEmulator::disassambleFetchUp(int lines)
 {
-    Q_UNUSED(delta)
-//    pokeEvent([delta, this]{
-//        fuse_emulation_pause();
-//        m_disassambleModel.disassamble(delta);
-//        fuse_emulation_unpause();
-//    });
+    pokeEvent([lines, this]{
+        fuse_emulation_pause();
+        m_disassambleModel.disassambleMore(DisassambleModel::Start, lines);
+        fuse_emulation_unpause();
+    });
 }
 
 void FuseEmulator::disassamble(int address, int delta, uint16_t length)

@@ -132,7 +132,7 @@ public slots:
     void debuggerRun();
 
     void disassamble();
-    void disassambleMore(int delta);
+    void disassambleFetchUp(int lines);
     void disassamble(int address, int delta = -10, uint16_t length = 0xff);
     // debug methods
 
