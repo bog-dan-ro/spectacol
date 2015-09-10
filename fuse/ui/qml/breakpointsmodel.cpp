@@ -27,24 +27,26 @@ BreakpointsModel::BreakpointsModel(QObject *parent)
 
 void BreakpointsModel::breakpointsUpdated()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_breakPointsTmp.clear();
-    for (GSList *ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
-        debugger_breakpoint *bp = reinterpret_cast<debugger_breakpoint *>(ptr->data);
-        m_breakPointsTmp.emplace_back(DebuggerBreakpoint(bp));
-        switch (bp->type) {
-        case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
-        case DEBUGGER_BREAKPOINT_TYPE_READ:
-        case DEBUGGER_BREAKPOINT_TYPE_WRITE:
-            if (bp->value.address.source == memory_source_any ||
-                bp->value.address.source == memory_source_rom)
-                    m_addresses[bp->value.address.offset] = {bp->type, bp->value.address};
-            else if (bp->value.address.source == memory_source_ram)
-                m_addresses[absoluteAddress(bp->value.address.page, bp->value.address.offset)] = {bp->type, bp->value.address};
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_breakPointsTmp.clear();
+        for (GSList *ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
+            debugger_breakpoint *bp = reinterpret_cast<debugger_breakpoint *>(ptr->data);
+            m_breakPointsTmp.emplace_back(DebuggerBreakpoint(bp));
+            switch (bp->type) {
+            case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
+            case DEBUGGER_BREAKPOINT_TYPE_READ:
+            case DEBUGGER_BREAKPOINT_TYPE_WRITE:
+                if (bp->value.address.source == memory_source_any ||
+                    bp->value.address.source == memory_source_rom)
+                        m_addresses[bp->value.address.offset] = {bp->type, bp->value.address};
+                else if (bp->value.address.source == memory_source_ram)
+                    m_addresses[absoluteAddress(bp->value.address.page, bp->value.address.offset)] = {bp->type, bp->value.address};
+                    break;
                 break;
-            break;
-        default:
-            break;
+            default:
+                break;
+            }
         }
     }
 
