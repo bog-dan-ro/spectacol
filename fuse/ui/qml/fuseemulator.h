@@ -3,8 +3,9 @@
 
 #include "breakpointsmodel.h"
 #include "disassamblemodel.h"
+#include "fuseobject.h"
+#include "pokefindermodel.h"
 
-#include <QObject>
 #include <QThread>
 #include <QUrl>
 
@@ -18,7 +19,7 @@ protected:
     void run();
 };
 
-class FuseEmulator : public QObject
+class FuseEmulator : public FuseObject
 {
     Q_OBJECT
     Q_ENUMS(ErrorLevel)
@@ -28,6 +29,7 @@ class FuseEmulator : public QObject
     Q_PROPERTY(bool saveSnapshotEnabled READ saveSnapshotEnabled NOTIFY saveSnapshotEnabledChanged)
     Q_PROPERTY(QStringList filtersModel READ filtersModel)
     Q_PROPERTY(int selectedFilterIndex READ selectedFilterIndex WRITE setSelectedFilterIndex NOTIFY selectedFilterIndexChanged)
+    Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
 
     /* regs properties */
     Q_PROPERTY(QString PC READ PC WRITE setPC NOTIFY registersChanged)
@@ -116,12 +118,15 @@ public:
     BreakpointsModel *breakpointsModel() { return &m_breakpointsModel; }
     void updateDebugger();
 
+    int pokeFinderCount() const;
+
 public slots:
     QUrl snapshotsPath() const;
     void load(const QUrl &filePath);
     void save(const QUrl &filePath);
     void reset();
     void hardReset();
+    void nmi();
     void quickSaveSnapshot();
     void quickLoadSnapshot();
     QString snapshotFileName(bool addExtension = true) const;
@@ -134,15 +139,24 @@ public slots:
     void disassamble();
     void disassambleFetchUp(int lines);
     void disassamble(int address, int delta = -10, uint16_t length = 0xff);
-    // debug methods
-
     void activateDebugger();
     void deactivateDebugger(bool interruptable);
+    // debug methods
+
+    // pokefinder methods
+    void pokeFinderInced();
+    void pokeFinderDeced();
+    void pokeFinderSearch(int value);
+    void pokeFinderReset();
+    void pokeFinderResetIfNeeded();
+    // pokefinder methods
+
 signals:
     void pausedChanged();
     void dataPathChanged();
     void saveSnapshotEnabledChanged();
     void selectedFilterIndexChanged();
+    void pokeFinderCountChanged();
     void registersChanged();
     void showDebugger();
     void hideDebugger();
@@ -159,8 +173,10 @@ private:
     mutable std::vector<int> m_supportedScalers;
     BreakpointsModel m_breakpointsModel;
     DisassambleModel m_disassambleModel;
+    PokeFinderModel m_pokeFinderModel;
     FuseThread m_fuseThread;
     std::atomic_bool m_debuggerActivated;
+    bool m_resetPokeFinder;
 };
 
 extern FuseEmulator *g_fuseEmulator;

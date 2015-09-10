@@ -41,14 +41,12 @@ ColumnLayout {
         menuModel.clear();
         if (currentMenu !== null) {
             var i, items = currentMenu.items, len = currentMenu.items.length;
-            var currentIndex = -1;
             for (i = 0; i < len; ++i) {
                 var item = items[i];
-                if (currentIndex == -1 && item.visible)
-                    currentIndex = i;
-                menuModel.append({"modelData": item});
+                if (item.visible)
+                    menuModel.append({"modelData": item});
             }
-            menuView.currentIndex = currentIndex;
+            menuView.currentIndex = 0;
         } else {
             menuView.currentIndex = -1;
         }
@@ -153,7 +151,7 @@ ColumnLayout {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: openMenu(menuData, index)
+                onClicked: openMenu(modelData, index)
             }
         }
     }

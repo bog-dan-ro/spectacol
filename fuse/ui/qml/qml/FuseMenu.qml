@@ -40,6 +40,7 @@ Menu {
 
         Menu {
             title: qsTr("Recording")
+            visible: false
             MenuItem {
                 text: "Record"
                 onTriggered: {
@@ -51,56 +52,56 @@ Menu {
                 text: "Record from snapshot"
                 onTriggered: {
                     menuBar.open = false;
-                    pageLoader.source = "StartRecordingPage.qml";
+                    pageLoader.source = "RecordFromSnapshotRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Continue recording"
                 onTriggered: {
                     menuBar.open = false;
-                    pageLoader.source = "StartRecordingPage.qml";
+                    pageLoader.source = "ContinueRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Insert snapshot"
                 onTriggered: {
                     menuBar.open = false;
-                    pageLoader.source = "StartRecordingPage.qml";
+                    pageLoader.source = "InsertSnapshotRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Rollback"
                 onTriggered: {
                     menuBar.open = false;
-                    pageLoader.source = "StartRecordingPage.qml";
+                    pageLoader.source = "RollbackRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Rollback to ..."
                 onTriggered: {
                     menuBar.open = false;
-                    pageLoader.source = "StartRecordingPage.qml";
+                    pageLoader.source = "RollbackToRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Play"
                 onTriggered: {
                     menuBar.open = false;
-                    pageLoader.source = "StartRecordingPage.qml";
+                    pageLoader.source = "PlayRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Stop"
                 onTriggered: {
                     menuBar.open = false;
-                    pageLoader.source = "StartRecordingPage.qml";
+                    pageLoader.source = "StopRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Finalise ..."
                 onTriggered: {
                     menuBar.open = false;
-                    pageLoader.source = "StartRecordingPage.qml";
+                    pageLoader.source = "FinaliseRecordingPage.qml";
                 }
             }
         }
@@ -182,6 +183,7 @@ Menu {
         }
 
         Menu {
+            visible: false
             title: qsTr("Profiler")
             MenuItem {
                 text: qsTr("Start")
@@ -208,10 +210,11 @@ Menu {
         }
 
         MenuItem {
+            visible: false
             text: qsTr("Didaktik SNAP")
             onTriggered: {
                 menuBar.open = false;
-                fuse.nmi();
+                fuse.didaktikSNAP();
             }
         }
     }

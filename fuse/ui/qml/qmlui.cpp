@@ -22,6 +22,7 @@
 #include "disassamblemodel.h"
 
 #include <fuse.h>
+#include <pokefinder/pokefinder.h>
 #include <ui/uidisplay.h>
 #include <ui/widget/widget.h>
 
@@ -111,6 +112,12 @@ extern "C" int ui_event( void )
         else
             break;
     }
+    return 0;
+}
+
+extern "C" int ui_widgets_reset( void )
+{
+    pokefinder_clear();
     return 0;
 }
 

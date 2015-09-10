@@ -4,6 +4,7 @@
 #include <libspectrum.h>
 #include <fuse.h>
 #include <machine.h>
+#include <pokefinder/pokefinder.h>
 #include <settings.h>
 #include <snapshot.h>
 #include <utils.h>
@@ -79,15 +80,18 @@ static void destroy_mutex(libspectrum_mutex_t mutex)
 FuseEmulator *g_fuseEmulator = nullptr;
 
 FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
-    : QObject(parent)
+    : FuseObject(parent)
     , m_breakpointsModel(this)
     , m_disassambleModel(this)
+    , m_pokeFinderModel(this)
+    , m_resetPokeFinder(true)
 {
     g_fuseEmulator = this;
 
     ctxt->setContextProperty("fuse", this);
     ctxt->setContextProperty("breakpointsModel", &m_breakpointsModel);
     ctxt->setContextProperty("disassambleModel", &m_disassambleModel);
+    ctxt->setContextProperty("pokeFinderModel", &m_pokeFinderModel);
 
     qRegisterMetaType<ErrorLevel>("ErrorLevel");
 
@@ -364,6 +368,11 @@ void FuseEmulator::updateDebugger()
     emit registersChanged();
 }
 
+int FuseEmulator::pokeFinderCount() const
+{
+    return pokefinder_count;
+}
+
 QUrl FuseEmulator::snapshotsPath() const
 {
     return QUrl::fromLocalFile(dataPath().toLocalFile() + QLatin1Literal("/Snapshots/"));
@@ -379,6 +388,7 @@ void FuseEmulator::load(const QUrl &filePath)
         emit saveSnapshotEnabledChanged();
         display_refresh_all();
         fuse_emulation_unpause();
+        m_resetPokeFinder = true;
     });
 }
 
@@ -402,6 +412,13 @@ void FuseEmulator::hardReset()
 {
     pokeEvent([]() {
         machine_reset(1);
+    });
+}
+
+void FuseEmulator::nmi()
+{
+    pokeEvent([]() {
+        event_add( 0, z80_nmi_event );
     });
 }
 
@@ -463,6 +480,59 @@ void FuseEmulator::deactivateDebugger(bool interruptable)
     if (!interruptable)
         emit hideDebugger();
     fuse_emulation_unpause();
+}
+
+void FuseEmulator::pokeFinderInced()
+{
+    pokeEvent([this]{
+        pokefinder_incremented();
+        m_pokeFinderModel.update();
+        callFunction([this]{
+            emit pokeFinderCountChanged();
+        });
+    });
+}
+
+void FuseEmulator::pokeFinderDeced()
+{
+    pokeEvent([this]{
+        pokefinder_decremented();
+        m_pokeFinderModel.update();
+        callFunction([this]{
+            emit pokeFinderCountChanged();
+        });
+    });
+}
+
+void FuseEmulator::pokeFinderSearch(int value)
+{
+    pokeEvent([this, value]{
+        pokefinder_search(value);
+        m_pokeFinderModel.update();
+        callFunction([this]{
+            emit pokeFinderCountChanged();
+        });
+    });
+}
+
+void FuseEmulator::pokeFinderReset()
+{
+    pokeEvent([this]{
+        pokefinder_clear();
+        m_pokeFinderModel.update();
+        callFunction([this]{
+            emit pokeFinderCountChanged();
+        });
+    });
+}
+
+void FuseEmulator::pokeFinderResetIfNeeded()
+{
+    if (m_resetPokeFinder) {
+        pokeFinderReset();
+        m_resetPokeFinder = false;
+    }
+
 }
 
 QString FuseEmulator::snapshotFileName(bool addExtension) const

@@ -27,7 +27,9 @@ SOURCES += main.cpp \
     disassamblemodel.cpp \
     breakpointsmodel.cpp \
     fuseemulator.cpp \
-    fuselistmodel.cpp
+    fuselistmodel.cpp \
+    fuseobject.cpp \
+    pokefindermodel.cpp
 
 HEADERS += \
     fusetexture.h \
@@ -37,7 +39,9 @@ HEADERS += \
     disassamblemodel.h \
     breakpointsmodel.h \
     fuseemulator.h \
-    fuselistmodel.h
+    fuselistmodel.h \
+    fuseobject.h \
+    pokefindermodel.h
 
 RESOURCES += qml.qrc
 

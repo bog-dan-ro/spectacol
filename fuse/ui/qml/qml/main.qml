@@ -59,6 +59,11 @@ ApplicationWindow {
                     event.accepted = true;
                     break;
 
+                case Qt.Key_F4:
+                    pageLoader.source = "FileBrowserPage.qml";
+                    event.accepted = true;
+                    break;
+
                 case Qt.Key_F10:
                     quitDialog.open();
                     event.accepted = true;
