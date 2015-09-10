@@ -28,6 +28,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 extern libspectrum_byte pokefinder_possible[][ MEMORY_PAGE_SIZE ];
 extern libspectrum_byte pokefinder_impossible[][ MEMORY_PAGE_SIZE / 8 ];
 extern size_t pokefinder_count;
@@ -36,5 +40,9 @@ void pokefinder_clear( void );
 int pokefinder_search( libspectrum_byte value );
 int pokefinder_incremented( void );
 int pokefinder_decremented( void );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_POKEFINDER_H */

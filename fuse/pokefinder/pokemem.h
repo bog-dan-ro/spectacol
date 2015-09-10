@@ -28,6 +28,10 @@
 
 #include <libspectrum.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif				/* #ifdef __cplusplus */
+
 extern GSList *trainer_list;
 
 typedef struct trainer_t {
@@ -59,5 +63,9 @@ trainer_t *pokemem_trainer_list_add( libspectrum_byte bank,
 
 int pokemem_trainer_activate( trainer_t *trainer );
 int pokemem_trainer_deactivate( trainer_t *trainer );
+
+#ifdef __cplusplus
+};
+#endif				/* #ifdef __cplusplus */
 
 #endif
