@@ -20,7 +20,9 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
+import QtQml.Models 2.2
 import QtQuick.Window 2.0
+import Fuse 1.0
 
 Rectangle {
     id: pokeFinderPage
@@ -83,27 +85,52 @@ Rectangle {
             ColumnLayout {
                 Button {
                     Layout.fillWidth: true
-                    id: inc
+                    activeFocusOnTab: false
                     text: qsTr("&Incremented")
                     onClicked: fuse.pokeFinderInced()
                 }
                 Button {
                     Layout.fillWidth: true
+                    activeFocusOnTab: false
                     text: qsTr("&Decremented")
                     onClicked: fuse.pokeFinderDeced()
                 }
                 Button {
                     Layout.fillWidth: true
+                    activeFocusOnTab: false
                     text: qsTr("&Search")
                     onClicked: fuse.pokeFinderSearch(value.text)
                 }
                 Button {
                     Layout.fillWidth: true
+                    activeFocusOnTab: false
                     text: qsTr("&Reset")
                     onClicked: fuse.pokeFinderReset()
                 }
                 Button {
                     Layout.fillWidth: true
+                    activeFocusOnTab: false
+                    enabled: view.currentIndex !== -1
+                    text: qsTr("&Break on R/W")
+                    onClicked: {
+                        var model = visualModel.items.get(view.currentIndex).model;
+                        fuse.addBreakpointPage(model.offset, model.bank, BreakpointsModel.BreakOnRead);
+                        fuse.addBreakpointPage(model.offset, model.bank, BreakpointsModel.BreakOnWrite);
+                    }
+                }
+                Button {
+                    Layout.fillWidth: true
+                    enabled: view.currentIndex !== -1
+                    activeFocusOnTab: false
+                    text: qsTr("Break on &write")
+                    onClicked: {
+                        var model = visualModel.items.get(view.currentIndex).model;
+                        fuse.addBreakpointPage(model.offset, model.bank, BreakpointsModel.BreakOnWrite);
+                    }
+                }
+                Button {
+                    Layout.fillWidth: true
+                    activeFocusOnTab: false
                     text: qsTr("&Close")
                     onClicked: pageLoader.source = "";
                 }
@@ -116,6 +143,73 @@ Rectangle {
                     Layout.alignment: Qt.AlignRight
                     text: qsTr("Possible locations: ") + fuse.pokeFinderCount
                 }
+
+                VisualDataModel {
+                    id: visualModel
+                    model: pokeFinderModel
+                    delegate: Rectangle {
+                        property color paper: view.currentIndex !== index ? Qt.rgba(0, 0, 0, 0.9) : "white"
+                        property color ink: view.currentIndex !== index ? "white": Qt.rgba(0, 0, 0, 0.9)
+
+                        width: view.width
+                        height: 7 * Screen.pixelDensity
+                        color: paper
+                        RowLayout {
+                            anchors.fill: parent
+                            FancyText {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: 10 * Screen.pixelDensity
+                                horizontalAlignment: Text.AlignRight
+                                fontSize: 4
+                                style: Text.Normal
+                                color: ink
+                                text: model.bank
+                            }
+
+                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+
+                            FancyText {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: 15 * Screen.pixelDensity
+                                horizontalAlignment: Text.AlignHCenter
+                                fontSize: 4
+                                style: Text.Normal
+                                color: ink
+                                text: model.offsetText
+                            }
+
+                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+
+                            FancyText {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: false
+                                horizontalAlignment: Text.AlignLeft
+                                fontSize: 4
+                                color: ink
+                                style: Text.Normal
+                                text: model.value
+                            }
+
+                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+
+                            FancyText {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                horizontalAlignment: Text.AlignLeft
+                                fontSize: 4
+                                color: ink
+                                style: Text.Normal
+                                text: model.breakpoint
+                            }
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {view.focus = true; view.currentIndex = model.index}
+                        }
+                    }
+                }
                 ListView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -125,12 +219,14 @@ Rectangle {
                     snapMode: ListView.SnapToItem
                     highlightFollowsCurrentItem: true
                     focus: true
-                    activeFocusOnTab: true
+                    activeFocusOnTab: fuse.pokeFinderCount <= 20
 
                     Keys.onUpPressed: decrementCurrentIndex();
                     Keys.onDownPressed: incrementCurrentIndex()
 
-                    currentIndex: 0
+                    model: visualModel
+
+                    currentIndex: fuse.pokeFinderCount <= 20 ? 0 : -1
 
                     header: Rectangle {
                         height: 5 * Screen.pixelDensity
@@ -179,59 +275,6 @@ Rectangle {
                                 style: Text.Normal
                                 text: "Breakpoint"
                             }
-                        }
-                    }
-
-                    model: pokeFinderModel
-
-                    delegate: Rectangle {
-                        property color paper: view.currentIndex !== index ? Qt.rgba(0, 0, 0, 0.9) : "white"
-                        property color ink: view.currentIndex !== index ? "white": Qt.rgba(0, 0, 0, 0.9)
-
-                        width: view.width
-                        height: 7 * Screen.pixelDensity
-                        color: paper
-                        RowLayout {
-                            anchors.fill: parent
-                            FancyText {
-                                Layout.fillHeight: true
-                                Layout.fillWidth: false
-                                Layout.preferredWidth: 10 * Screen.pixelDensity
-                                horizontalAlignment: Text.AlignRight
-                                fontSize: 4
-                                style: Text.Normal
-                                color: ink
-                                text: model.bank
-                            }
-
-                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
-
-                            FancyText {
-                                Layout.fillHeight: true
-                                Layout.fillWidth: false
-                                Layout.preferredWidth: 15 * Screen.pixelDensity
-                                horizontalAlignment: Text.AlignHCenter
-                                fontSize: 4
-                                style: Text.Normal
-                                color: ink
-                                text: model.offsetText
-                            }
-
-                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
-
-                            FancyText {
-                                Layout.fillHeight: true
-                                Layout.fillWidth: true
-                                horizontalAlignment: Text.AlignLeft
-                                fontSize: 4
-                                color: ink
-                                style: Text.Normal
-                                text: model.value
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: view.currentIndex = model.index
                         }
                     }
                 }

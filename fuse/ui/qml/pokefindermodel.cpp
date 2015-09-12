@@ -17,6 +17,8 @@
 
 #include "pokefindermodel.h"
 
+#include "breakpointsmodel.h"
+#include "fuseemulator.h"
 #include "qmlui.h"
 
 #include <memory.h>
@@ -32,8 +34,11 @@ PokeFinderModel::PokeFinderModel(QObject *parent)
 void PokeFinderModel::update()
 {
     {
+        BreakpointsModel *breakpointsModel = g_fuseEmulator->breakpointsModel();
         std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::mutex> lockBreakpoints(breakpointsModel->breakpointsMutex());
         m_dataTmp.clear();
+        const auto &addresses = breakpointsModel->addresses();
         if (pokefinder_count && pokefinder_count <= MAX_POSSIBLE) {
             for (size_t page = 0; page < MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES; page++ ) {
                 memory_page *mapping = &memory_map_ram[page];
@@ -43,18 +48,36 @@ void PokeFinderModel::update()
                     if( ! (pokefinder_impossible[page][offset/8] & 1 << (offset & 7)) ) {
                         const uint16_t bank_offset = mapping->offset + offset;
                         const uint8_t value = mapping->page[offset];
-                        m_dataTmp.emplace_back(PokeFinderData(bank, bank_offset, value));
+                        debugger_breakpoint_address addr;
+                        addr.source = memory_source_ram;
+                        addr.page = bank;
+                        addr.offset = bank_offset;
+                        auto it = addresses.find(addr);
+                        uint8_t breakpoints = NoBreakpoint;
+                        if (it != addresses.end()) {
+                            if (it->second.find(DEBUGGER_BREAKPOINT_TYPE_READ) != it->second.end())
+                                breakpoints = OnRead;
+
+                            if (it->second.find(DEBUGGER_BREAKPOINT_TYPE_WRITE) != it->second.end())
+                                breakpoints |= OnWrite;
+                        }
+                        m_dataTmp.emplace_back(PokeFinderData(bank, bank_offset, value, breakpoints));
                     }
                 }
             }
         }
     }
     callFunction([this]{
-        beginResetModel();
+        bool changed = m_dataTmp.size() == m_data.size();
+        if (!changed)
+            beginResetModel();
         std::lock_guard<std::mutex> lock(m_mutex);
         m_data = std::move(m_dataTmp);
         m_dataTmp.clear();
-        endResetModel();
+        if (!changed)
+            endResetModel();
+        else
+            emit dataChanged(index(0), index(m_data.size()-1));
     });
 }
 
@@ -72,13 +95,30 @@ QVariant PokeFinderModel::data(const QModelIndex &index, int role) const
     switch (role) {
     case Bank:
         return m_data[index.row()].bank;
+
     case Offset:
         return m_data[index.row()].offset;
+
     case OffsetText:
         return formatNumber(m_data[index.row()].offset);
+
     case Value:
         return formatNumber(m_data[index.row()].value);
+
+    case Breakpoint:
+        switch (m_data[index.row()].breakpoints) {
+        case 1:
+            return QLatin1Literal("Break on Read");
+        case 2:
+            return QLatin1Literal("Break on Write");
+        case 3:
+            return QLatin1Literal("Break on R/W");
+        default:
+            return QLatin1Literal("");
+        }
+        break;
     }
+
     return QVariant();
 }
 
@@ -89,5 +129,6 @@ QHash<int, QByteArray> PokeFinderModel::roleNames() const
     roles[Offset] = "offset";
     roles[OffsetText] = "offsetText";
     roles[Value] = "value";
+    roles[Breakpoint] = "breakpoint";
     return roles;
 }

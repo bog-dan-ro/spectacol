@@ -153,6 +153,9 @@ public slots:
     void debuggerStep();
     void debuggerRun();
 
+    void addBreakpoint(int address, int type = BreakpointsModel::BreakOnExecute);
+    void addBreakpointPage(int address, int page, int type = BreakpointsModel::BreakOnWrite);
+
     void disassamble();
     void disassambleFetchUp(int lines);
     void disassamble(int address, int delta = -10, uint16_t length = 0xff);

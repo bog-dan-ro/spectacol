@@ -29,7 +29,8 @@ class PokeFinderModel : public FuseListModel
         Bank = Qt::UserRole + 1,
         Offset,
         OffsetText,
-        Value
+        Value,
+        Breakpoint
     };
 
 public:
@@ -43,12 +44,18 @@ protected:
     QHash<int, QByteArray> roleNames() const;
 
 private:
+    enum {
+        NoBreakpoint = 0,
+        OnRead = 1,
+        OnWrite = 2
+    };
     struct PokeFinderData {
-        PokeFinderData(uint16_t bank, uint16_t offset, uint8_t value)
-            : bank(bank), offset(offset), value(value) {}
+        PokeFinderData(uint16_t bank, uint16_t offset, uint8_t value, uint8_t breakpoints = NoBreakpoint)
+            : bank(bank), offset(offset), value(value), breakpoints(breakpoints) {}
         uint16_t bank;
         uint16_t offset;
         uint8_t value;
+        uint8_t breakpoints;
     };
 
     mutable std::mutex m_mutex;

@@ -24,6 +24,22 @@
 
 #include <debugger/debugger.h>
 
+static inline uint32_t absolute2PageAddress(uint16_t page, uint16_t address)
+{
+    uint32_t absAdd = 0;
+    switch (page) {
+    case 5:
+        absAdd = 0x4000;
+        break;
+    case 2:
+        absAdd = 0x8000;
+    default:
+        absAdd = 0xc000;
+        break;
+    }
+    return address - absAdd;
+}
+
 DisassambleModel::DisassambleModel(QObject *parent)
     : FuseListModel(parent)
 {
@@ -131,32 +147,21 @@ QHash<int, QByteArray> DisassambleModel::roleNames() const
     return ret;
 }
 
-QColor DisassambleModel::color(DisassambleModel::ColorType colorType, DisassambleModel::DisassambleDataType type)
+QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std::unordered_set<int> &types)
 {
     switch (colorType) {
     case Ink:
-        switch (type) {
-        case NormalLine:
-        case BreakExec:
-        case BreakRead:
-        case BreakWrite:
-            return Qt::white;
-            break;
-        }
-        break;
+        return Qt::white;
 
     case Paper:
-        switch (type) {
-        case NormalLine:
-            return QColor(0, 0, 0, 200);
-        case BreakExec:
+        if (types.find(DEBUGGER_BREAKPOINT_TYPE_EXECUTE) != types.end())
             return Qt::red;
-        case BreakRead:
-        case BreakWrite:
+
+        if (types.find(DEBUGGER_BREAKPOINT_TYPE_READ) != types.end() ||
+                types.find(DEBUGGER_BREAKPOINT_TYPE_WRITE) != types.end())
             return Qt::darkRed;
-            break;
-        }
-        break;
+
+        return QColor(0, 0, 0, 200);
     }
     Q_ASSERT(false);
     return QColor();
@@ -187,20 +192,22 @@ void DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t ins
             bytes += formatNumber(readbyte(address + i)) + QLatin1Char(' ');
         bytes = bytes.trimmed();
 
-        auto it = addresses.find(address);
+        debugger_breakpoint_address addr;
+        addr.source = memory_source_any;
+        addr.page = 0;
+        addr.offset = address;
+        auto it = addresses.find(addr);
+        if (it == addresses.end()) {
+            addr.source = memory_source_ram;
+            addr.page = machine_current->ram.current_page;
+            addr.offset = absolute2PageAddress(addr.page, address);
+            it = addresses.find(addr);
+        }
+
         if (it != addresses.end()) { // we have a breakpoint
-            if (it->second.second.source == memory_source_ram) { // we need to check if is the current page
-                if (it->second.second.page == 5 ||
-                        it->second.second.page == 2 ||
-                        it->second.second.page == machine_current->ram.current_page) {
-                    m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), DisassambleDataType(it->second.first)));
-                } else {
-                    m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), NormalLine));
-                }
-            }
-            m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), DisassambleDataType(it->second.first)));
+            m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), it->second));
         } else {
-            m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), NormalLine));
+            m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff)));
         }
 
         address += len;
@@ -208,9 +215,9 @@ void DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t ins
     }
 }
 
-DisassambleModel::DisassambleData::DisassambleData(uint16_t address, const QString &bytes, const QString &disassamble, DisassambleModel::DisassambleDataType type)
-    : background(color(Paper, type))
-    , foreground(color(Ink, type))
+DisassambleModel::DisassambleData::DisassambleData(uint16_t address, const QString &bytes, const QString &disassamble, const std::unordered_set<int> &types)
+    : background(color(Paper, types))
+    , foreground(color(Ink, types))
     , address(address)
     , bytes(bytes)
     , disassamble(disassamble)

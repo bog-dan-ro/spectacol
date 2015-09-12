@@ -22,8 +22,10 @@
 
 #include <debugger/breakpoint.h>
 
-#include <vector>
 #include <mutex>
+#include <vector>
+#include <unordered_set>
+
 #include <QColor>
 
 class DisassambleModel : public FuseListModel
@@ -43,13 +45,6 @@ class DisassambleModel : public FuseListModel
         Disassable
     };
 
-    enum DisassambleDataType {
-        BreakExec = DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
-        BreakRead = DEBUGGER_BREAKPOINT_TYPE_READ,
-        BreakWrite = DEBUGGER_BREAKPOINT_TYPE_WRITE,
-        NormalLine
-    };
-
     enum ColorType {
         Paper,
         Ink
@@ -59,7 +54,7 @@ class DisassambleModel : public FuseListModel
         DisassambleData(uint16_t address,
                         const QString &bytes,
                         const QString &disassamble,
-                        DisassambleDataType type);
+                        const std::unordered_set<int> &types = std::unordered_set<int>());
         QColor background, foreground;
         uint16_t address = 0;
         QString bytes;
@@ -93,7 +88,7 @@ protected:
     QHash<int, QByteArray> roleNames() const;
 
 private:
-    static QColor color(ColorType colorType, DisassambleDataType type);
+    static QColor color(ColorType colorType, const std::unordered_set<int> &types);
     void disassambleTemp(uint16_t address, int delta, uint16_t instructions);
 
 private:

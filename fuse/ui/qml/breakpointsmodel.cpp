@@ -18,24 +18,6 @@
 #include "breakpointsmodel.h"
 #include "qmlui.h"
 
-#include <set>
-
-static inline uint32_t absoluteAddress(uint16_t page, uint16_t address)
-{
-    uint32_t absAdd = 0;
-    switch (page) {
-    case 5:
-        absAdd = 0x4000;
-        break;
-    case 2:
-        absAdd = 0x8000;
-    default:
-        absAdd = 0xc000;
-        break;
-    }
-    return absAdd + address;
-}
-
 BreakpointsModel::BreakpointsModel(QObject *parent)
     : FuseListModel(parent)
 {
@@ -47,6 +29,7 @@ void BreakpointsModel::breakpointsUpdated()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_breakPointsTmp.clear();
+        m_addresses.clear();
         for (GSList *ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
             debugger_breakpoint *bp = reinterpret_cast<debugger_breakpoint *>(ptr->data);
             m_breakPointsTmp.emplace_back(DebuggerBreakpoint(bp));
@@ -54,12 +37,7 @@ void BreakpointsModel::breakpointsUpdated()
             case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
             case DEBUGGER_BREAKPOINT_TYPE_READ:
             case DEBUGGER_BREAKPOINT_TYPE_WRITE:
-                if (bp->value.address.source == memory_source_any ||
-                    bp->value.address.source == memory_source_rom)
-                        m_addresses[bp->value.address.offset] = {bp->type, bp->value.address};
-                else if (bp->value.address.source == memory_source_ram)
-                    m_addresses[absoluteAddress(bp->value.address.page, bp->value.address.offset)] = {bp->type, bp->value.address};
-                    break;
+                m_addresses[bp->value.address].insert(bp->type);
                 break;
             default:
                 break;
@@ -124,24 +102,24 @@ QHash<int, QByteArray> BreakpointsModel::roleNames() const
 QVariant BreakpointsModel::breakPointValue(const BreakpointsModel::DebuggerBreakpoint &bp) const
 {
     switch (bp.type) {
-    case Execute:
-    case Read:
-    case Write:
+    case BreakOnExecute:
+    case BreakOnRead:
+    case BreakOnWrite:
         if (bp.value.address.source== memory_source_any)
             return formatNumber(bp.value.address.offset);
         return QLatin1String(memory_source_description(bp.value.address.source)) + QLatin1Char(':') +
                 formatNumber(bp.value.address.page) + QLatin1Char(':') +
                 formatNumber(bp.value.address.offset) + QLatin1Char(':');
 
-    case PortRead:
-    case PortWrite:
+    case BreakOnPortRead:
+    case BreakOnPortWrite:
         return  formatNumber(bp.value.port.mask) + QLatin1Char(':') +
                 formatNumber(bp.value.port.port) + QLatin1Char(':');
 
-    case Time:
+    case BreakOnTime:
         return QString::number(bp.value.time.tstates);
 
-    case Event:
+    case BreakOnEvent:
         return bp.value.event->type + ":" + bp.value.event->detail;
     }
     return QVariant();
@@ -153,22 +131,22 @@ BreakpointsModel::DebuggerBreakpoint::DebuggerBreakpoint(debugger_breakpoint *bp
     id = bp->id;
     type = BreakpointType(bp->type);
     switch (type) {
-    case Execute:
-    case Read:
-    case Write:
+    case BreakOnExecute:
+    case BreakOnRead:
+    case BreakOnWrite:
         value.address = bp->value.address;
         break;
 
-    case PortRead:
-    case PortWrite:
+    case BreakOnPortRead:
+    case BreakOnPortWrite:
         value.port = bp->value.port;
         break;
 
-    case Time:
+    case BreakOnTime:
         value.time = bp->value.time;
         break;
 
-    case Event:
+    case BreakOnEvent:
         value.event = new DebuggerEvent(bp->value.event);
     }
     ignore = bp->ignore;
@@ -184,6 +162,6 @@ BreakpointsModel::DebuggerBreakpoint::DebuggerBreakpoint(debugger_breakpoint *bp
 
 BreakpointsModel::DebuggerBreakpoint::~DebuggerBreakpoint()
 {
-    if (type == Event)
+    if (type == BreakOnEvent)
         delete value.event;
 }

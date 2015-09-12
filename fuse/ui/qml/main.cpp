@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("Fuse Emulator");
 
     qmlRegisterType<FuseScreen>("Fuse", 1, 0, "FuseScreen");
+    qmlRegisterUncreatableType<BreakpointsModel>("Fuse", 1, 0, "BreakpointsModel", QLatin1String("use breakpointsModel context property instead"));
 
     QQmlApplicationEngine engine;
     FuseEmulator fuse(engine.rootContext());

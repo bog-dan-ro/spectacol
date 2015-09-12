@@ -23,8 +23,35 @@
 #include <vector>
 #include <mutex>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <debugger/breakpoint.h>
+
+namespace std
+{
+    template<>
+    struct hash<debugger_breakpoint_address>
+    {
+        typedef debugger_breakpoint_address argument_type;
+        typedef std::size_t result_type;
+
+        result_type operator()(argument_type const& s) const
+        {
+            return s.source << 24 | s.page << 16 | s.offset;
+        }
+    };
+
+    template<>
+    struct equal_to<debugger_breakpoint_address>
+    {
+        typedef debugger_breakpoint_address argument_type;
+        bool
+        operator()(const argument_type &a, const argument_type &b) const
+        {
+            return a.source == b.source && a.page == b.page && a.offset == b.offset;
+        }
+    };
+}
 
 class BreakpointsModel : public FuseListModel
 {
@@ -42,13 +69,13 @@ class BreakpointsModel : public FuseListModel
 
 public:
     enum BreakpointType {
-        Execute = DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
-        Read,
-        Write,
-        PortRead,
-        PortWrite,
-        Time,
-        Event
+        BreakOnExecute = DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
+        BreakOnRead = DEBUGGER_BREAKPOINT_TYPE_READ,
+        BreakOnWrite = DEBUGGER_BREAKPOINT_TYPE_WRITE,
+        BreakOnPortRead = DEBUGGER_BREAKPOINT_TYPE_PORT_READ,
+        BreakOnPortWrite = DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE,
+        BreakOnTime = DEBUGGER_BREAKPOINT_TYPE_TIME,
+        BreakOnEvent = DEBUGGER_BREAKPOINT_TYPE_EVENT
     };
 
     enum BreakpointLife {
@@ -86,7 +113,7 @@ private:
     };
 
 public:
-    typedef std::unordered_map<u_int32_t, std::pair<debugger_breakpoint_type, debugger_breakpoint_address>> Addresses;
+    typedef std::unordered_map<debugger_breakpoint_address, std::unordered_set<int>> Addresses;
 
 public:
     BreakpointsModel(QObject *parent);

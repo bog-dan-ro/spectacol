@@ -18,17 +18,18 @@
 #include "fuseemulator.h"
 #include "qmlui.h"
 
-#include <libspectrum.h>
+#include <debugger/breakpoint.h>
 #include <fuse.h>
+#include <libspectrum.h>
 #include <machine.h>
 #include <pokefinder/pokefinder.h>
 #include <settings.h>
 #include <snapshot.h>
+#include <ui/ui.h>
+#include <ui/scaler/scaler.h>
 #include <utils.h>
 #include <z80/z80.h>
 
-#include <ui/ui.h>
-#include <ui/scaler/scaler.h>
 
 #include <QCoreApplication>
 #include <QDateTime>
@@ -200,7 +201,6 @@ void FuseEmulator::setSelectedFilterIndex(int selectedFilterIndex)
 
 QString FuseEmulator::PC() const
 {
-    qDebug() << z80.pc.w;
     return formatNumber(z80.pc.w);
 }
 
@@ -575,6 +575,22 @@ void FuseEmulator::debuggerRun()
 {
     pokeEvent([]{
         debugger_run();
+    });
+}
+
+void FuseEmulator::addBreakpoint(int address, int type)
+{
+    pokeEvent([this, type, address]{
+        debugger_breakpoint_add_address(debugger_breakpoint_type(type), memory_source_any, 0, address, 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, nullptr);
+        m_pokeFinderModel.update();
+    });
+}
+
+void FuseEmulator::addBreakpointPage(int address, int page, int type)
+{
+    pokeEvent([this, type, address, page]{
+        debugger_breakpoint_add_address(debugger_breakpoint_type(type), memory_source_ram, page, address, 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, nullptr);
+        m_pokeFinderModel.update();
     });
 }
 
