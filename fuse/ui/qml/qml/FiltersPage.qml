@@ -23,6 +23,9 @@ import QtQuick.Window 2.0
 
 ListView {
     id: view
+    Component.onCompleted: fuse.paused = true
+    Component.onDestruction: fuse.paused = false
+
     clip: true
     focus: true
     PropertyAnimation on x {

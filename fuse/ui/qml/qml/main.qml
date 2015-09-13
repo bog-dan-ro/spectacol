@@ -117,6 +117,11 @@ ApplicationWindow {
                     if (menuBar.open) {
                         menuView.popMenu();
                         event.accepted = true;
+                    } else {
+                        if (pageLoader.source != "") {
+                            pageLoader.source = "";
+                            event.accepted = true;
+                        }
                     }
                     break;
                 }
@@ -133,16 +138,16 @@ ApplicationWindow {
                 visible: status === Loader.Ready
                 focus: visible
                 enabled: visible
-                onStatusChanged: {
-                    switch (status) {
-                    case Loader.Ready:
-                        fuse.paused = true;
-                        break;
-                    case Loader.Null:
-                        fuse.paused = false;
-                        break;
-                    }
-                }
+//                onStatusChanged: {
+//                    switch (status) {
+//                    case Loader.Ready:
+//                        fuse.paused = true;
+//                        break;
+//                    case Loader.Null:
+//                        fuse.paused = false;
+//                        break;
+//                    }
+//                }
             }
         }
 

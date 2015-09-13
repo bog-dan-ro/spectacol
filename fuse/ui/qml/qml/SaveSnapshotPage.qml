@@ -24,6 +24,9 @@ import Qt.labs.settings 1.0
 
 SaveFilePage {
     id: saveSnapshotPage
+    Component.onCompleted: fuse.paused = true
+    Component.onDestruction: fuse.paused = false
+
     title: qsTr("Snapshot name:")
     folder: fuse.dataPath + "/Snapshots/"
     onAccpeted: {

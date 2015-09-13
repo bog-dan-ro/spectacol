@@ -22,6 +22,9 @@ import Qt.labs.settings 1.0
 
 CoverFlowFiles {
     id: browser
+    Component.onCompleted: fuse.paused = true
+    Component.onDestruction: fuse.paused = false
+
     folder: fuse.dataPath
 
     Settings {
