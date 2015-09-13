@@ -512,6 +512,7 @@ debugger_breakpoint_remove_all( void )
   /* Restart the breakpoint numbering */
   next_breakpoint_id = 1;
 
+  ui_breakpoints_updated();
   return 0;
 }
 
