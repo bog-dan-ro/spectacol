@@ -93,7 +93,7 @@ QVariant PokeFinderModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     switch (role) {
-    case Bank:
+    case Page:
         return m_data[index.row()].bank;
 
     case Offset:
@@ -125,7 +125,7 @@ QVariant PokeFinderModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> PokeFinderModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[Bank] = "bank";
+    roles[Page] = "page";
     roles[Offset] = "offset";
     roles[OffsetText] = "offsetText";
     roles[Value] = "value";

@@ -60,6 +60,33 @@ int BreakpointsModel::rowCount(const QModelIndex &parent) const
     return m_breakPoints.size();
 }
 
+QVariant breakpointType(BreakpointsModel::BreakpointType type)
+{
+    switch (type) {
+    case BreakpointsModel::BreakOnExecute:
+        return QLatin1Literal("X");
+
+    case BreakpointsModel::BreakOnRead:
+        return QLatin1Literal("R");
+
+    case BreakpointsModel::BreakOnWrite:
+        return QLatin1Literal("W");
+
+    case BreakpointsModel::BreakOnPortRead:
+        return QLatin1Literal("PR");
+
+    case BreakpointsModel::BreakOnPortWrite:
+        return QLatin1Literal("PW");
+
+    case BreakpointsModel::BreakOnTime:
+        return QLatin1Literal("T");
+
+    case BreakpointsModel::BreakOnEvent:
+        return QLatin1Literal("E");
+    }
+    return QVariant();
+}
+
 QVariant BreakpointsModel::data(const QModelIndex &index, int role) const
 {
     if (size_t(index.row()) >= m_breakPoints.size())
@@ -71,13 +98,13 @@ QVariant BreakpointsModel::data(const QModelIndex &index, int role) const
     case Id:
         return value.id;
     case Type:
-        return value.type;
+        return breakpointType(value.type);
     case Value:
         return breakPointValue(value);
     case Ignore:
         return QString::number(value.ignore);
     case Life:
-        return value.life;
+        return (value.life == Permanent) ? QString::fromUtf8("∞") : QString::fromUtf8("1");
     case Condition:
         return value.condition;
     case Commands:
@@ -89,13 +116,13 @@ QVariant BreakpointsModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> BreakpointsModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[Id] = "Id";
-    roles[Type] = "Type";
-    roles[Value] = "Value";
-    roles[Ignore] = "Ignore";
-    roles[Life] = "Life";
-    roles[Condition] = "Condition";
-    roles[Commands] = "Commands";
+    roles[Id] = "id";
+    roles[Type] = "type";
+    roles[Value] = "value";
+    roles[Ignore] = "ignore";
+    roles[Life] = "life";
+    roles[Condition] = "condition";
+    roles[Commands] = "commands";
     return roles;
 }
 
@@ -108,8 +135,8 @@ QVariant BreakpointsModel::breakPointValue(const BreakpointsModel::DebuggerBreak
         if (bp.value.address.source== memory_source_any)
             return formatNumber(bp.value.address.offset);
         return QLatin1String(memory_source_description(bp.value.address.source)) + QLatin1Char(':') +
-                formatNumber(bp.value.address.page) + QLatin1Char(':') +
-                formatNumber(bp.value.address.offset) + QLatin1Char(':');
+                formatNumber(uint8_t(bp.value.address.page)) + QLatin1Char(':') +
+                formatNumber(bp.value.address.offset);
 
     case BreakOnPortRead:
     case BreakOnPortWrite:

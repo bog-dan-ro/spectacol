@@ -38,7 +38,6 @@
 #include <QSettings>
 #include <QStandardPaths>
 
-#include <QDebug>
 
 #include <mutex>
 
@@ -91,7 +90,9 @@ static void destroy_mutex(libspectrum_mutex_t mutex)
     } else { \
         pokeEvent([this, val]{ \
             reg = val; \
-            emit registersChanged(); \
+            callFunction([this]{ \
+                emit registersChanged(); \
+            }); \
         }); \
     }
 
@@ -195,7 +196,9 @@ void FuseEmulator::setSelectedFilterIndex(int selectedFilterIndex)
     const scaler_type scaler = scaler_type(m_supportedScalers[selectedFilterIndex]);
     pokeEvent([scaler, this]{
         scaler_select_scaler(scaler);
-        emit selectedFilterIndexChanged();
+        callFunction([this]{
+            emit selectedFilterIndexChanged();
+        });
     });
 }
 
@@ -382,7 +385,9 @@ void FuseEmulator::setHL_(const QString &value)
 void FuseEmulator::updateDebugger()
 {
     m_disassambleModel.disassamble(z80.pc.w);
-    emit registersChanged();
+    callFunction([this]{
+        emit registersChanged();
+    });
 }
 
 int FuseEmulator::pokeFinderCount() const
@@ -402,7 +407,9 @@ void FuseEmulator::load(const QUrl &filePath)
         fuse_emulation_pause();
         if (utils_open_file(filePath.path().toUtf8().constData(), 1 , nullptr))
             m_loadedFileName = "";
-        emit saveSnapshotEnabledChanged();
+        callFunction([this]{
+            emit saveSnapshotEnabledChanged();
+        });
         display_refresh_all();
         fuse_emulation_unpause();
         m_resetPokeFinder = true;
@@ -485,18 +492,23 @@ void FuseEmulator::activateDebugger()
 
     fuse_emulation_pause();
     updateDebugger();
-    emit showDebugger();
+    callFunction([this]{;
+        emit showDebugger();
+    });
 }
 
-void FuseEmulator::deactivateDebugger(bool interruptable)
+void FuseEmulator::deactivateDebugger(bool /*interruptable*/)
 {
     bool expected = true;
     if (!m_debuggerActivated.compare_exchange_strong(expected, false))
         return;
 
-    if (!interruptable)
-        emit hideDebugger();
     fuse_emulation_unpause();
+
+//    if (interruptable)
+//        callFunction([this]{
+//            emit hideDebugger();
+//        });
 }
 
 void FuseEmulator::pokeFinderInced()
@@ -564,10 +576,10 @@ void FuseEmulator::debuggerTrap()
     });
 }
 
-void FuseEmulator::debuggerStep()
+void FuseEmulator::debuggerNext()
 {
     pokeEvent([]{
-        debugger_step();
+        debugger_next();
     });
 }
 
@@ -590,6 +602,14 @@ void FuseEmulator::addBreakpointPage(int address, int page, int type)
 {
     pokeEvent([this, type, address, page]{
         debugger_breakpoint_add_address(debugger_breakpoint_type(type), memory_source_ram, page, address, 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, nullptr);
+        m_pokeFinderModel.update();
+    });
+}
+
+void FuseEmulator::debuggerCommand(const QString &command)
+{
+    pokeEvent([this, command]{
+        debugger_command_evaluate(command.toUtf8().constData());
         m_pokeFinderModel.update();
     });
 }

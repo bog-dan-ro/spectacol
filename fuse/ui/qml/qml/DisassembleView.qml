@@ -30,6 +30,66 @@ ListView {
 
     currentIndex: disassambleModel.delta
 
+    VisualDataModel {
+        id: visualModel
+        model: disassambleModel
+        delegate: Rectangle {
+            property color paper: view.currentIndex !== index ? background : selectedBackground
+            property color ink: view.currentIndex !== index ? foreground : selectedForeground
+
+            width: view.width
+            height: 7 * Screen.pixelDensity
+            color: paper
+            RowLayout {
+                anchors.fill: parent
+                FancyText {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: false
+                    horizontalAlignment: Text.AlignRight
+                    fontSize: 4
+                    style: Text.Normal
+                    Layout.preferredWidth: 14 * Screen.pixelDensity
+                    color: ink
+                    text: model.addressText
+                }
+
+                Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
+
+                FancyText {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: false
+                    Layout.preferredWidth: 15 * Screen.pixelDensity
+                    horizontalAlignment: Text.AlignHCenter
+                    fontSize: 2.5
+                    style: Text.Normal
+                    color: ink
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    text: model.bytes
+                }
+
+                Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
+
+                FancyText {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignLeft
+                    fontSize: 4
+                    color: ink
+                    style: Text.Normal
+                    text: model.disassable
+                }
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    view.focus = true;
+                    view.currentIndex = model.index;
+                }
+                onDoubleClicked: fuse.addBreakpoint(model.address)
+                onPressAndHold: fuse.addBreakpoint(model.address)
+            }
+        }
+    }
     Keys.onUpPressed: {
         if (view.currentIndex > 1)
             decrementCurrentIndex();
@@ -40,58 +100,13 @@ ListView {
     }
 
     Keys.onDownPressed: incrementCurrentIndex()
-
-    model: disassambleModel
-
-    delegate: Rectangle {
-        property color paper: view.currentIndex !== index ? background : selectedBackground
-        property color ink: view.currentIndex !== index ? foreground : selectedForeground
-
-        width: view.width
-        height: 7 * Screen.pixelDensity
-        color: paper
-        RowLayout {
-            anchors.fill: parent
-            FancyText {
-                Layout.fillHeight: true
-                Layout.fillWidth: false
-                horizontalAlignment: Text.AlignRight
-                fontSize: 4
-                style: Text.Normal
-                Layout.preferredWidth: 14 * Screen.pixelDensity
-                color: ink
-                text: model.addressText
-            }
-
-            Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
-
-            FancyText {
-                Layout.fillHeight: true
-                Layout.fillWidth: false
-                Layout.preferredWidth: 15 * Screen.pixelDensity
-                horizontalAlignment: Text.AlignHCenter
-                fontSize: 2.5
-                style: Text.Normal
-                color: ink
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                text: model.bytes
-            }
-
-            Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
-
-            FancyText {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignLeft
-                fontSize: 4
-                color: ink
-                style: Text.Normal
-                text: model.disassable
-            }
-        }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: view.currentIndex = model.index
+    Keys.onPressed: {
+        event.accepted = true;
+        switch (event.key) {
+        case Qt.Key_Escape:
+            pageLoader.source = "";
+            break;
         }
     }
+    model: visualModel
 }

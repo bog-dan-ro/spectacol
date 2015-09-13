@@ -26,7 +26,7 @@
 class PokeFinderModel : public FuseListModel
 {
     enum {
-        Bank = Qt::UserRole + 1,
+        Page = Qt::UserRole + 1,
         Offset,
         OffsetText,
         Value,

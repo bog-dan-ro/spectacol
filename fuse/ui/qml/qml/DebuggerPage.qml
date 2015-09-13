@@ -18,6 +18,7 @@
 // @scope main.qml
 
 import QtQuick 2.5
+import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.0
 
@@ -55,7 +56,7 @@ Item {
                 Layout.fillHeight: true
                 Rectangle {
                     id: infoRect
-                    visible: true
+                    visible: false
                     anchors.fill: parent
                     radius: Screen.pixelDensity
                     color: backgroudColor
@@ -94,18 +95,14 @@ Item {
                     id: breakPointsRect
                     color: backgroudColor
                     radius: Screen.pixelDensity
-                    border.width: (focus ? 1 : 0.5) * Screen.pixelDensity
+                    border.width: (breakpointsView.focused ? 1 : 0.5) * Screen.pixelDensity
                     border.color: "white"
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    activeFocusOnTab: true
-                    FancyText {
-                        anchors.centerIn: parent
-                        text: "breakPoints"
-                    }
-                    MouseArea {
+                    BreakpointsView {
                         anchors.fill: parent
-                        onClicked: dissasambleRect.focus = true
+                        id: breakpointsView
+                        anchors.margins: parent.border.width
                     }
                 }
             }
@@ -118,9 +115,28 @@ Item {
             radius: Screen.pixelDensity
             border.width: (focus ? 1 : 0.5) * Screen.pixelDensity
             border.color: "white"
-            FancyText {
-                anchors.centerIn: parent
-                text: "toolBar"
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: parent.border.width
+                FancyTextField {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    onAccepted: {
+                        fuse.debuggerCommand(text);
+                        selectAll();
+                    }
+                    placeholderText: qsTr("Type a command here")
+                }
+                Button {
+                    Layout.alignment: Qt.AlignVCenter
+                    text: "Step"
+                    onClicked: fuse.debuggerNext()
+                }
+                Button {
+                    Layout.alignment: Qt.AlignVCenter
+                    text: "Continue"
+                    onClicked: fuse.debuggerRun()
+                }
             }
         }
     }

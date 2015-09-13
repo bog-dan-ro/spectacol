@@ -19,10 +19,11 @@
 
 #include "disassamblemodel.h"
 #include "fuseemulator.h"
-#include "machine.h"
 #include "qmlui.h"
 
 #include <debugger/debugger.h>
+#include <machine.h>
+#include <z80/z80.h>
 
 static inline uint32_t absolute2PageAddress(uint16_t page, uint16_t address)
 {
@@ -50,11 +51,13 @@ void DisassambleModel::disassamble(uint16_t address, int delta, uint16_t instruc
 {
     disassambleTemp(address, delta, instructions);
     callFunction([this](){
+        m_canFetchMore = false;
         beginResetModel();
         std::lock_guard<std::mutex> lock(m_mutex);
         m_disassambleData = std::move(m_disassambleDataTemp);
         m_disassambleDataTemp.clear();
         endResetModel();
+        m_canFetchMore = m_address + m_length < 0xffff;
         emit deltaChanged();
     });
 }
@@ -75,6 +78,7 @@ void DisassambleModel::disassambleMore(DisassambleModel::Origin origin, int size
     }
     disassambleTemp(addr, origin == Start ? -size : 0, size);
     callFunction([this, size, origin]{
+        std::lock_guard<std::mutex> lock(m_mutex);
         int first = (origin == Start) ? 0 : m_disassambleData.size();
         beginInsertRows(QModelIndex(), first, first + size -1);
         m_disassambleData.insert(origin == Start ? m_disassambleData.begin() : m_disassambleData.end(), m_disassambleDataTemp.begin(), m_disassambleDataTemp.end());
@@ -122,7 +126,7 @@ QVariant DisassambleModel::data(const QModelIndex &index, int role) const
 bool DisassambleModel::canFetchMore(const QModelIndex &parent) const
 {
     Q_ASSERT(!parent.isValid());
-    return m_address + m_length < 0xffff;
+    return m_canFetchMore;
 }
 
 void DisassambleModel::fetchMore(const QModelIndex &parent)
@@ -147,7 +151,7 @@ QHash<int, QByteArray> DisassambleModel::roleNames() const
     return ret;
 }
 
-QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std::unordered_set<int> &types)
+QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std::unordered_set<int> &types, uint16_t address)
 {
     switch (colorType) {
     case Ink:
@@ -157,9 +161,8 @@ QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std:
         if (types.find(DEBUGGER_BREAKPOINT_TYPE_EXECUTE) != types.end())
             return Qt::red;
 
-        if (types.find(DEBUGGER_BREAKPOINT_TYPE_READ) != types.end() ||
-                types.find(DEBUGGER_BREAKPOINT_TYPE_WRITE) != types.end())
-            return Qt::darkRed;
+        if (address == z80.pc.w)
+            return Qt::blue;
 
         return QColor(0, 0, 0, 200);
     }
@@ -169,22 +172,24 @@ QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std:
 
 void DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t instructions)
 {
+    uint16_t pc = address;
     if (address && delta)
         address = debugger_search_instruction(address, delta);
-    else
-        delta = 0;
+    delta = 0;
 
     BreakpointsModel* breakpointsModel = g_fuseEmulator->breakpointsModel();
     std::lock_guard<std::mutex> lock(m_mutex);
     std::lock_guard<std::mutex> lockBreakpoints(breakpointsModel->breakpointsMutex());
     m_address = address;
-    m_delta = delta;
+    m_delta = 0;
     m_length = 0;
     m_disassambleDataTemp.clear();
 
     char buff[100];
     const auto &addresses = breakpointsModel->addresses();
     while (instructions--) {
+        if (pc == address)
+            m_delta = -delta;
         size_t len;
         debugger_disassemble(buff, sizeof(buff), &len, address);
         QString bytes;
@@ -211,13 +216,14 @@ void DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t ins
         }
 
         address += len;
+        ++delta;
         m_length += len;
     }
 }
 
 DisassambleModel::DisassambleData::DisassambleData(uint16_t address, const QString &bytes, const QString &disassamble, const std::unordered_set<int> &types)
-    : background(color(Paper, types))
-    , foreground(color(Ink, types))
+    : background(color(Paper, types, address))
+    , foreground(color(Ink, types, address))
     , address(address)
     , bytes(bytes)
     , disassamble(disassamble)

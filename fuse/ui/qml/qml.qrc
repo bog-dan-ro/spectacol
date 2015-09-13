@@ -59,5 +59,6 @@
         <file>qml/DisassembleView.qml</file>
         <file>qml/RegistersView.qml</file>
         <file>qml/PokeFinderPage.qml</file>
+        <file>qml/BreakpointsView.qml</file>
     </qresource>
 </RCC>

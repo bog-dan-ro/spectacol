@@ -150,11 +150,13 @@ public slots:
 
     // debug methods
     void debuggerTrap();
-    void debuggerStep();
+    void debuggerNext();
     void debuggerRun();
 
     void addBreakpoint(int address, int type = BreakpointsModel::BreakOnExecute);
     void addBreakpointPage(int address, int page, int type = BreakpointsModel::BreakOnWrite);
+    void debuggerCommand(const QString &command);
+
 
     void disassamble();
     void disassambleFetchUp(int lines);

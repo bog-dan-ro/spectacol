@@ -88,13 +88,14 @@ protected:
     QHash<int, QByteArray> roleNames() const;
 
 private:
-    static QColor color(ColorType colorType, const std::unordered_set<int> &types);
+    static QColor color(ColorType colorType, const std::unordered_set<int> &types, uint16_t address);
     void disassambleTemp(uint16_t address, int delta, uint16_t instructions);
 
 private:
     uint16_t m_address = 0;
     int m_delta = 0;
     uint16_t m_length = 0;
+    bool m_canFetchMore = false;
     mutable std::mutex m_mutex;
     std::vector<DisassambleData> m_disassambleData, m_disassambleDataTemp;
 };

@@ -28,7 +28,51 @@ Rectangle {
     id: pokeFinderPage
     color: Qt.rgba(0, 0, 0, 0.75);
 
-    Component.onCompleted: fuse.pokeFinderResetIfNeeded()
+    Component.onCompleted: {
+        fuse.pokeFinderResetIfNeeded();
+        fuse.paused = true;
+    }
+    Component.onDestruction: fuse.paused = false
+
+    function addBreakpoint(type)
+    {
+        var model = visualModel.items.get(view.currentIndex).model;
+        fuse.addBreakpointPage(model.offset, model.page, type);
+    }
+
+    Keys.onPressed: {
+        switch (event.key) {
+        case Qt.Key_C:
+            pageLoader.source = "";
+            event.accepted = true;
+            break;
+
+        case Qt.Key_I:
+            fuse.pokeFinderInced();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_D:
+            fuse.pokeFinderDeced();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_R:
+            fuse.pokeFinderReset();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_B:
+            addBreakpoint(BreakpointsModel.BreakOnWrite);
+            event.accepted = true;
+            break;
+
+        case Qt.Key_D:
+            addBreakpoint(BreakpointsModel.BreakOnRead);
+            event.accepted = true;
+            break;
+        }
+    }
 
     ColumnLayout {
         anchors.centerIn: parent
@@ -49,7 +93,6 @@ Rectangle {
                 placeholderText: qsTr("Enter a numeric value")
                 Keys.onPressed: {
                     switch (event.key) {
-                    case Qt.Key_Escape:
                     case Qt.Key_C:
                         pageLoader.source = "";
                         event.accepted = true;
@@ -67,6 +110,16 @@ Rectangle {
 
                     case Qt.Key_R:
                         fuse.pokeFinderReset();
+                        event.accepted = true;
+                        break;
+
+                    case Qt.Key_B:
+                        addBreakpoint(BreakpointsModel.BreakOnWrite);
+                        event.accepted = true;
+                        break;
+
+                    case Qt.Key_D:
+                        addBreakpoint(BreakpointsModel.BreakOnRead);
                         event.accepted = true;
                         break;
 
@@ -109,24 +162,17 @@ Rectangle {
                 }
                 Button {
                     Layout.fillWidth: true
-                    activeFocusOnTab: false
                     enabled: view.currentIndex !== -1
-                    text: qsTr("&Break on R/W")
-                    onClicked: {
-                        var model = visualModel.items.get(view.currentIndex).model;
-                        fuse.addBreakpointPage(model.offset, model.bank, BreakpointsModel.BreakOnRead);
-                        fuse.addBreakpointPage(model.offset, model.bank, BreakpointsModel.BreakOnWrite);
-                    }
+                    activeFocusOnTab: false
+                    text: qsTr("&Break on write")
+                    onClicked: addBreakpoint(BreakpointsModel.BreakOnWrite);
                 }
                 Button {
                     Layout.fillWidth: true
-                    enabled: view.currentIndex !== -1
                     activeFocusOnTab: false
-                    text: qsTr("Break on &write")
-                    onClicked: {
-                        var model = visualModel.items.get(view.currentIndex).model;
-                        fuse.addBreakpointPage(model.offset, model.bank, BreakpointsModel.BreakOnWrite);
-                    }
+                    enabled: view.currentIndex !== -1
+                    text: qsTr("Break on rea&d")
+                    onClicked: addBreakpoint(BreakpointsModel.BreakOnRead);
                 }
                 Button {
                     Layout.fillWidth: true
@@ -164,7 +210,7 @@ Rectangle {
                                 fontSize: 4
                                 style: Text.Normal
                                 color: ink
-                                text: model.bank
+                                text: model.page
                             }
 
                             Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
