@@ -60,5 +60,6 @@
         <file>qml/RegistersView.qml</file>
         <file>qml/PokeFinderPage.qml</file>
         <file>qml/BreakpointsView.qml</file>
+        <file>z80_opcodes.csv</file>
     </qresource>
 </RCC>
