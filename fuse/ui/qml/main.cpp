@@ -18,6 +18,7 @@
 #include "fuseemulator.h"
 #include "fusescreen.h"
 #include "spectrumscreen.h"
+#include "z80assembler.h"
 
 #include <QQmlApplicationEngine>
 
