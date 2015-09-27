@@ -209,11 +209,11 @@ void DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t ins
             it = addresses.find(addr);
         }
 
-        if (it != addresses.end()) { // we have a breakpoint
+        if (it != addresses.end()) // we have a breakpoint
             m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff), it->second));
-        } else {
+        else
             m_disassambleDataTemp.emplace_back(DisassambleData(address, bytes, QLatin1String(buff)));
-        }
+
 
         address += len;
         ++delta;

@@ -39,7 +39,6 @@ private:
 
 FuseObject::FuseObject(QObject *parent) : QObject(parent)
 {
-
 }
 
 void FuseObject::callFunction(const FuseObject::Function &func)
