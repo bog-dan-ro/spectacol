@@ -20,6 +20,7 @@
 import QtQuick 2.5
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.0
+import Fuse 1.0
 
 ListView {
     id: view
@@ -29,6 +30,10 @@ ListView {
     highlightFollowsCurrentItem: true
 
     currentIndex: disassambleModel.delta
+
+    Z80Assembler {
+        id: assembler
+    }
 
     VisualDataModel {
         id: visualModel
@@ -40,6 +45,15 @@ ListView {
             width: view.width
             height: 7 * Screen.pixelDensity
             color: paper
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    view.focus = true;
+                    view.currentIndex = model.index;
+                }
+                onDoubleClicked: fuse.addBreakpoint(model.address)
+                onPressAndHold: fuse.addBreakpoint(model.address)
+            }
             RowLayout {
                 anchors.fill: parent
                 FancyText {
@@ -64,29 +78,44 @@ ListView {
                     style: Text.Normal
                     color: ink
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    text: model.bytes
+                    text: model.bytesText
                 }
 
                 Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
 
-                FancyText {
+                FancyTextField {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
                     fontSize: 4
-                    color: ink
+                    textColor: ink
+                    readOnly: true
                     style: Text.Normal
+                    inputMethodHints: Qt.ImhPreferUppercase
                     text: model.disassable
+                    onAccepted: {
+                        readOnly = true
+                        assembler.write(text, model.address, model.bytes)
+                        disassambleModel.update();
+                        validator = null;
+                        console.log(text)
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            view.focus = true;
+                            view.currentIndex = model.index;
+                        }
+                        onDoubleClicked: {
+                            parent.readOnly = false;
+                            parent.selectAll();
+                            parent.focus = true;
+                            parent.validator = assembler;
+                        }
+                        onPressAndHold: Qt.quit()
+                    }
                 }
-            }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    view.focus = true;
-                    view.currentIndex = model.index;
-                }
-                onDoubleClicked: fuse.addBreakpoint(model.address)
-                onPressAndHold: fuse.addBreakpoint(model.address)
             }
         }
     }

@@ -107,6 +107,8 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
 {
     g_fuseEmulator = this;
 
+    connect(&m_breakpointsModel, &BreakpointsModel::modelReset, &m_disassambleModel, &DisassambleModel::update);
+
     ctxt->setContextProperty("fuse", this);
     ctxt->setContextProperty("breakpointsModel", &m_breakpointsModel);
     ctxt->setContextProperty("disassambleModel", &m_disassambleModel);

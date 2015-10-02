@@ -134,6 +134,18 @@ QByteArray Z80Assembler::assemble(const QString &asmLine, int address, const QBy
     return QByteArray();
 }
 
+bool Z80Assembler::write(const QString &asmLine, int address, const QByteArray &assembledBytes) const
+{
+    QByteArray bytes = assemble(asmLine, address, assembledBytes);
+    if (bytes.isEmpty())
+        return false;
+
+    foreach (uint8_t byte, bytes)
+        writebyte(address++, byte);
+
+    return true;
+}
+
 QValidator::State Z80Assembler::validate(QString &value, int &) const
 {
     return assemble(value, 0).isEmpty() ? QValidator::Intermediate : QValidator::Acceptable;

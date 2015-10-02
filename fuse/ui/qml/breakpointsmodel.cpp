@@ -47,9 +47,10 @@ void BreakpointsModel::breakpointsUpdated()
 
     callFunction([this](){
         beginResetModel();
-        std::lock_guard<std::mutex> lock(m_mutex);
+        m_mutex.lock();
         m_breakPoints = std::move(m_breakPointsTmp);
         m_breakPointsTmp.clear();
+        m_mutex.unlock();
         endResetModel();
     });
 }

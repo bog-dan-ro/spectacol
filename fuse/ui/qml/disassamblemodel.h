@@ -25,6 +25,7 @@
 #include <mutex>
 #include <vector>
 #include <unordered_set>
+#include <memory>
 
 #include <QColor>
 
@@ -42,6 +43,7 @@ class DisassambleModel : public FuseListModel
         Address,
         AddressText,
         Bytes,
+        BytesText,
         Disassable
     };
 
@@ -52,12 +54,12 @@ class DisassambleModel : public FuseListModel
 
     struct DisassambleData {
         DisassambleData(uint16_t address,
-                        const QString &bytes,
+                        const QByteArray &bytes,
                         const QString &disassamble,
                         const std::unordered_set<int> &types = std::unordered_set<int>());
         QColor background, foreground;
         uint16_t address = 0;
-        QString bytes;
+        QByteArray bytes;
         QString disassamble;
     };
 
@@ -72,6 +74,7 @@ public:
 
     void disassamble(uint16_t address, int delta = -10, uint16_t instructions = 50);
     void disassambleMore(Origin origin, int size);
+    Q_INVOKABLE void update();
 
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const;
@@ -89,7 +92,8 @@ protected:
 
 private:
     static QColor color(ColorType colorType, const std::unordered_set<int> &types, uint16_t address);
-    void disassambleTemp(uint16_t address, int delta, uint16_t instructions);
+    typedef std::vector<DisassambleData> DisassambleDataVector;
+    std::shared_ptr<DisassambleDataVector> disassambleTemp(uint16_t address, int delta, uint16_t instructions);
 
 private:
     uint16_t m_address = 0;
@@ -97,7 +101,7 @@ private:
     uint16_t m_length = 0;
     bool m_canFetchMore = false;
     mutable std::mutex m_mutex;
-    std::vector<DisassambleData> m_disassambleData, m_disassambleDataTemp;
+    DisassambleDataVector m_disassambleData;
 };
 
 #endif // DISASSAMBLEMODEL_H
