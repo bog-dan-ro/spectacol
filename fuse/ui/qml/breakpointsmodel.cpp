@@ -18,6 +18,25 @@
 #include "breakpointsmodel.h"
 #include "qmlui.h"
 
+static inline uint32_t absoluteAddress(debugger_breakpoint_address address)
+{
+    if (address.source == memory_source_any)
+        return address.offset;
+
+    uint32_t absAdd = 0;
+    switch (address.page) {
+    case 5:
+        absAdd = 0x4000;
+        break;
+    case 2:
+        absAdd = 0x8000;
+    default:
+        absAdd = 0xc000;
+        break;
+    }
+    return absAdd + address.offset;
+}
+
 BreakpointsModel::BreakpointsModel(QObject *parent)
     : FuseListModel(parent)
 {
@@ -110,6 +129,8 @@ QVariant BreakpointsModel::data(const QModelIndex &index, int role) const
         return value.condition;
     case Commands:
         return value.commands;
+    case AbsoluteAddress:
+        return absoluteAddress(value.value.address);
     }
     return QVariant();
 }
@@ -124,6 +145,7 @@ QHash<int, QByteArray> BreakpointsModel::roleNames() const
     roles[Life] = "life";
     roles[Condition] = "condition";
     roles[Commands] = "commands";
+    roles[AbsoluteAddress] = "absoluteAddress";
     return roles;
 }
 

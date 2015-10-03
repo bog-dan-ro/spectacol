@@ -186,6 +186,9 @@ QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std:
         return Qt::white;
 
     case Paper:
+        if (types.find(DEBUGGER_BREAKPOINT_TYPE_EXECUTE) != types.end() && address == z80.pc.w)
+            return Qt::darkMagenta;
+
         if (types.find(DEBUGGER_BREAKPOINT_TYPE_EXECUTE) != types.end())
             return Qt::red;
 

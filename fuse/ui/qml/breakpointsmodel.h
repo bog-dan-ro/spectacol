@@ -64,7 +64,8 @@ class BreakpointsModel : public FuseListModel
         Ignore,
         Life,
         Condition,
-        Commands
+        Commands,
+        AbsoluteAddress
     };
 
 public:

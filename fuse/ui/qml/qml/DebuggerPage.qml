@@ -34,7 +34,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Rectangle {
-                id: dissasambleRect
+                id: disassambleRect
                 color: backgroudColor
                 radius: Screen.pixelDensity
                 border.width: (disassembleView.focus ? 1 : 0.5) * Screen.pixelDensity
@@ -103,6 +103,7 @@ Item {
                         anchors.fill: parent
                         id: breakpointsView
                         anchors.margins: parent.border.width
+                        onBreakpointSelected: fuse.disassamble(item.absoluteAddress);
                     }
                 }
             }

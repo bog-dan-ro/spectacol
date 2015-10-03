@@ -25,6 +25,7 @@ import QtQuick.Window 2.0
 
 Item {
     property alias focused: view.focus
+    signal breakpointSelected(var item)
 
     VisualDataModel {
         id: visualModel
@@ -77,6 +78,8 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {view.focus = true; view.currentIndex = model.index}
+                onPressAndHold: breakpointSelected(model)
+                onDoubleClicked: breakpointSelected(model)
             }
         }
     }

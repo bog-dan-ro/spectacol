@@ -28,6 +28,7 @@ ListView {
 
     snapMode: ListView.SnapToItem
     highlightFollowsCurrentItem: true
+    highlightMoveDuration: 100
 
     currentIndex: disassambleModel.delta
 
@@ -119,19 +120,40 @@ ListView {
             }
         }
     }
-    Keys.onUpPressed: {
-        if (view.currentIndex > 1)
-            decrementCurrentIndex();
-        else {
-            fuse.disassambleFetchUp(10);
-            decrementCurrentIndex();
-        }
-    }
 
-    Keys.onDownPressed: incrementCurrentIndex()
     Keys.onPressed: {
         event.accepted = true;
         switch (event.key) {
+        case Qt.Key_Home:
+            fuse.disassamble(0, 0);
+            view.currentIndex = 0;
+            break;
+
+        case Qt.Key_PageUp:
+            view.currentIndex = Math.max(0, view.currentIndex - 10);
+            break;
+
+        case Qt.Key_Up:
+            if (view.currentIndex > 1) {
+                decrementCurrentIndex();
+            } else {
+                fuse.disassambleFetchUp(10);
+                decrementCurrentIndex();
+            }
+            break;
+
+        case Qt.Key_Down:
+            incrementCurrentIndex();
+            break;
+
+        case Qt.Key_PageDown:
+            view.currentIndex = Math.min(view.count -1, view.currentIndex + 10);
+            break;
+
+        case Qt.Key_End:
+            fuse.disassamble(0xffff);
+            break;
+
         case Qt.Key_Escape:
             pageLoader.source = "";
             break;
