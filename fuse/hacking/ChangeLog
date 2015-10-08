@@ -4936,3 +4936,7 @@
          win32/win32ui.c},z80/{coretest.c,z80_checks.h,z80_ops.c}: capture BASIC
          video functions to SVG file (patch #322) (Stefano Bodrato).
 20150824 ui/widget/widget.c: remove unused function (Sergio).
+20151008 sound.c: remove DC offset compensation as it results in inaccurate
+         output when envelopes are used and is not required when using the
+         filtered sound output which removes the DC offset anyway (patch #339)
+         (Matthew Westcott and Fred)
