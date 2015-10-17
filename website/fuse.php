@@ -85,17 +85,18 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
    <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.1.1 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available.</li>
    <li><a href="http://fedoraproject.org/">Fedora</a> has <a href="https://apps.fedoraproject.org/packages/fuse-emulator/">packages</a> of 1.1.1 available by Lucian Langa.</li>
    <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.1.1 available as <a href="http://svnweb.freebsd.org/ports/head/emulators/fuse/">emulators/fuse</a>.</li>
-   <li><a href="http://www.gentoo.org/">Gentoo</a> users have an <a href="http://packages.gentoo.org/package/app-emulation/fuse?full_cat">ebuild</a> of 1.1.1 available.</li>
+   <li><a href="https://www.gentoo.org/">Gentoo</a> users have an <a href="https://packages.gentoo.org/packages/app-emulation/fuse">ebuild</a> of 1.1.1 available.</li>
    <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 1.1.1 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse/">emulators/fuse</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-utils/">emulators/fuse-utils</a>.</li>
    <li><a href="http://www.openbsd.org/">OpenBSD</a> users have version 1.1.1 available as the fuse and fuse-utils package, with thanks to Anthony J. Bentley.</li>
-   <li><a href="http://www.opensuse.org/">openSUSE</a> users have version 1.1.1 as the <a href="https://build.opensuse.org/package/show/Emulators/Fuse">Fuse</a> package from Emulators repository.</li>
+   <li><a href="https://www.opensuse.org/">openSUSE</a> users have version 1.1.1 as the <a href="https://build.opensuse.org/package/show/Emulators/Fuse">Fuse</a> package from Emulators repository.</li>
    <li>The <a href="https://www.pld-linux.org/">Polish Linux Distribution</a> has packages of <a href="http://sophie.zarb.org/search?search=fuse-gtk&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">Fuse</a> 1.1.1 and the <a href="http://sophie.zarb.org/search?search=fuse-utils&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">utilities</a>.</li>
+   <li><a href="http://www.slackware.com/">Slackware</a> users can get version 1.1.1 from SlackBuilds as a <a href="http://slackbuilds.org/result/?search=fuse-emulator">build script</a>.</li>
    <li><a href="http://www.ubuntu.com/">Ubuntu</a> has <a href="https://launchpad.net/ubuntu/+source/fuse-emulator">packages</a> of 1.1.1 available by Alberto Garcia.</li>
   </ul>
   <p>Packages of older versions of Fuse are also available for some other distributions:</p>
   <ul>
    <li>Nokia's <a href="http://maemo.org/">Maemo</a> platform has a port of <a href="http://maemo.org/downloads/product/OS2008/fuse-emulator/">1.0.0</a> available by Alberto Garcia.</li>
-   <li><a href="http://www.mandriva.com/">Mandriva</a> packages of 0.10.0.2 are available from the <a href="http://plf.zarb.org/">Penguin Liberation Front</a>.</li>
+   <li>Mandriva packages of 0.10.0.2 were available from the <a href="http://plf.zarb.org/">Penguin Liberation Front</a>.</li>
   </ul>
 
   <h3>Mac OS X</h3>
@@ -117,7 +118,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <p>A Wii port, based on work by Bj&ouml;rn Giesler, is available from <a href="http://wiibrew.org/wiki/Fuse">WiiBrew</a>. This is based on what is essentially 0.10.0.2.</p>
 
   <h3>Gizmondo</h3>
-  <p>A port of 0.9.0 to the Gizmondo tablet is available. The source is available via <a href="http://opensvn.csie.org/GizPorts/trunk/sdlport/fuzegiz/">csie.org</a>.</p>
+  <p>A port of 0.9.0 to the Gizmondo tablet is available. The source was available via <a href="https://web.archive.org/web/20090308111024/http://opensvn.csie.org/GizPorts/trunk/sdlport/fuzegiz/">csie.org</a>.</p>
 
   <h3>GP2X</h3>
   <p>Ben O'Steen has made a GP2X port, based on Fuse 0.6. Binaries and source are available from <a href="http://web.archive.org/web/20090905033548/http://www.zen71790.zen.co.uk/#fuse">his homepage</a>.</p>
