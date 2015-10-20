@@ -4940,3 +4940,5 @@
          output when envelopes are used and is not required when using the
          filtered sound output which removes the DC offset anyway (patch #339)
          (Matthew Westcott and Fred)
+20151020 z80/z80_checks.h: fix segfault due to inconsistent SETUP_CHECK() and
+         CHECK() ordering (UB880D; thanks, Guesser).
