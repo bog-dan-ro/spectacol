@@ -61,5 +61,7 @@
         <file>qml/PokeFinderPage.qml</file>
         <file>qml/BreakpointsView.qml</file>
         <file>z80_opcodes.csv</file>
+        <file>qml/StandardGamepad.qml</file>
+        <file>qml/ConfigureGamepad.qml</file>
     </qresource>
 </RCC>

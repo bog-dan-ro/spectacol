@@ -3,7 +3,7 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-QT += qml quick
+QT += qml quick gamepad
 !no_desktop: QT += widgets
 
 INCLUDEPATH += $$PWD/../../ $$PWD/../../../libspectrum
