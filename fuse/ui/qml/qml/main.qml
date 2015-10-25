@@ -154,20 +154,17 @@ ApplicationWindow {
         MessagePage {
             id: messagePage
             z: 100
-            Connections {
-                target: fuse
-                onError: messagePage.showMessage(level, message);
-            }
         }
     }
 
     Connections {
         target: fuse
-        onShowDebugger: pageLoader.source = "DebuggerPage.qml";
-    }
+        onError: messagePage.showMessage(level, message);
 
-    Connections {
-        target: fuse
+        onShowDebugger: pageLoader.source = "DebuggerPage.qml";
         onHideDebugger: pageLoader.source = "";
+
+        onShowMenu: menuBar.open = true;
+        onHideMenu: menuBar.open = false;
     }
 }

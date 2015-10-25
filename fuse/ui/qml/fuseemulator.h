@@ -182,6 +182,8 @@ signals:
     void registersChanged();
     void showDebugger();
     void hideDebugger();
+    void showMenu();
+    void hideMenu();
 
     void error(ErrorLevel level, const QString &message);
 
