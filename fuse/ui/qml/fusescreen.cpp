@@ -83,11 +83,13 @@ QSGNode *FuseScreen::updatePaintNode(QSGNode *n, QQuickItem::UpdatePaintNodeData
         }, Qt::QueuedConnection);
         geometryChanged(boundingRect(), boundingRect());
     }
-    node->setSourceRect(QRect(QPoint(0, 0), texture->imageSize()));
 
+    node->setSourceRect(QRect(QPoint(0, 0), texture->imageSize()));
     node->setRect(QRectF(qCeil((width() - implicitWidth()) / 2.),
                          qCeil((height() - implicitHeight()) / 2.),
                          implicitWidth(), implicitHeight()));
+
+    node->markDirty(QSGNode::DirtyMaterial);
     return node;
 }
 
