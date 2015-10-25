@@ -73,14 +73,14 @@ QSGNode *FuseScreen::updatePaintNode(QSGNode *n, QQuickItem::UpdatePaintNodeData
         node = new QSGSimpleTextureNode;
         node->setTexture(texture);
         node->setOwnsTexture(false);
-        QSizeF spectrumSize(FuseTexture::instance()->imageSize());
+        QSizeF spectrumSize(texture->imageSize());
         m_aspectRatio = spectrumSize.width()/spectrumSize.height();
-        connect(texture, &FuseTexture::screenGeometryChanged, this, &FuseScreen::screenChanged);
+        connect(texture, &FuseTexture::screenGeometryChanged, this, &FuseScreen::screenChanged, Qt::QueuedConnection);
         connect(texture, &FuseTexture::needsUpdate, this, &FuseScreen::update, Qt::QueuedConnection);
         connect(texture, &FuseTexture::sizeChanged, this, [this](const QSizeF &size) {
             m_aspectRatio = size.width()/size.height();
             geometryChanged(boundingRect(), boundingRect());
-        });
+        }, Qt::QueuedConnection);
         geometryChanged(boundingRect(), boundingRect());
     }
     node->setSourceRect(QRect(QPoint(0, 0), texture->imageSize()));
