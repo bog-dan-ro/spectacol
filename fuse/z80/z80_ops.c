@@ -157,8 +157,10 @@ z80_do_opcodes( void )
     /* Check if the debugger should become active at this point */
     CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE )
 
-    if( !z80.halted && debugger_check( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC ) )
+    if( !z80.halted && debugger_check( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC ) ) {
       debugger_trap();
+      break;
+    }
 
     END_CHECK
 
