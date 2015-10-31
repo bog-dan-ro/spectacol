@@ -408,7 +408,7 @@ dnl Look for NULL UI (default=no)
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether NULL UI requested)
   AC_ARG_WITH(nullui,
-  [  --with-nullui            use null user interface],
+  [  --with-nullui           use null user interface],
   if test "$withval" = no; then nullui=no; else nullui=yes; fi,
   nullui=no)
   AC_MSG_RESULT($nullui)
