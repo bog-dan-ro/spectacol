@@ -4944,3 +4944,5 @@
          CHECK() ordering (UB880D; thanks, Guesser).
 20151108 hacking/{code_beautifiers.txt,uncrustify.cfg}: document Uncrustify and
          Indent code beautifiers (patch #340) (Sergio).
+20151108 man/fuse.1: fix pal-tv2x and Pentagon ROMs command line options
+         (Sergio).

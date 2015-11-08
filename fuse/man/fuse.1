@@ -875,7 +875,7 @@ option.
 Insert the specified file into the emulated Opus Discovery's drive\ 1.
 .RE
 .PP
-.B \-\-paltv2x
+.B \-\-pal\-tv2x
 .RS
 Specify whether the PAL\ TV\ 2x and PAL\ TV\ 3x scalers should also produce
 scanlines along the lines of the TV\ 2x and Timex\ TV scalers.
@@ -1031,7 +1031,28 @@ Specify an RZX file to begin recording to.
 .B \-\-rom\-pentagon\-2
 .I file
 .br
-.B \-\-rom\-pentagon\-3
+.B \-\-rom\-pentagon512\-0
+.I file
+.br
+.B \-\-rom\-pentagon512\-1
+.I file
+.br
+.B \-\-rom\-pentagon512\-2
+.I file
+.br
+.B \-\-rom\-pentagon512\-3
+.I file
+.br
+.B \-\-rom\-pentagon1024\-0
+.I file
+.br
+.B \-\-rom\-pentagon1024\-1
+.I file
+.br
+.B \-\-rom\-pentagon1024\-2
+.I file
+.br
+.B \-\-rom\-pentagon1024\-3
 .I file
 .br
 .B \-\-rom\-scorpion\-0
@@ -1072,7 +1093,10 @@ the two ROMs for the TC2068
 .RI ( tc2068\-0.rom " and " tc2068\-1.rom ),
 the two ROMs for the TS2068
 .RI ( tc2068\-0.rom " and " tc2068\-1.rom ),
-the two main ROMs, the TR-DOS ROM and a reset service ROM for the Pentagon
+the two main ROMs and the TR-DOS ROM for the Pentagon\ 128K
+.RI ( 128p\-0.rom ", " 128p\-1.rom " and " trdos.rom ),
+the two main ROMs, the TR-DOS ROM and a reset service ROM for the
+Pentagon\ 512K and 1024K
 .RI ( 128p\-0.rom ", " 128p\-1.rom ", " trdos.rom " and " gluck.rom ),
 the four ROMs for the Scorpion 256
 .RI ( 256s\-0.rom ", " 256s\-1.rom ", " 256s\-2.rom " and " 256s\-3.rom ),
