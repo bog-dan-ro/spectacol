@@ -4946,3 +4946,5 @@
          Indent code beautifiers (patch #340) (Sergio).
 20151108 man/fuse.1: fix pal-tv2x and Pentagon ROMs command line options
          (Sergio).
+20151109 configure.ac,data/{Makefile.am,shell-completion/bash/fuse}: support 
+         bash completion (patch #335) (Sergio).

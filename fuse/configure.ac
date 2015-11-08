@@ -901,6 +901,21 @@ fi
 AM_CONDITIONAL(DESKTOP_DATADIR, test "$desktopdir" = yes)
 AC_SUBST(DESKTOP_DATADIR)
 
+dnl Where to install the bash completion script
+AC_ARG_WITH([bash-completion-dir],
+  [AS_HELP_STRING([--with-bash-completion-dir=DIR],
+                  [install bash completion script in given directory])],
+  if test "$withval" = no; then with_bash_completion_dir=""; fi
+)
+if test "$with_bash_completion_dir" = yes; then
+  PKG_CHECK_VAR([BASH_COMPLETION_DIR], [bash-completion], [completionsdir], [],
+                [BASH_COMPLETION_DIR="${sysconfdir}/bash_completion.d"])
+else
+  BASH_COMPLETION_DIR="$with_bash_completion_dir"
+fi
+AM_CONDITIONAL([BASH_COMPLETION], [test -n "$BASH_COMPLETION_DIR"])
+AC_SUBST([BASH_COMPLETION_DIR])
+
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)
 AC_ARG_ENABLE(smallmem,

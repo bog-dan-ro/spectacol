@@ -106,6 +106,13 @@ dist-hook: validate
 
 endif
 
+if BASH_COMPLETION
+
+bashcompletiondir = $(BASH_COMPLETION_DIR)
+dist_bashcompletion_DATA = data/shell-completion/bash/fuse
+
+endif
+
 EXTRA_DIST += \
               data/fuse.desktop.in \
               data/fuse.xml.in \
