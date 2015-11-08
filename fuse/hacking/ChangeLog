@@ -4942,3 +4942,5 @@
          (Matthew Westcott and Fred)
 20151020 z80/z80_checks.h: fix segfault due to inconsistent SETUP_CHECK() and
          CHECK() ordering (UB880D; thanks, Guesser).
+20151108 hacking/{code_beautifiers.txt,uncrustify.cfg}: document Uncrustify and
+         Indent code beautifiers (patch #340) (Sergio).
