@@ -4951,3 +4951,5 @@
 20151115 hacking/Makefile.am: add missing files (Sergio).
 20151115 data/{Makefile.am,shell-completion/diff_options.sh}: add a script to
          keep options in sync (Sergio).
+20151115 hacking/ChangeLog,man/fuse.1: add missing --drive-didaktik80[a|b]-type
+         options (Sergio).
