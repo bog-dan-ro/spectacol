@@ -4949,3 +4949,5 @@
 20151109 configure.ac,data/{Makefile.am,shell-completion/bash/fuse}: support 
          bash completion (patch #335) (Sergio).
 20151115 hacking/Makefile.am: add missing files (Sergio).
+20151115 data/{Makefile.am,shell-completion/diff_options.sh}: add a script to
+         keep options in sync (Sergio).

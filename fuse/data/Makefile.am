@@ -116,13 +116,17 @@ endif
 EXTRA_DIST += \
               data/fuse.desktop.in \
               data/fuse.xml.in \
+              data/shell-completion/diff_options.sh \
               data/win32/fuse.manifest.in \
               data/win32/installer.nsi.in \
               data/win32/winfuse.ico
 
 CLEANFILES += \
               data/fuse.desktop \
-              data/fuse.xml
+              data/fuse.xml \
+              data/shell-completion/bash.txt \
+              data/shell-completion/man.txt \
+              data/shell-completion/settings.txt
 
 ## Windows distribution rules
 if COMPAT_WIN32
