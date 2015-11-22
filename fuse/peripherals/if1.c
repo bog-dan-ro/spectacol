@@ -384,8 +384,8 @@ if1_reset( int hard_reset GCC_UNUSED )
 
   /* Check for an Interface 1 ROM */
   if( machine_load_rom_bank( if1_memory_map_romcs, 0,
-			     settings_current.rom_interface_i,
-			     settings_default.rom_interface_i,
+			     settings_current.rom_interface_1,
+			     settings_default.rom_interface_1,
 			     0x2000 ) ) {
     settings_current.interface1 = 0;
     periph_activate_type( PERIPH_TYPE_INTERFACE1, 0 );

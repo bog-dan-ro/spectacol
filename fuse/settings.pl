@@ -41,12 +41,12 @@ while(<>) {
     my( $name, $type, $default, $short, $commandline, $configfile ) =
 	split /\s*,\s*/;
 
-    if( not defined $commandline ) {
+    if( ( not defined $commandline ) || ( $commandline eq '' ) ) {
 	$commandline = $name;
 	$commandline =~ s/_/-/g;
     }
 
-    if( not defined $configfile ) {
+    if( ( not defined $configfile ) || ( $configfile eq '' ) ) {
 	$configfile = $commandline;
 	$configfile =~ s/-//g;
     }
@@ -767,7 +767,7 @@ settings_get_rom_setting( settings_info *settings, size_t which,
     }
   } else {
     switch( which ) {
-    case  0: return &( settings->rom_interface_i );
+    case  0: return &( settings->rom_interface_1 );
     case  1: return &( settings->rom_beta128 );
     case  2: return &( settings->rom_plusd );
     case  3: return &( settings->rom_didaktik80 );

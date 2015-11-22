@@ -4953,3 +4953,5 @@
          keep options in sync (Sergio).
 20151115 hacking/ChangeLog,man/fuse.1: add missing --drive-didaktik80[a|b]-type
          options (Sergio).
+20151122 peripherals/if1.c,settings.[dat|pl]: more from rename 'Interface I' to
+         'Interface 1' (thanks, Stuart) (Sergio).
