@@ -19,6 +19,7 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
+import Qt.labs.controls 1.0
 import Fuse 1.0
 
 ApplicationWindow {
@@ -42,23 +43,30 @@ ApplicationWindow {
         onYes: Qt.quit()
     }
 
-    NavigationDrawer {
+    Drawer {
         id: menuBar
-        color: Qt.rgba(0, 0, 0, 0.5)
-        width: parent.width / 4
+        anchors.fill: parent
 
         MenuView {
-            anchors.fill: parent
             id: menuView
-            rootMenu: FuseMenu {}
+            width: mainScreen.width / 4
+            height: mainScreen.height
+            visible: menuBar.position > 0
+
             parentWidth: menuBar.width
+
+            rootMenu: FuseMenu {}
+            transform: Translate {
+                x: (menuBar.position - 1.0) * menuView.width
+            }
         }
 
-        onOpenChanged: {
+        onPositionChanged: {
             menuView.reset();
-            if (open)
+            if (position == 1)
                 pageLoader.source = "";
         }
+        onClicked: close()
     }
 
     Rectangle {
@@ -72,7 +80,10 @@ ApplicationWindow {
             Keys.onPressed: {
                 switch (event.key) {
                 case Qt.Key_F1:
-                    menuBar.open = !menuBar.open;
+                    if (menuBar.position)
+                        menuBar.close();
+                    else
+                        menuBar.open();
                     event.accepted = true;
                     break;
 
@@ -92,14 +103,14 @@ ApplicationWindow {
                     break;
 
                 case Qt.Key_Down:
-                    if (menuBar.open) {
+                    if (menuBar.position) {
                         menuView.incrementCurrentIndex();
                         event.accepted = true;
                     }
                     break;
 
                 case Qt.Key_Up:
-                    if (menuBar.open) {
+                    if (menuBar.position) {
                         menuView.decrementCurrentIndex();
                         event.accepted = true;
                     }
@@ -107,14 +118,14 @@ ApplicationWindow {
 
                 case Qt.Key_Return:
                 case Qt.Key_Enter:
-                    if (menuBar.open) {
+                    if (menuBar.position) {
                         menuView.openSelectedMenu();
                         event.accepted = true;
                     }
                     break;
 
                 case Qt.Key_Escape:
-                    if (menuBar.open) {
+                    if (menuBar.position) {
                         menuView.popMenu();
                         event.accepted = true;
                     } else {
@@ -164,7 +175,7 @@ ApplicationWindow {
         onShowDebugger: pageLoader.source = "DebuggerPage.qml";
         onHideDebugger: pageLoader.source = "";
 
-        onShowMenu: menuBar.open = true;
-        onHideMenu: menuBar.open = false;
+        onShowMenu: menuBar.open();
+        onHideMenu: menuBar.close();
     }
 }

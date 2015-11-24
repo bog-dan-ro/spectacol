@@ -94,7 +94,7 @@ ColumnLayout {
             showParentMenu();
         } else {
             reset();
-            menuBar.open = false;
+            menuBar.close();
         }
     }
 

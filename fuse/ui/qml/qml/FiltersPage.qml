@@ -17,9 +17,9 @@
 
 // @scope main.qml
 
-import QtQuick 2.5
-import QtQuick.Controls 1.2
-import QtQuick.Window 2.0
+import QtQuick 2.6
+import QtQuick.Window 2.2
+import Qt.labs.controls 1.0
 
 ListView {
     id: view

@@ -18,6 +18,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.0
+import QtGamepad 1.0
 
 Menu {
     id: fuseMenu
@@ -25,14 +26,14 @@ Menu {
         visible: fuse.saveSnapshotEnabled
         text: "Quick save snapshot"
         onTriggered: {
-            menuBar.open = false;
+            menuBar.close();
             fuse.quickSaveSnapshot();
         }
     }
     MenuItem {
         text: "Quick load snapshot"
         onTriggered: {
-            menuBar.open = false;
+            menuBar.close();
             fuse.quickLoadSnapshot();
         }
     }
@@ -42,7 +43,7 @@ Menu {
         MenuItem {
             text: "Open .."
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 pageLoader.source = "FileBrowserPage.qml";
             }
         }
@@ -50,7 +51,7 @@ Menu {
         MenuItem {
             text: "Save snapshot as ..."
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 pageLoader.source = "SaveSnapshotPage.qml";
             }
         }
@@ -61,70 +62,79 @@ Menu {
             MenuItem {
                 text: "Record"
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "StartRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Record from snapshot"
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "RecordFromSnapshotRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Continue recording"
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "ContinueRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Insert snapshot"
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "InsertSnapshotRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Rollback"
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "RollbackRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Rollback to ..."
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "RollbackToRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Play"
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "PlayRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Stop"
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "StopRecordingPage.qml";
                 }
             }
             MenuItem {
                 text: "Finalise ..."
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "FinaliseRecordingPage.qml";
                 }
             }
         }
     }
+
     Menu {
-        title: qsTr("Input")
+        title: "Joytick"
+        visible: GamepadManager.connectedGamepads.length > 0
+        MenuItem {
+            text: "Configure Gamepad"
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "ConfigureGamepad.qml";
+            }
+        }
     }
 
     Menu {
@@ -133,14 +143,14 @@ Menu {
         MenuItem {
             text: "Filter"
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 pageLoader.source = "FiltersPage.qml";
             }
         }
         MenuItem {
             text: "Toggle Full Screen"
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 fuseScreen.fullScreen = !fuseScreen.fullScreen;
             }
         }
@@ -151,42 +161,43 @@ Menu {
         MenuItem {
             text: qsTr("Reset")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 fuse.reset();
             }
         }
         MenuItem {
             text: qsTr("Hard reset")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 fuse.hardReset();
             }
         }
         MenuItem {
             text: qsTr("Debugger")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 fuse.debuggerTrap();
             }
         }
         MenuItem {
             text: qsTr("Poke finder")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 pageLoader.source = "PokeFinderPage.qml";
             }
         }
         MenuItem {
             text: qsTr("Poke memory")
             onTriggered: {
-                menuBar.open = false;
-                pageLoader.source = "PokeMemoryPage.qml";
+                menuBar.close();
+                //pageLoader.source = "PokeMemoryPage.qml";
+                fuse.pokeMemory(0,0,0);
             }
         }
         MenuItem {
             text: qsTr("Memory Browser")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 pageLoader.source = "MemoryBrowserPage.qml";
             }
         }
@@ -194,7 +205,7 @@ Menu {
         MenuItem {
             text: qsTr("Memory Browser")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 pageLoader.source = "MemoryBrowserPage.qml";
             }
         }
@@ -205,14 +216,14 @@ Menu {
             MenuItem {
                 text: qsTr("Start")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.startProfiler();
                 }
             }
             MenuItem {
                 text: qsTr("Stop")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.stopProfiler();
                 }
             }
@@ -221,7 +232,7 @@ Menu {
         MenuItem {
             text: qsTr("NMI")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 fuse.nmi();
             }
         }
@@ -230,7 +241,7 @@ Menu {
             visible: false
             text: qsTr("Didaktik SNAP")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 fuse.didaktikSNAP();
             }
         }
@@ -242,7 +253,7 @@ Menu {
         MenuItem {
             text: qsTr("General")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 pageLoader.source = "OptionsGeneralPage.qml";
             }
         }
@@ -250,7 +261,7 @@ Menu {
         MenuItem {
             text: qsTr("Media")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 pageLoader.source = "OptionsMediaPage.qml";
             }
         }
@@ -258,7 +269,7 @@ Menu {
         MenuItem {
             text: qsTr("Sound")
             onTriggered: {
-                menuBar.open = false;
+                menuBar.close();
                 pageLoader.source = "OptionsSoundPage.qml";
             }
         }
@@ -268,7 +279,7 @@ Menu {
             MenuItem {
                 text: qsTr("Reset")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.reset();
                 }
             }
@@ -282,56 +293,56 @@ Menu {
             MenuItem {
                 text: qsTr("Open")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     pageLoader.source = "FileBrowserPage.qml";
                 }
             }
             MenuItem {
                 text: qsTr("Play")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.playTape();
                 }
             }
             MenuItem {
                 text: qsTr("Browse")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.browseTape();
                 }
             }
             MenuItem {
                 text: qsTr("Rewind")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.rewindTape();
                 }
             }
             MenuItem {
                 text: qsTr("Clear")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.clearTape();
                 }
             }
             MenuItem {
                 text: qsTr("Write")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.writeTape();
                 }
             }
             MenuItem {
                 text: qsTr("Record Start")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.recordStartTape();
                 }
             }
             MenuItem {
                 text: qsTr("Record Stop")
                 onTriggered: {
-                    menuBar.open = false;
+                    menuBar.close();
                     fuse.recordStopTape();
                 }
             }
@@ -341,8 +352,8 @@ Menu {
     MenuItem {
         text: "About .."
         onTriggered: {
-            menuBar.open = false;
-//            pageLoader.source = "AboutPage.qml";
+            menuBar.close();
+            pageLoader.source = "AboutPage.qml";
         }
     }
 

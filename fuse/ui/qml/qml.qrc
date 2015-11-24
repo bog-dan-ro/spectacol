@@ -27,7 +27,6 @@
         <file>qml/CoverFlowFiles.qml</file>
         <file>qml/FancyText.qml</file>
         <file>qml/MenuView.qml</file>
-        <file>qml/NavigationDrawer.qml</file>
         <file>images/zx_broken_cassette.png</file>
         <file>images/zx_cassette_unknown.png</file>
         <file>images/zx_cassette.png</file>

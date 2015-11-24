@@ -17,11 +17,10 @@
 
 // @scope main.qml
 
-import QtQuick 2.5
-
-import QtQuick.Controls 1.4
+import QtQuick 2.6
 import QtQuick.Layouts 1.1
-import QtQuick.Window 2.0
+import QtQuick.Window 2.2
+import Qt.labs.controls 1.0
 
 Item {
     property alias focused: view.focus

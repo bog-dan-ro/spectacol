@@ -15,11 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.5
-import QtQuick.Controls 1.2
+import QtQuick 2.6
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
-import QtQuick.Window 2.0
+import QtQuick.Window 2.2
+import Qt.labs.controls 1.0
 
 Rectangle {
     id: saveFilePage
@@ -28,6 +28,7 @@ Rectangle {
     property alias title: title.text
     property alias fileName: fileNameEdit.text
     property alias folder: pathEdit.text
+
     signal accpeted
     signal canceled
 
@@ -76,11 +77,11 @@ Rectangle {
         Button {
             Layout.alignment: Qt.AlignRight
             text: qsTr("Save")
-            onClicked: accpeted()
+            onClicked: saveFilePage.accpeted()
         }
         Button {
             text: qsTr("Cancel")
-            onClicked: canceled()
+            onClicked: saveFilePage.canceled()
         }
     }
 }
