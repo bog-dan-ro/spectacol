@@ -4957,3 +4957,4 @@
          'Interface 1' (thanks, Stuart) (Sergio).
 20151130 ui/win32/options-resource.pl: remove redundant argument on button
          creation (Sergio).
+20151130 ui/win32/win32ui.c: fix compilation with mingwrt 4.0+ (Kirben).

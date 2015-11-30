@@ -301,7 +301,14 @@ WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
   fuse_nCmdShow = nCmdShow;
   fuse_hPrevInstance = hPrevInstance;
 
-  return fuse_main(__argc, __argv);
+/* HACK: __argc, __argv are broken and return zero when using mingwrt 4.0+
+   on MinGW */
+#if defined( __GNUC__ ) && defined( __MINGW32__ ) && !defined( __MINGW64__ )
+  return fuse_main( _argc, _argv );
+#else
+  return fuse_main( __argc, __argv );
+#endif
+
   /* FIXME: how do deal with returning wParam */
 }
 
