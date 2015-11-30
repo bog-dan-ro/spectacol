@@ -4955,3 +4955,5 @@
          options (Sergio).
 20151122 peripherals/if1.c,settings.[dat|pl]: more from rename 'Interface I' to
          'Interface 1' (thanks, Stuart) (Sergio).
+20151130 ui/win32/options-resource.pl: remove redundant argument on button
+         creation (Sergio).
