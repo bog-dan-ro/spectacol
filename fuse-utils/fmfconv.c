@@ -1689,9 +1689,9 @@ close_out( void )
 #ifdef USE_LIBJPEG
   if( out_t == TYPE_MJPEG && out_header_ok )
     out_finalize_mjpeg();
+#endif
   if( out_t == TYPE_AVI && out_header_ok )
     out_finalize_avi();
-#endif
   fclose( out );
   out = NULL;
 }

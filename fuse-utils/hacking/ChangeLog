@@ -516,3 +516,5 @@
 20150613 m4/ax_create_stdint_h.m4: add AX_CREATE_STDINT_H macro from the GNU
          Autoconf Archive (Stuart).
 20150617 Makefile.am: enable silent rules for windres commands (Sergio).
+20151201 fmfconv.c,fmfconv_avi.c: ensure AVI files are finalised and delete
+         the index file on Windows (Sergio).

@@ -111,8 +111,14 @@ out_write_aviheader( void )
               strerror( errno ) );
       return ERR_WRITE_OUT;
     }
+
+#ifndef WIN32
+    /* Note: On Windows, the file remains in existence after the file
+       descriptor referring to it is closed */
     unlink( idx_name );
     free( idx_name );
+    idx_name = NULL;
+#endif
   }
 
 #define AVI_POS_FILELEN 0x04L
@@ -369,6 +375,13 @@ out_finalize_avi( void )
   }
   printi( 2, "out_finalize_avi(): Write idx1: %libyte\n", pos2 );
   fclose( ifile );
+
+  if( idx_name ) {
+    unlink( idx_name );
+    free( idx_name );
+    idx_name = NULL;
+  }
+
   fflush( out );
 
   pos2 = ftell( out );
