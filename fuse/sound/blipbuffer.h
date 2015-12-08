@@ -219,9 +219,6 @@ typedef struct blip_eq_s {
 /*  End of public interface */
 
 #define BLIP_UNSCALED 65535
-
-inline long blip_buffer_samples_avail( Blip_Buffer * buff );
-
 #define BLIP_MAX_LENGTH 0
 
 #define BLIP_SYNTH_QUALITY BLIP_GOOD_QUALITY
