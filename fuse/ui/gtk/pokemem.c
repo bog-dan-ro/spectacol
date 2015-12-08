@@ -202,7 +202,10 @@ create_and_fill_treeview( void )
   GtkTreeModel *model;
 
   poke_list = gtk_tree_view_new();
+
+#if !GTK_CHECK_VERSION( 3, 0, 0 )
   gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( poke_list ), TRUE );
+#endif
 
   store = gtk_list_store_new( NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING,
                               G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_BOOLEAN,

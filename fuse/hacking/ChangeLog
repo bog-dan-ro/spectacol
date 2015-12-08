@@ -4960,3 +4960,5 @@
 20151130 ui/win32/win32ui.c: fix compilation with mingwrt 4.0+ (Kirben).
 20151208 sound/blipbuffer.h: remove second inline declaration of
          blip_buffer_samples_avail() (Sergio).
+20151208 ui/gtk/pokemem.c: do not use deprecated gtk_tree_view_set_rules_hint()
+         on GTK+ 3 UI (Sergio).
