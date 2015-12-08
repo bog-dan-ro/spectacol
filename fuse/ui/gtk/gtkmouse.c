@@ -85,13 +85,13 @@ ui_mouse_grab( int startup )
 
   if( startup ) return 0;
 
-  if( !nullpointer ) {
-    nullpointer = gdk_cursor_new( GDK_BLANK_CURSOR );
-  }
-
   window = gtk_widget_get_window( gtkui_drawing_area );
 
 #if !GTK_CHECK_VERSION( 3, 0, 0 )
+
+  if( !nullpointer ) {
+    nullpointer = gdk_cursor_new( GDK_BLANK_CURSOR );
+  }
 
   status = gdk_pointer_grab( window, FALSE,
                              GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK |
@@ -105,6 +105,11 @@ ui_mouse_grab( int startup )
   GdkDevice *pointer;
 
   display = gdk_window_get_display( window );
+
+  if( !nullpointer ) {
+    nullpointer = gdk_cursor_new_for_display( display, GDK_BLANK_CURSOR );
+  }
+
   device_manager = gdk_display_get_device_manager( display );
   pointer = gdk_device_manager_get_client_pointer( device_manager );
 

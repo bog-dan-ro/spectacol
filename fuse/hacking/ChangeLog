@@ -4962,3 +4962,5 @@
          blip_buffer_samples_avail() (Sergio).
 20151208 ui/gtk/pokemem.c: do not use deprecated gtk_tree_view_set_rules_hint()
          on GTK+ 3 UI (Sergio).
+20151208 ui/gtk/gtkmouse.c: replace deprecated gdk_cursor_new() on GTK+ 3 UI
+         (Sergio).
