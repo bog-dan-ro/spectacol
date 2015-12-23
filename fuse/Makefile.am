@@ -58,6 +58,7 @@ fuse_SOURCES = display.c \
 	utils.c
 
 fuse_LDADD = \
+             $(PTHREAD_LIBS) \
              $(LIBSPEC_LIBS) \
              $(GTK_LIBS) \
              $(GLIB_LIBS) \
@@ -89,6 +90,8 @@ AM_CPPFLAGS = \
               -DFUSEDATADIR="\"${pkgdatadir}\"" \
               $(SDL_CFLAGS) \
               $(PNG_CFLAGS)
+
+AM_CFLAGS = $(WARN_CFLAGS) $(PTHREAD_CFLAGS)
 
 noinst_HEADERS = bitmap.h \
 	compat.h \

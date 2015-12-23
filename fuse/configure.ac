@@ -783,9 +783,7 @@ if test "$withval" = no; then pthread=no; else pthread=yes; fi,
 pthread=yes)
 AC_MSG_RESULT($pthread)
 if test "$pthread" = yes; then
-  AX_PTHREAD([LIBS="$PTHREAD_LIBS $LIBS"
-              CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-              CC="$PTHREAD_CC"],
+  AX_PTHREAD([],
              [AC_MSG_WARN(POSIX threads not found - some peripherals disabled)
               pthread=no])
 fi
@@ -945,12 +943,13 @@ AC_MSG_RESULT($warnings)
 
 dnl If it appears we're using gcc as our compiler, turn on warnings
 if test "$ac_cv_c_compiler_gnu" = yes; then
-    CFLAGS="$CFLAGS -Wall -Wwrite-strings"
+    WARN_CFLAGS="-Wall -Wwrite-strings"
     dnl And possibly lots of warnings
     if test "$warnings" = yes; then
-        CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Waggregate-return -W -Wsign-compare"
+        WARN_CFLAGS="$WARN_CFLAGS -Wstrict-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Waggregate-return -W -Wsign-compare"
     fi
 fi
+AC_SUBST(WARN_CFLAGS)
 
 AC_CONFIG_FILES([
 Makefile

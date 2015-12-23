@@ -4965,3 +4965,5 @@
 20151208 ui/gtk/gtkmouse.c: replace deprecated gdk_cursor_new() on GTK+ 3 UI
          (Sergio).
 20151223 m4/ax_pthread.m4: update macro that checks POSIX threads (Sergio).
+20151223 Makefile.am,configure.ac: don't use CFLAGS user variable for warnings
+         or pthread options (Sergio).
