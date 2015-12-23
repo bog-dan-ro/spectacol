@@ -4964,3 +4964,4 @@
          on GTK+ 3 UI (Sergio).
 20151208 ui/gtk/gtkmouse.c: replace deprecated gdk_cursor_new() on GTK+ 3 UI
          (Sergio).
+20151223 m4/ax_pthread.m4: update macro that checks POSIX threads (Sergio).
