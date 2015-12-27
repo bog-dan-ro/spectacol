@@ -161,14 +161,14 @@ CPPFLAGS="$ac_save_CPPFLAGS"
 
 # If we're not libspectrum's own internal GLib replacement, we must use the
 # real thing
-if test "$fakeglib" = no; then
-  AM_PATH_GLIB_2_0(
-    2.20.0,
-    AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got GLib])
-    LIBS="$LIBS `pkg-config --libs glib-2.0`",
+AS_IF([test "$fakeglib" = no], [
+  PKG_CHECK_MODULES(
+    [GLIB],
+    [glib-2.0 >= 2.20.0],
+    [AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got GLib])],
     [AC_MSG_ERROR([GLib not found, and libspectrum has no internal replacement])]
   )
-fi
+])
 
 dnl Check if supplied libspectrum has support for compressed szx files
 AC_MSG_CHECKING(whether libspectrum supports compressed szx snaps)

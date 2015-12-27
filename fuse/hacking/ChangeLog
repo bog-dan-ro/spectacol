@@ -4969,3 +4969,5 @@
          or pthread options (Sergio).
 20151228 configure.ac: remove duplicate sdl-config calls and avoid the use of
          CPPFLAGS (Sergio).
+20151228 configure.ac: use PKG_CHECK_MODULES for glib detection rather than raw
+         pkg-config, that doesn't play well when cross-compiling (Sergio).
