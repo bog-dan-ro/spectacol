@@ -4967,3 +4967,5 @@
 20151223 m4/ax_pthread.m4: update macro that checks POSIX threads (Sergio).
 20151223 Makefile.am,configure.ac: don't use CFLAGS user variable for warnings
          or pthread options (Sergio).
+20151228 configure.ac: remove duplicate sdl-config calls and avoid the use of
+         CPPFLAGS (Sergio).

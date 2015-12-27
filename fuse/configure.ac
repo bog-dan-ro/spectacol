@@ -706,8 +706,6 @@ if test "$stick" = yes; then
         AC_MSG_RESULT(yes)
         SDL_VERSION=1.2.4
         AM_PATH_SDL($SDL_VERSION,		    
-          LIBS="$LIBS `sdl-config --libs`"
-          CPPFLAGS="$CPPFLAGS `sdl-config --cflags`"
           AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks]),
           AC_MSG_WARN([SDL version $SDL_VERSION not found - joystick support disabled]))
       fi
