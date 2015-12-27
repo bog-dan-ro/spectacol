@@ -658,10 +658,12 @@ menu_help_keyboard( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 void
 menu_help_about( GtkAction *gtk_action GCC_UNUSED, gpointer data GCC_UNUSED )
 {
+  /* TODO: show Fuse icon */
   gtk_show_about_dialog( GTK_WINDOW( gtkui_window ),
-                         "name", "Fuse",
+                         "program-name", "Fuse",
                          "comments", "The Free Unix Spectrum Emulator",
                          "copyright", FUSE_COPYRIGHT,
+                         "logo-icon-name", NULL,
                          "version", VERSION,
                          "website", PACKAGE_URL,
                          NULL );
