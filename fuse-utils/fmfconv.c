@@ -43,14 +43,6 @@
 #include <fcntl.h>
 #include <getopt.h>
 
-#ifdef USE_FFMPEG
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-#ifndef USE_FFMPEG_VARS
-#define USE_FFMPEG_VARS 1
-#endif
-#endif
-
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #else
@@ -214,7 +206,6 @@ int out_fps = 0;			/* desired output frame rate */
 int out_header_ok = 0;			/* output header ok? */
 
 int out_chn = 2, out_rte = -1, out_fsz, out_len;	/* by default convert sound to 2 channel (STEREO) */
-int no_sound_resample = -1;		/* FFMPEG/AVCODEC do their own... */
 
 /* fmf variables */
 int fmf_compr = 0;			/* fmf compressed or not */
@@ -556,7 +547,7 @@ resample_sound( void )
   libspectrum_signed_byte *snd8_w, *snd8_r;
   libspectrum_signed_word *snd16_w, *snd16_r;
 
-  if( snd_t == TYPE_NONE || no_sound_resample ) return 0;
+  if( snd_t == TYPE_NONE ) return 0;
 
 
   snd16_r = snd16_w = sound16;
@@ -851,13 +842,6 @@ open_out( void )
     { TYPE_SCR,  "scr"  },
     { TYPE_PPM,  "ppm"  },
     { TYPE_PPM,  "pnm"  },
-#ifdef USE_FFMPEG
-    { TYPE_FFMPEG,"mpeg" },
-    { TYPE_FFMPEG,"mpg" },
-    { TYPE_FFMPEG,"mkv" },
-    { TYPE_FFMPEG,"flv" },
-    { TYPE_FFMPEG,"webm" },
-#endif
 #ifdef USE_LIBPNG
     { TYPE_PNG,  "png" },
 #endif
@@ -883,11 +867,7 @@ open_out( void )
   if( out_t == TYPE_NONE ) return 0;
 
   if( out_name && out_t == TYPE_UNSET ) {	/* try to identify the file type */
-#ifdef USE_FFMPEG
-    out_t = TYPE_FFMPEG;	/* default to FFMPEG */
-#else
     out_t = TYPE_AVI;		/* default to AVI */
-#endif
     ext = find_filename_ext( out_name );
     for( i = 0; ext != NULL && out_ext_tab[i].extension != NULL; i++ ) {
       if( !strcasecmp( ext, out_ext_tab[i].extension ) ) {
@@ -910,11 +890,7 @@ open_out( void )
   if( out_t >= TYPE_MJPEG && out_t <= TYPE_FFMPEG && out_fps == 0 )
     out_fps = 25000;
 
-  if( out_name
-#ifdef USE_FFMPEG
-		&& out_t != TYPE_FFMPEG
-#endif
-  ) {
+  if( out_name ) {
     if( ( out = fopen_overwr( out_name, "wb", 0 ) ) == NULL ) {
       printe( "Cannot open output file '%s' (%s)...\n", out_name,
               strerror( errno ) );
@@ -923,11 +899,7 @@ open_out( void )
 #ifdef USE_LIBJPEG
     if( avi_subtype == -1 ) avi_subtype = TYPE_AVI;
 #endif
-  } else if( 1
-#ifdef USE_FFMPEG
-	&& out_t != TYPE_FFMPEG
-#endif
-  ) {
+  } else {
 
     if( isatty( fileno( stdout ) ) ) {
       out_t = TYPE_NONE;
@@ -949,10 +921,6 @@ open_out( void )
 #ifdef USE_LIBPNG
   if( out_t == TYPE_PNG && png_palette < 0 )
     png_palette = 1;
-#endif
-#ifdef USE_FFMPEG
-  if( out_t == TYPE_FFMPEG && no_sound_resample == -1 )
-    no_sound_resample = 1;
 #endif
 
   if( out_t == TYPE_NONE ) {
@@ -998,14 +966,6 @@ open_snd( void )
     { TYPE_AU,   "snd" },
     { TYPE_AIFF, "aif" },
     { TYPE_AIFF, "aiff" },
-#ifdef FFMPEG
-    { TYPE_FFMPEG, "mp2" },
-    { TYPE_FFMPEG, "mp3" },
-    { TYPE_FFMPEG, "ogg" },
-    { TYPE_FFMPEG, "aac" },
-    { TYPE_FFMPEG, "ac3" },
-    { TYPE_FFMPEG, "m4a" },
-#endif
     { 0, NULL }
   };
 
@@ -1026,9 +986,6 @@ open_snd( void )
     }
   } else if( out_t == TYPE_AVI ) {	/* AVI video and audio if nothing else specified */
     snd_t = TYPE_AVI;
-    return 0;
-  } else if( out_t == TYPE_FFMPEG ) {	/* FFMPEG video and audio if nothing else specified */
-    snd_t = TYPE_FFMPEG;
     return 0;
   } else {
     snd_t = TYPE_NONE;
@@ -1065,9 +1022,6 @@ open_inp( void )
       printe( "Cannot open input file '%s'...\n", inp_name );
       return ERR_OPEN_INP;
     }
-  } else if( out_t == TYPE_FFMPEG ) {	/* FFMPEG video and audio if nothing else specified */
-    snd_t = TYPE_FFMPEG;
-    return 0;
   } else if( out_t == TYPE_AVI ) {	/* AVI video and audio */
     snd_t = TYPE_AVI;
     return 0;
@@ -1342,7 +1296,6 @@ snd_write_sound( void )
 
   if( snd_len <= 0 ) return 0;
 
-  if( no_sound_resample ) out_rte = snd_rte;
   if( snd_enc != TYPE_PCM && sound_pcm && ( err = law_2_pcm() ) ) return err;
   if( snd_chn == 2 && sound_stereo == 0 && ( err = stereo_2_mono() ) ) return err;
   if( ( snd_rte != out_rte || snd_frg ) && ( err = resample_sound() ) ) return err;
@@ -1356,10 +1309,7 @@ snd_write_sound( void )
     err = snd_write_aiff();
   else if( snd_t == TYPE_AVI )
     err = snd_write_avi();
-#ifdef USE_FFMPEG
-  else if( snd_t == TYPE_FFMPEG )
-    err = snd_write_ffmpeg();
-#endif
+
   snd_len = 0;
   if( err ) return err;
 
@@ -1643,10 +1593,6 @@ out_write_frame( void )
     }
     if( out_t == TYPE_YUV ) {
       if( ( err = out_write_yuv() ) ) return err;
-#ifdef USE_FFMPEG
-    } else if( out_t == TYPE_FFMPEG ) {
-      if( ( err = out_write_ffmpeg() ) ) return err;
-#endif
     } else if( out_t == TYPE_SCR ) {
       if( ( err = out_write_scr() ) ) return err;
     } else if( out_t == TYPE_PPM ) {
@@ -1679,11 +1625,6 @@ out_write_frame( void )
 void
 close_out( void )
 {
-#ifdef USE_FFMPEG
-  if( out_t == TYPE_FFMPEG && out_header_ok )
-    out_finalize_ffmpeg();
-#endif
-
   if( !out ) return;
 
 #ifdef USE_LIBJPEG
@@ -1717,13 +1658,10 @@ print_version( void )
     "This is free software: you are free to change and redistribute it.\n"
     "There is NO WARRANTY, to the extent permitted by law.\n" );
 
-#if defined USE_FFMPEG || defined USE_LIBPNG || defined USE_LIBPNG
+#if defined USE_LIBPNG || defined USE_LIBPNG
   printf( "Compiled with:\n" );
 #else
   printf( "Compiled without any external library support.\n" );
-#endif
-#ifdef USE_FFMPEG
-  print_ffmpeg_version();
 #endif
 #ifdef USE_LIBJPEG
   print_jpeg_version();
@@ -1754,13 +1692,6 @@ print_help( void )
 	  "                                 This is an advanced option. If stereo/mono or\n"
 	  "                                 audio encoding change through `fmf' file, your\n"
 	  "                                 sound will be crappy.\n"
-#ifdef USE_FFMPEG
-	  "                                 note: FFMPEG needs PCM audio without change\n"
-	  "                                 the channel number too.\n"
-	  "     --force-resample          FFMPEG output (see -X) disable the internal\n"
-	  "                                 sound resampling. You can force the internal\n"
-	  "                                 resampling of sound with this option.\n"
-#endif /* USE_FFMPEG */
 	  "  -E --srate <rate>            Resample audio to <rate> sampling rate where\n"
 	  "                                 <rate> is `cd' for 44100 or `dat' for 48000 or\n"
 	  "                                 a number (`cd' and `dat' set `stereo' as well)\n"
@@ -1804,9 +1735,6 @@ print_help( void )
 	  "                                 Encode video as uncompressed BGR24 DIB frames\n"
 	  "                                 and audio as S16_LE PCM.\n"
 #endif
-#if defined USE_FFMPEG && defined USE_LIBJPEG
-	  "                                 note: force internal AVI encoder over FFMPEG.\n"
-#endif
 	  "     --greyscale               Save greyscale image/video.\n"
 	  "  -f --frate <timing>          Set output frame rate. `timing' is `raw', `pal',\n"
 	  "                                 `ntsc', `movie' or a number with a maximum\n"
@@ -1825,36 +1753,6 @@ print_help( void )
 	  "                                 100-200, 300, 500 and frames from 1min 11sec\n"
 	  "                                 to 2min 22sec (in the given timing see:\n"
 	  "                                 -f/--frate).\n"
-#ifdef USE_FFMPEG
-	  "  -X --ffmpeg                  Save video and audio as FFMPEG file (default).\n"
-#endif
-#ifdef USE_FFMPEG_VARS
-	  "  -p --profile <profile>       Select the profile for FFMPEG output where\n"
-	  "                                 <profile> is `youtube', `dvd', `svcd' or `ipod'\n"
-	  "  -F --format <format>         Select file format for FFMPEG output (by default\n"
-	  "                                 the filename extension determines the format).\n"
-	  "  -c --vcodec <codec>          Select video codec for FFMPEG output (by default\n"
-	  "                                 file format determine).\n"
-	  "  -a --acodec <codec>          Select audio codec for FFMPEG output (by default\n"
-	  "                                 file format determine).\n"
-	  "  -A --arate <rate>            Select audio bitrate for FFMPEG output (by\n"
-	  "                                 default audio codec determine) where <rate> is\n"
-	  "                                 `default' or a number.\n"
-	  "  -r --vrate <rate>            Select video bitrate for FFMPEG output (by\n"
-	  "                                 default video codec determine) where <rate> is\n"
-	  "                                 `default' or `ffdefault' or a number.\n"
-	  "  -R --resize <res>            Resize video frame where <res> is `vga' for\n"
-	  "                                 640x480, `hvga' for 480x360, `qvga' for\n"
-	  "                                 320x240, `pal' for 768x576 (this set frame\n"
-	  "                                 rate to 25 also) or WxH, Sx, N/Mx or W.\n"
-#endif	/* USE_FFMPEG_VARS */
-#ifdef USE_FFMPEG
-	  "     --formats                 List available FFMPEG formats (see -F/--format).\n"
-	  "     --vcodecs                 List available FFMPEG video codecs (see\n"
-	  "                                 -c/--vcodec).\n"
-	  "     --acodecs                 List available FFMPEG audio codecs (see\n"
-	  "                                 -a/--acodec).\n"
-#endif  /* USE_FFMPEG */
 	  "     --info                    Scan input file(s) and print information.\n"
 	  "  -v --verbose                 Increase the verbosity level by one.\n"
 	  "  -q --quiet                   Decrease the verbosity level by one.\n"
@@ -1903,7 +1801,6 @@ print_progress( int force )
 #define ARG_YUV_FORMAT		0x101
 #define ARG_AIFC		0x102
 #define ARG_SOUND_ONLY		0x103
-#define ARG_FORCE_RESAMPLE	0x104
 
 #define ARG_JPG_SMOOTH		0x105
 #define ARG_JPG_OPT		0x106
@@ -1935,7 +1832,6 @@ parse_args( int argc, char *argv[] )
     {"no-sound", 0, &video_only, 1},
 */
     {"srate",  1, NULL, 'E'},		/* audio new samplerate cd/dat set 'stereo' also */
-    {"force-resample", 0, NULL, ARG_FORCE_RESAMPLE},	/* force internal resampling even with FFMPEG */
     {"wav",    0, NULL, 'w'},		/* save .wav sound */
     {"au",     0, NULL, 'u'},		/* save .au sound */
     {"aiff",   0, NULL, 'm'},		/* save .aiff sound */
@@ -1974,21 +1870,6 @@ parse_args( int argc, char *argv[] )
     {"progressive", 0, NULL, ARG_PROGRESSIVE},	/* jpeg/png progressive */
 #endif
     {"greyscale",  0, NULL, ARG_GREYSCALE},		/* convert to grescale */
-#ifdef USE_FFMPEG
-    {"ffmpeg", 0, NULL, 'X'},		/* select FFMPEG output */
-    {"formats",0, &ffmpeg_list, 0},	/* list formats */
-    {"acodecs",0, &ffmpeg_list, 1},	/* list formats */
-    {"vcodecs",0, &ffmpeg_list, 2},	/* list formats */
-#endif
-#ifdef USE_FFMPEG_VARS
-    {"profile",1 ,NULL, 'p'},		/* output profile */
-    {"format", 1, NULL, 'F'},		/* file format */
-    {"acodec", 1, NULL, 'a'},		/* audio codec */
-    {"vcodec", 1, NULL, 'c'},		/* video codec */
-    {"arate",  1, NULL, 'A'},		/* audio bitrate */
-    {"vrate",  1, NULL, 'r'},		/* video bitrate */
-    {"resize", 1, NULL, 'R'},		/* resize video */
-#endif
     {"info", 0, &do_info, 1},
 
     {"help", 0, NULL, 'h'},
@@ -2013,12 +1894,6 @@ parse_args( int argc, char *argv[] )
 #endif
 #ifdef USE_LIBPNG
 				"G"
-#endif
-#ifdef USE_FFMPEG_VARS
-				"p:F:a:c:A:r:R:"
-#endif
-#ifdef USE_FFMPEG
-				"X"
 #endif
 				"hVvq", long_options, NULL);
 
@@ -2197,99 +2072,6 @@ parse_args( int argc, char *argv[] )
 	out_cut = optarg;
 	inp_get_next_cut();
 	break;
-#ifdef USE_FFMPEG
-    case 'X':		/* FFMPEG output */
-      out_t = TYPE_FFMPEG;
-      snd_t = TYPE_FFMPEG;
-      break;
-#endif
-#ifdef USE_FFMPEG_VARS
-    case 'p':		/* profile */
-      if( !strcmp( optarg, "youtube" ) ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_w = 480; out_h = 360; out_fps = 25000;
-	ffmpeg_vcodec = "mpeg4";
-	ffmpeg_format = "mov"; ffmpeg_arate = 128000; ffmpeg_vrate = 600000;
-      } else if( !strcmp( optarg, "dvd" ) ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_w = 720; out_h = 576; out_fps = 25000;
-	ffmpeg_format = "vob"; ffmpeg_arate = 192000; ffmpeg_vrate = 5000000;
-	ffmpeg_aspect.num = 48; ffmpeg_aspect.den = 45;
-	out_rte = 48000; sound_stereo = 1;
-      } else if( !strcmp( optarg, "svcd" ) ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_w = 480; out_h = 576; out_fps = 25000;
-	ffmpeg_format = "svcd"; ffmpeg_arate = 192000; ffmpeg_vrate = 2600000;
-	ffmpeg_aspect.num = 48; ffmpeg_aspect.den = 45;
-	out_rte = 48000; sound_stereo = 1;
-      } else if( !strcmp( optarg, "ipod" ) ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_w = 320; out_h = 240; out_fps = 30000;
-	ffmpeg_vcodec = "libx264";
-	ffmpeg_format = "ipod"; ffmpeg_arate = 128000;ffmpeg_vrate = 256000;
-	out_rte = 44100; sound_stereo = 1;
-#ifdef USE_FFMPEG
-	ffmpeg_libx264 = 1;
-#endif
-      } else {
-	printe( "Unknow value for '-p/--profile' ...\n");
-	return ERR_BAD_PARAM;
-      }
-	break;
-    case 'F':
-      ffmpeg_format = optarg;
-      break;
-    case 'a':
-      ffmpeg_acodec = optarg;
-      break;
-    case 'c':
-      ffmpeg_vcodec = optarg;
-      break;
-    case 'A':
-      if( !strcmp( optarg, "default" ) )
-        ffmpeg_arate = 0;
-      else
-        ffmpeg_arate = atoi( optarg );
-      break;
-    case 'r':
-      if( !strcmp( optarg, "default" ) )
-        ffmpeg_vrate = 0;
-      else if( !strcmp( optarg, "ffdefault" ) )
-        ffmpeg_vrate = -1;
-      else
-        ffmpeg_vrate = atoi( optarg );
-      break;
-    case 'R':
-      if( !strcmp( optarg, "vga" ) ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_w = 640; out_h = 480;
-      } else if( !strcmp( optarg, "hvga" ) ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_w = 480; out_h = 360;
-      } else if( !strcmp( optarg, "qvga" ) ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_w = 320; out_h = 240;
-      } else if( !strcmp( optarg, "pal" ) ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_w = 768; out_h = 576; out_fps = 25000;
-      } else if( sscanf( optarg, "%dx%d%c", &out_w, &out_h, &t ) == 2 ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-      } else if( sscanf( optarg, "%d/%d%c%c", &out_w, &out_h, &t, &t ) == 3 && t == 'x' ) {
-	ffmpeg_rescale = TYPE_RESCALE_X;
-      } else if( sscanf( optarg, "%d%c%c", &out_w, &t, &t ) == 2 && t == 'x' ) {
-	ffmpeg_rescale = TYPE_RESCALE_X, out_h = 1;
-      } else if( sscanf( optarg, "%d%c", &out_w, &t ) == 1 ) {
-	ffmpeg_rescale = TYPE_RESCALE_WH;
-	out_h = out_w * 3 / 4;
-      } else {
-	printe( "Unknow value for '-R/--resize' ...\n");
-	return ERR_BAD_PARAM;
-      }
-      break;
-    case ARG_FORCE_RESAMPLE: /* force internal resample */
-      no_sound_resample = 0;
-      break;
-#endif	/* USE_FFMPEG_VARS */
     case 'h':
 	print_help();
 	help_exit = 1;
@@ -2339,11 +2121,7 @@ parse_args( int argc, char *argv[] )
     return ERR_BAD_PARAM;
   }
 
-  if( !help_exit && !inp_name
-#ifdef USE_FFMPEG
-      && ffmpeg_list < 0
-#endif
-  ) {
+  if( !help_exit && !inp_name ) {
     int fd = fileno( stdin );
     if( isatty( fd ) ) {
       printe( "%s: no input file specified\n", progname );
@@ -2378,12 +2156,7 @@ main( int argc, char *argv[] )
   }
 
   if( help_exit ) return 0;
-#ifdef USE_FFMPEG
-  if( ffmpeg_list >= 0 ) {
-    ffmpeg_list_ffmpeg( ffmpeg_list );
-    return 0;
-  }
-#endif
+
   if( do_info ) {
     snd_t = TYPE_NONE;
     out_t = TYPE_NONE;
@@ -2394,10 +2167,9 @@ main( int argc, char *argv[] )
   }
   if( !sound_only && ( err = open_out() ) ) return err;
   if( ( err = open_snd() ) ) return err;
-  if( no_sound_resample == -1 ) no_sound_resample = 0;
 
-  if( snd_t == TYPE_UNSET && out_t == TYPE_FFMPEG ) {
-    snd_t = TYPE_FFMPEG;
+  if( snd_t == TYPE_UNSET ) {
+    snd_t = TYPE_NONE;
   }
 
   if( sound_raw ) {
@@ -2430,9 +2202,6 @@ main( int argc, char *argv[] )
       break;
     case DO_HEAD:					/* read (next) file header */
       if( ( err = fmf_read_head() ) ) eop = 1;
-#ifdef USE_FFMPEG
-      if( out_t == TYPE_FFMPEG && !out_header_ok && ( err = out_write_ffmpegheader() ) ) return err;
-#endif
       break;
     case DO_FRAME_HEAD:
       if( ( err = fmf_read_frame_head() ) ) eop = 1;	/* after finish a frame read next settings */

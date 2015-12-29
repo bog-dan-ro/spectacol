@@ -518,3 +518,5 @@
 20150617 Makefile.am: enable silent rules for windres commands (Sergio).
 20151201 fmfconv.c,fmfconv_avi.c: ensure AVI files are finalised and delete
          the index file on Windows (Sergio).
+20151229 Makefile.am,configure.ac,fmfconv.[ch],fmfconv_ff.c,man/fmfconv.1: drop
+         FFmpeg/Libav API support in fmfconv (patch #345) (Sergio).

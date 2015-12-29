@@ -54,7 +54,6 @@ createhdf_SOURCES = ide.c createhdf.c
 
 fmfconv_SOURCES = fmfconv.c \
 		  fmfconv_avi.c \
-		  fmfconv_ff.c \
 		  fmfconv_yuv.c \
 		  fmfconv_scr.c \
 		  fmfconv_ppm.c \
@@ -74,7 +73,7 @@ if HAVE_LIBPNG
 fmfconv_SOURCES += fmfconv_png.c
 endif
 
-fmfconv_LDADD = $(JPEG_LIBS) $(PNG_LIBS) $(FFMPEG_LIBS) compat/libcompatos.a
+fmfconv_LDADD = $(JPEG_LIBS) $(PNG_LIBS) compat/libcompatos.a
 
 listbasic_SOURCES = listbasic.c utils.c
 listbasic_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
