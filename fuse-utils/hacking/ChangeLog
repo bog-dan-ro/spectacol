@@ -520,3 +520,4 @@
          the index file on Windows (Sergio).
 20151229 Makefile.am,configure.ac,fmfconv.[ch],fmfconv_ff.c,man/fmfconv.1: drop
          FFmpeg/Libav API support in fmfconv (patch #345) (Sergio).
+20160103 fmfconv.c: fix crash when writing a sequence of screenshots (Sergio).

@@ -894,7 +894,7 @@ open_out( void )
     if( ( out = fopen_overwr( out_name, "wb", 0 ) ) == NULL ) {
       printe( "Cannot open output file '%s' (%s)...\n", out_name,
               strerror( errno ) );
-      return ERR_OPEN_SND;
+      return ERR_OPEN_OUT;
     }
 #ifdef USE_LIBJPEG
     if( avi_subtype == -1 ) avi_subtype = TYPE_AVI;
@@ -1614,7 +1614,7 @@ out_write_frame( void )
     output_no++;
     if( ( out_t >= TYPE_SCR && out_t <= TYPE_JPEG ) ) {
       close_out();
-      open_out();
+      if( ( err = open_out() ) ) return err;
     }
   }
   fmf_fps -= out_fps;
@@ -2225,7 +2225,7 @@ main( int argc, char *argv[] )
       break;
     case DO_FRAME:
       if( out_t != TYPE_NONE ) {
-        out_write_frame();
+        if( ( err = out_write_frame() ) ) eop = 1;
       }
     case DO_LAST_FRAME:
       if( inp_t == TYPE_FMF ) {
