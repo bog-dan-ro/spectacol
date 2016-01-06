@@ -150,6 +150,7 @@ static const libspectrum_byte ZXATASP_IDE_SECONDARY = 0x80;
 
 static void zxatasp_reset( int hard_reset );
 static void zxatasp_memory_map( void );
+static void zxatasp_snapshot_enabled( libspectrum_snap *snap );
 static void zxatasp_from_snapshot( libspectrum_snap *snap );
 static void zxatasp_to_snapshot( libspectrum_snap *snap );
 
@@ -157,7 +158,7 @@ static module_info_t zxatasp_module_info = {
 
   /* .reset = */ zxatasp_reset,
   /* .romcs = */ zxatasp_memory_map,
-  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_enabled = */ zxatasp_snapshot_enabled,
   /* .snapshot_from = */ zxatasp_from_snapshot,
   /* .snapshot_to = */ zxatasp_to_snapshot,
 
@@ -517,13 +518,19 @@ zxatasp_memory_map( void )
 }
 
 static void
+zxatasp_snapshot_enabled( libspectrum_snap *snap )
+{
+  if( libspectrum_snap_zxatasp_active( snap ) )
+    settings_current.zxatasp_active = 1;
+}
+
+static void
 zxatasp_from_snapshot( libspectrum_snap *snap )
 {
   size_t i, page;
 
   if( !libspectrum_snap_zxatasp_active( snap ) ) return;
 
-  settings_current.zxatasp_active = 1;
   settings_current.zxatasp_upload = libspectrum_snap_zxatasp_upload( snap );
   settings_current.zxatasp_wp = libspectrum_snap_zxatasp_writeprotect( snap );
 

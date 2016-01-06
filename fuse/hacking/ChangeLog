@@ -4973,3 +4973,6 @@
          pkg-config, that doesn't play well when cross-compiling (Sergio).
 20151228 ui/gtk/gtkui.c: update properties used in GtkAboutDialog (Sergio).
 20160106 man/fuse.1,peripherals/speccyboot.[ch]: update SpeccyBoot URL (Sergio).
+20160106 peripherals/{ide/{simpleide.c,zxatasp.c,zxcf.c},kempmouse.c,printer.c}:
+         fix some peripherals activation when loading snapshots (fixes bug #328)
+         (Sergio).

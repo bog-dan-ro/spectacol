@@ -72,15 +72,15 @@ static void printer_zxp_write( libspectrum_word port, libspectrum_byte b );
 static libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED,
 				              libspectrum_byte *attached);
 
-static void zx_printer_from_snapshot( libspectrum_snap *snap );
+static void zx_printer_snapshot_enabled( libspectrum_snap *snap );
 static void zx_printer_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t printer_zxp_module_info = {
 
   /* .reset = */ printer_zxp_reset,
   /* .romcs = */ NULL,
-  /* .snapshot_enabled = */ NULL,
-  /* .snapshot_from = */ zx_printer_from_snapshot,
+  /* .snapshot_enabled = */ zx_printer_snapshot_enabled,
+  /* .snapshot_from = */ NULL,
   /* .snapshot_to = */ zx_printer_to_snapshot,
 
 };
@@ -722,9 +722,10 @@ printer_text_end();
 printer_zxp_end();
 }
 
-static void zx_printer_from_snapshot( libspectrum_snap *snap )
+static void zx_printer_snapshot_enabled( libspectrum_snap *snap )
 {
-  settings_current.zxprinter = libspectrum_snap_zx_printer_active( snap );
+  if( libspectrum_snap_zx_printer_active( snap ) )
+    settings_current.zxprinter = 1;
 }
 
 static void zx_printer_to_snapshot( libspectrum_snap *snap )

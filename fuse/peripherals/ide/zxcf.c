@@ -88,6 +88,7 @@ static libspectrum_byte last_memctl;
 
 static void zxcf_reset( int hard_reset );
 static void zxcf_memory_map( void );
+static void zxcf_snapshot_enabled( libspectrum_snap *snap );
 static void zxcf_from_snapshot( libspectrum_snap *snap );
 static void zxcf_to_snapshot( libspectrum_snap *snap );
 
@@ -95,7 +96,7 @@ static module_info_t zxcf_module_info = {
 
   /* .reset = */ zxcf_reset,
   /* .romcs = */ zxcf_memory_map,
-  /* .snapshot_enabled = */ NULL,
+  /* .snapshot_enabled = */ zxcf_snapshot_enabled,
   /* .snapshot_from = */ zxcf_from_snapshot,
   /* .snapshot_to = */ zxcf_to_snapshot,
 
@@ -290,13 +291,19 @@ zxcf_memory_map( void )
 }
 
 static void
+zxcf_snapshot_enabled( libspectrum_snap *snap )
+{
+  if( libspectrum_snap_zxcf_active( snap ) )
+    settings_current.zxcf_active = 1;
+}
+
+static void
 zxcf_from_snapshot( libspectrum_snap *snap )
 {
   size_t i;
 
   if( !libspectrum_snap_zxcf_active( snap ) ) return;
 
-  settings_current.zxcf_active = 1;
   settings_current.zxcf_upload = libspectrum_snap_zxcf_upload( snap );
 
   zxcf_memctl_write( 0x10bf, libspectrum_snap_zxcf_memctl( snap ) );

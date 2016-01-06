@@ -57,15 +57,15 @@ static const periph_t simpleide_periph = {
 
 static libspectrum_ide_channel *simpleide_idechn;
 
-static void simpleide_from_snapshot( libspectrum_snap *snap );
+static void simpleide_snapshot_enabled( libspectrum_snap *snap );
 static void simpleide_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t simpleide_module_info = {
 
   /* .reset = */ simpleide_reset,
   /* .romcs = */ NULL,
-  /* .snapshot_enabled = */ NULL,
-  /* .snapshot_from = */ simpleide_from_snapshot,
+  /* .snapshot_enabled = */ simpleide_snapshot_enabled,
+  /* .snapshot_from = */ NULL,
   /* .snapshot_to = */ simpleide_to_snapshot,
 
 };
@@ -197,10 +197,10 @@ simpleide_write( libspectrum_word port, libspectrum_byte data )
 }
 
 static void
-simpleide_from_snapshot( libspectrum_snap *snap )
+simpleide_snapshot_enabled( libspectrum_snap *snap )
 {
-  settings_current.simpleide_active =
-    libspectrum_snap_simpleide_active( snap );
+  if( libspectrum_snap_simpleide_active( snap ) )
+    settings_current.simpleide_active = 1;
 }
 
 static void

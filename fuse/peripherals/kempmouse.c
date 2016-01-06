@@ -33,15 +33,15 @@
 #include "settings.h"
 #include "ui/ui.h"
 
-static void kempmouse_from_snapshot( libspectrum_snap *snap );
+static void kempmouse_snapshot_enabled( libspectrum_snap *snap );
 static void kempmouse_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t kempmouse_module_info = {
 
   /* .reset = */ NULL,
   /* .romcs = */ NULL,
-  /* .snapshot_enabled = */ NULL,
-  /* .snapshot_from = */ kempmouse_from_snapshot,
+  /* .snapshot_enabled = */ kempmouse_snapshot_enabled,
+  /* .snapshot_from = */ NULL,
   /* .snapshot_to = */ kempmouse_to_snapshot,
 
 };
@@ -98,10 +98,10 @@ kempmouse_update( int dx, int dy, int btn, int down )
 }
 
 static void
-kempmouse_from_snapshot( libspectrum_snap *snap )
+kempmouse_snapshot_enabled( libspectrum_snap *snap )
 {
-  settings_current.kempston_mouse =
-    libspectrum_snap_kempston_mouse_active( snap );
+  if( libspectrum_snap_kempston_mouse_active( snap ) )
+    settings_current.kempston_mouse = 1;
 }
 
 static void
