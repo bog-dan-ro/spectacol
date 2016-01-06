@@ -9,7 +9,7 @@
      http://www.microchip.com/wwwproducts/Devices.aspx?dDocName=en022889
 
    SpeccyBoot:
-     http://speccyboot.sourceforge.net/
+     http://patrikpersson.github.io/speccyboot/
   
    Copyright (c) 2009-2011 Patrik Persson, Philip Kendall
 
