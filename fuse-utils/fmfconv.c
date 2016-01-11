@@ -2060,7 +2060,7 @@ parse_args( int argc, char *argv[] )
       else if( sscanf( optarg, "%d%c", &out_fps, &t ) == 1 )
 	out_fps *= 1000;
       else {
-	printe( "Unknow value for '-f/--frate' ...\n");
+	printe( "Unknown value for '-f/--frate' ...\n" );
 	return ERR_BAD_PARAM;
       }
       if( out_fps != -1 && out_fps < 1 ) {
