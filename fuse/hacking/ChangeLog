@@ -4976,3 +4976,4 @@
 20160106 peripherals/{ide/{simpleide.c,zxatasp.c,zxcf.c},kempmouse.c,printer.c}:
          fix some peripherals activation when loading snapshots (fixes bug #328)
          (Sergio).
+20160111 man/fuse.1: fix spelling (Sergio).
