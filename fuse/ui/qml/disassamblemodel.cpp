@@ -34,6 +34,7 @@ static inline uint32_t absolute2PageAddress(uint16_t page, uint16_t address)
         break;
     case 2:
         absAdd = 0x8000;
+        break;
     default:
         absAdd = 0xc000;
         break;
