@@ -24,7 +24,7 @@
 class FunctionEvent : public QEvent
 {
 public:
-    FunctionEvent(const FuseListModel::Function &function)
+    explicit FunctionEvent(const FuseListModel::Function &function)
         : QEvent(User)
         , m_function(function)
     {}

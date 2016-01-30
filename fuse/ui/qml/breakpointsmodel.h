@@ -117,7 +117,7 @@ public:
     typedef std::unordered_map<debugger_breakpoint_address, std::unordered_set<int>> Addresses;
 
 public:
-    BreakpointsModel(QObject *parent);
+    explicit BreakpointsModel(QObject *parent = nullptr);
     void breakpointsUpdated();
 
     std::mutex &breakpointsMutex() const { return m_mutex; }

@@ -70,7 +70,7 @@ public:
     };
 
 public:
-    DisassambleModel(QObject *parent);
+    explicit DisassambleModel(QObject *parent = nullptr);
 
     void disassamble(uint16_t address, int delta = -10, uint16_t instructions = 50);
     void disassambleMore(Origin origin, int size);

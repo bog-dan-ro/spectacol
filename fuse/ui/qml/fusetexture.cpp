@@ -403,11 +403,11 @@ QRect FuseTexture::updateGlPixels()
         return QRect();
 
     int x = m_updateRect.x(), y = m_updateRect.y(), w = m_updateRect.width(), h = m_updateRect.height();
+    Q_ASSERT(x >= 0);
+    Q_ASSERT(y >= 0);
+    Q_ASSERT(w >= 0);
+    Q_ASSERT(h >= 0);
     m_updateRect = QRect();
-    Q_ASSERT(x>= 0);
-    Q_ASSERT(y>= 0);
-    Q_ASSERT(w<= w);
-    Q_ASSERT(h<= h);
 
     if (!w)
         w = m_width;
