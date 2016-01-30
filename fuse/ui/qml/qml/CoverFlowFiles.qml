@@ -17,6 +17,7 @@
 
 import QtQuick 2.2
 import Qt.labs.folderlistmodel 2.1
+import QtGamepad 1.0
 
 Item
 {
@@ -24,6 +25,10 @@ Item
     signal fileSelected(string filePath);
     property alias rootFolder: filesModel.rootFolder
     property alias folder: filesModel.folder
+
+    GamepadKeyNavigation {
+        gamepad: Gamepad { deviceId: fuse.gamepadId }
+    }
 
     transform: Rotation {
         angle : 0
@@ -71,9 +76,9 @@ Item
                 id : album_delegate
                 property real rotAngle : PathView.onPath ? PathView.delAngle : 0
                 property real delScale : PathView.onPath ? PathView.delScale : 0.5
-                property bool isCurrentItem : index === PathView.view.currentIndex;
+                property bool isCurrentItem : index === filesView.currentIndex;
 
-                width : mainScreen.portrait ? PathView.view.width * 0.8 : PathView.view.height * 0.65
+                width : mainScreen.portrait ? filesView.width * 0.8 : filesView.height * 0.65
                 height : width
                 fillMode: Image.PreserveAspectFit
                 scale : delScale
@@ -169,7 +174,6 @@ Item
             left : parent.left
             right : parent.right
             top : parent.verticalCenter
-            //topMargin : 1.25 * album_delegate.width
         }
         height : parent.height
 

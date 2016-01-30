@@ -25,7 +25,6 @@
 #include <pokefinder/pokefinder.h>
 #include <settings.h>
 #include <snapshot.h>
-#include <ui/ui.h>
 #include <ui/scaler/scaler.h>
 #include <utils.h>
 #include <z80/z80.h>
@@ -37,6 +36,8 @@
 #include <QQmlContext>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QGamepadManager>
+#include <QSemaphore>
 
 
 #include <mutex>
@@ -98,6 +99,37 @@ static void destroy_mutex(libspectrum_mutex_t mutex)
 
 FuseEmulator *g_fuseEmulator = nullptr;
 
+static input_key toJoystickKey(QGamepadManager::GamepadButton button)
+{
+    switch (button) {
+
+    case QGamepadManager::ButtonUp: return INPUT_JOYSTICK_UP;
+    case QGamepadManager::ButtonDown: return INPUT_JOYSTICK_DOWN;
+    case QGamepadManager::ButtonRight: return INPUT_JOYSTICK_RIGHT;
+    case QGamepadManager::ButtonLeft: return INPUT_JOYSTICK_LEFT;
+
+    case QGamepadManager::ButtonL1: return INPUT_JOYSTICK_FIRE_1;
+    case QGamepadManager::ButtonR1: return INPUT_JOYSTICK_FIRE_2;
+
+    case QGamepadManager::ButtonL2: return INPUT_JOYSTICK_FIRE_3;
+    case QGamepadManager::ButtonR2: return INPUT_JOYSTICK_FIRE_4;
+
+    case QGamepadManager::ButtonA: return INPUT_JOYSTICK_FIRE_5;
+    case QGamepadManager::ButtonB: return INPUT_JOYSTICK_FIRE_6;
+    case QGamepadManager::ButtonX: return INPUT_JOYSTICK_FIRE_7;
+    case QGamepadManager::ButtonY: return INPUT_JOYSTICK_FIRE_8;
+
+    case QGamepadManager::ButtonSelect: return INPUT_JOYSTICK_FIRE_9;
+    case QGamepadManager::ButtonStart: return INPUT_JOYSTICK_FIRE_10;
+    case QGamepadManager::ButtonL3: return INPUT_JOYSTICK_FIRE_11;
+    case QGamepadManager::ButtonR3: return INPUT_JOYSTICK_FIRE_12;
+    case QGamepadManager::ButtonCenter: return INPUT_JOYSTICK_FIRE_13;
+    case QGamepadManager::ButtonGuide: return INPUT_JOYSTICK_FIRE_14;
+    default:
+        return INPUT_JOYSTICK_FIRE_15;
+    }
+}
+
 FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     : FuseObject(parent)
     , m_breakpointsModel(this)
@@ -105,7 +137,85 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     , m_pokeFinderModel(this)
     , m_resetPokeFinder(true)
 {
+    QGamepadManager *gm = QGamepadManager::instance();
     g_fuseEmulator = this;
+    {
+        QSettings s;
+        m_gamepadId = s.value("gamepadId", -1).toInt();
+        emit gamepadIdChanged();
+    }
+
+    connect(gm, &QGamepadManager::gamepadAxisEvent, this, [this](int deviceId, QGamepadManager::GamepadAxis axis, double value){
+        if (!m_processJoysticksEvents || deviceId != m_gamepadId ||
+                axis == QGamepadManager::AxisInvalid)
+            return;
+
+        pokeEvent([axis, value]{
+            input_event_t event1, event2;
+            switch (axis) {
+            case QGamepadManager::AxisLeftX:
+            case QGamepadManager::AxisRightX:
+                event1.types.joystick.button = INPUT_JOYSTICK_LEFT;
+                event2.types.joystick.button = INPUT_JOYSTICK_RIGHT;
+                break;
+
+            case QGamepadManager::AxisLeftY:
+            case QGamepadManager::AxisRightY:
+                event1.types.joystick.button = INPUT_JOYSTICK_UP;
+                event2.types.joystick.button = INPUT_JOYSTICK_DOWN;
+                break;
+            default:
+                return;
+            }
+            event1.types.joystick.which = event2.types.joystick.which = 0;
+            if (value <= -0.5) {
+                event1.type = INPUT_EVENT_JOYSTICK_PRESS;
+                event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+            } else if (value >= 0.5) {
+                event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+                event2.type = INPUT_EVENT_JOYSTICK_PRESS;
+            } else {
+                event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+                event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+            }
+            input_event(&event1);
+            input_event(&event2);
+        });
+    });
+
+    connect(gm, &QGamepadManager::gamepadButtonPressEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button, double value) {
+        if (m_processJoysticksEvents.load() && button == QGamepadManager::ButtonStart) {
+            emit showMenu();
+            return;
+        }
+
+        if (!m_processJoysticksEvents.load() || deviceId != m_gamepadId ||
+                button == QGamepadManager::ButtonInvalid || value != 1)
+            return;
+
+        pokeEvent([button] {
+            input_event_t event;
+            event.type = INPUT_EVENT_JOYSTICK_PRESS;
+            event.types.joystick.which = 0;
+            event.types.joystick.button = toJoystickKey(button);
+            input_event(&event);
+        });
+    });
+
+    connect(gm, &QGamepadManager::gamepadButtonReleaseEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button) {
+        if (!m_processJoysticksEvents.load() || deviceId != m_gamepadId ||
+                button == QGamepadManager::ButtonInvalid ||
+                button == QGamepadManager::ButtonStart)
+            return;
+
+        pokeEvent([button] {
+            input_event_t event;
+            event.type = INPUT_EVENT_JOYSTICK_RELEASE;
+            event.types.joystick.which = 0;
+            event.types.joystick.button = toJoystickKey(button);
+            input_event(&event);
+        });
+    });
 
     connect(&m_breakpointsModel, &BreakpointsModel::modelReset, &m_disassambleModel, &DisassambleModel::update);
 
@@ -124,6 +234,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     libspectrum_mutex_set_vtable( &t );
     setDataPath(dataPath());
     m_debuggerActivated.store(false);
+    m_processJoysticksEvents.store(true);
 }
 
 FuseEmulator::~FuseEmulator()
@@ -200,6 +311,29 @@ void FuseEmulator::setSelectedFilterIndex(int selectedFilterIndex)
         scaler_select_scaler(scaler);
         callFunction([this]{
             emit selectedFilterIndexChanged();
+        });
+    });
+}
+
+QStringList FuseEmulator::joysticksModel() const
+{
+    QStringList ret;
+    for (int i = LIBSPECTRUM_JOYSTICK_NONE; i <= LIBSPECTRUM_JOYSTICK_FULLER; ++i )
+        ret << QLatin1String(libspectrum_joystick_name(libspectrum_joystick(i)));
+    return ret;
+}
+
+int FuseEmulator::selectedJoysticksIndex() const
+{
+    return settings_current.joystick_1_output;
+}
+
+void FuseEmulator::setSelectedJoysticksIndex(int selectedJoysticksIndex)
+{
+    pokeEvent([selectedJoysticksIndex, this]{
+        settings_current.joystick_1_output = selectedJoysticksIndex;
+        callFunction([this]{
+            emit selectedJoysticksIndexChanged();
         });
     });
 }
@@ -397,6 +531,26 @@ int FuseEmulator::pokeFinderCount() const
     return pokefinder_count;
 }
 
+void FuseEmulator::setProcessJoysticksEvents(bool processJoysticksEvents)
+{
+   bool expect = !processJoysticksEvents;
+   if (m_processJoysticksEvents.compare_exchange_strong(expect, processJoysticksEvents))
+       emit processJoysticksEventsChanged();
+}
+
+void FuseEmulator::setGamepadId(int gamepadId)
+{
+    if (m_gamepadId == gamepadId)
+        return;
+    {
+        QSettings s;
+        s.setValue("gamepadId", gamepadId);
+    }
+
+    m_gamepadId = gamepadId;
+    emit gamepadIdChanged();
+}
+
 QUrl FuseEmulator::snapshotsPath() const
 {
     return QUrl::fromLocalFile(dataPath().toLocalFile() + QLatin1Literal("/Snapshots/"));
@@ -564,6 +718,35 @@ void FuseEmulator::pokeFinderResetIfNeeded()
         m_resetPokeFinder = false;
     }
 
+}
+
+#include "z80assembler.h"
+#include <QDebug>
+void FuseEmulator::pokeMemory(int _address, int page, int value)
+{
+//    pokeEvent([]{
+//        Z80Assembler zasm;
+//        uint16_t address = z80.pc.w;
+//        uint16_t pa = 0;
+//        size_t len;
+//        do {
+//            char buff[100];
+//            debugger_disassemble(buff, sizeof(buff), &len, address);
+//            QByteArray bytes;
+//            for (size_t i = 0; i < len; ++i)
+//                bytes.push_back(readbyte(address + i));
+
+//            QByteArray asmBytes = zasm.assemble(QString(buff).trimmed(), address, bytes);
+//            if (asmBytes != bytes)
+//                qDebug() << "Failed to assamble " << buff << bytes << asmBytes;
+
+//            address += len;
+//            if (0xff + pa < address) {
+//                qDebug() << address;
+//                pa = address;
+//            }
+//        } while (len + address < 0xffff);
+    //    });
 }
 
 QString FuseEmulator::snapshotFileName(bool addExtension) const

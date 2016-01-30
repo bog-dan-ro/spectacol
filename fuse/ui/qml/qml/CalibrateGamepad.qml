@@ -15,6 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// @scope main.qml
+
 import QtQuick 2.5
 import QtGamepad 1.0
 
@@ -167,6 +169,7 @@ StandardGamepad {
 
     function configureNext()
     {
+        fuse.processJoysticksEvents = false;
         if (__buttons.length > 0) {
             var but = __buttons.shift();
             GamepadManager.configureButton(deviceId, but);
@@ -183,6 +186,7 @@ StandardGamepad {
             configureText.visible = false;
             cancelButtonText.visible = false;
             configureDone();
+            fuse.processJoysticksEvents = true;
         }
     }
 
@@ -191,8 +195,6 @@ StandardGamepad {
         interval: 500; running: false; repeat: false
         onTriggered: configureNext();
     }
-
-    onDeviceIdChanged: configureNext();
 
     Connections {
         target: GamepadManager
@@ -211,7 +213,9 @@ StandardGamepad {
     }
 
     Component.onCompleted: {
-        deviceId = GamepadManager.connectedGamepads[0];
+        deviceId = fuse.gamepadId;
+        GamepadManager.resetConfiguration(deviceId);
         GamepadManager.setCancelConfigureButton(deviceId, GamepadManager.ButtonStart);
+        configTimer.restart();
     }
 }

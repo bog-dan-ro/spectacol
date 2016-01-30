@@ -17,7 +17,6 @@ SOURCES += main.cpp \
     fusetexture.cpp \
     ../../compat/unix/osname.c \
     keysyms.cpp \
-    joystick.cpp \
     qmlui.cpp \
     ../../timer/native.c \
     ../../sound/alsasound.c \
@@ -50,7 +49,7 @@ RESOURCES += qml.qrc
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
-LIBS = $$PWD/../../libfuse.a $$PWD/../../../install/lib/libspectrum.a -lxml2 -lz -lpng -lbz2 -lasound
+LIBS = $$PWD/../../libfuse.a $$PWD/../../../install/lib/libspectrum.a -lxml2 -lz -lpng -lbz2 -lasound -laudiofile
 
 QMAKE_CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
 QMAKE_CFLAGS += -fsanitize=address -fno-omit-frame-pointer

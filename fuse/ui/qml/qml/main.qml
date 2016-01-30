@@ -15,11 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.5
+import QtQuick 2.6
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
 import Qt.labs.controls 1.0
+import QtGamepad 1.0
 import Fuse 1.0
 
 ApplicationWindow {
@@ -46,7 +47,6 @@ ApplicationWindow {
     Drawer {
         id: menuBar
         anchors.fill: parent
-
         MenuView {
             id: menuView
             width: mainScreen.width / 4
@@ -63,8 +63,13 @@ ApplicationWindow {
 
         onPositionChanged: {
             menuView.reset();
-            if (position == 1)
+            if (position == 1) {
                 pageLoader.source = "";
+                menuView.useGamepad = true;
+            }
+
+            if (position == 0)
+                menuView.useGamepad = false;
         }
         onClicked: close()
     }
@@ -80,10 +85,15 @@ ApplicationWindow {
             Keys.onPressed: {
                 switch (event.key) {
                 case Qt.Key_F1:
-                    if (menuBar.position)
+                    if (menuBar.position) {
                         menuBar.close();
-                    else
-                        menuBar.open();
+                    } else {
+                        if (pageLoader.source != "") {
+                            pageLoader.source = "";
+                        } else {
+                            menuBar.open();
+                        }
+                    }
                     event.accepted = true;
                     break;
 
@@ -177,5 +187,26 @@ ApplicationWindow {
 
         onShowMenu: menuBar.open();
         onHideMenu: menuBar.close();
+    }
+
+    Component.onCompleted: {
+        // Check gamepads status
+        if (fuse.gamepadId == -1) {
+            var len = GamepadManager.connectedGamepads.length;
+            if (len > 0) {
+                for (var i = 0; i < len; ++i) {
+                    var id = GamepadManager.connectedGamepads[i];
+                    if (!GamepadManager.isConfigurationNeeded(id)) {
+                        fuse.gamepadId = id;
+                        break;
+                    }
+                }
+
+                if (fuse.gamepadId == -1) {
+                    fuse.gamepadId = GamepadManager.connectedGamepads[0];
+                    pageLoader.source = "CalibrateGamepad.qml";
+                }
+            }
+        }
     }
 }

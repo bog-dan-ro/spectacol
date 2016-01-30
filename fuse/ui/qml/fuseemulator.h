@@ -23,6 +23,8 @@
 #include "fuseobject.h"
 #include "pokefindermodel.h"
 
+#include <ui/ui.h>
+
 #include <QThread>
 #include <QUrl>
 
@@ -39,13 +41,16 @@ protected:
 class FuseEmulator : public FuseObject
 {
     Q_OBJECT
-    Q_ENUMS(ErrorLevel)
 
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
+    Q_PROPERTY(bool processJoysticksEvents READ processJoysticksEvents WRITE setProcessJoysticksEvents NOTIFY processJoysticksEventsChanged)
+    Q_PROPERTY(int gamepadId READ gamepadId WRITE setGamepadId NOTIFY gamepadIdChanged)
     Q_PROPERTY(QUrl dataPath READ dataPath WRITE setDataPath NOTIFY dataPathChanged)
     Q_PROPERTY(bool saveSnapshotEnabled READ saveSnapshotEnabled NOTIFY saveSnapshotEnabledChanged)
-    Q_PROPERTY(QStringList filtersModel READ filtersModel)
+    Q_PROPERTY(QStringList filtersModel READ filtersModel CONSTANT)
     Q_PROPERTY(int selectedFilterIndex READ selectedFilterIndex WRITE setSelectedFilterIndex NOTIFY selectedFilterIndexChanged)
+    Q_PROPERTY(QStringList joysticksModel READ joysticksModel CONSTANT)
+    Q_PROPERTY(int selectedJoysticksIndex READ selectedJoysticksIndex WRITE setSelectedJoysticksIndex NOTIFY selectedJoysticksIndexChanged)
     Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
 
     /* regs properties */
@@ -76,7 +81,6 @@ public:
         Error
     };
 
-
 public:
     explicit FuseEmulator(QQmlContext *ctxt, QObject *parent = 0);
     ~FuseEmulator();
@@ -90,9 +94,12 @@ public:
     bool saveSnapshotEnabled() const;
 
     QStringList filtersModel() const;
-
     int selectedFilterIndex() const;
     void setSelectedFilterIndex(int selectedFilterIndex);
+
+    QStringList joysticksModel() const;
+    int selectedJoysticksIndex() const;
+    void setSelectedJoysticksIndex(int selectedJoysticksIndex);
 
     QString PC() const;
     void setPC(const QString &value);
@@ -137,6 +144,12 @@ public:
 
     int pokeFinderCount() const;
 
+    bool processJoysticksEvents() const { return m_processJoysticksEvents.load(); }
+    void setProcessJoysticksEvents(bool processJoysticksEvents);
+
+    int gamepadId() const { return m_gamepadId; }
+    void setGamepadId(int gamepadId);
+
 public slots:
     QUrl snapshotsPath() const;
     void load(const QUrl &filePath);
@@ -173,17 +186,22 @@ public slots:
     void pokeFinderResetIfNeeded();
     // pokefinder methods
 
+    void pokeMemory(int address, int page, int value);
+
 signals:
     void pausedChanged();
     void dataPathChanged();
     void saveSnapshotEnabledChanged();
     void selectedFilterIndexChanged();
+    void selectedJoysticksIndexChanged();
     void pokeFinderCountChanged();
     void registersChanged();
     void showDebugger();
     void hideDebugger();
     void showMenu();
     void hideMenu();
+    void processJoysticksEventsChanged();
+    void gamepadIdChanged();
 
     void error(ErrorLevel level, const QString &message);
 
@@ -201,6 +219,8 @@ private:
     FuseThread m_fuseThread;
     std::atomic_bool m_debuggerActivated;
     bool m_resetPokeFinder;
+    std::atomic_bool m_processJoysticksEvents;
+    int m_gamepadId = -1;
 };
 
 extern FuseEmulator *g_fuseEmulator;

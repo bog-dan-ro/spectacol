@@ -19,12 +19,14 @@ import QtQuick 2.3
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
+import QtGamepad 1.0
 
 ColumnLayout {
     property Menu rootMenu: null
     property Menu currentMenu: rootMenu
     property var menus: []
     property real parentWidth: 50
+    property alias useGamepad: gamepadKeyNavigation.active
 
     function decrementCurrentIndex()
     {
@@ -108,7 +110,7 @@ ColumnLayout {
         var ampersantPos = text.indexOf("&");
         if (ampersantPos === -1)
             return text;
-        return text.substr(0, ampersantPos) + "<b>" + text.substr(ampersantPos + 1, 1) + "</b>" + text.substr(ampersantPos + 2);
+        return text.substr(0, ampersantPos) + "<b><u>" + text.substr(ampersantPos + 1, 1) + "</u></b>" + text.substr(ampersantPos + 2);
     }
 
     spacing: 0.5 * Screen.pixelDensity
@@ -152,6 +154,7 @@ ColumnLayout {
 
             RowLayout {
                 anchors.fill: parent
+                anchors.leftMargin: Screen.pixelDensity
                 FancyText {
                     Layout.fillWidth: true
                     height: parent.height
@@ -171,5 +174,20 @@ ColumnLayout {
                 onClicked: openMenu(modelData, index)
             }
         }
+    }
+
+
+    GamepadKeyNavigation {
+        id: gamepadKeyNavigation
+        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        active: false
+        onActiveChanged: fuse.processJoysticksEvents = !active
+        upKey: Qt.Key_Up
+        downKey: Qt.Key_Down
+        leftKey: Qt.Key_Escape
+        rightKey: Qt.Key_Return
+        buttonAKey: Qt.Key_Return
+        buttonStartKey: Qt.Key_F1
+        buttonBKey: Qt.Key_Escape
     }
 }

@@ -91,13 +91,31 @@ extern "C" int ui_debugger_disassemble( libspectrum_word address )
     return 0;
 }
 
+extern "C" int ui_joystick_init( void )
+{
+  return 1;
+}
+
+extern "C" void ui_joystick_end( void )
+{
+}
+
+extern "C" void ui_joystick_poll( void )
+{
+}
+
+extern "C" ui_confirm_joystick_t ui_confirm_joystick( libspectrum_joystick /*libspectrum_type*/, int /*inputs*/ )
+{
+    return UI_CONFIRM_JOYSTICK_JOYSTICK_1;
+}
+
 inline SpectrumEventFunction peekEvent()
 {
     SpectrumEventFunction event;
     s_eventsMutex.lock();
     if (!s_events.empty()) {
-        event = std::move(s_events.back());
-        s_events.pop_back();
+        event = std::move(s_events.front());
+        s_events.pop_front();
     }
     s_eventsMutex.unlock();
     return std::move(event);

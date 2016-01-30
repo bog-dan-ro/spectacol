@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ FancyList {
     Component.onCompleted: fuse.paused = true
     Component.onDestruction: fuse.paused = false
 
-    model: fuse.filtersModel
-    currentIndex: fuse.selectedFilterIndex
-    onCurrentIndexChanged: fuse.selectedFilterIndex = currentIndex
+    model: fuse.joysticksModel
+    currentIndex: fuse.selectedJoysticksIndex
+    onCurrentIndexChanged: fuse.selectedJoysticksIndex = currentIndex
 
     delegate: Rectangle {
         width: 50 * Screen.pixelDensity

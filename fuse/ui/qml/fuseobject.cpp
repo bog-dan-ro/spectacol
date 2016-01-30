@@ -19,6 +19,7 @@
 
 #include <QCoreApplication>
 #include <QEvent>
+#include <QSemaphore>
 #include <QThread>
 
 class FunctionEvent : public QEvent

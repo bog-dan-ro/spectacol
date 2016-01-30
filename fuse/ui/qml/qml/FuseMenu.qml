@@ -24,14 +24,14 @@ Menu {
     id: fuseMenu
     MenuItem {
         visible: fuse.saveSnapshotEnabled
-        text: "Quick save snapshot"
+        text: "Quick &save snapshot"
         onTriggered: {
             menuBar.close();
             fuse.quickSaveSnapshot();
         }
     }
     MenuItem {
-        text: "Quick load snapshot"
+        text: "Quick &load snapshot"
         onTriggered: {
             menuBar.close();
             fuse.quickLoadSnapshot();
@@ -41,7 +41,7 @@ Menu {
     Menu {
         title: "&File"
         MenuItem {
-            text: "Open .."
+            text: "&Open .."
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "FileBrowserPage.qml";
@@ -49,7 +49,7 @@ Menu {
         }
 
         MenuItem {
-            text: "Save snapshot as ..."
+            text: "&Save snapshot as ..."
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "SaveSnapshotPage.qml";
@@ -126,13 +126,21 @@ Menu {
     }
 
     Menu {
-        title: "Joytick"
+        title: "Joystick"
         visible: GamepadManager.connectedGamepads.length > 0
         MenuItem {
-            text: "Configure Gamepad"
+            text: "Joysticks"
             onTriggered: {
                 menuBar.close();
-                pageLoader.source = "ConfigureGamepad.qml";
+                pageLoader.source = "Joysticks.qml";
+            }
+        }
+
+        MenuItem {
+            text: "Calibrate Gamepad"
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "CalibrateGamepad.qml";
             }
         }
     }
