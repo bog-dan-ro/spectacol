@@ -22,6 +22,7 @@
 #include "disassamblemodel.h"
 #include "fuseobject.h"
 #include "pokefindermodel.h"
+#include "zxgamesmodel.h"
 
 #include <ui/ui.h>
 
@@ -29,6 +30,8 @@
 #include <QUrl>
 
 #include <atomic>
+
+#include <QGamepadManager>
 
 class QQmlContext;
 
@@ -150,6 +153,8 @@ public:
     int gamepadId() const { return m_gamepadId; }
     void setGamepadId(int gamepadId);
 
+    QString saveFilePath(const QString& fileName);
+
 public slots:
     QUrl snapshotsPath() const;
     void load(const QUrl &filePath);
@@ -159,7 +164,6 @@ public slots:
     void nmi();
     void quickSaveSnapshot();
     void quickLoadSnapshot();
-    QString snapshotFileName(bool addExtension = true) const;
 
     // debug methods
     void debuggerTrap();
@@ -221,6 +225,7 @@ private:
     bool m_resetPokeFinder;
     std::atomic_bool m_processJoysticksEvents;
     int m_gamepadId = -1;
+    ZXGamesModel m_onlineGamesModel;
 };
 
 extern FuseEmulator *g_fuseEmulator;

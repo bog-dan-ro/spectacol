@@ -64,5 +64,6 @@
         <file>qml/Joysticks.qml</file>
         <file>qml/CalibrateGamepad.qml</file>
         <file>qml/FancyList.qml</file>
+        <file>qml/SearchOnlinePage.qml</file>
     </qresource>
 </RCC>

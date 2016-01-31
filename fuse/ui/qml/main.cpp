@@ -36,6 +36,7 @@
 
 int main(int argc, char *argv[])
 {
+    qputenv("QT_LABS_CONTROLS_STYLE", "default");
     QtQuickControlsApplication app(argc, argv);
     app.setOrganizationName("Fuse Emulator");
     app.setOrganizationDomain("licentia.eu");

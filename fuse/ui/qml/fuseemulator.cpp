@@ -36,7 +36,6 @@
 #include <QQmlContext>
 #include <QSettings>
 #include <QStandardPaths>
-#include <QGamepadManager>
 #include <QSemaphore>
 
 
@@ -184,13 +183,24 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     });
 
     connect(gm, &QGamepadManager::gamepadButtonPressEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button, double value) {
-        if (m_processJoysticksEvents.load() && button == QGamepadManager::ButtonStart) {
+        if (!m_processJoysticksEvents.load())
+            return;
+
+        switch (button) {
+        case QGamepadManager::ButtonStart:
             emit showMenu();
             return;
+        case QGamepadManager::ButtonL2:
+            quickSaveSnapshot();
+            return;
+        case QGamepadManager::ButtonR2:
+            quickLoadSnapshot();
+            return;
+        default:
+            break;
         }
 
-        if (!m_processJoysticksEvents.load() || deviceId != m_gamepadId ||
-                button == QGamepadManager::ButtonInvalid || value != 1)
+        if (deviceId != m_gamepadId || button == QGamepadManager::ButtonInvalid || value != 1)
             return;
 
         pokeEvent([button] {
@@ -223,6 +233,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     ctxt->setContextProperty("breakpointsModel", &m_breakpointsModel);
     ctxt->setContextProperty("disassambleModel", &m_disassambleModel);
     ctxt->setContextProperty("pokeFinderModel", &m_pokeFinderModel);
+    ctxt->setContextProperty("onlineGamesModel", &m_onlineGamesModel);
 
     qRegisterMetaType<ErrorLevel>("ErrorLevel");
 
@@ -551,6 +562,12 @@ void FuseEmulator::setGamepadId(int gamepadId)
     emit gamepadIdChanged();
 }
 
+QString FuseEmulator::saveFilePath(const QString &fileName)
+{
+    return dataPath().toLocalFile() + fileName.left(1).toLower() + QLatin1String("/") +
+            fileName.left(3).toLower() + QLatin1String("/") + fileName;
+}
+
 QUrl FuseEmulator::snapshotsPath() const
 {
     return QUrl::fromLocalFile(dataPath().toLocalFile() + QLatin1Literal("/Snapshots/"));
@@ -604,17 +621,21 @@ void FuseEmulator::nmi()
 
 void FuseEmulator::quickSaveSnapshot()
 {
-    save(snapshotsPath().toLocalFile() + snapshotFileName(false) + QLatin1Char(' ') +
-         QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") +
-         QLatin1Literal(".szx"));
+    const QString name = m_loadedFileName +
+            QDateTime::currentDateTime().toString(".yyyy-MM-dd_hh:mm:ss") +
+            QLatin1Literal(".szx");
+    save(snapshotsPath().toLocalFile() + name);
+    emit error(Info, tr("Snapshot saved to '%1").arg(name));
 }
 
 void FuseEmulator::quickLoadSnapshot()
 {
     QDir dir(snapshotsPath().toLocalFile());
     const auto &list = dir.entryInfoList(QDir::Files, QDir::Time);
-    if (list.size())
+    if (list.size()) {
         load(QUrl::fromLocalFile(list.first().filePath()));
+        emit error(Info, tr("Snapshot loaded from '%1").arg(list.first().fileName()));
+    }
 }
 
 void FuseEmulator::disassamble()
@@ -747,11 +768,6 @@ void FuseEmulator::pokeMemory(int _address, int page, int value)
 //            }
 //        } while (len + address < 0xffff);
     //    });
-}
-
-QString FuseEmulator::snapshotFileName(bool addExtension) const
-{
-    return m_loadedFileName + (addExtension ? QLatin1Literal(".szx") : QLatin1Literal(""));
 }
 
 void FuseEmulator::debuggerTrap()

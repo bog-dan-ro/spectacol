@@ -125,6 +125,14 @@ Menu {
         }
     }
 
+    MenuItem {
+        text: "&Search online .."
+        onTriggered: {
+            menuBar.close();
+            pageLoader.source = "SearchOnlinePage.qml";
+        }
+    }
+
     Menu {
         title: "Joystick"
         visible: GamepadManager.connectedGamepads.length > 0
@@ -198,26 +206,17 @@ Menu {
             text: qsTr("Poke memory")
             onTriggered: {
                 menuBar.close();
-                //pageLoader.source = "PokeMemoryPage.qml";
-                fuse.pokeMemory(0,0,0);
+                pageLoader.source = "PokeMemoryPage.qml";
             }
         }
         MenuItem {
+            visible: false
             text: qsTr("Memory Browser")
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "MemoryBrowserPage.qml";
             }
         }
-
-        MenuItem {
-            text: qsTr("Memory Browser")
-            onTriggered: {
-                menuBar.close();
-                pageLoader.source = "MemoryBrowserPage.qml";
-            }
-        }
-
         Menu {
             visible: false
             title: qsTr("Profiler")
@@ -257,6 +256,7 @@ Menu {
 
     Menu {
         title: qsTr("Options")
+        visible: false
 
         MenuItem {
             text: qsTr("General")
@@ -295,6 +295,7 @@ Menu {
     }
 
     Menu {
+        visible: false
         title: qsTr("Media")
         Menu {
             title: qsTr("Tape")

@@ -34,7 +34,7 @@ class PokeFinderModel : public FuseListModel
     };
 
 public:
-    PokeFinderModel(QObject *parent);
+    explicit PokeFinderModel(QObject *parent = nullptr);
     void update();
 
 protected:

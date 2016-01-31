@@ -87,7 +87,7 @@ Rectangle {
                 Layout.fillWidth: true
                 id: value
                 focus: true
-                activeFocusOnTab: true
+                //activeFocusOnTab: true
                 implicitWidth: pokeFinderPage.width / 2
                 validator: IntValidator {bottom: 0; top: 255;}
                 placeholderText: qsTr("Enter a numeric value")
@@ -138,45 +138,45 @@ Rectangle {
             ColumnLayout {
                 Button {
                     Layout.fillWidth: true
-                    activeFocusOnTab: false
+                    //activeFocusOnTab: false
                     text: qsTr("&Incremented")
                     onClicked: fuse.pokeFinderInced()
                 }
                 Button {
                     Layout.fillWidth: true
-                    activeFocusOnTab: false
+                    //activeFocusOnTab: false
                     text: qsTr("&Decremented")
                     onClicked: fuse.pokeFinderDeced()
                 }
                 Button {
                     Layout.fillWidth: true
-                    activeFocusOnTab: false
+                    //activeFocusOnTab: false
                     text: qsTr("&Search")
                     onClicked: fuse.pokeFinderSearch(value.text)
                 }
                 Button {
                     Layout.fillWidth: true
-                    activeFocusOnTab: false
+                    //activeFocusOnTab: false
                     text: qsTr("&Reset")
                     onClicked: fuse.pokeFinderReset()
                 }
                 Button {
                     Layout.fillWidth: true
                     enabled: view.currentIndex !== -1
-                    activeFocusOnTab: false
+                    //activeFocusOnTab: false
                     text: qsTr("&Break on write")
                     onClicked: addBreakpoint(BreakpointsModel.BreakOnWrite);
                 }
                 Button {
                     Layout.fillWidth: true
-                    activeFocusOnTab: false
+                    //activeFocusOnTab: false
                     enabled: view.currentIndex !== -1
                     text: qsTr("Break on rea&d")
                     onClicked: addBreakpoint(BreakpointsModel.BreakOnRead);
                 }
                 Button {
                     Layout.fillWidth: true
-                    activeFocusOnTab: false
+                    //activeFocusOnTab: false
                     text: qsTr("&Close")
                     onClicked: pageLoader.source = "";
                 }

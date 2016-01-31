@@ -21,10 +21,10 @@ import Qt.labs.controls 1.0
 
 TextField {
     property real fontSize : 5
-
     focus: true
     font.pixelSize: fontSize * Screen.pixelDensity
     font.bold: true
+    color: "white"
     horizontalAlignment: Text.AlignLeft
     verticalAlignment: Text.AlignVCenter
     inputMethodHints: Qt.ImhNoPredictiveText

@@ -29,7 +29,9 @@ SOURCES += main.cpp \
     fuselistmodel.cpp \
     fuseobject.cpp \
     pokefindermodel.cpp \
-    z80assembler.cpp
+    z80assembler.cpp \
+    zxgamesmodel.cpp \
+    zxrequests.cpp
 
 HEADERS += \
     fusetexture.h \
@@ -42,7 +44,9 @@ HEADERS += \
     fuselistmodel.h \
     fuseobject.h \
     pokefindermodel.h \
-    z80assembler.h
+    z80assembler.h \
+    zxgamesmodel.h \
+    zxrequests.h
 
 RESOURCES += qml.qrc
 
