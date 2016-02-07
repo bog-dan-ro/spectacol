@@ -834,7 +834,7 @@ libspectrum_uncompress_file(libspectrum_context_t *context, unsigned char **new_
 #else				/* #ifdef HAVE_LIBBZ2 */
 
     libspectrum_print_error(
-      context->context,
+      context,
       LIBSPECTRUM_ERROR_UNKNOWN,
       "libbz2 not available to decompress bzipped file"
     );
@@ -865,7 +865,7 @@ libspectrum_uncompress_file(libspectrum_context_t *context, unsigned char **new_
 
 #else				/* #ifdef HAVE_ZLIB_H */
 
-    libspectrum_print_error( context->context,
+    libspectrum_print_error( context,
                              LIBSPECTRUM_ERROR_UNKNOWN,
 			     "zlib not available to decompress gzipped file" );
     if( new_filename ) libspectrum_free( *new_filename );
@@ -919,7 +919,7 @@ libspectrum_uncompress_file(libspectrum_context_t *context, unsigned char **new_
 #endif				/* #ifndef __MORPHOS__ */
               } else {
                 libspectrum_print_error(
-                             context->context,
+                             context,
                              LIBSPECTRUM_ERROR_UNKNOWN,
                              "xfdmaster.library not able to decrunch %s file",
                              xfdobj->xfdbi_PackerName );
@@ -927,7 +927,7 @@ libspectrum_uncompress_file(libspectrum_context_t *context, unsigned char **new_
               }
             } else {
               libspectrum_print_error(
-                                 context->context,
+                                 context,
                                  LIBSPECTRUM_ERROR_UNKNOWN,
                                  "xfdmaster.library does not recognise file" );
               return LIBSPECTRUM_ERROR_UNKNOWN;
