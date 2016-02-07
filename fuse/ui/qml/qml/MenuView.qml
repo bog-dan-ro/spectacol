@@ -20,6 +20,7 @@ import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import QtGamepad 1.0
+import "Utils.js" as Utils
 
 ColumnLayout {
     property Menu rootMenu: null
@@ -102,15 +103,7 @@ ColumnLayout {
 
     function showParentMenu()
     {
-        title.text = (menus.length > 1 ? "&lt;/../" : "&lt;/") + _menuText(currentMenu.title);
-    }
-
-    function _menuText(text)
-    {
-        var ampersantPos = text.indexOf("&");
-        if (ampersantPos === -1)
-            return text;
-        return text.substr(0, ampersantPos) + "<b><u>" + text.substr(ampersantPos + 1, 1) + "</u></b>" + text.substr(ampersantPos + 2);
+        title.text = (menus.length > 1 ? "&lt;/../" : "&lt;/") + Utils.shortcutText(currentMenu.title);
     }
 
     spacing: 0.5 * Screen.pixelDensity
@@ -159,7 +152,7 @@ ColumnLayout {
                     Layout.fillWidth: true
                     height: parent.height
                     fontSize: 4
-                    text: modelData.type === MenuItemType.Item ? _menuText(modelData.text) : _menuText(modelData.title)
+                    text: modelData.type === MenuItemType.Item ? Utils.shortcutText(modelData.text) : Utils.shortcutText(modelData.title)
                 }
                 FancyText {
                     visible: modelData.type === MenuItemType.Menu
