@@ -7,7 +7,7 @@ ANDROID=$HOME/android
 NDK=$ANDROID/android-ndk
 TOOLCHAIN_VERSION=4.9
 ABI=arm
-PLATFORM=12
+PLATFORM=21
 
 while getopts ":hn:a:p:" optname
 do
@@ -61,11 +61,18 @@ esac
 
 case $ABI in
   "arm")
-    SYSROOT=$NDK/platforms/android-$PLATFORM/arch-arm
+    SYSROOT=$NDK/platforms/android-$PLATFORM/arch-$ABI
     TOOLCHAIN=$NDK/toolchains/arm-linux-androideabi-$TOOLCHAIN_VERSION/prebuilt/$HOST_OS-$HOST_ARCH
     TOOLCHAIN_PREFIX=arm-linux-androideabi
     CFLAGS="-mandroid -mthumb -Wno-psabi -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -DANDROID -Wa,--noexecstack -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/armeabi-v7a/include"
     LDFLAGS="-L${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/armeabi-v7a"
+    ;;
+  "arm64")
+    SYSROOT=$NDK/platforms/android-$PLATFORM/arch-$ABI
+    TOOLCHAIN=$NDK/toolchains/aarch64-linux-android-$TOOLCHAIN_VERSION/prebuilt/$HOST_OS-$HOST_ARCH
+    TOOLCHAIN_PREFIX=aarch64-linux-android
+    CFLAGS="-mandroid -ffunction-sections -funwind-tables -fstack-protector -fomit-frame-pointer -fstrict-aliasing -funswitch-loops -finline-limit=300 -DANDROID -Wa,--noexecstac -I${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/arm64-v8a/include"
+    LDFLAGS="-L${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/arm64-v8a"
     ;;
   *)
     echo "Unknown/Unhandled ABI $ABI"
@@ -96,7 +103,7 @@ pushd ../libspectrum
     ./autogen.sh
   fi
   ./configure --host=$TOOLCHAIN_PREFIX --with-sysroot=$SYSROOT --prefix=$INSTALL_PREFIX \
-              --disable-shared --with-fake-glib
+              --disable-shared --with-fake-glib --without-libaudiofile
   make $JOBS
   make install
 popd
