@@ -21,9 +21,19 @@ import QtQuick 2.6
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
+import QtGamepad 1.0
 
 Item {
-    Component.onDestruction: fuse.debuggerRun()
+    Component.onCompleted: fuse.processJoysticksEvents = false
+
+    Component.onDestruction: {
+        fuse.processJoysticksEvents = true;
+        fuse.debuggerRun();
+    }
+
+    GamepadKeyNavigation {
+        gamepad: Gamepad { deviceId: fuse.gamepadId }
+    }
 
     readonly property color backgroudColor : Qt.rgba(0, 0, 0, 0.85);
     ColumnLayout {
@@ -40,15 +50,16 @@ Item {
                 border.width: (disassembleView.focus ? 1 : 0.5) * Screen.pixelDensity
                 border.color: "white"
 
-                width: 65 * Screen.pixelDensity
+                width: 75 * Screen.pixelDensity
                 Layout.fillHeight: true
 
                 DisassembleView {
                     id: disassembleView
                     anchors.fill: parent
                     anchors.margins: parent.border.width
-                    activeFocusOnTab: true
                     focus: true
+                    KeyNavigation.left: breakpointsView
+                    KeyNavigation.right: breakpointsView
                 }
             }
             Item {
@@ -82,7 +93,6 @@ Item {
                     border.color: "white"
                     height: 60 * Screen.pixelDensity
                     Layout.fillWidth: true
-                    activeFocusOnTab: true
                     RegistersView {
                         anchors.fill: parent
                         anchors.topMargin: parent.border.width + Screen.pixelDensity
@@ -95,19 +105,28 @@ Item {
                     id: breakPointsRect
                     color: backgroudColor
                     radius: Screen.pixelDensity
-                    border.width: (breakpointsView.focused ? 1 : 0.5) * Screen.pixelDensity
+                    border.width: (breakpointsView.activeFocus ? 1 : 0.5) * Screen.pixelDensity
                     border.color: "white"
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    BreakpointsView {
-                        anchors.fill: parent
+                    FocusScope {
                         id: breakpointsView
+                        anchors.fill: parent
                         anchors.margins: parent.border.width
-                        onBreakpointSelected: fuse.disassamble(item.absoluteAddress);
+                        KeyNavigation.left: disassembleView
+                        KeyNavigation.right: disassembleView
+                        KeyNavigation.tab: commandsLine
+                        KeyNavigation.down: commandsLine
+                        KeyNavigation.backtab: disassembleView
+                        BreakpointsView {
+                            anchors.fill: parent
+                            onBreakpointSelected: fuse.disassamble(item.absoluteAddress);
+                        }
                     }
                 }
             }
         }
+
         Rectangle {
             id: toolBarRect
             height: 10 * Screen.pixelDensity
@@ -120,8 +139,14 @@ Item {
                 anchors.fill: parent
                 anchors.margins: parent.border.width
                 FancyTextField {
-                    Layout.alignment: Qt.AlignVCenter
+                    id: commandsLine
+                    KeyNavigation.up: disassembleView
+                    KeyNavigation.down: breakpointsView
+                    KeyNavigation.tab: disassembleView
+                    KeyNavigation.backtab: breakpointsView
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.leftMargin: toolBarRect.border.width
                     onAccepted: {
                         fuse.debuggerCommand(text);
                         selectAll();
@@ -129,12 +154,13 @@ Item {
                     placeholderText: qsTr("Type a command here")
                 }
                 Button {
-                    Layout.alignment: Qt.AlignVCenter
+                    Layout.fillHeight: true
                     text: "Step"
                     onClicked: fuse.debuggerNext()
                 }
                 Button {
-                    Layout.alignment: Qt.AlignVCenter
+                    Layout.fillHeight: true
+                    Layout.rightMargin: toolBarRect.border.width
                     text: "Continue"
                     onClicked: fuse.debuggerRun()
                 }

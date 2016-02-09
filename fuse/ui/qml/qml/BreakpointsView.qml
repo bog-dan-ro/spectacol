@@ -91,13 +91,20 @@ Item {
             clip: true
             snapMode: ListView.SnapToItem
             highlightFollowsCurrentItem: true
-            activeFocusOnTab: true
+            focus: true
 
             Layout.fillHeight: true
             Layout.fillWidth: true
-
-            Keys.onUpPressed: decrementCurrentIndex();
-            Keys.onDownPressed: incrementCurrentIndex()
+            Keys.onPressed: {
+                switch (event.key) {
+                case Qt.Key_Y:
+                    fuse.debuggerCommand("delete " + visualModel.items.get(view.currentIndex).model.id);
+                    break;
+                case Qt.Key_X:
+                    fuse.debuggerCommand("delete");
+                    break;
+                }
+            }
 
             model: visualModel
         }
@@ -107,17 +114,16 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignVCenter
                 enabled: view.currentIndex != -1
-                text:"&Remove"
+                text:"Remove <b>(Y)</b>"
                 onClicked: fuse.debuggerCommand("delete " + visualModel.items.get(view.currentIndex).model.id)
             }
             Item {
-                Layout.fillHeight: true
                 Layout.fillWidth: true
             }
             Button {
                 Layout.alignment: Qt.AlignVCenter
                 enabled: view.currentIndex != -1
-                text:"Remove &All"
+                text:"Remove All <b>(X)</b>"
                 onClicked: fuse.debuggerCommand("delete")
             }
         }

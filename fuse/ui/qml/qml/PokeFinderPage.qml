@@ -23,16 +23,21 @@ import QtQuick.Window 2.2
 import QtQml.Models 2.2
 import Qt.labs.controls 1.0
 import Fuse 1.0
+import QtGamepad 1.0
 
 Rectangle {
     id: pokeFinderPage
     color: Qt.rgba(0, 0, 0, 0.75);
 
     Component.onCompleted: {
+        fuse.processJoysticksEvents = false;
         fuse.pokeFinderResetIfNeeded();
         fuse.paused = true;
     }
-    Component.onDestruction: fuse.paused = false
+    Component.onDestruction: {
+        fuse.processJoysticksEvents = true;
+        fuse.paused = false
+    }
 
     function addBreakpoint(type)
     {
@@ -40,9 +45,22 @@ Rectangle {
         fuse.addBreakpointPage(model.offset, model.page, type);
     }
 
+    GamepadKeyNavigation {
+        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        buttonAKey: Qt.Key_A
+        buttonBKey: Qt.Key_B
+        buttonYKey: Qt.Key_Y
+        buttonXKey: Qt.Key_X
+        buttonL1Key: Qt.Key_W
+        buttonR1Key: Qt.Key_R
+        buttonL2Key: Qt.Key_E
+        buttonR2Key: Qt.Key_E
+    }
+
     Keys.onPressed: {
         switch (event.key) {
-        case Qt.Key_C:
+        case Qt.Key_Escape:
+        case Qt.Key_B:
             pageLoader.source = "";
             event.accepted = true;
             break;
@@ -57,17 +75,17 @@ Rectangle {
             event.accepted = true;
             break;
 
-        case Qt.Key_R:
+        case Qt.Key_E:
             fuse.pokeFinderReset();
             event.accepted = true;
             break;
 
-        case Qt.Key_B:
+        case Qt.Key_W:
             addBreakpoint(BreakpointsModel.BreakOnWrite);
             event.accepted = true;
             break;
 
-        case Qt.Key_D:
+        case Qt.Key_R:
             addBreakpoint(BreakpointsModel.BreakOnRead);
             event.accepted = true;
             break;
@@ -84,46 +102,49 @@ Rectangle {
             }
 
             FancyTextField {
-                Layout.fillWidth: true
                 id: value
+                KeyNavigation.down: view
+                KeyNavigation.up: buttonInc
+                Layout.fillWidth: true
                 focus: true
-                //activeFocusOnTab: true
                 implicitWidth: pokeFinderPage.width / 2
+                inputMethodHints: Qt.ImhDigitsOnly
                 validator: IntValidator {bottom: 0; top: 255;}
                 placeholderText: qsTr("Enter a numeric value")
                 Keys.onPressed: {
                     switch (event.key) {
-                    case Qt.Key_C:
+                    case Qt.Key_Escape:
+                    case Qt.Key_B:
                         pageLoader.source = "";
                         event.accepted = true;
                         break;
 
-                    case Qt.Key_I:
+                    case Qt.Key_Y:
                         fuse.pokeFinderInced();
                         event.accepted = true;
                         break;
 
-                    case Qt.Key_D:
+                    case Qt.Key_X:
                         fuse.pokeFinderDeced();
                         event.accepted = true;
                         break;
 
-                    case Qt.Key_R:
+                    case Qt.Key_E:
                         fuse.pokeFinderReset();
                         event.accepted = true;
                         break;
 
-                    case Qt.Key_B:
+                    case Qt.Key_W:
                         addBreakpoint(BreakpointsModel.BreakOnWrite);
                         event.accepted = true;
                         break;
 
-                    case Qt.Key_D:
+                    case Qt.Key_R:
                         addBreakpoint(BreakpointsModel.BreakOnRead);
                         event.accepted = true;
                         break;
 
-                    case Qt.Key_S:
+                    case Qt.Key_A:
                     case Qt.Key_Enter:
                     case Qt.Key_Return:
                         fuse.pokeFinderSearch(value.text);
@@ -137,47 +158,76 @@ Rectangle {
             Layout.fillWidth: true
             ColumnLayout {
                 Button {
+                    id: buttonInc
+                    KeyNavigation.up: value
+                    KeyNavigation.right: view
+                    KeyNavigation.left: view
+                    KeyNavigation.down: buttonDec
                     Layout.fillWidth: true
-                    //activeFocusOnTab: false
-                    text: qsTr("&Incremented")
+                    text: qsTr("Incremented <b>(Y)</b>")
                     onClicked: fuse.pokeFinderInced()
                 }
                 Button {
+                    id: buttonDec
+                    KeyNavigation.up: buttonInc
+                    KeyNavigation.right: view
+                    KeyNavigation.left: view
+                    KeyNavigation.down: buttonSearch
                     Layout.fillWidth: true
-                    //activeFocusOnTab: false
-                    text: qsTr("&Decremented")
+                    text: qsTr("Decremented <b>(X)</b>")
                     onClicked: fuse.pokeFinderDeced()
                 }
                 Button {
+                    id: buttonSearch
+                    KeyNavigation.up: buttonDec
+                    KeyNavigation.right: view
+                    KeyNavigation.left: view
+                    KeyNavigation.down: buttonReset
                     Layout.fillWidth: true
-                    //activeFocusOnTab: false
-                    text: qsTr("&Search")
+                    text: qsTr("Search <b>(A)</b>")
                     onClicked: fuse.pokeFinderSearch(value.text)
                 }
                 Button {
+                    id: buttonReset
+                    KeyNavigation.up: buttonSearch
+                    KeyNavigation.right: view
+                    KeyNavigation.left: view
+                    KeyNavigation.down: buttonBW
                     Layout.fillWidth: true
-                    //activeFocusOnTab: false
-                    text: qsTr("&Reset")
+                    text: qsTr("Reset <b>(L2, R2, E)</b>")
                     onClicked: fuse.pokeFinderReset()
                 }
                 Button {
+                    id: buttonBW
+                    KeyNavigation.up: buttonReset
+                    KeyNavigation.right: view
+                    KeyNavigation.left: view
+                    KeyNavigation.down: buttonBR
+
                     Layout.fillWidth: true
                     enabled: view.currentIndex !== -1
-                    //activeFocusOnTab: false
-                    text: qsTr("&Break on write")
+                    text: qsTr("Break on write <b>(L1, W)</b>")
                     onClicked: addBreakpoint(BreakpointsModel.BreakOnWrite);
                 }
                 Button {
+                    id: buttonBR
+                    KeyNavigation.up: buttonBW
+                    KeyNavigation.right: view
+                    KeyNavigation.left: view
+                    KeyNavigation.down: buttonClose
                     Layout.fillWidth: true
-                    //activeFocusOnTab: false
                     enabled: view.currentIndex !== -1
-                    text: qsTr("Break on rea&d")
+                    text: qsTr("Break on read <b>(R1, R)</b>")
                     onClicked: addBreakpoint(BreakpointsModel.BreakOnRead);
                 }
                 Button {
+                    id: buttonClose
+                    KeyNavigation.up: buttonBR
+                    KeyNavigation.right: view
+                    KeyNavigation.left: view
+                    KeyNavigation.down: value
                     Layout.fillWidth: true
-                    //activeFocusOnTab: false
-                    text: qsTr("&Close")
+                    text: qsTr("Close <b>(B)</b>")
                     onClicked: pageLoader.source = "";
                 }
             }
@@ -269,6 +319,11 @@ Rectangle {
 
                     Keys.onUpPressed: decrementCurrentIndex();
                     Keys.onDownPressed: incrementCurrentIndex()
+
+                    KeyNavigation.right: value
+                    KeyNavigation.left: buttonInc
+                    KeyNavigation.up: value
+                    KeyNavigation.down: value
 
                     model: visualModel
 

@@ -40,11 +40,24 @@ ListView {
         id: visualModel
         model: disassambleModel
         delegate: Rectangle {
+            function toggleEdit()
+            {
+                asmEdit.readOnly = !asmEdit.readOnly;
+                if (asmEdit.readOnly)
+                    return false;
+
+                asmEdit.readOnly = false;
+                asmEdit.selectAll();
+                asmEdit.focus = true;
+                asmEdit.validator = assembler;
+                return true;
+            }
+
             property color paper: view.currentIndex !== index ? background : selectedBackground
             property color ink: view.currentIndex !== index ? foreground : selectedForeground
 
             width: view.width
-            height: 7 * Screen.pixelDensity
+            height: 8 * Screen.pixelDensity
             color: paper
             MouseArea {
                 anchors.fill: parent
@@ -85,21 +98,20 @@ ListView {
                 Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
 
                 FancyTextField {
+                    id: asmEdit
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
                     fontSize: 4
-                    textColor: ink
+                    color: ink
+                    font.bold: false
                     readOnly: true
-                    style: Text.Normal
                     inputMethodHints: Qt.ImhPreferUppercase
                     text: model.disassable
                     onAccepted: {
-                        readOnly = true
                         assembler.write(text, model.address, model.bytes)
                         disassambleModel.update();
                         validator = null;
-                        console.log(text)
                     }
 
                     MouseArea {
@@ -108,13 +120,12 @@ ListView {
                             view.focus = true;
                             view.currentIndex = model.index;
                         }
-                        onDoubleClicked: {
-                            parent.readOnly = false;
-                            parent.selectAll();
-                            parent.focus = true;
-                            parent.validator = assembler;
-                        }
-                        onPressAndHold: Qt.quit()
+
+                        onDoubleClicked:
+                            toggleEdit();
+
+                        onPressAndHold:
+                            toggleEdit();
                     }
                 }
             }
@@ -122,15 +133,16 @@ ListView {
     }
 
     Keys.onPressed: {
-        event.accepted = true;
         switch (event.key) {
         case Qt.Key_Home:
             fuse.disassamble(0, 0);
             view.currentIndex = 0;
+            event.accepted = true;
             break;
 
         case Qt.Key_PageUp:
             view.currentIndex = Math.max(0, view.currentIndex - 10);
+            event.accepted = true;
             break;
 
         case Qt.Key_Up:
@@ -140,22 +152,32 @@ ListView {
                 fuse.disassambleFetchUp(10);
                 decrementCurrentIndex();
             }
+            event.accepted = true;
             break;
 
         case Qt.Key_Down:
             incrementCurrentIndex();
+            event.accepted = true;
             break;
 
         case Qt.Key_PageDown:
             view.currentIndex = Math.min(view.count -1, view.currentIndex + 10);
+            event.accepted = true;
             break;
 
         case Qt.Key_End:
             fuse.disassamble(0xffff);
+            event.accepted = true;
             break;
 
         case Qt.Key_Escape:
             pageLoader.source = "";
+            event.accepted = true;
+            break;
+
+        case Qt.Key_Enter:
+        case Qt.Key_Return:
+            event.accepted = currentItem.toggleEdit();
             break;
         }
     }
