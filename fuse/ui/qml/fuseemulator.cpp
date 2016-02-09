@@ -150,6 +150,9 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             return;
 
         pokeEvent([axis, value]{
+            if (fuse_emulation_paused)
+                return;
+
             input_event_t event1, event2;
             switch (axis) {
             case QGamepadManager::AxisLeftX:
@@ -184,6 +187,9 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
 
     connect(gm, &QGamepadManager::gamepadButtonPressEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button, double value) {
         if (!m_processJoysticksEvents.load())
+            return;
+
+        if (fuse_emulation_paused)
             return;
 
         switch (button) {
