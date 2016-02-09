@@ -28,7 +28,7 @@ Rectangle {
     Timer {
         id: timer
         repeat: false
-        interval: 500
+        interval: 5000
         running: false
         onTriggered: {
             onlineGamesModel.search(searchText.text);
@@ -39,8 +39,6 @@ Rectangle {
     GamepadKeyNavigation {
         id: gamepadKeyNavigation
         gamepad: Gamepad { deviceId: fuse.gamepadId }
-        active: false
-        onActiveChanged: fuse.processJoysticksEvents = !active
         buttonAKey: Qt.Key_Return
         buttonStartKey: Qt.Key_F1
         buttonYKey: Qt.Key_Tab
@@ -56,10 +54,17 @@ Rectangle {
             placeholderText: qsTr("Type to search")
             onTextChanged: timer.restart()
             KeyNavigation.tab: grid
+            KeyNavigation.down: grid
+            onAccepted: {
+                timer.stop();
+                onlineGamesModel.search(searchText.text);
+                grid.focus = true;
+            }
         }
         GridView {
             id: grid
             KeyNavigation.tab: searchText
+            KeyNavigation.up: searchText
             Keys.onReturnPressed:{
                 pageLoader.source = "";
                 fuse.load(model.getPath(currentIndex))
@@ -118,10 +123,8 @@ Rectangle {
     Component.onCompleted: {
         onlineGamesModel.search();
         fuse.paused = true;
-        gamepadKeyNavigation.active = true;
     }
     Component.onDestruction: {
-        gamepadKeyNavigation.active = false;
         fuse.paused = false
     }
 }
