@@ -65,5 +65,7 @@
         <file>qml/CalibrateGamepad.qml</file>
         <file>qml/FancyList.qml</file>
         <file>qml/SearchOnlinePage.qml</file>
+        <file>qml/Utils.js</file>
+        <file>qtlabscontrols.conf</file>
     </qresource>
 </RCC>
