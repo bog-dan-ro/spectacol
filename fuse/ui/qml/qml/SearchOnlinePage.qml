@@ -28,12 +28,9 @@ Rectangle {
     Timer {
         id: timer
         repeat: false
-        interval: 5000
+        interval: 2500
         running: false
-        onTriggered: {
-            onlineGamesModel.search(searchText.text);
-            grid.focus = true;
-        }
+        onTriggered: onlineGamesModel.search(searchText.text);
     }
 
     GamepadKeyNavigation {
