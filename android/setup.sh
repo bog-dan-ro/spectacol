@@ -91,9 +91,7 @@ JOBS=${JOBS:="-j4"}
 
 export PATH=$TOOLCHAIN/bin:$NDK:$PATH
 
-export CFLAGS="${CFLAGS} --sysroot=${SYSROOT} -I${SYSROOT}/usr/include \
-               -I${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/include \
-               -I${INSTALL_PREFIX}/include"
+export CFLAGS="${CFLAGS} --sysroot=${SYSROOT} -I${INSTALL_PREFIX}/include"
 export CPPFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
 export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib -L${INSTALL_PREFIX}/lib -lm -ldl"
