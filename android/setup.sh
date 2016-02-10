@@ -7,7 +7,7 @@ ANDROID=$HOME/android
 NDK=$ANDROID/android-ndk
 TOOLCHAIN_VERSION=4.9
 ABI=arm
-PLATFORM=21
+PLATFORM=9
 
 while getopts ":hn:a:p:" optname
 do
@@ -64,7 +64,7 @@ case $ABI in
     SYSROOT=$NDK/platforms/android-$PLATFORM/arch-$ABI
     TOOLCHAIN=$NDK/toolchains/arm-linux-androideabi-$TOOLCHAIN_VERSION/prebuilt/$HOST_OS-$HOST_ARCH
     TOOLCHAIN_PREFIX=arm-linux-androideabi
-    CFLAGS="-mandroid -mthumb -Wno-psabi -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -DANDROID -Wa,--noexecstack -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/armeabi-v7a/include"
+    CFLAGS="-mandroid -mthumb -Wno-psabi -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -DANDROID -Wa,--noexecstack -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64"
     LDFLAGS="-L${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/armeabi-v7a"
     ;;
   "arm64")
@@ -73,6 +73,7 @@ case $ABI in
     TOOLCHAIN_PREFIX=aarch64-linux-android
     CFLAGS="-mandroid -ffunction-sections -funwind-tables -fstack-protector -fomit-frame-pointer -fstrict-aliasing -funswitch-loops -finline-limit=300 -DANDROID -Wa,--noexecstac -I${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/arm64-v8a/include"
     LDFLAGS="-L${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/arm64-v8a"
+    PLATFORM=21
     ;;
   *)
     echo "Unknown/Unhandled ABI $ABI"
@@ -91,7 +92,7 @@ JOBS=${JOBS:="-j4"}
 
 export PATH=$TOOLCHAIN/bin:$NDK:$PATH
 
-export CFLAGS="${CFLAGS} --sysroot=${SYSROOT} -I${INSTALL_PREFIX}/include"
+export CFLAGS="${CFLAGS} -g --sysroot=${SYSROOT} -I${INSTALL_PREFIX}/include"
 export CPPFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
 export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib -L${INSTALL_PREFIX}/lib -lm -ldl"

@@ -30,6 +30,9 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#ifdef ANDROID
+# include <limits.h>
+#endif
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -84,7 +87,7 @@ extern "C" {
 char *dirname( char *path );
 #endif				/* #ifndef HAVE_DIRNAME */
 
-#if !defined HAVE_GETOPT_LONG && !defined AMIGA && !defined __MORPHOS__
+#if !defined HAVE_GETOPT_LONG && !defined AMIGA && !defined __MORPHOS__  && !defined ANDROID
 #include "compat/getopt.h"
 #endif				/* #ifndef HAVE_GETOPT_LONG */
 

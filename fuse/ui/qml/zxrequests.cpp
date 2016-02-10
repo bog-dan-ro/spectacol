@@ -3,7 +3,8 @@
 #include "zxgamesmodel.h"
 #include "fuseemulator.h"
 
-#include <QDebug>
+#include <QCryptographicHash>
+
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>

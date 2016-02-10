@@ -24,6 +24,7 @@
 #include <QCoreApplication>
 #include <QDirIterator>
 #include <QThread>
+#include <QStandardPaths>
 
 #include <errno.h>
 #include <string.h>
@@ -104,13 +105,12 @@ static QByteArray contextType(int type) {
 extern "C" int compat_get_next_path(path_context *ctx)
 {
     switch (ctx->state++) {
-    /* First look relative to the current directory */
     case 0:
         strncpy( ctx->path, ".", PATH_MAX );
         return 1;
 
     case 1: {
-        QByteArray type(qApp->applicationDirPath().toUtf8() + QDir::separator().toLatin1() + contextType(ctx->type));
+        QByteArray type(QStandardPaths::writableLocation(QStandardPaths::DataLocation).toUtf8() + QDir::separator().toLatin1() + contextType(ctx->type));
         strncpy( ctx->path, type.constData(), PATH_MAX );
         return 1;
     }

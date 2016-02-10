@@ -72,9 +72,11 @@ extern "C" int uidisplay_init( int width, int height )
     }
 
     display_ui_initialised = 1;
+#ifndef ANDROID
     pokeEvent([]{
         scaler_select_scaler(SCALER_HQ3X);
     });
+#endif
     s_semaphore.release();
     return 0;
 }
