@@ -29,7 +29,6 @@
 #include <utils.h>
 #include <z80/z80.h>
 
-
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
@@ -37,9 +36,67 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QSemaphore>
-
+#include <QAudioDeviceInfo>
+#include <QAudioOutput>
 
 #include <mutex>
+
+extern "C" int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
+{
+    return g_fuseEmulator->soundLowlevelInit(device, freqptr, stereoptr);
+}
+
+extern "C" void sound_lowlevel_end( void )
+{
+    g_fuseEmulator->soundLowlevelEnd();
+}
+
+extern "C" void sound_lowlevel_frame( libspectrum_signed_word *data, int len )
+{
+    g_fuseEmulator->soundLowlevelFrame(data, len);
+}
+
+int FuseThread::soundLowlevelInit(const char *, int *freqptr, int *stereoptr)
+{
+    QAudioFormat format;
+    format.setCodec("audio/pcm");
+    format.setChannelCount(*stereoptr ? 2 : 1);
+    format.setSampleSize(16);
+    format.setSampleType(QAudioFormat::SignedInt);
+    format.setSampleRate(*freqptr);
+    if (format == m_audioFormat && m_audioOutput)
+        return 0;
+
+    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    if (!info.isFormatSupported(format))
+        format = info.nearestFormat(format);
+
+    m_audioFormat = format;
+    m_audioOutput.reset(new QAudioOutput(format));
+    if (!m_audioOutput->bufferSize())
+        m_audioOutput->setBufferSize(0x10000);
+    m_audioOutputDevice = m_audioOutput->start();
+    return 0;
+}
+
+void FuseThread::soundLowlevelFrame(libspectrum_signed_word *data, int len)
+{
+    if (!m_audioOutputDevice)
+        return;
+
+    while (len) {
+        int buffSize = m_audioOutput->bytesFree() / 2;
+        if (!buffSize) {
+            QThread::msleep(1);
+            continue;
+        }
+        buffSize = std::min(buffSize, len);
+        auto written = m_audioOutputDevice->write((const char *)data, buffSize * 2);
+        written /= 2;
+        data += written;
+        len -= written;
+    }
+}
 
 void FuseThread::run()
 {
@@ -52,6 +109,7 @@ void FuseThread::run()
         argv[argc++] = argsVector.back().constData();
     }
     fuse_main(argc, argv);
+    m_audioOutput.reset();
     qApp->quit();
 }
 
@@ -574,6 +632,16 @@ QString FuseEmulator::saveFilePath(const QString &fileName)
             fileName.left(3).toLower() + QLatin1String("/") + fileName;
 }
 
+int FuseEmulator::soundLowlevelInit(const char *device, int *freqptr, int *stereoptr)
+{
+    return m_fuseThread.soundLowlevelInit(device, freqptr, stereoptr);
+}
+
+void FuseEmulator::soundLowlevelFrame(libspectrum_signed_word *data, int len)
+{
+    return m_fuseThread.soundLowlevelFrame(data, len);
+}
+
 QUrl FuseEmulator::snapshotsPath() const
 {
     return QUrl::fromLocalFile(dataPath().toLocalFile() + QLatin1Literal("/Snapshots/"));
@@ -747,33 +815,14 @@ void FuseEmulator::pokeFinderResetIfNeeded()
 
 }
 
-#include "z80assembler.h"
-#include <QDebug>
-void FuseEmulator::pokeMemory(int _address, int page, int value)
+void FuseEmulator::pokeMemory(int address, int page, int value)
 {
-//    pokeEvent([]{
-//        Z80Assembler zasm;
-//        uint16_t address = z80.pc.w;
-//        uint16_t pa = 0;
-//        size_t len;
-//        do {
-//            char buff[100];
-//            debugger_disassemble(buff, sizeof(buff), &len, address);
-//            QByteArray bytes;
-//            for (size_t i = 0; i < len; ++i)
-//                bytes.push_back(readbyte(address + i));
-
-//            QByteArray asmBytes = zasm.assemble(QString(buff).trimmed(), address, bytes);
-//            if (asmBytes != bytes)
-//                qDebug() << "Failed to assamble " << buff << bytes << asmBytes;
-
-//            address += len;
-//            if (0xff + pa < address) {
-//                qDebug() << address;
-//                pa = address;
-//            }
-//        } while (len + address < 0xffff);
-    //    });
+    if (page >= 8) {
+        writebyte_internal(address, value);
+    } else {
+        address &= 0x3fff;
+        RAM[page][address] = value;
+    }
 }
 
 void FuseEmulator::debuggerTrap()

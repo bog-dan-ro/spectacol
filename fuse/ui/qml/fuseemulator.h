@@ -26,6 +26,8 @@
 
 #include <ui/ui.h>
 
+#include <QAudioFormat>
+#include <QPointer>
 #include <QThread>
 #include <QUrl>
 
@@ -33,12 +35,24 @@
 
 #include <QGamepadManager>
 
+#include <libspectrum.h>
+
+class QAudioOutput;
+class QIODevice;
 class QQmlContext;
 
 class FuseThread : public QThread
 {
+public:
+    int soundLowlevelInit(const char */*device*/, int *freqptr, int *stereoptr);
+    void soundLowlevelFrame(libspectrum_signed_word *data, int len);
+    void soundLowlevelEnd(void) {}
 protected:
     void run();
+private:
+    QScopedPointer<QAudioOutput> m_audioOutput;
+    QAudioFormat m_audioFormat;
+    QPointer<QIODevice> m_audioOutputDevice;
 };
 
 class FuseEmulator : public FuseObject
@@ -154,6 +168,10 @@ public:
     void setGamepadId(int gamepadId);
 
     QString saveFilePath(const QString& fileName);
+
+    int soundLowlevelInit(const char */*device*/, int *freqptr, int *stereoptr);
+    void soundLowlevelFrame(libspectrum_signed_word *data, int len);
+    void soundLowlevelEnd(void) {}
 
 public slots:
     QUrl snapshotsPath() const;

@@ -3,12 +3,9 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-QT += qml quick gamepad
-!no_desktop: QT += widgets
+QT += qml quick gamepad multimedia
 
 INCLUDEPATH += $$PWD/../../ $$PWD/../../../libspectrum
-
-DEFINES+=UI_WIN32
 
 SOURCES += main.cpp \
     compat.cpp \
@@ -19,7 +16,6 @@ SOURCES += main.cpp \
     keysyms.cpp \
     qmlui.cpp \
     ../../timer/native.c \
-    ../../sound/alsasound.c \
     ../../timer/timer.c \
     ../../compat/unix/tuntap.c \
     spectrumscreen.cpp \
@@ -53,8 +49,11 @@ RESOURCES += qml.qrc
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
-LIBS = $$PWD/../../libfuse.a $$PWD/../../../install/lib/libspectrum.a -lxml2 -lz -lpng -lbz2 -lasound -laudiofile
+LIBS = $$PWD/../../libfuse.a $$PWD/../../../libspectrum/.libs/libspectrum.a -lz
+!android: LIBS += -lxml2 -lpng -lbz2 -lasound -laudiofile
 
-QMAKE_CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
-QMAKE_CFLAGS += -fsanitize=address -fno-omit-frame-pointer
-QMAKE_LFLAGS += -fsanitize=address
+!android {
+    QMAKE_CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+    QMAKE_CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+    QMAKE_LFLAGS += -fsanitize=address
+}
