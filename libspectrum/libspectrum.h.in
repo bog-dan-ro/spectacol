@@ -34,7 +34,6 @@ extern "C" {
 
 #include <stdarg.h>
 #include <stddef.h>
-#include <stdlib.h>
 #include <stdio.h>
 
 #ifdef _WIN32
