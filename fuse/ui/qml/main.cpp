@@ -21,22 +21,11 @@
 #include "z80assembler.h"
 
 #include <QQmlApplicationEngine>
-
-#ifdef QT_WIDGETS_LIB
-#include <QApplication>
-#else
 #include <QGuiApplication>
-#endif
-
-#ifdef QT_WIDGETS_LIB
-#define QtQuickControlsApplication QApplication
-#else
-#define QtQuickControlsApplication QGuiApplication
-#endif
 
 int main(int argc, char *argv[])
 {
-    QtQuickControlsApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
     app.setOrganizationName("Fuse Emulator");
     app.setOrganizationDomain("licentia.eu");
     app.setApplicationName("Fuse Emulator");

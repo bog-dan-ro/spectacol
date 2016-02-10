@@ -159,16 +159,6 @@ ApplicationWindow {
                 visible: status === Loader.Ready
                 focus: visible
                 enabled: visible
-//                onStatusChanged: {
-//                    switch (status) {
-//                    case Loader.Ready:
-//                        fuse.paused = true;
-//                        break;
-//                    case Loader.Null:
-//                        fuse.paused = false;
-//                        break;
-//                    }
-//                }
             }
         }
 

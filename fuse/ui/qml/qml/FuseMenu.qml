@@ -203,6 +203,7 @@ Menu {
             }
         }
         MenuItem {
+            enabled: false
             text: qsTr("Poke memory")
             onTriggered: {
                 menuBar.close();
@@ -279,17 +280,6 @@ Menu {
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "OptionsSoundPage.qml";
-            }
-        }
-
-        Menu {
-            title: qsTr("Machine")
-            MenuItem {
-                text: qsTr("Reset")
-                onTriggered: {
-                    menuBar.close();
-                    fuse.reset();
-                }
             }
         }
     }
