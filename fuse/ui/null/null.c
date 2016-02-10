@@ -1,6 +1,7 @@
 #include "keyboard.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
+#include <libspectrum.h>
 
 keysyms_map_t keysyms_map[] = {{ INPUT_KEY_NONE, INPUT_KEY_NONE }};
 
@@ -103,4 +104,51 @@ int
 uidisplay_end( void )
 {
     return 1;
+}
+
+int
+ui_widgets_reset( void )
+{
+    return 1;
+}
+
+void
+ui_breakpoints_updated( void )
+{
+}
+
+int
+ui_debugger_update( void )
+{
+    return 1;
+}
+
+int
+ui_debugger_disassemble( libspectrum_word address )
+{
+    return 1;
+}
+
+int
+ui_debugger_activate( void )
+{
+    return 1;
+}
+
+int
+ui_debugger_deactivate( int interruptable )
+{
+    return 1;
+}
+
+int
+ui_error_specific( ui_error_level severity, const char *message )
+{
+    return 1;
+}
+
+ui_confirm_joystick_t
+ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
+{
+    return UI_CONFIRM_JOYSTICK_NONE;
 }
