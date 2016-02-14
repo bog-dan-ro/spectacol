@@ -633,7 +633,7 @@ void FuseEmulator::load(const QUrl &filePath)
     m_loadedFileName = QFileInfo(filePath.toLocalFile()).baseName();
     pokeEvent([this, filePath]() {
         fuse_emulation_pause();
-        if (utils_open_file(filePath.path().toUtf8().constData(), 1 , nullptr))
+        if (utils_open_file(filePath.path().toUtf8().constData(), settings_current.auto_load , nullptr))
             m_loadedFileName = "";
         callFunction([this]{
             emit saveSnapshotEnabledChanged();
