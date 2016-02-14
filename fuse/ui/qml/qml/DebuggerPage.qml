@@ -33,6 +33,10 @@ Item {
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
+        buttonAKey: Qt.Key_Return
+        buttonBKey: Qt.Key_Escape
+        buttonXKey: Qt.Key_X
+        buttonYKey: Qt.Key_Y
     }
 
     readonly property color backgroudColor : Qt.rgba(0, 0, 0, 0.85);
