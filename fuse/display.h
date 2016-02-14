@@ -45,8 +45,13 @@ extern "C" {
 #define DISPLAY_HEIGHT        ( DISPLAY_HEIGHT_ROWS * 8 )
 
 /* The width and height of the (emulated) border */
-#define DISPLAY_BORDER_WIDTH_COLS  4
-#define DISPLAY_BORDER_HEIGHT_COLS 3
+#ifndef ANDROID
+# define DISPLAY_BORDER_WIDTH_COLS  4
+# define DISPLAY_BORDER_HEIGHT_COLS 3
+#else
+# define DISPLAY_BORDER_WIDTH_COLS  2
+# define DISPLAY_BORDER_HEIGHT_COLS 1
+#endif
 
 /* The width and height of the (emulated) border */
 /* Each main screen column can produce 16 pixels in hires mode */
