@@ -67,7 +67,7 @@ private:
     GLuint m_textureId = 0;
     QSize m_texSize;
     uint32_t m_width = 0, m_height = 0, m_scale = 0;
-    uint16_t *m_spectrumPixels = nullptr, *m_spectrumScaledPixels = nullptr, *m_glPixels = nullptr, *m_savedSpectrumPixels = nullptr;
+    uint32_t *m_spectrumPixels = nullptr, *m_spectrumScaledPixels = nullptr, *m_glPixels = nullptr, *m_savedSpectrumPixels = nullptr;
     QRect m_updateRect;
     bool m_recreate = false;
     bool m_update = false;

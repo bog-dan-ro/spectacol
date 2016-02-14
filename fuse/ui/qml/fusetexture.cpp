@@ -22,6 +22,7 @@
 #include <QSemaphore>
 #include <QDebug>
 #include <QTimer>
+#include <QFile>
 
 #include <vector>
 
@@ -175,14 +176,13 @@ void FuseTexture::resize(uint32_t w, uint32_t h)
         m_width = w;
         m_height = h;
         delete[] m_spectrumPixels;
-        m_spectrumPixels = new uint16_t[m_width * m_height];
+        m_spectrumPixels = new uint32_t[m_width * m_height];
     }
     rescale();
 }
 
 void FuseTexture::rescale()
 {
-
     uint32_t scale = scaler_get_scaling_factor( current_scaler );
     if (!scale)
         scale = 1;
@@ -196,12 +196,12 @@ void FuseTexture::rescale()
     if (m_scale == 1) {
         m_spectrumScaledPixels = nullptr;
     } else {
-        m_spectrumScaledPixels = new uint16_t[m_width * m_scale * m_height * m_scale];
+        m_spectrumScaledPixels = new uint32_t[m_width * m_scale * m_height * m_scale];
     }
 
     m_texSize = QSize(nextpow2(m_width * m_scale), nextpow2(m_height * m_scale));
     delete[] m_glPixels;
-    m_glPixels = new uint16_t[m_texSize.width() * m_texSize.height()];
+    m_glPixels = new uint32_t[m_texSize.width() * m_texSize.height()];
 
     m_recreate = true;
     m_updateRect = QRect(0, 0, m_width, m_height);
@@ -256,8 +256,8 @@ void FuseTexture::bind()
         recreate = m_recreate;
     }
 
-    GLint format = GL_RGB;
-    GLenum type = GL_UNSIGNED_SHORT_5_6_5;
+    GLint format = GL_RGBA;
+    GLenum type = GL_UNSIGNED_BYTE;
 
     QRect updateRect = updateGlPixels();
 
@@ -310,7 +310,7 @@ void FuseTexture::frameEnd()
 void FuseTexture::saveScreen()
 {
     delete []m_savedSpectrumPixels;
-    m_savedSpectrumPixels = new uint16_t[m_width * m_height];
+    m_savedSpectrumPixels = new uint32_t[m_width * m_height];
     memcpy(m_savedSpectrumPixels, m_spectrumPixels, sizeof(uint16_t) * m_width * m_height);
 }
 
@@ -320,28 +320,23 @@ void FuseTexture::restoreScreen()
     update(0, 0, m_width, m_height);
 }
 
-constexpr uint16_t rgb16(int r, int g, int b)
-{
-    return (b >> 3) | ((g >> 2) << 5) | ((r >> 3) << 11);
-}
-
-static const uint16_t palette[16] = {
-    rgb16(  0,   0,   0),
-    rgb16(   0,   0, 192),
-    rgb16( 192,   0,   0),
-    rgb16( 192,   0, 192),
-    rgb16(   0, 192,   0),
-    rgb16(   0, 192, 192),
-    rgb16( 192, 192,   0),
-    rgb16( 192, 192, 192),
-    rgb16(   0,   0,   0),
-    rgb16(   0,   0, 255),
-    rgb16( 255,   0,   0),
-    rgb16( 255,   0, 255),
-    rgb16(   0, 255,   0),
-    rgb16(   0, 255, 255),
-    rgb16( 255, 255,   0),
-    rgb16( 255, 255, 255)
+static const uint32_t palette[16] = {
+    0x000000,
+    0xCD0000,
+    0x0000CD,
+    0xCD00CD,
+    0x00CD00,
+    0xCDCD00,
+    0x00CDCD,
+    0xCDCDCD,
+    0x000000,
+    0xFF0000,
+    0x0000FF,
+    0xFF00FF,
+    0x00FF00,
+    0xFFFF00,
+    0x00FFFF,
+    0xFFFFFF
 };
 
 void FuseTexture::putpixel(int x, int y, int colour)
@@ -358,9 +353,9 @@ void FuseTexture::plot8(int x, int y, libspectrum_byte data, libspectrum_byte in
     x <<= 3;
     Q_ASSERT(ink < 16 && paper < 16);
     Q_ASSERT(uint32_t(x) < m_width && uint32_t(y) < m_height);
-    uint16_t inkColor = palette[ink];
-    uint16_t paperColor = palette[paper];
-    uint16_t *dataPtr = m_spectrumPixels + x + m_width * y;
+    uint32_t inkColor = palette[ink];
+    uint32_t paperColor = palette[paper];
+    uint32_t *dataPtr = m_spectrumPixels + x + m_width * y;
     *dataPtr++ = (data & 0x80) ? inkColor : paperColor;
     *dataPtr++ = (data & 0x40) ? inkColor : paperColor;
     *dataPtr++ = (data & 0x20) ? inkColor : paperColor;
@@ -376,9 +371,9 @@ void FuseTexture::plot16(int x, int y, libspectrum_word data, libspectrum_byte i
     QMutexLocker lock(&m_copyPixelsMutex);
     Q_ASSERT(ink < 16 && paper < 16);
     Q_ASSERT(uint32_t(x) < m_width && uint32_t(y) < m_height);
-    uint16_t inkColor = palette[ink];
-    uint16_t paperColor = palette[paper];
-    uint16_t *dataPtr = m_spectrumPixels;
+    uint32_t inkColor = palette[ink];
+    uint32_t paperColor = palette[paper];
+    uint32_t *dataPtr = m_spectrumPixels;
     dataPtr += x + m_width * y;
     *dataPtr++ = (data & 0x8000) ? inkColor : paperColor;
     *dataPtr++ = (data & 0x4000) ? inkColor : paperColor;
@@ -401,7 +396,7 @@ void FuseTexture::plot16(int x, int y, libspectrum_word data, libspectrum_byte i
 QRect FuseTexture::updateGlPixels()
 {
     QMutexLocker lock(&m_syncVars);
-    if (!m_spectrumPixels || !m_glPixels)
+    if (!m_spectrumPixels || !m_glPixels || !m_scale)
         return QRect();
 
     int x = m_updateRect.x(), y = m_updateRect.y(), w = m_updateRect.width(), h = m_updateRect.height();
@@ -419,8 +414,8 @@ QRect FuseTexture::updateGlPixels()
     int copy_y = y;
     int copy_w = w;
     int copy_h = h;
-    uint16_t *glPixels = m_glPixels;
-    uint16_t *spectrumPixels = nullptr;
+    uint32_t *glPixels = m_glPixels;
+    uint32_t *spectrumPixels = nullptr;
     int specPitch = m_width * m_scale;
 
     if (m_scale != 1) {
@@ -435,7 +430,7 @@ QRect FuseTexture::updateGlPixels()
         const libspectrum_byte *src = (const libspectrum_byte *)(m_spectrumPixels + x + y * m_width);
         spectrumPixels = m_spectrumScaledPixels + dest_x + dest_y * specPitch;
         libspectrum_byte *dst = (libspectrum_byte *)(spectrumPixels);
-        scaler_proc16(src, m_width * sizeof(uint16_t), dst, specPitch * sizeof(uint16_t), w, h);
+        scaler_proc32(src, m_width * sizeof(uint32_t), dst, specPitch * sizeof(uint32_t), w, h);
         spectrumPixels += abs(copy_y - y) * m_scale * specPitch;
         spectrumPixels += abs(copy_x - x) * m_scale;
     } else {
@@ -443,7 +438,7 @@ QRect FuseTexture::updateGlPixels()
     }
 
     int glPitch = m_recreate ? m_texSize.width() : copy_w * m_scale;
-    const size_t copy_sz = copy_w * m_scale * sizeof(uint16_t);
+    const size_t copy_sz = copy_w * m_scale * sizeof(uint32_t);
     for (u_int32_t i = 0; i < copy_h * m_scale; i++) {
         memcpy(glPixels, spectrumPixels, copy_sz);
         glPixels += glPitch;

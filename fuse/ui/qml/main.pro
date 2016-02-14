@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     pokefindermodel.cpp \
     z80assembler.cpp \
     zxgamesmodel.cpp \
-    zxrequests.cpp
+    zxrequests.cpp \
+    xbrz.cpp
 
 HEADERS += \
     fusetexture.h \
@@ -42,7 +43,8 @@ HEADERS += \
     pokefindermodel.h \
     z80assembler.h \
     zxgamesmodel.h \
-    zxrequests.h
+    zxrequests.h \
+    xbrz.h
 
 RESOURCES += qml.qrc
 
@@ -51,6 +53,10 @@ QML_IMPORT_PATH =
 
 LIBS = $$PWD/../../libfuse.a $$PWD/../../../libspectrum/.libs/libspectrum.a -lz
 !android: LIBS += -lxml2 -lpng -lbz2 -lasound -laudiofile
+
+QMAKE_CFLAGS += -fopenmp
+QMAKE_LFLAGS += -fopenmp
+QMAKE_CXXFLAGS += -fopenmp
 
 !android {
     QMAKE_CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
