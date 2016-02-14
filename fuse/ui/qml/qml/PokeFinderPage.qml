@@ -103,54 +103,18 @@ Rectangle {
 
             FancyTextField {
                 id: value
-                KeyNavigation.down: view
-                KeyNavigation.up: buttonInc
+                KeyNavigation.up: view
+                KeyNavigation.down: buttonInc
                 Layout.fillWidth: true
                 focus: true
                 implicitWidth: pokeFinderPage.width / 2
                 inputMethodHints: Qt.ImhDigitsOnly
                 validator: IntValidator {bottom: 0; top: 255;}
                 placeholderText: qsTr("Enter a numeric value")
-                Keys.onPressed: {
-                    switch (event.key) {
-                    case Qt.Key_Escape:
-                    case Qt.Key_B:
-                        pageLoader.source = "";
-                        event.accepted = true;
-                        break;
+                onAccepted: {
+                    fuse.pokeFinderSearch(value.text);
+                    view.focus = true;
 
-                    case Qt.Key_Y:
-                        fuse.pokeFinderInced();
-                        event.accepted = true;
-                        break;
-
-                    case Qt.Key_X:
-                        fuse.pokeFinderDeced();
-                        event.accepted = true;
-                        break;
-
-                    case Qt.Key_E:
-                        fuse.pokeFinderReset();
-                        event.accepted = true;
-                        break;
-
-                    case Qt.Key_W:
-                        addBreakpoint(BreakpointsModel.BreakOnWrite);
-                        event.accepted = true;
-                        break;
-
-                    case Qt.Key_R:
-                        addBreakpoint(BreakpointsModel.BreakOnRead);
-                        event.accepted = true;
-                        break;
-
-                    case Qt.Key_A:
-                    case Qt.Key_Enter:
-                    case Qt.Key_Return:
-                        fuse.pokeFinderSearch(value.text);
-                        event.accepted = true;
-                        break;
-                    }
                 }
             }
         }
@@ -306,75 +270,79 @@ Rectangle {
                         }
                     }
                 }
-                ListView {
+                Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    radius: Screen.pixelDensity
+                    border.width: (view.focus ? 1 : 0.5) * Screen.pixelDensity
+                    border.color: "white"
+                    color: "transparent"
+                    ListView {
+                        id: view
+                        anchors.fill: parent
+                        anchors.margins: Screen.pixelDensity * 2
+                        clip: true
+                        snapMode: ListView.SnapToItem
+                        highlightFollowsCurrentItem: true
+                        focus: true
+                        activeFocusOnTab: fuse.pokeFinderCount <= 20
 
-                    id: view
-                    clip: true
-                    snapMode: ListView.SnapToItem
-                    highlightFollowsCurrentItem: true
-                    focus: true
-                    activeFocusOnTab: fuse.pokeFinderCount <= 20
+                        KeyNavigation.right: value
+                        KeyNavigation.left: buttonInc
+                        KeyNavigation.up: value
+                        KeyNavigation.down: value
 
-                    Keys.onUpPressed: decrementCurrentIndex();
-                    Keys.onDownPressed: incrementCurrentIndex()
+                        model: visualModel
 
-                    KeyNavigation.right: value
-                    KeyNavigation.left: buttonInc
-                    KeyNavigation.up: value
-                    KeyNavigation.down: value
+                        currentIndex: fuse.pokeFinderCount <= 20 ? 0 : -1
 
-                    model: visualModel
+                        header: Rectangle {
+                            height: 5 * Screen.pixelDensity
+                            RowLayout {
+                                anchors.fill: parent
+                                FancyText {
+                                    Layout.fillHeight: true
+                                    Layout.fillWidth: false
+                                    Layout.preferredWidth: 10 * Screen.pixelDensity
+                                    Layout.alignment: Qt.AlignRight
+                                    fontSize: 4
+                                    style: Text.Normal
+                                    text: "Bank"
+                                }
 
-                    currentIndex: fuse.pokeFinderCount <= 20 ? 0 : -1
+                                Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
 
-                    header: Rectangle {
-                        height: 5 * Screen.pixelDensity
-                        RowLayout {
-                            anchors.fill: parent
-                            FancyText {
-                                Layout.fillHeight: true
-                                Layout.fillWidth: false
-                                Layout.preferredWidth: 10 * Screen.pixelDensity
-                                Layout.alignment: Qt.AlignRight
-                                fontSize: 4
-                                style: Text.Normal
-                                text: "Bank"
-                            }
+                                FancyText {
+                                    Layout.fillHeight: true
+                                    Layout.fillWidth: false
+                                    Layout.preferredWidth: 15 * Screen.pixelDensity
+                                    Layout.alignment: Qt.AlignLeft
+                                    fontSize: 4
+                                    style: Text.Normal
+                                    text: "Offset"
+                                }
 
-                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                                Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
 
-                            FancyText {
-                                Layout.fillHeight: true
-                                Layout.fillWidth: false
-                                Layout.preferredWidth: 15 * Screen.pixelDensity
-                                Layout.alignment: Qt.AlignLeft
-                                fontSize: 4
-                                style: Text.Normal
-                                text: "Offset"
-                            }
+                                FancyText {
+                                    Layout.fillHeight: true
+                                    Layout.fillWidth: false
+                                    horizontalAlignment: Text.AlignHCenter
+                                    fontSize: 4
+                                    style: Text.Normal
+                                    text: "Value"
+                                }
 
-                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                                Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
 
-                            FancyText {
-                                Layout.fillHeight: true
-                                Layout.fillWidth: false
-                                horizontalAlignment: Text.AlignHCenter
-                                fontSize: 4
-                                style: Text.Normal
-                                text: "Value"
-                            }
-
-                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
-
-                            FancyText {
-                                Layout.fillHeight: true
-                                Layout.fillWidth: false
-                                horizontalAlignment: Text.AlignRight
-                                fontSize: 4
-                                style: Text.Normal
-                                text: "Breakpoint"
+                                FancyText {
+                                    Layout.fillHeight: true
+                                    Layout.fillWidth: false
+                                    horizontalAlignment: Text.AlignRight
+                                    fontSize: 4
+                                    style: Text.Normal
+                                    text: "Breakpoint"
+                                }
                             }
                         }
                     }
