@@ -175,7 +175,7 @@ read_config_file( settings_info *settings )
   snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
 
   /* See if the file exists; if doesn't, it's not a problem */
-  if( compat_file_exists( path ) ) {
+  if( !compat_file_exists( path ) ) {
       return 0;
   }
 
