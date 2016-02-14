@@ -16,7 +16,6 @@
 */
 
 import QtQuick 2.6
-import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
 import Qt.labs.controls 1.0
@@ -134,6 +133,7 @@ ApplicationWindow {
                     }
                     break;
 
+                case Qt.Key_Back:
                 case Qt.Key_Escape:
                     if (menuBar.position) {
                         menuView.popMenu();
@@ -141,6 +141,9 @@ ApplicationWindow {
                     } else {
                         if (pageLoader.source != "") {
                             pageLoader.source = "";
+                            event.accepted = true;
+                        } else {
+                            quitDialog.open();
                             event.accepted = true;
                         }
                     }
@@ -150,6 +153,18 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: pageLoader.source = "";
+            }
+
+            Button {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                text: "="
+                onClicked: {
+                    if (menuBar.position)
+                        menuBar.close();
+                    else
+                        menuBar.open();
+                }
             }
 
             Loader {
@@ -198,5 +213,8 @@ ApplicationWindow {
                 }
             }
         }
+
+        if (Qt.platform.os == "android")
+            mainScreen.visibility = Window.FullScreen;
     }
 }
