@@ -35,7 +35,6 @@ Flickable {
                 text: qsTr("General Options")
             }
 
-
             Row {
                 spacing: 2.5 * Screen.pixelDensity
                 Label {
@@ -78,7 +77,6 @@ Flickable {
                 KeyNavigation.backtab: emulationSpeed
                 KeyNavigation.tab: accelerateLoader
                 focus: true
-                highlighted: activeFocus
                 text: qsTr("Fast loading")
                 checked: fuseSettings.fastLoad
                 onCheckedChanged: fuseSettings.fastLoad = checked

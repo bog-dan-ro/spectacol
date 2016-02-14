@@ -143,6 +143,7 @@ Menu {
     }
 
     Menu {
+        visible: false
         title: "Screen"
 
         MenuItem {
