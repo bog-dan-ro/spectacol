@@ -299,7 +299,7 @@ template <class ColorDistance>
 FORCE_INLINE //detect blend direction
 BlendResult preProcessCorners(const Kernel_4x4& ker, const xbrz::ScalerCfg& cfg) //result: F, G, J, K corners of "GradientType"
 {
-    BlendResult result = {};
+    BlendResult result;
 
     if ((ker.f == ker.g &&
          ker.j == ker.k) ||
@@ -516,7 +516,7 @@ void scaleImage(const uint32_t* src, uint32_t* trg, int srcWidth, int srcHeight,
             const int x_p1 = std::min(x + 1, srcWidth - 1);
             const int x_p2 = std::min(x + 2, srcWidth - 1);
 
-            Kernel_4x4 ker = {}; //perf: initialization is negligible
+            Kernel_4x4 ker; //perf: initialization is negligible
             ker.a = s_m1[x_m1]; //read sequentially from memory as far as possible
             ker.b = s_m1[x];
             ker.c = s_m1[x_p1];
@@ -572,7 +572,7 @@ void scaleImage(const uint32_t* src, uint32_t* trg, int srcWidth, int srcHeight,
             const int x_p1 = std::min(x + 1, srcWidth - 1);
             const int x_p2 = std::min(x + 2, srcWidth - 1);
 
-            Kernel_4x4 ker4 = {}; //perf: initialization is negligible
+            Kernel_4x4 ker4; //perf: initialization is negligible
 
             ker4.a = s_m1[x_m1]; //read sequentially from memory as far as possible
             ker4.b = s_m1[x];
@@ -625,7 +625,7 @@ void scaleImage(const uint32_t* src, uint32_t* trg, int srcWidth, int srcHeight,
             //blend four corners of current pixel
             if (blendingNeeded(blend_xy)) //good 5% perf-improvement
             {
-                Kernel_3x3 ker3 = {}; //perf: initialization is negligible
+                Kernel_3x3 ker3; //perf: initialization is negligible
 
                 ker3.a = ker4.a;
                 ker3.b = ker4.b;

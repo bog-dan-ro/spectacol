@@ -33,6 +33,7 @@ class FuseTexture : public QSGTexture
 private:
     FuseTexture();
     ~FuseTexture();
+
 public:
     static FuseTexture *instance();
 
@@ -40,6 +41,8 @@ public:
 public:
     void resize(uint32_t w, uint32_t h);
     void rescale();
+    void rescale(uint32_t scale);
+    int scale() const;
     int textureId() const;
     QSize textureSize() const;
     QSize imageSize() const;
@@ -66,14 +69,14 @@ signals:
 private:
     GLuint m_textureId = 0;
     QSize m_texSize;
-    uint32_t m_width = 0, m_height = 0, m_scale = 0;
+    uint32_t m_width = 0, m_height = 0, m_scale = 1;
     uint32_t *m_spectrumPixels = nullptr, *m_spectrumScaledPixels = nullptr, *m_glPixels = nullptr, *m_savedSpectrumPixels = nullptr;
     QRect m_updateRect;
     bool m_recreate = false;
     bool m_update = false;
     bool m_fullScreen = false;
     QMutex m_copyPixelsMutex;
-    QMutex m_syncVars;
+    mutable QMutex m_syncVars;
 };
 
 #endif // FUSETEXTURE_H

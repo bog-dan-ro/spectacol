@@ -18,8 +18,10 @@
 
 #include "fusetexture.h"
 #include "fuseemulator.h"
+#include "xbrz.h"
 
 #include <QSemaphore>
+#include <QSettings>
 #include <QDebug>
 #include <QTimer>
 #include <QFile>
@@ -31,53 +33,20 @@
 #include <ui/uidisplay.h>
 #include <ui/widget/widget.h>
 
-QSemaphore s_semaphore;
+#ifdef _OPENMP
+   #include <omp.h>
+#else
+   #define omp_get_max_threads() 1
+#endif
 
 #include "qmlui.h"
+
+static QSemaphore s_semaphore;
 
 extern "C" int uidisplay_init( int width, int height )
 {
     FuseTexture::instance()->resize(width, height);
-
-    scaler_register_clear();
-    scaler_select_bitformat( 565 );		/* 16bit always */
-
-    scaler_register( SCALER_NORMAL );
-    scaler_register( SCALER_DOUBLESIZE );
-    scaler_register( SCALER_TRIPLESIZE );
-    scaler_register( SCALER_2XSAI );
-    scaler_register( SCALER_SUPER2XSAI );
-    scaler_register( SCALER_SUPEREAGLE );
-    scaler_register( SCALER_ADVMAME2X );
-    scaler_register( SCALER_ADVMAME3X );
-    scaler_register( SCALER_DOTMATRIX );
-    scaler_register( SCALER_PALTV );
-    scaler_register( SCALER_HQ2X );
-    if( machine_current->timex ) {
-      scaler_register( SCALER_HALF );
-      scaler_register( SCALER_HALFSKIP );
-      scaler_register( SCALER_TIMEXTV );
-      scaler_register( SCALER_TIMEX1_5X );
-    } else {
-      scaler_register( SCALER_TV2X );
-      scaler_register( SCALER_TV3X );
-      scaler_register( SCALER_PALTV2X );
-      scaler_register( SCALER_PALTV3X );
-      scaler_register( SCALER_HQ3X );
-    }
-
-    if( scaler_is_supported( current_scaler ) ) {
-      scaler_select_scaler( current_scaler );
-    } else {
-      scaler_select_scaler( SCALER_NORMAL );
-    }
-
     display_ui_initialised = 1;
-#ifndef ANDROID
-    pokeEvent([]{
-        scaler_select_scaler(SCALER_HQ3X);
-    });
-#endif
     s_semaphore.release();
     return 0;
 }
@@ -85,11 +54,8 @@ extern "C" int uidisplay_init( int width, int height )
 extern "C" int uidisplay_hotswap_gfx_mode( void )
 {
   fuse_emulation_pause();
-
   FuseTexture::instance()->rescale();
-
   fuse_emulation_unpause();
-
   return 0;
 }
 
@@ -141,6 +107,9 @@ extern "C" void uidisplay_frame_restore( void )
 
 FuseTexture::FuseTexture()
 {
+    QSettings s;
+    m_scale = s.value("scale", 4).toInt();
+
     g_fuseEmulator->startFuseThread();
 }
 
@@ -183,21 +152,13 @@ void FuseTexture::resize(uint32_t w, uint32_t h)
 
 void FuseTexture::rescale()
 {
-    uint32_t scale = scaler_get_scaling_factor( current_scaler );
-    if (!scale)
-        scale = 1;
-
     QMutexLocker lock(&m_syncVars);
-    if (m_scale == scale)
-        return;
 
-    m_scale = scale;
     delete[] m_spectrumScaledPixels;
-    if (m_scale == 1) {
+    if (m_scale == 1)
         m_spectrumScaledPixels = nullptr;
-    } else {
+    else
         m_spectrumScaledPixels = new uint32_t[m_width * m_scale * m_height * m_scale];
-    }
 
     m_texSize = QSize(nextpow2(m_width * m_scale), nextpow2(m_height * m_scale));
     delete[] m_glPixels;
@@ -210,6 +171,21 @@ void FuseTexture::rescale()
     emit needsUpdate();
 }
 
+void FuseTexture::rescale(uint32_t scale)
+{
+    m_scale = scale;
+    {
+        QSettings s;
+        s.setValue("scale", scale);
+    }
+    rescale();
+}
+
+int FuseTexture::scale() const
+{
+    QMutexLocker lock(&m_syncVars);
+    return m_scale;
+}
 
 int FuseTexture::textureId() const
 {
@@ -410,41 +386,47 @@ QRect FuseTexture::updateGlPixels()
         w = m_width;
     if (!h)
         h = m_height;
-    int copy_x = x;
-    int copy_y = y;
-    int copy_w = w;
-    int copy_h = h;
+
     uint32_t *glPixels = m_glPixels;
     uint32_t *spectrumPixels = nullptr;
-    int specPitch = m_width * m_scale;
+    const int specPitch = m_width * m_scale;
 
     if (m_scale != 1) {
-        /* Extend the dirty region by 1 pixel for scalers
-           that "smear" the screen, e.g. 2xSAI */
-        if( scaler_flags & SCALER_FLAGS_EXPAND )
-            scaler_expander(&x, &y, &w, &h, m_width, m_height);
+        if (y > 2)
+            y -= 2;
+        else
+            y = 0;
+        if (h <= int(m_height - 2))
+            h += 2;
 
         QMutexLocker lockCopy(&m_copyPixelsMutex);
-        int dest_x = x * m_scale;
-        int dest_y = y * m_scale;
-        const libspectrum_byte *src = (const libspectrum_byte *)(m_spectrumPixels + x + y * m_width);
+        const int dest_x = x * m_scale;
+        const int dest_y = y * m_scale;
+        const int step = h / omp_get_max_threads();
+        static xbrz::ScalerCfg cfg;
+        if (step) {
+            #pragma omp parallel for
+            for (int line = y; line < y + h; line += step)
+                xbrz::scale(m_scale, m_spectrumPixels, m_spectrumScaledPixels, m_width, m_height, xbrz::ColorFormat::RGB, cfg, line, line + step);
+        }
+
+        const int lines = h - step * omp_get_max_threads();
+        if (lines)
+            xbrz::scale(m_scale, m_spectrumPixels, m_spectrumScaledPixels, m_width, m_height, xbrz::ColorFormat::RGB, cfg, y + h - lines, y + h);
+
         spectrumPixels = m_spectrumScaledPixels + dest_x + dest_y * specPitch;
-        libspectrum_byte *dst = (libspectrum_byte *)(spectrumPixels);
-        scaler_proc32(src, m_width * sizeof(uint32_t), dst, specPitch * sizeof(uint32_t), w, h);
-        spectrumPixels += abs(copy_y - y) * m_scale * specPitch;
-        spectrumPixels += abs(copy_x - x) * m_scale;
     } else {
         spectrumPixels = m_spectrumPixels + x + y * specPitch;
     }
 
-    int glPitch = m_recreate ? m_texSize.width() : copy_w * m_scale;
-    const size_t copy_sz = copy_w * m_scale * sizeof(uint32_t);
-    for (u_int32_t i = 0; i < copy_h * m_scale; i++) {
+    int glPitch = m_recreate ? m_texSize.width() : w * m_scale;
+    const size_t copy_sz = w * m_scale * sizeof(uint32_t);
+    for (u_int32_t i = 0; i < h * m_scale; i++) {
         memcpy(glPixels, spectrumPixels, copy_sz);
         glPixels += glPitch;
         spectrumPixels += specPitch;
     }
     m_update = false;
     m_recreate = false;
-    return QRect(copy_x * m_scale, copy_y * m_scale, copy_w * m_scale, copy_h * m_scale);
+    return QRect(x * m_scale, y * m_scale, w * m_scale, h * m_scale);
 }

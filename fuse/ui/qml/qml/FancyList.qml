@@ -61,6 +61,7 @@ ListView {
     }
 
     footer: Button {
+        width: 50 * Screen.pixelDensity
         text: qsTr("Close")
         onClicked: pageLoader.source = ""
     }

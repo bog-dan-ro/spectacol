@@ -16,6 +16,9 @@
 */
 
 #include "fuseemulator.h"
+#include "fusetexture.h"
+#include "fusesettings.h"
+
 #include "qmlui.h"
 
 #include <debugger/breakpoint.h>
@@ -25,7 +28,6 @@
 #include <pokefinder/pokefinder.h>
 #include <settings.h>
 #include <snapshot.h>
-#include <ui/scaler/scaler.h>
 #include <utils.h>
 #include <z80/z80.h>
 
@@ -73,8 +75,7 @@ int FuseThread::soundLowlevelInit(const char *, int *freqptr, int *stereoptr)
 
     m_audioFormat = format;
     m_audioOutput.reset(new QAudioOutput(format));
-    if (!m_audioOutput->bufferSize())
-        m_audioOutput->setBufferSize(0x10000);
+    m_audioOutput->setBufferSize(0x1000);
     m_audioOutputDevice = m_audioOutput->start();
     return 0;
 }
@@ -193,6 +194,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     , m_disassambleModel(this)
     , m_pokeFinderModel(this)
     , m_resetPokeFinder(true)
+    , m_fuseSettings(new FuseSettings(this))
 {
     QGamepadManager *gm = QGamepadManager::instance();
     g_fuseEmulator = this;
@@ -208,7 +210,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             return;
 
         pokeEvent([axis, value]{
-            if (fuse_emulation_paused)
+            if (fuse_emulation_paused && ui_widget_level == -1)
                 return;
 
             input_event_t event1, event2;
@@ -247,7 +249,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         if (!m_processJoysticksEvents.load())
             return;
 
-        if (fuse_emulation_paused)
+        if (fuse_emulation_paused && ui_widget_level == -1)
             return;
 
         switch (button) {
@@ -282,6 +284,9 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
                 button == QGamepadManager::ButtonStart)
             return;
 
+        if (fuse_emulation_paused && ui_widget_level == -1)
+            return;
+
         pokeEvent([button] {
             input_event_t event;
             event.type = INPUT_EVENT_JOYSTICK_RELEASE;
@@ -294,6 +299,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     connect(&m_breakpointsModel, &BreakpointsModel::modelReset, &m_disassambleModel, &DisassambleModel::update);
 
     ctxt->setContextProperty("fuse", this);
+    ctxt->setContextProperty("fuseSettings", m_fuseSettings.get());
     ctxt->setContextProperty("breakpointsModel", &m_breakpointsModel);
     ctxt->setContextProperty("disassambleModel", &m_disassambleModel);
     ctxt->setContextProperty("pokeFinderModel", &m_pokeFinderModel);
@@ -310,6 +316,9 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     setDataPath(dataPath());
     m_debuggerActivated.store(false);
     m_processJoysticksEvents.store(true);
+    pokeEvent([]{
+        settings_current.autosave_settings = 1;
+    });
 }
 
 FuseEmulator::~FuseEmulator()
@@ -360,34 +369,6 @@ void FuseEmulator::setDataPath(const QUrl &dataPath)
 bool FuseEmulator::saveSnapshotEnabled() const
 {
     return !m_loadedFileName.isEmpty();
-}
-
-QStringList FuseEmulator::filtersModel() const
-{
-    updateScalers();
-    QStringList ret;
-    for (int scaller : m_supportedScalers)
-        ret.push_back(QLatin1String(scaler_name(scaler_type(scaller))));
-    return ret;
-}
-
-int FuseEmulator::selectedFilterIndex() const
-{
-    auto it = std::find(m_supportedScalers.begin(), m_supportedScalers.end(), current_scaler);
-    if (it != m_supportedScalers.end())
-        return it - m_supportedScalers.begin();
-    return -1;
-}
-
-void FuseEmulator::setSelectedFilterIndex(int selectedFilterIndex)
-{
-    const scaler_type scaler = scaler_type(m_supportedScalers[selectedFilterIndex]);
-    pokeEvent([scaler, this]{
-        scaler_select_scaler(scaler);
-        callFunction([this]{
-            emit selectedFilterIndexChanged();
-        });
-    });
 }
 
 QStringList FuseEmulator::joysticksModel() const
@@ -868,16 +849,6 @@ void FuseEmulator::debuggerCommand(const QString &command)
         debugger_command_evaluate(command.toUtf8().constData());
         m_pokeFinderModel.update();
     });
-}
-
-void FuseEmulator::updateScalers() const
-{
-    if (!m_supportedScalers.empty())
-        return;
-
-    for (int i = SCALER_HALF; i < SCALER_NUM; ++i)
-        if (scaler_is_supported(scaler_type(i)))
-            m_supportedScalers.push_back(i);
 }
 
 void FuseEmulator::startFuseThread()

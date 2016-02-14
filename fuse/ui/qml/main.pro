@@ -28,7 +28,8 @@ SOURCES += main.cpp \
     z80assembler.cpp \
     zxgamesmodel.cpp \
     zxrequests.cpp \
-    xbrz.cpp
+    xbrz.cpp \
+    fusesettings.cpp
 
 HEADERS += \
     fusetexture.h \
@@ -44,7 +45,8 @@ HEADERS += \
     z80assembler.h \
     zxgamesmodel.h \
     zxrequests.h \
-    xbrz.h
+    xbrz.h \
+    fusesettings.h
 
 RESOURCES += qml.qrc
 
@@ -63,3 +65,14 @@ QMAKE_CXXFLAGS += -fopenmp
     QMAKE_CFLAGS += -fsanitize=address -fno-omit-frame-pointer
     QMAKE_LFLAGS += -fsanitize=address
 }
+
+DISTFILES += \
+    android/AndroidManifest.xml \
+    android/gradle/wrapper/gradle-wrapper.jar \
+    android/gradlew \
+    android/res/values/libs.xml \
+    android/build.gradle \
+    android/gradle/wrapper/gradle-wrapper.properties \
+    android/gradlew.bat
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

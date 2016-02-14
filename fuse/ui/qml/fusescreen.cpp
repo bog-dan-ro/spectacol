@@ -28,7 +28,6 @@
 #include <settings.h>
 
 #include <ui/ui.h>
-#include <ui/scaler/scaler.h>
 
 #include <QtMath>
 #include <QSGSimpleTextureNode>

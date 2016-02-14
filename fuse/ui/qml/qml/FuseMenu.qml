@@ -39,7 +39,7 @@ Menu {
     }
 
     Menu {
-        title: "&File"
+        title: "Media"
         MenuItem {
             text: "&Open .."
             onTriggered: {
@@ -53,6 +53,14 @@ Menu {
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "SaveSnapshotPage.qml";
+            }
+        }
+
+        MenuItem {
+            text: "&Search online .."
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "SearchOnlinePage.qml";
             }
         }
 
@@ -125,31 +133,12 @@ Menu {
         }
     }
 
+
     MenuItem {
-        text: "&Search online .."
+        text: "Joystick type"
         onTriggered: {
             menuBar.close();
-            pageLoader.source = "SearchOnlinePage.qml";
-        }
-    }
-
-    Menu {
-        title: "Joystick"
-        visible: GamepadManager.connectedGamepads.length > 0
-        MenuItem {
-            text: "Joysticks"
-            onTriggered: {
-                menuBar.close();
-                pageLoader.source = "Joysticks.qml";
-            }
-        }
-
-        MenuItem {
-            text: "Calibrate Gamepad"
-            onTriggered: {
-                menuBar.close();
-                pageLoader.source = "CalibrateGamepad.qml";
-            }
+            pageLoader.source = "Joysticks.qml";
         }
     }
 
@@ -175,20 +164,6 @@ Menu {
     Menu {
         title: qsTr("Machine")
         MenuItem {
-            text: qsTr("Reset")
-            onTriggered: {
-                menuBar.close();
-                fuse.reset();
-            }
-        }
-        MenuItem {
-            text: qsTr("Hard reset")
-            onTriggered: {
-                menuBar.close();
-                fuse.hardReset();
-            }
-        }
-        MenuItem {
             text: qsTr("Debugger")
             onTriggered: {
                 menuBar.close();
@@ -203,7 +178,28 @@ Menu {
             }
         }
         MenuItem {
-            enabled: false
+            text: qsTr("Select ...  ") + fuseSettings.currentMachine
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "MachineTypePage.qml";
+            }
+        }
+        MenuItem {
+            text: qsTr("Reset")
+            onTriggered: {
+                menuBar.close();
+                fuse.reset();
+            }
+        }
+        MenuItem {
+            text: qsTr("Hard reset")
+            onTriggered: {
+                menuBar.close();
+                fuse.hardReset();
+            }
+        }
+        MenuItem {
+            visible: false
             text: qsTr("Poke memory")
             onTriggered: {
                 menuBar.close();
@@ -257,7 +253,6 @@ Menu {
 
     Menu {
         title: qsTr("Options")
-        visible: false
 
         MenuItem {
             text: qsTr("General")
@@ -268,6 +263,15 @@ Menu {
         }
 
         MenuItem {
+            text: qsTr("Sound")
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "OptionsSoundPage.qml";
+            }
+        }
+
+        MenuItem {
+            visible: false
             text: qsTr("Media")
             onTriggered: {
                 menuBar.close();
@@ -276,10 +280,11 @@ Menu {
         }
 
         MenuItem {
-            text: qsTr("Sound")
+            visible: false
+            text: "Calibrate Gamepad"
             onTriggered: {
                 menuBar.close();
-                pageLoader.source = "OptionsSoundPage.qml";
+                pageLoader.source = "CalibrateGamepad.qml";
             }
         }
     }
