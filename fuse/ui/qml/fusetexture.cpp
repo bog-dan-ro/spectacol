@@ -146,6 +146,7 @@ void FuseTexture::resize(uint32_t w, uint32_t h)
         m_height = h;
         delete[] m_spectrumPixels;
         m_spectrumPixels = new uint32_t[m_width * m_height];
+        memset(m_spectrumPixels, 0, m_width * m_height * sizeof(uint32_t));
     }
     rescale();
 }
@@ -392,12 +393,14 @@ QRect FuseTexture::updateGlPixels()
     const int specPitch = m_width * m_scale;
 
     if (m_scale != 1) {
-        if (y > 2)
-            y -= 2;
+        if (y > 4)
+            y -= 4;
         else
             y = 0;
-        if (h <= int(m_height - 2))
-            h += 2;
+        if (h < int(m_height - 4))
+            h += 4;
+        else
+            h = m_height;
 
         QMutexLocker lockCopy(&m_copyPixelsMutex);
         const int dest_x = x * m_scale;
