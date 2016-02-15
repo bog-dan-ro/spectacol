@@ -213,8 +213,5 @@ ApplicationWindow {
                 }
             }
         }
-
-        if (Qt.platform.os == "android")
-            mainScreen.visibility = Window.FullScreen;
     }
 }

@@ -28,7 +28,7 @@ Rectangle {
     Timer {
         id: timer
         repeat: false
-        interval: 2500
+        interval: 5000
         running: false
         onTriggered: onlineGamesModel.search(searchText.text);
     }

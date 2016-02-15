@@ -53,7 +53,6 @@ protected:
 
 private:
     qreal m_aspectRatio = 4/3;
-    bool m_fullScreen = false;
 };
 
 #endif // FUSESCREEN_H
