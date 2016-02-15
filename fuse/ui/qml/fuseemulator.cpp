@@ -68,7 +68,6 @@ int FuseThread::soundLowlevelInit(const char *, int *freqptr, int *stereoptr)
     format.setSampleRate(*freqptr);
     if (format == m_audioFormat && m_audioOutput)
         return 0;
-
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
     if (!info.isFormatSupported(format))
         format = info.nearestFormat(format);
@@ -204,6 +203,9 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         emit gamepadIdChanged();
     }
 
+    if (!gm->connectedGamepads().contains(m_gamepadId))
+        m_gamepadId = -1;
+
     connect(gm, &QGamepadManager::gamepadAxisEvent, this, [this](int deviceId, QGamepadManager::GamepadAxis axis, double value){
         if (!m_processJoysticksEvents || deviceId != m_gamepadId ||
                 axis == QGamepadManager::AxisInvalid)
@@ -295,6 +297,17 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             input_event(&event);
         });
     });
+
+    connect(gm, &QGamepadManager::gamepadConnected, this, [this](int deviceId){
+        if (m_gamepadId == -1)
+            setGamepadId(deviceId);
+    });
+
+    connect(gm, &QGamepadManager::gamepadDisconnected, this, [this](int deviceId){
+        if (m_gamepadId == deviceId)
+            setGamepadId(-1);
+    });
+
 
     connect(&m_breakpointsModel, &BreakpointsModel::modelReset, &m_disassambleModel, &DisassambleModel::update);
 
