@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
-<manifest package="eu.licentia.games.spectum" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.0" android:versionCode="1" android:installLocation="auto">
-    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="-- %%INSERT_APP_NAME%% --">
+<manifest package="eu.licentia.games.yasefa" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.0" android:versionCode="1" android:installLocation="auto">
+    <application android:banner="@drawable/logo" android:isGame="true" android:theme="@android:style/Theme.DeviceDefault.NoActionBar" android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="-- %%INSERT_APP_NAME%% --">
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="-- %%INSERT_APP_NAME%% --" android:screenOrientation="unspecified" android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+<!-- Android TV stuff -->
+                <category android:name="android.intent.category.CATEGORY_LEANBACK_LAUNCHER"/>
+<!-- Android TV stuff -->
             </intent-filter>
             <meta-data android:name="android.app.lib_name" android:value="-- %%INSERT_APP_LIB_NAME%% --"/>
             <meta-data android:name="android.app.qt_sources_resource_id" android:resource="@array/qt_sources"/>
@@ -28,9 +31,8 @@
             <!--  Messages maps -->
 
             <!-- Splash screen -->
-            <!--
             <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/logo"/>
-            -->
+            <meta-data android:name="android.app.splash_screen_sticky" android:value="true"/>
             <!-- Splash screen -->
 
             <!-- Background running -->
@@ -46,15 +48,27 @@
             <!-- auto screen scale factor -->
         </activity>
     </application>
-    <uses-sdk android:minSdkVersion="12" android:targetSdkVersion="14"/>
+    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="16"/>
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
 
     <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
          Remove the comment if you do not require these default permissions. -->
-    <!-- %%INSERT_PERMISSIONS -->
+
 
     <!-- The following comment will be replaced upon deployment with default features based on the dependencies of the application.
          Remove the comment if you do not require these default features. -->
-    <!-- %%INSERT_FEATURES -->
+
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
+<!-- Android TV stuff -->
+    <uses-feature android:name="android.software.leanback" android:required="false"/>
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+    <uses-feature android:name="android.hardware.gamepad" android:required="false"/>
+<!-- Android TV stuff -->
 
 </manifest>
