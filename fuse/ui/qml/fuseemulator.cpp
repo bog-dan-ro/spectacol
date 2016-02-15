@@ -622,8 +622,8 @@ void FuseEmulator::setGamepadId(int gamepadId)
 
 QString FuseEmulator::saveFilePath(const QString &fileName)
 {
-    return dataPath().toLocalFile() + fileName.left(1).toLower() + QLatin1String("/") +
-            fileName.left(3).toLower() + QLatin1String("/") + fileName;
+    return dataPath().toLocalFile() + QLatin1String("Downloaded/") + fileName.left(1).toLower() +
+            QLatin1Char('/') + fileName.left(3).toLower() + QLatin1Char('/') + fileName;
 }
 
 int FuseEmulator::soundLowlevelInit(const char *device, int *freqptr, int *stereoptr)
@@ -689,6 +689,9 @@ void FuseEmulator::nmi()
 
 void FuseEmulator::quickSaveSnapshot()
 {
+    if (m_loadedFileName.isEmpty())
+        return;
+
     const QString name = m_loadedFileName +
             QDateTime::currentDateTime().toString(".yyyy-MM-dd_hh:mm:ss") +
             QLatin1Literal(".szx");
