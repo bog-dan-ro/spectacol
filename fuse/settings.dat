@@ -45,7 +45,7 @@ detect_loader, boolean, 1
 accelerate_loader, boolean, 1
 slt_traps, boolean, 1,, slt, slttraps
 double_screen, null, 0
-full_screen, boolean, 0
+full_screen, boolean, 1
 writable_roms, boolean, 0
 autosave_settings, boolean, 0
 bw_tv, boolean, 0
@@ -145,7 +145,7 @@ rzx_autosaves, boolean, 1
 
 snapshot, string, NULL, 's'
 tape_file, string, NULL, 't', tape, tapefile
-start_machine, string, "48", 'm', machine
+start_machine, string, "128", 'm', machine
 record_file, string, NULL, 'r', record, recordfile
 opusdisk_file, string, NULL,, opusdisk
 playback_file, string, NULL, 'p', playback, playbackfile
