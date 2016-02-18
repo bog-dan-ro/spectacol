@@ -54,14 +54,17 @@ Rectangle {
         var msg = "";
         switch(level) {
         case fuse.Info:
+            msgDialog.border.color = "white"
             msg = qsTr("<b>Info:</b> ");
             break;
 
         case fuse.Warning:
+            msgDialog.border.color = "yellow"
             msg = qsTr("<b>Warning:</b> ");
             break;
 
         case fuse.Error:
+            msgDialog.border.color = "red"
             msg = qsTr("<b>Error:</b> ");
             break;
         }
@@ -74,4 +77,3 @@ Rectangle {
         msgDialog.visible = true;
     }
 }
-
