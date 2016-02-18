@@ -641,14 +641,19 @@ QUrl FuseEmulator::snapshotsPath() const
     return QUrl::fromLocalFile(dataPath().toLocalFile() + QLatin1Literal("/Snapshots/"));
 }
 
-void FuseEmulator::load(const QUrl &filePath)
+void FuseEmulator::load(const QUrl &filePath, bool removeOnFail)
 {
     m_loadedFileName = QFileInfo(filePath.toLocalFile()).baseName();
-    pokeEvent([this, filePath]() {
+    pokeEvent([this, removeOnFail, filePath]() {
         fuse_emulation_pause();
         if (utils_open_file(filePath.path().toUtf8().constData(), settings_current.auto_load , nullptr))
             m_loadedFileName = "";
-        callFunction([this]{
+
+        callFunction([this, filePath, removeOnFail]{
+            if (m_loadedFileName.isEmpty() && removeOnFail) {
+                QFile::remove(filePath.path());
+                emit error(Warning, tr("File \"%1\" was removed").arg(filePath.path()));
+            }
             emit saveSnapshotEnabledChanged();
         });
         display_refresh_all();
@@ -704,7 +709,7 @@ void FuseEmulator::quickLoadSnapshot()
     QDir dir(snapshotsPath().toLocalFile());
     const auto &list = dir.entryInfoList(QDir::Files, QDir::Time);
     if (list.size()) {
-        load(QUrl::fromLocalFile(list.first().filePath()));
+        load(QUrl::fromLocalFile(list.first().filePath()), true);
         emit error(Info, tr("Snapshot loaded from '%1").arg(list.first().fileName()));
     }
 }

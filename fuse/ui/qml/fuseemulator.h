@@ -171,7 +171,7 @@ public:
 
 public slots:
     QUrl snapshotsPath() const;
-    void load(const QUrl &filePath);
+    void load(const QUrl &filePath, bool removeOnFail = false);
     void save(const QUrl &filePath);
     void reset();
     void hardReset();
