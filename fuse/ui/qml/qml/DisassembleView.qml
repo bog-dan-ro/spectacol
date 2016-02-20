@@ -108,7 +108,7 @@ ListView {
                     readOnly: true
                     inputMethodHints: Qt.ImhPreferUppercase
                     text: model.disassable
-                    onAccepted: {
+                    onEditingFinished: {
                         assembler.write(text, model.address, model.bytes)
                         disassambleModel.update();
                         validator = null;

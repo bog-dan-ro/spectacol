@@ -108,7 +108,7 @@ extern "C" void uidisplay_frame_restore( void )
 FuseTexture::FuseTexture()
 {
     QSettings s;
-    m_scale = s.value("scale", 4).toInt();
+    m_scale = s.value("scale", 1).toInt();
 
     g_fuseEmulator->startFuseThread();
 }

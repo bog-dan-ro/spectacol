@@ -3,7 +3,11 @@
 set -e
 set -o nounset
 
-JOBS=${JOBS:="-j4"}
+JOBS=${JOBS:="-j10"}
+
+export CFLAGS="-g"
+export CPPFLAGS="${CFLAGS}"
+export CXXFLAGS="${CFLAGS}"
 
 pushd ../libspectrum
   if [ ! -f configure ]; then

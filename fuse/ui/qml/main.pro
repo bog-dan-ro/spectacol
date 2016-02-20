@@ -7,17 +7,18 @@ QT += qml quick gamepad multimedia
 
 INCLUDEPATH += $$PWD/../../ $$PWD/../../../libspectrum
 
-SOURCES += main.cpp \
-    compat.cpp \
+SOURCES += \
     ../../compat/unix/socket.c \
-    fusescreen.cpp \
-    fusetexture.cpp \
     ../../compat/unix/osname.c \
-    keysyms.cpp \
-    qmlui.cpp \
+    ../../compat/unix/tuntap.c \
     ../../timer/native.c \
     ../../timer/timer.c \
-    ../../compat/unix/tuntap.c \
+    main.cpp \
+    compat.cpp \
+    fusescreen.cpp \
+    fusetexture.cpp \
+    keysyms.cpp \
+    qmlui.cpp \
     spectrumscreen.cpp \
     disassamblemodel.cpp \
     breakpointsmodel.cpp \
@@ -73,6 +74,7 @@ DISTFILES += \
     android/res/values/libs.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
-    android/gradlew.bat
+    android/gradlew.bat \
+    android/res/drawable/logo.png
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
