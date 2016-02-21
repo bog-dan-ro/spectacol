@@ -42,6 +42,7 @@
 #include <QAudioOutput>
 
 #include <mutex>
+#include <thread>
 
 extern "C" int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
@@ -68,34 +69,56 @@ int FuseThread::soundLowlevelInit(const char *, int *freqptr, int *stereoptr)
     format.setSampleRate(*freqptr);
     if (format == m_audioFormat && m_audioOutput)
         return 0;
-    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
-    if (!info.isFormatSupported(format))
-        format = info.nearestFormat(format);
 
     m_audioFormat = format;
+    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    if (!info.isFormatSupported(format)) {
+        m_audioOutputDevice.clear();
+        return 0;
+    }
+
     m_audioOutput.reset(new QAudioOutput(format));
-    m_audioOutput->setBufferSize(0x1000);
+    m_audioOutput->setBufferSize(format.bytesForDuration(2 * 1000 * 1000)); // 2s buffer
     m_audioOutputDevice = m_audioOutput->start();
     return 0;
 }
 
 void FuseThread::soundLowlevelFrame(libspectrum_signed_word *data, int len)
 {
-    if (!m_audioOutputDevice)
+    if (!m_audioOutputDevice) {
+        std::this_thread::sleep_for(std::chrono::microseconds(m_audioFormat.durationForBytes(len * 2)));
         return;
+    }
 
+    if (m_uSleepTotal) {
+        auto sleepTime = m_uSleepTotal - m_sleepDelta - std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_startFrameTime).count();
+        if (sleepTime > 0)
+            std::this_thread::sleep_for(std::chrono::microseconds(sleepTime));
+        else if (m_sleepDelta < 1500)
+            m_sleepDelta += 5; //sleep less with 5us
+    }
+
+    m_startFrameTime = std::chrono::high_resolution_clock::now();
+    m_uSleepTotal = m_audioFormat.durationForBytes(len * 2);
+    bool slept = false;
     while (len) {
-        int buffSize = m_audioOutput->bytesFree() / 2;
-        if (!buffSize) {
-            QThread::msleep(1);
+        auto written = m_audioOutputDevice->write((const char *)data, len * 2);
+        if (!written) {
+            if (!slept && m_sleepDelta > 10) {
+                slept = true;
+                m_sleepDelta -= 5; //sleep more with 5us
+            }
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
             continue;
         }
-        buffSize = std::min(buffSize, len);
-        auto written = m_audioOutputDevice->write((const char *)data, buffSize * 2);
+        ++written;
         written /= 2;
         data += written;
         len -= written;
     }
+    auto sleepTime = (m_uSleepTotal - std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_startFrameTime).count()) / 2;
+    if (sleepTime > 0)
+        std::this_thread::sleep_for(std::chrono::microseconds(sleepTime));
 }
 
 void FuseThread::run()

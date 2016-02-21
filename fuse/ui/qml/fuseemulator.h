@@ -27,13 +27,12 @@
 #include <ui/ui.h>
 
 #include <QAudioFormat>
+#include <QGamepadManager>
 #include <QPointer>
 #include <QThread>
 #include <QUrl>
 
 #include <atomic>
-
-#include <QGamepadManager>
 
 #include <libspectrum.h>
 
@@ -54,6 +53,9 @@ private:
     QScopedPointer<QAudioOutput> m_audioOutput;
     QAudioFormat m_audioFormat;
     QPointer<QIODevice> m_audioOutputDevice;
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_startFrameTime;
+    int64_t m_uSleepTotal = 0;
+    int64_t m_sleepDelta = 500; //us
 };
 
 class FuseEmulator : public FuseObject
