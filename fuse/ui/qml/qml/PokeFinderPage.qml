@@ -47,7 +47,7 @@ Rectangle {
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
-        buttonAKey: Qt.Key_A
+        buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_B
         buttonYKey: Qt.Key_Y
         buttonXKey: Qt.Key_X
@@ -104,7 +104,7 @@ Rectangle {
             FancyTextField {
                 id: value
                 KeyNavigation.up: view
-                KeyNavigation.down: buttonInc
+                KeyNavigation.down: view
                 Layout.fillWidth: true
                 focus: true
                 implicitWidth: pokeFinderPage.width / 2
@@ -114,7 +114,6 @@ Rectangle {
                 onAccepted: {
                     fuse.pokeFinderSearch(value.text);
                     view.focus = true;
-
                 }
             }
         }
@@ -123,51 +122,30 @@ Rectangle {
             ColumnLayout {
                 Button {
                     id: buttonInc
-                    KeyNavigation.up: value
-                    KeyNavigation.right: view
-                    KeyNavigation.left: view
-                    KeyNavigation.down: buttonDec
                     Layout.fillWidth: true
                     text: qsTr("Incremented <b>(Y)</b>")
                     onClicked: fuse.pokeFinderInced()
                 }
                 Button {
                     id: buttonDec
-                    KeyNavigation.up: buttonInc
-                    KeyNavigation.right: view
-                    KeyNavigation.left: view
-                    KeyNavigation.down: buttonSearch
                     Layout.fillWidth: true
                     text: qsTr("Decremented <b>(X)</b>")
                     onClicked: fuse.pokeFinderDeced()
                 }
                 Button {
                     id: buttonSearch
-                    KeyNavigation.up: buttonDec
-                    KeyNavigation.right: view
-                    KeyNavigation.left: view
-                    KeyNavigation.down: buttonReset
                     Layout.fillWidth: true
                     text: qsTr("Search <b>(A)</b>")
                     onClicked: fuse.pokeFinderSearch(value.text)
                 }
                 Button {
                     id: buttonReset
-                    KeyNavigation.up: buttonSearch
-                    KeyNavigation.right: view
-                    KeyNavigation.left: view
-                    KeyNavigation.down: buttonBW
                     Layout.fillWidth: true
                     text: qsTr("Reset <b>(L2, R2, E)</b>")
                     onClicked: fuse.pokeFinderReset()
                 }
                 Button {
                     id: buttonBW
-                    KeyNavigation.up: buttonReset
-                    KeyNavigation.right: view
-                    KeyNavigation.left: view
-                    KeyNavigation.down: buttonBR
-
                     Layout.fillWidth: true
                     enabled: view.currentIndex !== -1
                     text: qsTr("Break on write <b>(L1, W)</b>")
@@ -175,10 +153,6 @@ Rectangle {
                 }
                 Button {
                     id: buttonBR
-                    KeyNavigation.up: buttonBW
-                    KeyNavigation.right: view
-                    KeyNavigation.left: view
-                    KeyNavigation.down: buttonClose
                     Layout.fillWidth: true
                     enabled: view.currentIndex !== -1
                     text: qsTr("Break on read <b>(R1, R)</b>")
@@ -186,10 +160,6 @@ Rectangle {
                 }
                 Button {
                     id: buttonClose
-                    KeyNavigation.up: buttonBR
-                    KeyNavigation.right: view
-                    KeyNavigation.left: view
-                    KeyNavigation.down: value
                     Layout.fillWidth: true
                     text: qsTr("Close <b>(B)</b>")
                     onClicked: pageLoader.source = "";
@@ -288,7 +258,7 @@ Rectangle {
                         activeFocusOnTab: fuse.pokeFinderCount <= 20
 
                         KeyNavigation.right: value
-                        KeyNavigation.left: buttonInc
+                        KeyNavigation.left: value
                         KeyNavigation.up: value
                         KeyNavigation.down: value
 

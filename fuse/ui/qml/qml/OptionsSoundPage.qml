@@ -23,6 +23,7 @@ Flickable {
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
         buttonBKey: Qt.Key_Escape
+        buttonAKey: Qt.Key_Space
     }
 
     Pane {
