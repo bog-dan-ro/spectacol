@@ -248,7 +248,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     });
 
     connect(gm, &QGamepadManager::gamepadButtonPressEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button, double value) {
-        if (!m_processJoysticksEvents.load())
+        if (!m_processJoysticksEvents.load() || value != 1)
             return;
 
         if (fuse_emulation_paused && ui_widget_level == -1)
@@ -268,7 +268,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             break;
         }
 
-        if (deviceId != m_gamepadId || button == QGamepadManager::ButtonInvalid || value != 1)
+        if (deviceId != m_gamepadId || button == QGamepadManager::ButtonInvalid)
             return;
 
         pokeEvent([button] {

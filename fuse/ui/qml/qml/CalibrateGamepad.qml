@@ -62,7 +62,7 @@ StandardGamepad {
         onButtonRightChanged: confGamepad.buttonRightPressed = value
         onButtonStartChanged: confGamepad.buttonStartPressed = value
         onButtonSelectChanged: confGamepad.buttonSelectPressed = value
-        onAxisLeftXChanged: confGamepad.axisLeftX = value;
+        onAxisLeftXChanged: confGamepad.axisLeftX = value
         onAxisLeftYChanged: confGamepad.axisLeftY = value
         onAxisRightXChanged: confGamepad.axisRightX = value
         onAxisRightYChanged: confGamepad.axisRightY = value

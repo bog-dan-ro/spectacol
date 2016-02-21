@@ -108,7 +108,7 @@ extern "C" void uidisplay_frame_restore( void )
 FuseTexture::FuseTexture()
 {
     QSettings s;
-    m_scale = s.value("scale", 1).toInt();
+    m_scale = s.value("scale", 4).toInt();
 
     g_fuseEmulator->startFuseThread();
 }
@@ -146,7 +146,6 @@ void FuseTexture::resize(uint32_t w, uint32_t h)
         m_height = h;
         delete[] m_spectrumPixels;
         m_spectrumPixels = new uint32_t[m_width * m_height];
-        memset(m_spectrumPixels, 0, m_width * m_height * sizeof(uint32_t));
     }
     rescale();
 }
@@ -405,15 +404,16 @@ QRect FuseTexture::updateGlPixels()
         QMutexLocker lockCopy(&m_copyPixelsMutex);
         const int dest_x = x * m_scale;
         const int dest_y = y * m_scale;
-        const int step = h / omp_get_max_threads();
         static xbrz::ScalerCfg cfg;
+        const int maxThreads = omp_get_max_threads();
+        const int step = h / maxThreads;
         if (step) {
-            #pragma omp parallel for
+            #pragma omp parallel for schedule(static)
             for (int line = y; line < y + h; line += step)
                 xbrz::scale(m_scale, m_spectrumPixels, m_spectrumScaledPixels, m_width, m_height, xbrz::ColorFormat::RGB, cfg, line, line + step);
         }
 
-        const int lines = h - step * omp_get_max_threads();
+        const int lines = h - step * maxThreads;
         if (lines)
             xbrz::scale(m_scale, m_spectrumPixels, m_spectrumScaledPixels, m_width, m_height, xbrz::ColorFormat::RGB, cfg, y + h - lines, y + h);
 

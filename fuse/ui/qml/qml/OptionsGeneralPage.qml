@@ -43,8 +43,11 @@ Flickable {
                 }
                 SpinBox {
                     id: screenFilter
+                    focus: true
                     KeyNavigation.backtab: detectLoaders
                     KeyNavigation.tab: emulationSpeed
+                    KeyNavigation.right: detectLoaders
+                    KeyNavigation.left: emulationSpeed
                     from: fuseSettings.scaleMin
                     to: fuseSettings.scaleMax
                     value: fuseSettings.currentScale
@@ -63,6 +66,8 @@ Flickable {
                     id: emulationSpeed
                     KeyNavigation.backtab: screenFilter
                     KeyNavigation.tab: fastLoad
+                    KeyNavigation.right: screenFilter
+                    KeyNavigation.left: fastLoad
                     from: 10
                     to: 1000
                     value: fuseSettings.emulationSpeed
@@ -76,7 +81,6 @@ Flickable {
                 KeyNavigation.down: accelerateLoader
                 KeyNavigation.backtab: emulationSpeed
                 KeyNavigation.tab: accelerateLoader
-                focus: true
                 text: qsTr("Fast loading")
                 checked: fuseSettings.fastLoad
                 onCheckedChanged: fuseSettings.fastLoad = checked
