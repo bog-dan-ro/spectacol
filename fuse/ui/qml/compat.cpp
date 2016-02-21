@@ -23,7 +23,6 @@
 #include <QFile>
 #include <QCoreApplication>
 #include <QDirIterator>
-#include <QThread>
 #include <QStandardPaths>
 
 #include <errno.h>
@@ -32,6 +31,7 @@
 #include <unistd.h>
 
 #include <memory>
+#include <thread>
 
 #include <utils.h>
 #include <ui/ui.h>
@@ -165,5 +165,5 @@ extern "C" double compat_timer_get_time( void )
 
 extern "C" void compat_timer_sleep( int ms )
 {
-    QThread::usleep( ms * 1000 );
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
