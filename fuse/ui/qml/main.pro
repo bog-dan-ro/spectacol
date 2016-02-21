@@ -3,7 +3,7 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-QT += qml quick gamepad multimedia
+QT += qml quick gamepad multimedia svg
 
 INCLUDEPATH += $$PWD/../../ $$PWD/../../../libspectrum
 
