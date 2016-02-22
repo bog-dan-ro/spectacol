@@ -82,8 +82,8 @@ Flickable {
 
                 ComboBox {
                     id: ayStereoSeparation
-//TODO:                    KeyNavigation.up: speakerType
-//TODO:                    KeyNavigation.down: loadingSound
+                    KeyNavigation.left: loadingSound
+                    KeyNavigation.right: speakerType
                     model: ["None", "ACB", "ABC"]
                     currentIndex: getIndex(model, fuseSettings.AYStereoSeparation)
                     onCurrentTextChanged: fuseSettings.AYStereoSeparation = currentText
@@ -99,8 +99,8 @@ Flickable {
 
                 ComboBox {
                     id: speakerType
-//TODO:                    KeyNavigation.up: speakerType
-//TODO:                    KeyNavigation.down: loadingSound
+                    KeyNavigation.left: loadingSound
+                    KeyNavigation.right: soundEnabled
                     model: ["TV speaker", "Beeper", "Unfiltered"]
                     currentIndex: getIndex(model, fuseSettings.speakerType)
                     onCurrentTextChanged: fuseSettings.speakerType = currentText
