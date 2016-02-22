@@ -31,7 +31,7 @@
 #include <utils.h>
 #include <z80/z80.h>
 
-#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QDateTime>
 #include <QDir>
 #include <QQmlContext>
@@ -218,6 +218,18 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     , m_resetPokeFinder(true)
     , m_fuseSettings(new FuseSettings(this))
 {
+    connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state){
+        switch (state) {
+        case Qt::ApplicationActive:
+            setPaused(false);
+            break;
+        case Qt::ApplicationInactive:
+            setPaused(true);
+            break;
+        default:
+            break;
+        }
+    });
     QGamepadManager *gm = QGamepadManager::instance();
     g_fuseEmulator = this;
     {
@@ -370,13 +382,16 @@ bool FuseEmulator::paused() const
 
 void FuseEmulator::setPaused(bool paused)
 {
-    pokeEvent([this, paused]() {
+    pokeEvent([this, paused]{
         if (paused)
             fuse_emulation_pause();
         else
             fuse_emulation_unpause();
-        if (paused != bool(fuse_emulation_paused))
-            emit pausedChanged();
+
+        callFunction([this, paused]{
+            if (paused != bool(fuse_emulation_paused))
+                emit pausedChanged();
+        });
     });
 }
 
