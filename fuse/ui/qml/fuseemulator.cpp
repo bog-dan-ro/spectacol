@@ -94,7 +94,7 @@ void FuseThread::soundLowlevelFrame(libspectrum_signed_word *data, int len)
         auto sleepTime = m_uSleepTotal - m_sleepDelta - std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_startFrameTime).count();
         if (sleepTime > 0)
             std::this_thread::sleep_for(std::chrono::microseconds(sleepTime));
-        else if (m_sleepDelta < 1500)
+        else if (m_sleepDelta < 5000)
             m_sleepDelta += 5; //sleep less with 5us
     }
 
