@@ -4977,3 +4977,5 @@
          fix some peripherals activation when loading snapshots (fixes bug #328)
          (Sergio).
 20160111 man/fuse.1: fix spelling (Sergio).
+20160224 AUTHORS,THANKS,hacking/peripheral_tests.txt,man/fuse.1: fix broken URLs
+         (Sergio).
