@@ -52,7 +52,8 @@ Flickable {
                     to: fuseSettings.scaleMax
                     value: fuseSettings.currentScale
                     onValueChanged: fuseSettings.currentScale = value
-                    textFromValue: function (value, locale) { if (value > 1) return value + qsTr("xBRZ"); else return qsTr("none"); }
+                    textFromValue: function (value, locale) { if (value > 1) return value + qsTr("xBRZ"); return qsTr("none"); }
+                    valueFromText: function (text, locale) { if (text === "none") return 0; return text[0]; }
                 }
             }
 
