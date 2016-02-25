@@ -221,10 +221,16 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state){
         switch (state) {
         case Qt::ApplicationActive:
-            setPaused(false);
+            if (m_applicationState != Qt::ApplicationActive) {
+                m_applicationState = Qt::ApplicationActive;
+                setPaused(false);
+            }
             break;
         case Qt::ApplicationInactive:
-            setPaused(true);
+            if (m_applicationState != Qt::ApplicationInactive) {
+                m_applicationState = Qt::ApplicationInactive;
+                setPaused(true);
+            }
             break;
         default:
             break;

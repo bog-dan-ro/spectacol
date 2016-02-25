@@ -240,6 +240,7 @@ private:
     int m_gamepadId = -1;
     ZXGamesModel m_onlineGamesModel;
     std::unique_ptr<FuseSettings> m_fuseSettings;
+    Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
 };
 
 extern FuseEmulator *g_fuseEmulator;
