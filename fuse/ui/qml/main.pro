@@ -30,7 +30,8 @@ SOURCES += \
     zxgamesmodel.cpp \
     zxrequests.cpp \
     xbrz.cpp \
-    fusesettings.cpp
+    fusesettings.cpp \
+    folderlistmodel.cpp
 
 HEADERS += \
     fusetexture.h \
@@ -47,7 +48,8 @@ HEADERS += \
     zxgamesmodel.h \
     zxrequests.h \
     xbrz.h \
-    fusesettings.h
+    fusesettings.h \
+    folderlistmodel.h
 
 RESOURCES += qml.qrc
 

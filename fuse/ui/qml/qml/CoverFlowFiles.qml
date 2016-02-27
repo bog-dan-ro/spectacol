@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
 */
 
 import QtQuick 2.2
-import Qt.labs.folderlistmodel 2.1
 import QtGamepad 1.0
+import Fuse 1.0
 
 Item
 {
@@ -39,18 +39,7 @@ Item
 
     FolderListModel {
         id: filesModel
-        rootFolder: "file:///"
-        folder: "file:///"
-        showDirs: true
-        showDirsFirst: true
-        showOnlyReadable: true
-        sortField: FolderListModel.Name
         onFolderChanged: filesView.currentIndex = 0
-    }
-
-    function folderUp() {
-        if (filesModel.parentFolder != "")
-            filesModel.folder = filesModel.parentFolder
     }
 
     CoverFlow
@@ -61,14 +50,14 @@ Item
         model : filesModel
 
         onReturnPressed: {
-            if (model.isFolder(currentIndex))
-                filesModel.folder = model.get(currentIndex, "fileURL");
+            if (model.isDir(currentIndex))
+                filesModel.folder = model.path(currentIndex);
             else
-                fileSelected(model.get(currentIndex, "fileURL"));
+                fileSelected(model.path(currentIndex));
         }
         onEscapePressed: fileSelected("")
 
-        onUpPressed: folderUp()
+        onUpPressed: filesModel.cdUp()
 
         delegate: Component {
             Image
@@ -86,7 +75,7 @@ Item
                 Behavior on rotAngle {SpringAnimation {spring : 5; damping: 0.7; epsilon: 0.025}}
                 Behavior on delScale {SpringAnimation {spring : 5; damping: 1; epsilon: 0.005}}
                 onStatusChanged: if (status === Image.Ready) scale_anim.start();
-                source : "image://spectrum/" + model.filePath
+                source : "image://spectrum/" + path
                 smooth : false
 
                 NumberAnimation {id : scale_anim; target : album_delegate; property: "scale"; from : 0; to : delScale; duration : 500; easing.type: Easing.InOutQuad}
@@ -100,7 +89,7 @@ Item
                     color : "white"
                     font.bold: true
                     font.family: "Helvetica"
-                    text : model.fileName
+                    text : name
                     width : parent.width
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
@@ -114,18 +103,15 @@ Item
                 MouseArea
                 {
                     anchors.fill: parent
-                    onClicked:
-                    {
-                        if (isCurrentItem)
-                        {
-                            if (model.fileIsDir) {
-                                filesModel.folder = model.fileURL
-                            } else {
-                                fileSelected(model.fileURL);
-                            }
-                        }
-                        else
+                    onClicked: {
+                        if (isCurrentItem) {
+                            if (isDir)
+                                filesModel.folder = path
+                            else
+                                fileSelected(path);
+                        } else {
                             filesView.currentIndex = index;
+                        }
                     }
                 }
             }
@@ -155,7 +141,7 @@ Item
         verticalAlignment: Text.AlignVCenter
         MouseArea {
             anchors.fill: parent
-            onClicked: folderUp()
+            onClicked: filesModel.cdUp()
         }
     }
 

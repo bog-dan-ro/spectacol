@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "folderlistmodel.h"
 #include "fuseemulator.h"
 #include "fusescreen.h"
 #include "spectrumscreen.h"
@@ -32,6 +33,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<FuseScreen>("Fuse", 1, 0, "FuseScreen");
     qmlRegisterType<Z80Assembler>("Fuse", 1, 0, "Z80Assembler");
+    qmlRegisterType<FolderListModel>("Fuse", 1, 0, "FolderListModel");
     qmlRegisterUncreatableType<BreakpointsModel>("Fuse", 1, 0, "BreakpointsModel", QLatin1String("use breakpointsModel context property instead"));
 
     QQmlApplicationEngine engine;
