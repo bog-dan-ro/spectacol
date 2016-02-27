@@ -9,6 +9,7 @@ Flickable {
     contentHeight: pane.height
     Component.onCompleted: fuse.paused = true
     Component.onDestruction: fuse.paused = false
+    anchors.margins: Screen.pixelDensity
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: fuse.gamepadId }

@@ -9,14 +9,12 @@ Flickable {
     contentHeight: pane.height
     Component.onCompleted: fuse.paused = true
     Component.onDestruction: fuse.paused = false
+    anchors.margins: Screen.pixelDensity
 
     function getIndex(data, str) {
-        for (var i = 0; i < data.length; ++i) {
-            if (data[i] === str) {
-                console.log(data[i] + "   " + i);
+        for (var i = 0; i < data.length; ++i)
+            if (data[i] === str)
                 return i;
-            }
-        }
         return 0;
     }
 

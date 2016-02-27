@@ -180,3 +180,43 @@ void FuseSettings::setSpeakerType(const QString &speakerType)
 {
     safe_set_string(settings_current.speaker_type, speakerType);
 }
+
+bool FuseSettings::kempstonJoystick() const
+{
+    return settings_current.joy_kempston;
+}
+
+void FuseSettings::setKempstonJoystick(bool kempstonJoystick)
+{
+    safe_set(settings_current.joy_kempston, kempstonJoystick);
+}
+
+bool FuseSettings::kempstonMouse() const
+{
+    return settings_current.kempston_mouse;
+}
+
+void FuseSettings::setKempstonMouse(bool kempstonMouse)
+{
+    safe_set(settings_current.kempston_mouse, kempstonMouse);
+}
+
+bool FuseSettings::interface1() const
+{
+    return settings_current.interface1;
+}
+
+void FuseSettings::setInterface1(bool interface1)
+{
+    safe_set(settings_current.interface1, interface1);
+}
+
+bool FuseSettings::interface2() const
+{
+    return settings_current.interface2;
+}
+
+void FuseSettings::setInterface2(bool interface2)
+{
+    safe_set(settings_current.interface2, interface2);
+}

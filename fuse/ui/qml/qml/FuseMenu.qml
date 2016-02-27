@@ -272,6 +272,14 @@ Menu {
         }
 
         MenuItem {
+            text: qsTr("Peripherals")
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "OptionsPeripheralsPage.qml";
+            }
+        }
+
+        MenuItem {
             visible: false
             text: qsTr("Media")
             onTriggered: {

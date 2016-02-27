@@ -22,6 +22,10 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool soundForce8Bit READ soundForce8Bit WRITE setSoundForce8Bit NOTIFY settingsCurrentChanged)
     Q_PROPERTY(QString AYStereoSeparation READ AYStereoSeparation WRITE setAYStereoSeparation NOTIFY settingsCurrentChanged)
     Q_PROPERTY(QString speakerType READ speakerType WRITE setSpeakerType NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool kempstonJoystick READ kempstonJoystick WRITE setKempstonJoystick NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool kempstonMouse READ kempstonMouse WRITE setKempstonMouse NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool interface1 READ interface1 WRITE setInterface1 NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool interface2 READ interface2 WRITE setInterface2 NOTIFY settingsCurrentChanged)
 
 public:
     explicit FuseSettings(QObject *parent = 0);
@@ -66,6 +70,17 @@ public:
     QString speakerType() const;
     void setSpeakerType(const QString &speakerType);
 
+    bool kempstonJoystick() const;
+    void setKempstonJoystick(bool kempstonJoystick);
+
+    bool kempstonMouse() const;
+    void setKempstonMouse(bool kempstonMouse);
+
+    bool interface1() const;
+    void setInterface1(bool interface1);
+
+    bool interface2() const;
+    void setInterface2(bool interface2);
 
 signals:
     void currentMachineChanged();

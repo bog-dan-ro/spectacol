@@ -70,5 +70,6 @@
         <file>qml/MachineTypePage.qml</file>
         <file>qml/OptionsGeneralPage.qml</file>
         <file>qml/OptionsSoundPage.qml</file>
+        <file>qml/OptionsPeripheralsPage.qml</file>
     </qresource>
 </RCC>
