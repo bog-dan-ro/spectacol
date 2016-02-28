@@ -127,7 +127,7 @@ ZXUpdateRequest::ZXUpdateRequest(ZXGamesModel *parent, const QString &identifier
                         if (workable_servers.empty())
                             return;
 
-                        auto download_url = QLatin1String("https://") + workable_servers.at(qrand() % workable_servers.size()).toString() +
+                        auto download_url = QLatin1String("http://") + workable_servers.at(qrand() % workable_servers.size()).toString() +
                                 rootObject.value(QLatin1String("dir")).toString() + QLatin1Char('/') + name;
 
                         QNetworkRequest req(download_url);
