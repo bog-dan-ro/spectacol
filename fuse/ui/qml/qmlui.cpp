@@ -22,9 +22,12 @@
 #include "disassamblemodel.h"
 
 #include <fuse.h>
+#include <settings.h>
 #include <pokefinder/pokefinder.h>
 #include <ui/uidisplay.h>
 #include <ui/widget/widget.h>
+
+#include <QAudioDeviceInfo>
 
 #include <mutex>
 #include <deque>
@@ -35,7 +38,9 @@ static std::deque<SpectrumEventFunction> s_events;
 extern "C" int ui_init( int *, char ***)
 {
     ui_mouse_present = 1;
-
+    auto audio = QAudioDeviceInfo::defaultOutputDevice();
+    if (!audio.isNull())
+        settings_current.sound_freq = audio.preferredFormat().sampleRate();
     return ui_widget_init();
 }
 

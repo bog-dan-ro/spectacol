@@ -7,6 +7,8 @@ QT += qml quick gamepad multimedia svg
 
 INCLUDEPATH += $$PWD/../../ $$PWD/../../../libspectrum
 
+DEFINES += TIMER_ALWAYS_SLEEP
+
 SOURCES += \
     ../../compat/unix/socket.c \
     ../../compat/unix/osname.c \

@@ -44,18 +44,20 @@ class FuseSettings;
 class FuseThread : public QThread
 {
 public:
+    FuseThread();
     int soundLowlevelInit(const char */*device*/, int *freqptr, int *stereoptr);
     void soundLowlevelFrame(libspectrum_signed_word *data, int len);
     void soundLowlevelEnd(void) {}
+
 protected:
     void run();
+
 private:
     QScopedPointer<QAudioOutput> m_audioOutput;
     QAudioFormat m_audioFormat;
     QPointer<QIODevice> m_audioOutputDevice;
-    std::chrono::time_point<std::chrono::high_resolution_clock> m_startFrameTime;
+    std::chrono::time_point<std::chrono::steady_clock> m_startFrameTime;
     int64_t m_uSleepTotal = 0;
-    int64_t m_sleepDelta = 500; //us
 };
 
 class FuseEmulator : public FuseObject

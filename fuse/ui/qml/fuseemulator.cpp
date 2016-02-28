@@ -59,6 +59,12 @@ extern "C" void sound_lowlevel_frame( libspectrum_signed_word *data, int len )
     g_fuseEmulator->soundLowlevelFrame(data, len);
 }
 
+FuseThread::FuseThread()
+ : QThread()
+{
+    setPriority(QThread::HighestPriority);
+}
+
 int FuseThread::soundLowlevelInit(const char *, int *freqptr, int *stereoptr)
 {
     QAudioFormat format;
@@ -78,8 +84,8 @@ int FuseThread::soundLowlevelInit(const char *, int *freqptr, int *stereoptr)
     }
 
     m_audioOutput.reset(new QAudioOutput(format));
-    m_audioOutput->setBufferSize(format.bytesForDuration(2 * 1000 * 1000)); // 2s buffer
     m_audioOutputDevice = m_audioOutput->start();
+    m_uSleepTotal = 0;
     return 0;
 }
 
@@ -89,36 +95,25 @@ void FuseThread::soundLowlevelFrame(libspectrum_signed_word *data, int len)
         std::this_thread::sleep_for(std::chrono::microseconds(m_audioFormat.durationForBytes(len * 2)));
         return;
     }
-
+    auto now = std::chrono::steady_clock::now();
     if (m_uSleepTotal) {
-        auto sleepTime = m_uSleepTotal - m_sleepDelta - std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_startFrameTime).count();
+        auto sleepTime = m_uSleepTotal - std::chrono::duration_cast<std::chrono::microseconds>(now - m_startFrameTime).count();
         if (sleepTime > 0)
             std::this_thread::sleep_for(std::chrono::microseconds(sleepTime));
-        else if (m_sleepDelta < 5000)
-            m_sleepDelta += 5; //sleep less with 5us
     }
 
-    m_startFrameTime = std::chrono::high_resolution_clock::now();
+    m_startFrameTime = now;
     m_uSleepTotal = m_audioFormat.durationForBytes(len * 2);
-    bool slept = false;
     while (len) {
         auto written = m_audioOutputDevice->write((const char *)data, len * 2);
         if (!written) {
-            if (!slept && m_sleepDelta > 10) {
-                slept = true;
-                m_sleepDelta -= 5; //sleep more with 5us
-            }
-            std::this_thread::sleep_for(std::chrono::microseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
-        ++written;
         written /= 2;
         data += written;
         len -= written;
     }
-    auto sleepTime = (m_uSleepTotal - std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_startFrameTime).count()) / 2;
-    if (sleepTime > 0)
-        std::this_thread::sleep_for(std::chrono::microseconds(sleepTime));
 }
 
 void FuseThread::run()

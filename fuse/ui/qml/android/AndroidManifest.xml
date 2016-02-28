@@ -65,6 +65,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
+    <uses-feature android:name="android.hardware.audio.low_latency" android:required="true"/>
+
 <!-- Android TV stuff -->
     <uses-feature android:name="android.software.leanback" android:required="false"/>
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>

@@ -33,8 +33,9 @@
 #include "timer.h"
 #include "ui/ui.h"
 
+#ifndef TIMER_ALWAYS_SLEEP
 static void timer_frame_callback_sound( libspectrum_dword last_tstates );
-
+#endif
 /*
  * Routines for estimating emulation speed
  */
@@ -154,13 +155,14 @@ timer_frame_callback_sound( libspectrum_dword last_tstates )
 #else                           /* #ifdef SOUND_FIFO */
 
 /* Blocking socket-style sound based timer */
+# ifndef TIMER_ALWAYS_SLEEP
 static void
 timer_frame_callback_sound( libspectrum_dword last_tstates )
 {
   event_add( last_tstates + machine_current->timings.tstates_per_frame,
              timer_event );
 }
-  
+# endif // # ifndef TIMER_ALWAYS_SLEEP
 #endif                          /* #ifdef SOUND_FIFO */
 
 static void
@@ -170,10 +172,12 @@ timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
   double current_time, difference;
   long tstates;
 
+#ifndef TIMER_ALWAYS_SLEEP
   if( sound_enabled && settings_current.sound ) {
     timer_frame_callback_sound( last_tstates );
     return;
   }
+#endif
 
   /* If we're fastloading, just schedule another check in a frame's time
      and do nothing else */
