@@ -42,19 +42,15 @@ Flickable {
                     text: qsTr("Screen filter")
                     anchors.verticalCenter: parent.verticalCenter
                 }
-                SpinBox {
-                    id: screenFilter
+                ComboBox {
                     focus: true
                     KeyNavigation.backtab: detectLoaders
                     KeyNavigation.tab: emulationSpeed
-                    KeyNavigation.right: detectLoaders
-                    KeyNavigation.left: emulationSpeed
-                    from: fuseSettings.scaleMin
-                    to: fuseSettings.scaleMax
-                    value: fuseSettings.currentScale
-                    onValueChanged: fuseSettings.currentScale = value
-                    textFromValue: function (value, locale) { if (value > 1) return value + qsTr("xBRZ"); return qsTr("none"); }
-                    valueFromText: function (text, locale) { if (text === "none") return 0; return text[0]; }
+                    KeyNavigation.left: detectLoaders
+                    KeyNavigation.right: emulationSpeed
+                    model: fuse.filtersModel
+                    currentIndex: fuse.selectedFilterIndex
+                    onCurrentIndexChanged: fuse.selectedFilterIndex = currentIndex
                 }
             }
 
@@ -68,8 +64,8 @@ Flickable {
                     id: emulationSpeed
                     KeyNavigation.backtab: screenFilter
                     KeyNavigation.tab: fastLoad
-                    KeyNavigation.right: screenFilter
-                    KeyNavigation.left: fastLoad
+                    KeyNavigation.left: screenFilter
+                    KeyNavigation.right: fastLoad
                     from: 10
                     to: 1000
                     value: fuseSettings.emulationSpeed

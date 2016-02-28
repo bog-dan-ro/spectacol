@@ -11,7 +11,6 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(int currentMachineIndex READ currentMachineIndex WRITE setCurrentMachineIndex NOTIFY currentMachineChanged)
     Q_PROPERTY(int scaleMin READ scaleMin CONSTANT)
     Q_PROPERTY(int scaleMax READ scaleMax CONSTANT)
-    Q_PROPERTY(int currentScale READ currentScale WRITE setCurrentScale NOTIFY currentScaleChanged)
     Q_PROPERTY(int emulationSpeed READ emulationSpeed WRITE setEmulationSpeed NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool fastLoad READ fastLoad WRITE setFastLoad NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool accelerateLoader READ accelerateLoader WRITE setAccelerateLoader NOTIFY settingsCurrentChanged)
@@ -37,8 +36,6 @@ public:
 
     int scaleMin() const { return 1; }
     int scaleMax() const { return 6; }
-    int currentScale() const;
-    void setCurrentScale(int scale);
 
     int emulationSpeed() const;
     void setEmulationSpeed(int speed);
@@ -84,7 +81,6 @@ public:
 
 signals:
     void currentMachineChanged();
-    void currentScaleChanged();
     void settingsCurrentChanged();
 };
 

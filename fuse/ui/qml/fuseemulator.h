@@ -68,8 +68,9 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(bool processJoysticksEvents READ processJoysticksEvents WRITE setProcessJoysticksEvents NOTIFY processJoysticksEventsChanged)
     Q_PROPERTY(int gamepadId READ gamepadId WRITE setGamepadId NOTIFY gamepadIdChanged)
     Q_PROPERTY(QUrl dataPath READ dataPath WRITE setDataPath NOTIFY dataPathChanged)
-
     Q_PROPERTY(bool saveSnapshotEnabled READ saveSnapshotEnabled NOTIFY saveSnapshotEnabledChanged)
+    Q_PROPERTY(QStringList filtersModel READ filtersModel CONSTANT)
+    Q_PROPERTY(int selectedFilterIndex READ selectedFilterIndex WRITE setSelectedFilterIndex NOTIFY selectedFilterIndexChanged)
     Q_PROPERTY(QStringList joysticksModel READ joysticksModel CONSTANT)
     Q_PROPERTY(int selectedJoysticksIndex READ selectedJoysticksIndex WRITE setSelectedJoysticksIndex NOTIFY selectedJoysticksIndexChanged)
     Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
@@ -113,6 +114,10 @@ public:
     void setDataPath(const QUrl &dataPath);
 
     bool saveSnapshotEnabled() const;
+
+    QStringList filtersModel() const;
+    int selectedFilterIndex() const;
+    void setSelectedFilterIndex(int selectedFilterIndex);
 
     QStringList joysticksModel() const;
     int selectedJoysticksIndex() const;
@@ -214,6 +219,7 @@ signals:
     void pausedChanged();
     void dataPathChanged();
     void saveSnapshotEnabledChanged();
+    void selectedFilterIndexChanged();
     void selectedJoysticksIndexChanged();
     void pokeFinderCountChanged();
     void registersChanged();
@@ -227,11 +233,13 @@ signals:
     void error(ErrorLevel level, const QString &message);
 
 private:
+    void updateScalers() const;
     void startFuseThread();
     friend class FuseTexture;
 
 private:
     QString m_loadedFileName;
+    mutable std::vector<int> m_supportedScalers;
     BreakpointsModel m_breakpointsModel;
     DisassambleModel m_disassambleModel;
     PokeFinderModel m_pokeFinderModel;

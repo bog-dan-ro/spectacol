@@ -1,5 +1,4 @@
 #include "fusesettings.h"
-#include "fusetexture.h"
 #include "qmlui.h"
 
 #include <QDebug>
@@ -68,17 +67,6 @@ void FuseSettings::setCurrentMachineIndex(int idx)
         machine_select(machine_types[idx]->machine);
         callFunction([this]{ emit currentMachineChanged(); emit settingsCurrentChanged();});
     });
-}
-
-int FuseSettings::currentScale() const
-{
-    return FuseTexture::instance()->scale();
-}
-
-void FuseSettings::setCurrentScale(int scale)
-{
-    FuseTexture::instance()->rescale(scale);
-    emit currentScaleChanged();
 }
 
 int FuseSettings::emulationSpeed() const

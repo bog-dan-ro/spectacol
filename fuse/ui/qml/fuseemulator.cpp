@@ -28,6 +28,7 @@
 #include <pokefinder/pokefinder.h>
 #include <settings.h>
 #include <snapshot.h>
+#include <ui/scaler/scaler.h>
 #include <utils.h>
 #include <z80/z80.h>
 
@@ -421,6 +422,34 @@ void FuseEmulator::setDataPath(const QUrl &dataPath)
 bool FuseEmulator::saveSnapshotEnabled() const
 {
     return !m_loadedFileName.isEmpty();
+}
+
+QStringList FuseEmulator::filtersModel() const
+{
+    updateScalers();
+    QStringList ret;
+    for (int scaller : m_supportedScalers)
+        ret.push_back(QLatin1String(scaler_name(scaler_type(scaller))));
+    return ret;
+}
+
+int FuseEmulator::selectedFilterIndex() const
+{
+    auto it = std::find(m_supportedScalers.begin(), m_supportedScalers.end(), current_scaler);
+    if (it != m_supportedScalers.end())
+        return it - m_supportedScalers.begin();
+    return -1;
+}
+
+void FuseEmulator::setSelectedFilterIndex(int selectedFilterIndex)
+{
+    const scaler_type scaler = scaler_type(m_supportedScalers[selectedFilterIndex]);
+    pokeEvent([scaler, this]{
+        scaler_select_scaler(scaler);
+        callFunction([this]{
+            emit selectedFilterIndexChanged();
+        });
+    });
 }
 
 QStringList FuseEmulator::joysticksModel() const
@@ -909,6 +938,16 @@ void FuseEmulator::debuggerCommand(const QString &command)
         debugger_command_evaluate(command.toUtf8().constData());
         m_pokeFinderModel.update();
     });
+}
+
+void FuseEmulator::updateScalers() const
+{
+    if (!m_supportedScalers.empty())
+        return;
+
+    for (int i = SCALER_HALF; i < SCALER_NUM; ++i)
+        if (scaler_is_supported(scaler_type(i)))
+            m_supportedScalers.push_back(i);
 }
 
 void FuseEmulator::startFuseThread()
