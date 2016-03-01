@@ -38,6 +38,8 @@
 
 class QAudioOutput;
 class QIODevice;
+class QKeyEvent;
+class QMouseEvent;
 class QQmlContext;
 class FuseSettings;
 
@@ -65,7 +67,7 @@ class FuseEmulator : public FuseObject
     Q_OBJECT
 
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
-    Q_PROPERTY(bool processJoysticksEvents READ processJoysticksEvents WRITE setProcessJoysticksEvents NOTIFY processJoysticksEventsChanged)
+    Q_PROPERTY(bool processInputEvents READ processInputEvents WRITE setProcessInputEvents NOTIFY processInputEventsChanged)
     Q_PROPERTY(int gamepadId READ gamepadId WRITE setGamepadId NOTIFY gamepadIdChanged)
     Q_PROPERTY(QUrl dataPath READ dataPath WRITE setDataPath NOTIFY dataPathChanged)
     Q_PROPERTY(bool saveSnapshotEnabled READ saveSnapshotEnabled NOTIFY saveSnapshotEnabledChanged)
@@ -102,7 +104,14 @@ public:
         Warning,
         Error
     };
+    enum ControlType {
+        CursorJoystick,
+        SinclairJoysticks,
+        Keyboard48K,
+        Keyboard128K
+    };
 
+    Q_ENUMS(ErrorLevel ControlType)
 public:
     explicit FuseEmulator(QQmlContext *ctxt, QObject *parent = 0);
     ~FuseEmulator();
@@ -166,8 +175,8 @@ public:
 
     int pokeFinderCount() const;
 
-    bool processJoysticksEvents() const { return m_processJoysticksEvents.load(); }
-    void setProcessJoysticksEvents(bool processJoysticksEvents);
+    bool processInputEvents() const { return m_processInputEvents.load(); }
+    void setProcessInputEvents(bool processEvents);
 
     int gamepadId() const { return m_gamepadId; }
     void setGamepadId(int gamepadId);
@@ -177,6 +186,12 @@ public:
     int soundLowlevelInit(const char */*device*/, int *freqptr, int *stereoptr);
     void soundLowlevelFrame(libspectrum_signed_word *data, int len);
     void soundLowlevelEnd(void) {}
+
+    void keyPress(QKeyEvent *event);
+    void keyRelease(QKeyEvent *event);
+    void mousePress(QMouseEvent *event);
+    void mouseMove(QMouseEvent *event);
+    void mouseRelease(QMouseEvent *event);
 
 public slots:
     QUrl snapshotsPath() const;
@@ -215,6 +230,9 @@ public slots:
 
     void pokeMemory(int address, int page, int value);
 
+    void keyPress(Qt::Key qtKey);
+    void keyRelease(Qt::Key qtKey);
+
 signals:
     void pausedChanged();
     void dataPathChanged();
@@ -227,8 +245,9 @@ signals:
     void hideDebugger();
     void showMenu();
     void hideMenu();
-    void processJoysticksEventsChanged();
+    void processInputEventsChanged();
     void gamepadIdChanged();
+    void toggleOnScreenControls(ControlType type, bool gamepadMode);
 
     void error(ErrorLevel level, const QString &message);
 
@@ -246,7 +265,7 @@ private:
     FuseThread m_fuseThread;
     std::atomic_bool m_debuggerActivated;
     bool m_resetPokeFinder;
-    std::atomic_bool m_processJoysticksEvents;
+    std::atomic_bool m_processInputEvents;
     int m_gamepadId = -1;
     ZXGamesModel m_onlineGamesModel;
     std::unique_ptr<FuseSettings> m_fuseSettings;

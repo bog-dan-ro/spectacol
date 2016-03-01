@@ -71,5 +71,16 @@
         <file>qml/OptionsGeneralPage.qml</file>
         <file>qml/OptionsSoundPage.qml</file>
         <file>qml/OptionsPeripheralsPage.qml</file>
+        <file>images/arrow-up.svg</file>
+        <file>images/arrow-right.svg</file>
+        <file>images/arrow-left.svg</file>
+        <file>images/arrow-down.svg</file>
+        <file>qml/OnScreenCursorJoystick.qml</file>
+        <file>qml/OnScreenButton.qml</file>
+        <file>images/draw-fire.svg</file>
+        <file>images/arrow-down-left.svg</file>
+        <file>images/arrow-down-right.svg</file>
+        <file>images/arrow-up-left.svg</file>
+        <file>images/arrow-up-right.svg</file>
     </qresource>
 </RCC>

@@ -23,8 +23,8 @@ import Qt.labs.controls 1.0
 
 FancyList {
     id: view
-    Component.onCompleted: fuse.processJoysticksEvents = false
-    Component.onDestruction: fuse.processJoysticksEvents = true
+    Component.onCompleted: fuse.processInputEvents = false
+    Component.onDestruction: fuse.processInputEvents = true
 
     model: fuseSettings.machinesModel
     currentIndex: fuseSettings.currentMachineIndex

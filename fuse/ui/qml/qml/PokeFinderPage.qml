@@ -30,12 +30,12 @@ Rectangle {
     color: Qt.rgba(0, 0, 0, 0.75);
 
     Component.onCompleted: {
-        fuse.processJoysticksEvents = false;
+        fuse.processInputEvents = false;
         fuse.pokeFinderResetIfNeeded();
         fuse.paused = true;
     }
     Component.onDestruction: {
-        fuse.processJoysticksEvents = true;
+        fuse.processInputEvents = true;
         fuse.paused = false
     }
 

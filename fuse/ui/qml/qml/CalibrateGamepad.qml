@@ -169,7 +169,7 @@ StandardGamepad {
 
     function configureNext()
     {
-        fuse.processJoysticksEvents = false;
+        fuse.processInputEvents = false;
         if (__buttons.length > 0) {
             var but = __buttons.shift();
             GamepadManager.configureButton(deviceId, but);
@@ -186,7 +186,7 @@ StandardGamepad {
             configureText.visible = false;
             cancelButtonText.visible = false;
             configureDone();
-            fuse.processJoysticksEvents = true;
+            fuse.processInputEvents = true;
         }
     }
 

@@ -174,7 +174,7 @@ ColumnLayout {
         id: gamepadKeyNavigation
         gamepad: Gamepad { deviceId: fuse.gamepadId }
         active: false
-        onActiveChanged: fuse.processJoysticksEvents = !active
+        onActiveChanged: fuse.processInputEvents = !active
         upKey: Qt.Key_Up
         downKey: Qt.Key_Down
         leftKey: Qt.Key_Escape

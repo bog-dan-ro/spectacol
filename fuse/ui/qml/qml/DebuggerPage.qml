@@ -24,10 +24,10 @@ import Qt.labs.controls 1.0
 import QtGamepad 1.0
 
 Item {
-    Component.onCompleted: fuse.processJoysticksEvents = false
+    Component.onCompleted: fuse.processInputEvents = false
 
     Component.onDestruction: {
-        fuse.processJoysticksEvents = true;
+        fuse.processInputEvents = true;
         fuse.debuggerRun();
     }
 

@@ -23,6 +23,7 @@
 
 #include <debugger/breakpoint.h>
 #include <fuse.h>
+#include <keyboard.h>
 #include <libspectrum.h>
 #include <machine.h>
 #include <pokefinder/pokefinder.h>
@@ -41,6 +42,8 @@
 #include <QSemaphore>
 #include <QAudioDeviceInfo>
 #include <QAudioOutput>
+#include <QKeyEvent>
+#include <QTimer>
 
 #include <mutex>
 #include <thread>
@@ -244,7 +247,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         m_gamepadId = -1;
 
     connect(gm, &QGamepadManager::gamepadAxisEvent, this, [this](int deviceId, QGamepadManager::GamepadAxis axis, double value){
-        if (!m_processJoysticksEvents || deviceId != m_gamepadId ||
+        if (!m_processInputEvents || deviceId != m_gamepadId ||
                 axis == QGamepadManager::AxisInvalid)
             return;
 
@@ -285,7 +288,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     });
 
     connect(gm, &QGamepadManager::gamepadButtonPressEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button, double value) {
-        if (!m_processJoysticksEvents.load() || value != 1)
+        if (!m_processInputEvents.load() || value != 1)
             return;
 
         if (fuse_emulation_paused && ui_widget_level == -1)
@@ -294,6 +297,8 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         switch (button) {
         case QGamepadManager::ButtonStart:
             emit showMenu();
+            return;
+        case QGamepadManager::ButtonX:
             return;
         case QGamepadManager::ButtonL2:
             quickSaveSnapshot();
@@ -318,10 +323,15 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     });
 
     connect(gm, &QGamepadManager::gamepadButtonReleaseEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button) {
-        if (!m_processJoysticksEvents.load() || deviceId != m_gamepadId ||
+        if (!m_processInputEvents.load() || deviceId != m_gamepadId ||
                 button == QGamepadManager::ButtonInvalid ||
-                button == QGamepadManager::ButtonStart)
+                button == QGamepadManager::ButtonStart ||
+                button == QGamepadManager::ButtonL2 ||
+                button == QGamepadManager::ButtonR2)
             return;
+
+        if (button == QGamepadManager::ButtonX)
+            QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(CursorJoystick, true); });
 
         if (fuse_emulation_paused && ui_widget_level == -1)
             return;
@@ -365,7 +375,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     libspectrum_mutex_set_vtable( &t );
     setDataPath(dataPath());
     m_debuggerActivated.store(false);
-    m_processJoysticksEvents.store(true);
+    m_processInputEvents.store(true);
     pokeEvent([]{
         settings_current.autosave_settings = 1;
     });
@@ -668,11 +678,11 @@ int FuseEmulator::pokeFinderCount() const
     return pokefinder_count;
 }
 
-void FuseEmulator::setProcessJoysticksEvents(bool processJoysticksEvents)
+void FuseEmulator::setProcessInputEvents(bool processEvents)
 {
-   bool expect = !processJoysticksEvents;
-   if (m_processJoysticksEvents.compare_exchange_strong(expect, processJoysticksEvents))
-       emit processJoysticksEventsChanged();
+   bool expect = !processEvents;
+   if (m_processInputEvents.compare_exchange_strong(expect, processEvents))
+       emit processInputEventsChanged();
 }
 
 void FuseEmulator::setGamepadId(int gamepadId)
@@ -703,6 +713,86 @@ void FuseEmulator::soundLowlevelFrame(libspectrum_signed_word *data, int len)
 {
     return m_fuseThread.soundLowlevelFrame(data, len);
 }
+
+void FuseEmulator::keyPress(QKeyEvent *event)
+{
+    if (!m_processInputEvents)
+        return;
+
+    event->accept();
+    if (ui_widget_level == -1 && event->isAutoRepeat())
+        return;
+
+    input_key key = keysyms_remap(event->key() + event->modifiers());
+    if (key == INPUT_KEY_NONE)
+        key = keysyms_remap(event->key());
+    if (key == INPUT_KEY_NONE)
+        return;
+
+    pokeEvent([key]{
+        input_event_t event;
+        event.type = INPUT_EVENT_KEYPRESS;
+        event.types.key.spectrum_key = key;
+        event.types.key.native_key = key;
+        input_event(&event);
+    });
+}
+
+void FuseEmulator::keyRelease(QKeyEvent *event)
+{
+    if (!m_processInputEvents)
+        return;
+
+    event->accept();
+    if (ui_widget_level == -1 && event->isAutoRepeat())
+        return;
+
+    input_key key = keysyms_remap(event->key() + event->modifiers());
+    if (key == INPUT_KEY_NONE)
+        key = keysyms_remap(event->key());
+    if (key == INPUT_KEY_NONE)
+        return;
+
+    pokeEvent([key]{
+        input_event_t event;
+        event.type = INPUT_EVENT_KEYRELEASE;
+        event.types.key.spectrum_key = key;
+        event.types.key.native_key = key;
+        input_event(&event);
+    });
+}
+
+void FuseEmulator::mousePress(QMouseEvent *event)
+{
+    if (!m_processInputEvents)
+        return;
+
+    int button = event->button();
+    pokeEvent([button]{
+        ui_mouse_button( button, 1 );
+    });
+}
+
+void FuseEmulator::mouseMove(QMouseEvent *event)
+{
+    if (!m_processInputEvents)
+        return;
+
+    Q_UNUSED(event)
+}
+
+void FuseEmulator::mouseRelease(QMouseEvent *event)
+{
+    if (!m_processInputEvents)
+        return;
+
+    int button = event->button();
+    pokeEvent([button]{
+        ui_mouse_button( button, 0 );
+    });
+}
+
+
 
 QUrl FuseEmulator::snapshotsPath() const
 {
@@ -893,6 +983,38 @@ void FuseEmulator::pokeMemory(int address, int page, int value)
         address &= 0x3fff;
         RAM[page][address] = value;
     }
+}
+
+void FuseEmulator::keyPress(Qt::Key qtKey)
+{
+    input_key key = keysyms_remap(qtKey);
+    if (key == INPUT_KEY_NONE)
+        return;
+
+    pokeEvent([key]{
+        input_event_t event;
+        event.type = INPUT_EVENT_KEYPRESS;
+        event.types.key.spectrum_key = key;
+        event.types.key.native_key = key;
+        input_event(&event);
+    });
+
+}
+
+void FuseEmulator::keyRelease(Qt::Key qtKey)
+{
+    input_key key = keysyms_remap(qtKey);
+    if (key == INPUT_KEY_NONE)
+        return;
+
+    pokeEvent([key]{
+        input_event_t event;
+        event.type = INPUT_EVENT_KEYRELEASE;
+        event.types.key.spectrum_key = key;
+        event.types.key.native_key = key;
+        input_event(&event);
+    });
+
 }
 
 void FuseEmulator::debuggerTrap()

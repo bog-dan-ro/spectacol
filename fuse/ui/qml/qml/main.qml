@@ -132,9 +132,18 @@ ApplicationWindow {
                         event.accepted = true;
                     }
                     break;
-
-                case Qt.Key_Back:
                 case Qt.Key_Escape:
+                    if (menuBar.position) {
+                        menuView.popMenu();
+                        event.accepted = true;
+                    } else {
+                        if (pageLoader.source != "") {
+                            pageLoader.source = "";
+                            event.accepted = true;
+                        }
+                    }
+                    break;
+                case Qt.Key_Back:
                     if (menuBar.position) {
                         menuView.popMenu();
                         event.accepted = true;
@@ -167,10 +176,20 @@ ApplicationWindow {
                 }
             }
 
+            OnScreenCursorJoystick {
+                id: onScreenCursorJoystick
+                visible: false
+                gamepadMode: false
+                enabled: visible
+                anchors.fill: parent
+                z: parent.z + 10
+            }
+
             Loader {
+                z: parent.z + 20
                 id: pageLoader
                 anchors.fill: parent
-                asynchronous: true
+                asynchronous: false
                 visible: status === Loader.Ready
                 focus: visible
                 enabled: visible
@@ -192,6 +211,31 @@ ApplicationWindow {
 
         onShowMenu: menuBar.open();
         onHideMenu: menuBar.close();
+        onToggleOnScreenControls: {
+            switch (type) {
+            case FuseEmulator.CursorJoystick:
+                if (onScreenCursorJoystick.visible) {
+                    onScreenCursorJoystick.visible = false;
+                    onScreenCursorJoystick.gamepadMode = false;
+                } else {
+                    onScreenCursorJoystick.visible = true;
+                    onScreenCursorJoystick.gamepadMode = gamepadMode;
+                }
+                break;
+
+            case FuseEmulator.SinclairJoysticks:
+                // TODO
+                break;
+
+            case FuseEmulator.Keyboard48K:
+                // TODO
+                break;
+
+            case FuseEmulator.Keyboard128K:
+                // TODO
+                break;
+            }
+        }
     }
 
     Component.onCompleted: {

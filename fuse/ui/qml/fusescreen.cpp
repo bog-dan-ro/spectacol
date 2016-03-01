@@ -21,6 +21,7 @@
 #include "breakpointsmodel.h"
 #include "disassamblemodel.h"
 #include "fusetexture.h"
+#include "fuseemulator.h"
 #include "qmlui.h"
 
 #include <input.h>
@@ -94,63 +95,25 @@ QSGNode *FuseScreen::updatePaintNode(QSGNode *n, QQuickItem::UpdatePaintNodeData
 
 void FuseScreen::keyPressEvent(QKeyEvent *event)
 {
-    event->accept();
-    if (ui_widget_level ==-1 && event->isAutoRepeat())
-        return;
-
-    input_key key = keysyms_remap(event->key() + event->modifiers());
-    if (key == INPUT_KEY_NONE)
-        key = keysyms_remap(event->key());
-    if (key == INPUT_KEY_NONE)
-        return;
-
-    pokeEvent([key]{
-        input_event_t event;
-        event.type = INPUT_EVENT_KEYPRESS;
-        event.types.key.spectrum_key = key;
-        event.types.key.native_key = key;
-        input_event(&event);
-    });
+    g_fuseEmulator->keyPress(event);
 }
 
 void FuseScreen::keyReleaseEvent(QKeyEvent *event)
 {
-    event->accept();
-    if (ui_widget_level ==-1 && event->isAutoRepeat())
-        return;
-
-    input_key key = keysyms_remap(event->key() + event->modifiers());
-    if (key == INPUT_KEY_NONE)
-        key = keysyms_remap(event->key());
-    if (key == INPUT_KEY_NONE)
-        return;
-
-    pokeEvent([key]{
-        input_event_t event;
-        event.type = INPUT_EVENT_KEYRELEASE;
-        event.types.key.spectrum_key = key;
-        event.types.key.native_key = key;
-        input_event(&event);
-    });
+    g_fuseEmulator->keyRelease(event);
 }
 
 void FuseScreen::mousePressEvent(QMouseEvent *event)
 {
-    int button = event->button();
-    pokeEvent([button]{
-        ui_mouse_button( button, 1 );
-    });
+    g_fuseEmulator->mousePress(event);
 }
 
 void FuseScreen::mouseMoveEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event)
+    g_fuseEmulator->mouseMove(event);
 }
 
 void FuseScreen::mouseReleaseEvent(QMouseEvent *event)
 {
-    int button = event->button();
-    pokeEvent([button]{
-        ui_mouse_button( button, 0 );
-    });
+    g_fuseEmulator->mouseRelease(event);
 }
