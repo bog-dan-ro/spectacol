@@ -127,10 +127,8 @@ ApplicationWindow {
 
                 case Qt.Key_Return:
                 case Qt.Key_Enter:
-                    if (menuBar.position) {
-                        menuView.openSelectedMenu();
+                    if (menuBar.position)
                         event.accepted = true;
-                    }
                     break;
                 case Qt.Key_Escape:
                     if (menuBar.position) {
@@ -155,6 +153,18 @@ ApplicationWindow {
                             quitDialog.open();
                             event.accepted = true;
                         }
+                    }
+                    break;
+                }
+            }
+
+            Keys.onReleased: {
+                switch (event.key) {
+                case Qt.Key_Return:
+                case Qt.Key_Enter:
+                    if (menuBar.position) {
+                        menuView.openSelectedMenu();
+                        event.accepted = true;
                     }
                     break;
                 }

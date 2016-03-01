@@ -13,6 +13,7 @@ Flickable {
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
+        buttonAKey: Qt.Key_Space
         buttonBKey: Qt.Key_Escape
         buttonYKey: Qt.Key_Tab
         buttonXKey: Qt.Key_Backtab
@@ -44,6 +45,7 @@ Flickable {
                 }
                 ComboBox {
                     focus: true
+                    id: screenFilter
                     KeyNavigation.backtab: detectLoaders
                     KeyNavigation.tab: emulationSpeed
                     KeyNavigation.left: detectLoaders

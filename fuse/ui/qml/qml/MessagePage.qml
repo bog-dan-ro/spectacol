@@ -53,17 +53,17 @@ Rectangle {
     function showMessage(level, text) {
         var msg = "";
         switch(level) {
-        case fuse.Info:
+        case FuseEmulator.Info:
             msgDialog.border.color = "white"
             msg = qsTr("<b>Info:</b> ");
             break;
 
-        case fuse.Warning:
+        case FuseEmulator.Warning:
             msgDialog.border.color = "yellow"
             msg = qsTr("<b>Warning:</b> ");
             break;
 
-        case fuse.Error:
+        case FuseEmulator.Error:
             msgDialog.border.color = "red"
             msg = qsTr("<b>Error:</b> ");
             break;
