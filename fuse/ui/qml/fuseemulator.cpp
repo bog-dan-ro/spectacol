@@ -453,6 +453,9 @@ int FuseEmulator::selectedFilterIndex() const
 
 void FuseEmulator::setSelectedFilterIndex(int selectedFilterIndex)
 {
+    if (size_t(selectedFilterIndex) >= m_supportedScalers.size())
+        return;
+
     const scaler_type scaler = scaler_type(m_supportedScalers[selectedFilterIndex]);
     pokeEvent([scaler, this]{
         scaler_select_scaler(scaler);

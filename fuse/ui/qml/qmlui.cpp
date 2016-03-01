@@ -61,9 +61,10 @@ extern "C" int ui_mouse_release( int /*suspend*/ )
 
 extern "C" int ui_error_specific( ui_error_level severity, const char *message )
 {
-    fuse_emulation_pause();
-    emit g_fuseEmulator->error(FuseEmulator::ErrorLevel(severity), QLatin1String(message));
-    fuse_emulation_unpause();
+    QString msg = QLatin1String(message);
+    g_fuseEmulator->callFunction([severity, msg]{
+        emit g_fuseEmulator->error(FuseEmulator::ErrorLevel(severity), msg);
+    });
     return 0;
 }
 
