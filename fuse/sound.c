@@ -658,7 +658,7 @@ sound_frame( void )
 }
 
 void
-sound_beeper( int on )
+sound_beeper( libspectrum_dword at_tstates, int on )
 {
   static int beeper_ampl[] = { 0, AMPL_TAPE, AMPL_BEEPER,
                                AMPL_BEEPER+AMPL_TAPE };
@@ -677,7 +677,7 @@ sound_beeper( int on )
 
   val = beeper_ampl[on];
 
-  blip_synth_update( left_beeper_synth, tstates, val );
+  blip_synth_update( left_beeper_synth, at_tstates, val );
   if( sound_stereo_ay != SOUND_STEREO_AY_NONE )
-    blip_synth_update( right_beeper_synth, tstates, val );
+    blip_synth_update( right_beeper_synth, at_tstates, val );
 }

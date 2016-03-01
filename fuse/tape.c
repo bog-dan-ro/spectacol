@@ -792,6 +792,8 @@ tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
     }
   }
 
+  sound_beeper( last_tstates, tape_microphone );
+
   /* If we've been requested to stop the tape, do so and then
      return without stacking another edge */
   if( ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ||

@@ -4979,3 +4979,6 @@
 20160111 man/fuse.1: fix spelling (Sergio).
 20160224 AUTHORS,THANKS,hacking/peripheral_tests.txt,man/fuse.1: fix broken URLs
          (Sergio).
+20160301 peripherals/ula.c,sound.[ch],tape.c: add tape data playback in tape
+         edge handling and correct time sound from tape edge starts (fixes bug
+         #330) (Fred).
