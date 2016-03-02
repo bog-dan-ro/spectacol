@@ -60,7 +60,7 @@ Item {
                 DisassembleView {
                     id: disassembleView
                     anchors.fill: parent
-                    anchors.margins: parent.border.width
+                    anchors.margins: 2 * Screen.pixelDensity
                     focus: true
                     KeyNavigation.left: breakpointsView
                     KeyNavigation.right: breakpointsView
@@ -86,7 +86,7 @@ Item {
             }
             ColumnLayout {
                 spacing: 2.5 * Screen.pixelDensity
-                width: 60 * Screen.pixelDensity
+                width: 80 * Screen.pixelDensity
                 Layout.fillWidth: false
                 Layout.fillHeight: true
                 Rectangle {
@@ -98,11 +98,8 @@ Item {
                     height: 60 * Screen.pixelDensity
                     Layout.fillWidth: true
                     RegistersView {
-                        anchors.fill: parent
-                        anchors.topMargin: parent.border.width + Screen.pixelDensity
-                        anchors.leftMargin: parent.border.width + Screen.pixelDensity
-                        anchors.rightMargin: parent.border.width + Screen.pixelDensity
-                        columnSpacing: Screen.pixelDensity
+                        anchors.centerIn: parent
+                        columnSpacing: Screen.pixelDensity * 3
                     }
                 }
                 Rectangle {
@@ -116,7 +113,7 @@ Item {
                     FocusScope {
                         id: breakpointsView
                         anchors.fill: parent
-                        anchors.margins: parent.border.width
+                        anchors.margins: 2 * Screen.pixelDensity
                         KeyNavigation.left: disassembleView
                         KeyNavigation.right: disassembleView
                         KeyNavigation.tab: commandsLine

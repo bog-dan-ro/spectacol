@@ -177,8 +177,6 @@ ColumnLayout {
         onActiveChanged: fuse.processInputEvents = !active
         upKey: Qt.Key_Up
         downKey: Qt.Key_Down
-        leftKey: Qt.Key_Escape
-        rightKey: Qt.Key_Return
         buttonAKey: Qt.Key_Return
         buttonStartKey: Qt.Key_F1
         buttonBKey: Qt.Key_Escape
