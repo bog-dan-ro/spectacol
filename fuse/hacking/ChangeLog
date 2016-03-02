@@ -4982,3 +4982,5 @@
 20160301 peripherals/ula.c,sound.[ch],tape.c: add tape data playback in tape
          edge handling and correct time sound from tape edge starts (fixes bug
          #330) (Fred).
+20160302 peripherals/ula.c: add parens to avoid gcc warning (more from bug #330)
+         (thanks, Sergio) (Fred).

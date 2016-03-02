@@ -122,7 +122,7 @@ ula_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 
   display_set_lores_border( b & 0x07 );
   sound_beeper( tstates,
-                (!!(b & 0x10) << 1) + ( !(b & 0x8) | tape_microphone ) );
+                (!!(b & 0x10) << 1) + ( (!(b & 0x8)) | tape_microphone ) );
 
   /* FIXME: shouldn't really be using the memory capabilities here */
 
