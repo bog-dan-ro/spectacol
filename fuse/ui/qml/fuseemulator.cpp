@@ -66,7 +66,6 @@ extern "C" void sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 FuseThread::FuseThread()
  : QThread()
 {
-    setPriority(QThread::HighestPriority);
 }
 
 int FuseThread::soundLowlevelInit(const char *, int *freqptr, int *stereoptr)
@@ -122,6 +121,7 @@ void FuseThread::soundLowlevelFrame(libspectrum_signed_word *data, int len)
 
 void FuseThread::run()
 {
+    setPriority(QThread::HighestPriority);
     int argc = 0;
     auto args = QCoreApplication::arguments();
     std::vector<QByteArray> argsVector(args.size());
