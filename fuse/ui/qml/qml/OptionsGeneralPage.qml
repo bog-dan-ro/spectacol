@@ -46,10 +46,21 @@ Flickable {
                 ComboBox {
                     focus: true
                     id: screenFilter
-                    KeyNavigation.backtab: detectLoaders
-                    KeyNavigation.tab: emulationSpeed
-                    KeyNavigation.left: detectLoaders
-                    KeyNavigation.right: emulationSpeed
+                    Keys.onUpPressed: {
+                        if (popup.visible)
+                            decrease();
+                        else
+                            detectLoaders.focus = true;
+                    }
+                    Keys.onDownPressed: {
+                        if (popup.visible)
+                            increase();
+                        else
+                            emulationSpeed.focus = true;
+                    }
+                    Keys.onLeftPressed: if (!popup.visible) decrease();
+                    Keys.onRightPressed: if (!popup.visible) increase();
+
                     model: fuse.filtersModel
                     currentIndex: fuse.selectedFilterIndex
                     onCurrentIndexChanged: fuse.selectedFilterIndex = currentIndex
@@ -64,10 +75,10 @@ Flickable {
                 }
                 SpinBox {
                     id: emulationSpeed
-                    KeyNavigation.backtab: screenFilter
-                    KeyNavigation.tab: fastLoad
-                    KeyNavigation.left: screenFilter
-                    KeyNavigation.right: fastLoad
+                    Keys.onUpPressed: screenFilter.focus = true
+                    Keys.onDownPressed: fastLoad.focus = true
+                    Keys.onLeftPressed: decrease()
+                    Keys.onRightPressed: increase()
                     from: 10
                     to: 1000
                     value: fuseSettings.emulationSpeed
@@ -79,8 +90,6 @@ Flickable {
                 id: fastLoad
                 KeyNavigation.up: emulationSpeed
                 KeyNavigation.down: accelerateLoader
-                KeyNavigation.backtab: emulationSpeed
-                KeyNavigation.tab: accelerateLoader
                 text: qsTr("Fast loading")
                 checked: fuseSettings.fastLoad
                 onCheckedChanged: fuseSettings.fastLoad = checked
@@ -90,8 +99,6 @@ Flickable {
                 id: accelerateLoader
                 KeyNavigation.up: fastLoad
                 KeyNavigation.down: autoLoad
-                KeyNavigation.backtab: fastLoad
-                KeyNavigation.tab: autoLoad
                 text: qsTr("Accelerate loaders")
                 checked: fuseSettings.accelerateLoader
                 onCheckedChanged: fuseSettings.accelerateLoader = checked
@@ -101,8 +108,6 @@ Flickable {
                 id: autoLoad
                 KeyNavigation.up: accelerateLoader
                 KeyNavigation.down: detectLoaders
-                KeyNavigation.backtab: accelerateLoader
-                KeyNavigation.tab: detectLoaders
                 text: qsTr("Auto load media")
                 checked: fuseSettings.autoLoad
                 onCheckedChanged: fuseSettings.autoLoad = checked
@@ -111,9 +116,7 @@ Flickable {
             CheckBox {
                 id: detectLoaders
                 KeyNavigation.up: autoLoad
-                KeyNavigation.down: emulationSpeed
-                KeyNavigation.backtab: autoLoad
-                KeyNavigation.tab: emulationSpeed
+                KeyNavigation.down: screenFilter
                 text: qsTr("Detect loaders")
                 checked: fuseSettings.detectLoaders
                 onCheckedChanged: fuseSettings.detectLoaders = checked

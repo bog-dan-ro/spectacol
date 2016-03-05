@@ -80,8 +80,20 @@ Flickable {
 
                 ComboBox {
                     id: ayStereoSeparation
-                    KeyNavigation.left: loadingSound
-                    KeyNavigation.right: speakerType
+                    Keys.onUpPressed: {
+                        if (popup.visible)
+                            decrease();
+                        else
+                            soundForce8Bit.focus = true;
+                    }
+                    Keys.onDownPressed: {
+                        if (popup.visible)
+                            increase();
+                        else
+                            speakerType.focus = true;
+                    }
+                    Keys.onLeftPressed: if (!popup.visible) decrease();
+                    Keys.onRightPressed: if (!popup.visible) increase();
                     model: ["None", "ACB", "ABC"]
                     currentIndex: getIndex(model, fuseSettings.AYStereoSeparation)
                     onCurrentTextChanged: fuseSettings.AYStereoSeparation = currentText
@@ -97,8 +109,20 @@ Flickable {
 
                 ComboBox {
                     id: speakerType
-                    KeyNavigation.left: loadingSound
-                    KeyNavigation.right: soundEnabled
+                    Keys.onUpPressed: {
+                        if (popup.visible)
+                            decrease();
+                        else
+                            ayStereoSeparation.focus = true;
+                    }
+                    Keys.onDownPressed: {
+                        if (popup.visible)
+                            increase();
+                        else
+                            soundEnabled.focus = true;
+                    }
+                    Keys.onLeftPressed: if (!popup.visible) decrease();
+                    Keys.onRightPressed: if (!popup.visible) increase();
                     model: ["TV speaker", "Beeper", "Unfiltered"]
                     currentIndex: getIndex(model, fuseSettings.speakerType)
                     onCurrentTextChanged: fuseSettings.speakerType = currentText
