@@ -42,6 +42,7 @@ extern "C" int uidisplay_init( int width, int height )
     scaler_select_bitformat( 565 );		/* 16bit always */
 
     scaler_register( SCALER_NORMAL );
+#ifndef Q_OS_ANDROID
     scaler_register( SCALER_2XSAI );
     scaler_register( SCALER_SUPER2XSAI );
     scaler_register( SCALER_SUPEREAGLE );
@@ -62,6 +63,7 @@ extern "C" int uidisplay_init( int width, int height )
       scaler_register( SCALER_PALTV3X );
       scaler_register( SCALER_HQ3X );
     }
+#endif
 
     if( scaler_is_supported( current_scaler ) ) {
       scaler_select_scaler( current_scaler );
@@ -70,11 +72,6 @@ extern "C" int uidisplay_init( int width, int height )
     }
 
     display_ui_initialised = 1;
-#ifndef ANDROID
-    pokeEvent([]{
-        scaler_select_scaler(SCALER_HQ3X);
-    });
-#endif
     s_semaphore.release();
     return 0;
 }
