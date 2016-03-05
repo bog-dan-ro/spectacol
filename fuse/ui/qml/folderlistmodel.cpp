@@ -26,8 +26,8 @@ void FolderListModel::setFolder(QString folder)
     if (!m_folder.startsWith(m_rootFolder))
         m_folder = m_rootFolder;
 
-    emit folderChanged(folder);
     updateFiles();
+    emit folderChanged(folder);
 }
 
 void FolderListModel::setRootFolder(QString rootFolder)

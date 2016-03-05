@@ -407,7 +407,7 @@ void FuseEmulator::setPaused(bool paused)
     });
 }
 
-QUrl FuseEmulator::dataPath() const
+QString FuseEmulator::dataPath() const
 {
     QSettings s;
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
@@ -415,16 +415,16 @@ QUrl FuseEmulator::dataPath() const
 #else
 # define DATA_LOCATION QStandardPaths::HomeLocation
 #endif
-    return QUrl::fromLocalFile(s.value("dataPath", QStandardPaths::writableLocation(DATA_LOCATION) + "/Spectrum/").toString());
+    return s.value("dataPath", QStandardPaths::writableLocation(DATA_LOCATION) + "/Spectrum/").toString();
 }
 
-void FuseEmulator::setDataPath(const QUrl &dataPath)
+void FuseEmulator::setDataPath(const QString &dataPath)
 {
     {
         QSettings s;
-        s.setValue("dataPath", dataPath.toLocalFile());
+        s.setValue("dataPath", dataPath);
     }
-    QDir dir(dataPath.toLocalFile());
+    QDir dir(dataPath);
     dir.mkpath("Snapshots");
     emit dataPathChanged();
 }
@@ -703,7 +703,7 @@ void FuseEmulator::setGamepadId(int gamepadId)
 
 QString FuseEmulator::saveFilePath(const QString &fileName)
 {
-    return dataPath().toLocalFile() + QLatin1String("Downloaded/") + fileName.left(1).toLower() +
+    return dataPath() + QLatin1String("/Downloaded/") + fileName.left(1).toLower() +
             QLatin1Char('/') + fileName.left(3).toLower() + QLatin1Char('/') + fileName;
 }
 
@@ -797,23 +797,23 @@ void FuseEmulator::mouseRelease(QMouseEvent *event)
 
 
 
-QUrl FuseEmulator::snapshotsPath() const
+QString FuseEmulator::snapshotsPath() const
 {
-    return QUrl::fromLocalFile(dataPath().toLocalFile() + QLatin1Literal("/Snapshots/"));
+    return dataPath() + QLatin1Literal("/Snapshots/");
 }
 
-void FuseEmulator::load(const QUrl &filePath, bool removeOnFail)
+void FuseEmulator::load(const QString &filePath, bool removeOnFail)
 {
-    m_loadedFileName = QFileInfo(filePath.toLocalFile()).baseName();
+    m_loadedFileName = QFileInfo(filePath).baseName();
     pokeEvent([this, removeOnFail, filePath]() {
         fuse_emulation_pause();
-        if (utils_open_file(filePath.path().toUtf8().constData(), settings_current.auto_load , nullptr))
+        if (utils_open_file(filePath.toUtf8().constData(), settings_current.auto_load , nullptr))
             m_loadedFileName = "";
 
         callFunction([this, filePath, removeOnFail]{
             if (m_loadedFileName.isEmpty() && removeOnFail) {
-                QFile::remove(filePath.path());
-                emit error(Warning, tr("File \"%1\" was removed").arg(filePath.path()));
+                QFile::remove(filePath);
+                emit error(Warning, tr("File \"%1\" was removed").arg(filePath));
             }
             emit saveSnapshotEnabledChanged();
         });
@@ -823,11 +823,11 @@ void FuseEmulator::load(const QUrl &filePath, bool removeOnFail)
     });
 }
 
-void FuseEmulator::save(const QUrl &filePath)
+void FuseEmulator::save(const QString &filePath)
 {
     pokeEvent([filePath]() {
         fuse_emulation_pause();
-        snapshot_write(filePath.path().toUtf8().constData());
+        snapshot_write(filePath.toUtf8().constData());
         fuse_emulation_unpause();
     });
 }
@@ -861,16 +861,16 @@ void FuseEmulator::quickSaveSnapshot()
     const QString name = m_loadedFileName +
             QDateTime::currentDateTime().toString(".yyyy-MM-dd_hh:mm:ss") +
             QLatin1Literal(".szx");
-    save(snapshotsPath().toLocalFile() + name);
+    save(snapshotsPath() + name);
     emit error(Info, tr("Snapshot saved to '%1").arg(name));
 }
 
 void FuseEmulator::quickLoadSnapshot()
 {
-    QDir dir(snapshotsPath().toLocalFile());
+    QDir dir(snapshotsPath());
     const auto &list = dir.entryInfoList(QDir::Files, QDir::Time);
     if (list.size()) {
-        load(QUrl::fromLocalFile(list.first().filePath()), true);
+        load(list.first().filePath(), true);
         emit error(Info, tr("Snapshot loaded from '%1").arg(list.first().fileName()));
     }
 }

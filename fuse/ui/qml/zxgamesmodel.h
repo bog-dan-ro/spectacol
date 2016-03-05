@@ -54,7 +54,7 @@ public:
 
 public slots:
     void search(const QString &title = QString(), const QString &firstTitle = QString());
-    QUrl getPath(int index);
+    QString getPath(int index);
 
 private:
     void abortAll();

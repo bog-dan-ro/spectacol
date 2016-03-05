@@ -39,7 +39,7 @@ QVariant ZXGamesModel::data(const QModelIndex &index, int role) const
     case Title:
         return m_data[index.row()].title;
     case Path:
-        return QUrl::fromLocalFile(path());
+        return path();
     case ScreenFile:
         return path();
     }
@@ -124,12 +124,12 @@ void ZXGamesModel::search(const QString &title, const QString &firstTitle)
     m_pendingRequests.insert(new ZXSearchRequest(this));
 }
 
-QUrl ZXGamesModel::getPath(int index)
+QString ZXGamesModel::getPath(int index)
 {
     if (size_t(index) >= m_data.size())
-        return QUrl();
+        return QString();
 
-    return QUrl::fromLocalFile(m_data[index].path);
+    return m_data[index].path;
 }
 
 void ZXGamesModel::abortAll()

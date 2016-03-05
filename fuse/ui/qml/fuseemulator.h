@@ -69,7 +69,7 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
     Q_PROPERTY(bool processInputEvents READ processInputEvents WRITE setProcessInputEvents NOTIFY processInputEventsChanged)
     Q_PROPERTY(int gamepadId READ gamepadId WRITE setGamepadId NOTIFY gamepadIdChanged)
-    Q_PROPERTY(QUrl dataPath READ dataPath WRITE setDataPath NOTIFY dataPathChanged)
+    Q_PROPERTY(QString dataPath READ dataPath WRITE setDataPath NOTIFY dataPathChanged)
     Q_PROPERTY(bool saveSnapshotEnabled READ saveSnapshotEnabled NOTIFY saveSnapshotEnabledChanged)
     Q_PROPERTY(QStringList filtersModel READ filtersModel CONSTANT)
     Q_PROPERTY(int selectedFilterIndex READ selectedFilterIndex WRITE setSelectedFilterIndex NOTIFY selectedFilterIndexChanged)
@@ -119,8 +119,8 @@ public:
     bool paused() const;
     void setPaused(bool paused);
 
-    QUrl dataPath() const;
-    void setDataPath(const QUrl &dataPath);
+    QString dataPath() const;
+    void setDataPath(const QString &dataPath);
 
     bool saveSnapshotEnabled() const;
 
@@ -194,9 +194,9 @@ public:
     void mouseRelease(QMouseEvent *event);
 
 public slots:
-    QUrl snapshotsPath() const;
-    void load(const QUrl &filePath, bool removeOnFail = false);
-    void save(const QUrl &filePath);
+    QString snapshotsPath() const;
+    void load(const QString &filePath, bool removeOnFail = false);
+    void save(const QString &filePath);
     void reset();
     void hardReset();
     void nmi();
