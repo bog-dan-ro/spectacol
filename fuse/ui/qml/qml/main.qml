@@ -65,10 +65,13 @@ ApplicationWindow {
             if (position == 1) {
                 pageLoader.source = "";
                 menuView.useGamepad = true;
+                fuse.paused = true;
             }
 
-            if (position == 0)
+            if (position == 0) {
                 menuView.useGamepad = false;
+                fuse.paused = false;
+            }
         }
         onClicked: close()
     }

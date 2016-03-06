@@ -86,7 +86,7 @@ Item {
             }
             ColumnLayout {
                 spacing: 2.5 * Screen.pixelDensity
-                width: 80 * Screen.pixelDensity
+                width: 90 * Screen.pixelDensity
                 Layout.fillWidth: false
                 Layout.fillHeight: true
                 Rectangle {
