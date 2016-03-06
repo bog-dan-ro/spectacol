@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<manifest package="eu.licentia.games.yasefa" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.0" android:versionCode="1" android:installLocation="auto">
-    <application android:banner="@drawable/banner" android:logo="@drawable/banner" android:icon="@drawable/icon" android:isGame="true" android:theme="@android:style/Theme.DeviceDefault.NoActionBar" android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="-- %%INSERT_APP_NAME%% --">
-        <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="-- %%INSERT_APP_NAME%% --" android:screenOrientation="landscape" android:launchMode="singleTop">
+<manifest package="eu.licentia.games.spectacol" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.0" android:versionCode="1" android:installLocation="auto">
+    <application android:banner="@drawable/banner" android:logo="@drawable/banner" android:icon="@drawable/icon" android:isGame="true" android:theme="@android:style/Theme.DeviceDefault.NoActionBar" android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="Spectacol">
+        <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="Spectacol" android:screenOrientation="landscape" android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -9,7 +9,7 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
 <!-- Android TV stuff -->
             </intent-filter>
-            <meta-data android:name="android.app.lib_name" android:value="-- %%INSERT_APP_LIB_NAME%% --"/>
+            <meta-data android:name="android.app.lib_name" android:value="fuse-qml"/>
             <meta-data android:name="android.app.qt_sources_resource_id" android:resource="@array/qt_sources"/>
             <meta-data android:name="android.app.repository" android:value="default"/>
             <meta-data android:name="android.app.qt_libs_resource_id" android:resource="@array/qt_libs"/>
@@ -31,7 +31,7 @@
             <!--  Messages maps -->
 
             <!-- Splash screen -->
-            <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/logo"/>
+            <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/banner"/>
             <meta-data android:name="android.app.splash_screen_sticky" android:value="true"/>
             <!-- Splash screen -->
 
@@ -70,7 +70,7 @@
 <!-- Android TV stuff -->
     <uses-feature android:name="android.software.leanback" android:required="false"/>
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
-    <uses-feature android:name="android.hardware.gamepad" android:required="false"/>
+    <uses-feature android:name="android.hardware.gamepad" android:required="true"/>
 <!-- Android TV stuff -->
 
 </manifest>

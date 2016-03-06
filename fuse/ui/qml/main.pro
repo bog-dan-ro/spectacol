@@ -5,6 +5,8 @@ CONFIG += c++11
 
 QT += qml quick gamepad multimedia svg
 
+android: QT += androidextras
+
 INCLUDEPATH += $$PWD/../../ $$PWD/../../../libspectrum
 
 DEFINES += TIMER_ALWAYS_SLEEP

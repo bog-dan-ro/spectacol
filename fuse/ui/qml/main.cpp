@@ -23,7 +23,9 @@
 
 #include <QQmlApplicationEngine>
 #include <QGuiApplication>
-
+#ifdef Q_OS_ANDROID
+# include <QtAndroid>
+#endif
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -41,6 +43,8 @@ int main(int argc, char *argv[])
     FuseEmulator fuse(engine.rootContext());
     engine.addImageProvider("spectrum", new SpectrumScreenImageProvider);
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
-
+#ifdef Q_OS_ANDROID
+    QtAndroid::hideSplashScreen();
+#endif
     return app.exec();
 }
