@@ -363,6 +363,7 @@ Menu {
     }
 
     MenuItem {
+        visible: false
         text: "About .."
         onTriggered: {
             menuBar.close();

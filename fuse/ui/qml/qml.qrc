@@ -82,5 +82,6 @@
         <file>images/arrow-down-right.svg</file>
         <file>images/arrow-up-left.svg</file>
         <file>images/arrow-up-right.svg</file>
+        <file>qml/AboutPage.qml</file>
     </qresource>
 </RCC>
