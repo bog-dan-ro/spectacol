@@ -43,8 +43,10 @@ ListView {
             function toggleEdit()
             {
                 asmEdit.readOnly = !asmEdit.readOnly;
-                if (asmEdit.readOnly)
+                if (asmEdit.readOnly) {
+                    asmEdit.focus = false;
                     return false;
+                }
 
                 asmEdit.readOnly = false;
                 asmEdit.selectAll();
@@ -57,7 +59,7 @@ ListView {
             property color ink: view.currentIndex !== index ? foreground : selectedForeground
 
             width: view.width
-            height: 8 * Screen.pixelDensity
+            height: 10 * Screen.pixelDensity
             color: paper
             MouseArea {
                 anchors.fill: parent
@@ -112,7 +114,11 @@ ListView {
                         assembler.write(text, model.address, model.bytes)
                         disassambleModel.update();
                         validator = null;
+                        if (!readOnly)
+                            toggleEdit();
                     }
+                    Keys.onReturnPressed: toggleEdit()
+                    Keys.onEnterPressed: toggleEdit()
 
                     MouseArea {
                         anchors.fill: parent
