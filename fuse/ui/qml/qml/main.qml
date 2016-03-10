@@ -198,6 +198,15 @@ ApplicationWindow {
                 z: parent.z + 10
             }
 
+            OnScreen48Keyboard {
+                id: onScreen48Keyboard
+                visible: false
+                gamepadMode: false
+                enabled: visible
+                anchors.fill: parent
+                z: parent.z + 11
+            }
+
             Loader {
                 z: parent.z + 20
                 id: pageLoader
@@ -236,16 +245,14 @@ ApplicationWindow {
                 }
                 break;
 
-            case FuseEmulator.SinclairJoysticks:
-                // TODO
-                break;
-
             case FuseEmulator.Keyboard48K:
-                // TODO
-                break;
-
-            case FuseEmulator.Keyboard128K:
-                // TODO
+                if (onScreen48Keyboard.visible) {
+                    onScreen48Keyboard.visible = false;
+                    onScreen48Keyboard.gamepadMode = false;
+                } else {
+                    onScreen48Keyboard.visible = true;
+                    onScreen48Keyboard.gamepadMode = gamepadMode;
+                }
                 break;
             }
         }
@@ -268,6 +275,8 @@ ApplicationWindow {
                     fuse.gamepadId = GamepadManager.connectedGamepads[0];
                     pageLoader.source = "CalibrateGamepad.qml";
                 }
+            } else {
+                onScreen48Keyboard.visible = true;
             }
         }
     }

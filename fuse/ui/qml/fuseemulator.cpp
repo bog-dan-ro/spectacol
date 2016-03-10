@@ -319,6 +319,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             emit showMenu();
             return;
         case QGamepadManager::ButtonX:
+        case QGamepadManager::ButtonY:
             return;
         case QGamepadManager::ButtonL2:
             quickSaveSnapshot();
@@ -352,6 +353,10 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
 
         if (button == QGamepadManager::ButtonX)
             QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(CursorJoystick, true); });
+
+        if (button == QGamepadManager::ButtonY)
+            QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(Keyboard48K, true); });
+
 
         if (fuse_emulation_paused && ui_widget_level == -1)
             return;

@@ -29,9 +29,9 @@
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-    app.setOrganizationName("Fuse Emulator");
+    app.setOrganizationName("Licentia");
     app.setOrganizationDomain("licentia.eu");
-    app.setApplicationName("Fuse Emulator");
+    app.setApplicationName("Spectacol");
 
     qmlRegisterType<FuseScreen>("Fuse", 1, 0, "FuseScreen");
     qmlRegisterType<Z80Assembler>("Fuse", 1, 0, "Z80Assembler");

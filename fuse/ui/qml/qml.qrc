@@ -83,5 +83,7 @@
         <file>images/arrow-up-left.svg</file>
         <file>images/arrow-up-right.svg</file>
         <file>qml/AboutPage.qml</file>
+        <file>images/gamepad.png</file>
+        <file>qml/OnScreen48Keyboard.qml</file>
     </qresource>
 </RCC>

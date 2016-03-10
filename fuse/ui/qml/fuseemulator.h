@@ -106,9 +106,7 @@ public:
     };
     enum ControlType {
         CursorJoystick,
-        SinclairJoysticks,
-        Keyboard48K,
-        Keyboard128K
+        Keyboard48K
     };
 
     Q_ENUMS(ErrorLevel ControlType)

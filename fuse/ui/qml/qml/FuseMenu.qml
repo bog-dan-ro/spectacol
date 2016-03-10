@@ -289,7 +289,7 @@ Menu {
         }
 
         MenuItem {
-            visible: false
+            visible: fuse.gamepadId != -1
             text: "Calibrate Gamepad"
             onTriggered: {
                 menuBar.close();
