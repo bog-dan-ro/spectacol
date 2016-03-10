@@ -1,7 +1,7 @@
 #include "fusesettings.h"
 #include "qmlui.h"
 
-#include <QDebug>
+#include <QSettings>
 
 #include <machine.h>
 #include <settings.h>
@@ -20,7 +20,7 @@
         if (QLatin1String(S) == V) \
             return; \
         free(S); \
-        S = strdup(V.toLatin1().constData()); qDebug() << S; \
+        S = strdup(V.toLatin1().constData()); \
         callFunction([this]{ emit settingsCurrentChanged(); }); \
     });
 
@@ -207,4 +207,19 @@ bool FuseSettings::interface2() const
 void FuseSettings::setInterface2(bool interface2)
 {
     safe_set(settings_current.interface2, interface2);
+}
+
+bool FuseSettings::full48kOSK() const
+{
+    QSettings s;
+    s.beginGroup(QLatin1String("Peripherals"));
+    return s.value("full48kOSK", true).toBool();
+}
+
+void FuseSettings::setFull48kOSK(bool full48kOSK)
+{
+    QSettings s;
+    s.beginGroup(QLatin1String("Peripherals"));
+    s.setValue("full48kOSK", full48kOSK);
+    emit settingsCurrentChanged();
 }

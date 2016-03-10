@@ -201,7 +201,6 @@ ApplicationWindow {
             OnScreen48Keyboard {
                 id: onScreen48Keyboard
                 visible: false
-                gamepadMode: false
                 enabled: visible
                 anchors.fill: parent
                 z: parent.z + 11
@@ -246,13 +245,7 @@ ApplicationWindow {
                 break;
 
             case FuseEmulator.Keyboard48K:
-                if (onScreen48Keyboard.visible) {
-                    onScreen48Keyboard.visible = false;
-                    onScreen48Keyboard.gamepadMode = false;
-                } else {
-                    onScreen48Keyboard.visible = true;
-                    onScreen48Keyboard.gamepadMode = gamepadMode;
-                }
+                onScreen48Keyboard.visible = !onScreen48Keyboard.visible
                 break;
             }
         }

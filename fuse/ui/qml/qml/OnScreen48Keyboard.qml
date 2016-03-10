@@ -23,8 +23,6 @@ import QtGamepad 1.0
 Item {
     id: onScreenKeyboard
 
-    property alias gamepadMode: gamepad.active
-
     anchors.topMargin: Screen.pixelDensity * 20
     anchors.leftMargin: Screen.pixelDensity * 2
     anchors.rightMargin: Screen.pixelDensity * 2
@@ -42,7 +40,6 @@ Item {
     Keys.onReleased: {
         if (event.key === Qt.Key_Y) {
             event.accept = true;
-            onScreenKeyboard.gamepadMode = false;
             onScreenKeyboard.visible = false;
         } else if (event.key === Qt.Key_Return) {
             event.accept = true;
@@ -95,6 +92,7 @@ Item {
     GamepadKeyNavigation {
         id: gamepad
         gamepad: Gamepad { deviceId: fuse.gamepadId }
+        active: onScreenKeyboard.visible
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_unknown
         buttonXKey: Qt.Key_unknown
@@ -187,12 +185,12 @@ Item {
                 anchors.fill: parent
                 anchors.leftMargin: parent.radius
                 anchors.rightMargin: parent.radius
-                anchors.topMargin: keyword ? parent.height / 4 : parent.radius
+                anchors.topMargin: fuseSettings.full48kOSK && keyword ? parent.height / 4 : parent.radius
                 font.family: 'Monospace'
                 font.bold: true
                 font.pixelSize: parent.height / 4
-                horizontalAlignment: keyword ? Text.AlignLeft : Text.AlignHCenter
-                verticalAlignment: keyword ? Text.AlignTop : Text.AlignVCenter
+                horizontalAlignment: fuseSettings.full48kOSK && keyword ? Text.AlignLeft : Text.AlignHCenter
+                verticalAlignment: fuseSettings.full48kOSK && keyword ? Text.AlignTop : Text.AlignVCenter
                 style: Text.Outline
                 styleColor: "black"
                 color: !keyword && buttonColor ? buttonColor : "white"
@@ -202,6 +200,7 @@ Item {
             }
 
             Text {
+                visible: fuseSettings.full48kOSK
                 anchors.left: parent.left
                 anchors.margins: parent.radius
                 style: Text.Outline
@@ -214,6 +213,7 @@ Item {
             }
 
             Text {
+                visible: fuseSettings.full48kOSK
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.rightMargin: parent.radius
@@ -228,6 +228,7 @@ Item {
             }
 
             Text {
+                visible: fuseSettings.full48kOSK
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.topMargin: parent.height / 6 * 3
@@ -241,6 +242,7 @@ Item {
             }
 
             Text {
+                visible: fuseSettings.full48kOSK
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.leftMargin: parent.radius

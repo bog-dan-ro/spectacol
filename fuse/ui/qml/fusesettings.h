@@ -9,6 +9,8 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(QStringList machinesModel READ machinesModel CONSTANT)
     Q_PROPERTY(QString currentMachine READ currentMachine NOTIFY currentMachineChanged)
     Q_PROPERTY(int currentMachineIndex READ currentMachineIndex WRITE setCurrentMachineIndex NOTIFY currentMachineChanged)
+
+    // General Options
     Q_PROPERTY(int scaleMin READ scaleMin CONSTANT)
     Q_PROPERTY(int scaleMax READ scaleMax CONSTANT)
     Q_PROPERTY(int emulationSpeed READ emulationSpeed WRITE setEmulationSpeed NOTIFY settingsCurrentChanged)
@@ -16,15 +18,22 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool accelerateLoader READ accelerateLoader WRITE setAccelerateLoader NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool autoLoad READ autoLoad WRITE setAutoLoad NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool detectLoaders READ detectLoaders WRITE setDetectLoaders NOTIFY settingsCurrentChanged)
+
+
+    // Sound Options
     Q_PROPERTY(bool soundEnabled READ soundEnabled WRITE setSoundEnabled NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool loadingSound READ loadingSound WRITE setLoadingSound NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool soundForce8Bit READ soundForce8Bit WRITE setSoundForce8Bit NOTIFY settingsCurrentChanged)
     Q_PROPERTY(QString AYStereoSeparation READ AYStereoSeparation WRITE setAYStereoSeparation NOTIFY settingsCurrentChanged)
     Q_PROPERTY(QString speakerType READ speakerType WRITE setSpeakerType NOTIFY settingsCurrentChanged)
+
+
+    // Peripherals Options
     Q_PROPERTY(bool kempstonJoystick READ kempstonJoystick WRITE setKempstonJoystick NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool kempstonMouse READ kempstonMouse WRITE setKempstonMouse NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool interface1 READ interface1 WRITE setInterface1 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool interface2 READ interface2 WRITE setInterface2 NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool full48kOSK READ full48kOSK WRITE setFull48kOSK NOTIFY settingsCurrentChanged)
 
 public:
     explicit FuseSettings(QObject *parent = 0);
@@ -78,6 +87,9 @@ public:
 
     bool interface2() const;
     void setInterface2(bool interface2);
+
+    bool full48kOSK() const;
+    void setFull48kOSK(bool full48kOSK);
 
 signals:
     void currentMachineChanged();
