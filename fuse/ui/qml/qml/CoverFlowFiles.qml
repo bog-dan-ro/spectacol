@@ -39,6 +39,7 @@ Item
 
     FolderListModel {
         id: filesModel
+        rootFolder: fuse.dataPath
         onFolderChanged: filesView.currentIndex = 0
     }
 

@@ -85,5 +85,7 @@
         <file>qml/AboutPage.qml</file>
         <file>images/gamepad.png</file>
         <file>qml/OnScreen48Keyboard.qml</file>
+        <file>images/controller-icon.svg</file>
+        <file>images/keyboard-icon.svg</file>
     </qresource>
 </RCC>

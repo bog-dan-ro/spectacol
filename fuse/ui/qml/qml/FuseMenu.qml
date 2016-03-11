@@ -134,13 +134,13 @@ Menu {
     }
 
 
-    MenuItem {
-        text: "Joystick type"
-        onTriggered: {
-            menuBar.close();
-            pageLoader.source = "Joysticks.qml";
+        MenuItem {
+            text: "Joystick type"
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "Joysticks.qml";
+            }
         }
-    }
 
     Menu {
         visible: false
@@ -361,15 +361,26 @@ Menu {
             }
         }
     }
+    Menu {
+        title: qsTr("Help")
 
-    MenuItem {
-        visible: false
-        text: "About .."
-        onTriggered: {
-            menuBar.close();
-            pageLoader.source = "AboutPage.qml";
+        MenuItem {
+            text: "About .."
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "AboutPage.qml";
+            }
+        }
+
+        MenuItem {
+            text: "Features and bugs"
+            onTriggered:  {
+                menuBar.close();
+                Qt.openUrlExternally("https://github.com/bog-dan-ro/spectacol/issues");
+            }
         }
     }
+
 
     MenuItem {
         text: "Quit"

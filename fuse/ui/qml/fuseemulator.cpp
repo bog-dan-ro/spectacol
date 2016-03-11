@@ -261,6 +261,14 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         QSettings s;
         m_gamepadId = s.value("gamepadId", -1).toInt();
         emit gamepadIdChanged();
+        if (s.value("first_start", true).toBool()) {
+            pokeEvent([this] {
+                callFunction([this] {
+                    emit showWelcome();
+                });
+            });
+        }
+        s.setValue("first_start", false);
     }
 
     if (!gm->connectedGamepads().contains(m_gamepadId))

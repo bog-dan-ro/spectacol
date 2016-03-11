@@ -189,6 +189,30 @@ ApplicationWindow {
                 }
             }
 
+            Row {
+                visible: GamepadManager.connectedGamepads.length < 1
+                anchors.top: parent.top
+                anchors.right: parent.right
+                Image {
+                    height: Screen.pixelDensity * 10
+                    width: Screen.pixelDensity * 15
+                    source: "qrc:///images/keyboard-icon.svg"
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: toggleOnScreenControls(FuseEmulator.Keyboard48K, false);
+                    }
+                }
+                Image {
+                    height: Screen.pixelDensity * 10
+                    width: Screen.pixelDensity * 13
+                    source: "qrc:///images/controller-icon.svg"
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: toggleOnScreenControls(FuseEmulator.CursorJoystick, false);
+                    }
+                }
+            }
+
             OnScreenCursorJoystick {
                 id: onScreenCursorJoystick
                 visible: false
@@ -210,7 +234,6 @@ ApplicationWindow {
                 z: parent.z + 20
                 id: pageLoader
                 anchors.fill: parent
-                asynchronous: false
                 visible: status === Loader.Ready
                 focus: visible
                 enabled: visible
@@ -223,6 +246,25 @@ ApplicationWindow {
         }
     }
 
+    function toggleOnScreenControls(type, gamepadMode) {
+        switch (type) {
+        case FuseEmulator.CursorJoystick:
+            if (onScreenCursorJoystick.visible) {
+                onScreenCursorJoystick.visible = false;
+                onScreenCursorJoystick.gamepadMode = false;
+            } else {
+                onScreenCursorJoystick.visible = true;
+                onScreenCursorJoystick.gamepadMode = gamepadMode;
+            }
+            break;
+
+        case FuseEmulator.Keyboard48K:
+            onScreen48Keyboard.visible = !onScreen48Keyboard.visible
+            break;
+        }
+
+    }
+
     Connections {
         target: fuse
         onError: messagePage.showMessage(level, message);
@@ -232,23 +274,8 @@ ApplicationWindow {
 
         onShowMenu: menuBar.open();
         onHideMenu: menuBar.close();
-        onToggleOnScreenControls: {
-            switch (type) {
-            case FuseEmulator.CursorJoystick:
-                if (onScreenCursorJoystick.visible) {
-                    onScreenCursorJoystick.visible = false;
-                    onScreenCursorJoystick.gamepadMode = false;
-                } else {
-                    onScreenCursorJoystick.visible = true;
-                    onScreenCursorJoystick.gamepadMode = gamepadMode;
-                }
-                break;
-
-            case FuseEmulator.Keyboard48K:
-                onScreen48Keyboard.visible = !onScreen48Keyboard.visible
-                break;
-            }
-        }
+        onToggleOnScreenControls: toggleOnScreenControls(type, gamepadMode)
+        onShowWelcome: pageLoader.source = "AboutPage.qml";
     }
 
     Component.onCompleted: {
@@ -269,7 +296,7 @@ ApplicationWindow {
                     pageLoader.source = "CalibrateGamepad.qml";
                 }
             } else {
-                onScreen48Keyboard.visible = true;
+                messagePage.showMessage(FuseEmulator.Info, qsTr("No gamepad was found, please connect a gamepad"));
             }
         }
     }

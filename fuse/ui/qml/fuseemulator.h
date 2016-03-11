@@ -239,6 +239,7 @@ signals:
     void selectedJoysticksIndexChanged();
     void pokeFinderCountChanged();
     void registersChanged();
+    void showWelcome();
     void showDebugger();
     void hideDebugger();
     void showMenu();

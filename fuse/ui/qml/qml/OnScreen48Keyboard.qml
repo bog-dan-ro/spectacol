@@ -22,6 +22,7 @@ import QtGamepad 1.0
 
 Item {
     id: onScreenKeyboard
+    enabled: visible
 
     anchors.topMargin: Screen.pixelDensity * 20
     anchors.leftMargin: Screen.pixelDensity * 2
