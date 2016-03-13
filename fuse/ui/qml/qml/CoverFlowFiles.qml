@@ -128,8 +128,9 @@ Item
             top : parent.top
             topMargin : 25
         }
+        property bool root: filesModel.rootFolder == filesModel.folder
         font.pointSize: 25 * mainScreen.dpiMultiplier
-        text : filesModel.folder
+        text : filesModel.folder + (root ? " X" : "  \u2191")
         style: Text.Outline
         styleColor: "#66ff2200"
         color : "white"
@@ -142,7 +143,12 @@ Item
         verticalAlignment: Text.AlignVCenter
         MouseArea {
             anchors.fill: parent
-            onClicked: filesModel.cdUp()
+            onClicked: {
+                if (artist_text_label.root)
+                    pageLoader.source = "";
+                else
+                    filesModel.cdUp();
+            }
         }
     }
 
