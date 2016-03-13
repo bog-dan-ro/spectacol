@@ -69,10 +69,11 @@ Rectangle {
             clip: true
             focus: true
             currentIndex: 0
-            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
             Layout.fillHeight: true
             cellWidth: 320 + 4 * Screen.pixelDensity
-            cellHeight: 320 + 4 * Screen.pixelDensity
+            cellHeight: cellWidth
+            Layout.preferredWidth: Math.floor(parent.width / Math.ceil(cellWidth)) * Math.ceil(cellWidth)
             populate: Transition {
                 NumberAnimation { properties: "x,y"; duration: 200 }
             }
@@ -116,7 +117,13 @@ Rectangle {
                 }
             }
         }
+        Button {
+            Layout.alignment: Qt.AlignHCenter
+            text: qsTr("Close (B)")
+            onClicked: pageLoader.source = ""
+        }
     }
+
     Component.onCompleted: {
         onlineGamesModel.search();
         fuse.paused = true;
