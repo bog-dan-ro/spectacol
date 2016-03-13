@@ -20,20 +20,38 @@ import QtQuick.Window 2.2
 import Fuse 1.0
 
 Rectangle {
+    id: button
     property variant buttons
     property alias imageSource: image.source
     property alias imageWidth: image.sourceSize.width
     property alias imageHeight: image.sourceSize.height
     property alias text: buttonText.text
     property alias animationRunning: animation.running
+    property bool pressed1: false
+    property bool pressed2: false
 
     width: imageWidth + Screen.pixelDensity * 2
     height: imageHeight + Screen.pixelDensity * 2
     radius: Screen.pixelDensity * 2
     color: "transparent"
+    border.color: "gray"
+
+    function pressReleaseButtons(press) {
+        if (buttons) {
+            for (var i = 0; i < buttons.length ; ++i)
+                if (press)
+                    fuse.keyPress(buttons[i]);
+                else
+                    fuse.keyRelease(buttons[i]);
+        }
+    }
+
+    onPressed1Changed: pressReleaseButtons(pressed1)
+    onPressed2Changed: pressReleaseButtons(pressed2)
+
     SequentialAnimation on color {
         id: animation
-        running: false
+        running: button.focus || pressed1 || pressed2
         alwaysRunToEnd: true
         loops: Animation.Infinite
         ColorAnimation { from: "transparent"; to: "#009688"; duration: 500 }
@@ -50,23 +68,6 @@ Rectangle {
     FancyText {
         id: buttonText
         anchors.centerIn: parent
-    }
-    MouseArea {
-        anchors.fill: parent
-        onPressed: {
-            animation.running = true;
-            if (buttons) {
-                for (var i = 0; i < buttons.length ; ++i)
-                    fuse.keyPress(buttons[i]);
-            }
-        }
-        onReleased: {
-            animation.running = parent.focus;
-            if (buttons) {
-                for (var i = 0; i < buttons.length ; ++i)
-                    fuse.keyRelease(buttons[i]);
-            }
-        }
     }
     Keys.onPressed: {
         if (event.key === Qt.Key_Return && buttons) {
