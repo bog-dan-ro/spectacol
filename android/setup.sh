@@ -24,7 +24,7 @@ do
     "n")
       NDK="$OPTARG"
       ;;
-    "n")
+    "p")
       PLATFORM="$OPTARG"
       ;;
     "?")
