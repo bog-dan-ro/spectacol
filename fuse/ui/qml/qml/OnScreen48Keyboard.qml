@@ -154,12 +154,21 @@ Item {
     Component {
         id: highlight
         Rectangle {
+            id: rect
+            visible: fuse.gamepadId != -1
             width: grid.cellWidth; height: grid.cellHeight
-            color: "blue"
             x: grid.currentItem.x
             y: grid.currentItem.y
             Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
             Behavior on y { SpringAnimation { spring: 3; damping: 0.2 } }
+            SequentialAnimation on color {
+                id: animation
+                running: rect.visible
+                loops: Animation.Infinite
+                ColorAnimation { from: "blue"; to: "magenta"; duration: 500 }
+                ColorAnimation { from: "magenta"; to: "blue"; duration: 500 }
+            }
+
         }
     }
 
@@ -172,9 +181,11 @@ Item {
         cellHeight: cellWidth
         model: zx48Keyboard
         currentIndex: 24
+        interactive: false
 
         delegate: Rectangle {
             id: rec
+            property bool pressed: true
             width: grid.cellWidth - 2 * Screen.pixelDensity
             height: width
             radius: Screen.pixelDensity * 2
@@ -256,35 +267,11 @@ Item {
                 font.pixelSize: parent.height / 6
                 text: extred ? extred : ""
             }
-            MouseArea {
+
+            MultiPointTouchArea {
                 anchors.fill: parent
-                onPressed: {
-                    switch (code) {
-                    case Qt.Key_Control:
-                        capsPressed = true;
-                        break;
-                    case Qt.Key_Shift:
-                        symbolPressed = true;
-                        break;
-                    default:
-                        grid.currentIndex = index;
-                        break;
-                    }
-                    fuse.keyPress(code);
-                }
-                onReleased: {
-                    switch (code) {
-                    case Qt.Key_Control:
-                        capsPressed = false;
-                        break;
-                    case Qt.Key_Shift:
-                        symbolPressed = false;
-                        break;
-                    default:
-                        grid.currentIndex = index;
-                        break;
-                    }
-                    fuse.keyRelease(code);
+                touchPoints: TouchPoint {
+                    onPressedChanged: pressed ? fuse.keyPress(code) : fuse.keyRelease(code)
                 }
             }
         }
