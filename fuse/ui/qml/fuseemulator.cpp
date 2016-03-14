@@ -444,11 +444,11 @@ QString FuseEmulator::dataPath() const
 {
     QSettings s;
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-# define DATA_LOCATION QStandardPaths::GenericDataLocation
+# define DATA_LOCATION QStandardPaths::DataLocation
 #else
 # define DATA_LOCATION QStandardPaths::HomeLocation
 #endif
-    return s.value("dataPath", QStandardPaths::writableLocation(DATA_LOCATION) + "/Spectrum/").toString();
+    return s.value("dataPath", QStandardPaths::standardLocations(DATA_LOCATION).last() + QLatin1String("/Spectrum/")).toString();
 }
 
 void FuseEmulator::setDataPath(const QString &dataPath)
