@@ -59,18 +59,21 @@ ApplicationWindow {
                 x: (menuBar.position - 1.0) * menuView.width
             }
         }
-
+        property bool paused: false
+        onPausedChanged: fuse.paused = paused
         onPositionChanged: {
             menuView.reset();
             if (position == 1) {
                 pageLoader.source = "";
                 menuView.useGamepad = true;
-                fuse.paused = true;
+                if (!paused)
+                    paused = true;
             }
 
             if (position == 0) {
                 menuView.useGamepad = false;
-                fuse.paused = false;
+                if (paused)
+                    paused = false;
             }
         }
         onClicked: close()

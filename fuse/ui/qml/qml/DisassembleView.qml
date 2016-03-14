@@ -108,7 +108,7 @@ ListView {
                     color: ink
                     font.bold: false
                     readOnly: true
-                    inputMethodHints: Qt.ImhPreferUppercase
+                    inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhPreferUppercase | Qt.ImhNoPredictiveText
                     text: model.disassable
                     onEditingFinished: {
                         assembler.write(text, model.address, model.bytes)

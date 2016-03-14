@@ -156,14 +156,20 @@ Item {
                 }
                 Button {
                     Layout.fillHeight: true
-                    text: "Step"
+                    text: qsTr("Step")
                     onClicked: fuse.debuggerNext()
                 }
                 Button {
                     Layout.fillHeight: true
                     Layout.rightMargin: toolBarRect.border.width
-                    text: "Continue"
+                    text: qsTr("Continue")
                     onClicked: fuse.debuggerRun()
+                }
+                Button {
+                    Layout.fillHeight: true
+                    Layout.rightMargin: toolBarRect.border.width
+                    text: qsTr("Close (B)")
+                    onClicked: pageLoader.source = ""
                 }
             }
         }
