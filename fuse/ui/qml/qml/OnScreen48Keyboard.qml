@@ -181,7 +181,7 @@ Item {
         cellHeight: cellWidth
         model: zx48Keyboard
         currentIndex: 24
-        interactive: false
+        interactive: fuse.gamepadId != -1
 
         delegate: Rectangle {
             id: rec
