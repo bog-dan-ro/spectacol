@@ -141,21 +141,21 @@ Rectangle {
                 Button {
                     id: buttonReset
                     Layout.fillWidth: true
-                    text: qsTr("Reset <b>(L2, R2, E)</b>")
+                    text: qsTr("Reset <b>(L2, R2)</b>")
                     onClicked: fuse.pokeFinderReset()
                 }
                 Button {
                     id: buttonBW
                     Layout.fillWidth: true
                     enabled: view.currentIndex !== -1
-                    text: qsTr("Break on write <b>(L1, W)</b>")
+                    text: qsTr("Break on write <b>(L1)</b>")
                     onClicked: addBreakpoint(BreakpointsModel.BreakOnWrite);
                 }
                 Button {
                     id: buttonBR
                     Layout.fillWidth: true
                     enabled: view.currentIndex !== -1
-                    text: qsTr("Break on read <b>(R1, R)</b>")
+                    text: qsTr("Break on read <b>(R1)</b>")
                     onClicked: addBreakpoint(BreakpointsModel.BreakOnRead);
                 }
                 Button {
