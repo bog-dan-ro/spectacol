@@ -63,7 +63,9 @@ show_version( void );
 static void
 show_help( void );
 
+extern "C" {
 char *progname;
+}
 
 const std::string schmitt_str("schmitt");
 const std::string simple_str("simple");

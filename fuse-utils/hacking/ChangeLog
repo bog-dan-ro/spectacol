@@ -522,3 +522,4 @@
          FFmpeg/Libav API support in fmfconv (patch #345) (Sergio).
 20160103 fmfconv.c: fix crash when writing a sequence of screenshots (Sergio).
 20160111 fmfconv.c: fix spelling (Sergio).
+20160311 audio2tape.cc: declare C linkage for progname (Adam Sampson).
