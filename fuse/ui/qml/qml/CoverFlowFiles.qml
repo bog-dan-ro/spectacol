@@ -18,6 +18,7 @@
 import QtQuick 2.2
 import QtGamepad 1.0
 import Fuse 1.0
+import Qt.labs.controls 1.0
 
 Item
 {
@@ -116,6 +117,13 @@ Item
                     }
                 }
             }
+        }
+        Button {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: qsTr("Close (B)")
+            onClicked: pageLoader.source = ""
         }
     }
 
