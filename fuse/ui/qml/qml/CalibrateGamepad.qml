@@ -19,6 +19,7 @@
 
 import QtQuick 2.5
 import QtGamepad 1.0
+import "private" 1.0
 
 StandardGamepad {
     id: confGamepad
@@ -30,7 +31,7 @@ StandardGamepad {
 
     FancyText {
         id: configureText
-        fontSize: 4
+        font.pixelSize: TextSizes.scale12
         visible: false
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
@@ -39,7 +40,7 @@ StandardGamepad {
 
     FancyText {
         id: cancelButtonText
-        fontSize: 4
+        font.pixelSize: TextSizes.scale12
         visible: false
         anchors.top: configureText.bottom
         anchors.horizontalCenter: parent.horizontalCenter

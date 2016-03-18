@@ -20,6 +20,7 @@
 import QtQuick 2.6
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
+import "private" 1.0
 
 FancyList {
     id: view
@@ -30,15 +31,16 @@ FancyList {
     currentIndex: fuse.selectedFilterIndex
     onCurrentIndexChanged: fuse.selectedFilterIndex = currentIndex
 
+    width: 20 * TextSizes.scale14
     delegate: Rectangle {
-        width: 50 * Screen.pixelDensity
-        height: 7 * Screen.pixelDensity
+        width: view.width
+        height: TextSizes.scale14
         color: Qt.rgba(0, 0, 0, 0.75);
 
         FancyText {
             anchors.fill: parent
             anchors.leftMargin: 10 * Screen.pixelDensity
-            fontSize: 4
+            font.pixelSize: TextSizes.scale12
             text: modelData
         }
         MouseArea {

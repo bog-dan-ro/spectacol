@@ -21,6 +21,8 @@ import QtQuick 2.5
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.0
 import Fuse 1.0
+import "private" 1.0
+
 
 ListView {
     id: view
@@ -59,7 +61,7 @@ ListView {
             property color ink: view.currentIndex !== index ? foreground : selectedForeground
 
             width: view.width
-            height: 10 * Screen.pixelDensity
+            height: TextSizes.scale24
             color: paper
             MouseArea {
                 anchors.fill: parent
@@ -76,35 +78,35 @@ ListView {
                     Layout.fillHeight: true
                     Layout.fillWidth: false
                     horizontalAlignment: Text.AlignRight
-                    fontSize: 4
+                    font.pixelSize: TextSizes.scale12
                     style: Text.Normal
-                    Layout.preferredWidth: 14 * Screen.pixelDensity
+                    Layout.preferredWidth: 4 * TextSizes.scale12
                     color: ink
                     text: model.addressText
                 }
 
-                Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
+                Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyText {
                     Layout.fillHeight: true
                     Layout.fillWidth: false
-                    Layout.preferredWidth: 15 * Screen.pixelDensity
+                    Layout.preferredWidth: 4 * TextSizes.scale12
                     horizontalAlignment: Text.AlignHCenter
-                    fontSize: 2.5
+                    font.pixelSize: TextSizes.scale16 / 2
                     style: Text.Normal
                     color: ink
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     text: model.bytesText
                 }
 
-                Item { Layout.fillWidth: false;width: 1.5 * Screen.pixelDensity }
+                Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyTextField {
                     id: asmEdit
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
-                    fontSize: 4
+                    font.pixelSize: TextSizes.scale12
                     color: ink
                     font.bold: false
                     readOnly: true

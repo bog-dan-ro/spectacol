@@ -52,8 +52,6 @@ ApplicationWindow {
             height: mainScreen.height
             visible: menuBar.position > 0
 
-            parentWidth: menuBar.width
-
             rootMenu: FuseMenu {}
             transform: Translate {
                 x: (menuBar.position - 1.0) * menuView.width

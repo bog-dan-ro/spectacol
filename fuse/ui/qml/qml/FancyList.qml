@@ -25,10 +25,8 @@ import QtGamepad 1.0
 ListView {
     id: view
 
-    clip: true
-    focus: true
     PropertyAnimation on x {
-        to: (pageLoader.width - 50 * Screen.pixelDensity) / 2
+        to: parent.width / 2 - view.width / 2
         easing.type: Easing.InOutBack
         easing.amplitude: 2.0
         easing.period: 1.5
@@ -39,10 +37,11 @@ ListView {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
     }
 
-    width: pageLoader.width - 50 * Screen.pixelDensity
-    anchors.top: pageLoader.top
-    anchors.bottom: pageLoader.bottom
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
 
+    clip: true
+    focus: true
     snapMode: ListView.SnapToItem
     highlightFollowsCurrentItem: true
     highlightRangeMode: ListView.ApplyRange
@@ -52,17 +51,17 @@ ListView {
     Keys.onEscapePressed: pageLoader.source = ""
     Keys.onReturnPressed: pageLoader.source = ""
 
-
     highlight: Rectangle {
-        width: 50 * Screen.pixelDensity
+        width: view.width
+        height: delegate.height
         color: "lightgreen"
         border.width: 0.5 * Screen.pixelDensity
         border.color: "green"
     }
 
     footer: Button {
-        width: 50 * Screen.pixelDensity
-        text: qsTr("Close")
+        width: view.width
+        text: qsTr("Close (B)")
         onClicked: pageLoader.source = ""
     }
 }

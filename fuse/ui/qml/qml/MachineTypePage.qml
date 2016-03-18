@@ -20,30 +20,34 @@
 import QtQuick 2.6
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
+import "private" 1.0
 
-FancyList {
-    id: view
-    Component.onCompleted: fuse.processInputEvents = false
-    Component.onDestruction: fuse.processInputEvents = true
+Item {
+    FancyList {
+        id: view
+        Component.onCompleted: fuse.processInputEvents = false
+        Component.onDestruction: fuse.processInputEvents = true
 
-    model: fuseSettings.machinesModel
-    currentIndex: fuseSettings.currentMachineIndex
-    onCurrentIndexChanged: fuseSettings.currentMachineIndex = currentIndex
+        model: fuseSettings.machinesModel
+        currentIndex: fuseSettings.currentMachineIndex
+        onCurrentIndexChanged: fuseSettings.currentMachineIndex = currentIndex
 
-    delegate: Rectangle {
-        width: 50 * Screen.pixelDensity
-        height: 7 * Screen.pixelDensity
-        color: Qt.rgba(0, 0, 0, 0.75);
+        width: 11 * TextSizes.scale14
+        delegate: Rectangle {
+            width: view.width
+            height: TextSizes.scale14 * 2
+            color: Qt.rgba(0, 0, 0, 0.75);
 
-        FancyText {
-            anchors.fill: parent
-            anchors.leftMargin: 10 * Screen.pixelDensity
-            fontSize: 4
-            text: modelData
-        }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: view.currentIndex = model.index
+            FancyText {
+                anchors.fill: parent
+                anchors.leftMargin: TextSizes.scale14 / 2
+                font.pixelSize: TextSizes.scale14
+                text: modelData
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: view.currentIndex = model.index
+            }
         }
     }
 }

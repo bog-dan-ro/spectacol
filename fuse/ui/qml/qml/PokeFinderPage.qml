@@ -24,6 +24,7 @@ import QtQml.Models 2.2
 import Qt.labs.controls 1.0
 import Fuse 1.0
 import QtGamepad 1.0
+import "private" 1.0
 
 Rectangle {
     id: pokeFinderPage
@@ -191,7 +192,7 @@ Rectangle {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: 10 * Screen.pixelDensity
                                 horizontalAlignment: Text.AlignRight
-                                fontSize: 4
+                                font.pixelSize: TextSizes.scale12
                                 style: Text.Normal
                                 color: ink
                                 text: model.page
@@ -204,7 +205,7 @@ Rectangle {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: 15 * Screen.pixelDensity
                                 horizontalAlignment: Text.AlignHCenter
-                                fontSize: 4
+                                font.pixelSize: TextSizes.scale12
                                 style: Text.Normal
                                 color: ink
                                 text: model.offsetText
@@ -216,7 +217,7 @@ Rectangle {
                                 Layout.fillHeight: true
                                 Layout.fillWidth: false
                                 horizontalAlignment: Text.AlignLeft
-                                fontSize: 4
+                                font.pixelSize: TextSizes.scale12
                                 color: ink
                                 style: Text.Normal
                                 text: model.value
@@ -228,7 +229,7 @@ Rectangle {
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
                                 horizontalAlignment: Text.AlignLeft
-                                fontSize: 4
+                                font.pixelSize: TextSizes.scale12
                                 color: ink
                                 style: Text.Normal
                                 text: model.breakpoint
@@ -275,7 +276,7 @@ Rectangle {
                                     Layout.fillWidth: false
                                     Layout.preferredWidth: 10 * Screen.pixelDensity
                                     Layout.alignment: Qt.AlignRight
-                                    fontSize: 4
+                                    font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Bank"
                                 }
@@ -287,7 +288,7 @@ Rectangle {
                                     Layout.fillWidth: false
                                     Layout.preferredWidth: 15 * Screen.pixelDensity
                                     Layout.alignment: Qt.AlignLeft
-                                    fontSize: 4
+                                    font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Offset"
                                 }
@@ -298,7 +299,7 @@ Rectangle {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: false
                                     horizontalAlignment: Text.AlignHCenter
-                                    fontSize: 4
+                                    font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Value"
                                 }
@@ -309,7 +310,7 @@ Rectangle {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: false
                                     horizontalAlignment: Text.AlignRight
-                                    fontSize: 4
+                                    font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Breakpoint"
                                 }

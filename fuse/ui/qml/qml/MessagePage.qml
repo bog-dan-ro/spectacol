@@ -18,6 +18,7 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
 import Fuse 1.0
+import "private" 1.0
 
 Rectangle {
     id: msgDialog
@@ -27,11 +28,11 @@ Rectangle {
     border.width: 0.25 * Screen.pixelDensity
     border.color: "red"
     color: Qt.rgba(0.15, 0.05, 0.05, 0.75)
-    height: 20 * Screen.pixelDensity
+    height: TextSizes.scale24 * 3
     visible: false
 
     FancyText {
-        fontSize: 4
+        font.pixelSize: TextSizes.scale20
         id: message
         anchors.fill: parent
         elide: Text.ElideRight

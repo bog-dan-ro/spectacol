@@ -40,13 +40,15 @@ Pane {
             currentIndex: tabbar.currentIndex
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Label {
-                font.family: 'Monospace'
+            FancyText {
                 textFormat: Text.RichText
+                style: Text.Normal
                 wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignTop
                 text: qsTr("Spectacol (in Romanian it means <b>show</b>) is a <a href=\"https://github.com/bog-dan-ro/spectacol\"><b>free</b></a> ZX Spectrum emulator
                             based on famous <a href=\"http://fuse-emulator.sf.net\">FUSE Spectrum emulator</a>.
-                            <a href=\"http://fuse-emulator.sf.net\">FUSE</a> has, by far, the most complete ZX features list,
+                            FUSE emulator has, by far, the most reachest ZX features list,
                             but <b>Spectacol</b>, currently, it enables only the following features:
                             <ul>
                                 <li> Loads all ZX Spectrum files handles by FUSE
@@ -79,11 +81,13 @@ Pane {
                     fillMode: Image.PreserveAspectFit
                     source: "qrc:///images/gamepad.png"
                 }
-                Label {
-                    wrapMode: Text.WordWrap
-                    font.family: 'Monospace'
-                    textFormat: Text.RichText
+                FancyText {
                     Layout.fillWidth: true
+                    textFormat: Text.RichText
+                    style: Text.Normal
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignTop
                     text: qsTr("<ul>
                             <li> <b>START</b> toggle the menu
                             <li> <b>BACK</b> (not available on all gamepads) close the menu or the dialog, exits the application
@@ -103,11 +107,13 @@ Pane {
                     fillMode: Image.PreserveAspectFit
                     source: "qrc:///images/gamepad.png"
                 }
-                Label {
-                    wrapMode: Text.WordWrap
-                    font.family: 'Monospace'
-                    textFormat: Text.RichText
+                FancyText {
                     Layout.fillWidth: true
+                    textFormat: Text.RichText
+                    style: Text.Normal
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignTop
                     text: qsTr("<ul> \
                             <li> <b>L1, R1, A, B</b> Joystick fire button
                             <li> <b>UP/DOWN/LEFT/RIGHT, LEFT AND RIGHT AXIS</b> Joystick directions

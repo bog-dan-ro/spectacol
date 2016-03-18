@@ -21,12 +21,12 @@ import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import QtGamepad 1.0
 import "Utils.js" as Utils
+import "private" 1.0
 
 ColumnLayout {
     property Menu rootMenu: null
     property Menu currentMenu: rootMenu
     property var menus: []
-    property real parentWidth: 50
     property alias useGamepad: gamepadKeyNavigation.active
 
     function decrementCurrentIndex()
@@ -110,13 +110,14 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        Layout.preferredHeight: 10 * Screen.pixelDensity
+        Layout.preferredHeight: TextSizes.scale20 * 2
         border.width: 0.25 * Screen.pixelDensity
         border.color: "black"
         color: Qt.rgba(0.25, 0.25, 0.25, 0.75);
 
         FancyText {
             id: title
+            font.pixelSize: TextSizes.scale16
             anchors.fill: parent
         }
 
@@ -139,24 +140,27 @@ ColumnLayout {
         delegate: Rectangle {
             id: menuItemRect
             visible: modelData.visible
-            width: parentWidth
-            height: visible ? 9 * Screen.pixelDensity : 0
+            width: menuView.width
+            height: visible ? TextSizes.scale20 * 2 : 0
             border.width: 0.25 * Screen.pixelDensity
             border.color: (index !== menuView.currentIndex) ? "black" : "lightgreen"
             color: (index !== menuView.currentIndex) ? Qt.rgba(0.25, 0.25, 0.25, 0.75) : Qt.rgba(0.0, 0.85, 0.0, 0.75)
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Screen.pixelDensity
+                anchors.leftMargin: TextSizes.scale16 / 4
+                anchors.rightMargin: TextSizes.scale16 / 4
                 FancyText {
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     height: parent.height
-                    fontSize: 4
+                    font.pixelSize: TextSizes.scale16
                     text: modelData.type === MenuItemType.Item ? Utils.shortcutText(modelData.text) : Utils.shortcutText(modelData.title)
                 }
                 FancyText {
+                    Layout.fillHeight: true
                     visible: modelData.type === MenuItemType.Menu
-                    fontSize: 5
+                    font.pixelSize: TextSizes.scale20
                     font.bold: true
                     text: modelData.type === MenuItemType.Menu ? ">" : ""
                 }

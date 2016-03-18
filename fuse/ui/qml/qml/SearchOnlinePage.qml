@@ -22,6 +22,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
 import QtGamepad 1.0
+import "private" 1.0
 
 Rectangle {
     color: Qt.rgba(0, 0, 0, 0.75);
@@ -44,10 +45,14 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
+        Layout.topMargin: TextSizes.scale24
         FancyTextField {
             id: searchText
             focus: false
+            font.pixelSize: TextSizes.scale16
             Layout.fillWidth: true
+            Layout.leftMargin: TextSizes.scale24 * 4
+            Layout.rightMargin: TextSizes.scale24 * 4
             placeholderText: qsTr("Type to search")
             onTextChanged: timer.restart()
             KeyNavigation.tab: grid
@@ -98,6 +103,7 @@ Rectangle {
                     FancyText {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
+                        Layout.margins: TextSizes.scale14 / 2
                         text: title
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere

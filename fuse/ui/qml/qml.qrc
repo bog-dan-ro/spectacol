@@ -87,5 +87,7 @@
         <file>qml/OnScreen48Keyboard.qml</file>
         <file>images/controller-icon.svg</file>
         <file>images/keyboard-icon.svg</file>
+        <file>qml/private/qmldir</file>
+        <file>qml/private/TextSizes.qml</file>
     </qresource>
 </RCC>

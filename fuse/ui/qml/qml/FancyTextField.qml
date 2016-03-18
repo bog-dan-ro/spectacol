@@ -20,11 +20,9 @@ import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
 
 TextField {
-    property real fontSize : 5
-    font.pixelSize: fontSize * Screen.pixelDensity
     font.bold: true
     font.family: 'Monospace'
     horizontalAlignment: Text.AlignLeft
     verticalAlignment: Text.AlignVCenter
-    inputMethodHints: Qt.ImhNoPredictiveText
+    inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
 }

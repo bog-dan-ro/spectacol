@@ -18,6 +18,7 @@
 import QtQuick 2.0
 import QtQuick.Window 2.2
 import Fuse 1.0
+import "private" 1.0
 
 Rectangle {
     id: button
@@ -67,6 +68,7 @@ Rectangle {
     }
     FancyText {
         id: buttonText
+        font.pixelSize: TextSizes.scale16
         anchors.centerIn: parent
     }
     Keys.onPressed: {

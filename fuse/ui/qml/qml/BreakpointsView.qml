@@ -21,6 +21,8 @@ import QtQuick 2.6
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
+import "private" 1.0
+
 
 Item {
     property alias focused: view.focus
@@ -41,9 +43,9 @@ Item {
                 FancyText {
                     Layout.fillHeight: true
                     Layout.fillWidth: false
-                    Layout.preferredWidth: 3 * Screen.pixelDensity
+                    Layout.preferredWidth: 2 * TextSizes.scale12
                     horizontalAlignment: Text.AlignRight
-                    fontSize: 4
+                    font.pixelSize: TextSizes.scale12
                     style: Text.Normal
                     color: ink
                     text: model.id
@@ -54,9 +56,9 @@ Item {
                 FancyText {
                     Layout.fillHeight: true
                     Layout.fillWidth: false
-                    Layout.preferredWidth: 3 * Screen.pixelDensity
+                    Layout.preferredWidth: 3 * TextSizes.scale12
                     horizontalAlignment: Text.AlignHCenter
-                    fontSize: 4
+                    font.pixelSize: TextSizes.scale12
                     style: Text.Normal
                     color: ink
                     text: model.type + "," + model.life
@@ -68,7 +70,7 @@ Item {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
-                    fontSize: 4
+                    font.pixelSize: TextSizes.scale12
                     color: ink
                     style: Text.Normal
                     text: model.value + " " + model.condition + model.commands

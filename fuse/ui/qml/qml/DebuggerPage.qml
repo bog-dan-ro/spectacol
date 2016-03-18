@@ -22,6 +22,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
 import QtGamepad 1.0
+import "private" 1.0
 
 Item {
     Component.onCompleted: fuse.processInputEvents = false
@@ -54,7 +55,7 @@ Item {
                 border.width: (disassembleView.focus ? 1 : 0.5) * Screen.pixelDensity
                 border.color: "white"
 
-                width: 75 * Screen.pixelDensity
+                width: 18 * TextSizes.scale14
                 Layout.fillHeight: true
 
                 DisassembleView {
@@ -86,7 +87,7 @@ Item {
             }
             ColumnLayout {
                 spacing: 2.5 * Screen.pixelDensity
-                width: 90 * Screen.pixelDensity
+                width: 18 * TextSizes.scale14
                 Layout.fillWidth: false
                 Layout.fillHeight: true
                 Rectangle {
@@ -95,7 +96,7 @@ Item {
                     radius: Screen.pixelDensity
                     border.width: (focus ? 1 : 0.5) * Screen.pixelDensity
                     border.color: "white"
-                    height: 60 * Screen.pixelDensity
+                    height: 14 * TextSizes.scale14
                     Layout.fillWidth: true
                     RegistersView {
                         anchors.centerIn: parent

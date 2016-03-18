@@ -19,6 +19,7 @@ import QtQuick 2.2
 import QtGamepad 1.0
 import Fuse 1.0
 import Qt.labs.controls 1.0
+import "private" 1.0
 
 Item
 {
@@ -83,14 +84,9 @@ Item
                 NumberAnimation {id : scale_anim; target : album_delegate; property: "scale"; from : 0; to : delScale; duration : 500; easing.type: Easing.InOutQuad}
                 transform: [Rotation {id : rotation; angle : rotAngle; axis {x : 0; y: 1; z : 0} origin.x : width * 0.5; origin.y : height * 0.5}]
 
-                Text
-                {
-                    font.pointSize: 25
-                    style: Text.Outline
-                    styleColor: "#66ff2200"
-                    color : "white"
+                FancyText {
+                    font.pixelSize: TextSizes.scale20
                     font.bold: true
-                    font.family: "Helvetica"
                     text : name
                     width : parent.width
                     elide: Text.ElideRight
@@ -126,24 +122,18 @@ Item
             onClicked: pageLoader.source = ""
         }
     }
-
-    Text
-    {
+    FancyText {
         id : artist_text_label
         anchors
         {
             horizontalCenter : parent.horizontalCenter
             top : parent.top
-            topMargin : 25
+            topMargin : TextSizes.scale20 / 2
         }
         property bool root: filesModel.rootFolder == filesModel.folder
-        font.pointSize: 25 * mainScreen.dpiMultiplier
+        font.pixelSize: TextSizes.scale20
         text : filesModel.folder + (root ? " X" : "  \u2191")
-        style: Text.Outline
-        styleColor: "#66ff2200"
-        color : "white"
         font.bold: true
-        font.family: "Helvetica"
         elide: Text.ElideRight
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         width : parent.width

@@ -20,30 +20,34 @@
 import QtQuick 2.6
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
+import "private" 1.0
 
-FancyList {
-    id: view
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+Item {
+    FancyList {
+        id: view
+        Component.onCompleted: fuse.paused = true
+        Component.onDestruction: fuse.paused = false
 
-    model: fuse.joysticksModel
-    currentIndex: fuse.selectedJoysticksIndex
-    onCurrentIndexChanged: fuse.selectedJoysticksIndex = currentIndex
+        model: fuse.joysticksModel
+        currentIndex: fuse.selectedJoysticksIndex
+        onCurrentIndexChanged: fuse.selectedJoysticksIndex = currentIndex
 
-    delegate: Rectangle {
-        width: 50 * Screen.pixelDensity
-        height: 7 * Screen.pixelDensity
-        color: Qt.rgba(0, 0, 0, 0.75);
+        width: 7 * TextSizes.scale20
+        delegate: Rectangle {
+            width: view.width
+            height: TextSizes.scale20 * 2
+            color: Qt.rgba(0, 0, 0, 0.75);
 
-        FancyText {
-            anchors.fill: parent
-            anchors.leftMargin: 10 * Screen.pixelDensity
-            fontSize: 4
-            text: modelData
-        }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: view.currentIndex = model.index
+            FancyText {
+                anchors.fill: parent
+                anchors.leftMargin: TextSizes.scale20 / 2
+                font.pixelSize: TextSizes.scale20
+                text: modelData
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: view.currentIndex = model.index
+            }
         }
     }
 }
