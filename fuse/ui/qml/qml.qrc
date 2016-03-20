@@ -89,5 +89,6 @@
         <file>images/keyboard-icon.svg</file>
         <file>qml/private/qmldir</file>
         <file>qml/private/TextSizes.qml</file>
+        <file>qml/OnScreenJoystick.qml</file>
     </qresource>
 </RCC>

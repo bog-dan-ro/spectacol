@@ -48,6 +48,10 @@
 #include <mutex>
 #include <thread>
 
+#ifdef Q_OS_ANDROID
+# include <QtAndroid>
+#endif
+
 extern "C" int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
     return g_fuseEmulator->soundLowlevelInit(device, freqptr, stereoptr);
@@ -278,41 +282,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         if (!m_processInputEvents || deviceId != m_gamepadId ||
                 axis == QGamepadManager::AxisInvalid)
             return;
-
-        pokeEvent([axis, value]{
-            if (fuse_emulation_paused && ui_widget_level == -1)
-                return;
-
-            input_event_t event1, event2;
-            switch (axis) {
-            case QGamepadManager::AxisLeftX:
-            case QGamepadManager::AxisRightX:
-                event1.types.joystick.button = INPUT_JOYSTICK_LEFT;
-                event2.types.joystick.button = INPUT_JOYSTICK_RIGHT;
-                break;
-
-            case QGamepadManager::AxisLeftY:
-            case QGamepadManager::AxisRightY:
-                event1.types.joystick.button = INPUT_JOYSTICK_UP;
-                event2.types.joystick.button = INPUT_JOYSTICK_DOWN;
-                break;
-            default:
-                return;
-            }
-            event1.types.joystick.which = event2.types.joystick.which = 0;
-            if (value <= -0.5) {
-                event1.type = INPUT_EVENT_JOYSTICK_PRESS;
-                event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
-            } else if (value >= 0.5) {
-                event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
-                event2.type = INPUT_EVENT_JOYSTICK_PRESS;
-            } else {
-                event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
-                event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
-            }
-            input_event(&event1);
-            input_event(&event2);
-        });
+        gamepadAxisEvent(axis, value);
     });
 
     connect(gm, &QGamepadManager::gamepadButtonPressEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button, double value) {
@@ -342,13 +312,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         if (deviceId != m_gamepadId || button == QGamepadManager::ButtonInvalid)
             return;
 
-        pokeEvent([button] {
-            input_event_t event;
-            event.type = INPUT_EVENT_JOYSTICK_PRESS;
-            event.types.joystick.which = 0;
-            event.types.joystick.button = toJoystickKey(button);
-            input_event(&event);
-        });
+        gamepadButtonPressEvent(button);
     });
 
     connect(gm, &QGamepadManager::gamepadButtonReleaseEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button) {
@@ -360,22 +324,16 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             return;
 
         if (button == QGamepadManager::ButtonX)
-            QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(CursorJoystick, true); });
+            QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(CursorJoystick); });
 
         if (button == QGamepadManager::ButtonY)
-            QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(Keyboard48K, true); });
+            QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(Keyboard48K); });
 
 
         if (fuse_emulation_paused && ui_widget_level == -1)
             return;
 
-        pokeEvent([button] {
-            input_event_t event;
-            event.type = INPUT_EVENT_JOYSTICK_RELEASE;
-            event.types.joystick.which = 0;
-            event.types.joystick.button = toJoystickKey(button);
-            input_event(&event);
-        });
+        gamepadButtonReleaseEvent(button);
     });
 
     connect(gm, &QGamepadManager::gamepadConnected, this, [this](int deviceId){
@@ -412,6 +370,10 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     pokeEvent([]{
         settings_current.autosave_settings = 1;
     });
+#ifdef Q_OS_ANDROID
+    m_touchscreen = QtAndroid::androidActivity().callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;")
+                                                .callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(QLatin1String("android.hardware.touchscreen")).object());
+#endif
 }
 
 FuseEmulator::~FuseEmulator()
@@ -1051,6 +1013,66 @@ void FuseEmulator::keyRelease(Qt::Key qtKey)
         input_event(&event);
     });
 
+}
+
+void FuseEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value)
+{
+    pokeEvent([axis, value]{
+        if (fuse_emulation_paused && ui_widget_level == -1)
+            return;
+
+        input_event_t event1, event2;
+        switch (axis) {
+        case QGamepadManager::AxisLeftX:
+        case QGamepadManager::AxisRightX:
+            event1.types.joystick.button = INPUT_JOYSTICK_LEFT;
+            event2.types.joystick.button = INPUT_JOYSTICK_RIGHT;
+            break;
+
+        case QGamepadManager::AxisLeftY:
+        case QGamepadManager::AxisRightY:
+            event1.types.joystick.button = INPUT_JOYSTICK_UP;
+            event2.types.joystick.button = INPUT_JOYSTICK_DOWN;
+            break;
+        default:
+            return;
+        }
+        event1.types.joystick.which = event2.types.joystick.which = 0;
+        if (value <= -0.3) {
+            event1.type = INPUT_EVENT_JOYSTICK_PRESS;
+            event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+        } else if (value >= 0.3) {
+            event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+            event2.type = INPUT_EVENT_JOYSTICK_PRESS;
+        } else {
+            event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+            event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+        }
+        input_event(&event1);
+        input_event(&event2);
+    });
+}
+
+void FuseEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button)
+{
+    pokeEvent([button] {
+        input_event_t event;
+        event.type = INPUT_EVENT_JOYSTICK_PRESS;
+        event.types.joystick.which = 0;
+        event.types.joystick.button = toJoystickKey(button);
+        input_event(&event);
+    });
+}
+
+void FuseEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button)
+{
+    pokeEvent([button] {
+        input_event_t event;
+        event.type = INPUT_EVENT_JOYSTICK_RELEASE;
+        event.types.joystick.which = 0;
+        event.types.joystick.button = toJoystickKey(button);
+        input_event(&event);
+    });
 }
 
 void FuseEmulator::debuggerTrap()

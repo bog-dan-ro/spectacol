@@ -65,7 +65,7 @@ private:
 class FuseEmulator : public FuseObject
 {
     Q_OBJECT
-
+    Q_PROPERTY(bool touchscreen MEMBER m_touchscreen CONSTANT)
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
     Q_PROPERTY(bool processInputEvents READ processInputEvents WRITE setProcessInputEvents NOTIFY processInputEventsChanged)
     Q_PROPERTY(int gamepadId READ gamepadId WRITE setGamepadId NOTIFY gamepadIdChanged)
@@ -230,6 +230,9 @@ public slots:
 
     void keyPress(Qt::Key qtKey);
     void keyRelease(Qt::Key qtKey);
+    void gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value);
+    void gamepadButtonPressEvent(QGamepadManager::GamepadButton button);
+    void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button);
 
 signals:
     void pausedChanged();
@@ -246,7 +249,7 @@ signals:
     void hideMenu();
     void processInputEventsChanged();
     void gamepadIdChanged();
-    void toggleOnScreenControls(ControlType type, bool gamepadMode);
+    void toggleOnScreenControls(ControlType type);
 
     void error(ErrorLevel level, const QString &message);
 
@@ -256,6 +259,7 @@ private:
     friend class FuseTexture;
 
 private:
+    bool m_touchscreen = false;
     QString m_loadedFileName;
     mutable std::vector<int> m_supportedScalers;
     BreakpointsModel m_breakpointsModel;

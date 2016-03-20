@@ -155,7 +155,7 @@ Item {
         id: highlight
         Rectangle {
             id: rect
-            visible: fuse.gamepadId != -1
+            visible: fuse.gamepadId != -1 && !fuse.touchscreen
             width: grid.cellWidth; height: grid.cellHeight
             x: grid.currentItem.x
             y: grid.currentItem.y
@@ -181,7 +181,7 @@ Item {
         cellHeight: cellWidth
         model: zx48Keyboard
         currentIndex: 24
-        interactive: fuse.gamepadId != -1
+        interactive: fuse.gamepadId != -1 && !fuse.touchscreen
 
         delegate: Rectangle {
             id: rec

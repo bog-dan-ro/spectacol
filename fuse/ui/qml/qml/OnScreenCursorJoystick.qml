@@ -24,21 +24,19 @@ Item {
     id: onScreenJoystick
     anchors.fill: parent
     anchors.topMargin: Screen.pixelDensity * 20
-    property alias gamepadMode: gamepad.active
     property var buttonList: [button5, button56, button57, button6,
                                button7, button8, button86, button87,
                                button1, button2, button3, button4,
                                button0, button9]
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_X) {
-            onScreenJoystick.gamepadMode = false;
-            onScreenJoystick.visible = false;
-        }
+        if (event.key === Qt.Key_X)
+            parent.visible = false;
     }
 
     GamepadKeyNavigation {
         id: gamepad
+        active: onScreenJoystick.visible
         gamepad: Gamepad { deviceId: fuse.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_unknown
@@ -58,7 +56,7 @@ Item {
                 rows: 2
                 OnScreenButton {
                     id: button1
-                    focus: gamepadMode
+                    focus: onScreenJoystick.visible
                     KeyNavigation.up: button6
                     KeyNavigation.left: button0
                     KeyNavigation.right: button2

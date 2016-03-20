@@ -21,6 +21,7 @@ import QtQuick.Window 2.0
 import Qt.labs.controls 1.0
 import QtGamepad 1.0
 import Fuse 1.0
+import "private"
 
 ApplicationWindow {
     id: mainScreen
@@ -29,7 +30,7 @@ ApplicationWindow {
     width: 320 * 3
     height: 256 * 3
 
-    title: qsTr("Fuse QML")
+    title: qsTr("Spectacol")
 
     property int dpiMultiplier: 1
     property bool portrait: false
@@ -78,167 +79,178 @@ ApplicationWindow {
     }
 
     Rectangle {
+        id: mainRectangle
         anchors.fill: parent
         color: "black"
+        focus: true
+
+        Keys.onPressed: {
+            switch (event.key) {
+            case Qt.Key_F1:
+                if (menuBar.position) {
+                    menuBar.close();
+                } else {
+                    if (pageLoader.source != "") {
+                        pageLoader.source = "";
+                    } else {
+                        menuBar.open();
+                    }
+                }
+                event.accepted = true;
+                break;
+
+            case Qt.Key_F4:
+                pageLoader.source = "FileBrowserPage.qml";
+                event.accepted = true;
+                break;
+
+            case Qt.Key_F10:
+                quitDialog.open();
+                event.accepted = true;
+                break;
+
+            case Qt.Key_F11:
+                fullScreen = !fullScreen;
+                event.accepted = true;
+                break;
+
+            case Qt.Key_Down:
+                if (menuBar.position) {
+                    menuView.incrementCurrentIndex();
+                    event.accepted = true;
+                }
+                break;
+
+            case Qt.Key_Up:
+                if (menuBar.position) {
+                    menuView.decrementCurrentIndex();
+                    event.accepted = true;
+                }
+                break;
+
+            case Qt.Key_Return:
+            case Qt.Key_Enter:
+                if (menuBar.position)
+                    event.accepted = true;
+                break;
+            case Qt.Key_Escape:
+                if (menuBar.position) {
+                    menuView.popMenu();
+                    event.accepted = true;
+                } else {
+                    if (pageLoader.source != "") {
+                        pageLoader.source = "";
+                        event.accepted = true;
+                    }
+                }
+                break;
+            case Qt.Key_Back:
+                if (menuBar.position) {
+                    menuView.popMenu();
+                    event.accepted = true;
+                } else {
+                    if (pageLoader.source != "") {
+                        pageLoader.source = "";
+                        event.accepted = true;
+                    } else {
+                        quitDialog.open();
+                        event.accepted = true;
+                    }
+                }
+                break;
+            }
+        }
+
+        Keys.onReleased: {
+            switch (event.key) {
+            case Qt.Key_Return:
+            case Qt.Key_Enter:
+                if (menuBar.position) {
+                    menuView.openSelectedMenu();
+                    event.accepted = true;
+                }
+                break;
+            }
+        }
+
         FuseScreen {
             id: fuseScreen
-            focus: true
             anchors.fill: parent
+            anchors.leftMargin: TextSizes.smallScreen ? 10 * Screen.pixelDensity : 0
             onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
-            Keys.onPressed: {
-                switch (event.key) {
-                case Qt.Key_F1:
-                    if (menuBar.position) {
-                        menuBar.close();
-                    } else {
-                        if (pageLoader.source != "") {
-                            pageLoader.source = "";
-                        } else {
-                            menuBar.open();
-                        }
-                    }
-                    event.accepted = true;
-                    break;
+        }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: pageLoader.source = "";
+        }
 
-                case Qt.Key_F4:
-                    pageLoader.source = "FileBrowserPage.qml";
-                    event.accepted = true;
-                    break;
+        Button {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            text: "="
+            onClicked: {
+                if (menuBar.position)
+                    menuBar.close();
+                else
+                    menuBar.open();
+            }
+        }
 
-                case Qt.Key_F10:
-                    quitDialog.open();
-                    event.accepted = true;
-                    break;
-
-                case Qt.Key_F11:
-                    fullScreen = !fullScreen;
-                    event.accepted = true;
-                    break;
-
-                case Qt.Key_Down:
-                    if (menuBar.position) {
-                        menuView.incrementCurrentIndex();
-                        event.accepted = true;
-                    }
-                    break;
-
-                case Qt.Key_Up:
-                    if (menuBar.position) {
-                        menuView.decrementCurrentIndex();
-                        event.accepted = true;
-                    }
-                    break;
-
-                case Qt.Key_Return:
-                case Qt.Key_Enter:
-                    if (menuBar.position)
-                        event.accepted = true;
-                    break;
-                case Qt.Key_Escape:
-                    if (menuBar.position) {
-                        menuView.popMenu();
-                        event.accepted = true;
-                    } else {
-                        if (pageLoader.source != "") {
-                            pageLoader.source = "";
-                            event.accepted = true;
-                        }
-                    }
-                    break;
-                case Qt.Key_Back:
-                    if (menuBar.position) {
-                        menuView.popMenu();
-                        event.accepted = true;
-                    } else {
-                        if (pageLoader.source != "") {
-                            pageLoader.source = "";
-                            event.accepted = true;
-                        } else {
-                            quitDialog.open();
-                            event.accepted = true;
-                        }
-                    }
-                    break;
+        Column {
+            visible: fuse.touchscreen
+            anchors.top: parent.top
+            anchors.right: parent.right
+            Image {
+                height: Screen.pixelDensity * 10
+                width: Screen.pixelDensity * 15
+                source: "qrc:///images/keyboard-icon.svg"
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: toggleOnScreenControls(FuseEmulator.Keyboard48K, false);
                 }
             }
-
-            Keys.onReleased: {
-                switch (event.key) {
-                case Qt.Key_Return:
-                case Qt.Key_Enter:
-                    if (menuBar.position) {
-                        menuView.openSelectedMenu();
-                        event.accepted = true;
-                    }
-                    break;
-                }
-            }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: pageLoader.source = "";
-            }
-
-            Button {
-                anchors.top: parent.top
-                anchors.left: parent.left
-                text: "="
-                onClicked: {
-                    if (menuBar.position)
-                        menuBar.close();
-                    else
-                        menuBar.open();
-                }
-            }
-
-            Row {
-                visible: GamepadManager.connectedGamepads.length < 1
-                anchors.top: parent.top
-                anchors.right: parent.right
-                Image {
-                    height: Screen.pixelDensity * 10
-                    width: Screen.pixelDensity * 15
-                    source: "qrc:///images/keyboard-icon.svg"
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: toggleOnScreenControls(FuseEmulator.Keyboard48K, false);
-                    }
-                }
-                Image {
-                    height: Screen.pixelDensity * 10
-                    width: Screen.pixelDensity * 13
-                    source: "qrc:///images/controller-icon.svg"
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: toggleOnScreenControls(FuseEmulator.CursorJoystick, false);
+            Image {
+                height: Screen.pixelDensity * 10
+                width: Screen.pixelDensity * 13
+                source: "qrc:///images/controller-icon.svg"
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        onScreenCursorJoystick.source = "OnScreenJoystick.qml";
+                        toggleOnScreenControls(FuseEmulator.CursorJoystick, false);
                     }
                 }
             }
+        }
 
-            OnScreenCursorJoystick {
-                id: onScreenCursorJoystick
-                visible: false
-                gamepadMode: false
-                enabled: visible
-                anchors.fill: parent
-                z: parent.z + 10
-            }
+        Loader {
+            id: onScreenCursorJoystick
+            anchors.fill: parent
+            visible: false
+            focus: visible
+            enabled: visible
+            z: parent.z + 10
+            source: "OnScreenCursorJoystick.qml"
+            onVisibleChanged: if (!visible) mainRectangle.focus = true;
+        }
 
-            OnScreen48Keyboard {
-                id: onScreen48Keyboard
-                visible: false
-                enabled: visible
-                anchors.fill: parent
-                z: parent.z + 11
-            }
+        OnScreen48Keyboard {
+            id: onScreen48Keyboard
+            visible: false
+            enabled: visible
+            anchors.fill: parent
+            z: parent.z + 11
+            onVisibleChanged: if (!visible) mainRectangle.focus = true;
+        }
 
-            Loader {
-                z: parent.z + 20
-                id: pageLoader
-                anchors.fill: parent
-                visible: status === Loader.Ready
-                focus: visible
-                enabled: visible
-            }
+        Loader {
+            z: parent.z + 20
+            id: pageLoader
+            anchors.fill: parent
+            visible: status === Loader.Ready
+            focus: visible
+            enabled: visible
+            onVisibleChanged: if (!visible) mainRectangle.focus = true;
         }
 
         MessagePage {
@@ -247,15 +259,13 @@ ApplicationWindow {
         }
     }
 
-    function toggleOnScreenControls(type, gamepadMode) {
+    function toggleOnScreenControls(type) {
         switch (type) {
         case FuseEmulator.CursorJoystick:
             if (onScreenCursorJoystick.visible) {
                 onScreenCursorJoystick.visible = false;
-                onScreenCursorJoystick.gamepadMode = false;
             } else {
                 onScreenCursorJoystick.visible = true;
-                onScreenCursorJoystick.gamepadMode = gamepadMode;
             }
             break;
 
@@ -263,7 +273,6 @@ ApplicationWindow {
             onScreen48Keyboard.visible = !onScreen48Keyboard.visible
             break;
         }
-
     }
 
     Connections {
@@ -275,7 +284,7 @@ ApplicationWindow {
 
         onShowMenu: menuBar.open();
         onHideMenu: menuBar.close();
-        onToggleOnScreenControls: toggleOnScreenControls(type, gamepadMode)
+        onToggleOnScreenControls: toggleOnScreenControls(type)
         onShowWelcome: pageLoader.source = "AboutPage.qml";
     }
 
