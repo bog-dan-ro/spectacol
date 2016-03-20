@@ -78,6 +78,8 @@ void ZXGamesModel::setSearchData(const std::vector<ZXGamesModel::ZXData> &data, 
     m_totalFound = total;
     m_fetchStart = m_data.size();
     endResetModel();
+    if (m_data.empty())
+        emit noResults();
 }
 
 void ZXGamesModel::setFetchedData(const std::vector<ZXGamesModel::ZXData> &data)

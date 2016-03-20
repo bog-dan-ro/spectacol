@@ -31,7 +31,18 @@ Rectangle {
         repeat: false
         interval: 5000
         running: false
-        onTriggered: onlineGamesModel.search(searchText.text);
+        onTriggered: {
+            noResults.visible = false;
+            onlineGamesModel.search(searchText.text);
+        }
+    }
+
+    Connections {
+        target: onlineGamesModel
+        onNoResults: {
+            noResults.visible = true;
+            searchText.focus = true;
+        }
     }
 
     GamepadKeyNavigation {
@@ -53,16 +64,21 @@ Rectangle {
             Layout.fillWidth: true
             Layout.leftMargin: TextSizes.scale24 * 4
             Layout.rightMargin: TextSizes.scale24 * 4
-            placeholderText: qsTr("Type to search")
+            placeholderText: qsTr("Search title or one letter to browse the catalogue")
             onTextChanged: timer.restart()
             KeyNavigation.tab: grid
             KeyNavigation.down: grid
             onAccepted: {
+                noResults.visible = false;
                 timer.stop();
-                onlineGamesModel.search(searchText.text);
+                if (searchText.text.length == 1)
+                    onlineGamesModel.search("", searchText.text);
+                else
+                    onlineGamesModel.search(searchText.text);
                 grid.focus = true;
             }
         }
+
         GridView {
             id: grid
             KeyNavigation.tab: searchText
@@ -130,11 +146,22 @@ Rectangle {
         }
     }
 
+    FancyText {
+        id: noResults
+        visible: false
+        anchors.centerIn: parent
+        font.pixelSize: TextSizes.scale16
+        text: qsTr("No resutls")
+    }
+
     Component.onCompleted: {
+        noResults.visible = false;
         onlineGamesModel.search();
         fuse.paused = true;
+        fuse.processInputEvents = false;
     }
     Component.onDestruction: {
         fuse.paused = false
+        fuse.processInputEvents = true;
     }
 }
