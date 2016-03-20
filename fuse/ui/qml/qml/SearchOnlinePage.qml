@@ -76,7 +76,7 @@ Rectangle {
             currentIndex: 0
             Layout.alignment: Qt.AlignHCenter
             Layout.fillHeight: true
-            cellWidth: 320 + 4 * Screen.pixelDensity
+            cellWidth: 320 / TextSizes.scaleImage + 4 * Screen.pixelDensity
             cellHeight: cellWidth
             Layout.preferredWidth: Math.floor(parent.width / Math.ceil(cellWidth)) * Math.ceil(cellWidth)
             populate: Transition {
@@ -95,8 +95,8 @@ Rectangle {
                     Image {
                         Layout.margins: 2 * Screen.pixelDensity
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredHeight: 240
-                        Layout.preferredWidth: 320
+                        Layout.preferredHeight: 240 / TextSizes.scaleImage
+                        Layout.preferredWidth: 320 / TextSizes.scaleImage
                         source: "image://spectrum/" + screenFile
                         anchors.horizontalCenter: parent.horizontalCenter
                     }

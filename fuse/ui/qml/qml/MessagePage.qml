@@ -28,11 +28,11 @@ Rectangle {
     border.width: 0.25 * Screen.pixelDensity
     border.color: "red"
     color: Qt.rgba(0.15, 0.05, 0.05, 0.75)
-    height: TextSizes.scale24 * 3
+    height: TextSizes.scale20 * 3
     visible: false
 
     FancyText {
-        font.pixelSize: TextSizes.scale20
+        font.pixelSize: TextSizes.scale16
         id: message
         anchors.fill: parent
         elide: Text.ElideRight

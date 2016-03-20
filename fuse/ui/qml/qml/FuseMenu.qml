@@ -49,6 +49,7 @@ Menu {
         }
 
         MenuItem {
+            visible: false
             text: "&Save snapshot as ..."
             onTriggered: {
                 menuBar.close();

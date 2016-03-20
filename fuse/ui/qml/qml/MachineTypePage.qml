@@ -32,16 +32,16 @@ Item {
         currentIndex: fuseSettings.currentMachineIndex
         onCurrentIndexChanged: fuseSettings.currentMachineIndex = currentIndex
 
-        width: 11 * TextSizes.scale14
+        width: 11 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
         delegate: Rectangle {
             width: view.width
-            height: TextSizes.scale14 * 2
+            height: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) * 2
             color: Qt.rgba(0, 0, 0, 0.75);
 
             FancyText {
                 anchors.fill: parent
-                anchors.leftMargin: TextSizes.scale14 / 2
-                font.pixelSize: TextSizes.scale14
+                anchors.leftMargin: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) / 2
+                font.pixelSize: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
                 text: modelData
             }
             MouseArea {

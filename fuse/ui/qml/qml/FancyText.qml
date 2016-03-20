@@ -21,7 +21,7 @@ import Qt.labs.controls 1.0
 import "private" 1.0
 
 Label {
-    font.pixelSize: TextSizes.scale14
+    font.pixelSize: TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14
     font.family: 'Monospace'
     style: Text.Outline
     styleColor: "#66ff2200"

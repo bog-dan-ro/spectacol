@@ -42,7 +42,7 @@ Item {
 
     readonly property color backgroudColor : Qt.rgba(0, 0, 0, 0.85);
     ColumnLayout {
-        spacing: 2.5 * Screen.pixelDensity
+        spacing: TextSizes.smallScreen ? 0 : 2.5 * Screen.pixelDensity
         anchors.fill: parent
         RowLayout {
             spacing: 2.5 * Screen.pixelDensity
@@ -86,7 +86,7 @@ Item {
                 }
             }
             ColumnLayout {
-                spacing: 2.5 * Screen.pixelDensity
+                spacing: TextSizes.smallScreen ? 0 : 2.5 * Screen.pixelDensity
                 width: 18 * TextSizes.scale14
                 Layout.fillWidth: false
                 Layout.fillHeight: true
@@ -96,7 +96,7 @@ Item {
                     radius: Screen.pixelDensity
                     border.width: (focus ? 1 : 0.5) * Screen.pixelDensity
                     border.color: "white"
-                    height: 14 * TextSizes.scale14
+                    height: 14 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
                     Layout.fillWidth: true
                     RegistersView {
                         anchors.centerIn: parent

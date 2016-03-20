@@ -110,7 +110,7 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        Layout.preferredHeight: TextSizes.scale20 * 2
+        Layout.preferredHeight: (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20) * 2
         border.width: 0.25 * Screen.pixelDensity
         border.color: "black"
         color: Qt.rgba(0.25, 0.25, 0.25, 0.75);
@@ -141,7 +141,7 @@ ColumnLayout {
             id: menuItemRect
             visible: modelData.visible
             width: menuView.width
-            height: visible ? TextSizes.scale20 * 2 : 0
+            height: visible ? (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20) * 2 : 0
             border.width: 0.25 * Screen.pixelDensity
             border.color: (index !== menuView.currentIndex) ? "black" : "lightgreen"
             color: (index !== menuView.currentIndex) ? Qt.rgba(0.25, 0.25, 0.25, 0.75) : Qt.rgba(0.0, 0.85, 0.0, 0.75)
@@ -154,13 +154,13 @@ ColumnLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     height: parent.height
-                    font.pixelSize: TextSizes.scale16
+                    font.pixelSize: TextSizes.smallScreen ? TextSizes.scale14 : TextSizes.scale16
                     text: modelData.type === MenuItemType.Item ? Utils.shortcutText(modelData.text) : Utils.shortcutText(modelData.title)
                 }
                 FancyText {
                     Layout.fillHeight: true
                     visible: modelData.type === MenuItemType.Menu
-                    font.pixelSize: TextSizes.scale20
+                    font.pixelSize: TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20
                     font.bold: true
                     text: modelData.type === MenuItemType.Menu ? ">" : ""
                 }

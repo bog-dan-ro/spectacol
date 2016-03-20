@@ -95,6 +95,10 @@ Rectangle {
 
     ColumnLayout {
         anchors.centerIn: parent
+        Component.onCompleted: {
+            if (TextSizes.smallScreen)
+                spacing = 0;
+        }
         RowLayout {
             Layout.fillWidth: true
             FancyText {
@@ -121,6 +125,10 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             ColumnLayout {
+                Component.onCompleted: {
+                    if (TextSizes.smallScreen)
+                        spacing = 0;
+                }
                 Button {
                     id: buttonInc
                     Layout.fillWidth: true
@@ -183,14 +191,14 @@ Rectangle {
                         property color ink: view.currentIndex !== index ? "white": Qt.rgba(0, 0, 0, 0.9)
 
                         width: view.width
-                        height: 7 * Screen.pixelDensity
+                        height: TextSizes.scale12 * 2
                         color: paper
                         RowLayout {
                             anchors.fill: parent
                             FancyText {
                                 Layout.fillHeight: true
                                 Layout.fillWidth: false
-                                Layout.preferredWidth: 10 * Screen.pixelDensity
+                                Layout.preferredWidth: 5 * TextSizes.scale12
                                 horizontalAlignment: Text.AlignRight
                                 font.pixelSize: TextSizes.scale12
                                 style: Text.Normal
@@ -198,12 +206,12 @@ Rectangle {
                                 text: model.page
                             }
 
-                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                            Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                             FancyText {
                                 Layout.fillHeight: true
                                 Layout.fillWidth: false
-                                Layout.preferredWidth: 15 * Screen.pixelDensity
+                                Layout.preferredWidth: 6 * TextSizes.scale12
                                 horizontalAlignment: Text.AlignHCenter
                                 font.pixelSize: TextSizes.scale12
                                 style: Text.Normal
@@ -211,7 +219,7 @@ Rectangle {
                                 text: model.offsetText
                             }
 
-                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                            Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                             FancyText {
                                 Layout.fillHeight: true
@@ -223,7 +231,7 @@ Rectangle {
                                 text: model.value
                             }
 
-                            Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                            Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                             FancyText {
                                 Layout.fillHeight: true
@@ -268,32 +276,32 @@ Rectangle {
                         currentIndex: fuse.pokeFinderCount <= 20 ? 0 : -1
 
                         header: Rectangle {
-                            height: 5 * Screen.pixelDensity
+                            height: 2 * TextSizes.scale12
                             RowLayout {
                                 anchors.fill: parent
                                 FancyText {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: false
-                                    Layout.preferredWidth: 10 * Screen.pixelDensity
+                                    Layout.preferredWidth: 5 * TextSizes.scale12
                                     Layout.alignment: Qt.AlignRight
                                     font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Bank"
                                 }
 
-                                Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                                Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                                 FancyText {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: false
-                                    Layout.preferredWidth: 15 * Screen.pixelDensity
+                                    Layout.preferredWidth: 6 * TextSizes.scale12
                                     Layout.alignment: Qt.AlignLeft
                                     font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Offset"
                                 }
 
-                                Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                                Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                                 FancyText {
                                     Layout.fillHeight: true
@@ -304,7 +312,7 @@ Rectangle {
                                     text: "Value"
                                 }
 
-                                Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                                Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                                 FancyText {
                                     Layout.fillHeight: true
