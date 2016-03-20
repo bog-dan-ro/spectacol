@@ -23,4 +23,5 @@ In addition to FUSE's features, Spectacol adds:
 Be aware that, Spectacol is in **BETA** stage, so, if you find bugs or you like to see new features, please add them to the [bugtracker](https://github.com/bog-dan-ro/spectacol/issues)
 
 Download it from [google play](https://play.google.com/store/apps/details?id=eu.licentia.games.spectacol)
+
 Or become a [beta tester](https://play.google.com/apps/testing/eu.licentia.games.spectacol)
