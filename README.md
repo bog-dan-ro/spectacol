@@ -20,4 +20,4 @@ In addition to FUSE's features, Spectacol adds:
  - On Screen full/simplified 48K Keyboard needed when the numeric cursor is not enough
  - On screen virtual Joystick (available only when no gamepad is present), allows the user to play the games on touch screen
 
-Be aware that, Spectacol is in **BETA** stage, so, if you find bugs or you like to see new features, please add them to the [bugtracker](#issues)
+Be aware that, Spectacol is in **BETA** stage, so, if you find bugs or you like to see new features, please add them to the [bugtracker](https://github.com/bog-dan-ro/spectacol/issues)
