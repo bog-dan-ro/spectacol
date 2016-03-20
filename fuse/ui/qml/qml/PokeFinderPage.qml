@@ -95,6 +95,7 @@ Rectangle {
 
     ColumnLayout {
         anchors.centerIn: parent
+        width: TextSizes.scale12 * 40
         Component.onCompleted: {
             if (TextSizes.smallScreen)
                 spacing = 0;
