@@ -371,8 +371,17 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         settings_current.autosave_settings = 1;
     });
 #ifdef Q_OS_ANDROID
-    m_touchscreen = QtAndroid::androidActivity().callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;")
-                                                .callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(QLatin1String("android.hardware.touchscreen")).object());
+    auto pm = QtAndroid::androidActivity().callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;");
+    m_touchscreen = pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(QLatin1String("android.hardware.touchscreen")).object());
+    if (!pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(QLatin1String("android.hardware.audio.low_latency")).object())) {
+        pokeEvent([this]{
+            callFunction([this]{
+                QTimer::singleShot(500, [this] {
+                    emit error(Warning, tr("Your device doesn't support low latency audio.<br />You might experience sound issues."));
+                });
+            });
+        });
+    }
 #endif
 }
 
