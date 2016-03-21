@@ -306,7 +306,8 @@ ApplicationWindow {
                     pageLoader.source = "CalibrateGamepad.qml";
                 }
             } else {
-                messagePage.showMessage(FuseEmulator.Info, qsTr("No gamepad was found, please connect a gamepad"));
+                if (!fuse.touchscreen)
+                    messagePage.showMessage(FuseEmulator.Info, qsTr("No gamepad was found, please connect a gamepad"));
             }
         }
     }
