@@ -4,7 +4,7 @@ Spectacol (in Romanian it means **show**) is a [free](http://www.gnu.org/license
 
 Why QML? Well, first and foremost because I love Qt and also because I needed a framework which allows me to quickly target [lots of platforms](http://doc.qt.io/qt-5/supported-platforms.html) painlessly.
 
-Why [FUSE](http://fuse-emulator.sourceforge.net/)? Because it has, by far, the reachest ZX features list.
+Why [FUSE](http://fuse-emulator.sourceforge.net/)? Because it has, by far, the richest ZX features list.
 **Spectacol**, currently, enables the following features:
  - Loads all ZX Spectrum files
  - Accurate 16K, 48K, 128K, +2, +2A and +3 emulation
