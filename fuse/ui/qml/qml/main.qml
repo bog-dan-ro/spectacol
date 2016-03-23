@@ -200,6 +200,7 @@ ApplicationWindow {
             visible: fuse.touchscreen
             anchors.top: parent.top
             anchors.right: parent.right
+            opacity: (onScreenCursorJoystick.visible || onScreen48Keyboard.visible) ? 0.25 : 1.0
             Image {
                 height: Screen.pixelDensity * 10
                 width: Screen.pixelDensity * 15
