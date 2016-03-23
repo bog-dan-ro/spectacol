@@ -212,7 +212,7 @@ static input_key toJoystickKey(QGamepadManager::GamepadButton button)
     case QGamepadManager::ButtonLeft: return INPUT_JOYSTICK_LEFT;
 
     case QGamepadManager::ButtonL1: return INPUT_JOYSTICK_FIRE_1;
-    case QGamepadManager::ButtonR1: return INPUT_JOYSTICK_FIRE_2;
+    case QGamepadManager::ButtonR1: return INPUT_JOYSTICK_FIRE_1;
 
     case QGamepadManager::ButtonL2: return INPUT_JOYSTICK_FIRE_3;
     case QGamepadManager::ButtonR2: return INPUT_JOYSTICK_FIRE_4;
