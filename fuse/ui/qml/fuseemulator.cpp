@@ -135,25 +135,6 @@ void FuseThread::run()
         argv[argc++] = argsVector.back().constData();
     }
 
-    scaler_register_clear();
-    scaler_select_bitformat( 565 );		/* 16bit always */
-    scaler_register( SCALER_NORMAL );
-#ifndef Q_OS_ANDROID
-    scaler_register( SCALER_2XSAI );
-    scaler_register( SCALER_SUPER2XSAI );
-    scaler_register( SCALER_SUPEREAGLE );
-    scaler_register( SCALER_ADVMAME2X );
-    scaler_register( SCALER_ADVMAME3X );
-    scaler_register( SCALER_DOTMATRIX );
-    scaler_register( SCALER_PALTV );
-    scaler_register( SCALER_HQ2X );
-    scaler_register( SCALER_TV2X );
-    scaler_register( SCALER_TV3X );
-    scaler_register( SCALER_PALTV2X );
-    scaler_register( SCALER_PALTV3X );
-    scaler_register( SCALER_HQ3X );
-#endif
-
     fuse_main(argc, argv);
     m_audioOutput.reset();
     qApp->quit();

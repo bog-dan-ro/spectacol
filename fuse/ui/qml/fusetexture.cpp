@@ -42,34 +42,26 @@ extern "C" int uidisplay_init( int width, int height )
     scaler_select_bitformat( 565 );		/* 16bit always */
 
     scaler_register( SCALER_NORMAL );
-#ifndef Q_OS_ANDROID
-    scaler_register( SCALER_2XSAI );
-    scaler_register( SCALER_SUPER2XSAI );
-    scaler_register( SCALER_SUPEREAGLE );
     scaler_register( SCALER_ADVMAME2X );
     scaler_register( SCALER_ADVMAME3X );
     scaler_register( SCALER_DOTMATRIX );
     scaler_register( SCALER_PALTV );
     scaler_register( SCALER_HQ2X );
     if( machine_current->timex ) {
-      scaler_register( SCALER_HALF );
-      scaler_register( SCALER_HALFSKIP );
-      scaler_register( SCALER_TIMEXTV );
-      scaler_register( SCALER_TIMEX1_5X );
+        scaler_register( SCALER_HALF );
+        scaler_register( SCALER_HALFSKIP );
+        scaler_register( SCALER_TIMEXTV );
+        scaler_register( SCALER_TIMEX1_5X );
     } else {
-      scaler_register( SCALER_TV2X );
-      scaler_register( SCALER_TV3X );
-      scaler_register( SCALER_PALTV2X );
-      scaler_register( SCALER_PALTV3X );
-      scaler_register( SCALER_HQ3X );
+        scaler_register( SCALER_TV2X );
+        scaler_register( SCALER_PALTV2X );
+        scaler_register( SCALER_HQ3X );
     }
-#endif
 
-    if( scaler_is_supported( current_scaler ) ) {
-      scaler_select_scaler( current_scaler );
-    } else {
+    if (scaler_is_supported(current_scaler))
+      scaler_select_scaler(current_scaler);
+    else
       scaler_select_scaler( SCALER_NORMAL );
-    }
 
     display_ui_initialised = 1;
     s_semaphore.release();
@@ -140,7 +132,7 @@ FuseTexture::FuseTexture()
 
 FuseTexture::~FuseTexture()
 {
-    delete[] m_spectrumPixels;
+    delete[] (m_spectrumPixels - m_width);
     delete[] m_spectrumScaledPixels;
     delete[] m_savedSpectrumPixels;
     delete[] m_glPixels;
@@ -167,32 +159,29 @@ void FuseTexture::resize(uint32_t w, uint32_t h)
 {
     {
         QMutexLocker lock(&m_syncVars);
+        delete[] (m_spectrumPixels - m_width);
         m_width = w;
         m_height = h;
-        delete[] m_spectrumPixels;
-        m_spectrumPixels = new uint16_t[m_width * m_height];
+        m_spectrumPixels = new uint16_t[m_width * (m_height + 2)];
+        memset(m_spectrumPixels , 0 , 2 * m_width * (m_height + 2));
+        m_spectrumPixels += m_width;
     }
     rescale();
 }
 
 void FuseTexture::rescale()
 {
-
     uint32_t scale = scaler_get_scaling_factor( current_scaler );
     if (!scale)
         scale = 1;
 
     QMutexLocker lock(&m_syncVars);
-    if (m_scale == scale)
-        return;
-
     m_scale = scale;
     delete[] m_spectrumScaledPixels;
-    if (m_scale == 1) {
+    if (m_scale == 1)
         m_spectrumScaledPixels = nullptr;
-    } else {
+    else
         m_spectrumScaledPixels = new uint16_t[m_width * m_scale * m_height * m_scale];
-    }
 
     m_texSize = QSize(nextpow2(m_width * m_scale), nextpow2(m_height * m_scale));
     delete[] m_glPixels;
@@ -419,9 +408,7 @@ QRect FuseTexture::updateGlPixels()
     int specPitch = m_width * m_scale;
 
     if (m_scale != 1) {
-        /* Extend the dirty region by 1 pixel for scalers
-           that "smear" the screen, e.g. 2xSAI */
-        if( scaler_flags & SCALER_FLAGS_EXPAND )
+        if (scaler_flags & SCALER_FLAGS_EXPAND)
             scaler_expander(&x, &y, &w, &h, m_width, m_height);
 
         QMutexLocker lockCopy(&m_copyPixelsMutex);
