@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\"
-.\" tape2wav.1: tape2wav man page
-.\" Copyright (c) 2007 Fredrick Meunier
+.\" tape2pulses.1: tape2pulses man page
+.\" Copyright (c) 2016 Fredrick Meunier
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -22,34 +22,28 @@
 .\" E-mail: fredm@spamcop.net
 .\"
 .\"
-.TH tape2wav 1 "18th May, 2013" "Version 1.1.0" "Emulators"
+.TH tape2pulses 1 "25th March, 2016" "Version 1.1.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH NAME
-tape2wav \(em Sinclair ZX Spectrum tape to wav audio file converter
+tape2pulses \(em Sinclair ZX Spectrum tape pulse dumper
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH SYNOPSIS
-.B tape2wav
-.RI "[ \-r " "sample rate" " ]"
+.B tape2pulses
 .I infile outfile
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH DESCRIPTION
-tape2wav converts ZX Spectrum tape images to audio files.
+tape2pulses dumps the pulse information from ZX Spectrum tape images to
+text files.
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH OPTIONS
-.TP
-.RI "\-r " "sample rate"
-causes
-.I sample rate
-to be used as the sample rate for the target wav file. The default rate is
-44100 Hz.
 .TP
 \-h, \-\-help
 give brief usage help, listing available options.
@@ -63,8 +57,8 @@ tape formats supported by
 .IR libspectrum "(3)."
 .TP
 .I outfile
-specifies the output wav file, if set to \(lq\-\(rq will write the file to standard
-output.
+specifies the output text file, if set to \(lq\-\(rq will write the file to
+standard output.
 .\"
 .\"------------------------------------------------------------------
 .\"

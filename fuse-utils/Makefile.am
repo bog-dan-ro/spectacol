@@ -36,6 +36,7 @@ bin_PROGRAMS = createhdf \
 	       snap2tzx \
 	       snapconv \
 	       tapeconv \
+	       tape2pulses \
 	       tzxlist
 
 if BUILD_AUDIOTOOLS
@@ -117,6 +118,9 @@ audio2tape_LDADD = $(LIBSPEC_LIBS) $(AUDIOFILE_LIBS) \
 tape2wav_SOURCES = tape2wav.c utils.c
 tape2wav_LDADD = $(LIBSPEC_LIBS) $(AUDIOFILE_LIBS) \
                  compat/libcompatos.a
+
+tape2pulses_SOURCES = tape2pulses.c utils.c
+tape2pulses_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
 
 noinst_HEADERS = compat.h ide.h utils.h audio2tape.h importer/interpolator.h \
                  importer/schmitt.h importer/simple.h importer/soundfile.h \
