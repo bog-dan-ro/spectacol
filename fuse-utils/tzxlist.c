@@ -512,6 +512,7 @@ process_tape( char *filename )
                8 );
       printf("  Tail length: %d tstates\n",
 	     libspectrum_tape_block_tail_length( block ) );
+      decode_header( block );
       break;
 
     default:
