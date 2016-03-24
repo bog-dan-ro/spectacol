@@ -866,6 +866,7 @@ tape_block_details( char *buffer, size_t length,
   switch( libspectrum_tape_block_type( block ) ) {
 
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
+  case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
     /* See if this looks like a standard Spectrum header and if so
        display some extra data */
     if( libspectrum_tape_block_data_length( block ) != 19 ) goto normal;
@@ -897,7 +898,6 @@ tape_block_details( char *buffer, size_t length,
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
   case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
-  case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
     snprintf( buffer, length, "%lu bytes",
 	      (unsigned long)libspectrum_tape_block_data_length( block ) );
     break;

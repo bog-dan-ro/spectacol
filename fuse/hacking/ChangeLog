@@ -4987,3 +4987,5 @@
 20160325 machines/specplus3.c,peripherals/disk/{beta.c,didaktik.c,disciple.c,
          fdd.c,opus.c,plusd.c,wd_fdc.c}: move the "Disk icon" update code to
          fdd.c (patch #348) (Gergely Szasz).
+20160325 tape.c: also check if data blocks are headers for handling PZX files
+         (Fred).
