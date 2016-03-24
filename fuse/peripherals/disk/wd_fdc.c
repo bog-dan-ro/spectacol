@@ -36,7 +36,6 @@
 #include "ui/ui.h"
 #include "wd_fdc.h"
 
-static void statusbar_update( int busy );
 static void crc_preset( wd_fdc *f );
 static void crc_add( wd_fdc *f, fdd_t *d );
 static int read_id( wd_fdc *f );
@@ -125,14 +124,6 @@ wd_fdc_alloc_fdc( wd_type_t type, int hlt_time, unsigned int flags )
   fdc->flags = flags;			/* Beta128 connect HLD out to READY in and MOTOR ON */
   wd_fdc_master_reset( fdc );
   return fdc;
-}
-
-static void
-statusbar_update( int busy )
-{
-  ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
-		       busy ? UI_STATUSBAR_STATE_ACTIVE :
-			      UI_STATUSBAR_STATE_INACTIVE );
 }
 
 void
@@ -529,7 +520,6 @@ type_i_verify:
       event_add_with_data( tstates + 15 * 				/* 15ms */
 		    machine_current->timings.processor_speed / 1000,
 			fdc_event, f );
-      statusbar_update( 1 );
     }
 
     f->state = WD_FDC_STATE_VERIFY;
@@ -538,7 +528,6 @@ type_i_verify:
 	!( f->status_register & WD_FDC_SR_MOTORON ) ) {
       f->status_register |= WD_FDC_SR_MOTORON;
       fdd_motoron( f->current_drive, 1 );
-      statusbar_update( 1 );
       event_remove_type( fdc_event );
       event_add_with_data( tstates + 12 * 		/* 6 revolution 6 * 200 / 1000 */
 		    machine_current->timings.processor_speed / 10,
@@ -624,7 +613,6 @@ wd_fdc_type_ii_seek( wd_fdc *f )
     for( i = 11; i > 0; i-- )	/* "delay" 11 GAP byte */
       fdd_read_data( d );
     wd_fdc_set_datarq( f );
-    f->data_offset = 0;
     if( f->dden )
       for( i = 11; i > 0; i-- )	/* "delay" another 11 GAP byte */
 	fdd_read_data( d );
@@ -797,7 +785,6 @@ wd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
       else
         fdd_head_load( d, 0 );
     }
-    statusbar_update( 0 );
     return;
   }
 
@@ -885,7 +872,6 @@ wd_fdc_spinup( wd_fdc *f, libspectrum_byte b )
     if( !( f->status_register & WD_FDC_SR_MOTORON ) ) {
       f->status_register |= WD_FDC_SR_MOTORON;
       fdd_motoron( d, 1 );
-      statusbar_update( 1 );
       if( !( b & 0x08 ) )
         delay += 6 * 200;
     }
@@ -898,7 +884,6 @@ wd_fdc_spinup( wd_fdc *f, libspectrum_byte b )
           fdd_motoron( d, 1 );
         else
 	  fdd_head_load( d, 1 );
-	statusbar_update( 1 );
       } else if( !( b & 0x04 ) ) {	/* HLD reset only if V flag == 0 too */
 	f->head_load = 0;
         if( !( f->flags & WD_FLAG_NOHLT ) && f->hlt_time > 0 ) f->hlt = 0;		/* reset the trigger */
@@ -906,7 +891,6 @@ wd_fdc_spinup( wd_fdc *f, libspectrum_byte b )
           fdd_motoron( d, 0 );
         else
 	  fdd_head_load( d, 0 );
-	statusbar_update( 0 );
       }
       return 0;
     } else {
@@ -915,7 +899,6 @@ wd_fdc_spinup( wd_fdc *f, libspectrum_byte b )
         fdd_motoron( d, 1 );
       else
         fdd_head_load( d, 1 );
-      statusbar_update( 1 );
       if( f->hlt_time > 0 )
         delay += f->hlt_time;
     }

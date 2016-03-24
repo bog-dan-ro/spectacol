@@ -4984,3 +4984,6 @@
          #330) (Fred).
 20160302 peripherals/ula.c: add parens to avoid gcc warning (more from bug #330)
          (thanks, Sergio) (Fred).
+20160325 machines/specplus3.c,peripherals/disk/{beta.c,didaktik.c,disciple.c,
+         fdd.c,opus.c,plusd.c,wd_fdc.c}: move the "Disk icon" update code to
+         fdd.c (patch #348) (Gergely Szasz).
