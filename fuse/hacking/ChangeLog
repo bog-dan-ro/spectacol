@@ -4989,3 +4989,5 @@
          fdd.c (patch #348) (Gergely Szasz).
 20160325 tape.c: also check if data blocks are headers for handling PZX files
          (Fred).
+20160325 tape.c: correctly count number of pulses in PZX pulse block for tape
+         browser (Fred).

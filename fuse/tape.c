@@ -860,6 +860,8 @@ tape_block_details( char *buffer, size_t length,
   libspectrum_byte *data;
   const char *type; unsigned char name[11];
   int offset;
+  size_t i;
+  unsigned long total_pulses;
 
   buffer[0] = '\0';
 
@@ -908,9 +910,15 @@ tape_block_details( char *buffer, size_t length,
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_PULSES:
-  case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
     snprintf( buffer, length, "%lu pulses",
 	      (unsigned long)libspectrum_tape_block_count( block ) );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
+    total_pulses = 0;
+    for( i=0; i < libspectrum_tape_block_count( block ); i++ )
+      total_pulses += libspectrum_tape_block_pulse_repeats( block, i );
+    snprintf( buffer, length, "%lu pulses", total_pulses );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
