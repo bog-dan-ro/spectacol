@@ -381,7 +381,9 @@ data_block_init( libspectrum_tape_data_block *block,
     }
   }
 
-  state->level = block->initial_level;
+  if( block->initial_level != -1 ) {
+    state->level = block->initial_level;
+  }
 
   /* We're just before the start of the data */
   state->bytes_through_block = -1; state->bits_through_byte = 7;

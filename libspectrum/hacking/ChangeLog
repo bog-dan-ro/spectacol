@@ -1020,3 +1020,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150617 Makefile.am,test/Makefile.am: enable silent rules for perl and windres
          commands (Sergio).
 20150831 test/turbo-zeropilot.tzx: add mime-type property (Sergio).
+20160325 tape_block.c: allow for the possibility that inital_level has the
+         default value (Fred).
