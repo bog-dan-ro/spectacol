@@ -86,7 +86,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
    <li><a href="http://fedoraproject.org/">Fedora</a> has <a href="https://apps.fedoraproject.org/packages/fuse-emulator/">packages</a> of 1.1.1 available by Lucian Langa.</li>
    <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.1.1 available as <a href="http://svnweb.freebsd.org/ports/head/emulators/fuse/">emulators/fuse</a>.</li>
    <li><a href="https://www.gentoo.org/">Gentoo</a> users have an <a href="https://packages.gentoo.org/packages/app-emulation/fuse">ebuild</a> of 1.1.1 available.</li>
-   <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 1.1.1 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse/">emulators/fuse</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-utils/">emulators/fuse-utils</a>.</li>
+   <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 1.1.1 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-emulator/">emulators/fuse-emulator</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-emulator-utils/">emulators/fuse-emulator-utils</a>.</li>
    <li><a href="http://www.openbsd.org/">OpenBSD</a> users have version 1.1.1 available as the fuse and fuse-utils package, with thanks to Anthony J. Bentley.</li>
    <li><a href="https://www.opensuse.org/">openSUSE</a> users have version 1.1.1 as the <a href="https://build.opensuse.org/package/show/Emulators/Fuse">Fuse</a> package from Emulators repository.</li>
    <li>The <a href="https://www.pld-linux.org/">Polish Linux Distribution</a> has packages of <a href="http://sophie.zarb.org/search?search=fuse-gtk&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">Fuse</a> 1.1.1 and the <a href="http://sophie.zarb.org/search?search=fuse-utils&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">utilities</a>.</li>
@@ -104,6 +104,12 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
 
   <h3>Windows</h3>
   <p>A port to Windows of 1.1.1 by Sergio Baldovi is available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.1.1/fuse-1.1.1-win32-setup.exe/download">here</a>, and the utilities are available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.1.1/fuse-utils-1.1.1-win32.zip/download">here</a>.</p>
+
+  <h3>Android</h3>
+  <p>BogDan Vatra has ported Fuse 1.1.1 to Android OS, which could run on smartphones, tablets and TVs. Sources are available from <a href="https://github.com/bog-dan-ro/spectacol">GitHub</a> and binaries from <a href="https://play.google.com/store/apps/details?id=eu.licentia.games.spectacol">Google Play</a>.</p>
+
+  <h3>Haiku</h3>
+  <p>Adrien Destugues has ported Fuse 1.1.1 to Haiku, available from haikuports as <a href="https://github.com/haikuports/haikuports/tree/master/app-emulation/fuse">app-emulation/fuse</a> and <a href="https://github.com/haikuports/haikuports/tree/master/app-emulation/fuse-utils">app-emulation/fuse-utils</a>.</p>
 
   <h3>AmigaOS 4</h3>
   <p>Chris Young has ported Fuse 1.0.0.1 to AmigaOS 4, with binaries available from Aminet as <a href="http://aminet.net/package/misc/emu/fuse.lha">misc/emu/fuse.lha</a>.</p>
@@ -129,7 +135,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>PocketPC</h3>
   <p>Anders Holmberg's ported Fuse 0.4 to the PocketPC as <a href="http://pocketclive.emuunlim.com/">PocketClive</a>.</p>
 
-  <h3>Smartphone</h3>
+  <h3>Windows Mobile Smartphone</h3>
   <p>Keith Orbell's then ported PocketClive to the Smartphone as <a href="http://web.archive.org/web/20090418170517/http://www.aooa27.dsl.pipex.com/FuseSP.htm">FuseSP</a>.</p>
 
 END_SECTION
