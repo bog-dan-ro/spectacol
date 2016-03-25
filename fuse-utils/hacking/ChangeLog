@@ -527,3 +527,4 @@
 20160325 Makefile.am,man/{Makefile.am,audio2tape.1,tape2pulses.1,tape2wav.1,
          tapeconv.1,tzxlist.1},tape2pulses.c: add new utility to dump the
          pulses found in a tape file to a file for analysis (Fred).
+20160325 tape2pulses.c: fix getopt_long arguments (Fred).

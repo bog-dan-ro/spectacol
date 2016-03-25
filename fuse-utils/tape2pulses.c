@@ -58,7 +58,7 @@ main( int argc, char **argv )
     { 0, 0, 0, 0 }
   };
 
-  while( ( c = getopt_long( argc, argv, "r:hV", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "hV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
 
