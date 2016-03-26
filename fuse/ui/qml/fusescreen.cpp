@@ -93,16 +93,6 @@ QSGNode *FuseScreen::updatePaintNode(QSGNode *n, QQuickItem::UpdatePaintNodeData
     return node;
 }
 
-void FuseScreen::keyPressEvent(QKeyEvent *event)
-{
-    g_fuseEmulator->keyPress(event);
-}
-
-void FuseScreen::keyReleaseEvent(QKeyEvent *event)
-{
-    g_fuseEmulator->keyRelease(event);
-}
-
 void FuseScreen::mousePressEvent(QMouseEvent *event)
 {
     g_fuseEmulator->mousePress(event);

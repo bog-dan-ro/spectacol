@@ -24,6 +24,7 @@ Item {
     id: onScreenKeyboard
     enabled: visible
 
+    property bool gamepadMode: false
     anchors.topMargin: Screen.pixelDensity * 20
     anchors.leftMargin: Screen.pixelDensity * 2
     anchors.rightMargin: Screen.pixelDensity * 2
@@ -155,7 +156,7 @@ Item {
         id: highlight
         Rectangle {
             id: rect
-            visible: fuse.gamepadId != -1 && !fuse.touchscreen
+            visible: fuse.gamepadId != -1 && gamepadMode
             width: grid.cellWidth; height: grid.cellHeight
             x: grid.currentItem.x
             y: grid.currentItem.y
@@ -181,7 +182,7 @@ Item {
         cellHeight: cellWidth
         model: zx48Keyboard
         currentIndex: 24
-        interactive: fuse.gamepadId != -1 && !fuse.touchscreen
+        interactive: fuse.gamepadId != -1 && gamepadMode
 
         delegate: Rectangle {
             id: rec

@@ -45,8 +45,6 @@ signals:
 protected:
     QSGNode *updatePaintNode(QSGNode *n, UpdatePaintNodeData *);
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

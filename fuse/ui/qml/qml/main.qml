@@ -110,7 +110,7 @@ ApplicationWindow {
                 break;
 
             case Qt.Key_F11:
-                fullScreen = !fullScreen;
+                fuseScreen.fullScreen = !fuseScreen.fullScreen;
                 event.accepted = true;
                 break;
 
@@ -159,6 +159,10 @@ ApplicationWindow {
                 }
                 break;
             }
+            if (!event.accepted && fuse.processInputEvents) {
+                fuse.keyPress(event.key, event.modifiers, event.isAutoRepeat);
+                event.accepted = true;
+            }
         }
 
         Keys.onReleased: {
@@ -170,6 +174,10 @@ ApplicationWindow {
                     event.accepted = true;
                 }
                 break;
+            }
+            if (!event.accepted && fuse.processInputEvents) {
+                fuse.keyRelease(event.key, event.modifiers, event.isAutoRepeat);
+                event.accepted = true;
             }
         }
 
@@ -260,7 +268,7 @@ ApplicationWindow {
         }
     }
 
-    function toggleOnScreenControls(type) {
+    function toggleOnScreenControls(type, gamepad) {
         switch (type) {
         case FuseEmulator.CursorJoystick:
             if (onScreenCursorJoystick.visible) {
@@ -271,7 +279,8 @@ ApplicationWindow {
             break;
 
         case FuseEmulator.Keyboard48K:
-            onScreen48Keyboard.visible = !onScreen48Keyboard.visible
+            onScreen48Keyboard.visible = !onScreen48Keyboard.visible;
+            onScreen48Keyboard.gamepadMode = gamepad;
             break;
         }
     }
@@ -285,7 +294,7 @@ ApplicationWindow {
 
         onShowMenu: menuBar.open();
         onHideMenu: menuBar.close();
-        onToggleOnScreenControls: toggleOnScreenControls(type)
+        onToggleOnScreenControls: toggleOnScreenControls(type, true)
         onShowWelcome: pageLoader.source = "AboutPage.qml";
     }
 

@@ -275,6 +275,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
 
         switch (button) {
         case QGamepadManager::ButtonStart:
+            setGamepadId(deviceId);
             emit showMenu();
             return;
         case QGamepadManager::ButtonX:
@@ -683,6 +684,7 @@ void FuseEmulator::setGamepadId(int gamepadId)
     }
 
     m_gamepadId = gamepadId;
+    emit error(Info, tr("A new default gamepad was selected"));
     emit gamepadIdChanged();
 }
 
@@ -700,54 +702,6 @@ int FuseEmulator::soundLowlevelInit(const char *device, int *freqptr, int *stere
 void FuseEmulator::soundLowlevelFrame(libspectrum_signed_word *data, int len)
 {
     return m_fuseThread.soundLowlevelFrame(data, len);
-}
-
-void FuseEmulator::keyPress(QKeyEvent *event)
-{
-    if (!m_processInputEvents)
-        return;
-
-    event->accept();
-    if (ui_widget_level == -1 && event->isAutoRepeat())
-        return;
-
-    input_key key = keysyms_remap(event->key() + event->modifiers());
-    if (key == INPUT_KEY_NONE)
-        key = keysyms_remap(event->key());
-    if (key == INPUT_KEY_NONE)
-        return;
-
-    pokeEvent([key]{
-        input_event_t event;
-        event.type = INPUT_EVENT_KEYPRESS;
-        event.types.key.spectrum_key = key;
-        event.types.key.native_key = key;
-        input_event(&event);
-    });
-}
-
-void FuseEmulator::keyRelease(QKeyEvent *event)
-{
-    if (!m_processInputEvents)
-        return;
-
-    event->accept();
-    if (ui_widget_level == -1 && event->isAutoRepeat())
-        return;
-
-    input_key key = keysyms_remap(event->key() + event->modifiers());
-    if (key == INPUT_KEY_NONE)
-        key = keysyms_remap(event->key());
-    if (key == INPUT_KEY_NONE)
-        return;
-
-    pokeEvent([key]{
-        input_event_t event;
-        event.type = INPUT_EVENT_KEYRELEASE;
-        event.types.key.spectrum_key = key;
-        event.types.key.native_key = key;
-        input_event(&event);
-    });
 }
 
 void FuseEmulator::mousePress(QMouseEvent *event)
@@ -973,36 +927,49 @@ void FuseEmulator::pokeMemory(int address, int page, int value)
     }
 }
 
-void FuseEmulator::keyPress(Qt::Key qtKey)
+void FuseEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat)
 {
+    if (ui_widget_level == -1 && autoRepeat)
+        return;
+
+    input_key unicode = keysyms_remap(qtKey + modifiers);
     input_key key = keysyms_remap(qtKey);
+    if (unicode == INPUT_KEY_NONE)
+        unicode = key;
+
     if (key == INPUT_KEY_NONE)
         return;
 
-    pokeEvent([key]{
+    pokeEvent([key, unicode]{
         input_event_t event;
         event.type = INPUT_EVENT_KEYPRESS;
         event.types.key.spectrum_key = key;
-        event.types.key.native_key = key;
+        event.types.key.native_key = unicode;
         input_event(&event);
     });
 
 }
 
-void FuseEmulator::keyRelease(Qt::Key qtKey)
+void FuseEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat)
 {
+    if (ui_widget_level == -1 && autoRepeat)
+        return;
+
+    input_key unicode = keysyms_remap(qtKey + modifiers);
     input_key key = keysyms_remap(qtKey);
+    if (unicode == INPUT_KEY_NONE)
+        unicode = key;
+
     if (key == INPUT_KEY_NONE)
         return;
 
-    pokeEvent([key]{
+    pokeEvent([key, unicode]{
         input_event_t event;
         event.type = INPUT_EVENT_KEYRELEASE;
         event.types.key.spectrum_key = key;
-        event.types.key.native_key = key;
+        event.types.key.native_key = unicode;
         input_event(&event);
     });
-
 }
 
 void FuseEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value)

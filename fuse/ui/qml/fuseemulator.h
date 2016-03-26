@@ -185,8 +185,6 @@ public:
     void soundLowlevelFrame(libspectrum_signed_word *data, int len);
     void soundLowlevelEnd(void) {}
 
-    void keyPress(QKeyEvent *event);
-    void keyRelease(QKeyEvent *event);
     void mousePress(QMouseEvent *event);
     void mouseMove(QMouseEvent *event);
     void mouseRelease(QMouseEvent *event);
@@ -228,8 +226,8 @@ public slots:
 
     void pokeMemory(int address, int page, int value);
 
-    void keyPress(Qt::Key qtKey);
-    void keyRelease(Qt::Key qtKey);
+    void keyPress(int qtKey, int modifiers = 0, bool autoRepeat = false);
+    void keyRelease(int qtKey, int modifiers = 0, bool autoRepeat = false);
     void gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value);
     void gamepadButtonPressEvent(QGamepadManager::GamepadButton button);
     void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button);
