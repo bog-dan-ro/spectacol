@@ -61,7 +61,7 @@ ListView {
             property color ink: view.currentIndex !== index ? foreground : selectedForeground
 
             width: view.width
-            height: TextSizes.scale24
+            height: asmEdit.contentHeight + asmEdit.topPadding + asmEdit.bottomPadding + Screen.pixelDensity
             color: paper
             MouseArea {
                 anchors.fill: parent
