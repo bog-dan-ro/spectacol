@@ -19,255 +19,93 @@
 
 import QtQuick 2.5
 import QtQuick.Layouts 1.1
+import QtQuick.Window 2.2
 import "private" 1.0
 
-GridLayout {
-    columns: 4
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "PC"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.PC
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "SP"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.SP
-    }
+Flickable {
+    anchors.margins: Screen.pixelDensity * 3
+    contentHeight: grid.height
+    contentWidth: grid.width
+    clip: true
+    Grid {
+        id: grid
+        columns: 2
+        columnSpacing: Screen.pixelDensity * 3
+        rowSpacing: Screen.pixelDensity
+        horizontalItemAlignment: Grid.AlignRight
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "PC :" + fuse.PC
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "SP :" + fuse.SP
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "AF :" + fuse.AF
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "AF' :" + fuse.AF_
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "BC :" + fuse.BC
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "BC' :" + fuse.BC_
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "DE :" + fuse.DE
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "DE' :" + fuse.DE_
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "HL :" + fuse.HL
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "HL' :" + fuse.HL_
+        }
 
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "AF"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.AF
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "AF'"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.AF_
-    }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "IX :" + fuse.IX
+        }
 
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "BC"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.BC
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "BC'"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.BC_
-    }
-
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "DE"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.DE
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "DE'"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.DE_
-    }
-
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "HL"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.HL
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "HL'"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.HL_
-    }
-
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "IX"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.IX
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "IY"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.IY
-    }
-
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "I"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.I
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "R"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.R
-    }
-
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "IFF1"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.IFF1
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "IFF2"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.IFF2
-    }
-
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "R7"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.R7
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        horizontalAlignment: Text.AlignRight
-        Layout.fillHeight: false
-        Layout.fillWidth: true
-        text: "IM"
-    }
-    FancyText {
-        font.pixelSize: TextSizes.scale12
-        Layout.fillHeight: false
-        Layout.fillWidth: false
-        text: fuse.IM
-    }
-
-    Item {
-        Layout.fillHeight: true
-        Layout.fillWidth: true
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "IY :" + fuse.IY
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "I :" + fuse.I
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "R :" + fuse.R
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "IFF1 :" + fuse.IFF1
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "IFF2 :" + fuse.IFF2
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "R7 :" + fuse.R7
+        }
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "IM :" + fuse.IM
+        }
     }
 }

@@ -84,35 +84,30 @@ Item {
             }
         }
     }
-    ColumnLayout {
+    ListView {
+        id: view
+
         anchors.fill: parent
+        clip: true
+        snapMode: ListView.SnapToItem
+        highlightFollowsCurrentItem: true
+        focus: true
 
-        ListView {
-            id: view
-
-            clip: true
-            snapMode: ListView.SnapToItem
-            highlightFollowsCurrentItem: true
-            focus: true
-
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            Keys.onPressed: {
-                switch (event.key) {
-                case Qt.Key_Y:
-                    fuse.debuggerCommand("delete " + visualModel.items.get(view.currentIndex).model.id);
-                    break;
-                case Qt.Key_X:
-                    fuse.debuggerCommand("delete");
-                    break;
-                }
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        Keys.onPressed: {
+            switch (event.key) {
+            case Qt.Key_Y:
+                fuse.debuggerCommand("delete " + visualModel.items.get(view.currentIndex).model.id);
+                break;
+            case Qt.Key_X:
+                fuse.debuggerCommand("delete");
+                break;
             }
-
-            model: visualModel
         }
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: false
+
+        model: visualModel
+        footer: RowLayout {
             Button {
                 Layout.alignment: Qt.AlignVCenter
                 enabled: view.currentIndex != -1

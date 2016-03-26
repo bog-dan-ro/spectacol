@@ -99,8 +99,7 @@ Item {
                     height: 14 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
                     Layout.fillWidth: true
                     RegistersView {
-                        anchors.centerIn: parent
-                        columnSpacing: Screen.pixelDensity * 3
+                        anchors.fill: parent
                     }
                 }
                 Rectangle {
