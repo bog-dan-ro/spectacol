@@ -127,7 +127,7 @@ show_help( void )
 {
   printf(
     "Usage: %s [OPTION] <infile> <outfile>\n"
-    "Converts ZX Spectrum tape images to audio files.\n"
+    "Dumps the pulse information from ZX Spectrum tape images to text files.\n"
     "\n"
     "Options:\n"
     "  -h, --help     Display this help and exit.\n"

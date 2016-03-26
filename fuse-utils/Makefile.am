@@ -152,6 +152,7 @@ rzxtool_SOURCES += rzxtool_res.rc
 scl2trd_SOURCES += scl2trd_res.rc
 snap2tzx_SOURCES += snap2tzx_res.rc
 snapconv_SOURCES += snapconv_res.rc
+tape2pulses_SOURCES += tape2pulses_res.rc
 tape2wav_SOURCES += tape2wav_res.rc
 tapeconv_SOURCES += tapeconv_res.rc
 tzxlist_SOURCES += tzxlist_res.rc

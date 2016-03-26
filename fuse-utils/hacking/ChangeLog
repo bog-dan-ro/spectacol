@@ -528,3 +528,6 @@
          tapeconv.1,tzxlist.1},tape2pulses.c: add new utility to dump the
          pulses found in a tape file to a file for analysis (Fred).
 20160325 tape2pulses.c: fix getopt_long arguments (Fred).
+20160326 AUTHORS,Makefile.am,README,man/fuse-utils.1,tape2pulses.c,
+         tape2pulses_res.rc: set tape2pulses info into Windows executable and
+         complete documentation (Sergio).
