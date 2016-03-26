@@ -41,7 +41,7 @@ extern "C" const compat_fd COMPAT_FILE_OPEN_FAILED = nullptr;
 extern "C" compat_fd compat_file_open(const char *path, int write)
 {
     std::unique_ptr<QFile> file(new QFile(path));
-    if (file->open(write ? QIODevice::ReadWrite : QIODevice::ReadOnly))
+    if (file->open(write ? QIODevice::WriteOnly : QIODevice::ReadOnly))
         return (compat_fd)file.release();
     return nullptr;
 }
