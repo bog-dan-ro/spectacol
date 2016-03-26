@@ -734,7 +734,15 @@ void FuseEmulator::mouseRelease(QMouseEvent *event)
     });
 }
 
-
+void FuseEmulator::quit()
+{
+    quickSaveSnapshot();
+    pokeEvent([this] {
+        callFunction([]{
+            QCoreApplication::quit();
+        });
+    });
+}
 
 QString FuseEmulator::snapshotsPath() const
 {

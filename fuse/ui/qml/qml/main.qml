@@ -41,7 +41,7 @@ ApplicationWindow {
         title: "Fuse QML"
         text: "Quit ?"
         standardButtons: StandardButton.Yes | StandardButton.No
-        onYes: Qt.quit()
+        onYes: fuse.quit()
     }
 
     Drawer {

@@ -190,6 +190,7 @@ public:
     void mouseRelease(QMouseEvent *event);
 
 public slots:
+    void quit();
     QString snapshotsPath() const;
     void load(const QString &filePath, bool removeOnFail = false);
     void save(const QString &filePath);
