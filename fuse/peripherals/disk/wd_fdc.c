@@ -613,6 +613,7 @@ wd_fdc_type_ii_seek( wd_fdc *f )
     for( i = 11; i > 0; i-- )	/* "delay" 11 GAP byte */
       fdd_read_data( d );
     wd_fdc_set_datarq( f );
+    f->data_offset = 0;
     if( f->dden )
       for( i = 11; i > 0; i-- )	/* "delay" another 11 GAP byte */
 	fdd_read_data( d );

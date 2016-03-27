@@ -4991,3 +4991,6 @@
          (Fred).
 20160325 tape.c: correctly count number of pulses in PZX pulse block for tape
          browser (Fred).
+20160325 peripherals/disk/wd_fdc.c: revert mistaken deletion of
+         f->data_offset = 0; from patch #348 (thanks, Stuart and Gergely)
+         (Fred).
