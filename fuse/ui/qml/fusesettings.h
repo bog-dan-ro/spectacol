@@ -11,13 +11,12 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(int currentMachineIndex READ currentMachineIndex WRITE setCurrentMachineIndex NOTIFY currentMachineChanged)
 
     // General Options
-    Q_PROPERTY(int scaleMin READ scaleMin CONSTANT)
-    Q_PROPERTY(int scaleMax READ scaleMax CONSTANT)
     Q_PROPERTY(int emulationSpeed READ emulationSpeed WRITE setEmulationSpeed NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool fastLoad READ fastLoad WRITE setFastLoad NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool accelerateLoader READ accelerateLoader WRITE setAccelerateLoader NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool autoLoad READ autoLoad WRITE setAutoLoad NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool detectLoaders READ detectLoaders WRITE setDetectLoaders NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool restrictToSpectacol READ restrictToSpectacol WRITE setRestrictToSpectacol NOTIFY settingsCurrentChanged)
 
 
     // Sound Options
@@ -42,9 +41,6 @@ public:
     QString currentMachine();
     int currentMachineIndex() const;
     void setCurrentMachineIndex(int idx);
-
-    int scaleMin() const { return 1; }
-    int scaleMax() const { return 6; }
 
     int emulationSpeed() const;
     void setEmulationSpeed(int speed);
@@ -90,6 +86,11 @@ public:
 
     bool full48kOSK() const;
     void setFull48kOSK(bool full48kOSK);
+
+    bool restrictToSpectacol() const;
+    void setRestrictToSpectacol(bool restrictToSpectacol);
+
+public slots:
 
 signals:
     void currentMachineChanged();

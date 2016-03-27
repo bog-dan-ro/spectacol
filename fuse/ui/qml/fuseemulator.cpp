@@ -397,11 +397,27 @@ QString FuseEmulator::dataPath() const
 {
     QSettings s;
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-# define DATA_LOCATION QStandardPaths::DataLocation
+    QString path = s.value("dataPath", QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + QLatin1String("/Spectacol/")).toString();
 #else
-# define DATA_LOCATION QStandardPaths::HomeLocation
+    QString path = s.value("dataPath", QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + QLatin1String("/Spectacol/")).toString();
 #endif
-    return s.value("dataPath", QStandardPaths::standardLocations(DATA_LOCATION).last() + QLatin1String("/Spectrum/")).toString();
+#ifdef Q_OS_ANDROID
+    if (s.value(QLatin1String("dataPathChanged"), false).toBool())
+        return path;
+    s.setValue(QLatin1String("dataPathChanged"), true);
+    QString p = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QLatin1String("/Spectacol/");
+    if (QDir(path) != QDir(p)) {
+        QDir d(p);
+        // Make sure we can properly create folders on external partition
+        if (d.mkpath(QLatin1String("test/path/on/Android"))) {
+            d.rmpath(QLatin1String("test/path/on/Android"));
+            QDir ren(path);
+            if (ren.rename(ren.absolutePath(), d.absolutePath()))
+                path = p;
+        }
+    }
+#endif
+    return path;
 }
 
 void FuseEmulator::setDataPath(const QString &dataPath)

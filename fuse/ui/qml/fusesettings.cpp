@@ -223,3 +223,23 @@ void FuseSettings::setFull48kOSK(bool full48kOSK)
     s.setValue("full48kOSK", full48kOSK);
     emit settingsCurrentChanged();
 }
+
+bool FuseSettings::restrictToSpectacol() const
+{
+    QSettings s;
+    s.beginGroup(QLatin1String("General"));
+    bool ret = s.value("restrictToSpectacol", true).toBool();
+
+    return ret;
+}
+
+void FuseSettings::setRestrictToSpectacol(bool restrictBrowse)
+{
+    if (restrictToSpectacol() == restrictBrowse)
+        return;
+
+    QSettings s;
+    s.beginGroup(QLatin1String("General"));
+    s.setValue("restrictToSpectacol", restrictBrowse);
+    emit settingsCurrentChanged();
+}

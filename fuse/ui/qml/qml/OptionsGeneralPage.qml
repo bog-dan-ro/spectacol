@@ -93,7 +93,7 @@ Flickable {
                 SpinBox {
                     id: emulationSpeed
                     Keys.onUpPressed: screenFilter.focus = true
-                    Keys.onDownPressed: fastLoad.focus = true
+                    Keys.onDownPressed: restrictBrowse.focus = true
                     Keys.onLeftPressed: decrease()
                     Keys.onRightPressed: increase()
                     from: 10
@@ -104,8 +104,17 @@ Flickable {
             }
 
             CheckBox {
-                id: fastLoad
+                id: restrictBrowse
                 KeyNavigation.up: emulationSpeed
+                KeyNavigation.down: fastLoad
+                text: qsTr("Restrict browsing to Spectacol folder")
+                checked: fuseSettings.restrictToSpectacol
+                onCheckedChanged: fuseSettings.restrictToSpectacol = checked
+            }
+
+            CheckBox {
+                id: fastLoad
+                KeyNavigation.up: restrictBrowse
                 KeyNavigation.down: accelerateLoader
                 text: qsTr("Fast loading")
                 checked: fuseSettings.fastLoad

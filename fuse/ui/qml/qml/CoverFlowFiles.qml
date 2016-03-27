@@ -41,7 +41,7 @@ Item
 
     FolderListModel {
         id: filesModel
-        rootFolder: fuse.dataPath
+        rootFolder: fuseSettings.restrictToSpectacol ? fuse.dataPath : "/"
         onFolderChanged: filesView.currentIndex = 0
     }
 
@@ -130,7 +130,12 @@ Item
             top : parent.top
             topMargin : TextSizes.scale20 / 2
         }
+        background: Rectangle {
+            color: "gray"
+            opacity: 0.85
+        }
         property bool root: filesModel.rootFolder == filesModel.folder
+        padding: TextSizes.scale20 / 2
         font.pixelSize: TextSizes.scale20
         text : filesModel.folder + (root ? " X" : "  \u2191")
         font.bold: true
