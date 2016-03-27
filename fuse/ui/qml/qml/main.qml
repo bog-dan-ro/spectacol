@@ -87,6 +87,7 @@ ApplicationWindow {
         Keys.onPressed: {
             switch (event.key) {
             case Qt.Key_F1:
+            case Qt.Key_Search:
                 if (menuBar.position) {
                     menuBar.close();
                 } else {
