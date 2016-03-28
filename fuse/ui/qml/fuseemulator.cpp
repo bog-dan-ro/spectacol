@@ -52,6 +52,8 @@
 # include <QtAndroid>
 #endif
 
+typedef QLatin1String _;
+
 extern "C" int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
     return g_fuseEmulator->soundLowlevelInit(device, freqptr, stereoptr);
@@ -128,6 +130,14 @@ void FuseThread::run()
     setPriority(QThread::HighestPriority);
     int argc = 0;
     auto args = QCoreApplication::arguments();
+#ifdef Q_OS_ANDROID
+    auto intent = QtAndroid::androidActivity().callObjectMethod("getIntent", "()Landroid/content/Intent;");
+    if (intent.isValid() &&
+            intent.callObjectMethod("getAction", "()Ljava/lang/String;").toString() == _("android.intent.action.VIEW") &&
+            intent.callObjectMethod("getScheme", "()Ljava/lang/String;").toString() == _("file")) {
+        args << intent.callObjectMethod("getData", "()Landroid/net/Uri;").callObjectMethod("getPath", "()Ljava/lang/String;").toString();
+    }
+#endif
     std::vector<QByteArray> argsVector(args.size());
     const char *argv[args.size()];
     foreach (const QString &arg, args) {
@@ -354,8 +364,8 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     });
 #ifdef Q_OS_ANDROID
     auto pm = QtAndroid::androidActivity().callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;");
-    m_touchscreen = pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(QLatin1String("android.hardware.touchscreen")).object());
-    if (!pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(QLatin1String("android.hardware.audio.low_latency")).object())) {
+    m_touchscreen = pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(_("android.hardware.touchscreen")).object());
+    if (!pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(_("android.hardware.audio.low_latency")).object())) {
         pokeEvent([this]{
             callFunction([this]{
                 QTimer::singleShot(500, [this] {
@@ -397,20 +407,20 @@ QString FuseEmulator::dataPath() const
 {
     QSettings s;
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-    QString path = s.value("dataPath", QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + QLatin1String("/Spectacol/")).toString();
+    QString path = s.value("dataPath", QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + _("/Spectacol/")).toString();
 #else
-    QString path = s.value("dataPath", QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + QLatin1String("/Spectacol/")).toString();
+    QString path = s.value("dataPath", QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + _("/Spectacol/")).toString();
 #endif
 #ifdef Q_OS_ANDROID
-    if (s.value(QLatin1String("dataPathChanged"), false).toBool())
+    if (s.value(_("dataPathChanged"), false).toBool())
         return path;
-    s.setValue(QLatin1String("dataPathChanged"), true);
-    QString p = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QLatin1String("/Spectacol/");
+    s.setValue(_("dataPathChanged"), true);
+    QString p = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + _("/Spectacol/");
     if (QDir(path) != QDir(p)) {
         QDir d(p);
         // Make sure we can properly create folders on external partition
-        if (d.mkpath(QLatin1String("test/path/on/Android"))) {
-            d.rmpath(QLatin1String("test/path/on/Android"));
+        if (d.mkpath(_("test/path/on/Android"))) {
+            d.rmpath(_("test/path/on/Android"));
             QDir ren(path);
             if (ren.rename(ren.absolutePath(), d.absolutePath()))
                 path = p;
@@ -441,7 +451,7 @@ QStringList FuseEmulator::filtersModel() const
     updateScalers();
     QStringList ret;
     for (int scaller : m_supportedScalers)
-        ret.push_back(QLatin1String(scaler_name(scaler_type(scaller))));
+        ret.push_back(_(scaler_name(scaler_type(scaller))));
     return ret;
 }
 
@@ -471,7 +481,7 @@ QStringList FuseEmulator::joysticksModel() const
 {
     QStringList ret;
     for (int i = LIBSPECTRUM_JOYSTICK_NONE; i <= LIBSPECTRUM_JOYSTICK_FULLER; ++i )
-        ret << QLatin1String(libspectrum_joystick_name(libspectrum_joystick(i)));
+        ret << _(libspectrum_joystick_name(libspectrum_joystick(i)));
     return ret;
 }
 
@@ -706,7 +716,7 @@ void FuseEmulator::setGamepadId(int gamepadId)
 
 QString FuseEmulator::saveFilePath(const QString &fileName)
 {
-    return dataPath() + QLatin1String("/Downloaded/") + fileName.left(1).toLower() +
+    return dataPath() + _("/Downloaded/") + fileName.left(1).toLower() +
             QLatin1Char('/') + fileName.left(3).toLower() + QLatin1Char('/') + fileName;
 }
 
