@@ -1022,3 +1022,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20150831 test/turbo-zeropilot.tzx: add mime-type property (Sergio).
 20160325 tape_block.c: allow for the possibility that inital_level has the
          default value (Fred).
+20160329 timings.c: refactor frame timings (Stuart).
