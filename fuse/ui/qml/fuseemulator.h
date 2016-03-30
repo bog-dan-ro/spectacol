@@ -194,6 +194,8 @@ public slots:
     QString snapshotsPath() const;
     void load(const QString &filePath, bool removeOnFail = false);
     void save(const QString &filePath);
+    void copyToFavourites(const QString &filePath);
+
     void reset();
     void hardReset();
     void nmi();

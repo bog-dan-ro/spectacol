@@ -85,7 +85,7 @@ Rectangle {
             KeyNavigation.up: searchText
             Keys.onReturnPressed:{
                 pageLoader.source = "";
-                fuse.load(model.getPath(currentIndex))
+                fuse.copyToFavourites(model.getPath(currentIndex))
             }
             clip: true
             focus: true
@@ -132,7 +132,7 @@ Rectangle {
                         if (grid.currentIndex != index)
                             grid.currentIndex = index;
                         else {
-                            fuse.load(path);
+                            fuse.copyToFavourites(path);
                             pageLoader.source = "";
                         }
                     }
