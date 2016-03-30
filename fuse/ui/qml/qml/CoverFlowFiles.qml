@@ -42,6 +42,7 @@ Item
     FolderListModel {
         id: filesModel
         rootFolder: fuseSettings.restrictToSpectacol ? fuse.dataPath : "/"
+        sortCriteria: folder.indexOf(fuse.snapshotsPath(), 0) == 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
         onFolderChanged: filesView.currentIndex = 0
     }
 

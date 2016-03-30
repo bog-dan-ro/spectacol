@@ -1,5 +1,6 @@
 #include "folderlistmodel.h"
 
+#include <QDateTime>
 #include <QDirIterator>
 
 FolderListModel::FolderListModel(QObject *parent)
@@ -45,6 +46,35 @@ void FolderListModel::setRootFolder(QString rootFolder)
         setFolder(m_rootFolder);
     else
         updateFiles();
+}
+
+FolderListModel::FileSortCriteria FolderListModel::sortCriteria() const
+{
+    return m_sortCriteria;
+}
+
+void FolderListModel::setSortCriteria(FolderListModel::FileSortCriteria sortCriteria)
+{
+    if (m_sortCriteria == sortCriteria)
+        return;
+
+    m_sortCriteria = sortCriteria;
+    emit sortCriteriaChanged(sortCriteria);
+    updateFiles();
+}
+
+bool FolderListModel::showDirsFirst() const
+{
+    return m_showDirsFirst;
+}
+
+void FolderListModel::setShowDirsFirst(bool showDirsFirst)
+{
+    if (m_showDirsFirst == showDirsFirst)
+        return;
+
+    m_showDirsFirst = showDirsFirst;
+    emit showDirsFirstChanged(showDirsFirst);
 }
 
 bool FolderListModel::isDir(int index)
@@ -125,14 +155,21 @@ void FolderListModel::updateFiles()
             m_files.push_back(inf);
     }
 
-    std::sort(m_files.begin(), m_files.end(), [](const QFileInfo &a, const QFileInfo &b){
-        if (a.isDir() && !b.isDir())
-            return true;
+    std::sort(m_files.begin(), m_files.end(), [this](const QFileInfo &a, const QFileInfo &b){
+        if (m_showDirsFirst) {
+            if (a.isDir() && !b.isDir())
+                return true;
 
-        if (!a.isDir() && b.isDir())
-            return false;
-
-        return a.fileName() < b.fileName();
+            if (!a.isDir() && b.isDir())
+                return false;
+        }
+        switch (m_sortCriteria) {
+        case ByName:
+            return a.fileName() < b.fileName();
+        case ByDateDesc:
+            return a.lastModified() > b.lastModified();
+        }
+        return true;
     });
     endResetModel();
 }

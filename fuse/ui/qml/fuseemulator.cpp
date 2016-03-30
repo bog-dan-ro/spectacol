@@ -772,7 +772,7 @@ void FuseEmulator::quit()
 
 QString FuseEmulator::snapshotsPath() const
 {
-    return dataPath() + QLatin1Literal("/Snapshots/");
+    return dataPath() + _("Snapshots/");
 }
 
 void FuseEmulator::load(const QString &filePath, bool removeOnFail)
@@ -798,6 +798,8 @@ void FuseEmulator::load(const QString &filePath, bool removeOnFail)
 
 void FuseEmulator::save(const QString &filePath)
 {
+    QDir d = QFileInfo(filePath).absoluteDir();
+    d.mkpath(d.absolutePath());
     pokeEvent([filePath]() {
         fuse_emulation_pause();
         snapshot_write(filePath.toUtf8().constData());
@@ -843,9 +845,9 @@ void FuseEmulator::quickSaveSnapshot()
     if (m_loadedFileName.isEmpty())
         return;
 
-    const QString name = m_loadedFileName +
-            QDateTime::currentDateTime().toString(".yyyy-MM-dd_hh:mm:ss") +
-            QLatin1Literal(".szx");
+    const QString name = m_loadedFileName + QLatin1Char('/') + m_loadedFileName +
+            QDateTime::currentDateTime().toString(_(".yyyy-MM-dd_hh:mm:ss")) +
+            _(".szx");
     save(snapshotsPath() + name);
     emit error(Info, tr("Snapshot saved to '%1").arg(name));
 }
@@ -853,10 +855,15 @@ void FuseEmulator::quickSaveSnapshot()
 void FuseEmulator::quickLoadSnapshot()
 {
     QDir dir(snapshotsPath());
-    const auto &list = dir.entryInfoList(QDir::Files, QDir::Time);
+    auto list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Time);
+    if (list.size())
+        list = QDir(list.first().absoluteFilePath()).entryInfoList(QDir::Files, QDir::Time);
+    else
+        list = dir.entryInfoList(QDir::Files, QDir::Time);
+
     if (list.size()) {
         load(list.first().filePath(), true);
-        emit error(Info, tr("Snapshot loaded from '%1").arg(list.first().fileName()));
+        emit error(Info, tr("Snapshot loaded from '%1'").arg(list.first().fileName()));
     }
 }
 
