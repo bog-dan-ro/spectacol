@@ -4994,3 +4994,5 @@
 20160325 peripherals/disk/wd_fdc.c: revert mistaken deletion of
          f->data_offset = 0; from patch #348 (thanks, Stuart and Gergely)
          (Fred).
+20160330 ui/win32/win32ui.c: fix compilation with MinGW-w64 toolchain
+         (lordhoto).
