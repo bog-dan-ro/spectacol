@@ -4996,3 +4996,5 @@
          (Fred).
 20160330 ui/win32/win32ui.c: fix compilation with MinGW-w64 toolchain
          (lordhoto).
+20160331 peripherals/disk/didaktik.c: don't enable Didaktik SNAP option if ROM
+         file is missing (Sergio).

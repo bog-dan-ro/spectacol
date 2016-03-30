@@ -208,7 +208,6 @@ didaktik_reset( int hard_reset )
   if( !periph_is_active( PERIPH_TYPE_DIDAKTIK80 ) ) {
     return;
   }
-  ui_menu_activate( UI_MENU_ITEM_MACHINE_DIDAKTIK80_SNAP, 1 );
 
   if( machine_load_rom_bank( didaktik_memory_map_romcs_rom, 0,
                              settings_current.rom_didaktik80,
@@ -217,6 +216,8 @@ didaktik_reset( int hard_reset )
     periph_activate_type( PERIPH_TYPE_DIDAKTIK80, 0 );
     return;
   }
+
+  ui_menu_activate( UI_MENU_ITEM_MACHINE_DIDAKTIK80_SNAP, 1 );
 
   for( i = 0; i < MEMORY_PAGES_IN_2K; i++ ) {
     struct memory_page *page =
