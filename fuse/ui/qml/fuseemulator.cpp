@@ -423,7 +423,7 @@ QString FuseEmulator::dataPath() const
         if (d.mkpath(_("test/path/on/Android"))) {
             d.rmpath(_("test/path/on/Android"));
             QDir ren(path);
-            if (ren.rename(ren.absolutePath(), d.absolutePath()))
+            if (!ren.exists() || ren.rename(ren.absolutePath(), d.absolutePath()))
                 path = p;
         }
     }
