@@ -315,6 +315,9 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
                 button == QGamepadManager::ButtonR2)
             return;
 
+        if (fuse_emulation_paused && ui_widget_level == -1)
+            return;
+
         if (button == QGamepadManager::ButtonX)
             QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(CursorJoystick); });
 
@@ -322,8 +325,6 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(Keyboard48K); });
 
 
-        if (fuse_emulation_paused && ui_widget_level == -1)
-            return;
 
         gamepadButtonReleaseEvent(button);
     });
