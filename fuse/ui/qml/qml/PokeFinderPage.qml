@@ -66,12 +66,12 @@ Rectangle {
             event.accepted = true;
             break;
 
-        case Qt.Key_I:
+        case Qt.Key_Y:
             fuse.pokeFinderInced();
             event.accepted = true;
             break;
 
-        case Qt.Key_D:
+        case Qt.Key_X:
             fuse.pokeFinderDeced();
             event.accepted = true;
             break;
