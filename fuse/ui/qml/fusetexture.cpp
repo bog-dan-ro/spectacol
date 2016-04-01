@@ -127,6 +127,7 @@ extern "C" void uidisplay_frame_restore( void )
 
 FuseTexture::FuseTexture()
 {
+    setFiltering(QSGTexture::Linear);
     g_fuseEmulator->startFuseThread();
 }
 
