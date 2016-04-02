@@ -38,7 +38,7 @@ ApplicationWindow {
     MessageDialog {
         id: quitDialog
         icon: StandardIcon.Question
-        title: "Fuse QML"
+        title: "Spectacol"
         text: "Quit ?"
         standardButtons: StandardButton.Yes | StandardButton.No
         onYes: fuse.quit()
