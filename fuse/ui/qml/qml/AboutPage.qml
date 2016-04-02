@@ -70,7 +70,7 @@ Pane {
                     verticalAlignment: Text.AlignTop
                     text: qsTr("Spectacol (in Romanian it means <b>show</b>) is a <a href=\"https://github.com/bog-dan-ro/spectacol\"><b>free (GPL v3+)</b></a> ZX Spectrum emulator
                             based on famous <a href=\"http://fuse-emulator.sf.net\">FUSE Spectrum emulator</a>. <br />
-                            FUSE emulator has, by far, the reachest ZX features list. <b>Spectacol</b> enables the following features:
+                            FUSE emulator has, by far, the richest ZX features list. <b>Spectacol</b> enables the following features:
                             <ul>
                                 <li> Loads all ZX Spectrum files
                                 <li> Accurate 16K, 48K, 128K, +2, +2A and +3 emulation
