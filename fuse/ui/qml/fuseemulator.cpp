@@ -1063,10 +1063,10 @@ void FuseEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double va
             return;
         }
         event1.types.joystick.which = event2.types.joystick.which = 0;
-        if (value <= -0.3) {
+        if (value <= -0.4) {
             event1.type = INPUT_EVENT_JOYSTICK_PRESS;
             event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
-        } else if (value >= 0.3) {
+        } else if (value >= 0.4) {
             event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
             event2.type = INPUT_EVENT_JOYSTICK_PRESS;
         } else {
