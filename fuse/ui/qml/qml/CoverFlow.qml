@@ -5,6 +5,7 @@ PathView
     signal returnPressed()
     signal upPressed()
     signal escapePressed();
+    signal deletePressed();
 
     anchors.fill: parent
     pathItemCount: mainScreen.portrait ? 5 : 10
@@ -15,12 +16,41 @@ PathView
     highlightRangeMode : PathView.StrictlyEnforceRange
     focus: true
 
-    Keys.onLeftPressed: decrementCurrentIndex()
-    Keys.onRightPressed: incrementCurrentIndex()
-    Keys.onEnterPressed: returnPressed()
-    Keys.onReturnPressed: returnPressed()
-    Keys.onUpPressed: upPressed()
-    Keys.onEscapePressed: escapePressed()
+    Keys.onPressed: {
+        switch (event.key) {
+        case Qt.Key_Left:
+            decrementCurrentIndex();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_Right:
+            incrementCurrentIndex();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_Enter:
+        case Qt.Key_Return:
+            returnPressed();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_Up:
+            upPressed();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_Escape:
+            escapePressed();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_Delete:
+        case Qt.Key_X:
+            deletePressed();
+            event.accepted = true;
+            break;
+        }
+    }
 
     path : Path  {
         // LEFT

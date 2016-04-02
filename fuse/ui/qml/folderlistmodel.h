@@ -48,6 +48,7 @@ public slots:
     bool isDir(int index);
     QString path(int index);
     void cdUp();
+    void refresh();
 
 signals:
     void folderChanged(QString folder);
@@ -61,7 +62,6 @@ protected:
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
     bool canOpen(const QString &path);
-    void updateFiles();
 
 private:
     std::vector<QFileInfo> m_files;

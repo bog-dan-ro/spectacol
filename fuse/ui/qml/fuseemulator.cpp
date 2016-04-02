@@ -820,6 +820,20 @@ void FuseEmulator::copyToFavourites(const QString &filePath)
     load(dest, true);
 }
 
+void FuseEmulator::remove(const QString &file)
+{
+    QFileInfo inf(file);
+    if (inf.isDir()) {
+        // remove files recursively
+        QDir dir(file);
+        foreach(const QFileInfo &item, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+            remove(item.absoluteFilePath());
+        dir.rmdir(file);
+    } else {
+        QFile::remove(file);
+    }
+}
+
 void FuseEmulator::reset()
 {
     pokeEvent([]() {

@@ -27,7 +27,7 @@ void FolderListModel::setFolder(QString folder)
     if (!m_folder.startsWith(m_rootFolder))
         m_folder = m_rootFolder;
 
-    updateFiles();
+    refresh();
     emit folderChanged(folder);
 }
 
@@ -45,7 +45,7 @@ void FolderListModel::setRootFolder(QString rootFolder)
     if (!m_folder.startsWith(m_rootFolder))
         setFolder(m_rootFolder);
     else
-        updateFiles();
+        refresh();
 }
 
 FolderListModel::FileSortCriteria FolderListModel::sortCriteria() const
@@ -60,7 +60,7 @@ void FolderListModel::setSortCriteria(FolderListModel::FileSortCriteria sortCrit
 
     m_sortCriteria = sortCriteria;
     emit sortCriteriaChanged(sortCriteria);
-    updateFiles();
+    refresh();
 }
 
 bool FolderListModel::showDirsFirst() const
@@ -143,7 +143,7 @@ bool FolderListModel::canOpen(const QString &path)
     return error == LIBSPECTRUM_ERROR_NONE && fileType != LIBSPECTRUM_ID_UNKNOWN;
 }
 
-void FolderListModel::updateFiles()
+void FolderListModel::refresh()
 {
     beginResetModel();
     m_files.clear();

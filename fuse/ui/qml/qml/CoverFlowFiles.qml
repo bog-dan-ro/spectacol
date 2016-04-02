@@ -17,6 +17,8 @@
 
 import QtQuick 2.2
 import QtGamepad 1.0
+import QtQuick.Dialogs 1.2
+import QtQuick.Layouts 1.1
 import Fuse 1.0
 import Qt.labs.controls 1.0
 import "private" 1.0
@@ -30,6 +32,7 @@ Item
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
+        buttonXKey: Qt.Key_X
     }
 
     transform: Rotation {
@@ -44,6 +47,24 @@ Item
         rootFolder: fuseSettings.restrictToSpectacol ? fuse.dataPath : "/"
         sortCriteria: folder.indexOf(fuse.snapshotsPath(), 0) == 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
         onFolderChanged: filesView.currentIndex = 0
+    }
+
+    MessageDialog {
+        id: removeDialog
+        icon: StandardIcon.Question
+        title: "Spectacol"
+        text: qsTr("Remove \"") + filePath + "\" ?";
+        standardButtons: StandardButton.Yes | StandardButton.No
+        property string filePath
+        onYes: {
+            fuse.remove(filePath)
+            filesModel.refresh();
+            filesView.currentIndex = 0;
+        }
+        function remove() {
+            removeDialog.filePath = filesModel.path(filesView.currentIndex);
+            removeDialog.open();
+        }
     }
 
     CoverFlow
@@ -62,6 +83,8 @@ Item
         onEscapePressed: fileSelected("")
 
         onUpPressed: filesModel.cdUp()
+
+        onDeletePressed: removeDialog.remove()
 
         delegate: Component {
             Image
@@ -115,12 +138,20 @@ Item
                 }
             }
         }
-        Button {
+        RowLayout {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            text: qsTr("Close (B)")
-            onClicked: pageLoader.source = ""
+            Button {
+                Layout.fillWidth: true
+                text: qsTr("Remove (X)")
+                onClicked: removeDialog.remove()
+            }
+            Button {
+                Layout.fillWidth: true
+                text: qsTr("Close (B)")
+                onClicked: pageLoader.source = ""
+            }
         }
     }
     FancyText {
