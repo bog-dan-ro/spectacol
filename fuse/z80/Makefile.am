@@ -72,7 +72,8 @@ EXTRA_DIST += \
 noinst_PROGRAMS += z80/coretest
 
 z80_coretest_SOURCES = z80/coretest.c z80/z80.c
-z80_coretest_LDADD = z80/z80_coretest.o $(LIBSPEC_LIBS)
+z80_coretest_LDADD = z80/z80_coretest.o $(GLIB_LIBS) $(LIBSPEC_LIBS)
+z80_coretest_CPPFLAGS = $(GLIB_CFLAGS) $(LIBSPEC_CFLAGS) -DCORETEST
 
 z80/coretest.o: $(srcdir)/z80/coretest.c
 	$(AM_V_CC)$(COMPILE) -DCORETEST -c $(srcdir)/z80/coretest.c -o $@

@@ -4998,3 +4998,6 @@
          (lordhoto).
 20160331 peripherals/disk/didaktik.c: don't enable Didaktik SNAP option if ROM
          file is missing (Sergio).
+20160404 configure.ac,data/win32/{distribution.mk,installer.nsi.in},
+         z80/Makefile.am: fix the build of SDL UI on Windows (patch #336)
+         (Sergio).

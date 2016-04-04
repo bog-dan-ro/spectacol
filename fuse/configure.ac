@@ -233,9 +233,6 @@ if test "$win32" = yes; then
   AC_CHECK_HEADER(windows.h,
                   LIBS="$LIBS -mwindows -lcomctl32 -lwinmm";
                   AC_DEFINE([UI_WIN32], 1, [Defined if Win32 UI in use])
-                  AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
-                  AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
-                  AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Exclude rarely used stuff from Windows headers <windows.h>])
                   UI=win32,
                   AC_MSG_ERROR([Win32 UI not found]))
 fi
@@ -445,6 +442,7 @@ AM_CONDITIONAL(UI_WII, test "$UI" = wii)
 AM_CONDITIONAL(UI_WIN32, test "$UI" = win32)
 AM_CONDITIONAL(UI_X, test "$UI" = xlib)
 AM_CONDITIONAL(USE_WIDGET, test x$WIDGET != x)
+AC_SUBST(UI)
 
 dnl Locate common options for widget UIs
 if test -n "$WIDGET"; then
@@ -858,6 +856,9 @@ case "$host_os" in
     ;;
   mingw32*)
     COMPAT_OSNAME='win32'
+    AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
+    AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
+    AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Exclude rarely used stuff from Windows headers <windows.h>])
     ;;
   wii)
     COMPAT_OSNAME='wii'
