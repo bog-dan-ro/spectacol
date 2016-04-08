@@ -167,7 +167,6 @@ static int
 read_config_file( settings_info *settings )
 {
   const char *home; char path[ PATH_MAX ];
-  struct stat stat_info;
 
   xmlDocPtr doc;
 
@@ -176,14 +175,8 @@ read_config_file( settings_info *settings )
   snprintf( path, PATH_MAX, "%s/%s", home, CONFIG_FILE_NAME );
 
   /* See if the file exists; if doesn't, it's not a problem */
-  if( stat( path, &stat_info ) ) {
-    if( errno == ENOENT ) {
+  if( !compat_file_exists( path ) ) {
       return 0;
-    } else {
-      ui_error( UI_ERROR_ERROR, "couldn't stat '%s': %s", path,
-		strerror( errno ) );
-      return 1;
-    }
   }
 
   doc = xmlParseFile( path );

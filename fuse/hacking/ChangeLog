@@ -5002,4 +5002,7 @@
          z80/Makefile.am: fix the build of SDL UI on Windows (patch #336)
          (Sergio).
 20160408 debugger/disassemble.c: fix disassembly of LD (HL), LD (IX) and LD (IY)
-         (patch #350) (BogDan Vatra)
+         (patch #350) (BogDan Vatra).
+20160408 settings.pl,utils.c: use compat_file_exists() instead of stat() in
+         read_config_file() and utils_find_file_path() (patch #351) (BogDan
+         Vatra).
