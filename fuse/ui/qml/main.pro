@@ -78,3 +78,9 @@ DISTFILES += \
     android/res/drawable/logo.png
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
+    ANDROID_EXTRA_LIBS = \
+        $$PWD/3rdparty/android_ssl_armv7a/libcrypto.so \
+        $$PWD/3rdparty/android_ssl_armv7a/libssl.so
+}
