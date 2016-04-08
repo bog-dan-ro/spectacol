@@ -111,6 +111,13 @@ void DisassambleModel::update()
     });
 }
 
+int DisassambleModel::address(int index)
+{
+    if (size_t(index) >= m_disassambleData.size())
+        return -1;
+    return m_disassambleData[index].address;
+}
+
 int DisassambleModel::rowCount(const QModelIndex &parent) const
 {
     Q_ASSERT(!parent.isValid());

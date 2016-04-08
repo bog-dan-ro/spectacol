@@ -38,6 +38,8 @@ Item {
         buttonBKey: Qt.Key_Escape
         buttonXKey: Qt.Key_X
         buttonYKey: Qt.Key_Y
+        buttonL1Key: Qt.Key_S
+        buttonR1Key: Qt.key_C
     }
 
     readonly property color backgroudColor : Qt.rgba(0, 0, 0, 0.85);
@@ -156,13 +158,13 @@ Item {
                 }
                 Button {
                     Layout.fillHeight: true
-                    text: qsTr("Step")
+                    text: qsTr("Step (L1)")
                     onClicked: fuse.debuggerNext()
                 }
                 Button {
                     Layout.fillHeight: true
                     Layout.rightMargin: toolBarRect.border.width
-                    text: qsTr("Continue")
+                    text: qsTr("Continue (R1)")
                     onClicked: fuse.debuggerRun()
                 }
                 Button {

@@ -187,6 +187,21 @@ ListView {
         case Qt.Key_Return:
             event.accepted = currentItem.toggleEdit();
             break;
+
+        case Qt.Key_C:
+            fuse.debuggerRun();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_S:
+            fuse.debuggerNext();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_X:
+            fuse.addBreakpoint(disassambleModel.address(view.currentIndex));
+            event.accepted = true;
+            break;
         }
     }
     model: visualModel

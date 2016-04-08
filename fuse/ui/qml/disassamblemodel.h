@@ -75,6 +75,7 @@ public:
     void disassamble(uint16_t address, int delta = -10, uint16_t instructions = 50);
     void disassambleMore(Origin origin, int size);
     Q_INVOKABLE void update();
+    Q_INVOKABLE int address(int index);
 
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const;
