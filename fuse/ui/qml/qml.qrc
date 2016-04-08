@@ -90,5 +90,14 @@
         <file>qml/private/qmldir</file>
         <file>qml/private/TextSizes.qml</file>
         <file>qml/OnScreenJoystick.qml</file>
+        <file>rom/256s-2.rom</file>
+        <file>rom/128p-0.rom</file>
+        <file>rom/128p-1.rom</file>
+        <file>rom/256s-0.rom</file>
+        <file>rom/256s-1.rom</file>
+        <file>rom/256s-3.rom</file>
+        <file>rom/gluck.rom</file>
+        <file>rom/if1-1.rom</file>
+        <file>rom/trdos.rom</file>
     </qresource>
 </RCC>
