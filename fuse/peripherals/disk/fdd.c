@@ -88,7 +88,7 @@ const char *
 fdd_strerror( int error )
 {
   if( error >= FDD_LAST_ERROR )
-    error = FDD_LAST_ERROR;
+    error = FDD_LAST_ERROR - 1;
   return fdd_error[ error ];
 }
 

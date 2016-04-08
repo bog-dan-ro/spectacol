@@ -5006,3 +5006,5 @@
 20160408 settings.pl,utils.c: use compat_file_exists() instead of stat() in
          read_config_file() and utils_find_file_path() (patch #351) (BogDan
          Vatra).
+20160408 peripherals/disk/fdd.c: fix fdd_strerror() reading past the end of the
+         fdd_error array (patch #352) (BogDan Vatra).
