@@ -5001,3 +5001,5 @@
 20160404 configure.ac,data/win32/{distribution.mk,installer.nsi.in},
          z80/Makefile.am: fix the build of SDL UI on Windows (patch #336)
          (Sergio).
+20160408 debugger/disassemble.c: fix disassembly of LD (HL), LD (IX) and LD (IY)
+         (patch #350) (BogDan Vatra)
