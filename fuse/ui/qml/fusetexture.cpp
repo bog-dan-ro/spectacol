@@ -340,47 +340,75 @@ void FuseTexture::putpixel(int x, int y, int colour)
 void FuseTexture::plot8(int x, int y, libspectrum_byte data, libspectrum_byte ink, libspectrum_byte paper)
 {
     QMutexLocker lock(&m_copyPixelsMutex);
-    x <<= 3;
     Q_ASSERT(ink < 16 && paper < 16);
-    Q_ASSERT(uint32_t(x) < m_width && uint32_t(y) < m_height);
     uint16_t inkColor = palette[ink];
     uint16_t paperColor = palette[paper];
-    uint16_t *dataPtr = m_spectrumPixels + x + m_width * y;
-    *dataPtr++ = (data & 0x80) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x40) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x20) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x10) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x08) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x04) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x02) ? inkColor : paperColor;
-    *dataPtr   = (data & 0x01) ? inkColor : paperColor;
+    if (machine_current->timex) {
+        x <<= 4;
+        y <<= 1;
+        Q_ASSERT(uint32_t(x) < m_width && uint32_t(y) < m_height);
+        for (int i = 0; i < 2; ++i) {
+            uint16_t *dataPtr = m_spectrumPixels + x + m_width * y++;
+            *(dataPtr++) = ( data & 0x80 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x80 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x40 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x40 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x20 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x20 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x10 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x10 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x08 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x08 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x04 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x04 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x02 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x02 ) ? inkColor : paperColor;
+            *(dataPtr++) = ( data & 0x01 ) ? inkColor : paperColor;
+            *dataPtr     = ( data & 0x01 ) ? inkColor : paperColor;
+        }
+    } else {
+        x <<= 3;
+        Q_ASSERT(uint32_t(x) < m_width && uint32_t(y) < m_height);
+        uint16_t *dataPtr = m_spectrumPixels + x + m_width * y;
+        *dataPtr++ = (data & 0x80) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x40) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x20) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x10) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x08) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x04) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x02) ? inkColor : paperColor;
+        *dataPtr   = (data & 0x01) ? inkColor : paperColor;
+    }
 }
 
 void FuseTexture::plot16(int x, int y, libspectrum_word data, libspectrum_byte ink, libspectrum_byte paper)
 {
     QMutexLocker lock(&m_copyPixelsMutex);
     Q_ASSERT(ink < 16 && paper < 16);
-    Q_ASSERT(uint32_t(x) < m_width && uint32_t(y) < m_height);
     uint16_t inkColor = palette[ink];
     uint16_t paperColor = palette[paper];
-    uint16_t *dataPtr = m_spectrumPixels;
-    dataPtr += x + m_width * y;
-    *dataPtr++ = (data & 0x8000) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x4000) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x2000) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x1000) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0800) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0400) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0200) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0100) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0080) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0040) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0020) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0010) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0008) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0004) ? inkColor : paperColor;
-    *dataPtr++ = (data & 0x0002) ? inkColor : paperColor;
-    *dataPtr   = (data & 0x0001) ? inkColor : paperColor;
+    x <<= 4;
+    y <<= 1;
+    Q_ASSERT(uint32_t(x) < m_width && uint32_t(y) < m_height);
+    for (int i = 0; i < 2; ++i) {
+        uint16_t *dataPtr = m_spectrumPixels + x + m_width * y++;
+        *dataPtr++ = (data & 0x8000) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x4000) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x2000) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x1000) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0800) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0400) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0200) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0100) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0080) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0040) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0020) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0010) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0008) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0004) ? inkColor : paperColor;
+        *dataPtr++ = (data & 0x0002) ? inkColor : paperColor;
+        *dataPtr   = (data & 0x0001) ? inkColor : paperColor;
+    }
 }
 
 QRect FuseTexture::updateGlPixels()
