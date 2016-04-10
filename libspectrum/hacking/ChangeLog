@@ -1023,3 +1023,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160325 tape_block.c: allow for the possibility that inital_level has the
          default value (Fred).
 20160329 timings.c: refactor frame timings (Stuart).
+20160410 Makefile.am: revert revision 4731 / bug #262 as it makes configuring
+         target flags for cross-compilation difficult (patch #357) (BogDan
+         Vatra).
