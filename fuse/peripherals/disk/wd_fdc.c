@@ -198,6 +198,9 @@ crc_add( wd_fdc *f, fdd_t *d )
 static int
 disk_ready( wd_fdc *f )
 {
+  if( f->flags & WD_FLAG_BETA128 )	/* Beta 128, READY = HLD */
+    return f->head_load;
+
   if( f->flags & WD_FLAG_RDY )
     return f->extra_signal;		/* MB-02+ set ready, if any of fdd selected */
 
@@ -383,8 +386,7 @@ wd_fdc_sr_read( wd_fdc *f )
     else
       f->status_register &= ~WD_FDC_SR_MOTORON; */
 
-    if( ( ( f->flags & WD_FLAG_BETA128 ) && f->head_load ) ||
-        ( !( f->flags & WD_FLAG_BETA128 ) && disk_ready( f ) ) )
+    if( disk_ready( f ) )
       f->status_register &= ~WD_FDC_SR_MOTORON;
     else
       f->status_register |= WD_FDC_SR_MOTORON;
@@ -973,8 +975,7 @@ wd_fdc_cr_write( wd_fdc *f, libspectrum_byte b )
     wd_fdc_type_i( f );
   } else if( !( b & 0x40 ) ) {                  /* Type II */
     if( f->type == WD1773 || f->type == FD1793 ) {
-      if( ( ( f->flags & WD_FLAG_BETA128 ) && !f->head_load ) ||
-        ( !( f->flags & WD_FLAG_BETA128 ) && !disk_ready( f ) ) ) {
+      if( !disk_ready( f ) ) {
         f->status_register &= ~WD_FDC_SR_BUSY;
         f->state = WD_FDC_STATE_NONE;
         wd_fdc_set_intrq( f );
@@ -1006,8 +1007,7 @@ wd_fdc_cr_write( wd_fdc *f, libspectrum_byte b )
     wd_fdc_type_ii( f );
   } else if( ( b & 0x30 ) != 0x10 ) {           /* Type III */
     if( f->type == WD1773 || f->type == FD1793 || f->type == WD2797 ) {
-      if( ( ( f->flags & WD_FLAG_BETA128 ) && !f->head_load ) ||
-           ( !( f->flags & WD_FLAG_BETA128 ) && !disk_ready( f ) ) ) {
+      if( !disk_ready( f ) ) {
         f->status_register &= ~WD_FDC_SR_BUSY;
         f->state = WD_FDC_STATE_NONE;
         wd_fdc_set_intrq( f );

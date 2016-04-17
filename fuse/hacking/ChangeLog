@@ -4835,7 +4835,7 @@
          (Stuart).
 20150514 ui/gtk/gtkjoystick.c,ui/sdl/sdljoystick.c,ui/svga/svgajoystick.c,
          ui/uijoystick.[ch],ui/win32/win32joystick.[c|h|rc]: standardise the
-         number of joystick buttons across UIs (fixes bug #332) (UB880D).
+         number of joystick buttons across UIs (patch #332) (UB880D).
 20150514 peripherals/nic/w5100_internals.h: #include <sys/select.h> for POSIX
          systems (Adrien Destugues).
 20150515 peripherals/disk/didaktik.c: fix address of i8255 port (more of patch
@@ -5011,3 +5011,5 @@
 20160409 debugger/breakpoint.c,ui/gtk/debugger.c,ui/ui.h,ui/widget/debugger.c,
          ui/win32/debugger.c: signal the UI when the breakpoints list is changed
          (patch #357) (BogDan Vatra).
+20160417 peripherals/disk/wd_fdc.c: fix Beta 128 type II commands (fixes bug
+         #331) (thanks, windale and BogDan Vatra) (Sergio).
