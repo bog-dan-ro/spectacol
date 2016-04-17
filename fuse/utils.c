@@ -281,6 +281,7 @@ utils_find_file_path( const char *filename, char *ret_path,
   /* If given an absolute path, just look there */
   if( compat_is_absolute_path( filename ) ) {
     strncpy( ret_path, filename, PATH_MAX );
+    ret_path[ PATH_MAX - 1 ] = '\0';
     return 0;
   }
 
