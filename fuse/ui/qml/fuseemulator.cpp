@@ -813,7 +813,7 @@ void FuseEmulator::copyToFavourites(const QString &filePath)
     QDir d(dataPath());
     d.mkpath(_("Favourites"));
     const QString &dest = dataPath() + _("Favourites/") + QFileInfo(filePath).fileName();
-    if (!QFile::copy(filePath, dest)) {
+    if (!QFile::exists(dest) && !QFile::copy(filePath, dest)) {
         emit error(Error, tr("Can't copy \"%1\" to \"%2\"").arg(filePath).arg(dest));
         return;
     }
