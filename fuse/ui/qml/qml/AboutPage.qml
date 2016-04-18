@@ -113,7 +113,7 @@ Pane {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignTop
                     text: qsTr("<ul>
-                            <li> <b>START</b> toggle the menu
+                            <li> <b>START, L1</b> toggle the menu
                             <li> <b>BACK</b> (not available on all gamepads) close the menu or the dialog, exits the application
                             <li> <b>UP/DOWN, LEFT AXIS</b> navigate trough menu & controls
                             <li> <b>A</b> select or activate
@@ -139,7 +139,7 @@ Pane {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignTop
                     text: qsTr("<ul> \
-                            <li> <b>L1, R1, A, B</b> Joystick fire button
+                            <li> <b>R1, A, B</b> Joystick fire button
                             <li> <b>UP/DOWN/LEFT/RIGHT, LEFT AND RIGHT AXIS</b> Joystick directions
                             <li> <b>START</b> toggle menu
                             <li> <b>X</b> on screen numeric keys
