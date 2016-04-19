@@ -47,6 +47,10 @@ FuseSettings::FuseSettings(QObject *parent)
     pokeEvent([this]{
         callFunction([this]{ emit settingsCurrentChanged(); });
     });
+
+    QSettings s;
+    s.beginGroup(QLatin1String("General"));
+    m_hasStartButton = s.value("hasStartButton", false).toBool();
 }
 
 QStringList FuseSettings::machinesModel() const
@@ -259,4 +263,22 @@ void FuseSettings::setRestrictToSpectacol(bool restrictBrowse)
     s.beginGroup(QLatin1String("General"));
     s.setValue("restrictToSpectacol", restrictBrowse);
     emit settingsCurrentChanged();
+}
+
+bool FuseSettings::hasStartButton() const
+{
+    return m_hasStartButton;
+}
+
+void FuseSettings::setHasStartButton(bool hasStartButton)
+{
+    if (m_hasStartButton == hasStartButton)
+        return;
+
+    QSettings s;
+    s.beginGroup(QLatin1String("General"));
+    s.setValue("hasStartButton", hasStartButton);
+
+    m_hasStartButton = hasStartButton;
+    emit hasStartButtonChanged(hasStartButton);
 }

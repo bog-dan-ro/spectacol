@@ -286,6 +286,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         switch (button) {
         case QGamepadManager::ButtonStart:
             setGamepadId(deviceId);
+            m_fuseSettings->setHasStartButton(true);
             emit showMenu();
             return;
         case QGamepadManager::ButtonX:
@@ -330,8 +331,10 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     });
 
     connect(gm, &QGamepadManager::gamepadConnected, this, [this](int deviceId){
-        if (m_gamepadId == -1)
+        if (m_gamepadId == -1) {
             setGamepadId(deviceId);
+            m_fuseSettings->setHasStartButton(false);
+        }
     });
 
     connect(gm, &QGamepadManager::gamepadDisconnected, this, [this](int deviceId){

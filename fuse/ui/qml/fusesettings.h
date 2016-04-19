@@ -26,6 +26,7 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(QStringList machinesModel READ machinesModel CONSTANT)
     Q_PROPERTY(QString currentMachine READ currentMachine NOTIFY currentMachineChanged)
     Q_PROPERTY(int currentMachineIndex READ currentMachineIndex WRITE setCurrentMachineIndex NOTIFY currentMachineChanged)
+    Q_PROPERTY(bool hasStartButton READ hasStartButton NOTIFY hasStartButtonChanged)
 
     // General Options
     Q_PROPERTY(int emulationSpeed READ emulationSpeed WRITE setEmulationSpeed NOTIFY settingsCurrentChanged)
@@ -107,11 +108,17 @@ public:
     bool restrictToSpectacol() const;
     void setRestrictToSpectacol(bool restrictToSpectacol);
 
-public slots:
+    bool hasStartButton() const;
+    void setHasStartButton(bool hasStartButton);
+
 
 signals:
     void currentMachineChanged();
     void settingsCurrentChanged();
+    void hasStartButtonChanged(bool hasStartButton);
+
+private:
+    bool m_hasStartButton = false;
 };
 
 #endif // FUSESETTINGS_H

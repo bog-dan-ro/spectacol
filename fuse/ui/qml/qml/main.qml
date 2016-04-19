@@ -154,7 +154,10 @@ ApplicationWindow {
                         pageLoader.source = "";
                         event.accepted = true;
                     } else {
-                        quitDialog.open();
+                        if (fuseSettings.hasStartButton)
+                            quitDialog.open();
+                        else
+                            menuBar.open();
                         event.accepted = true;
                     }
                 }
