@@ -284,7 +284,6 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             return;
 
         switch (button) {
-        case QGamepadManager::ButtonL1:
         case QGamepadManager::ButtonStart:
             setGamepadId(deviceId);
             emit showMenu();
@@ -311,7 +310,6 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     connect(gm, &QGamepadManager::gamepadButtonReleaseEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button) {
         if (!m_processInputEvents.load() || deviceId != m_gamepadId ||
                 button == QGamepadManager::ButtonInvalid ||
-                button == QGamepadManager::ButtonL1 ||
                 button == QGamepadManager::ButtonStart ||
                 button == QGamepadManager::ButtonL2 ||
                 button == QGamepadManager::ButtonR2)
