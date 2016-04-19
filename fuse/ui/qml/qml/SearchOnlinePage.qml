@@ -48,8 +48,6 @@ Rectangle {
     GamepadKeyNavigation {
         id: gamepadKeyNavigation
         gamepad: Gamepad { deviceId: fuse.gamepadId }
-        buttonAKey: Qt.Key_Return
-        buttonStartKey: Qt.Key_F1
         buttonYKey: Qt.Key_Tab
         buttonBKey: Qt.Key_Escape
     }
