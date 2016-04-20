@@ -421,6 +421,18 @@ Module {
 
     Rule {
         inputs: ["z80.pl", "opcodes_base.dat"]
+            cmd.description = 'generating ' + output.fileName;
+            cmd.highlight = 'codegen';
+            cmd.program=product.moduleProperty("configure", "PERL_PATH");
+            cmd.arguments= ['-I./perl', 'settings-header.pl', 'settings.dat'];
+            cmd.workingDirectory = FileInfo.path(input.filePath);
+            cmd.stdoutRedirectFile = output.filePath;
+            return cmd;
+        }
+    }
+
+    Rule {
+        inputs: ["z80.pl", "opcodes_base.dat"]
         Artifact {
             fileTags: 'opcodes_base.c'
             filePath: 'opcodes_base.c'
@@ -491,6 +503,25 @@ Module {
             cmd.arguments= ['-I./perl', 'z80/z80.pl', 'z80/opcodes_ddfdcb.dat'];
             cmd.workingDirectory = product.sourceDirectory;
             cmd.stdoutFilePath = output.filePath;
+            return cmd;
+        }
+    }
+
+    Rule {
+        inputs: ["z80.pl", "opcodes_ed.dat"]
+        Artifact {
+            fileTags: 'z80_ed.c'
+            filePath: 'z80_ed.c'
+        }
+
+        prepare: {
+            var cmd = new Command();
+            cmd.description = 'generating ' + output.fileName;
+            cmd.highlight = 'codegen';
+            cmd.program=product.moduleProperty("configure", "PERL_PATH");
+            cmd.arguments= ['-I./perl', 'z80/z80.pl', 'z80/opcodes_ed.dat'];
+            cmd.workingDirectory = product.sourceDirectory;
+            cmd.stdoutRedirectFile = output.filePath;
             return cmd;
         }
     }

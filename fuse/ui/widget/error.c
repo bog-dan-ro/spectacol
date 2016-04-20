@@ -36,7 +36,7 @@
 widget_error_t *error_info;
 
 int
-ui_error_specific( ui_error_level severity, const char *message )
+_ui_error_specific( ui_error_level severity, const char *message )
 {
   widget_error_t error_info;
   /* Can't output widgets if we don't have a display yet */

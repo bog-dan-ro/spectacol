@@ -744,7 +744,7 @@ ui_get_rollback_point( GSList *points )
 }
 
 ui_confirm_joystick_t
-ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
+_ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
   widget_select_t info;
   int error;
@@ -768,7 +768,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 }
 
 int
-ui_widgets_reset( void )
+_ui_widgets_reset( void )
 {
   pokefinder_clear();
   return 0;

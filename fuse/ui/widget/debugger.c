@@ -81,24 +81,24 @@ static inline const char *format_16_bit( void )
   return debugger_output_base == 10 ? "%-5d" : "%04X";
 }
 
-int ui_debugger_activate( void )
+int _ui_debugger_activate( void )
 {
   return widget_do_debugger();
 }
 
-int ui_debugger_deactivate( int interruptible GCC_UNUSED )
+int _ui_debugger_deactivate( int interruptible GCC_UNUSED )
 {
   /* Refresh the Spectrum's display, including the border */
   display_refresh_all();
   return widget_end_all( WIDGET_FINISHED_OK );
 }
 
-int ui_debugger_update( void )
+int _ui_debugger_update( void )
 {
   return widget_debugger_draw( NULL );
 }
 
-int ui_debugger_disassemble( libspectrum_word addr )
+int _ui_debugger_disassemble( libspectrum_word addr )
 {
   debugger_memaddr = addr;
   return 0;
@@ -106,7 +106,7 @@ int ui_debugger_disassemble( libspectrum_word addr )
 
 /* Debugger update function. The dialog box is created every time it is
    displayed, so no need to do anything here */
-void ui_breakpoints_updated( void )
+void _ui_breakpoints_updated( void )
 {
 }
 
