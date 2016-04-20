@@ -114,7 +114,7 @@ Pane {
                     verticalAlignment: Text.AlignTop
                     text: qsTr("<ul>
                             <li> <b>START</b> toggle the menu
-                            <li> <b>BACK</b> (not available on all gamepads) close the menu or the dialog, exits the application
+                            <li> <b>BACK</b> (not available on all gamepads) toggle the menu or the dialog, exits the application
                             <li> <b>UP/DOWN, LEFT AXIS</b> navigate trough menu & controls
                             <li> <b>A</b> select or activate
                             <li> <b>B</b> close the dialog or the menu
