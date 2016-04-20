@@ -256,6 +256,8 @@ section "!Fuse Core Files (required)" SecCore
     File "lib\*"
     SetOutPath "$INSTDIR\roms"
     File "roms\*"
+    SetOutPath "$INSTDIR\ui\widget"
+    File /nonfatal "ui\widget\fuse.font"
  
     ; create the uninstaller
     writeUninstaller "$INSTDIR\uninstall.exe"

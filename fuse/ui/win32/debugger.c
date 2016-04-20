@@ -162,9 +162,10 @@ ui_debugger_activate( void )
   return 0;
 }
 
-void ui_breakpoints_updated( void )
+void
+ui_breakpoints_updated( void )
 {
-    // TODO: Refreash debugger list here
+  /* TODO: Refresh debugger list here */
 }
 
 static int

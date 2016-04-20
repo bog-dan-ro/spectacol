@@ -234,7 +234,7 @@ rom_scorpion_2, string, "256s-2.rom",
 rom_scorpion_3, string, "256s-3.rom",
 rom_spec_se_0, string, "se-0.rom",
 rom_spec_se_1, string, "se-1.rom",
-rom_interface_i, string, "if1-2.rom",
+rom_interface_1, string, "if1-2.rom",,, rominterfacei
 rom_beta128, string, "trdos.rom",
 rom_plusd, string, "plusd.rom",
 rom_didaktik80, string, "didaktik80.rom",

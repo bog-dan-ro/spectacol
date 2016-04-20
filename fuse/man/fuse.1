@@ -364,6 +364,12 @@ try a different option or say `\-\-fbmode 640'.
 .B \-\-drive\-plusd2\-type
 .I type
 .br
+.B \-\-drive\-didaktik80a\-type
+.I type
+.br
+.B \-\-drive\-didaktik80b\-type
+.I type
+.br
 .B \-\-drive\-disciple1\-type
 .I type
 .br
@@ -875,7 +881,7 @@ option.
 Insert the specified file into the emulated Opus Discovery's drive\ 1.
 .RE
 .PP
-.B \-\-paltv2x
+.B \-\-pal\-tv2x
 .RS
 Specify whether the PAL\ TV\ 2x and PAL\ TV\ 3x scalers should also produce
 scanlines along the lines of the TV\ 2x and Timex\ TV scalers.
@@ -1031,7 +1037,28 @@ Specify an RZX file to begin recording to.
 .B \-\-rom\-pentagon\-2
 .I file
 .br
-.B \-\-rom\-pentagon\-3
+.B \-\-rom\-pentagon512\-0
+.I file
+.br
+.B \-\-rom\-pentagon512\-1
+.I file
+.br
+.B \-\-rom\-pentagon512\-2
+.I file
+.br
+.B \-\-rom\-pentagon512\-3
+.I file
+.br
+.B \-\-rom\-pentagon1024\-0
+.I file
+.br
+.B \-\-rom\-pentagon1024\-1
+.I file
+.br
+.B \-\-rom\-pentagon1024\-2
+.I file
+.br
+.B \-\-rom\-pentagon1024\-3
 .I file
 .br
 .B \-\-rom\-scorpion\-0
@@ -1072,7 +1099,10 @@ the two ROMs for the TC2068
 .RI ( tc2068\-0.rom " and " tc2068\-1.rom ),
 the two ROMs for the TS2068
 .RI ( tc2068\-0.rom " and " tc2068\-1.rom ),
-the two main ROMs, the TR-DOS ROM and a reset service ROM for the Pentagon
+the two main ROMs and the TR-DOS ROM for the Pentagon\ 128K
+.RI ( 128p\-0.rom ", " 128p\-1.rom " and " trdos.rom ),
+the two main ROMs, the TR-DOS ROM and a reset service ROM for the
+Pentagon\ 512K and 1024K
 .RI ( 128p\-0.rom ", " 128p\-1.rom ", " trdos.rom " and " gluck.rom ),
 the four ROMs for the Scorpion 256
 .RI ( 256s\-0.rom ", " 256s\-1.rom ", " 256s\-2.rom " and " 256s\-3.rom ),
@@ -1533,7 +1563,7 @@ option.
 Emulate a SpeccyBoot Ethernet interface. Same as the General Peripherals Options dialog's
 .I "SpeccyBoot"
 option. See the SpeccyBoot web page at
-.I http://speccyboot.sourceforge.net/
+.I http://patrikpersson.github.io/speccyboot/
 for full details on the SpeccyBoot.
 .RE
 .PP
@@ -1952,6 +1982,35 @@ screenshot to.
 .RS
 Save the current screen as a PNG file. You will be prompted for a
 filename to save the screenshot to.
+.RE
+.PP
+.I "File, Scalable Vector Graphics, Start capture in line mode..."
+.RS
+Start trapping the video output functions present in ROM to copy the
+picture to SVG files, thus creating vectorized scalable picture; it is
+expected to be fully operational in BASIC only, but few machine code
+programs could work, if they use the ROM addresses to output text or
+graphics. The initial picture size is 256\(mu176, but it is increased
+everytime a `scroll' happens. On every CLS a new file will be created,
+with an increasing sequence number. CIRCLEs will be described as a
+sequence of lines, so the original `imprecisions' will be still visible.
+The text output will be fully understood and decoded: normal ASCII
+characters will be converted into COURIER scalable fonts, UDG graphics
+into dot matrix areas, GRAPHICS blocky characters into small squares.
+A slightly transparent output permits to show a bit of the overlapped
+text and graphics elements. Lower portion of the screen (normally bound
+to stream #0 and #1) won't be captured.
+.RE
+.PP
+.I "File, Scalable Vector Graphics, Start capture in dot mode..."
+.RS
+As above, but line capture is disabled. A line will be rendered as a
+sequence of dots.
+.RE
+.PP
+.I "File, Scalable Vector Graphics, Stop capture"
+.RS
+Stop the SVG capture function.
 .RE
 .PP
 .I "File, Movie, Record..."
@@ -2391,7 +2450,7 @@ section for more details.
 If this option is selected, Fuse will emulate a SpeccyBoot interface which
 allows booting a ZX\ Spectrum over an Ethernet network. See the SpeccyBoot
 web page at
-.I http://speccyboot.sourceforge.net/
+.I http://patrikpersson.github.io/speccyboot/
 for more details.
 .RE
 .PP
@@ -3070,7 +3129,7 @@ section for more information.
 .PP
 .I "Machine, Poke Memory..."
 .RS
-Allow to use multiface POKEs for things such as infinite lives. See the
+Allow one to use multiface POKEs for things such as infinite lives. See the
 .B "POKE MEMORY"
 section for more information.
 .RE
@@ -3887,7 +3946,7 @@ for more details.
 .SH "DIVIDE"
 The DivIDE is another IDE interface for the Spectrum, of which full
 details can be found at
-.IR "http://baze.au.com/divide/" .
+.IR "http://web.archive.org/web/20150302052256/http://baze.au.com/divide/" .
 The interface can be activated via the
 .I "DivIDE interface"
 option from the
@@ -4775,7 +4834,7 @@ For reading:
 .I .UDI
 .RS
 Ultra Disk Image; for specification please see
-.I http://scratchpad.wikia.com/wiki/Spectrum_emulator_file_format:_udi
+.I http://faqwiki.zxnet.co.uk/wiki/UDI_format
 or
 .I http://zxmak.chat.ru/docs.htm
 .PP
@@ -4827,7 +4886,7 @@ Teledisk image format; Fuse supports only files which do not use the
 \(lqAdvanced Compression\(rq option. Detailed description found in
 .I http://www.classiccmp.org/dunfield/img54306/td0notes.txt
 and
-.I http://www.fpns.net/willy/wteledsk.htm
+.I https://web.archive.org/web/20130116072335/http://www.fpns.net/willy/wteledsk.htm
 .RE
 .PP
 .I .DSK

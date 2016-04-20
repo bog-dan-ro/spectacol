@@ -36,6 +36,7 @@ bin_PROGRAMS = createhdf \
 	       snap2tzx \
 	       snapconv \
 	       tapeconv \
+	       tape2pulses \
 	       tzxlist
 
 if BUILD_AUDIOTOOLS
@@ -54,7 +55,6 @@ createhdf_SOURCES = ide.c createhdf.c
 
 fmfconv_SOURCES = fmfconv.c \
 		  fmfconv_avi.c \
-		  fmfconv_ff.c \
 		  fmfconv_yuv.c \
 		  fmfconv_scr.c \
 		  fmfconv_ppm.c \
@@ -74,7 +74,7 @@ if HAVE_LIBPNG
 fmfconv_SOURCES += fmfconv_png.c
 endif
 
-fmfconv_LDADD = $(JPEG_LIBS) $(PNG_LIBS) $(FFMPEG_LIBS) compat/libcompatos.a
+fmfconv_LDADD = $(JPEG_LIBS) $(PNG_LIBS) compat/libcompatos.a
 
 listbasic_SOURCES = listbasic.c utils.c
 listbasic_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
@@ -119,6 +119,9 @@ tape2wav_SOURCES = tape2wav.c utils.c
 tape2wav_LDADD = $(LIBSPEC_LIBS) $(AUDIOFILE_LIBS) \
                  compat/libcompatos.a
 
+tape2pulses_SOURCES = tape2pulses.c utils.c
+tape2pulses_LDADD = $(LIBSPEC_LIBS) compat/libcompatos.a
+
 noinst_HEADERS = compat.h ide.h utils.h audio2tape.h importer/interpolator.h \
                  importer/schmitt.h importer/simple.h importer/soundfile.h \
                  importer/trigger.h converter/findpilot.h \
@@ -149,6 +152,7 @@ rzxtool_SOURCES += rzxtool_res.rc
 scl2trd_SOURCES += scl2trd_res.rc
 snap2tzx_SOURCES += snap2tzx_res.rc
 snapconv_SOURCES += snapconv_res.rc
+tape2pulses_SOURCES += tape2pulses_res.rc
 tape2wav_SOURCES += tape2wav_res.rc
 tapeconv_SOURCES += tapeconv_res.rc
 tzxlist_SOURCES += tzxlist_res.rc

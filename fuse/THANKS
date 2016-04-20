@@ -29,7 +29,7 @@ Some thanks (in alphabetical order):
   you've got an Amiga, you may well like to check out Ian's Spectrum
   Emulator, ASp: http://www.lasernet.plus.com/asp.html
 
-* Shawn Hargreaves: for Allegro (http://alleg.sourceforge.net/)
+* Shawn Hargreaves: for Allegro (http://liballeg.org/)
   (again, used by previous versions of Fuse for the graphical display)
 
 * Steven Harrison: for helping track down why the SDL sound routines
@@ -44,7 +44,7 @@ Some thanks (in alphabetical order):
   emulations (see `AUTHORS')
 
 * Gerton Lunter: his wonderful z80
-  (ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
+  (http://www.worldofspectrum.org/pub/sinclair/emulators/pc/windows/z80-400.zip)
   got me started on this emulation lark all those years ago...
 
 * Anders Holmberg: for reporting a bug in the z80 v1.45 load routines. Anders

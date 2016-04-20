@@ -65,6 +65,11 @@ MENU_CALLBACK( menu_file_recording_stop );
 MENU_CALLBACK( menu_file_recording_finalise );
 MENU_CALLBACK( menu_file_aylogging_stop );
 MENU_CALLBACK( menu_file_openscrscreenshot );
+
+MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureinlinemode );
+MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureindotmode );
+MENU_CALLBACK( menu_file_scalablevectorgraphics_stopcapture );
+
 MENU_CALLBACK( menu_file_movie_stop );
 MENU_CALLBACK( menu_file_movie_pause );
 

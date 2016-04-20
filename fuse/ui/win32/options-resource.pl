@@ -78,8 +78,8 @@ foreach( @dialogs ) {
 
     $y += 5;
 
-    $buffer .= sprintf "  DEFPUSHBUTTON \"OK\",IDOK,45,$y,50,14\n", $optname;
-    $buffer .= sprintf "  PUSHBUTTON \"Cancel\",IDCANCEL,100,$y,50,14\n", $optname;
+    $buffer .= sprintf "  DEFPUSHBUTTON \"OK\",IDOK,45,$y,50,14\n";
+    $buffer .= sprintf "  PUSHBUTTON \"Cancel\",IDCANCEL,100,$y,50,14\n";
 
     $y += 14 + 5; #height of the buttons + 5 margin
    

@@ -21,6 +21,7 @@ The available utilities are:
 * scl2trd: convert .scl disk images to .trd disk images.
 * snap2tzx: convert snapshots to TZX tape images.
 * snapconv: convert between snapshot formats.
+* tape2pulses: dumps the pulse information from tape images to text files.
 * tape2wav: convert a tape file to .wav audio format.
 * tapeconv: convert between .tzx and .tap files.
 * tzxlist: list the contents of a TZX, TAP, PZX or Warajevo TAP file.

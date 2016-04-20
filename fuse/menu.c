@@ -51,6 +51,7 @@
 #include "screenshot.h"
 #include "settings.h"
 #include "snapshot.h"
+#include "svg.h"
 #include "tape.h"
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
@@ -747,7 +748,67 @@ MENU_CALLBACK( menu_file_savescreenaspng )
 
   fuse_emulation_unpause();
 }
+
 #endif
+
+#ifdef HAVE_LIB_XML2
+
+MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureinlinemode )
+{
+  char *filename;
+
+  ui_widget_finish();
+  if( !svg_capture_active ) {
+
+    fuse_emulation_pause();
+
+    filename = ui_get_save_filename( "Fuse - Capture to SVG File" );
+    if( !filename ) { fuse_emulation_unpause(); return; }
+
+    ui_menu_activate( UI_MENU_ITEM_FILE_SVG_CAPTURE, 1 );
+    svg_capture_mode = SVG_CAPTURE_LINES;
+    svg_startcapture( filename );
+
+    fuse_emulation_unpause();
+  }
+}
+
+MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureindotmode )
+{
+  char *filename;
+
+  ui_widget_finish();
+  if( !svg_capture_active ) {
+
+    fuse_emulation_pause();
+
+    filename = ui_get_save_filename( "Fuse - Capture to SVG File" );
+    if( !filename ) { fuse_emulation_unpause(); return; }
+    ui_menu_activate( UI_MENU_ITEM_FILE_SVG_CAPTURE, 1 );
+
+    svg_capture_mode = SVG_CAPTURE_DOTS;
+    svg_startcapture( filename );
+
+    fuse_emulation_unpause();
+  }
+}
+
+MENU_CALLBACK( menu_file_scalablevectorgraphics_stopcapture )
+{
+  ui_widget_finish();
+  if( svg_capture_active ) {
+
+    fuse_emulation_pause();
+
+    svg_stopcapture();
+    ui_menu_activate( UI_MENU_ITEM_FILE_SVG_CAPTURE, 0 );
+
+    fuse_emulation_unpause();
+  }
+}
+
+#endif  /* HAVE_LIB_XML2 */
+
 
 MENU_CALLBACK( menu_file_movie_record )
 {

@@ -186,4 +186,12 @@ void memory_display_dirty_pentagon_16_col( libspectrum_word address,
 };
 #endif				/* #ifdef __cplusplus */
 
+typedef enum trap_type {
+  CHECK_TAPE_ROM,
+  CHECK_48K_ROM
+} trap_type;
+
+/* Check whether we're actually in the right ROM when a tape or other traps hit */
+extern int trap_check_rom( trap_type type );
+
 #endif				/* #ifndef FUSE_MEMORY_H */

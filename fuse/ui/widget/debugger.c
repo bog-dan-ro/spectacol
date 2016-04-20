@@ -104,9 +104,10 @@ int ui_debugger_disassemble( libspectrum_word addr )
   return 0;
 }
 
+/* Debugger update function. The dialog box is created every time it is
+   displayed, so no need to do anything here */
 void ui_breakpoints_updated( void )
 {
-    // TODO: Refreash debugger list here
 }
 
 int widget_debugger_draw( void *data )

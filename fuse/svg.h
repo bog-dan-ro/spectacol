@@ -1,17 +1,7 @@
-/* speccyboot.h: SpeccyBoot Ethernet emulation
-
-   Emulates SPI communication and (a minimal subset of) the
-   functionality of the Microchip ENC28J60 Ethernet controller. Refer
-   to the ENC28J60 data sheet and SpeccyBoot documentation for
-   details.
-
-   ENC28J60 data sheet:
-     http://www.microchip.com/wwwproducts/Devices.aspx?dDocName=en022889
-
-   SpeccyBoot:
-     http://patrikpersson.github.io/speccyboot/
-  
-   Copyright (c) 2009-2011 Patrik Persson, Philip Kendall
+/* svg.h: Routines to capture ROM graphics statements to Scalable Vector
+          Graphics files
+   Copyright (c) 2014 Stefano Bodrato
+   Portions taken from svgwrite.c, (c) J.J. Green 2005
 
    $Id$
 
@@ -31,17 +21,25 @@
 
    Author contact information:
 
-   E-mail: philip-fuse@shadowmagic.org.uk
+   E-mail: stefano@bodrato.it
 
 */
 
-#ifndef FUSE_SPECCYBOOT_H
-#define FUSE_SPECCYBOOT_H
+#ifndef FUSE_SVG_H
+#define FUSE_SVG_H
 
-void speccyboot_init( void );
+extern int svg_capture_active;     /* SVG capture enabled? */
 
-void speccyboot_end( void );
+extern void svg_startcapture( const char *name );
 
-int speccyboot_unittest( void );
+extern void svg_stopcapture( void );
 
-#endif /* #ifndef FUSE_SPECCYBOOT_H */
+void svg_capture( void );
+void svg_capture_end( void );
+
+#define SVG_CAPTURE_DOTS   1
+#define SVG_CAPTURE_LINES  2
+
+extern int svg_capture_mode;     /* SVG capture enabled? */
+
+#endif				/* #ifndef FUSE_SVG_H */

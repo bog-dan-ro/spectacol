@@ -199,7 +199,13 @@ print_block_name( libspectrum_byte * data )
 {
   int i;
   for( i = 2; i < 12; i++) {
-    printf("%c", data[i]);
+    char c;
+    if( data[i] >= 32 && data[i] < 127 ) {
+      c = data[i];
+    } else {
+      c = '?';
+    }
+    printf("%c", c);
   }
 }
 
@@ -512,6 +518,7 @@ process_tape( char *filename )
                8 );
       printf("  Tail length: %d tstates\n",
 	     libspectrum_tape_block_tail_length( block ) );
+      decode_header( block );
       break;
 
     default:

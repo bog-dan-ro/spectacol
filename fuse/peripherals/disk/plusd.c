@@ -229,7 +229,6 @@ plusd_reset( int hard_reset )
   fdd_select( &plusd_drives[ 0 ], 1 );
   machine_current->memory_map();
 
-  ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
 }
 
 void

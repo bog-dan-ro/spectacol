@@ -301,10 +301,6 @@ specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
 
     fdd_motoron( &specplus3_drives[0], b & 0x08 );
     fdd_motoron( &specplus3_drives[1], b & 0x08 );
-
-    ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
-			 b & 0x08 ? UI_STATUSBAR_STATE_ACTIVE :
-			            UI_STATUSBAR_STATE_INACTIVE );
   }
 
   /* Store the last byte written in case we need it */

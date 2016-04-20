@@ -48,6 +48,7 @@ libfuse_a_SOURCES = display.c \
 	snapshot.c \
 	sound.c \
 	spectrum.c \
+	svg.c \
 	tape.c \
 	ui.c \
 	uidisplay.c \
@@ -80,6 +81,8 @@ AM_CPPFLAGS = \
               $(SDL_CFLAGS) \
               $(PNG_CFLAGS)
 
+AM_CFLAGS = $(WARN_CFLAGS) $(PTHREAD_CFLAGS)
+
 noinst_HEADERS = bitmap.h \
 	compat.h \
 	display.h \
@@ -105,6 +108,7 @@ noinst_HEADERS = bitmap.h \
 	snapshot.h \
 	sound.h \
 	spectrum.h \
+	svg.h \
 	tape.h \
 	utils.h \
 	options.h \
@@ -145,6 +149,7 @@ fuse_SOURCES = fuse-main.c
 
 fuse_LDADD = libfuse.a \
              $(LIBSPEC_LIBS) \
+             $(PTHREAD_LIBS) \
              $(GTK_LIBS) \
              $(GLIB_LIBS) \
              $(PNG_LIBS) \

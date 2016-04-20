@@ -1019,3 +1019,10 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          Autoconf Archive (Stuart).
 20150617 Makefile.am,test/Makefile.am: enable silent rules for perl and windres
          commands (Sergio).
+20150831 test/turbo-zeropilot.tzx: add mime-type property (Sergio).
+20160325 tape_block.c: allow for the possibility that inital_level has the
+         default value (Fred).
+20160329 timings.c: refactor frame timings (Stuart).
+20160410 Makefile.am: revert revision 4731 / bug #262 as it makes configuring
+         target flags for cross-compilation difficult (patch #357) (BogDan
+         Vatra).

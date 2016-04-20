@@ -2,7 +2,7 @@ The Fuse utilities have been brought to you by:
 
 * Darren Salt: listing multiple files in tzxlist, and the tzxlist man page.
 
-* Fredrick Meunier: scl2trd and audio2tape.
+* Fredrick Meunier: tape2pulses, scl2trd and audio2tape.
 
 * Dmitry Sanarin: the original scl to trd conversion code, taken from
   Glukalka (http://www.sanarin.ru/glukalka/)

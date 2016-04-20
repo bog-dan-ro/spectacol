@@ -301,7 +301,21 @@ WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
   fuse_nCmdShow = nCmdShow;
   fuse_hPrevInstance = hPrevInstance;
 
-  return fuse_main(__argc, __argv);
+/* HACK: __argc, __argv are broken and return zero when using mingwrt 4.0+
+   on MinGW.
+   HACK: MinGW-w64 based toolchains neither feature _argc nor _argv. The 32 bit
+   incarnation only defines __MINGW32__. This leads to build breakage due to
+   missing declarations. Luckily MinGW-w64 based toolchains define
+   __MINGW64_VERSION_foo macros inside _mingw.h, which is included from all
+   system headers. Thus we abuse that to detect them.
+*/
+#if defined( __GNUC__ ) && defined( __MINGW32__ ) \
+                        && !defined( __MINGW64_VERSION_MAJOR )
+  return fuse_main( _argc, _argv );
+#else
+  return fuse_main( __argc, __argv );
+#endif
+
   /* FIXME: how do deal with returning wParam */
 }
 
@@ -387,7 +401,9 @@ win32ui_make_menu( void )
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
   ui_menu_activate( UI_MENU_ITEM_TAPE_RECORDING, 0 );
-
+#ifdef HAVE_LIB_XML2
+  ui_menu_activate( UI_MENU_ITEM_FILE_SVG_CAPTURE, 0 );
+#endif
   return FALSE;
 }
 

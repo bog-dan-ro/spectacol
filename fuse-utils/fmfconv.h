@@ -43,11 +43,6 @@
 #define USE_ZLIB
 #endif
 
-#ifdef USE_FFMPEG
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-#endif
-
 #define printe(format...) \
     fprintf (stderr, "*ERR " format)
 
@@ -204,33 +199,5 @@ void snd_finalize_au( void );
 
 int snd_write_aiff( void );
 void snd_finalize_aiff( void );
-
-#ifdef USE_FFMPEG_VARS
-extern int ffmpeg_arate;		/* audio bitrate */
-extern int ffmpeg_vrate;		/* video bitrate */
-extern type_t ffmpeg_rescale;
-extern const char *ffmpeg_frate;
-extern const char *ffmpeg_format;
-extern const char *ffmpeg_vcodec;
-extern const char *ffmpeg_acodec;
-extern AVRational ffmpeg_aspect;
-#endif
-
-#ifdef USE_FFMPEG
-extern int ffmpeg_libx264;
-extern int ffmpeg_list;
-
-int snd_write_ffmpeg( void );
-int out_write_ffmpegheader( void );
-int out_write_ffmpeg( void );
-void out_finalize_ffmpeg( void );
-
-int ffmpeg_resample_audio( void );
-int ffmpeg_rescale_video( void );
-
-void ffmpeg_list_ffmpeg( int what );
-void print_ffmpeg_version( void );
-#endif
-
 
 #endif	/* FMFCONV_H */

@@ -165,14 +165,14 @@ CPPFLAGS="$ac_save_CPPFLAGS"
 
 # If we're not libspectrum's own internal GLib replacement, we must use the
 # real thing
-if test "$fakeglib" = no; then
-  AM_PATH_GLIB_2_0(
-    2.20.0,
-    AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got GLib])
-    LIBS="$LIBS `pkg-config --libs glib-2.0`",
+AS_IF([test "$fakeglib" = no], [
+  PKG_CHECK_MODULES(
+    [GLIB],
+    [glib-2.0 >= 2.20.0],
+    [AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got GLib])],
     [AC_MSG_ERROR([GLib not found, and libspectrum has no internal replacement])]
   )
-fi
+])
 
 dnl Check if supplied libspectrum has support for compressed szx files
 AC_MSG_CHECKING(whether libspectrum supports compressed szx snaps)
@@ -237,9 +237,6 @@ if test "$win32" = yes; then
   AC_CHECK_HEADER(windows.h,
                   LIBS="$LIBS -mwindows -lcomctl32 -lwinmm";
                   AC_DEFINE([UI_WIN32], 1, [Defined if Win32 UI in use])
-                  AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
-                  AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
-                  AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Exclude rarely used stuff from Windows headers <windows.h>])
                   UI=win32,
                   AC_MSG_ERROR([Win32 UI not found]))
 fi
@@ -465,6 +462,7 @@ AM_CONDITIONAL(UI_WII, test "$UI" = wii)
 AM_CONDITIONAL(UI_WIN32, test "$UI" = win32)
 AM_CONDITIONAL(UI_X, test "$UI" = xlib)
 AM_CONDITIONAL(USE_WIDGET, test x$WIDGET != x)
+AC_SUBST(UI)
 
 dnl Locate common options for widget UIs
 if test -n "$WIDGET"; then
@@ -726,8 +724,6 @@ if test "$stick" = yes; then
         AC_MSG_RESULT(yes)
         SDL_VERSION=1.2.4
         AM_PATH_SDL($SDL_VERSION,
-          LIBS="$LIBS `sdl-config --libs`"
-          CPPFLAGS="$CPPFLAGS `sdl-config --cflags`"
           AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks]),
           AC_MSG_WARN([SDL version $SDL_VERSION not found - joystick support disabled]))
       fi
@@ -803,9 +799,7 @@ if test "$withval" = no; then pthread=no; else pthread=yes; fi,
 pthread=yes)
 AC_MSG_RESULT($pthread)
 if test "$pthread" = yes; then
-  AX_PTHREAD([LIBS="$PTHREAD_LIBS $LIBS"
-              CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-              CC="$PTHREAD_CC"],
+  AX_PTHREAD([],
              [AC_MSG_WARN(POSIX threads not found - some peripherals disabled)
               pthread=no])
 fi
@@ -882,6 +876,9 @@ case "$host_os" in
     ;;
   mingw32*)
     COMPAT_OSNAME='win32'
+    AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
+    AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
+    AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Exclude rarely used stuff from Windows headers <windows.h>])
     ;;
   wii)
     COMPAT_OSNAME='wii'
@@ -921,6 +918,21 @@ fi
 AM_CONDITIONAL(DESKTOP_DATADIR, test "$desktopdir" = yes)
 AC_SUBST(DESKTOP_DATADIR)
 
+dnl Where to install the bash completion script
+AC_ARG_WITH([bash-completion-dir],
+  [AS_HELP_STRING([--with-bash-completion-dir=DIR],
+                  [install bash completion script in given directory])],
+  if test "$withval" = no; then with_bash_completion_dir=""; fi
+)
+if test "$with_bash_completion_dir" = yes; then
+  PKG_CHECK_VAR([BASH_COMPLETION_DIR], [bash-completion], [completionsdir], [],
+                [BASH_COMPLETION_DIR="${sysconfdir}/bash_completion.d"])
+else
+  BASH_COMPLETION_DIR="$with_bash_completion_dir"
+fi
+AM_CONDITIONAL([BASH_COMPLETION], [test -n "$BASH_COMPLETION_DIR"])
+AC_SUBST([BASH_COMPLETION_DIR])
+
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)
 AC_ARG_ENABLE(smallmem,
@@ -950,12 +962,13 @@ AC_MSG_RESULT($warnings)
 
 dnl If it appears we're using gcc as our compiler, turn on warnings
 if test "$ac_cv_c_compiler_gnu" = yes; then
-    CFLAGS="$CFLAGS -Wall -Wwrite-strings"
+    WARN_CFLAGS="-Wall -Wwrite-strings"
     dnl And possibly lots of warnings
     if test "$warnings" = yes; then
-        CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Waggregate-return -W -Wsign-compare"
+        WARN_CFLAGS="$WARN_CFLAGS -Wstrict-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Waggregate-return -W -Wsign-compare"
     fi
 fi
+AC_SUBST(WARN_CFLAGS)
 
 AC_CONFIG_FILES([
 Makefile

@@ -34,6 +34,7 @@
 #include "machine.h"
 #include "spectrum.h"
 #include "settings.h"
+#include "ui/ui.h"
 #include "upd_fdc.h"
 #include "wd_fdc.h"
 
@@ -70,6 +71,8 @@ fdd_event( libspectrum_dword last_tstates, int event, void *user_data );
 
 static int motor_event;
 static int index_event;
+
+static int fdd_motor = 0; /* to manage 'disk' icon */
 
 void
 fdd_init_events( void )
@@ -185,6 +188,10 @@ fdd_motoron( fdd_t *d, int on )
   if( d->motoron == on )
     return;
   d->motoron = on;
+  fdd_motor += on ? 1 : -1;
+  ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
+                       fdd_motor > 0 ? UI_STATUSBAR_STATE_ACTIVE :
+                       UI_STATUSBAR_STATE_INACTIVE );
   /*
   TEAC FD55 Spec:
   (13) READY output signal

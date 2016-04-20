@@ -355,22 +355,8 @@ ay_do_tone( int level, unsigned int tone_count, int *var, int chan )
     if( ay_tone_high[ chan ] )
       *var = level;
     else {
-      *var = -level;
+      *var = 0;
     }
-  }
-
-  /* The AY output goes from 0 to the maximum volume, so there
-   * is a DC component that is half the maxmum volume.
-   * Robocop uses a high frequency square wave with a tone
-   * period of one to average out to being like a DC offset at
-   * around half the maximum volume. This is used as a base for
-   * the sample playback.
-   * This seems to intefere with our attempt to remove the
-   * returned DC offset, so for now we just ignore the high
-   * frequency wave and hope it's a sample
-   */
-  if( ay_tone_period[ chan ] == 1 ) {
-      *var = -level;
   }
 }
 
@@ -672,7 +658,7 @@ sound_frame( void )
 }
 
 void
-sound_beeper( int on )
+sound_beeper( libspectrum_dword at_tstates, int on )
 {
   static int beeper_ampl[] = { 0, AMPL_TAPE, AMPL_BEEPER,
                                AMPL_BEEPER+AMPL_TAPE };
@@ -689,9 +675,9 @@ sound_beeper( int on )
     if( on == 1 ) on = 0;
   }
 
-  val = -beeper_ampl[3] + beeper_ampl[on]*2;
+  val = beeper_ampl[on];
 
-  blip_synth_update( left_beeper_synth, tstates, val );
+  blip_synth_update( left_beeper_synth, at_tstates, val );
   if( sound_stereo_ay != SOUND_STEREO_AY_NONE )
-    blip_synth_update( right_beeper_synth, tstates, val );
+    blip_synth_update( right_beeper_synth, at_tstates, val );
 }

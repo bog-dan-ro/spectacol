@@ -516,3 +516,20 @@
 20150613 m4/ax_create_stdint_h.m4: add AX_CREATE_STDINT_H macro from the GNU
          Autoconf Archive (Stuart).
 20150617 Makefile.am: enable silent rules for windres commands (Sergio).
+20151201 fmfconv.c,fmfconv_avi.c: ensure AVI files are finalised and delete
+         the index file on Windows (Sergio).
+20151229 Makefile.am,configure.ac,fmfconv.[ch],fmfconv_ff.c,man/fmfconv.1: drop
+         FFmpeg/Libav API support in fmfconv (patch #345) (Sergio).
+20160103 fmfconv.c: fix crash when writing a sequence of screenshots (Sergio).
+20160111 fmfconv.c: fix spelling (Sergio).
+20160311 audio2tape.cc: declare C linkage for progname (Adam Sampson).
+20160325 tzxlist.c: dump headers that appear to be in data blocks (Fred).
+20160325 Makefile.am,man/{Makefile.am,audio2tape.1,tape2pulses.1,tape2wav.1,
+         tapeconv.1,tzxlist.1},tape2pulses.c: add new utility to dump the
+         pulses found in a tape file to a file for analysis (Fred).
+20160325 tape2pulses.c: fix getopt_long arguments (Fred).
+20160326 AUTHORS,Makefile.am,README,man/fuse-utils.1,tape2pulses.c,
+         tape2pulses_res.rc: set tape2pulses info into Windows executable and
+         complete documentation (Sergio).
+20160420 tzxlist.c: don't print non-printable header characters like Fuse
+         (thanks, Sergio) (Fred).

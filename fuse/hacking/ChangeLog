@@ -4835,7 +4835,7 @@
          (Stuart).
 20150514 ui/gtk/gtkjoystick.c,ui/sdl/sdljoystick.c,ui/svga/svgajoystick.c,
          ui/uijoystick.[ch],ui/win32/win32joystick.[c|h|rc]: standardise the
-         number of joystick buttons across UIs (fixes bug #332) (UB880D).
+         number of joystick buttons across UIs (patch #332) (UB880D).
 20150514 peripherals/nic/w5100_internals.h: #include <sys/select.h> for POSIX
          systems (Adrien Destugues).
 20150515 peripherals/disk/didaktik.c: fix address of i8255 port (more of patch
@@ -4931,3 +4931,86 @@
          the 0x4000 - 0x7FFF range (thanks, rga24 from WoS) (Fred).
 20150803 peripherals/printer.c: make the partial decode ZX Printer not require a
          hard reset to enable (thanks, RMartins) (Fred).
+20150824 Makefile.am,fuse.c,man/fuse.1,memory.[c|h],menu.[c|h],menu_data.dat,
+         svg.[c|h],tape.c,ui.c,ui/{gtk/gtkui.c,ui.h,widget/widget.c,
+         win32/win32ui.c},z80/{coretest.c,z80_checks.h,z80_ops.c}: capture BASIC
+         video functions to SVG file (patch #322) (Stefano Bodrato).
+20150824 ui/widget/widget.c: remove unused function (Sergio).
+20151008 sound.c: remove DC offset compensation as it results in inaccurate
+         output when envelopes are used and is not required when using the
+         filtered sound output which removes the DC offset anyway (patch #339)
+         (Matthew Westcott and Fred)
+20151020 z80/z80_checks.h: fix segfault due to inconsistent SETUP_CHECK() and
+         CHECK() ordering (UB880D; thanks, Guesser).
+20151108 hacking/{code_beautifiers.txt,uncrustify.cfg}: document Uncrustify and
+         Indent code beautifiers (patch #340) (Sergio).
+20151108 man/fuse.1: fix pal-tv2x and Pentagon ROMs command line options
+         (Sergio).
+20151109 configure.ac,data/{Makefile.am,shell-completion/bash/fuse}: support 
+         bash completion (patch #335) (Sergio).
+20151115 hacking/Makefile.am: add missing files (Sergio).
+20151115 data/{Makefile.am,shell-completion/diff_options.sh}: add a script to
+         keep options in sync (Sergio).
+20151115 hacking/ChangeLog,man/fuse.1: add missing --drive-didaktik80[a|b]-type
+         options (Sergio).
+20151122 peripherals/if1.c,settings.[dat|pl]: more from rename 'Interface I' to
+         'Interface 1' (thanks, Stuart) (Sergio).
+20151130 ui/win32/options-resource.pl: remove redundant argument on button
+         creation (Sergio).
+20151130 ui/win32/win32ui.c: fix compilation with mingwrt 4.0+ (Kirben).
+20151208 sound/blipbuffer.h: remove second inline declaration of
+         blip_buffer_samples_avail() (Sergio).
+20151208 ui/gtk/pokemem.c: do not use deprecated gtk_tree_view_set_rules_hint()
+         on GTK+ 3 UI (Sergio).
+20151208 ui/gtk/gtkmouse.c: replace deprecated gdk_cursor_new() on GTK+ 3 UI
+         (Sergio).
+20151223 m4/ax_pthread.m4: update macro that checks POSIX threads (Sergio).
+20151223 Makefile.am,configure.ac: don't use CFLAGS user variable for warnings
+         or pthread options (Sergio).
+20151228 configure.ac: remove duplicate sdl-config calls and avoid the use of
+         CPPFLAGS (Sergio).
+20151228 configure.ac: use PKG_CHECK_MODULES for GLib detection rather than raw
+         pkg-config, that doesn't play well when cross-compiling (Sergio).
+20151228 ui/gtk/gtkui.c: update properties used in GtkAboutDialog (Sergio).
+20160106 man/fuse.1,peripherals/speccyboot.[ch]: update SpeccyBoot URL (Sergio).
+20160106 peripherals/{ide/{simpleide.c,zxatasp.c,zxcf.c},kempmouse.c,printer.c}:
+         fix some peripherals activation when loading snapshots (fixes bug #328)
+         (Sergio).
+20160111 man/fuse.1: fix spelling (Sergio).
+20160224 AUTHORS,THANKS,hacking/peripheral_tests.txt,man/fuse.1: fix broken URLs
+         (Sergio).
+20160301 peripherals/ula.c,sound.[ch],tape.c: add tape data playback in tape
+         edge handling and correct time sound from tape edge starts (fixes bug
+         #330) (Fred).
+20160302 peripherals/ula.c: add parens to avoid gcc warning (more from bug #330)
+         (thanks, Sergio) (Fred).
+20160325 machines/specplus3.c,peripherals/disk/{beta.c,didaktik.c,disciple.c,
+         fdd.c,opus.c,plusd.c,wd_fdc.c}: move the "Disk icon" update code to
+         fdd.c (patch #348) (Gergely Szasz).
+20160325 tape.c: also check if data blocks are headers for handling PZX files
+         (Fred).
+20160325 tape.c: correctly count number of pulses in PZX pulse block for tape
+         browser (Fred).
+20160325 peripherals/disk/wd_fdc.c: revert mistaken deletion of
+         f->data_offset = 0; from patch #348 (thanks, Stuart and Gergely)
+         (Fred).
+20160330 ui/win32/win32ui.c: fix compilation with MinGW-w64 toolchain
+         (lordhoto).
+20160331 peripherals/disk/didaktik.c: don't enable Didaktik SNAP option if ROM
+         file is missing (Sergio).
+20160404 configure.ac,data/win32/{distribution.mk,installer.nsi.in},
+         z80/Makefile.am: fix the build of SDL UI on Windows (patch #336)
+         (Sergio).
+20160408 debugger/disassemble.c: fix disassembly of LD (HL), LD (IX) and LD (IY)
+         (patch #350) (BogDan Vatra).
+20160408 settings.pl,utils.c: use compat_file_exists() instead of stat() in
+         read_config_file() and utils_find_file_path() (patch #351) (BogDan
+         Vatra).
+20160408 peripherals/disk/fdd.c: fix fdd_strerror() reading past the end of the
+         fdd_error array (patch #352) (BogDan Vatra).
+20160409 debugger/breakpoint.c,ui/gtk/debugger.c,ui/ui.h,ui/widget/debugger.c,
+         ui/win32/debugger.c: signal the UI when the breakpoints list is changed
+         (patch #357) (BogDan Vatra).
+20160417 peripherals/disk/wd_fdc.c: fix Beta 128 type II commands (fixes bug
+         #331) (thanks, windale and BogDan Vatra) (Sergio).
+20160417 compat/unix/tuntap.c,ui.c,utils.c: secure strncpy() calls (Sergio).

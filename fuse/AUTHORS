@@ -11,7 +11,7 @@ Fuse has been brought to you by:
 
 * John Elliott: for lib765, which provided Fuse's original emulation of the
   +3's FDC, and libdsk which provided support for more disk image formats:
-  see http://www.seasip.demon.co.uk/Unix/LibDsk/
+  see http://www.seasip.info/Unix/LibDsk/index.html
 
 * Darren Salt: the original versions of the code for +3 emulation,
   SLT support, MITSHM support (for the Xlib UI), TZX raw data blocks,

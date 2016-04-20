@@ -22,6 +22,7 @@
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
 EXTRA_DIST += \
+              hacking/code_beautifiers.txt \
               hacking/coding_style.txt \
               hacking/cvs-tags \
               hacking/implementation_notes.txt \
@@ -32,4 +33,5 @@ EXTRA_DIST += \
               hacking/tc2048_tech_notes.txt \
               hacking/timer.txt \
               hacking/ui.txt \
+              hacking/uncrustify.cfg \
               hacking/valgrind.supp
