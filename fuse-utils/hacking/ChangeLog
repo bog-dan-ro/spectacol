@@ -531,3 +531,5 @@
 20160326 AUTHORS,Makefile.am,README,man/fuse-utils.1,tape2pulses.c,
          tape2pulses_res.rc: set tape2pulses info into Windows executable and
          complete documentation (Sergio).
+20160420 tzxlist.c: don't print non-printable header characters like Fuse
+         (thanks, Sergio) (Fred).
