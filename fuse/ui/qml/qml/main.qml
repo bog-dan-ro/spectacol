@@ -18,7 +18,7 @@
 import QtQuick 2.6
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.0
 import QtGamepad 1.0
 import Fuse 1.0
 import "private"
@@ -46,13 +46,11 @@ ApplicationWindow {
 
     Drawer {
         id: menuBar
-        anchors.fill: parent
+        width: Math.max(mainScreen.width, mainScreen.height) / 3
+        height: mainScreen.height
         MenuView {
             id: menuView
-            width: mainScreen.width / 4
-            height: mainScreen.height
-            visible: menuBar.position > 0
-
+            anchors.fill: parent
             rootMenu: FuseMenu {}
             transform: Translate {
                 x: (menuBar.position - 1.0) * menuView.width
@@ -75,7 +73,6 @@ ApplicationWindow {
                     paused = false;
             }
         }
-        onClicked: close()
     }
 
     Rectangle {

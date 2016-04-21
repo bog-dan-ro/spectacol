@@ -19,7 +19,7 @@ import QtQuick 2.6
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.0
 
 Rectangle {
     id: saveFilePage

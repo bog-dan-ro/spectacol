@@ -18,7 +18,7 @@
 pragma Singleton
 
 import QtQuick.Window 2.0
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.0
 
 Label {
     id: _label

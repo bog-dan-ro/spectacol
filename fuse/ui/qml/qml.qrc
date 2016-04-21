@@ -66,7 +66,6 @@
         <file>qml/FancyList.qml</file>
         <file>qml/SearchOnlinePage.qml</file>
         <file>qml/Utils.js</file>
-        <file>qtlabscontrols.conf</file>
         <file>qml/MachineTypePage.qml</file>
         <file>qml/OptionsGeneralPage.qml</file>
         <file>qml/OptionsSoundPage.qml</file>
@@ -99,5 +98,6 @@
         <file>rom/gluck.rom</file>
         <file>rom/if1-1.rom</file>
         <file>rom/trdos.rom</file>
+        <file>qtquickcontrols2.conf</file>
     </qresource>
 </RCC>

@@ -20,7 +20,7 @@ import QtGamepad 1.0
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 import Fuse 1.0
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.0
 import "private" 1.0
 
 Item
