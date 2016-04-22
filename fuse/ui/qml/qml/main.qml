@@ -154,7 +154,7 @@ ApplicationWindow {
                         pageLoader.source = "";
                         event.accepted = true;
                     } else {
-                        if (fuseSettings.hasStartButton)
+                        if (fuseSettings.hasStartButton || fuse.touchscreen)
                             quitDialog.open();
                         else
                             menuBar.open();
