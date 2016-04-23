@@ -185,7 +185,7 @@ ApplicationWindow {
         FuseScreen {
             id: fuseScreen
             anchors.fill: parent
-            anchors.leftMargin: TextSizes.smallScreen ? 10 * Screen.pixelDensity : 0
+            anchors.leftMargin: (TextSizes.smallScreen && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
             onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
         }
         MouseArea {
@@ -194,8 +194,10 @@ ApplicationWindow {
         }
 
         Button {
+            visible: fuse.touchscreen
             anchors.top: parent.top
             anchors.left: parent.left
+            anchors.topMargin: mainScreen.height > mainScreen.width ? mainScreen.height / 2 : 0;
             text: "="
             onClicked: {
                 if (menuBar.position)
@@ -209,6 +211,7 @@ ApplicationWindow {
             visible: fuse.touchscreen
             anchors.top: parent.top
             anchors.right: parent.right
+            anchors.topMargin: mainScreen.height > mainScreen.width ? mainScreen.height / 2 : 0;
             opacity: (onScreenCursorJoystick.visible || onScreen48Keyboard.visible) ? 0.25 : 1.0
             Image {
                 height: Screen.pixelDensity * 10

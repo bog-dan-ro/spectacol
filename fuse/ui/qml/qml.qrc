@@ -99,5 +99,6 @@
         <file>rom/if1-1.rom</file>
         <file>rom/trdos.rom</file>
         <file>qtquickcontrols2.conf</file>
+        <file>qml/OptionsScreenPage.qml</file>
     </qresource>
 </RCC>

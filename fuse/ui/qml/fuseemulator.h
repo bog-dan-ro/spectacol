@@ -189,6 +189,7 @@ public:
     void mouseMove(QMouseEvent *event);
     void mouseRelease(QMouseEvent *event);
 
+    FuseSettings *settings() const;
 public slots:
     void quit();
     QString snapshotsPath() const;

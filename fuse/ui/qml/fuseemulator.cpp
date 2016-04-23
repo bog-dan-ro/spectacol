@@ -764,6 +764,11 @@ void FuseEmulator::mouseRelease(QMouseEvent *event)
     });
 }
 
+FuseSettings *FuseEmulator::settings() const
+{
+    return m_fuseSettings.get();
+}
+
 void FuseEmulator::quit()
 {
     quickSaveSnapshot();

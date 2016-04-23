@@ -23,6 +23,8 @@
 class FuseSettings : public FuseObject
 {
     Q_OBJECT
+    Q_ENUMS(FillMode)
+
     Q_PROPERTY(QStringList machinesModel READ machinesModel CONSTANT)
     Q_PROPERTY(QString currentMachine READ currentMachine NOTIFY currentMachineChanged)
     Q_PROPERTY(int currentMachineIndex READ currentMachineIndex WRITE setCurrentMachineIndex NOTIFY currentMachineChanged)
@@ -36,6 +38,10 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool detectLoaders READ detectLoaders WRITE setDetectLoaders NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool restrictToSpectacol READ restrictToSpectacol WRITE setRestrictToSpectacol NOTIFY settingsCurrentChanged)
 
+    // Screen Options
+    Q_PROPERTY(bool showOrientationChooser READ showOrientationChooser CONSTANT)
+    Q_PROPERTY(int screenOrientation READ screenOrientation WRITE setScreenOrientation NOTIFY screenOrientationChanged)
+    Q_PROPERTY(FillMode fillMode READ fillMode WRITE setFillMode NOTIFY fillModeChanged)
 
     // Sound Options
     Q_PROPERTY(bool soundEnabled READ soundEnabled WRITE setSoundEnabled NOTIFY settingsCurrentChanged)
@@ -51,6 +57,13 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool interface1 READ interface1 WRITE setInterface1 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool interface2 READ interface2 WRITE setInterface2 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool full48kOSK READ full48kOSK WRITE setFull48kOSK NOTIFY settingsCurrentChanged)
+
+public:
+    enum FillMode {
+        PreserveAspectFit = 0,
+        PreserveAspect,
+        Stretch
+    };
 
 public:
     explicit FuseSettings(QObject *parent = 0);
@@ -111,11 +124,28 @@ public:
     bool hasStartButton() const;
     void setHasStartButton(bool hasStartButton);
 
+    bool showOrientationChooser() const;
+
+    int screenOrientation() const;
+    void setScreenOrientation(int orientation);
+
+    FillMode fillMode() const;
+    void setFillMode(FillMode fill);
+
+private:
+    enum ScreenOrientation {
+        Sensors = 0,
+        Landscape,
+        Portrait
+    };
 
 signals:
     void currentMachineChanged();
     void settingsCurrentChanged();
     void hasStartButtonChanged(bool hasStartButton);
+    void screenOrientationChanged(int currentOrientation);
+
+    void fillModeChanged(FillMode fillMode);
 
 private:
     bool m_hasStartButton = false;

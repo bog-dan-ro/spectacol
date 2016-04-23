@@ -22,8 +22,8 @@ import QtQuick.Controls 2.0
 
 Label {
     id: _label
-    property bool smallScreen: Screen.height / Screen.pixelDensity < 80
-    property double scale12: smallScreen ? _label.font.pixelSize / (80 / (Screen.height / Screen.pixelDensity)) : _label.font.pixelSize
+    property bool smallScreen: Math.min(Screen.height, Screen.width) / Screen.pixelDensity < 80
+    property double scale12: smallScreen ? _label.font.pixelSize / (80 / (Math.min(Screen.height, Screen.width) / Screen.pixelDensity)) : _label.font.pixelSize
     property double scale14: scale12 * 14 / 12
     property double scale16: scale12 * 16 / 12
     property double scale20: scale12 * 20 / 12

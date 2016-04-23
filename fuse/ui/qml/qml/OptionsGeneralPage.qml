@@ -57,42 +57,12 @@ Flickable {
             Row {
                 spacing: 2.5 * Screen.pixelDensity
                 Label {
-                    text: qsTr("Screen filter")
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                ComboBox {
-                    focus: true
-                    id: screenFilter
-                    Keys.onUpPressed: {
-                        if (popup.visible)
-                            decrease();
-                        else
-                            detectLoaders.focus = true;
-                    }
-                    Keys.onDownPressed: {
-                        if (popup.visible)
-                            increase();
-                        else
-                            emulationSpeed.focus = true;
-                    }
-                    Keys.onLeftPressed: if (!popup.visible) decrease();
-                    Keys.onRightPressed: if (!popup.visible) increase();
-
-                    model: fuse.filtersModel
-                    currentIndex: fuse.selectedFilterIndex
-                    onCurrentIndexChanged: fuse.selectedFilterIndex = currentIndex
-                }
-            }
-
-            Row {
-                spacing: 2.5 * Screen.pixelDensity
-                Label {
                     text: qsTr("Emulation Speed")
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 SpinBox {
                     id: emulationSpeed
-                    Keys.onUpPressed: screenFilter.focus = true
+                    Keys.onUpPressed: detectLoaders.focus = true;
                     Keys.onDownPressed: restrictBrowse.focus = true
                     Keys.onLeftPressed: decrease()
                     Keys.onRightPressed: increase()

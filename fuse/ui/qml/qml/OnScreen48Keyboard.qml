@@ -19,6 +19,7 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import QtGamepad 1.0
+import "private"
 
 Item {
     id: onScreenKeyboard
@@ -178,7 +179,8 @@ Item {
         highlight: highlight
         focus: onScreenKeyboard.visible
         anchors.fill: parent
-        cellWidth: (width - 4 * Screen.pixelDensity) / 10
+        anchors.topMargin: mainScreen.height > mainScreen.width ? mainScreen.height / 2 : 0;
+        cellWidth: (width - (mainScreen.height > mainScreen.width ? 0 : (4 * Screen.pixelDensity) / TextSizes.scaleImage)) / 10
         cellHeight: cellWidth
         model: zx48Keyboard
         currentIndex: 24
@@ -187,9 +189,9 @@ Item {
         delegate: Rectangle {
             id: rec
             property bool pressed: true
-            width: grid.cellWidth - 2 * Screen.pixelDensity
+            width: grid.cellWidth - (2 * Screen.pixelDensity) / TextSizes.scaleImage
             height: width
-            radius: Screen.pixelDensity * 2
+            radius: ((mainScreen.height > mainScreen.width ? 1 : 2) * Screen.pixelDensity) / TextSizes.scaleImage
             color: (code == Qt.Key_Control && capsPressed) ||
                    (code == Qt.Key_Shift && symbolPressed) ? "blue"
                                                            : Qt.rgba(0.5, 0.5, 0.5, 0.75);

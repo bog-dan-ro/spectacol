@@ -37,6 +37,7 @@ FuseScreen::FuseScreen()
 {
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
+    m_fillMode = g_fuseEmulator->settings()->fillMode();
 }
 
 bool FuseScreen::fullScreen() const
@@ -54,14 +55,48 @@ void FuseScreen::setFullScreen(bool fullScreen)
     });
 }
 
+void FuseScreen::updateFillMode()
+{
+    m_fillMode = g_fuseEmulator->settings()->fillMode();
+    geometryChanged(boundingRect(), boundingRect());
+    update();
+}
+
+static double fitFactor(double i, double s)
+{
+    if (i < s)
+        return std::floor(s / i);
+
+    return 1. / (std::ceil(i / s));
+}
+
 void FuseScreen::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    if (!newGeometry.width() || !newGeometry.height())
+        return;
+
     QRectF itemRect = newGeometry;
-    if (itemRect.width() > itemRect.height())
-        itemRect.setWidth(itemRect.height() * m_aspectRatio);
-    else
-        itemRect.setHeight(itemRect.width() * m_aspectRatio);
+    switch (m_fillMode) {
+    case FuseSettings::PreserveAspect: {
+        auto wf = fitFactor(m_imageSize.width(), newGeometry.width());
+        auto hf = fitFactor(m_imageSize.height(), newGeometry.height());
+        auto factor = (wf < 0 || hf < 0) ? std::max(wf, hf) : std::min(wf, hf);
+        itemRect.setWidth(m_imageSize.width() * factor);
+        itemRect.setHeight(m_imageSize.height() * factor);
+    }
+        break;
+
+    case FuseSettings::PreserveAspectFit:
+        if (itemRect.width() > itemRect.height())
+            itemRect.setWidth(itemRect.height() * m_aspectRatio);
+        else
+            itemRect.setHeight(itemRect.width() / m_aspectRatio);
+        break;
+
+    case FuseSettings::Stretch:
+        break;
+    }
     setImplicitSize(itemRect.width(), itemRect.height());
 }
 
@@ -73,21 +108,27 @@ QSGNode *FuseScreen::updatePaintNode(QSGNode *n, QQuickItem::UpdatePaintNodeData
         node = new QSGSimpleTextureNode;
         node->setTexture(texture);
         node->setOwnsTexture(false);
-        QSizeF spectrumSize(texture->imageSize());
+        QSizeF spectrumSize(m_imageSize = texture->imageSize());
         m_aspectRatio = spectrumSize.width()/spectrumSize.height();
         connect(texture, &FuseTexture::screenGeometryChanged, this, &FuseScreen::screenChanged, Qt::QueuedConnection);
         connect(texture, &FuseTexture::needsUpdate, this, &FuseScreen::update, Qt::QueuedConnection);
         connect(texture, &FuseTexture::sizeChanged, this, [this](const QSizeF &size) {
+            m_imageSize = size.toSize();
             m_aspectRatio = size.width()/size.height();
             geometryChanged(boundingRect(), boundingRect());
         }, Qt::QueuedConnection);
         geometryChanged(boundingRect(), boundingRect());
     }
 
-    node->setSourceRect(QRect(QPoint(0, 0), texture->imageSize()));
-    node->setRect(QRectF(qCeil((width() - implicitWidth()) / 2.),
-                         qCeil((height() - implicitHeight()) / 2.),
-                         implicitWidth(), implicitHeight()));
+    node->setSourceRect(QRect(QPoint(0, 0), m_imageSize));
+    node->setRect(QRectF(std::ceil((width() - implicitWidth()) / 2.),
+#ifdef Q_OS_ANDROID
+                         0,
+#else
+                         std::ceil((height() - implicitHeight()) / 2.),
+#endif
+                         implicitWidth(),
+                         implicitHeight()));
 
     node->markDirty(QSGNode::DirtyMaterial);
     return node;

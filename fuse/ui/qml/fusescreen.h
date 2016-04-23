@@ -21,6 +21,9 @@
 
 #include <QQuickItem>
 #include <vector>
+
+#include "fusesettings.h"
+
 class DisassambleModel;
 class BreakpointsModel;
 class QAbstractItemModel;
@@ -28,15 +31,16 @@ class QAbstractItemModel;
 class FuseScreen : public QQuickItem
 {
     Q_OBJECT
-
     Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY screenChanged)
-
 
 public:
     FuseScreen();
 
     bool fullScreen() const;
     void setFullScreen(bool fullScreen);
+
+public slots:
+    void updateFillMode();
 
 signals:
     void screenChanged();
@@ -51,6 +55,8 @@ protected:
 
 private:
     qreal m_aspectRatio = 4/3;
+    QSize m_imageSize = QSize(1, 1);
+    FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
 };
 
 #endif // FUSESCREEN_H

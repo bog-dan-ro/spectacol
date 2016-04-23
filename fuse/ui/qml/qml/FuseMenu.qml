@@ -265,6 +265,14 @@ Menu {
         }
 
         MenuItem {
+            text: qsTr("Screen")
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "OptionsScreenPage.qml";
+            }
+        }
+
+        MenuItem {
             text: qsTr("Sound")
             onTriggered: {
                 menuBar.close();
