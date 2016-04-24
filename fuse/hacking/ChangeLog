@@ -5014,3 +5014,4 @@
 20160417 peripherals/disk/wd_fdc.c: fix Beta 128 type II commands (fixes bug
          #331) (thanks, windale and BogDan Vatra) (Sergio).
 20160417 compat/unix/tuntap.c,ui.c,utils.c: secure strncpy() calls (Sergio).
+20160424 svg.c: initialise err in svg_byte() (Fred).
