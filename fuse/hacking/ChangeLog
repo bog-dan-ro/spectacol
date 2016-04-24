@@ -5023,3 +5023,6 @@
 20160424 ChangeLog,README,configure.ac,hacking/ChangeLog,man/fuse.1: Merge
          Release-1_1_0-branch changes onto trunk (Fred).
 20160425 tape.c: whitespace fix (Fred).
+20160425 memory.c: use tape traps if we are using a custom ROM if the instructions
+         at the entry points have been preserved (feature request #83) (thanks,
+         Alberto Garcia) (Fred).
