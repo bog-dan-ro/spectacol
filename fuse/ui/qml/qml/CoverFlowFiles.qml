@@ -46,7 +46,6 @@ Item
         id: filesModel
         rootFolder: fuseSettings.restrictToSpectacol ? fuse.dataPath : "/"
         sortCriteria: folder.indexOf(fuse.snapshotsPath(), 0) == 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
-        onFolderChanged: filesView.currentIndex = 0
     }
 
     MessageDialog {
@@ -73,16 +72,22 @@ Item
         id : filesView
         anchors.fill: parent
         model : filesModel
+        currentIndex: filesModel.currentIndex
 
         onReturnPressed: {
-            if (model.isDir(currentIndex))
+            if (model.isDir(currentIndex)) {
                 filesModel.folder = model.path(currentIndex);
-            else
+                filesModel.currentIndex = currentIndex;
+            } else {
                 fileSelected(model.path(currentIndex));
+            }
         }
         onEscapePressed: fileSelected("")
 
-        onUpPressed: filesModel.cdUp()
+        onUpPressed: {
+            filesModel.currentIndex = currentIndex;
+            filesModel.cdUp();
+        }
 
         onDeletePressed: removeDialog.remove()
 
@@ -127,10 +132,12 @@ Item
                     anchors.fill: parent
                     onClicked: {
                         if (isCurrentItem) {
-                            if (isDir)
+                            if (isDir) {
+                                filesModel.currentIndex = index;
                                 filesModel.folder = path
-                            else
+                            } else {
                                 fileSelected(path);
+                            }
                         } else {
                             filesView.currentIndex = index;
                         }
@@ -179,10 +186,12 @@ Item
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                if (artist_text_label.root)
+                if (artist_text_label.root) {
                     pageLoader.source = "";
-                else
+                } else {
+                    filesModel.currentIndex = filesView.currentIndex;
                     filesModel.cdUp();
+                }
             }
         }
     }

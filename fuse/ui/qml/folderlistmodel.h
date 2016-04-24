@@ -22,6 +22,7 @@
 
 #include <QAbstractListModel>
 #include <QFileInfo>
+#include <QCache>
 #include <libspectrum.h>
 
 class FolderListModel : public QAbstractListModel
@@ -32,6 +33,7 @@ class FolderListModel : public QAbstractListModel
     Q_PROPERTY(QString rootFolder READ rootFolder WRITE setRootFolder NOTIFY rootFolderChanged)
     Q_PROPERTY(FileSortCriteria sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged)
     Q_PROPERTY(bool showDirsFirst READ showDirsFirst WRITE setShowDirsFirst NOTIFY showDirsFirstChanged)
+    Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
 
 public:
     enum FileFields {
@@ -61,17 +63,22 @@ public:
     bool showDirsFirst() const;
     void setShowDirsFirst(bool showDirsFirst);
 
+    int currentIndex() const;
+    void setCurrentIndex(int currentIndex);
+
 public slots:
     bool isDir(int index);
     QString path(int index);
     void cdUp();
     void refresh();
 
+
 signals:
     void folderChanged(QString folder);
     void rootFolderChanged(QString rootFolder);
     void sortCriteriaChanged(FileSortCriteria sortCriteria);
     void showDirsFirstChanged(bool showDirsFirst);
+    void currentIndexChanged(int currentIndex);
 
 protected:
     // QAbstractItemModel interface
@@ -87,6 +94,8 @@ private:
     libspectrum_init_t m_spectrumInit;
     FileSortCriteria m_sortCriteria = ByName;
     bool m_showDirsFirst = true;
+    int m_currentIndex = -1;
+    QCache<QString, int> m_currentIndexes;
 };
 
 #endif // FOLDERLISTMODEL_H
