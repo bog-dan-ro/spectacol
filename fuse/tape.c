@@ -315,7 +315,6 @@ int tape_write( const char* filename )
   libspectrum_free( buffer );
 
   return 0;
-
 }
 
 int tape_can_autoload( void )

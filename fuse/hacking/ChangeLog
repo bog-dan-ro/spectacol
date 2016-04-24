@@ -5022,3 +5022,4 @@
 20160424 svg.c: initialise err in svg_byte() (Fred).
 20160424 ChangeLog,README,configure.ac,hacking/ChangeLog,man/fuse.1: Merge
          Release-1_1_0-branch changes onto trunk (Fred).
+20160425 tape.c: whitespace fix (Fred).
