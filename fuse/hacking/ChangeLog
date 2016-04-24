@@ -4497,6 +4497,7 @@
          roms.c,stock.c},ui/options.dat,ui/win32/options.pl: display
          confirmation dialogue for reset due to peripheral changes (Sergio).
 20130517 README: update date for 1.1 release.
+20130518 README: mention DISCiPLE support (Stuart).
 20130518 ui/widget/options.pl: display confirmation dialogue for reset due to
          peripheral changes (Stuart).
 20130518 ui/widget/options.pl: update peripherals list when a machine reset is
@@ -4508,11 +4509,15 @@
          from peripheral reset confirmation dialogue (Stuart).
 20130519 ui/{gtk/gtkui.c,widget/menu.c,win32/win32ui.c}: use different
          confirmation messages for hard and soft resets (Stuart).
+20130519 ChangeLog,README,man/fuse.1: update date for 1.1 release (Stuart).
 20130519 AUTHOR,man/fuse.1: Add Sergio Baldoví (Stuart).
 20130519 lib/Makefile.am: distribute tests/success.{mgt.bz2,opd} (Stuart).
 20130519 Makefile.am,hacking/Makefile.am,sound/Makefile.am,ui/wii/Makefile.am:
          distribute PORTING,hacking/valgrind.supp,sound/wiisound.c,
          ui/wii/wiimouse.h (Stuart).
+20130524 ChangeLog,README: updates for a "1.1.1" release (Fred).
+20130524 ChangeLog,README,configure.ac,man/fuse.1: fill in date and bump
+         version number (Stuart).
 20130526 Makefile.am,ui/win32/installer/fuse.nsi.in: distribute ChangeLog and
          build notes in Windows packages (Sergio).
 20130527 pokefinder/pokemem.c: fix crash when opening a file without extension
@@ -5015,3 +5020,5 @@
          #331) (thanks, windale and BogDan Vatra) (Sergio).
 20160417 compat/unix/tuntap.c,ui.c,utils.c: secure strncpy() calls (Sergio).
 20160424 svg.c: initialise err in svg_byte() (Fred).
+20160424 ChangeLog,README,configure.ac,hacking/ChangeLog,man/fuse.1: Merge
+         Release-1_1_0-branch changes onto trunk (Fred).
