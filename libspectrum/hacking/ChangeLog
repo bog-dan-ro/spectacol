@@ -949,6 +949,10 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20130518 doc/libspectrum.txt: update version number for 1.1 release (Sergio).
 20130524 Makefile.am: update libtool age to support binaries built against
          libspectrum 1.0.0 (Stuart).
+20130524 ChangeLog,README,configure.ac,doc/libspectrum.{3,txt},
+         hacking/ChangeLog: updates for a "1.1.1" release (Stuart).
+20130524 doc/libspectrum,README: further updates for 1.1.1(Stuart).
+20130524 ChangeLog: fill in date (Stuart).
 20130526 Makefile.am: add dll.c into the dist tarball (Sergio).
 20130928 configure.ac: use 'subdir-objects' option as advised by automake 1.14
          to place object files in subdirectories (Sergio).
@@ -1026,3 +1030,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160410 Makefile.am: revert revision 4731 / bug #262 as it makes configuring
          target flags for cross-compilation difficult (patch #357) (BogDan
          Vatra).
+20160424 ChangeLog,README,configure.ac,doc/libspectrum.{3,txt},
+         hacking/ChangeLog: merge libspectrum_1_1_0-branch changes onto trunk
+         (Fred).

@@ -1,3 +1,10 @@
+2013-05-24  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * libspectrum 1.1.1 released.
+
+        * Decreased libtool version to allow binaries built against
+          libspectrum 1.0.0 to run with libspectrum 1.1.1.
+
 2013-05-18  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * libspectrum 1.1.0 released.
