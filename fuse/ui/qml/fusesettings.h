@@ -37,6 +37,7 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool autoLoad READ autoLoad WRITE setAutoLoad NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool detectLoaders READ detectLoaders WRITE setDetectLoaders NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool restrictToSpectacol READ restrictToSpectacol WRITE setRestrictToSpectacol NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool swipe4menu READ swipe4menu WRITE setSwipe4menu NOTIFY swipe4menuChanged)
 
     // Screen Options
     Q_PROPERTY(bool showOrientationChooser READ showOrientationChooser CONSTANT)
@@ -132,6 +133,9 @@ public:
     FillMode fillMode() const;
     void setFillMode(FillMode fill);
 
+    bool swipe4menu() const;
+    void setSwipe4menu(bool swipe4menu);
+
 private:
     enum ScreenOrientation {
         Sensors = 0,
@@ -144,8 +148,8 @@ signals:
     void settingsCurrentChanged();
     void hasStartButtonChanged(bool hasStartButton);
     void screenOrientationChanged(int currentOrientation);
-
     void fillModeChanged(FillMode fillMode);
+    void swipe4menuChanged(bool swipe4menu);
 
 private:
     bool m_hasStartButton = false;

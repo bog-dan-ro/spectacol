@@ -47,6 +47,9 @@ ApplicationWindow {
     Drawer {
         id: menuBar
         focus: false
+        dragMargin: fuseSettings.swipe4menu ? Qt.styleHints.startDragDistance : 0
+        onDragMarginChanged: console.log(dragMargin)
+
         width: Math.max(mainScreen.width, mainScreen.height) / 3
         height: mainScreen.height
         MenuView {
@@ -300,7 +303,11 @@ ApplicationWindow {
         onShowMenu: menuBar.open();
         onHideMenu: menuBar.close();
         onToggleOnScreenControls: toggleOnScreenControls(type, true)
-        onShowWelcome: pageLoader.source = "AboutPage.qml";
+        onShowWelcome: {
+            if (TextSizes.smallScreen)
+                fuseSettings.swipe4menu = false;
+            pageLoader.source = "AboutPage.qml";
+        }
     }
 
     Component.onCompleted: {

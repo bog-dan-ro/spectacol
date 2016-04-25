@@ -366,3 +366,21 @@ void FuseSettings::setFillMode(FuseSettings::FillMode fill)
 
     emit fillModeChanged(fill);
 }
+
+bool FuseSettings::swipe4menu() const
+{
+    QSettings s;
+    s.beginGroup(QLatin1String("General"));
+    return s.value("swipe4menu", true).toBool();
+}
+
+void FuseSettings::setSwipe4menu(bool swipe)
+{
+    if (swipe == swipe4menu())
+        return;
+
+    QSettings s;
+    s.beginGroup(QLatin1String("General"));
+    s.setValue("swipe4menu", swipe);
+    emit swipe4menuChanged(swipe);
+}

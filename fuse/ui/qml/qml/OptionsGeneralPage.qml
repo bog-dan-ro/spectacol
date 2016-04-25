@@ -77,15 +77,26 @@ Flickable {
             CheckBox {
                 id: restrictBrowse
                 KeyNavigation.up: emulationSpeed
-                KeyNavigation.down: fastLoad
+                KeyNavigation.down: fuse.touchscreen ? swipeForMenu : fastLoad
                 text: qsTr("Restrict browsing to Spectacol folder")
                 checked: fuseSettings.restrictToSpectacol
                 onCheckedChanged: fuseSettings.restrictToSpectacol = checked
             }
 
             CheckBox {
-                id: fastLoad
+                id: swipeForMenu
+                visible: fuse.touchscreen
                 KeyNavigation.up: restrictBrowse
+                KeyNavigation.down: fastLoad
+                text: qsTr("Swipe to open the menu")
+                checked: fuseSettings.swipe4menu
+                onCheckedChanged: fuseSettings.swipe4menu = checked
+            }
+
+
+            CheckBox {
+                id: fastLoad
+                KeyNavigation.up: fuse.touchscreen ? swipeForMenu : restrictBrowse
                 KeyNavigation.down: accelerateLoader
                 text: qsTr("Fast loading")
                 checked: fuseSettings.fastLoad
