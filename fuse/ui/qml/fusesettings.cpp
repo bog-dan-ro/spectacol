@@ -23,6 +23,7 @@
 #include <machine.h>
 #include <settings.h>
 #include <sound.h>
+#include <fuseemulator.h>
 
 #ifdef Q_OS_ANDROID
 # include <QtAndroid>
@@ -94,6 +95,7 @@ void FuseSettings::setCurrentMachineIndex(int idx)
             return;
         machine_select(machine_types[idx]->machine);
         callFunction([this]{ emit currentMachineChanged(); emit settingsCurrentChanged();});
+        g_fuseEmulator->resetLoadedFile();
     });
 }
 

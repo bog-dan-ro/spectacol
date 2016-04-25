@@ -190,6 +190,7 @@ public:
     void mouseRelease(QMouseEvent *event);
 
     FuseSettings *settings() const;
+    void resetLoadedFile();
 public slots:
     void quit();
     QString snapshotsPath() const;

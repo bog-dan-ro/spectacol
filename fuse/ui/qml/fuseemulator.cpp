@@ -769,6 +769,14 @@ FuseSettings *FuseEmulator::settings() const
     return m_fuseSettings.get();
 }
 
+void FuseEmulator::resetLoadedFile()
+{
+    callFunction([this]{
+        m_loadedFileName = "";
+        emit saveSnapshotEnabledChanged();
+    });
+}
+
 void FuseEmulator::quit()
 {
     quickSaveSnapshot();
@@ -844,13 +852,15 @@ void FuseEmulator::remove(const QString &file)
 
 void FuseEmulator::reset()
 {
-    pokeEvent([]() {
+    resetLoadedFile();
+    pokeEvent([this]() {
         machine_reset(0);
     });
 }
 
 void FuseEmulator::hardReset()
 {
+    resetLoadedFile();
     pokeEvent([]() {
         machine_reset(1);
     });
@@ -858,6 +868,7 @@ void FuseEmulator::hardReset()
 
 void FuseEmulator::nmi()
 {
+    resetLoadedFile();
     pokeEvent([]() {
         event_add( 0, z80_nmi_event );
     });
