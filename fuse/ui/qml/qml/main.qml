@@ -46,6 +46,7 @@ ApplicationWindow {
 
     Drawer {
         id: menuBar
+        focus: false
         width: Math.max(mainScreen.width, mainScreen.height) / 3
         height: mainScreen.height
         MenuView {
