@@ -62,6 +62,7 @@ Flickable {
                 }
                 SpinBox {
                     id: emulationSpeed
+                    focus: true
                     Keys.onUpPressed: detectLoaders.focus = true;
                     Keys.onDownPressed: restrictBrowse.focus = true
                     Keys.onLeftPressed: decrease()
@@ -112,7 +113,7 @@ Flickable {
             CheckBox {
                 id: detectLoaders
                 KeyNavigation.up: autoLoad
-                KeyNavigation.down: screenFilter
+                KeyNavigation.down: emulationSpeed
                 text: qsTr("Detect loaders")
                 checked: fuseSettings.detectLoaders
                 onCheckedChanged: fuseSettings.detectLoaders = checked
