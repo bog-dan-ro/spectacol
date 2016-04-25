@@ -161,10 +161,10 @@ StandardGamepad {
             return 'left joystick vertical';
         case GamepadManager.AxisRightX:
             confGamepad.axisRightX = 1;
-            return 'left joystick horizontal';
+            return 'right joystick horizontal';
         case GamepadManager.AxisRightY:
             confGamepad.axisRightY = 1;
-            return 'left joystick vertical';
+            return 'right joystick vertical';
         }
     }
 
