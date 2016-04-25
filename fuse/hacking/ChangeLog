@@ -5026,3 +5026,5 @@
 20160425 memory.c: use tape traps if we are using a custom ROM if the instructions
          at the entry points have been preserved (feature request #83) (thanks,
          Alberto Garcia) (Fred).
+20160425 INSTALL: Cygwin no longer distributes MinGW. Update documentation.
+         (Sergio).

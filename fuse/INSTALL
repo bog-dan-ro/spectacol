@@ -81,8 +81,8 @@ methods.
 Building the Win32 version of Fuse
 ----------------------------------
 
-You'll need to have the MinGW <http://www.mingw.org> or MinGW-w64 toolchain
-<http://mingw-w64.sourceforge.net>, e.g., on Debian:
+You'll need to have the MinGW <http://www.mingw.org/> or Mingw-w64 toolchain
+<http://mingw-w64.org/>, e.g., on Debian:
 `apt-get install mingw32 mingw32-binutils mingw32-runtime'
 
 On Windows, besides the former toolchain, you'll need an environment that
@@ -128,17 +128,18 @@ Then, build Fuse:
 	    --prefix=/usr/local
 make
 
-3) On Windows, using Cygwin + MinGW toolchain, first build libspectrum:
+3) On Windows, using Cygwin + Mingw-w64 toolchain, first build libspectrum:
 
-./configure --build=i686-pc-cygwin --host=i686-pc-mingw32 --with-fake-glib \
+./configure --build=i686-pc-cygwin --host=i686-w64-mingw32 --with-fake-glib \
 	    --without-libaudiofile --without-libgcrypt --without-zlib \
-	    --without-bzip2 --prefix=/usr/local/i686-pc
+	    --without-bzip2 --prefix=/usr/local/i686-w64-mingw32
 make install
 
 Then, build Fuse:
 
-./configure --build=i686-pc-cygwin --host=i686-pc-mingw32 --without-libxml2 \
-        --without-zlib --without-png --with-win32 --prefix=/usr/local/i686-pc
+./configure --build=i686-pc-cygwin --host=i686-w64-mingw32 --without-libxml2 \
+	    --without-zlib --without-png --with-win32 \
+	    --prefix=/usr/local/i686-w64-mingw32
 make
 
 Note: you need `libspectrum-8.dll' and the `roms' directory and the `lib'
