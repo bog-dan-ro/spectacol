@@ -544,3 +544,5 @@
          rzxcheck.1,rzxdump.1,rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,
          tape2wav.1,tapeconv.1,tzxlist.1}: merge fuse-utils_1_1_0-branch changes
          onto trunk (Fred).
+20160425 man/tzxlist.1,tzxlist.c: allow tzxlist dump standard data blocks (patch
+         #328) (Gergely Szasz).

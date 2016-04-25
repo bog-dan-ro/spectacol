@@ -35,6 +35,7 @@
 #include <locale.h>
 #endif /* #ifdef HAVE_LOCALE_H */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -47,6 +48,9 @@
 #define DESCRIPTION_LENGTH 80
 
 const char *progname;
+
+static int dump_block = -9999;
+static int block_num = 0;
 
 #ifdef HAVE_ICONV
 static iconv_t conversion_descriptor;
@@ -195,6 +199,15 @@ check_checksum(unsigned long length, libspectrum_byte * data)
 }
 
 static void
+fprint_block_name( FILE *f, libspectrum_byte *data )
+{
+  int i;
+  for( i = 2; i < 12; i++ ) {
+    fprintf( f, "%c", data[i] );
+  }
+}
+
+static void
 print_block_name( libspectrum_byte * data )
 {
   int i;
@@ -209,39 +222,98 @@ print_block_name( libspectrum_byte * data )
   }
 }
 
+/* decode header and save data */
 static void
 decode_header( libspectrum_tape_block *block )
 {
   unsigned long length = libspectrum_tape_block_data_length( block );
   libspectrum_byte * data = libspectrum_tape_block_data( block );
   int is_header = length == 19 && data[0] == 0x00;
+  char filename[17]; /* %8d.dsc; %8d.hdr %8d.dat */
+  int save = 0;
+  static int save_data = -9999;
+  FILE *f = NULL;
   if(is_header) {
+    save = ( dump_block == -1 || dump_block == block_num ) ? 1 : 0;
+    if( save ) {
+      snprintf( filename, 16, "%08d.dsc", block_num );
+      f = fopen( filename, "wb" );
+      if( !f ) {
+        fprintf( stderr, "%s: couldn't open '%s': %s\n", progname, filename,
+          strerror( errno ) );
+      }
+    }
     switch( data[1] ) {
     case 0:
       printf("  Program: ");
       print_block_name( data );
+      if( f ) {
+        fprintf( f, "Program: " );
+        fprint_block_name( f, data );
+      }
       break;
     case 1:
       printf("  Number Array: ");
       print_block_name( data );
+      if( f ) {
+        fprintf( f, "Number Array: " );
+        fprint_block_name( f, data );
+      }
       break;
     case 2:
       printf("  Character Array: ");
       print_block_name( data );
+      if( f ) {
+        fprintf( f, "Character Array: " );
+        fprint_block_name( f, data );
+      }
       break;
     case 3:
       printf("  CODE: ");
       print_block_name( data );
       printf("\n  Start: %d\n", data[14] + data[15] * 0x100 );
       printf("  Length: %d", data[12] + data[13] * 0x100 );
+      if( f ) {
+        fprintf( f, "CODE: " );
+        fprint_block_name( f, data );
+        fprintf( f, "\nStart: %d\n", data[14] + data[15] * 0x100 );
+        fprintf( f, "Length: %d", data[12] + data[13] * 0x100 );
+      }
       break;
     default:
       printf("  Unknown");
+      if( f ) {
+        fprintf( f, "Unknow" );
+      }
       break;
     }
     printf("\n");
+    if( f ) {
+      fprintf( f, "\n" );
+      fclose( f );
+    }
   }
   check_checksum(length, data);
+
+  /* save data block */
+  if( save || save_data == block_num - 1 || dump_block == block_num ) {
+
+    snprintf( filename, 16, "%08d.%s",
+              save || dump_block == block_num ? block_num : save_data,
+              save ? "hdr" : "dat" );
+    f = fopen( filename, "wb" );
+    if( !f ) {
+      fprintf( stderr, "%s: couldn't open '%s': %s\n", progname, filename,
+               strerror( errno ) );
+    } else if( fwrite( data + 1, 1, length - 2, f ) != length - 2 ) {
+      fprintf( stderr, "%s: error writing to '%s'\n", progname, filename );
+      fclose( f );
+    } else {
+      fclose( f );
+      printf( "* Tape block dumped\n" );
+    }
+  }
+  save_data = save ? block_num : -9999;
 }
 
 static int
@@ -311,6 +383,7 @@ process_tape( char *filename )
       libspectrum_tape_block_description( description, DESCRIPTION_LENGTH,
 					  block );
     if( error ) return 1;
+    printf( "--= Block #%d =--\n", block_num );
     printf( "Block type 0x%02x (%s)\n", libspectrum_tape_block_type( block ),
 	    description );
     printf("  Block duration: %.2f sec\n",
@@ -528,6 +601,8 @@ process_tape( char *filename )
     }
 
     block = libspectrum_tape_iterator_next( &iterator );
+    printf( "\n" );
+    block_num++;
 
   }
 
@@ -565,6 +640,8 @@ show_help( void )
     "Outputs a description of the contents of TZX, TAP, PZX and Warajevo tape files.\n"
     "\n"
     "Options:\n"
+    "  -d <num>       Dump standard block (header and data) number <num>.\n"
+    "                   Use -1 to dump all blocks.\n"
     "  -h, --help     Display this help and exit.\n"
     "  -V, --version  Output version information and exit.\n"
     "\n"
@@ -591,9 +668,13 @@ main( int argc, char **argv )
 
   progname = argv[0];
 
-  while( ( c = getopt_long( argc, argv, "hV", long_options, NULL ) ) != -1 ) {
+  while( ( c = getopt_long( argc, argv, "d:hV", long_options, NULL ) ) != -1 ) {
 
     switch( c ) {
+
+    case 'd':
+      dump_block = atoi( optarg );
+      break;
 
     case 'h':
       show_help();
@@ -625,7 +706,8 @@ main( int argc, char **argv )
   }
 
   if( argc < 1 ) {
-    fprintf( stderr, "%s: usage: %s <tape files>...\n", progname, progname );
+    fprintf( stderr, "%s: usage: %s [OPTION] <tape files>...\n", progname,
+             progname );
     fprintf( stderr, "Try `%s --help' for more information.\n", progname );
     return 1;
   }

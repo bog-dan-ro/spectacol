@@ -52,6 +52,11 @@ encountered any applicable strings will be output as-is.
 .\"
 .SH OPTIONS
 .TP
+.RI "\-d " "block number"
+The block number specified will be dumped to files: the header (.hdr),
+the data (.dat) and a description (.dsc). The former two are binary files
+and the latter is a text file. Set -1 for all blocks.
+.TP
 \-h, \-\-help
 give brief usage help, listing available options.
 .TP
