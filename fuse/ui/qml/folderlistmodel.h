@@ -95,7 +95,6 @@ private:
     FileSortCriteria m_sortCriteria = ByName;
     bool m_showDirsFirst = true;
     int m_currentIndex = -1;
-    QCache<QString, int> m_currentIndexes;
 };
 
 #endif // FOLDERLISTMODEL_H

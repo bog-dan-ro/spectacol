@@ -75,12 +75,11 @@ Item
         currentIndex: filesModel.currentIndex
 
         onReturnPressed: {
-            if (model.isDir(currentIndex)) {
+            filesModel.currentIndex = currentIndex;
+            if (model.isDir(currentIndex))
                 filesModel.folder = model.path(currentIndex);
-                filesModel.currentIndex = currentIndex;
-            } else {
+            else
                 fileSelected(model.path(currentIndex));
-            }
         }
         onEscapePressed: fileSelected("")
 
@@ -132,12 +131,11 @@ Item
                     anchors.fill: parent
                     onClicked: {
                         if (isCurrentItem) {
-                            if (isDir) {
-                                filesModel.currentIndex = index;
+                            filesModel.currentIndex = index;
+                            if (isDir)
                                 filesModel.folder = path
-                            } else {
+                            else
                                 fileSelected(path);
-                            }
                         } else {
                             filesView.currentIndex = index;
                         }
@@ -186,12 +184,11 @@ Item
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                if (artist_text_label.root) {
+                filesModel.currentIndex = filesView.currentIndex;
+                if (artist_text_label.root)
                     pageLoader.source = "";
-                } else {
-                    filesModel.currentIndex = filesView.currentIndex;
+                else
                     filesModel.cdUp();
-                }
             }
         }
     }

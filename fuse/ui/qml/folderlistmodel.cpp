@@ -19,11 +19,15 @@
 
 #include <QDateTime>
 #include <QDirIterator>
+#include <QTimer>
+
+namespace {
+    static QCache<QString, int> s_currentIndexes;
+}
 
 FolderListModel::FolderListModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-    m_currentIndexes.setMaxCost(100);
     m_spectrumInit = libspectrum_default_init();
     libspectrum_init(&m_spectrumInit);
 }
@@ -41,9 +45,6 @@ void FolderListModel::setFolder(QString folder)
     if (m_folder == folder)
         return;
 
-    int *pos = new int;
-    *pos = m_currentIndex;
-    m_currentIndexes.insert(m_folder, pos);
     m_folder = QFileInfo(folder).absoluteFilePath();
     if (!m_folder.startsWith(m_rootFolder))
         m_folder = m_rootFolder;
@@ -53,14 +54,15 @@ void FolderListModel::setFolder(QString folder)
     if (m_files.empty()) {
         m_currentIndex = -1;
     } else {
-        if (int *oldIndex = m_currentIndexes.take(m_folder)) {
-            m_currentIndex = *oldIndex;
-            m_currentIndexes.insert(m_folder, oldIndex);
-        } else {
-            m_currentIndex = 0;
+        m_currentIndex = 0;
+        if (m_sortCriteria == ByName) {
+            if (int *oldIndex = s_currentIndexes.take(m_folder)) {
+                m_currentIndex = *oldIndex;
+                s_currentIndexes.insert(m_folder, oldIndex);
+            }
         }
+        emit currentIndexChanged(m_currentIndex);
     }
-    emit currentIndexChanged(m_currentIndex);
 }
 
 void FolderListModel::setRootFolder(QString rootFolder)
@@ -117,6 +119,9 @@ int FolderListModel::currentIndex() const
 void FolderListModel::setCurrentIndex(int currentIndex)
 {
     m_currentIndex = currentIndex;
+    int *pos = new int;
+    *pos = m_currentIndex;
+    s_currentIndexes.insert(m_folder, pos);
 }
 
 bool FolderListModel::isDir(int index)
