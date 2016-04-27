@@ -348,11 +348,19 @@ static libspectrum_error
 generalised_data_init( libspectrum_tape_generalised_data_block *block,
                        libspectrum_tape_generalised_data_block_state *state )
 {
-  state->state = LIBSPECTRUM_TAPE_STATE_PILOT;
+  state->state = block->pilot_table.symbols_in_block ?
+    LIBSPECTRUM_TAPE_STATE_PILOT : LIBSPECTRUM_TAPE_STATE_DATA1;
 
   state->run = 0;
   state->symbols_through_run = 0;
   state->edges_through_symbol = 0;
+
+  state->current_symbol = 0;
+  state->symbols_through_stream = 0;
+
+  state->current_byte = 0;
+  state->bits_through_byte = 0;
+  state->bytes_through_stream = 0;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -447,7 +455,8 @@ libspectrum_tape_block_read_symbol_table_parameters(
   table->max_pulses = (*ptr)[0];
 
   table->symbols_in_table = (*ptr)[1];
-  if( !table->symbols_in_table ) table->symbols_in_table = 256;
+  if( !table->symbols_in_table && table->symbols_in_block ) 
+    table->symbols_in_table = 256;
 
   (*ptr) += 2;
 

@@ -1033,3 +1033,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160424 ChangeLog,README,configure.ac,doc/libspectrum.{3,txt},
          hacking/ChangeLog: merge libspectrum_1_1_0-branch changes onto trunk
          (Fred).
+20160427 tape_block.c: fix bugs handling TZX generalised data blocks with empty
+         symbol tables (e.g. ZX81 tapes encoded as in the TZX 1.20
+         specification) (Andre Leiradella).
