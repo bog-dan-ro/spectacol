@@ -202,15 +202,6 @@ static void
 fprint_block_name( FILE *f, libspectrum_byte *data )
 {
   int i;
-  for( i = 2; i < 12; i++ ) {
-    fprintf( f, "%c", data[i] );
-  }
-}
-
-static void
-print_block_name( libspectrum_byte * data )
-{
-  int i;
   for( i = 2; i < 12; i++) {
     char c;
     if( data[i] >= 32 && data[i] < 127 ) {
@@ -218,8 +209,14 @@ print_block_name( libspectrum_byte * data )
     } else {
       c = '?';
     }
-    printf("%c", c);
+    fprintf( f, "%c", c );
   }
+}
+
+static void
+print_block_name( libspectrum_byte * data )
+{
+  fprint_block_name( stdout, data );
 }
 
 /* decode header and save data */
@@ -283,7 +280,7 @@ decode_header( libspectrum_tape_block *block )
     default:
       printf("  Unknown");
       if( f ) {
-        fprintf( f, "Unknow" );
+        fprintf( f, "Unknown" );
       }
       break;
     }

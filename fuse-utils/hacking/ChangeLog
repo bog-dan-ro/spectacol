@@ -546,3 +546,5 @@
          onto trunk (Fred).
 20160425 man/tzxlist.1,tzxlist.c: allow tzxlist dump standard data blocks (patch
          #328) (Gergely Szasz).
+20160427 tzxlist.c: share implementation between fprint_block_name() and
+         print_block_name() and fix typo (Fred).
