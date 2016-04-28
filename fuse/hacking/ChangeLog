@@ -4756,7 +4756,7 @@
          from the list and freeing it (fixes bug #317) (Tom Seddon).
 20150402 man/fuse.1: adjust some references to peripherals options (Sergio).
 20150402 compat/win32/distribution.mk,ui/win32/installer/fuse.nsi.in: prefer
-         groff over man2html. Ensure tables are not broken. Distribute images
+         groff to man2html. Ensure tables are not broken. Distribute images
          referenced in the manual (Sergio).
 20150405 man/fuse.1: adjust some cross-references (Sergio).
 20150405 compat/win32/osname.c,sound/win32sound.c,ui/win32/{browse.c,debugger.c,
@@ -5028,3 +5028,6 @@
          Alberto Garcia) (Fred).
 20160425 INSTALL: Cygwin no longer distributes MinGW. Update documentation.
          (Sergio).
+20160428 utils.c: prefer Scorpion to Pentagon when loading SCL/TRD disks for
+         better timming compatibility (part of feature request #90) (thanks,
+         windale) (Sergio).
