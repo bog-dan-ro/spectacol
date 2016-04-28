@@ -548,3 +548,5 @@
          #328) (Gergely Szasz).
 20160427 tzxlist.c: share implementation between fprint_block_name() and
          print_block_name() and fix typo (Fred).
+20160429 configure.ac,m4/glib-[12].0.m4: check for libspectrum's own GLib
+         replacement (rest of feature request #28) (Stuart and Sergio).
