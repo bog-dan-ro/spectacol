@@ -1,5 +1,5 @@
 /* microdrive.c: Routines for handling microdrive images
-   Copyright (c) 2004-2005 Philip Kendall
+   Copyright (c) 2004-2015 Philip Kendall
 
    $Id$
 

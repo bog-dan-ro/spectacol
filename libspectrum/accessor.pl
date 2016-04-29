@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # accessor.pl: generate accessor functions
-# Copyright (c) 2003-2009 Philip Kendall
+# Copyright (c) 2003-2015 Philip Kendall
 
 # $Id$
 

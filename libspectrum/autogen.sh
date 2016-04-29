@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # autogen.sh: autotools invocation
-# Copyright (c) 2004 Philip Kendall
+# Copyright (c) 2004-2014 Philip Kendall, Sergio Baldoví
 
 # $Id$
 

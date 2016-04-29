@@ -1,6 +1,6 @@
 /* internals.h: functions which need to be called inter-file by libspectrum
                 routines, but not by user code
-   Copyright (c) 2001-2008 Philip Kendall, Darren Salt
+   Copyright (c) 2001-2015 Philip Kendall, Darren Salt
 
    $Id$
 

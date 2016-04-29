@@ -1,6 +1,6 @@
 /* warajevo_read.c: Routines for reading Warajevo .tap files
    Copyright (c) 2001, 2002 Philip Kendall, Darren Salt
-   Copyright (c) 2003 Fredrick Meunier
+   Copyright (c) 2003-2015 Fredrick Meunier
 
    $Id$
 

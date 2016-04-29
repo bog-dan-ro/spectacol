@@ -1,5 +1,5 @@
 /* csw.c: Routines for handling CSW raw audio files
-   Copyright (c) 2002-2007 Darren Salt, Fredrick Meunier
+   Copyright (c) 2002-2015 Darren Salt, Fredrick Meunier
    Based on tap.c, copyright (c) 2001 Philip Kendall
 
    $Id$

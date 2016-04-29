@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-dnl Copyright (c) 1999-2012 Philip Kendall
+dnl Copyright (c) 1999-2013 Philip Kendall
 
 dnl $Id$
 

@@ -1,5 +1,6 @@
 /* zlib.c: routines for zlib (de)compression of data
    Copyright (c) 2002 Darren Salt, Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

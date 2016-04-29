@@ -1,5 +1,5 @@
 /* dck.c: Routines for handling Warajevo DCK files
-   Copyright (c) 2003 Darren Salt, Fredrick Meunier
+   Copyright (c) 2003-2015 Darren Salt, Fredrick Meunier
 
    $Id$
 

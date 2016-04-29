@@ -1,5 +1,5 @@
 /* z80.c: Routines for handling .z80 snapshots
-   Copyright (c) 2001-2009 Philip Kendall, Darren Salt, Fredrick Meunier
+   Copyright (c) 2001-2015 Philip Kendall, Darren Salt, Fredrick Meunier
 
    $Id$
 

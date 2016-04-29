@@ -1,5 +1,5 @@
 /* tape_block.c: one tape block
-   Copyright (c) 2003-2008 Philip Kendall
+   Copyright (c) 2003-2016 Philip Kendall
 
    $Id$
 

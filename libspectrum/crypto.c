@@ -1,5 +1,5 @@
 /* crypto.c: crytography-related functions
-   Copyright (c) 2002-2005 Philip Kendall
+   Copyright (c) 2002-2015 Philip Kendall
 
    $Id$
 

@@ -1,5 +1,5 @@
 /* szx.c: Routines for .szx snapshots
-   Copyright (c) 1998-2012 Philip Kendall, Fredrick Meunier, Stuart Brady
+   Copyright (c) 1998-2015 Philip Kendall, Fredrick Meunier, Stuart Brady
 
    $Id$
 

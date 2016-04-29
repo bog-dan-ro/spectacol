@@ -1,5 +1,5 @@
 /* libspectrum.c: Some general routines
-   Copyright (c) 2001-2009 Philip Kendall, Darren Salt, Fredrick Meunier
+   Copyright (c) 2001-2015 Philip Kendall, Darren Salt, Fredrick Meunier
 
    $Id$
 

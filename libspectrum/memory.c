@@ -1,5 +1,6 @@
 /* memory.c: memory allocator routines
    Copyright (c) 2008 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

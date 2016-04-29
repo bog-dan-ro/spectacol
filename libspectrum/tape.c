@@ -1,5 +1,5 @@
 /* tape.c: Routines for handling tape files
-   Copyright (c) 2001-2008 Philip Kendall, Darren Salt, Fredrick Meunier
+   Copyright (c) 2001-2014 Philip Kendall, Darren Salt, Fredrick Meunier
 
    $Id$
 
