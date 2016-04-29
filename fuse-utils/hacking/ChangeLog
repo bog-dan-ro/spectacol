@@ -550,3 +550,5 @@
          print_block_name() and fix typo (Fred).
 20160429 configure.ac,m4/glib-[12].0.m4: check for libspectrum's own GLib
          replacement (rest of feature request #28) (Stuart and Sergio).
+20160429 tzxlist.c: allow tape durations longer than 20.5 minutes (fixes bug
+         #361) (UB880D).

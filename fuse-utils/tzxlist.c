@@ -322,7 +322,7 @@ process_tape( char *filename )
   libspectrum_tape *tape;
   libspectrum_tape_iterator iterator;
   libspectrum_tape_block *block;
-  libspectrum_dword total_length = 0;
+  libspectrum_qword total_length = 0;
   libspectrum_id_t type;
 
   size_t i;
