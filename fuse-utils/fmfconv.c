@@ -1,5 +1,6 @@
 /* fmfconv.c: Convert .fmf movie files
-   Copyright (c) 2004-2005 Gergely Szasz
+   Copyright (c) 2004-2015 Gergely Szasz
+   Copyright (c) 2014-2016 Sergio Baldovi
 
    $Id$
 

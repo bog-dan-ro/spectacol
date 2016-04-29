@@ -1,5 +1,5 @@
 /* fmfconv_avi.c: avi output with raw video/audio included into fmfconv.c
-   Copyright (c) 2015 Gergely Szasz
+   Copyright (c) 2015 Gergely Szasz, Sergio Baldovi
 
    $Id$
 

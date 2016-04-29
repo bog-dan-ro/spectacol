@@ -1,5 +1,6 @@
 /* raw2hdf.c: Create an .hdf file from a raw binary image
    Copyright (c) 2005 Matthew Westcott, 2006 Philip Kendall
+   Copyright (c) 2014-2015 Sergio Baldovi
 
    $Id$
 

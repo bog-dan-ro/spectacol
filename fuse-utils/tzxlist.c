@@ -1,5 +1,7 @@
 /* tzxlist.c: Produce a listing of the blocks in a .tzx file
-   Copyright (c) 2001-2011 Philip Kendall, Darren Salt, Fredrick Meunier
+   Copyright (c) 2001-2016 Philip Kendall, Darren Salt, Fredrick Meunier
+   Copyright (c) 2015 Sergio Baldovi
+   Copyright (c) 2016 Gergely Szasz
 
    $Id$
 

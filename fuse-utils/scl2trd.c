@@ -1,5 +1,6 @@
 /* scl2trd.c: Convert .SCL disk images to .TRD disk images
    Copyright (c) 2002-2007 Dmitry Sanarin, Philip Kendall and Fredrick Meunier
+   Copyright (c) 2014-2015 Sergio Baldovi
 
    $Id$
 
