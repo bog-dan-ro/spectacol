@@ -1035,10 +1035,11 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (Fred).
 20160427 tape_block.c: fix bugs handling TZX generalised data blocks with empty
          symbol tables (e.g. ZX81 tapes encoded as in the TZX 1.20
-         specification) (Andre Leiradella).
+         specification) (patch #359) (Andre Leiradella).
 20160429 Makefile.am,accessor.pl,autogen.sh,bzip2.c,configure.ac,creator.c,
          crypto.c,csw.c,dck.c,ide.c,internals.h,libspectrum.c,libspectrum.h.in,
          make-perl.c,memory.c,microdrive.c,plusd.c,pzx_read.c,rzx.c,szx.c,
          tape.c,tape_block.c,test/Makefile.am,timings.c,tzx_read.c,
          warajevo_read.c,wav.c,z80.c,z80em.c,zlib.c,zxs.c: have a go at updating
          copyright dates since v 1.1.1 (Fred).
+20160430 README,doc/libspectrum.3: list more disk formats (Sergio).

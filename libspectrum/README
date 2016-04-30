@@ -13,8 +13,8 @@ Currently supported are:
 * Tape images: .tzx, .tap, .spc, .sta and .ltp (read/write) and
   .pzx, Warajevo .tap, Z80Em and CSW version 1 (read only).
 * Input recordings: .rzx (read/write).
-* Disk images: .dsk (both plain and extended), .fdi, .sad, .scl, .td0,
-  .trd and .udi (identification only).
+* Disk images: .dsk (both plain and extended), .d40, .d80, .fdi, .img,
+  .mgt, .opd, .sad, .scl, .td0, .trd and .udi (identification only).
 * Timex cartridges: .dck (read only).
 * IDE hard disk images: .hdf (read/write).
 * Microdrive cartridge images: .mdr (read/write).
