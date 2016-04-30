@@ -1146,7 +1146,7 @@ the TR-DOS ROM for Beta\ 128 emulation with the 48K, TC2048, 128K or +2
 .RI ( trdos.rom ),
 the +D ROM
 .RI ( plusd.rom ),
-the Didaktik 80 ROM
+the Didaktik\ 80 ROM
 .RI ( didaktik80.rom ),
 the DISCiPLE ROM
 .RI ( disciple.rom ),
@@ -2177,13 +2177,16 @@ occurring.
 .I "Auto-save settings"
 .RS
 If this option is selected, Fuse will automatically write its
-currently selected options to its configuration file on exit (if
+currently selected options to its configuration file on exit (either
+in xml format if
 .I libxml2
-was available when Fuse was compiled). If you turn this option off,
-you'll have to manually use
+was available when Fuse was compiled or plain text). If this option 
+is off, you'll have to manually use
 .I "Options, Save"
 afterwards to ensure that this setting gets written to Fuse's
-configuration file.
+configuration file. Note that if you turn this option on, loading a
+snapshot could enable peripherals that would be written permanently 
+to the configuration file.
 .RE
 .RE
 .PP
@@ -2324,9 +2327,9 @@ this option unless you have a specific need for it.
 This option allows the emulation of the sound output system to be
 modified. Different choices of speaker limit the bass and treble
 response that can be produced from the machine. Choose between a
-\(lqTV\(rq type speaker and a small beeper type speaker that significantly
-limits bass and treble response. Choose \(lqUnfiltered\(rq to get
-unmodified (but less accurate) sound output.
+\(lqTV\(rq type speaker and a small \(lqBeeper\(rq type speaker that
+significantly limits bass and treble response. Choose \(lqUnfiltered\(rq
+to get unmodified (but less accurate) sound output.
 .RE
 .PP
 .I "AY volume"
@@ -2791,9 +2794,8 @@ built-in joystick interface.
 .RE
 .RE
 .PP
-For the real joysticks, it is also possible to configure (although
-currently only when using the GTK+ interface) what effect each button
-on the joystick will have: this can be
+For the real joysticks, it is also possible to configure what effect
+each button on the joystick will have: this can be
 .IR "Joystick Fire" ,
 equivalent to pressing the emulated joystick's fire button,
 .IR "Nothing" ,
@@ -2801,7 +2803,7 @@ meaning to have no effect, or any Spectrum key, meaning that pressing
 that button will be equivalent to pressing that Spectrum key.
 .RE
 .PP
-.I "Options, Select ROMs"
+.I "Options, Select ROMs, Machine ROMs"
 .RS
 An individual dialog is available for each Spectrum variant emulated
 by Fuse which allows selection of the ROM(s) used by that
@@ -2809,11 +2811,26 @@ machine. Simply select the ROM you wish to use, and then reset the
 Spectrum for the change to take effect.
 .RE
 .PP
+.I "Options, Select ROMs, Peripheral ROMs"
+.RS
+The same as the Machine ROMs menu, but an individual dialog is available
+for peripherals that need a ROM. Simply select the ROM you wish to use,
+and then reset the Spectrum for the change to take effect.
+.RE
+.PP
 .I "Options, Filter..."
 .RS
 Select the graphics filter currently in use. See the
 .B "GRAPHICS FILTERS"
 section for more details.
+.RE
+.PP
+.I F11
+.br
+.I "Options, Full Screen"
+.RS
+Switch Fuse between full screen and windowed mode.
+This menu is only available under the SDL UI.
 .RE
 .PP
 .I "Options, Disk Options..."
@@ -2891,22 +2908,22 @@ Defaults to a double-sided 80 track drive.
 Defaults to a double-sided 80 track drive.
 .RE
 .PP
-.I "DISCiPLE Drive 1"
-.RS
-Defaults to a double-sided 80 track drive.
-.RE
-.PP
-.I "DISCiPLE Drive 2"
-.RS
-Defaults to a double-sided 80 track drive.
-.RE
-.PP
 .I "Didaktik 80 Drive A"
 .RS
 Defaults to a double-sided 80 track drive.
 .RE
 .PP
 .I "Didaktik 80 Drive B"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "DISCiPLE Drive 1"
+.RS
+Defaults to a double-sided 80 track drive.
+.RE
+.PP
+.I "DISCiPLE Drive 2"
 .RS
 Defaults to a double-sided 80 track drive.
 .RE
@@ -2953,27 +2970,19 @@ The available options are
 and
 .IR Always .
 .RE
-.RE
-.PP
-.I F11
-.br
-.I "Options, Full Screen"
-.RS
-Switch Fuse between full screen and windowed mode.
-This menu is only available under the SDL UI.
-.RE
 .PP
 .I "Options, Save"
 .RS
-If
-.I libxml2
-was available when Fuse was compiled, this will cause Fuse's current
-options to be written to
+This will cause Fuse's current options to be written to
 .I .fuserc
-in your home directory, from which they will be picked up again when
-Fuse is restarted. The best way to update this file is by using this
-option, but it's a simple XML file and shouldn't be too hard to edit
-by hand if you really want to.
+in your home directory (Unix-like systems), or
+.I fuse.cfg
+in your %USERPROFILE% folder (Windows), from which they will be
+picked up again when Fuse is restarted. The best way to update
+this file is by using this option, but it's a simple XML file if
+.I libxml2
+was available when Fuse was compiled (otherwise, plain text), and
+shouldn't be too hard to edit by hand if you really want to.
 .RE
 .PP
 .I Pause
@@ -2989,15 +2998,13 @@ up the main menu.
 .br
 .I "Machine, Reset"
 .RS
-Reset the emulated Spectrum. Again, you get a chance to cancel this if
-you're using the GTK+ or Win32 UIs.
+Reset the emulated Spectrum.
 .RE
 .PP
 .I "Machine, Hard reset"
 .RS
 Reset the emulated Spectrum. A hard reset is equivalent to turning the
-Spectrum's power off, and then turning it back on. Again, you get a
-chance to cancel this if you're using the GTK+ or Win32 UIs.
+Spectrum's power off, and then turning it back on.
 .RE
 .PP
 .I F9
@@ -3347,7 +3354,7 @@ as the RS-232 TxD or RxD wire.
 .I "Media, Disk"
 .RS
 Virtual floppy disk images are accessible when emulating a +3, +3e,
-Pentagon or Scorpion, or when the Beta\ 128, Opus Discovery, +D or
+Pentagon or Scorpion, or when the Beta\ 128, Opus Discovery, +D, Didaktik or
 DISCiPLE interface options are enabled and a machine compatible with
 the chosen interface is selected. (See
 .BR "THE .DSK FORMAT" ,
@@ -4764,12 +4771,12 @@ Finally, `X' will return from the NMI menu.
 .SH DIDAKTIK 80 EMULATION
 .PP
 Fuse supports Didaktik 80 (and Didaktik 40) emulation.  It emulates
-the original version of the Didaktik 80, running MDOS\ 1 and with a
+the original version of the Didaktik\ 80, running MDOS\ 1 and with a
 WD2797 floppy controller.  See the
 .B "DISK FILE FORMATS"
 section for more details on supported disk file formats.
-The Didaktik 80 may only be used with 16K, 48K and TC2048 emulation.
-To press the Didaktik 80's `SNAP' button, choose the
+The Didaktik\ 80 may only be used with 16K, 48K and TC2048 emulation.
+To press the Didaktik\ 80's `SNAP' button, choose the
 .I "Machine, Didaktik SNAP"
 menu option.
 .\"
@@ -4826,7 +4833,7 @@ action.
 .\"
 .SH DISK FILE FORMATS
 .PP
-Fuse supports several disk image formats in its +D, DISCiPLE and
+Fuse supports several disk image formats in its +D, Didaktik, DISCiPLE and
 Beta\ 128 emulation.
 .PP
 For reading:
@@ -4877,7 +4884,8 @@ TR-DOS disk image; for detailed information please see
 .PP
 .I .SCL
 .RS
-A simple archive format for TR-DOS disk files.
+A simple archive format for TR-DOS disk files. For specification please see
+.I http://www.zx-modules.de/fileformats/sclformat.html
 .RE
 .PP
 .I .TD0

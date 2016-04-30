@@ -5031,3 +5031,14 @@
 20160428 utils.c: prefer Scorpion to Pentagon when loading SCL/TRD disks for
          better timming compatibility (part of feature request #90) (thanks,
          windale) (Sergio).
+20160430 man/fuse.1: update manual:
+           - Add missing Didaktik references.
+           - Add more details about autosave option.
+           - Options Save also works without libxml2.
+           - Order disk options menu as in program.
+           - Order full screen option as in program.
+           - Split Options Select ROMs menu between machine and peripherals.
+           - Link .SCL specification.
+           - All UIs warn on a machine reset.
+           - All UIs could configure joystick buttons.
+         (Sergio).
