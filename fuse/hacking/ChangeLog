@@ -5044,7 +5044,7 @@
          (Sergio).
 20160501 Makefile.am,autogen.sh,bitmap.h,compat/Makefile.am,
          compat/unix/{socket.c,tuntap.c},
-         compat/win32/{osname.c,compat/win32socket.c},compat.h,data/Makefile.am,
+         compat/win32/{osname.c,socket.c},compat.h,data/Makefile.am,
          data/win32/{distribution.mk,installer.nsi.in},
          debugger/{Makefile.am,breakpoint.[ch],command.c,commandl.l,commandy.y,
          debugger.h,disassemble.c,event.c,expression.c,variable.c},
@@ -5054,7 +5054,7 @@
          spec_se.c,specplus3.[ch],tc2048.c,tc2068.[ch],ts2068.c},
          man/Makefile.am,memory.[ch],mempool.[ch],menu.[ch],menu_data.[dat|pl],
          movie.c,periph.[ch],
-         peripherals/{Makefile.am,ay.[ch],dck.c},if1.[ch],if2.c,joystick.[ch],
+         peripherals/{Makefile.am,ay.[ch],dck.c,if1.[ch],if2.c,joystick.[ch],
          kempmouse.c,melodik.c,printer.c,scld.[ch],speccyboot.c,specdrum.c,
          spectranet.[ch],ula.c,usource.c},
          peripherals/disk/{beta.[ch],didaktik.c,disciple.[ch],disk.[ch],
@@ -5085,4 +5085,4 @@
          unittests/{Makefile.am,unittests.[ch]},utils.c,
          z80/{Makefile.am,coretest.c,z80.[c|h|pl],z80_macros.h,z80_ops.c}:
          have a go at updating copyright dates since v 1.1.1 (Fred).
-
+20160501 ui/fb/fbmouse.c: add missing header in framebuffer UI (Sergio).
