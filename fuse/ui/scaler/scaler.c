@@ -1,5 +1,6 @@
 /* scaler.c: code for selecting (etc) scalers
  * Copyright (C) 2003 Fredrick Meunier, Philip Kendall
+ * Copyright (c) 2015 Sergio Baldoví
  * 
  * $Id$
  *

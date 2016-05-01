@@ -1,5 +1,5 @@
 /* pokemem.c: Win32 interface to the poke memory
-   Copyright (c) 2011 Philip Kendall, Sergio Baldoví
+   Copyright (c) 2011-2015 Philip Kendall, Sergio Baldoví
 
    $Id$
 

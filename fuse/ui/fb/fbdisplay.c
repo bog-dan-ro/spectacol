@@ -1,6 +1,7 @@
 /* fbdisplay.c: Routines for dealing with the linux fbdev display
    Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Darren Salt,
 			   Witold Filipczyk
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

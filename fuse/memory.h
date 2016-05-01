@@ -1,5 +1,6 @@
 /* memory.h: memory access routines
    Copyright (c) 2003-2011 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

@@ -2,6 +2,7 @@
                era Pentagon machine with Beta 128 and AY as described in the
                Russian Speccy FAQ and emulated on most Spectrum emulators.
    Copyright (c) 1999-2012 Philip Kendall and Fredrick Meunier
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

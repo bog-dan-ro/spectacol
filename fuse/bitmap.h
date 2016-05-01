@@ -1,5 +1,5 @@
 /* bitmap.h: Bitmap routines
-   Copyright (c) 2007 Stuart Brady
+   Copyright (c) 2007-2015 Stuart Brady
 
    $Id$
 

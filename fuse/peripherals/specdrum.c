@@ -1,5 +1,6 @@
 /* specdrum.c: Routines for handling the Specdrum Drum Kit
    Copyright (c) 2011 Jon Mitchell
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

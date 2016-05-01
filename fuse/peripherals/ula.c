@@ -1,5 +1,7 @@
 /* ula.c: ULA routines
    Copyright (c) 1999-2011 Philip Kendall, Darren Salt
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2016 Fredrick Meunier
 
    $Id$
 

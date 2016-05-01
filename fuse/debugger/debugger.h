@@ -1,5 +1,5 @@
 /* debugger.h: Fuse's monitor/debugger
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2013 Philip Kendall
 
    $Id$
 

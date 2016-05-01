@@ -1,5 +1,5 @@
 /* screenshot.c: Routines for handling .png and .scr screenshots
-   Copyright (c) 2002-2003 Philip Kendall, Fredrick Meunier
+   Copyright (c) 2002-2015 Philip Kendall, Fredrick Meunier
 
    $Id$
 

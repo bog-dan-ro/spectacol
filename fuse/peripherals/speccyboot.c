@@ -2,6 +2,7 @@
    See http://patrikpersson.github.io/speccyboot/
    
    Copyright (c) 2009-2011 Patrik Persson, Philip Kendall
+   Copyright (c) 2015 Stuart Brady
    
    $Id$
    

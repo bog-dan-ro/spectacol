@@ -1,5 +1,5 @@
 /* gtkcompat.c: various compatibility bits between GTK+ versions
-   Copyright (c) 2012 Philip Kendall
+   Copyright (c) 2012-2014 Philip Kendall
 
    $Id$
 

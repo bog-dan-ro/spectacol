@@ -1,5 +1,7 @@
 /* periph.h: code for handling peripherals
    Copyright (c) 2004-2011 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2015 Gergely Szasz
 
    $Id$
 

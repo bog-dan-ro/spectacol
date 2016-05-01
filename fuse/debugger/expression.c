@@ -1,5 +1,5 @@
 /* expression.c: A numeric expression
-   Copyright (c) 2003-2008 Philip Kendall
+   Copyright (c) 2003-2015 Philip Kendall
 
    $Id$
 

@@ -1,5 +1,5 @@
 /* spec_se.c: ZX Spectrum SE specific routines
-   Copyright (c) 1999-2011 Fredrick Meunier, Philip Kendall, Darren Salt
+   Copyright (c) 1999-2015 Fredrick Meunier, Philip Kendall, Darren Salt
 
    $Id$
 

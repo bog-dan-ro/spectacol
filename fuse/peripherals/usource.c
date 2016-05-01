@@ -1,5 +1,5 @@
 /* usource.c: Routines for handling the Currah uSource interface
-   Copyright (c) 2007,2011 Stuart Brady
+   Copyright (c) 2007,2011,2015 Stuart Brady
 
    $Id$
 

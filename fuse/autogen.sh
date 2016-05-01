@@ -2,6 +2,7 @@
 
 # autogen.sh: autotools invocation
 # Copyright (c) 2004 Philip Kendall
+# Copyright (c) 2014 Sergio Baldoví
 
 # $Id$
 

@@ -1,5 +1,7 @@
 /* machines_periph.c: various machine-specific peripherals
    Copyright (c) 2011 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2015 Gergely Szasz
 
    $Id$
 

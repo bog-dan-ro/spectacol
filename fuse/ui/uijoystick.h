@@ -1,6 +1,8 @@
 /* uijoystick.h: Joystick emulation support
    Copyright (c) 2001-2003 Russell Marks, Philip Kendall, Darren Salt,
 			   Fredrick Meunier
+   Copyright (c) 2015 UB880D
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

@@ -1,5 +1,7 @@
 /* compat.h: various compatibility bits
    Copyright (c) 2003-2012 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

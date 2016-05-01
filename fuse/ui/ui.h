@@ -1,5 +1,6 @@
 /* ui.h: General UI event handling routines
-   Copyright (c) 2000-2004 Philip Kendall
+   Copyright (c) 2000-2015 Philip Kendall
+   Copyright (c) 2016 BogDan Vatra
 
    $Id$
 

@@ -1,5 +1,7 @@
 /* kempmouse.c: Kempston mouse emulation
    Copyright (c) 2004-2008 Darren Salt, Fredrick Meunier
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2016 Sergio Baldoví
 
    $Id$
 

@@ -1,6 +1,7 @@
 /* wd_fdc.c: Western Digital floppy disk controller emulation
-   Copyright (c) 2002-2007 Stuart Brady, Fredrick Meunier, Philip Kendall,
-   Dmitry Sanarin, Gergely Szasz
+   Copyright (c) 2002-2016 Stuart Brady, Fredrick Meunier, Philip Kendall,
+                           Dmitry Sanarin, Gergely Szasz
+   Copyright (c) 2016 Sergio Baldoví
 
    $Id$
 

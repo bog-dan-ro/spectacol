@@ -1,5 +1,5 @@
 /* z80.h: z80 emulation core
-   Copyright (c) 1999-2013 Philip Kendall
+   Copyright (c) 1999-2015 Philip Kendall
 
    $Id$
 

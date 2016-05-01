@@ -1,5 +1,6 @@
 /* upd_fdc.c: NEC floppy disk controller emulation
-   Copyright (c) 2007-2013 Gergely Szasz
+   Copyright (c) 2007-2015 Gergely Szasz
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

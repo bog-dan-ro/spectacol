@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2012 Philip Kendall and others
+   Copyright (c) 1999-2015 Philip Kendall and others
 
    $Id$
 

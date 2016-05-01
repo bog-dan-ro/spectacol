@@ -1,5 +1,5 @@
 /* opus.c: Routines for handling the Opus Discovery interface
-   Copyright (c) 1999-2011 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Copyright (c) 1999-2016 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Dmitry Sanarin, Darren Salt, Michael D Wynne, Gergely Szasz
 
    $Id$

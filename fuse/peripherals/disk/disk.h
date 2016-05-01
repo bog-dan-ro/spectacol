@@ -1,5 +1,5 @@
 /* disk.h: Routines for handling disk images
-   Copyright (c) 2007-2010 Gergely Szasz
+   Copyright (c) 2007-2015 Gergely Szasz
 
    $Id$
 

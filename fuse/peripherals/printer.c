@@ -1,5 +1,8 @@
 /* printer.c: Printer support
    Copyright (c) 2001-2004 Ian Collier, Russell Marks, Philip Kendall
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2015 Fredrick Meunier
+   Copyright (c) 2016 Sergio Baldoví
 
    $Id$
 

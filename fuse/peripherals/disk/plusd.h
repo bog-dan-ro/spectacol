@@ -1,5 +1,5 @@
 /* plusd.h: Routines for handling the +D interface
-   Copyright (c) 2005-2007 Stuart Brady
+   Copyright (c) 2005-2015 Stuart Brady
 
    $Id$
 

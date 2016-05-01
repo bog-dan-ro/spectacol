@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2011 Philip Kendall
+   Copyright (c) 1999-2015 Philip Kendall
 
    $Id$
 

@@ -1,5 +1,5 @@
 /* gtkjoystick.c: Joystick emulation
-   Copyright (c) 2003-2004 Darren Salt, Philip Kendall
+   Copyright (c) 2003-2015 Darren Salt, Philip Kendall
 
    $Id$
 

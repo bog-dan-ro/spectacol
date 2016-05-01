@@ -1,5 +1,6 @@
 /* sdljoystick.c: routines for dealing with the SDL joystick
    Copyright (c) 2003-2004 Darren Salt, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2015 UB880D
 
    $Id$
 

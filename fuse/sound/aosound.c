@@ -1,5 +1,6 @@
 /* aosound.c: libao sound I/O
-   Copyright (c) 2004 Gergely Szasz, Philip Kendall
+   Copyright (c) 2004,2013 Gergely Szasz, Philip Kendall
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

@@ -1,5 +1,7 @@
 /* win32ui.c: Win32 routines for dealing with the user interface
-   Copyright (c) 2003-2007 Marek Januszewski, Philip Kendall, Stuart Brady
+   Copyright (c) 2003-2015 Marek Januszewski, Philip Kendall, Stuart Brady
+   Copyright (c) 2015 Kirben
+   Copyright (c) 2016 lordhoto
 
    $Id$
 

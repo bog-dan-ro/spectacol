@@ -1,5 +1,5 @@
 /* sdlsound.c: SDL sound I/O
-   Copyright (c) 2002-2004 Alexander Yurchenko, Russell Marks, Philip Kendall,
+   Copyright (c) 2002-2015 Alexander Yurchenko, Russell Marks, Philip Kendall,
 			   Fredrick Meunier
 
    $Id$

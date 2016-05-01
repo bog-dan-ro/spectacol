@@ -1,5 +1,6 @@
 /* specplus3.h: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2013 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

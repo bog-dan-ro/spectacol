@@ -1,5 +1,6 @@
 /* tape.h: tape handling routines
    Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

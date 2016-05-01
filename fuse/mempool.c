@@ -1,5 +1,5 @@
 /* mempool.c: pooled system memory
-   Copyright (c) 2008 Philip Kendall
+   Copyright (c) 2008-2015 Philip Kendall
 
    $Id$
 

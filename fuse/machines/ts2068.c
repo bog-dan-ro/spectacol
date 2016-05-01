@@ -1,5 +1,6 @@
 /* ts2068.c: Timex TS2068 specific routines
-   Copyright (c) 1999-2011 Philip Kendall, Fredrick Meunier, Witold Filipczyk, Darren Salt
+   Copyright (c) 1999-2015 Philip Kendall, Fredrick Meunier, Witold Filipczyk,
+                           Darren Salt
 
    $Id$
 

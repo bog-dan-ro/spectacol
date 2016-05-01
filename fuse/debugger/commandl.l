@@ -1,5 +1,6 @@
 /* commandl.l: Debugger command lexical scanner
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2013 Philip Kendall
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

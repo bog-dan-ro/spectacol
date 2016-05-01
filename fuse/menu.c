@@ -1,5 +1,10 @@
 /* menu.c: general menu callbacks
-   Copyright (c) 2004-2005 Philip Kendall
+   Copyright (c) 2004-2013 Philip Kendall
+   Copyright (c) 2013 Alex Badea
+   Copyright (c) 2014-2015 Sergio Baldoví
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2015 Gergely Szasz
+   Copyright (c) 2015 Stefano Bodrato
 
    $Id$
 

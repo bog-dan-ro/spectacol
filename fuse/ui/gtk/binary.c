@@ -1,5 +1,6 @@
 /* binary.c: GTK+ routines to load/save chunks of binary data
-   Copyright (c) 2003-2005 Philip Kendall
+   Copyright (c) 2003-2013 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

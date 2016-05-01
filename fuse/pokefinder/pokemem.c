@@ -1,5 +1,5 @@
 /* pokemem.c: help with handling pokes
-   Copyright (c) 2011 Philip Kendall, Sergio Baldoví
+   Copyright (c) 2011-2015 Philip Kendall, Sergio Baldoví
 
    $Id$
 

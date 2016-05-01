@@ -2,7 +2,7 @@
    
    Emulates the AMD 29F010 flash chip
 
-   Copyright (c) 2011 Guesser, Philip Kendall
+   Copyright (c) 2011-2015 Guesser, Philip Kendall
    
    $Id$
    

@@ -1,5 +1,5 @@
 /* spectrum.c: Generic Spectrum routines
-   Copyright (c) 1999-2004 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2013 Philip Kendall, Darren Salt
 
    $Id$
 

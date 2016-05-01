@@ -1,5 +1,6 @@
 /* disassemble.c: Fuse's disassembler
-   Copyright (c) 2002-2003 Darren Salt, Philip Kendall
+   Copyright (c) 2002-2015 Darren Salt, Philip Kendall
+   Copyright (c) 2016 BogDan Vatra
 
    $Id$
 

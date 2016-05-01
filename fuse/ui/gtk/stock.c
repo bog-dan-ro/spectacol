@@ -1,5 +1,7 @@
 /* stock.c: 'standard' GTK+ widgets etc
    Copyright (c) 2004 Darren Salt, Philip Kendall
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

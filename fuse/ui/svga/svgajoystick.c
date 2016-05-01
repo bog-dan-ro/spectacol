@@ -1,5 +1,7 @@
 /* svgajoystick.c: Joystick emulation (using svgalib)
    Copyright (c) 2003-4 Darren Salt
+   Copyright (c) 2015 UB880D
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

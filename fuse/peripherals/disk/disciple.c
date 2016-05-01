@@ -1,6 +1,6 @@
 /* disciple.c: Routines for handling the DISCiPLE interface
-   Copyright (c) 1999-2011 Stuart Brady, Fredrick Meunier, Philip Kendall,
-   Dmitry Sanarin, Darren Salt
+   Copyright (c) 1999-2016 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Dmitry Sanarin, Darren Salt, Gergely Szasz
 
    $Id$
 

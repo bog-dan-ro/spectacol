@@ -1,5 +1,6 @@
 /* uijoystick.c: Joystick emulation (using libjsw)
-   Copyright (c) 2003-2004 Darren Salt, Philip Kendall
+   Copyright (c) 2003-2015 Darren Salt, Philip Kendall
+   Copyright (c) 2015 UB880D
 
    $Id$
 

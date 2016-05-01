@@ -1,5 +1,6 @@
 /* commandy.y: Parse a debugger command
-   Copyright (c) 2002-2011 Philip Kendall
+   Copyright (c) 2002-2015 Philip Kendall
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

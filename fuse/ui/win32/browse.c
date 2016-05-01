@@ -1,5 +1,6 @@
 /* browse.c: tape browser dialog box
    Copyright (c) 2002-2008 Philip Kendall, Marek Januszewski
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

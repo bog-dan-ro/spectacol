@@ -2,7 +2,7 @@
    
    Emulates a minimal subset of the Wiznet W5100 TCP/IP controller.
 
-   Copyright (c) 2011-2013 Philip Kendall
+   Copyright (c) 2011-2015 Philip Kendall
    
    $Id$
    

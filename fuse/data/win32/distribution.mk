@@ -1,5 +1,5 @@
 ## This file does not need automake. Include in the final Makefile.
-## Copyright (c) 2013 Sergio Baldoví
+## Copyright (c) 2013-2016 Sergio Baldoví
 
 ## $Id$
 

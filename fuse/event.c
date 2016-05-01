@@ -1,5 +1,5 @@
 /* event.c: Routines needed for dealing with the event list
-   Copyright (c) 2000-2008 Philip Kendall
+   Copyright (c) 2000-2015 Philip Kendall
 
    $Id$
 

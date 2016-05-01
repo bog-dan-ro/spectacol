@@ -1,5 +1,6 @@
 /* gtkmouse.c: GTK+ routines for emulating Spectrum mice
    Copyright (c) 2004 Darren Salt
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

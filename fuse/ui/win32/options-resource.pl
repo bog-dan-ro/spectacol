@@ -4,6 +4,7 @@
 # $Id$
 
 # Copyright (c) 2001-2007 Philip Kendall, Stuart Brady, Marek Januszewski
+# Copyright (c) 2015 Sergio Baldoví
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

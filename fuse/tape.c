@@ -1,5 +1,7 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2011 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 1999-2015 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 2015 UB880D
+   Copyright (c) 2016 Fredrick Meunier
 
    $Id$
 

@@ -1,5 +1,5 @@
 /* command.c: Parse a debugger command
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2015 Philip Kendall
 
    $Id$
 

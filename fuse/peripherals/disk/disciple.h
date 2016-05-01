@@ -1,5 +1,5 @@
 /* disciple.h: Routines for handling the DISCiPLE interface
-   Copyright (c) 2005-2011 Stuart Brady
+   Copyright (c) 2005-2015 Stuart Brady
 
    $Id$
 
