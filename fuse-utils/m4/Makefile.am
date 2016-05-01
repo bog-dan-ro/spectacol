@@ -23,8 +23,7 @@
 
 EXTRA_DIST += \
               m4/audiofile.m4 \
-              m4/glib-1.0.m4 \
-              m4/glib-2.0.m4 \
+              m4/ax_create_stdint_h.m4 \
               m4/iconv.m4 \
               m4/lib-ld.m4 \
               m4/lib-link.m4 \
