@@ -5029,7 +5029,7 @@
 20160425 INSTALL: Cygwin no longer distributes MinGW. Update documentation.
          (Sergio).
 20160428 utils.c: prefer Scorpion to Pentagon when loading SCL/TRD disks for
-         better timming compatibility (part of feature request #90) (thanks,
+         better timing compatibility (part of feature request #90) (thanks,
          windale) (Sergio).
 20160430 man/fuse.1: update manual:
            - Add missing Didaktik references.
