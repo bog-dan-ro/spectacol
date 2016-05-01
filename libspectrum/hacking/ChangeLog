@@ -1043,3 +1043,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          warajevo_read.c,wav.c,z80.c,z80em.c,zlib.c,zxs.c: have a go at updating
          copyright dates since v 1.1.1 (Fred).
 20160430 README,doc/libspectrum.3: list more disk formats (Sergio).
+20160501 Makefile.am,memory.c: don't use g_mem_set_vtable on newer GLib and
+         distribute missing macro files (Sergio).
