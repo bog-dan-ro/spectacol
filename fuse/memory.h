@@ -86,7 +86,7 @@ typedef struct memory_page {
 /* The number of memory pages in 4K */
 #define MEMORY_PAGES_IN_4K ( 1 << ( 12 - MEMORY_PAGE_SIZE_LOGARITHM ) )
 
-/* The number of memory pages in 4K */
+/* The number of memory pages in 2K */
 #define MEMORY_PAGES_IN_2K ( 1 << ( 11 - MEMORY_PAGE_SIZE_LOGARITHM ) )
 
 /* Each RAM chunk accessible by the Z80 */

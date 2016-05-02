@@ -5086,3 +5086,4 @@
          z80/{Makefile.am,coretest.c,z80.[c|h|pl],z80_macros.h,z80_ops.c}:
          have a go at updating copyright dates since v 1.1.1 (Fred).
 20160501 ui/fb/fbmouse.c: add missing header in framebuffer UI (Sergio).
+20160502 memory.h: fix typo in MEMORY_PAGES_IN_2K comment (Fred)
