@@ -1,5 +1,6 @@
 /* usource.c: Routines for handling the Currah uSource interface
    Copyright (c) 2007,2011,2015 Stuart Brady
+   Copyright (c) 2016 Fredrick Meunier
 
    $Id$
 
@@ -27,6 +28,8 @@
 
 #include <config.h>
 
+#include <string.h>
+
 #include <libspectrum.h>
 
 #include "compat.h"
@@ -52,15 +55,18 @@ static libspectrum_byte usource_toggle_read( libspectrum_word port,
 					     libspectrum_byte *attached );
 
 static void usource_reset( int hard_reset );
+static void usource_enabled_snapshot( libspectrum_snap *snap );
+static void usource_from_snapshot( libspectrum_snap *snap );
+static void usource_to_snapshot( libspectrum_snap *snap );
 static void usource_memory_map( void );
 
 static module_info_t usource_module_info = {
 
   /* .reset = */ usource_reset,
   /* .romcs = */ usource_memory_map,
-  /* .snapshot_enabled = */ NULL,
-  /* .snapshot_from = */ NULL,
-  /* .snapshot_to = */ NULL,
+  /* .snapshot_enabled = */ usource_enabled_snapshot,
+  /* .snapshot_from = */ usource_from_snapshot,
+  /* .snapshot_to = */ usource_to_snapshot,
 
 };
 
@@ -173,4 +179,59 @@ usource_unittest( void )
   r += unittests_paging_test_48( 2 );
 
   return r;
+}
+
+static void
+usource_enabled_snapshot( libspectrum_snap *snap )
+{
+  if( libspectrum_snap_usource_active( snap ) )
+    settings_current.usource = 1;
+}
+
+static void
+usource_from_snapshot( libspectrum_snap *snap )
+{
+  if( !libspectrum_snap_usource_active( snap ) ) return;
+
+  if( libspectrum_snap_usource_custom_rom( snap ) &&
+      libspectrum_snap_usource_rom( snap, 0 ) &&
+      machine_load_rom_bank_from_buffer(
+                             usource_memory_map_romcs, 0,
+                             libspectrum_snap_usource_rom( snap, 0 ),
+                             libspectrum_snap_usource_rom_length( snap, 0 ),
+                             1 ) )
+    return;
+
+  if( libspectrum_snap_usource_paged( snap ) ) {
+    usource_active = 0; /* Will be toggled to active next */
+    usource_toggle();
+  }
+}
+
+static void
+usource_to_snapshot( libspectrum_snap *snap )
+{
+  libspectrum_byte *buffer;
+  size_t rom_length;
+  int i;
+
+  if( !periph_is_active( PERIPH_TYPE_USOURCE ) ) return;
+
+  libspectrum_snap_set_usource_active( snap, 1 );
+  libspectrum_snap_set_usource_paged ( snap, usource_active );
+
+  if( usource_memory_map_romcs[0].save_to_snapshot ) {
+    rom_length = 0x2000;
+
+    libspectrum_snap_set_usource_custom_rom( snap, 1 );
+    libspectrum_snap_set_usource_rom_length( snap, 0, rom_length );
+
+    buffer = libspectrum_new( libspectrum_byte, rom_length );
+
+    for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+      memcpy( buffer + i * MEMORY_PAGE_SIZE,
+              usource_memory_map_romcs[ i ].page, MEMORY_PAGE_SIZE );
+
+    libspectrum_snap_set_usource_rom( snap, 0, buffer );
+  }
 }
