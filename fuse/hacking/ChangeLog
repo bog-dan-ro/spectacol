@@ -5089,3 +5089,4 @@
 20160502 memory.h: fix typo in MEMORY_PAGES_IN_2K comment (Fred)
 20160503 peripherals/usource.c: add support for Currah uSource snapshots (patch
          #363) (Fred and Sergio).
+20160503 machine.c: standardise setting of custom ROM field to 1 or 0 (Fred).
