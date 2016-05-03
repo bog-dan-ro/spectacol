@@ -1045,3 +1045,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160430 README,doc/libspectrum.3: list more disk formats (Sergio).
 20160501 Makefile.am,memory.c: don't use g_mem_set_vtable on newer GLib and
          distribute missing macro files (Sergio).
+20160503 accessor.pl,doc/libspectrum.txt,sna.c,snap_accessors.txt,snapshot.c,
+         szx.c,z80.c: add skeleton of support for Currah uSource snapshots
+         (patch #363) (Fred and Sergio).

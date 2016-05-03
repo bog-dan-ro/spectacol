@@ -1,5 +1,5 @@
 /* z80.c: Routines for handling .z80 snapshots
-   Copyright (c) 2001-2015 Philip Kendall, Darren Salt, Fredrick Meunier
+   Copyright (c) 2001-2016 Philip Kendall, Darren Salt, Fredrick Meunier
 
    $Id$
 
@@ -1180,6 +1180,10 @@ libspectrum_z80_write2( libspectrum_byte **buffer, size_t *length,
 
   /* .z80 format doesn't save the Spectranet state at all */
   if( libspectrum_snap_spectranet_active( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+
+  /* .z80 format doesn't save the uSource state at all */
+  if( libspectrum_snap_usource_active( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
 
   error = write_header( buffer, &ptr, length, out_flags, snap );

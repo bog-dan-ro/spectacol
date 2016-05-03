@@ -712,6 +712,12 @@ The available properties (along with their types) are:
 
 * int zx_printer_active
 
+* int usource_active
+* int usource_paged
+* int usource_custom_rom
+* libspectrum_byte* usource_rom[1]
+* size_t usource_rom_length[1]
+
 Most of those should be fairly self-explanatory; those which may not
 be are:
 

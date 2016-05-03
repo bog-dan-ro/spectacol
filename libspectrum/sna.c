@@ -1,5 +1,6 @@
 /* sna.c: Routines for handling .sna snapshots
    Copyright (c) 2001-2002 Philip Kendall
+   Copyright (c) 2016 Fredrick Meunier
 
    $Id$
 
@@ -333,6 +334,10 @@ libspectrum_sna_write( libspectrum_byte **buffer, size_t *length,
 
   /* We don't save the Spectranet state at all */
   if( libspectrum_snap_spectranet_active( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+
+  /* We don't save the uSource state at all */
+  if( libspectrum_snap_usource_active( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
 
   ptr = *buffer;
