@@ -67,16 +67,16 @@ Flickable {
                         if (popup.visible) {
                             decrease();
                         } else if (fuseSettings.showOrientationChooser) {
-                            screenOrientation.focus = true;
+                            screenOrientation.forceActiveFocus(Qt.TabFocusReason);
                         } else {
-                            screenFillMode.focus = true;
+                            screenFillMode.forceActiveFocus(Qt.TabFocusReason);
                         }
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)
                             increase();
                         else
-                            screenFillMode.focus = true;
+                            screenFillMode.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onLeftPressed: if (!popup.visible) decrease();
                     Keys.onRightPressed: if (!popup.visible) increase();
@@ -94,21 +94,20 @@ Flickable {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 ComboBox {
-                    focus: true
                     id: screenFillMode
                     Keys.onUpPressed: {
                         if (popup.visible)
                             decrease();
                         else
-                            screenFilter.focus = true;
+                            screenFilter.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible) {
                             increase();
                         } else if (fuseSettings.showOrientationChooser) {
-                            screenOrientation.focus = true;
+                            screenOrientation.forceActiveFocus(Qt.TabFocusReason);
                         } else {
-                            screenFilter.focus = true;
+                            screenFilter.forceActiveFocus(Qt.TabFocusReason);
                         }
                     }
                     Keys.onLeftPressed: if (!popup.visible) decrease();
@@ -131,19 +130,18 @@ Flickable {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 ComboBox {
-                    focus: true
                     id: screenOrientation
                     Keys.onUpPressed: {
                         if (popup.visible)
                             decrease();
                         else
-                            screenFillMode.focus = true;
+                            screenFillMode.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)
                             increase();
                         else
-                            screenFilter.focus = true;
+                            screenFilter.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onLeftPressed: if (!popup.visible) decrease();
                     Keys.onRightPressed: if (!popup.visible) increase();

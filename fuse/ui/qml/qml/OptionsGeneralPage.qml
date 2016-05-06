@@ -63,8 +63,8 @@ Flickable {
                 SpinBox {
                     id: emulationSpeed
                     focus: true
-                    Keys.onUpPressed: detectLoaders.focus = true;
-                    Keys.onDownPressed: restrictBrowse.focus = true
+                    Keys.onUpPressed: detectLoaders.forceActiveFocus(Qt.TabFocusReason)
+                    Keys.onDownPressed: restrictBrowse.forceActiveFocus(Qt.TabFocusReason)
                     Keys.onLeftPressed: decrease()
                     Keys.onRightPressed: increase()
                     from: 10

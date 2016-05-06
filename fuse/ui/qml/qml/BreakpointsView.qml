@@ -78,7 +78,7 @@ Item {
             }
             MouseArea {
                 anchors.fill: parent
-                onClicked: {view.focus = true; view.currentIndex = model.index}
+                onClicked: {view.forceActiveFocus(Qt.TabFocusReason); view.currentIndex = model.index}
                 onPressAndHold: breakpointSelected(model)
                 onDoubleClicked: breakpointSelected(model)
             }

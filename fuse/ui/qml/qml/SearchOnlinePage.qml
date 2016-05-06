@@ -41,7 +41,7 @@ Rectangle {
         target: onlineGamesModel
         onNoResults: {
             noResults.visible = true;
-            searchText.focus = true;
+            searchText.forceActiveFocus(Qt.TabFocusReason);
         }
     }
 
@@ -73,7 +73,7 @@ Rectangle {
                     onlineGamesModel.search("", searchText.text);
                 else
                     onlineGamesModel.search(searchText.text);
-                grid.focus = true;
+                grid.forceActiveFocus(Qt.TabFocusReason);
             }
         }
 

@@ -119,7 +119,7 @@ Rectangle {
                 placeholderText: qsTr("Enter a numeric value")
                 onAccepted: {
                     fuse.pokeFinderSearch(value.text);
-                    view.focus = true;
+                    view.forceActiveFocus(Qt.TabFocusReason);
                 }
             }
         }
@@ -246,7 +246,7 @@ Rectangle {
                         }
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: {view.focus = true; view.currentIndex = model.index}
+                            onClicked: {view.forceActiveFocus(Qt.TabFocusReason); view.currentIndex = model.index}
                         }
                     }
                 }

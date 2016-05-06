@@ -52,7 +52,7 @@ ListView {
 
                 asmEdit.readOnly = false;
                 asmEdit.selectAll();
-                asmEdit.focus = true;
+                asmEdit.forceActiveFocus(Qt.TabFocusReason);
                 asmEdit.validator = assembler;
                 return true;
             }
@@ -66,7 +66,7 @@ ListView {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    view.focus = true;
+                    view.forceActiveFocus(Qt.TabFocusReason);
                     view.currentIndex = model.index;
                 }
                 onDoubleClicked: fuse.addBreakpoint(model.address)
@@ -125,7 +125,7 @@ ListView {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            view.focus = true;
+                            view.forceActiveFocus(Qt.TabFocusReason);
                             view.currentIndex = model.index;
                         }
 

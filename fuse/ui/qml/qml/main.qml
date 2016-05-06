@@ -248,7 +248,7 @@ ApplicationWindow {
             enabled: visible
             z: parent.z + 10
             source: "OnScreenCursorJoystick.qml"
-            onVisibleChanged: if (!visible) mainRectangle.focus = true;
+            onVisibleChanged: if (!visible) mainRectangle.forceActiveFocus(Qt.TabFocusReason);
         }
 
         OnScreen48Keyboard {
@@ -257,7 +257,7 @@ ApplicationWindow {
             enabled: visible
             anchors.fill: parent
             z: parent.z + 11
-            onVisibleChanged: if (!visible) mainRectangle.focus = true;
+            onVisibleChanged: if (!visible) mainRectangle.forceActiveFocus(Qt.TabFocusReason);
         }
 
         Loader {
@@ -267,7 +267,7 @@ ApplicationWindow {
             visible: status === Loader.Ready
             focus: visible
             enabled: visible
-            onVisibleChanged: if (!visible) mainRectangle.focus = true;
+            onVisibleChanged: if (!visible) mainRectangle.forceActiveFocus(Qt.TabFocusReason);
         }
 
         MessagePage {

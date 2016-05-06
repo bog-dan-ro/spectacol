@@ -101,13 +101,13 @@ Flickable {
                         if (popup.visible)
                             decrease();
                         else
-                            soundForce8Bit.focus = true;
+                            soundForce8Bit.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)
                             increase();
                         else
-                            speakerType.focus = true;
+                            speakerType.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onLeftPressed: if (!popup.visible) decrease();
                     Keys.onRightPressed: if (!popup.visible) increase();
@@ -130,13 +130,13 @@ Flickable {
                         if (popup.visible)
                             decrease();
                         else
-                            ayStereoSeparation.focus = true;
+                            ayStereoSeparation.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)
                             increase();
                         else
-                            soundEnabled.focus = true;
+                            soundEnabled.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onLeftPressed: if (!popup.visible) decrease();
                     Keys.onRightPressed: if (!popup.visible) increase();
