@@ -132,7 +132,7 @@ Item {
 
         Rectangle {
             id: toolBarRect
-            height: 10 * Screen.pixelDensity
+            height: TextSizes.scale20 * 2
             Layout.fillWidth: true
             color: backgroudColor
             radius: Screen.pixelDensity
