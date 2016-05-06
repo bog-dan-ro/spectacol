@@ -67,7 +67,7 @@ static double fitFactor(double i, double s)
     if (i < s)
         return std::floor(s / i);
 
-    return 1. / (std::ceil(i / s));
+    return 1. / std::ceil(i / s);
 }
 
 void FuseScreen::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)

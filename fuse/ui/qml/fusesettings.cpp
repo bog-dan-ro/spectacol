@@ -319,6 +319,7 @@ int FuseSettings::screenOrientation() const
 void FuseSettings::setScreenOrientation(int orientation)
 {
 #ifndef Q_OS_ANDROID
+    Q_UNUSED(orientation);
     return;
 #else
     static const int fullSensor = QAndroidJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_FULL_SENSOR");
