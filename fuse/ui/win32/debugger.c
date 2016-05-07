@@ -1,5 +1,8 @@
 /* debugger.c: the Win32 debugger
    Copyright (c) 2004-2012 Philip Kendall, Marek Januszewski
+   Copyright (c) 2013-2015 Sergio Baldoví
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2016 BogDan Vatra
 
    $Id$
 

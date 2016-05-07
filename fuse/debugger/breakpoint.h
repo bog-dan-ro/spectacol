@@ -1,5 +1,6 @@
 /* breakpoint.h: a debugger breakpoint
    Copyright (c) 2002-2011 Philip Kendall
+   Copyright (c) 2013 Sergio Baldoví
 
    $Id$
 

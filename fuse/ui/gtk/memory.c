@@ -1,5 +1,6 @@
 /* memory.c: the GTK+ memory browser
    Copyright (c) 2004-2005 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

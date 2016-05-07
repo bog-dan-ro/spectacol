@@ -1,6 +1,8 @@
 /* tc2068.c: Timex TC2068 specific routines
-   Copyright (c) 1999-2011 Philip Kendall, Fredrick Meunier, Witold Filipczyk,
+   Copyright (c) 1999-2015 Philip Kendall, Fredrick Meunier, Witold Filipczyk,
                            Darren Salt
+   Copyright (c) 2015 Adrien Destugues
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

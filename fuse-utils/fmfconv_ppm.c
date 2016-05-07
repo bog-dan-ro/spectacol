@@ -1,5 +1,5 @@
 /* fmfconv_ppm.c: ppm output routine included into fmfconv.c
-   Copyright (c) 2004-2005 Gergely Szasz
+   Copyright (c) 2004-2015 Gergely Szasz
 
    $Id$
 

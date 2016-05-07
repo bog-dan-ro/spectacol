@@ -1,5 +1,6 @@
 /* tapeconv.c: Convert .tzx files to .tap files
    Copyright (c) 2002-2008 Philip Kendall, Fredrick Meunier
+   Copyright (c) 2015 Sergio Baldovi
 
    $Id$
 

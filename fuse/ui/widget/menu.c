@@ -1,5 +1,6 @@
 /* menu.c: general menu widget
-   Copyright (c) 2001-2006 Philip Kendall
+   Copyright (c) 2001-2015 Philip Kendall
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

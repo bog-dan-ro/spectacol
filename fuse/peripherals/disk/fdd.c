@@ -1,5 +1,7 @@
 /* fdd.c: Routines for emulating floppy disk drives
-   Copyright (c) 2007-2013 Gergely Szasz
+   Copyright (c) 2007-2016 Gergely Szasz
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2016 BogDan Vatra
 
    $Id$
 

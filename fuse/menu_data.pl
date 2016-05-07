@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # menu_data.pl: generate the menu structure from menu_data.dat
-# Copyright (c) 2004-2007 Philip Kendall, Stuart Brady, Marek Januszewski
+# Copyright (c) 2004-2015 Philip Kendall, Stuart Brady, Marek Januszewski
 
 # $Id$
 

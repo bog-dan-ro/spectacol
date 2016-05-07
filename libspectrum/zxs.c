@@ -1,5 +1,5 @@
 /* zxs.c: Routines for .zxs snapshots
-   Copyright (c) 1998,2003 Philip Kendall
+   Copyright (c) 1998,2003,2015 Philip Kendall
 
    $Id$
 

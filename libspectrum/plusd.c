@@ -1,6 +1,6 @@
 /* plusd.c: Routines for handling DISCiPLE/+D snapshots
    Copyright (c) 1998,2003 Philip Kendall
-   Copyright (c) 2007 Stuart Brady
+   Copyright (c) 2007,2015 Stuart Brady
 
    $Id$
 

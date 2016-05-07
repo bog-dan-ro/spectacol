@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 
 # settings.pl: generate settings.c from settings.dat
-# Copyright (c) 2002-2005 Philip Kendall
+# Copyright (c) 2002-2015 Philip Kendall
+# Copyright (c) 2016 BogDan Vatra
 
 # $Id$
 

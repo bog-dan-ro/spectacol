@@ -1,5 +1,5 @@
 /* make-perl.c: Generate a perl script to create the libspectrum_* typedefs
-   Copyright (c) 2002-2003 Philip Kendall, Darren Salt
+   Copyright (c) 2002-2003,2015 Philip Kendall, Darren Salt
 
    $Id$
 

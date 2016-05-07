@@ -1,5 +1,6 @@
 /* rzxcheck.c: Check the signature on an RZX file
    Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2015 Sergio Baldovi
 
    $Id$
 

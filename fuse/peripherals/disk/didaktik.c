@@ -1,5 +1,7 @@
 /* didaktik.c: Routines for handling the Didaktik 40/80 disk interface
-   Copyright (c) 2015 Gergely Szasz
+   Copyright (c) 2015-2016 Gergely Szasz
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2016 Sergio Baldoví
 
    $Id$
 

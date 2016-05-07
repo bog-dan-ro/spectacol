@@ -1,5 +1,5 @@
 /* confirm.c: Confirmation dialog box
-   Copyright (c) 2000-2003 Philip Kendall, Russell Marks
+   Copyright (c) 2000-2015 Philip Kendall, Russell Marks
 
    $Id$
 

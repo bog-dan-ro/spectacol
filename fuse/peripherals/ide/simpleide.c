@@ -2,6 +2,8 @@
    Copyright (c) 2003-2004 Garry Lancaster,
 		 2004 Philip Kendall,
 		 2008 Fredrick Meunier
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2016 Sergio Baldoví
 
    $Id$
 

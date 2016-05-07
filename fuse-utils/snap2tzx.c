@@ -3,6 +3,7 @@
                            Martijn van der Heide,
 		 2003 Tomaz Kac,
 		 2003 Philip Kendall
+   Copyright (c) 2014-2015 Sergio Baldovi
 
    $Id$
 

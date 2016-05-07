@@ -1,5 +1,6 @@
 /* audio2tape.cc: Convert audio files (wav, voc, etc.) to tape files (.tzx,.csw)
    Copyright (c) 2007-2008 Fredrick Meunier
+   Copyright (c) 2015 Sergio Baldovi
 
    $Id$
 

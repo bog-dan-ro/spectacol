@@ -1,5 +1,7 @@
 /* rzx.c: .rzx files
-   Copyright (c) 2002-2014 Philip Kendall
+   Copyright (c) 2002-2015 Philip Kendall
+   Copyright (c) 2014 Sergio Baldoví
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

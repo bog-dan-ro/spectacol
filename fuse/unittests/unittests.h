@@ -1,5 +1,5 @@
 /* unittests.h: Unit testing framework for Fuse
-   Copyright (c) 2008
+   Copyright (c) 2008-2015 Philip Kendall
 
    $Id$
 

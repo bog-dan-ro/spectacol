@@ -1,5 +1,6 @@
 /* if1.h: Interface 1 handling routines
    Copyright (c) 2004-2011 Gergely Szasz, Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

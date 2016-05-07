@@ -1,5 +1,5 @@
 /* xui.c: Routines for dealing with the Xlib user interface
-   Copyright (c) 2000-2003 Philip Kendall
+   Copyright (c) 2000-2015 Philip Kendall
 
    $Id$
 

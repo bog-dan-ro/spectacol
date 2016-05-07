@@ -1,5 +1,6 @@
 /* profile2map.c: convert Fuse profiler output into the Z80 map format
    Copyright (c) 2007 Stuart Brady
+   Copyright (c) 2015 Sergio Baldovi
 
    $Id$
 

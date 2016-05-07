@@ -1,5 +1,6 @@
 /* tape2wav.c: Convert tape files (tzx, tap, etc.) to .wav files
    Copyright (c) 2007 Fredrick Meunier
+   Copyright (c) 2014-2015 Sergio Baldovi
 
    $Id$
 

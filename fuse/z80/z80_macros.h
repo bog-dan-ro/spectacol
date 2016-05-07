@@ -1,5 +1,6 @@
 /* z80_macros.h: Some commonly used z80 things as macros
    Copyright (c) 1999-2011 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

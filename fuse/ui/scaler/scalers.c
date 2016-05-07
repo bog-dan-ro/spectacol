@@ -1,5 +1,5 @@
 /* scalers.c: the actual graphics scalers
- * Copyright (C) 2003-2008 Fredrick Meunier, Philip Kendall, Gergely Szasz
+ * Copyright (C) 2003-2015 Fredrick Meunier, Philip Kendall, Gergely Szasz
  *
  * $Id$
  * 

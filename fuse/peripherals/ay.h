@@ -1,5 +1,6 @@
 /* ay.h: AY-8-3912 routines
    Copyright (c) 1999-2009 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

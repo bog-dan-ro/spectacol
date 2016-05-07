@@ -1,6 +1,6 @@
 /* ide.c: Routines for handling HDF hard disk files
    Copyright (c) 2003-2004 Garry Lancaster,
-		 2004 Philip Kendall
+		 2004,2015 Philip Kendall
 
    $Id$
 

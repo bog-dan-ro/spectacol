@@ -1,6 +1,6 @@
 /* pzx_read.c: Routines for reading .pzx files
    Copyright (c) 2001, 2002 Philip Kendall, Darren Salt
-   Copyright (c) 2011 Fredrick Meunier
+   Copyright (c) 2011-2015 Fredrick Meunier
 
    $Id$
 

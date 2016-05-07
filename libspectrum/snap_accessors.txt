@@ -1,5 +1,5 @@
 # snap_accessors.txt: simple accessors for libspectrum_snap
-# Copyright (c) 2003-2009 Philip Kendall
+# Copyright (c) 2003-2016 Philip Kendall
 
 # $Id$
 
@@ -194,3 +194,9 @@ libspectrum_byte* spectranet_ram 1
 int late_timings
 
 int zx_printer_active
+
+int usource_active
+int usource_paged
+int usource_custom_rom
+libspectrum_byte* usource_rom 1
+size_t usource_rom_length 1

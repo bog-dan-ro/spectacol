@@ -1,5 +1,6 @@
 /* tc2068.h: Timex TC2068 specific routines
-   Copyright (c) 2004 Fredrick Meunier
+   Copyright (c) 2004,2015 Fredrick Meunier
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

@@ -3,7 +3,7 @@
 # z80.pl: generate C code for Z80 opcodes
 # $Id$
 
-# Copyright (c) 1999-2013 Philip Kendall
+# Copyright (c) 1999-2015 Philip Kendall
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

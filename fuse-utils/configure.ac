@@ -20,12 +20,12 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_utils_version], [1.1.0])
+m4_define([fuse_utils_version], [1.1.1])
 
 dnl Product full version
 m4_define([fuse_utils_major_version], [1])
 m4_define([fuse_utils_minor_version], [1])
-m4_define([fuse_utils_micro_version], [0])
+m4_define([fuse_utils_micro_version], [1])
 m4_define([fuse_utils_nano_version],  [0])
 m4_define([fuse_utils_full_version],
           [fuse_utils_major_version.fuse_utils_minor_version.fuse_utils_micro_version.fuse_utils_nano_version])
@@ -183,31 +183,6 @@ if test "$ac_cv_c_compiler_gnu" = yes; then
     fi
 fi
 
-# Must either find glib or use the replacement (as supplied by libspectrum)
-AC_MSG_CHECKING(whether to use glib)
-AC_ARG_WITH(glib,
-[  --without-glib          don't use glib],
-if test "$withval" = no; then glib=no; else glib=yes; fi,
-glib=yes)
-AC_MSG_RESULT($glib)
-if test "$glib" = yes; then
-  glib2=no
-  AM_PATH_GLIB_2_0(
-    2.0.0,
-    glib2=yes
-    AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-    GLIBS="`pkg-config --libs glib-2.0`",
-  )
-  if test "$glib2" = no; then
-    AM_PATH_GLIB(
-      1.2.0,
-      AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-      GLIBS="`glib-config --libs`",
-      AC_MSG_WARN(glib not found - using libspectrum's replacement)
-    )
-  fi
-fi
-
 dnl Check that libspectrum is available
 AC_ARG_WITH(libspectrum-prefix,
 [  --with-libspectrum-prefix=PFX where libspectrum is installed (optional)],
@@ -215,11 +190,55 @@ LIBSPEC_CFLAGS=-I$withval/include; LIBSPEC_LIBS=-L$withval/lib,
 LIBSPEC_CFLAGS=""; LIBSPEC_LIBS="")
 ac_save_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS $GLIB_CFLAGS"
-AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS="$LIBSPEC_LIBS -lspectrum $GLIBS",
+AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS="$LIBSPEC_LIBS -lspectrum",
 	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
 CPPFLAGS="$ac_save_CPPFLAGS"
 AC_SUBST(LIBSPEC_CFLAGS)
 AC_SUBST(LIBSPEC_LIBS)
+
+dnl Check that libspectrum is new enough
+AC_MSG_CHECKING(whether libspectrum is new enough)
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[#include <libspectrum.h>]],
+    [[
+      int test = LIBSPECTRUM_HAS_GLIB_REPLACEMENT;
+    ]])
+  ],
+  [AC_MSG_RESULT(yes)],
+  [AC_MSG_RESULT(no)
+   AC_MSG_ERROR(Sorry - I need a newer libspectrum)]
+)
+CPPFLAGS="$ac_save_CPPFLAGS"
+
+dnl Check if supplied libspectrum has its own internal GLib replacement
+AC_MSG_CHECKING(whether libspectrum has its own internal GLib replacement)
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+AC_PREPROC_IFELSE(
+  [AC_LANG_SOURCE([
+#include <libspectrum.h>
+#if LIBSPECTRUM_HAS_GLIB_REPLACEMENT == 0
+#error "GLib replacement not found"
+#endif
+  ])],
+  [fakeglib=yes; AC_MSG_RESULT(yes)],
+  [fakeglib=no; AC_MSG_RESULT(no)]
+)
+CPPFLAGS="$ac_save_CPPFLAGS"
+
+# If we're not libspectrum's own internal GLib replacement, we must use the
+# real thing
+AS_IF([test "$fakeglib" = no], [
+  PKG_CHECK_MODULES(
+    [GLIB],
+    [glib-2.0 >= 2.0.0],
+    [AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got GLib])
+     LIBSPEC_LIBS="$LIBSPEC_LIBS $GLIB_LIBS"],
+    [AC_MSG_ERROR([GLib not found, and libspectrum has no internal replacement])]
+  )
+])
 
 # Look for audiofile (default=yes)
 AC_MSG_CHECKING(whether to use audiofile)

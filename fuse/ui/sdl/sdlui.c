@@ -1,5 +1,6 @@
 /* sdlui.c: Routines for dealing with the SDL user interface
    Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

@@ -1,8 +1,9 @@
 #!/usr/bin/perl -w
 
 # keysyms.pl: generate keysyms.c from keysyms.dat
-# Copyright (c) 2000-2007 Philip Kendall, Matan Ziv-Av, Russell Marks,
+# Copyright (c) 2000-2013 Philip Kendall, Matan Ziv-Av, Russell Marks,
 #			  Fredrick Meunier, Catalin Mihaila, Stuart Brady
+# Copyright (c) 2015 Sergio Baldoví
 
 # $Id$
 

@@ -1,5 +1,10 @@
 /* utils.c: some useful helper functions
    Copyright (c) 1999-2012 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2015 Gergely Szasz
+   Copyright (c) 2015 Fredrick Meunier
+   Copyright (c) 2016 BogDan Vatra
+   Copyright (c) 2016 Sergio Baldoví
 
    $Id$
 
@@ -138,7 +143,7 @@ utils_open_file( const char *filename, int autoload,
     if( !( machine_current->capabilities &
 	   LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) &&
         !periph_is_active( PERIPH_TYPE_BETA128 ) ) {
-      error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
+      error = machine_select( LIBSPECTRUM_MACHINE_SCORP ); if( error ) break;
     }
 
     /* Check that we actually got a Beta capable machine to insert the disk */

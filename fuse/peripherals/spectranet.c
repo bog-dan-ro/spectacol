@@ -1,5 +1,6 @@
 /* spectranet.c: Spectranet emulation
-   Copyright (c) 2011-2013 Philip Kendall
+   Copyright (c) 2011-2015 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
    
    $Id$
    

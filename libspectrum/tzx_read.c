@@ -1,5 +1,5 @@
 /* tzx_read.c: Routines for reading .tzx files
-   Copyright (c) 2001-2007 Philip Kendall, Darren Salt
+   Copyright (c) 2001-2015 Philip Kendall, Darren Salt
 
    $Id$
 

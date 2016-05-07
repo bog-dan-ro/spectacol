@@ -1,5 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 ## Copyright (c) 2011 Philip Kendall
+## Copyright (c) 2013-2015 Sergio Baldoví
 
 ## $Id$
 

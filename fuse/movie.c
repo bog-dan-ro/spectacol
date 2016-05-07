@@ -1,5 +1,6 @@
 /* movie.c: Routines for creating 'movie' with border
-   Copyright (c) 2006-2011 Gergely Szasz
+   Copyright (c) 2006-2015 Gergely Szasz
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

@@ -1,5 +1,7 @@
 /* zxatasp.c: ZXATASP interface routines
-   Copyright (c) 2003-2008 Garry Lancaster and Philip Kendall
+   Copyright (c) 2003-2015 Garry Lancaster and Philip Kendall
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2016 Sergio Baldoví
 
    $Id$
 

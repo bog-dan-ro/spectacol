@@ -1,5 +1,5 @@
 /* gtkui.c: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000-2005 Philip Kendall, Russell Marks
+   Copyright (c) 2000-2015 Philip Kendall, Russell Marks, Sergio Baldoví
 
    $Id$
 

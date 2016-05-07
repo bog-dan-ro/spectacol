@@ -1,5 +1,6 @@
 /* memory.c: memory allocator routines
    Copyright (c) 2008 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 
@@ -115,6 +116,7 @@ libspectrum_mem_set_vtable( libspectrum_mem_vtable_t *table )
   libspectrum_free_fn = table->free;
 
 #ifdef HAVE_LIB_GLIB
+#if !GLIB_CHECK_VERSION( 2, 44, 0 )
   {
     GMemVTable glib_table;
 
@@ -124,5 +126,6 @@ libspectrum_mem_set_vtable( libspectrum_mem_vtable_t *table )
 
     g_mem_set_vtable( &glib_table );
   }
+#endif                  /* #if !GLIB_CHECK_VERSION( 2, 44, 0 ) */
 #endif                  /* #ifdef HAVE_LIB_GLIB */
 }

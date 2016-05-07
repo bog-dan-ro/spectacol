@@ -1,5 +1,8 @@
 /* debugger.c: the GTK+ debugger
-   Copyright (c) 2002-2012 Philip Kendall
+   Copyright (c) 2002-2015 Philip Kendall
+   Copyright (c) 2013 Sergio Baldoví
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2016 BogDan Vatra
 
    $Id$
 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # options.pl: generate options dialog boxes
-# Copyright (c) 2001-2013 Philip Kendall, Fredrick Meunier
+# Copyright (c) 2001-2015 Philip Kendall, Fredrick Meunier
 
 # $Id$
 

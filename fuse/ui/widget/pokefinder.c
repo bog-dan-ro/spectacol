@@ -1,5 +1,6 @@
 /* pokefinder.c: The poke finder widget
    Copyright (c) 2004 Darren Salt
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

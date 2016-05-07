@@ -1,4 +1,13 @@
-2013-05-18  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2013-05-24  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.1.1 released.
+
+        * Distribute PORTING,hacking/valgrind.supp,sound/wiisound.c,
+          tests/success.{mgt.bz2,opd} and ui/wii/wiimouse.h (Stuart Brady).
+        * Add ChangeLog entries for 1.0.0.1 and 1.0.0.1a (Fredrick Meunier).
+        * Release correct version of source files.
+
+2013-05-19  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.1.0 released.
 

@@ -1,6 +1,7 @@
 /* svgadisplay.c: Routines for dealing with the svgalib display
    Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Witold Filipczyk,
 			   Russell Marks
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

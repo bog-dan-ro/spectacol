@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2011 Philip Kendall
+   Copyright (c) 1999-2015 Philip Kendall
 
    $Id$
 
@@ -305,7 +305,7 @@ machine_load_rom_bank( memory_page* bank_map, int page_num,
   int custom = 0;
   int retval;
 
-  if( fallback ) custom = strcmp( filename, fallback );
+  if( fallback ) custom = !!strcmp( filename, fallback );
 
   retval = machine_load_rom_bank_from_file( bank_map, page_num, filename,
     expected_length, custom );

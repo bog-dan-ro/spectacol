@@ -1,5 +1,5 @@
 /* keyboard.c: Routines for dealing with the Spectrum's keyboard
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2013 Philip Kendall
 
    $Id$
 

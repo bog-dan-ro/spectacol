@@ -1,5 +1,5 @@
 /* if2.c: Interface 2 cartridge handling routines
-   Copyright (c) 2003-2011 Darren Salt, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2003-2015 Darren Salt, Fredrick Meunier, Philip Kendall
 
    $Id$
 

@@ -1,5 +1,6 @@
 /* divide.c: DivIDE interface routines
-   Copyright (c) 2005-2008 Matthew Westcott, Philip Kendall
+   Copyright (c) 2005-2015 Matthew Westcott, Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

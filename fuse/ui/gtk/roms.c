@@ -1,5 +1,6 @@
 /* roms.c: ROM selector dialog box
    Copyright (c) 2003-2004 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

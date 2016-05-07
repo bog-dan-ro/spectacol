@@ -1,5 +1,6 @@
 /* timings.c: Timing routines
    Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2016 Stuart Brady
 
    $Id$
 

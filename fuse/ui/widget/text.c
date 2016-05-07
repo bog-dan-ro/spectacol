@@ -1,5 +1,6 @@
 /* text.c: simple text entry widget
    Copyright (c) 2002-2005 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

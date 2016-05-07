@@ -1,5 +1,6 @@
 /* createhdf.c: Create an empty .hdf file
    Copyright (c) 2004-2006 Philip Kendall
+   Copyright (c) 2015 Sergio Baldovi
 
    $Id$
 

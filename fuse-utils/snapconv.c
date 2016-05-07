@@ -1,5 +1,6 @@
 /* snapconv.c: Convert snapshot formats
    Copyright (c) 2003-2005 Philip Kendall
+   Copyright (c) 2014-2015 Sergio Baldovi
 
    $Id$
 

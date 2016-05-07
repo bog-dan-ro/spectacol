@@ -4497,6 +4497,7 @@
          roms.c,stock.c},ui/options.dat,ui/win32/options.pl: display
          confirmation dialogue for reset due to peripheral changes (Sergio).
 20130517 README: update date for 1.1 release.
+20130518 README: mention DISCiPLE support (Stuart).
 20130518 ui/widget/options.pl: display confirmation dialogue for reset due to
          peripheral changes (Stuart).
 20130518 ui/widget/options.pl: update peripherals list when a machine reset is
@@ -4508,11 +4509,15 @@
          from peripheral reset confirmation dialogue (Stuart).
 20130519 ui/{gtk/gtkui.c,widget/menu.c,win32/win32ui.c}: use different
          confirmation messages for hard and soft resets (Stuart).
+20130519 ChangeLog,README,man/fuse.1: update date for 1.1 release (Stuart).
 20130519 AUTHOR,man/fuse.1: Add Sergio Baldoví (Stuart).
 20130519 lib/Makefile.am: distribute tests/success.{mgt.bz2,opd} (Stuart).
 20130519 Makefile.am,hacking/Makefile.am,sound/Makefile.am,ui/wii/Makefile.am:
          distribute PORTING,hacking/valgrind.supp,sound/wiisound.c,
          ui/wii/wiimouse.h (Stuart).
+20130524 ChangeLog,README: updates for a "1.1.1" release (Fred).
+20130524 ChangeLog,README,configure.ac,man/fuse.1: fill in date and bump
+         version number (Stuart).
 20130526 Makefile.am,ui/win32/installer/fuse.nsi.in: distribute ChangeLog and
          build notes in Windows packages (Sergio).
 20130527 pokefinder/pokemem.c: fix crash when opening a file without extension
@@ -4751,7 +4756,7 @@
          from the list and freeing it (fixes bug #317) (Tom Seddon).
 20150402 man/fuse.1: adjust some references to peripherals options (Sergio).
 20150402 compat/win32/distribution.mk,ui/win32/installer/fuse.nsi.in: prefer
-         groff over man2html. Ensure tables are not broken. Distribute images
+         groff to man2html. Ensure tables are not broken. Distribute images
          referenced in the manual (Sergio).
 20150405 man/fuse.1: adjust some cross-references (Sergio).
 20150405 compat/win32/osname.c,sound/win32sound.c,ui/win32/{browse.c,debugger.c,
@@ -5014,3 +5019,74 @@
 20160417 peripherals/disk/wd_fdc.c: fix Beta 128 type II commands (fixes bug
          #331) (thanks, windale and BogDan Vatra) (Sergio).
 20160417 compat/unix/tuntap.c,ui.c,utils.c: secure strncpy() calls (Sergio).
+20160424 svg.c: initialise err in svg_byte() (Fred).
+20160424 ChangeLog,README,configure.ac,hacking/ChangeLog,man/fuse.1: Merge
+         Release-1_1_0-branch changes onto trunk (Fred).
+20160425 tape.c: whitespace fix (Fred).
+20160425 memory.c: use tape traps if we are using a custom ROM if the instructions
+         at the entry points have been preserved (feature request #83) (thanks,
+         Alberto Garcia) (Fred).
+20160425 INSTALL: Cygwin no longer distributes MinGW. Update documentation.
+         (Sergio).
+20160428 utils.c: prefer Scorpion to Pentagon when loading SCL/TRD disks for
+         better timing compatibility (part of feature request #90) (thanks,
+         windale) (Sergio).
+20160430 man/fuse.1: update manual:
+           - Add missing Didaktik references.
+           - Add more details about autosave option.
+           - Options Save also works without libxml2.
+           - Order disk options menu as in program.
+           - Order full screen option as in program.
+           - Split Options Select ROMs menu between machine and peripherals.
+           - Link .SCL specification.
+           - All UIs warn on a machine reset.
+           - All UIs could configure joystick buttons.
+         (Sergio).
+20160501 Makefile.am,autogen.sh,bitmap.h,compat/Makefile.am,
+         compat/unix/{socket.c,tuntap.c},
+         compat/win32/{osname.c,socket.c},compat.h,data/Makefile.am,
+         data/win32/{distribution.mk,installer.nsi.in},
+         debugger/{Makefile.am,breakpoint.[ch],command.c,commandl.l,commandy.y,
+         debugger.h,disassemble.c,event.c,expression.c,variable.c},
+         display.c,event.c,fuse.[ch],hacking/Makefile.am,keyboard.c,keysyms.pl,
+         lib/Makefile.am,machine.c,
+         machines/{Makefile.am,machines_periph.c,pentagon.[ch],spec16.c,
+         spec_se.c,specplus3.[ch],tc2048.c,tc2068.[ch],ts2068.c},
+         man/Makefile.am,memory.[ch],mempool.[ch],menu.[ch],menu_data.[dat|pl],
+         movie.c,periph.[ch],
+         peripherals/{Makefile.am,ay.[ch],dck.c,if1.[ch],if2.c,joystick.[ch],
+         kempmouse.c,melodik.c,printer.c,scld.[ch],speccyboot.c,specdrum.c,
+         spectranet.[ch],ula.c,usource.c},
+         peripherals/disk/{beta.[ch],didaktik.c,disciple.[ch],disk.[ch],
+         fdd.[ch],opus.[ch],plusd.[ch],upd_fdc.[ch],wd_fdc.[ch]},
+         peripherals/nic/{enc28j60.c,w5100.c,w5100_internals.h,w5100_socket.c},
+         peripherals/flash/am29f010.c,
+         peripherals/ide/{divide.c,simpleide.c,zxatasp.c,zxcf.c},
+         perl/Makefile.am,pokefinder/{Makefile.am,pokemem.c},rectangle.c,
+         roms/Makefile.am,rzx.c,screenshot.c,settings-header.pl,
+         settings.[dat|pl],slt.c,
+         sound/{Makefile.am,aosound.c,sdlsound.c,win32sound.c},sound.[ch],
+         spectrum.c,tape.[ch],timer/Makefile.am,ui/Makefile.am,
+         ui/{ui.h,uijoystick.[ch],uimedia.h},
+         ui/fb/{Makefile.am,fbdisplay.c,fbui.c},
+         ui/gtk/{Makefile.am,binary.c,browse.c,confirm.c,debugger.c,
+         fileselector.c,gtkcompat.c,gtkinternals.h,gtkjoystick.c,gtkmouse.c,
+         gtkui.c,memory.c,options.pl,pokefinder.c,pokemem.c,roms.c,stock.c},
+         ui/scaler/{Makefile.am,scaler.c,scalers.c},
+         ui/sdl/{Makefile.am,sdldisplay.c,sdljoystick.c,sdlui.c},
+         ui/svga/{Makefile.am,svgadisplay.c,svgajoystick.c},
+         ui/widget/{Makefile.am,debugger.c,filesel.c,menu.c,options.pl,
+         pokefinder.c,pokemem.c,query.c,roms.c,select.c,text.c,widget.[ch],
+         widget_internals.h},ui/wii/Makefile.am,
+         ui/win32/{Makefile.am,browse.c,debugger.[c|h|rc],options-resource.pl,
+         options.pl,pokefinder.c,pokemem.c,rollback.c,roms.c,
+         win32joystick.[c|h|rc],win32ui.c},
+         ui/xlib/{Makefile.am,xdisplay.c,xui.c},ui.c,uimedia.c,
+         unittests/{Makefile.am,unittests.[ch]},utils.c,
+         z80/{Makefile.am,coretest.c,z80.[c|h|pl],z80_macros.h,z80_ops.c}:
+         have a go at updating copyright dates since v 1.1.1 (Fred).
+20160501 ui/fb/fbmouse.c: add missing header in framebuffer UI (Sergio).
+20160502 memory.h: fix typo in MEMORY_PAGES_IN_2K comment (Fred)
+20160503 peripherals/usource.c: add support for Currah uSource snapshots (patch
+         #363) (Fred and Sergio).
+20160503 machine.c: standardise setting of custom ROM field to 1 or 0 (Fred).

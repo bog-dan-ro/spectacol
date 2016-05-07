@@ -1,5 +1,5 @@
 /* rzxtool.c: Simple modifications to RZX files
-   Copyright (c) 2007-2014 Philip Kendall
+   Copyright (c) 2007-2015 Philip Kendall, Sergio Baldovi
 
    $Id$
 

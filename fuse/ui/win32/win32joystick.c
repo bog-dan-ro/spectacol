@@ -1,5 +1,6 @@
 /* win32joystick.c: Joystick emulation
    Copyright (c) 2003-2008 Darren Salt, Philip Kendall, Marek Januszewski
+   Copyright (c) 2015 UB880D
 
    $Id$
 

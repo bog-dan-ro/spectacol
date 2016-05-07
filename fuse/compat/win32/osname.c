@@ -1,5 +1,6 @@
 /* osname.c: Get a representation of the OS we're running on
    Copyright (c) 1999-2007 Philip Kendall
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

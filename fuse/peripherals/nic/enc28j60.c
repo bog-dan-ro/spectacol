@@ -7,7 +7,7 @@
    ENC28J60 data sheet:
      http://www.microchip.com/wwwproducts/Devices.aspx?dDocName=en022889
 
-   Copyright (c) 2009-2010 Patrik Persson, Philip Kendall
+   Copyright (c) 2009-2015 Patrik Persson, Philip Kendall
    
    $Id$
    

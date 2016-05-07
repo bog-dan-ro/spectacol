@@ -1,5 +1,6 @@
 /* event.c: Debugger events
    Copyright (c) 2008 Philip Kendall
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

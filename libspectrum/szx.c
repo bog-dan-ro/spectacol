@@ -1,5 +1,5 @@
 /* szx.c: Routines for .szx snapshots
-   Copyright (c) 1998-2012 Philip Kendall, Fredrick Meunier, Stuart Brady
+   Copyright (c) 1998-2016 Philip Kendall, Fredrick Meunier, Stuart Brady
 
    $Id$
 
@@ -2487,6 +2487,10 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
 
   *out_flags = 0;
 
+  /* We don't save the uSource state at all */
+  if( libspectrum_snap_usource_active( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+
   capabilities =
     libspectrum_machine_capabilities( libspectrum_snap_machine( snap ) );
 
@@ -2516,7 +2520,6 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
     error = write_rom_chunk( libspectrum_snap_context( snap ), buffer, &ptr, length, out_flags, snap, compress );
     if( error ) return error;
   }
-
 
   error = write_ram_pages( buffer, &ptr, length, snap, compress );
   if( error ) return error;

@@ -1,5 +1,5 @@
 /* pokemem.c: GTK+ interface that handles pok files
-   Copyright (c) 2011 Philip Kendall, Sergio Baldoví
+   Copyright (c) 2011-2015 Philip Kendall, Sergio Baldoví
 
    $Id$
 

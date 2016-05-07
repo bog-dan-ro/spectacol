@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # accessor.pl: generate accessor functions
-# Copyright (c) 2003-2009 Philip Kendall
+# Copyright (c) 2003-2016 Philip Kendall
 
 # $Id$
 
@@ -242,6 +242,13 @@ struct libspectrum_snap {
   int zx_printer_active;
 
   libspectrum_context_t *context;
+
+    /* uSource emulation */
+  int usource_active;
+  int usource_paged;
+  int usource_custom_rom;
+  libspectrum_byte* usource_rom[1];
+  size_t usource_rom_length[1];	/* Length of the ROM */
 };
 
 /* Initialise a libspectrum_snap structure */

@@ -431,7 +431,7 @@ svg_byte( int xpos, int ypos, int udg_byte, char *color )
 {
   int i;
   char path_element[ BUFSZ ];
-  int err;
+  int err = 0;
   
   for( i = 7; i >= 0; i-- ) {
     if( udg_byte & 1 ) {

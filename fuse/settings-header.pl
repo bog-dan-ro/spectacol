@@ -2,6 +2,7 @@
 
 # settings-header.pl: generate settings.h from settings.dat
 # Copyright (c) 2002-2003 Philip Kendall
+# Copyright (c) 2015 Stuart Brady
 
 # $Id$
 

@@ -1,5 +1,5 @@
 /* upd_fdc.h: NEC floppy disk controller emulation
-   Copyright (c) 2003-2013 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Copyright (c) 2003-2015 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Gergely Szasz
 
    $Id$

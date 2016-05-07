@@ -1,5 +1,7 @@
 /* widget.c: Simple dialog boxes for all user interfaces.
    Copyright (c) 2001-2005 Matan Ziv-Av, Philip Kendall, Russell Marks
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

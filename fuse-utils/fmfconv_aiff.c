@@ -1,5 +1,5 @@
 /* fmfconv_aiff.c: aiff output routine included into fmfconv.c
-   Copyright (c) 2010 Gergely Szasz
+   Copyright (c) 2010-2015 Gergely Szasz
 
    $Id$
 

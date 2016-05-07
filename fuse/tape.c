@@ -1,5 +1,7 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2011 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 1999-2015 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 2015 UB880D
+   Copyright (c) 2016 Fredrick Meunier
 
    $Id$
 
@@ -315,7 +317,6 @@ int tape_write( const char* filename )
   libspectrum_free( buffer );
 
   return 0;
-
 }
 
 int tape_can_autoload( void )

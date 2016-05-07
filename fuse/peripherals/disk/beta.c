@@ -1,5 +1,5 @@
 /* beta.c: Routines for handling the Beta disk interface
-   Copyright (c) 2004-2011 Stuart Brady, Philip Kendall
+   Copyright (c) 2004-2016 Stuart Brady, Philip Kendall, Gergely Szasz
 
    $Id$
 

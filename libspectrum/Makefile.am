@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2013 Philip Kendall
+## Copyright (c) 2001-2016 Philip Kendall
 
 ## $Id$
 
@@ -107,6 +107,7 @@ EXTRA_DIST = accessor.pl \
 	     dll.c \
 	     generate.pl.in \
 	     m4/audiofile.m4 \
+	     m4/ax_create_stdint_h.m4 \
 	     m4/pkg.m4 \
 	     make-perl.c \
 	     tape_accessors.pl \

@@ -1,6 +1,7 @@
 /* joystick.h: Joystick emulation support
    Copyright (c) 2001-2004 Russell Marks, Philip Kendall
    Copyright (c) 2003 Darren Salt
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

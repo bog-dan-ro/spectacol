@@ -1,5 +1,6 @@
 /* sound.h: Sound support
    Copyright (c) 2000-2004 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2016 Fredrick Meunier
 
    $Id$
 

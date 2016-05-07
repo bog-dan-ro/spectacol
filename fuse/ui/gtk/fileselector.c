@@ -1,5 +1,6 @@
 /* fileselector.c: GTK+ fileselector routines
    Copyright (c) 2000-2007 Philip Kendall
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

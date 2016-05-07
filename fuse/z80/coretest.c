@@ -1,5 +1,5 @@
 /* coretest.c: Test program for Fuse's Z80 core
-   Copyright (c) 2003-2013 Philip Kendall
+   Copyright (c) 2003-2015 Philip Kendall
 
    $Id$
 

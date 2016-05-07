@@ -2,6 +2,7 @@
    Copyright (c) 2002 Chris Cowley
                  2003 Philip Kendall, Darren Salt
                  2007 Stuart Brady
+   Copyright (c) 2015 Sergio Baldovi
 
    $Id$
 

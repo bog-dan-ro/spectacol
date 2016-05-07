@@ -1,5 +1,5 @@
 /* fuse.h: Variables exported from the main file
-   Copyright (c) 2000-2012 Philip Kendall
+   Copyright (c) 2000-2015 Philip Kendall
 
    $Id$
 

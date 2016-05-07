@@ -419,6 +419,12 @@
 20130520 configure.ac: fix typo in the CPPFLAGS variable name (patch #310)
          (Alberto).
 20130520 man/fmfconv.1: fix syntax error (patch #311) (Alberto).
+20130524 ChangeLog,README: updates for a "1.1.1" release (Fred).
+20130524 README,configure.ac,man/{audio2tape.1,createhdf.1,fmfconv.1,
+         fuse-utils.1,listbasic.1,profile2map.1,raw2hdf.1,rzxcheck.1,rzxdump.1,
+         rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,tape2wav.1,tapeconv.1,
+         tzxlist.1}: further updates for "1.1.1" (Stuart).
+20130524 ChangeLog: fill in date (Stuart).
 20130526 Makefile.am: distribute ChangeLog in Windows packages (Sergio).
 20130526 Makefile.am: add compat/getopt.h into the dist tarball (Sergio).
 20130928 Makefile.am,compat/win32/distribution.mk: take Windows distribution
@@ -533,3 +539,25 @@
          complete documentation (Sergio).
 20160420 tzxlist.c: don't print non-printable header characters like Fuse
          (thanks, Sergio) (Fred).
+20160424 ChangeLog,README,configure.ac,hacking/ChangeLog,man/{audio2tape.1,
+         createhdf.1,fmfconv.1,fuse-utils.1,listbasic.1,profile2map.1,raw2hdf.1,
+         rzxcheck.1,rzxdump.1,rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,
+         tape2wav.1,tapeconv.1,tzxlist.1}: merge fuse-utils_1_1_0-branch changes
+         onto trunk (Fred).
+20160425 man/tzxlist.1,tzxlist.c: allow tzxlist dump standard data blocks (patch
+         #328) (Gergely Szasz).
+20160427 tzxlist.c: share implementation between fprint_block_name() and
+         print_block_name() and fix typo (Fred).
+20160429 configure.ac,m4/glib-[12].0.m4: check for libspectrum's own GLib
+         replacement (rest of feature request #28) (Stuart and Sergio).
+20160429 tzxlist.c: allow tape durations longer than 20.5 minutes (patch #361)
+         (UB880D).
+20160429 Makefile.am,audio2tape.cc,autogen.sh,
+         compat/{Makefile.am,win32/distribution.mk},compat.h,createhdf.c,
+         fmfconv.[ch],fmfconv_aiff.c,fmfconv_au.c,fmfconv_avi.c,fmfconv_ppm.c,
+         fmfconv_wav.c,fmfconv_yuv.c,hacking/Makefile.am,listbasic.c,
+         m4/Makefile.am,man/Makefile.am,profile2map.c,raw2hdf.c,rzxcheck.c,
+         rzxdump.c,rzxtool.c,scl2trd.c,snap2tzx.c,snapconv.c,tape2wav.c,
+         tapeconv.c,tzxlist.c: have a go at updating copyright dates since
+         v 1.1.1 (Fred).
+20160501 m4/Makefile.am: fix distribution of macro files (Sergio).

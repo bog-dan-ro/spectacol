@@ -1,5 +1,5 @@
 /* sound.c: Sound support
-   Copyright (c) 2000-2012 Russell Marks, Matan Ziv-Av, Philip Kendall,
+   Copyright (c) 2000-2016 Russell Marks, Matan Ziv-Av, Philip Kendall,
                            Fredrick Meunier, Patrik Rak
 
    $Id$

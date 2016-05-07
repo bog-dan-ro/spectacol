@@ -1,5 +1,6 @@
 /* rollback.c: select a rollback point
    Copyright (c) 2004-2008 Philip Kendall, Marek Januszewski
+   Copyright (c) 2015 Sergio Baldoví
 
    $Id$
 

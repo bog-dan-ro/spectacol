@@ -1,5 +1,7 @@
 /* memory.c: Routines for accessing memory
-   Copyright (c) 1999-2012 Philip Kendall
+   Copyright (c) 1999-2015 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2016 Fredrick Meunier
 
    $Id$
 
@@ -644,9 +646,6 @@ trap_check_rom( trap_type type )
 
   if( opus_available && opus_active )
     return 0;		/* Opus must not be active */
-
-  if( memory_custom_rom() )
-    return 0;           /* and we can't be using a custom ROM */
 
   switch( machine_current->machine ) {
   case LIBSPECTRUM_MACHINE_16:

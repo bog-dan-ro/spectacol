@@ -1,5 +1,7 @@
 /* dck.c: dock snapshot (Warajevo .DCK) handling routines
    Copyright (c) 2003-2004 Darren Salt, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2015 Fredrick Meunier
 
    $Id$
 

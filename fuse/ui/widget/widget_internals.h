@@ -1,5 +1,6 @@
 /* widget_internals.h: Functions internal to the widget code
    Copyright (c) 2001-2005 Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

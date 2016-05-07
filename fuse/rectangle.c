@@ -1,6 +1,6 @@
 /* rectangle.c: routines for managing the set of screen area rectangles updated
                 since the last display
-   Copyright (c) 1999-2009 Philip Kendall, Thomas Harte, Witold Filipczyk
+   Copyright (c) 1999-2015 Philip Kendall, Thomas Harte, Witold Filipczyk
                            and Fredrick Meunier
 
    $Id$

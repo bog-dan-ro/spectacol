@@ -1,5 +1,5 @@
 /* rzxdump.c: get info on an RZX file
-   Copyright (c) 2002-2014 Philip Kendall
+   Copyright (c) 2002-2015 Philip Kendall, Sergio Baldovi
 
    $Id$
 

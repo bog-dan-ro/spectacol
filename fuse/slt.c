@@ -1,5 +1,7 @@
 /* slt.c: SLT data handling routines
    Copyright (c) 2004 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
+   Copyright (c) 2015 Fredrick Meunier
 
    $Id$
 

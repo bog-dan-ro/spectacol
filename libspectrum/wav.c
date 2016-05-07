@@ -1,5 +1,5 @@
 /* wav.c: Routines for handling WAV raw audio files
-   Copyright (c) 2007 Fredrick Meunier
+   Copyright (c) 2007-2015 Fredrick Meunier
 
    $Id$
 

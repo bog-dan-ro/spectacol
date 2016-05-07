@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2009 Philip Kendall
+## Copyright (c) 1999-2015 Philip Kendall
 
 ## $Id$
 

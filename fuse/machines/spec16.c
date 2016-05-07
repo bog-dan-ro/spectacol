@@ -1,5 +1,6 @@
 /* spec16.c: Spectrum 16K specific routines
    Copyright (c) 1999-2011 Philip Kendall
+   Copyright (c) 2015 Adrien Destugues
 
    $Id$
 

@@ -1,5 +1,6 @@
 /* periph.c: code for handling peripherals
-   Copyright (c) 2005-2011 Philip Kendall
+   Copyright (c) 2005-2015 Philip Kendall
+   Copyright (c) 2015 Stuart Brady
 
    $Id$
 

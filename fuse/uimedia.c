@@ -1,5 +1,6 @@
 /* uimedia.c: Disk media UI routines
    Copyright (c) 2013 Alex Badea
+   Copyright (c) 2015 Gergely Szasz
 
    $Id$
 

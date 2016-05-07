@@ -1,4 +1,5 @@
 /* z80em.c: Routines for handling Z80Em raw audio files
+   Copyright (c) 2015 Stuart Brady
    Copyright (c) 2002 Darren Salt
    Based on tap.c, copyright (c) 2001 Philip Kendall
 

@@ -1,5 +1,5 @@
 /* tc2048.c: Timex TC2048 specific routines
-   Copyright (c) 1999-2011 Philip Kendall, Fredrick Meunier
+   Copyright (c) 1999-2015 Philip Kendall, Fredrick Meunier
 
    $Id$
 

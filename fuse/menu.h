@@ -1,5 +1,5 @@
 /* menu.h: general menu callbacks
-   Copyright (c) 2004 Philip Kendall
+   Copyright (c) 2004-2015 Philip Kendall
 
    $Id$
 

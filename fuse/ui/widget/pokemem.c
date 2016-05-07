@@ -1,5 +1,6 @@
 /* pokemem.c: The poke memory widget
    Copyright (c) 2011 Philip Kendall, Sergio Baldoví
+   Copyright (c) 2015 Adrien Destugues
 
    $Id$
 

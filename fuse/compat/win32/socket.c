@@ -1,5 +1,5 @@
 /* socket.c: Socket-related compatibility routines
-   Copyright (c) 2011 Sergio Baldoví, Philip Kendall
+   Copyright (c) 2011-2015 Sergio Baldoví, Philip Kendall
 
    $Id$
 
