@@ -18,6 +18,7 @@
 #include "fusesettings.h"
 #include "qmlui.h"
 
+#include <QSemaphore>
 #include <QSettings>
 
 #include <machine.h>
@@ -90,13 +91,17 @@ int FuseSettings::currentMachineIndex() const
 
 void FuseSettings::setCurrentMachineIndex(int idx)
 {
-    pokeEvent([this, idx]{
-        if (machine_current->machine == machine_types[idx]->machine)
+    QSemaphore waitFuseThread;
+    pokeEvent([this, idx , &waitFuseThread]{
+        if (machine_current->machine == machine_types[idx]->machine) {
+            waitFuseThread.release();
             return;
+        }
         machine_select(machine_types[idx]->machine);
-        callFunction([this]{ emit currentMachineChanged(); emit settingsCurrentChanged();});
-        g_fuseEmulator->resetLoadedFile();
+        waitFuseThread.release();
+        callFunction([this]{ emit currentMachineChanged(); emit settingsCurrentChanged(); g_fuseEmulator->resetLoadedFile();});
     });
+    waitFuseThread.acquire();
 }
 
 int FuseSettings::emulationSpeed() const

@@ -771,10 +771,8 @@ FuseSettings *FuseEmulator::settings() const
 
 void FuseEmulator::resetLoadedFile()
 {
-    callFunction([this]{
-        m_loadedFileName = "";
-        emit saveSnapshotEnabledChanged();
-    });
+    m_loadedFileName = "";
+    emit saveSnapshotEnabledChanged();
 }
 
 void FuseEmulator::quit()
