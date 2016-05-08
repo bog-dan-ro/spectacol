@@ -5101,3 +5101,5 @@
          interface (Fred).
 20160508 ui/{gtk,win32}/fileselector.c: add file filters in open/save dialogs on
          Windows and GTK+ UIs (thanks, Crisis) (Sergio).
+20160508 ui/widget/filesel.c: don't show hidden files/directories in the file
+         selector on widget UIs (Sergio).
