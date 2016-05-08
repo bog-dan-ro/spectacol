@@ -5097,3 +5097,5 @@
          as we abort in those circumstances instead (Fred).
 20160508 peripherals/disk/plusd.c: remove check for NULL from memory allocation
          as we abort in those circumstances instead (Fred).
+20160508 ui/options.dat: remove shortcut clash with the Simple 8-Bit IDE
+         interface (Fred).

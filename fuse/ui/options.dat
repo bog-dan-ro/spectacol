@@ -65,7 +65,7 @@ Checkbox, ZXCF (u)pload, zxcf_upload, INPUT_KEY_u
 Checkbox, Div(I)DE interface, divide_enabled, INPUT_KEY_i
 Checkbox, DivIDE (w)rite protect, divide_wp, INPUT_KEY_w
 Checkbox, +(D) interface, plusd, INPUT_KEY_d
-Checkbox, Didaktik (8)0 interface, didaktik80, INPUT_KEY_8
+Checkbox, Dida(k)tik 80 interface, didaktik80, INPUT_KEY_k
 Checkbox, DISCi(P)LE interf(a)ce, disciple, INPUT_KEY_p
 Checkbox, (B)eta 128 interface, beta128, INPUT_KEY_b
 Checkbox, Beta 128 (a)uto-boot in 48K machines, beta128_48boot, INPUT_KEY_a
