@@ -713,7 +713,7 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
 
       if( uncompressed_length != expected_length ) {
         libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
-                                 "%s:read_plsd_chunk: invalid ROM length "
+                                 "%s:read_opus_chunk: invalid ROM length "
                                  "in compressed file, should be %lu, file "
                                  "has %lu",
                                  __FILE__, 
@@ -3409,9 +3409,9 @@ write_opus_chunk( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   write_chunk_header( buffer, ptr, length, ZXSTBID_OPUS, block_size );
 
-  if( libspectrum_snap_opus_paged( snap ) ) flags |= ZXSTPLUSDF_PAGED;
-  if( use_compression ) flags |= ZXSTPLUSDF_COMPRESSED;
-  if( !libspectrum_snap_opus_direction( snap ) ) flags |= ZXSTPLUSDF_SEEKLOWER;
+  if( libspectrum_snap_opus_paged( snap ) ) flags |= ZXSTOPUSF_PAGED;
+  if( use_compression ) flags |= ZXSTOPUSF_COMPRESSED;
+  if( !libspectrum_snap_opus_direction( snap ) ) flags |= ZXSTOPUSF_SEEKLOWER;
   if( libspectrum_snap_opus_custom_rom( snap ) ) flags |= ZXSTOPUSF_CUSTOMROM;
   libspectrum_write_dword( ptr, flags );
 
