@@ -5105,3 +5105,6 @@
          selector on widget UIs (Sergio).
 20160508 memory.h,peripherals/disk/didaktik.c: switch to using 14K Didaktik 80
          ROMs rather than padding to 16K (Fred).
+20160508 data/fuse.xml.in,hacking/peripheral_tests.txt,
+         lib/tests/success.d80.bz2: add smoke test for Didaktik 80 and mime type
+         for d40 and d80 files (Sergio).
