@@ -467,13 +467,11 @@ opus_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_opus_active( snap, 1 );
 
   buffer = alloc_and_copy_page( opus_memory_map_romcs_rom[0].page );
-  if( !buffer ) return;
   libspectrum_snap_set_opus_rom( snap, 0, buffer );
   if( opus_memory_map_romcs_rom[0].save_to_snapshot )
     libspectrum_snap_set_opus_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( opus_ram );
-  if( !buffer ) return;
   libspectrum_snap_set_opus_ram( snap, 0, buffer );
 
   drive_count++; /* Drive 1 is not removable */

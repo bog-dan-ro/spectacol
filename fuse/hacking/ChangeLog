@@ -5093,3 +5093,5 @@
 20160508 peripherals/disk/beta.c: don't enable the Beta128 interface when
          loading a snapshot on a machine with Beta built-in (fixes bug #342)
          (thanks, windale and BogDan Vatra) (Fred).
+20160508 peripherals/disk/opus.c: remove check for NULL from memory allocation
+         as we abort in those circumstances instead (Fred).
