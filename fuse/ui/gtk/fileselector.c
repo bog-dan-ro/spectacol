@@ -1,6 +1,6 @@
 /* fileselector.c: GTK+ fileselector routines
    Copyright (c) 2000-2007 Philip Kendall
-   Copyright (c) 2015 Sergio Baldoví
+   Copyright (c) 2015-2016 Sergio Baldoví
 
    $Id$
 
@@ -33,6 +33,16 @@
 
 static gchar *current_folder;
 
+static void add_filter_defaults( GtkWidget *file_chooser );
+static void add_filter_auxiliary_files( GtkFileFilter *filter );
+static void add_filter_disk_files( GtkFileFilter *filter );
+static void add_filter_dock_files( GtkFileFilter *filter );
+static void add_filter_harddisk_files( GtkFileFilter *filter );
+static void add_filter_microdrive_files( GtkFileFilter *filter );
+static void add_filter_recording_files( GtkFileFilter *filter );
+static void add_filter_snapshot_files( GtkFileFilter *filter );
+static void add_filter_tape_files( GtkFileFilter *filter );
+
 static char*
 run_dialog( const char *title, GtkFileChooserAction action )
 {
@@ -53,6 +63,9 @@ run_dialog( const char *title, GtkFileChooserAction action )
                                  NULL );
 
   gtk_dialog_set_default_response( GTK_DIALOG( dialog ), GTK_RESPONSE_ACCEPT );
+
+  /* TODO: select filter based on UI operation */
+  add_filter_defaults( dialog );
 
   if( current_folder )
     gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( dialog ), current_folder );
@@ -82,4 +95,198 @@ char*
 ui_get_save_filename( const char *title )
 {
   return run_dialog( title, GTK_FILE_CHOOSER_ACTION_SAVE );
+}
+
+static void
+add_filter_defaults( GtkWidget *file_chooser )
+{
+  GtkFileFilter *filter;
+
+  /* TODO: poll libspectrum for supported file extensions and avoid duplication
+     between UIs */
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Supported Files" );
+  add_filter_auxiliary_files( filter );
+  add_filter_disk_files( filter );
+  add_filter_dock_files( filter );
+  add_filter_harddisk_files( filter );
+  add_filter_microdrive_files( filter );
+  add_filter_recording_files( filter );
+  add_filter_snapshot_files( filter );
+  add_filter_tape_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "All Files" );
+  gtk_file_filter_add_pattern( filter, "*" );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Auxiliary Files" );
+  add_filter_auxiliary_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Disk Files" );
+  add_filter_disk_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Cartridge Files" );
+  add_filter_dock_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Harddisk Files" );
+  add_filter_harddisk_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Microdrive Files" );
+  add_filter_microdrive_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Recording Files" );
+  add_filter_recording_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Snapshot Files" );
+  add_filter_snapshot_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Tape Files" );
+  add_filter_tape_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+}
+
+static void
+add_filter_auxiliary_files( GtkFileFilter *filter )
+{
+  gtk_file_filter_add_pattern( filter, "*.log" );
+  gtk_file_filter_add_pattern( filter, "*.pok" );
+  gtk_file_filter_add_pattern( filter, "*.scr" );
+  gtk_file_filter_add_pattern( filter, "*.svg" );
+
+  gtk_file_filter_add_pattern( filter, "*.LOG" );
+  gtk_file_filter_add_pattern( filter, "*.POK" );
+  gtk_file_filter_add_pattern( filter, "*.SCR" );
+  gtk_file_filter_add_pattern( filter, "*.SVG" );
+}
+
+static void
+add_filter_disk_files( GtkFileFilter *filter )
+{
+  gtk_file_filter_add_pattern( filter, "*.d40" );
+  gtk_file_filter_add_pattern( filter, "*.d80" );
+  gtk_file_filter_add_pattern( filter, "*.dsk" );
+  gtk_file_filter_add_pattern( filter, "*.fdi" );
+  gtk_file_filter_add_pattern( filter, "*.img" );
+  gtk_file_filter_add_pattern( filter, "*.mgt" );
+  gtk_file_filter_add_pattern( filter, "*.opd" );
+  gtk_file_filter_add_pattern( filter, "*.opu" );
+  gtk_file_filter_add_pattern( filter, "*.sad" );
+  gtk_file_filter_add_pattern( filter, "*.scl" );
+  gtk_file_filter_add_pattern( filter, "*.td0" );
+  gtk_file_filter_add_pattern( filter, "*.trd" );
+  gtk_file_filter_add_pattern( filter, "*.udi" );
+
+  gtk_file_filter_add_pattern( filter, "*.D40" );
+  gtk_file_filter_add_pattern( filter, "*.D80" );
+  gtk_file_filter_add_pattern( filter, "*.DSK" );
+  gtk_file_filter_add_pattern( filter, "*.FDI" );
+  gtk_file_filter_add_pattern( filter, "*.IMG" );
+  gtk_file_filter_add_pattern( filter, "*.MGT" );
+  gtk_file_filter_add_pattern( filter, "*.OPD" );
+  gtk_file_filter_add_pattern( filter, "*.OPU" );
+  gtk_file_filter_add_pattern( filter, "*.SAD" );
+  gtk_file_filter_add_pattern( filter, "*.SCL" );
+  gtk_file_filter_add_pattern( filter, "*.TD0" );
+  gtk_file_filter_add_pattern( filter, "*.TRD" );
+  gtk_file_filter_add_pattern( filter, "*.UDI" );
+}
+
+static void
+add_filter_dock_files( GtkFileFilter *filter )
+{
+  gtk_file_filter_add_pattern( filter, "*.dck" );
+  gtk_file_filter_add_pattern( filter, "*.rom" );
+
+  gtk_file_filter_add_pattern( filter, "*.DCK" );
+  gtk_file_filter_add_pattern( filter, "*.ROM" );
+}
+
+static void
+add_filter_harddisk_files( GtkFileFilter *filter )
+{
+  gtk_file_filter_add_pattern( filter, "*.hdf" );
+
+  gtk_file_filter_add_pattern( filter, "*.HDF" );
+}
+
+static void
+add_filter_microdrive_files( GtkFileFilter *filter )
+{
+  gtk_file_filter_add_pattern( filter, "*.mdr" );
+
+  gtk_file_filter_add_pattern( filter, "*.MDR" );
+}
+
+static void
+add_filter_recording_files( GtkFileFilter *filter )
+{
+  gtk_file_filter_add_pattern( filter, "*.rzx" );
+
+  gtk_file_filter_add_pattern( filter, "*.RZX" );
+}
+
+static void
+add_filter_snapshot_files( GtkFileFilter *filter )
+{
+  gtk_file_filter_add_pattern( filter, "*.mgtsnp" );
+  gtk_file_filter_add_pattern( filter, "*.slt" );
+  gtk_file_filter_add_pattern( filter, "*.sna" );
+  gtk_file_filter_add_pattern( filter, "*.snapshot" );
+  gtk_file_filter_add_pattern( filter, "*.snp" );
+  gtk_file_filter_add_pattern( filter, "*.sp" );
+  gtk_file_filter_add_pattern( filter, "*.szx" );
+  gtk_file_filter_add_pattern( filter, "*.z80" );
+  gtk_file_filter_add_pattern( filter, "*.zx-state" );  
+
+  gtk_file_filter_add_pattern( filter, "*.MGTSNP" );
+  gtk_file_filter_add_pattern( filter, "*.SLT" );
+  gtk_file_filter_add_pattern( filter, "*.SNA" );
+  gtk_file_filter_add_pattern( filter, "*.SNAPSHOT" );
+  gtk_file_filter_add_pattern( filter, "*.SNP" );
+  gtk_file_filter_add_pattern( filter, "*.SP" );
+  gtk_file_filter_add_pattern( filter, "*.SZX" );
+  gtk_file_filter_add_pattern( filter, "*.Z80" );
+  gtk_file_filter_add_pattern( filter, "*.ZX-STATE" );  
+}
+
+static void
+add_filter_tape_files( GtkFileFilter *filter )
+{
+  gtk_file_filter_add_pattern( filter, "*.csw" );
+  gtk_file_filter_add_pattern( filter, "*.ltp" );
+  gtk_file_filter_add_pattern( filter, "*.pzx" );
+  gtk_file_filter_add_pattern( filter, "*.raw" );
+  gtk_file_filter_add_pattern( filter, "*.spc" );
+  gtk_file_filter_add_pattern( filter, "*.sta" );
+  gtk_file_filter_add_pattern( filter, "*.tzx" );
+  gtk_file_filter_add_pattern( filter, "*.tap" );
+  gtk_file_filter_add_pattern( filter, "*.wav" );
+
+  gtk_file_filter_add_pattern( filter, "*.CSW" );
+  gtk_file_filter_add_pattern( filter, "*.LTP" );
+  gtk_file_filter_add_pattern( filter, "*.PZX" );
+  gtk_file_filter_add_pattern( filter, "*.RAW" );
+  gtk_file_filter_add_pattern( filter, "*.SPC" );
+  gtk_file_filter_add_pattern( filter, "*.STA" );
+  gtk_file_filter_add_pattern( filter, "*.TZX" );
+  gtk_file_filter_add_pattern( filter, "*.TAP" );
+  gtk_file_filter_add_pattern( filter, "*.WAV" );
 }
