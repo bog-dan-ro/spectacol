@@ -5095,3 +5095,5 @@
          (thanks, windale and BogDan Vatra) (Fred).
 20160508 peripherals/disk/opus.c: remove check for NULL from memory allocation
          as we abort in those circumstances instead (Fred).
+20160508 peripherals/disk/plusd.c: remove check for NULL from memory allocation
+         as we abort in those circumstances instead (Fred).
