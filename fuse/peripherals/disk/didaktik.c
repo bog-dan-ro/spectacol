@@ -49,11 +49,13 @@
 #define DATARQ_ENABLED 0x40
 /* 2KB RAM */
 #define RAM_SIZE 0x0800
+/* 14KB ROM */
+#define ROM_SIZE 0x3800
 
 static int didaktik_rom_memory_source, didaktik_ram_memory_source;
 
 /* Two memory chunks accessible by the Z80 when /ROMCS is low */
-static memory_page didaktik_memory_map_romcs_rom[ MEMORY_PAGES_IN_16K ];
+static memory_page didaktik_memory_map_romcs_rom[ MEMORY_PAGES_IN_14K ];
 static memory_page didaktik_memory_map_romcs_ram[ MEMORY_PAGES_IN_2K ];
 
 int didaktik80_available = 0;
@@ -140,7 +142,11 @@ didaktik_memory_map( void )
 {
   if( !didaktik80_active ) return;
 
-  memory_map_romcs_full( didaktik_memory_map_romcs_rom );
+  memory_map_romcs_8k( 0x0000, didaktik_memory_map_romcs_rom );
+  memory_map_romcs_4k( 0x2000,
+                       didaktik_memory_map_romcs_rom + MEMORY_PAGES_IN_8K );
+  memory_map_romcs_2k( 0x3000,
+                       didaktik_memory_map_romcs_rom + MEMORY_PAGES_IN_12K );
   memory_map_romcs_2k( 0x3800, didaktik_memory_map_romcs_ram );
 }
 
@@ -168,7 +174,7 @@ didaktik80_init( void )
 
   for( i = 0; i < DIDAKTIK80_NUM_DRIVES; i++ ) {
     d = &didaktik_drives[ i ];
-    fdd_init( d, FDD_SHUGART, NULL, 0 );	/* drive geometry 'autodetect' */
+    fdd_init( d, FDD_SHUGART, NULL, 0 );       /* drive geometry 'autodetect' */
     d->disk.flag = DISK_FLAG_NONE;
   }
 
@@ -185,7 +191,7 @@ didaktik80_init( void )
 
   didaktik_rom_memory_source = memory_source_register( "Didaktik 80 ROM" );
   didaktik_ram_memory_source = memory_source_register( "Didaktik 80 RAM" );
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_14K; i++ )
     didaktik_memory_map_romcs_rom[i].source = didaktik_rom_memory_source;
 
   for( i = 0; i < MEMORY_PAGES_IN_2K; i++ )
@@ -213,7 +219,7 @@ didaktik_reset( int hard_reset )
 
   if( machine_load_rom_bank( didaktik_memory_map_romcs_rom, 0,
                              settings_current.rom_didaktik80,
-                             settings_default.rom_didaktik80, 0x4000 ) ) {
+                             settings_default.rom_didaktik80, ROM_SIZE ) ) {
     settings_current.didaktik80 = 0;
     periph_activate_type( PERIPH_TYPE_DIDAKTIK80, 0 );
     return;

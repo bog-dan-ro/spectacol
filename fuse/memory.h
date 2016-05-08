@@ -63,7 +63,10 @@ typedef struct memory_page {
 } memory_page;
 
 /* A memory page will be 1 << (this many) bytes in size
-   ie 12 => 4 Kb, 13 => 8 Kb, 14 => 16 Kb
+   ie 12 => 4 KB, 13 => 8 KB, 14 => 16 KB
+   Note: we now rely on 2KB page size so this should no longer be changed
+   without a full review of all relevant code and changes will be required to
+   match
  */
 #define MEMORY_PAGE_SIZE_LOGARITHM 11
 
@@ -88,6 +91,12 @@ typedef struct memory_page {
 
 /* The number of memory pages in 2K */
 #define MEMORY_PAGES_IN_2K ( 1 << ( 11 - MEMORY_PAGE_SIZE_LOGARITHM ) )
+
+/* The number of memory pages in 14K */
+#define MEMORY_PAGES_IN_14K ( MEMORY_PAGES_IN_16K - MEMORY_PAGES_IN_2K )
+
+/* The number of memory pages in 12K */
+#define MEMORY_PAGES_IN_12K ( MEMORY_PAGES_IN_16K - MEMORY_PAGES_IN_4K )
 
 /* Each RAM chunk accessible by the Z80 */
 extern memory_page memory_map_read[MEMORY_PAGES_IN_64K];

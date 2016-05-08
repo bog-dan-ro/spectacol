@@ -5103,3 +5103,5 @@
          Windows and GTK+ UIs (thanks, Crisis) (Sergio).
 20160508 ui/widget/filesel.c: don't show hidden files/directories in the file
          selector on widget UIs (Sergio).
+20160508 memory.h,peripherals/disk/didaktik.c: switch to using 14K Didaktik 80
+         ROMs rather than padding to 16K (Fred).
