@@ -5090,3 +5090,6 @@
 20160503 peripherals/usource.c: add support for Currah uSource snapshots (patch
          #363) (Fred and Sergio).
 20160503 machine.c: standardise setting of custom ROM field to 1 or 0 (Fred).
+20160508 peripherals/disk/beta.c: don't enable the Beta128 interface when
+         loading a snapshot on a machine with Beta built-in (fixes bug #342)
+         (thanks, windale and BogDan Vatra) (Fred).
