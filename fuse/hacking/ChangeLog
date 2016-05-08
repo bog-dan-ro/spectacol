@@ -5110,3 +5110,5 @@
          for d40 and d80 files (Sergio).
 20160508 uimedia.c: remember filename when saving a recently formatted disk
          (Sergio).
+20160508 roms/se-[01].rom: update SE ROMs to v4.07 (thanks, Andrew Owen)
+         (Sergio).
