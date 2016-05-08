@@ -5108,3 +5108,5 @@
 20160508 data/fuse.xml.in,hacking/peripheral_tests.txt,
          lib/tests/success.d80.bz2: add smoke test for Didaktik 80 and mime type
          for d40 and d80 files (Sergio).
+20160508 uimedia.c: remember filename when saving a recently formatted disk
+         (Sergio).

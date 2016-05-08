@@ -199,7 +199,8 @@ drive_disk_write( const ui_media_drive_info_t *drive, const char *filename )
     return 1;
   }
 
-  if( drive->fdd->disk.filename && strcmp( filename, drive->fdd->disk.filename ) ) {
+  if( !drive->fdd->disk.filename ||
+      strcmp( filename, drive->fdd->disk.filename ) ) {
     libspectrum_free( drive->fdd->disk.filename );
     drive->fdd->disk.filename = utils_safe_strdup( filename );
   }
