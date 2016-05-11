@@ -5116,3 +5116,5 @@
 20160511 tape.c: fix regression causing some Alkatraz games to fail to load if
          fastloading is enabled (fixes bugs #343 and #345) (thanks, Phil and
          Sergio) (Fred).
+20160511 peripherals/disk/disciple.c: add support for DISCiPLE snapshots (patch
+         #365) (Fred).

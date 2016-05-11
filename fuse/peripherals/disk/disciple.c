@@ -75,6 +75,9 @@ static int memory_allocated = 0;
 static void disciple_reset( int hard_reset );
 static void disciple_memory_map( void );
 static void disciple_activate( void );
+static void disciple_enabled_snapshot( libspectrum_snap *snap );
+static void disciple_from_snapshot( libspectrum_snap *snap );
+static void disciple_to_snapshot( libspectrum_snap *snap );
 
 /* WD1770 registers */
 static libspectrum_byte disciple_sr_read( libspectrum_word port, libspectrum_byte *attached );
@@ -95,13 +98,18 @@ static libspectrum_byte disciple_patch_read( libspectrum_word port, libspectrum_
 static void disciple_patch_write( libspectrum_word port, libspectrum_byte b );
 static void disciple_printer_write( libspectrum_word port, libspectrum_byte b );
 
+/* 8KB ROM */
+#define ROM_SIZE 0x2000
+/* 8KB RAM */
+#define RAM_SIZE 0x2000
+
 static module_info_t disciple_module_info = {
 
   /* .reset = */ disciple_reset,
   /* .romcs = */ disciple_memory_map,
-  /* .snapshot_enabled = */ NULL,
-  /* .snapshot_from = */ NULL,
-  /* .snapshot_to = */ NULL,
+  /* .snapshot_enabled = */ disciple_enabled_snapshot,
+  /* .snapshot_from = */ disciple_from_snapshot,
+  /* .snapshot_to = */ disciple_to_snapshot,
 
 };
 
@@ -238,7 +246,7 @@ disciple_reset( int hard_reset )
   /* TODO: add support for 16 KiB ROM images. */
   if( machine_load_rom_bank( disciple_memory_map_romcs_rom, 0,
 			     settings_current.rom_disciple,
-			     settings_default.rom_disciple, 0x2000 ) ) {
+			     settings_default.rom_disciple, ROM_SIZE ) ) {
     settings_current.disciple = 0;
     periph_activate_type( PERIPH_TYPE_DISCIPLE, 0 );
     return;
@@ -260,7 +268,7 @@ disciple_reset( int hard_reset )
   /* disciple_rombank = 0; */
 
   if( hard_reset )
-    memset( disciple_ram, 0, 0x2000 );
+    memset( disciple_ram, 0, RAM_SIZE );
 
   wd_fdc_master_reset( disciple_fdc );
 
@@ -455,7 +463,7 @@ static void
 disciple_activate( void )
 {
   if( !memory_allocated ) {
-    disciple_ram = memory_pool_allocate_persistent( 0x2000, 1 );
+    disciple_ram = memory_pool_allocate_persistent( RAM_SIZE, 1 );
     memory_allocated = 1;
   }
 }
@@ -558,3 +566,107 @@ static ui_media_drive_info_t disciple_ui_drives[ DISCIPLE_NUM_DRIVES ] = {
     /* .get_params = */ &ui_drive_get_params_2,
   },
 };
+
+static void
+disciple_enabled_snapshot( libspectrum_snap *snap )
+{
+  if( libspectrum_snap_disciple_active( snap ) )
+    settings_current.disciple = 1;
+}
+
+static void
+disciple_from_snapshot( libspectrum_snap *snap )
+{
+  int i;
+
+  if( !libspectrum_snap_disciple_active( snap ) ) return;
+
+  if( libspectrum_snap_disciple_custom_rom( snap ) &&
+      libspectrum_snap_disciple_rom( snap, 0 ) &&
+      machine_load_rom_bank_from_buffer(
+                             disciple_memory_map_romcs_rom, 0,
+                             libspectrum_snap_disciple_rom( snap, 0 ),
+                             libspectrum_snap_disciple_rom_length( snap, 0 ),
+                             1 ) )
+    return;
+
+  if( libspectrum_snap_disciple_ram( snap, 0 ) ) {
+    for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+      memcpy( disciple_memory_map_romcs_ram[ i ].page,
+              libspectrum_snap_disciple_ram( snap, 0 ) + i * MEMORY_PAGE_SIZE,
+              MEMORY_PAGE_SIZE );
+  }
+
+  /* ignore drive count for now, there will be an issue with loading snaps where
+     drives have been disabled
+  libspectrum_snap_disciple_drive_count( snap )
+   */
+
+  /* FIXME: As disciple_inhibited can flip on and off the hardware inhibit
+     button is effectively always pressed
+  libspectrum_snap_disciple_inhibit_button( snap );
+   */
+
+  disciple_fdc->direction = libspectrum_snap_plusd_direction( snap );
+
+  disciple_cr_write ( 0x001b, libspectrum_snap_disciple_status ( snap ) );
+  disciple_tr_write ( 0x005b, libspectrum_snap_disciple_track  ( snap ) );
+  disciple_sec_write( 0x009b, libspectrum_snap_disciple_sector ( snap ) );
+  disciple_dr_write ( 0x00db, libspectrum_snap_disciple_data   ( snap ) );
+  disciple_cn_write ( 0x001f, libspectrum_snap_disciple_control( snap ) );
+  /* FIXME: Set disciple_inhibited based on the value in
+     libspectrum_snap_disciple_control() */
+
+  if( libspectrum_snap_disciple_paged( snap ) ) {
+    disciple_page();
+  } else {
+    disciple_unpage();
+  }
+}
+
+static void
+disciple_to_snapshot( libspectrum_snap *snap )
+{
+  libspectrum_byte *buffer;
+  int drive_count = 0;
+  int i;
+
+  if( !periph_is_active( PERIPH_TYPE_DISCIPLE ) ) return;
+
+  libspectrum_snap_set_disciple_active( snap, 1 );
+
+  /* Always save ROM to snapshot to ensure any loading emulator has the matching
+     image */
+  libspectrum_snap_set_disciple_custom_rom( snap, 1 );
+  libspectrum_snap_set_disciple_rom_length( snap, 0, ROM_SIZE );
+
+  buffer = libspectrum_new( libspectrum_byte, ROM_SIZE );
+
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    memcpy( buffer + i * MEMORY_PAGE_SIZE,
+            disciple_memory_map_romcs_rom[ i ].page, MEMORY_PAGE_SIZE );
+
+  libspectrum_snap_set_disciple_rom( snap, 0, buffer );
+
+  buffer = libspectrum_new( libspectrum_byte, RAM_SIZE );
+
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    memcpy( buffer + i * MEMORY_PAGE_SIZE,
+            disciple_memory_map_romcs_ram[ i ].page, MEMORY_PAGE_SIZE );
+  libspectrum_snap_set_disciple_ram( snap, 0, buffer );
+
+  drive_count++; /* Drive 1 is not removable */
+  if( option_enumerate_diskoptions_drive_disciple2_type() > 0 ) drive_count++;
+  libspectrum_snap_set_disciple_drive_count( snap, drive_count );
+
+  libspectrum_snap_set_disciple_paged ( snap, disciple_active );
+  /* FIXME: As disciple_inhibited can flip on and off the hardware inhibit
+     button is effectively always pressed but should be emulated */
+  libspectrum_snap_set_disciple_inhibit_button( snap, 1 );
+  libspectrum_snap_set_disciple_direction( snap, disciple_fdc->direction );
+  libspectrum_snap_set_disciple_status( snap, disciple_fdc->status_register );
+  libspectrum_snap_set_disciple_track ( snap, disciple_fdc->track_register );
+  libspectrum_snap_set_disciple_sector( snap, disciple_fdc->sector_register );
+  libspectrum_snap_set_disciple_data  ( snap, disciple_fdc->data_register );
+  libspectrum_snap_set_disciple_control( snap, disciple_control_register );
+}
