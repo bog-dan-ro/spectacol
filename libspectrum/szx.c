@@ -2432,6 +2432,10 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
   if( libspectrum_snap_usource_active( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
 
+  /* We don't save the DISCiPLE state at all */
+  if( libspectrum_snap_disciple_active( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+
   capabilities =
     libspectrum_machine_capabilities( libspectrum_snap_machine( snap ) );
 

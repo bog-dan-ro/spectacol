@@ -247,6 +247,22 @@ struct libspectrum_snap {
   int usource_custom_rom;
   libspectrum_byte* usource_rom[1];
   size_t usource_rom_length[1];	/* Length of the ROM */
+
+  /* DISCiPLE emulation */
+  int disciple_active;
+  int disciple_paged;
+  int disciple_inhibit_button;
+  int disciple_drive_count;
+  int disciple_custom_rom;
+  int disciple_direction;
+  libspectrum_byte disciple_control;
+  libspectrum_byte disciple_track;
+  libspectrum_byte disciple_sector;
+  libspectrum_byte disciple_data;
+  libspectrum_byte disciple_status;
+  libspectrum_byte* disciple_rom[1];
+  size_t disciple_rom_length[1];
+  libspectrum_byte* disciple_ram[1];
 };
 
 /* Initialise a libspectrum_snap structure */

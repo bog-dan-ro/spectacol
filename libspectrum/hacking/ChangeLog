@@ -1049,3 +1049,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          szx.c,z80.c: add skeleton of support for Currah uSource snapshots
          (patch #363) (Fred and Sergio).
 20160508 szx.c: use Opus flags when writing chunk (Sergio).
+20160511 accessor.pl,doc/libspectrum.txt,sna.c,snap_accessors.txt,snapshot.c,
+         szx.c,z80.c: add skeleton of support for DISCiPLE snapshots (patch
+         #365) (Fred).
