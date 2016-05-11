@@ -5113,3 +5113,6 @@
 20160508 roms/se-[01].rom: update SE ROMs to v4.07 (thanks, Andrew Owen)
          (Sergio).
 20160509 periph.c: make floating bus work again (Phil).
+20160511 tape.c: fix regression causing some Alkatraz games to fail to load if
+         fastloading is enabled (fixes bugs #343 and #345) (thanks, Phil and
+         Sergio) (Fred).

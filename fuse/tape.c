@@ -77,6 +77,7 @@ static int play_event, stop_event = -1;
 /* Spectrum events */
 int tape_edge_event;
 static int record_event;
+static int tape_mic_off_event;
 
 /* Function prototypes */
 
@@ -87,6 +88,8 @@ static void make_name( unsigned char *name, const unsigned char *data );
 static void
 tape_event_record_sample( libspectrum_dword last_tstates, int type,
 			  void *user_data );
+static void tape_stop_mic_off( libspectrum_dword last_tstates, int type,
+                               void *user_data );
 
 /* Function definitions */
 
@@ -101,6 +104,7 @@ tape_init( void )
 					stop_event_detail_string );
 
   tape_edge_event = event_register( tape_next_edge, "Tape edge" );
+  tape_mic_off_event = event_register( tape_stop_mic_off, "Tape stop MIC off" );
   record_event = event_register( tape_event_record_sample,
 				 "Tape sample record" );
 
@@ -606,7 +610,6 @@ int tape_stop( void )
   if( tape_playing ) {
 
     tape_playing = 0;
-    tape_microphone = 0;
     ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
     loader_tape_stop();
 
@@ -618,6 +621,12 @@ int tape_stop( void )
     }
 
     event_remove_type( tape_edge_event );
+
+    /* Turn off any lingering MIC level in a second (some loaders like Alkatraz
+       seem to check the MIC level soon after loading is finished, presumably as
+       a copy protection check */
+    event_add( tstates + machine_current->timings.tstates_per_frame,
+               tape_mic_off_event );
   }
 
   if( stop_event != -1 ) debugger_event( stop_event );
@@ -835,6 +844,12 @@ tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
 
   /* Store length flags for acceleration purposes */
   loader_set_acceleration_flags( flags );
+}
+
+static void
+tape_stop_mic_off( libspectrum_dword last_tstates, int type, void *user_data )
+{
+  tape_microphone = 0;
 }
 
 /* Call a user-supplied function for every block in the current tape */
