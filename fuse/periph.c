@@ -332,7 +332,7 @@ readport_internal( libspectrum_word port )
 
   if( callback_info.attached != 0xff )
     callback_info.value &=
-      machine_current->unattached_port() & ~callback_info.attached;
+      machine_current->unattached_port() | callback_info.attached;
 
   /* If we're RZX recording, store this byte */
   if( rzx_recording ) rzx_store_byte( callback_info.value );

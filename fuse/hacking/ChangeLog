@@ -5118,3 +5118,6 @@
          Sergio) (Fred).
 20160511 peripherals/disk/disciple.c: add support for DISCiPLE snapshots (patch
          #365) (Fred).
+20160512 periph.c: really make floating bus work again (fix peripherals which
+         have asserted some lines on the bus but not others) (thanks, Stuart)
+         (Phil).
