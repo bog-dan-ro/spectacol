@@ -64,13 +64,10 @@ Flickable {
                     focus: true
                     id: screenFilter
                     Keys.onUpPressed: {
-                        if (popup.visible) {
+                        if (popup.visible)
                             decrease();
-                        } else if (fuseSettings.showOrientationChooser) {
-                            screenOrientation.forceActiveFocus(Qt.TabFocusReason);
-                        } else {
-                            screenFillMode.forceActiveFocus(Qt.TabFocusReason);
-                        }
+                        else
+                            smoothScaling.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)
@@ -107,7 +104,7 @@ Flickable {
                         } else if (fuseSettings.showOrientationChooser) {
                             screenOrientation.forceActiveFocus(Qt.TabFocusReason);
                         } else {
-                            screenFilter.forceActiveFocus(Qt.TabFocusReason);
+                            smoothScaling.forceActiveFocus(Qt.TabFocusReason);
                         }
                     }
                     Keys.onLeftPressed: if (!popup.visible) decrease();
@@ -150,6 +147,20 @@ Flickable {
                     currentIndex: fuseSettings.screenOrientation
                     onCurrentIndexChanged: fuseSettings.screenOrientation = currentIndex;
                 }
+            }
+
+            CheckBox {
+                id: smoothScaling
+                Keys.onUpPressed: {
+                    if (fuseSettings.showOrientationChooser)
+                        screenOrientation.forceActiveFocus(Qt.TabFocusReason);
+                    else
+                        screenFillMode.forceActiveFocus(Qt.TabFocusReason);
+                }
+                KeyNavigation.down: screenFilter
+                text: qsTr("Smooth scaling")
+                checked: fuseScreen.smoothScaling
+                onCheckedChanged: fuseScreen.smoothScaling = checked
             }
 
             Button {

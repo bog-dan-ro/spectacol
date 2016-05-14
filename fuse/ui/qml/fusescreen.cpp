@@ -31,6 +31,7 @@
 #include <ui/ui.h>
 
 #include <QtMath>
+#include <QSettings>
 #include <QSGSimpleTextureNode>
 
 FuseScreen::FuseScreen()
@@ -38,6 +39,9 @@ FuseScreen::FuseScreen()
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
     m_fillMode = g_fuseEmulator->settings()->fillMode();
+    QSettings s;
+    s.beginGroup(QLatin1String("Screen"));
+    m_smoothScaling = s.value("smoothScaling", false).toBool();
 }
 
 bool FuseScreen::fullScreen() const
@@ -53,6 +57,24 @@ void FuseScreen::setFullScreen(bool fullScreen)
 
         settings_current.full_screen = fullScreen;
     });
+}
+
+bool FuseScreen::smoothScaling() const
+{
+    return m_smoothScaling;
+}
+
+void FuseScreen::setSmoothScaling(bool smoothScaling)
+{
+    if (m_smoothScaling == smoothScaling)
+        return;
+
+    m_smoothScaling = smoothScaling;
+    QSettings s;
+    s.beginGroup(QLatin1String("Screen"));
+    s.setValue("smoothScaling", smoothScaling);
+    emit smoothScalingChanged(smoothScaling);
+    FuseTexture::instance()->rescale();
 }
 
 void FuseScreen::updateFillMode()
@@ -120,6 +142,7 @@ QSGNode *FuseScreen::updatePaintNode(QSGNode *n, QQuickItem::UpdatePaintNodeData
         geometryChanged(boundingRect(), boundingRect());
     }
 
+    node->setFiltering(m_smoothScaling ? QSGTexture::Linear : QSGTexture::Nearest);
     node->setSourceRect(QRect(QPoint(0, 0), m_imageSize));
     node->setRect(QRectF(std::ceil((width() - implicitWidth()) / 2.),
 #ifdef Q_OS_ANDROID

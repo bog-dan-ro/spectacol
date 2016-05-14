@@ -32,6 +32,7 @@ class FuseScreen : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY screenChanged)
+    Q_PROPERTY(bool smoothScaling READ smoothScaling WRITE setSmoothScaling NOTIFY smoothScalingChanged)
 
 public:
     FuseScreen();
@@ -39,11 +40,16 @@ public:
     bool fullScreen() const;
     void setFullScreen(bool fullScreen);
 
+    bool smoothScaling() const;
+    void setSmoothScaling(bool smoothScaling);
+
 public slots:
     void updateFillMode();
 
+
 signals:
     void screenChanged();
+    void smoothScalingChanged(bool smoothScaling);
 
     // QQuickItem interface
 protected:
@@ -57,6 +63,7 @@ private:
     qreal m_aspectRatio = 4/3;
     QSize m_imageSize = QSize(1, 1);
     FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
+    bool m_smoothScaling = false;
 };
 
 #endif // FUSESCREEN_H
