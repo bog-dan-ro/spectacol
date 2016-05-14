@@ -699,7 +699,7 @@ widget_t widget_data[] = {
 /* The statusbar handling functions */
 /* TODO: make these do something useful */
 int
-ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
+_ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 {
   return 0;
 }
