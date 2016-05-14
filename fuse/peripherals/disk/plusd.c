@@ -438,13 +438,11 @@ plusd_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_plusd_active( snap, 1 );
 
   buffer = alloc_and_copy_page( plusd_memory_map_romcs_rom[ 0 ].page );
-  if( !buffer ) return;
   libspectrum_snap_set_plusd_rom( snap, 0, buffer );
   if( plusd_memory_map_romcs_rom[ 0 ].save_to_snapshot )
     libspectrum_snap_set_plusd_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( plusd_ram );
-  if( !buffer ) return;
   libspectrum_snap_set_plusd_ram( snap, 0, buffer );
 
   drive_count++; /* Drive 1 is not removable */

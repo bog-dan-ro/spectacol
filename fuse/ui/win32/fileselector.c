@@ -1,5 +1,6 @@
 /* fileselector.c: Win32 fileselector routines
    Copyright (c) 2008 Marek Januszewski
+   Copyright (c) 2016 Sergio Baldoví
 
    $Id$
 
@@ -34,6 +35,37 @@
 static char *current_folder;
 */
 
+/* TODO: poll libspectrum for supported file extensions and avoid duplication
+   between UIs */
+static LPCTSTR file_filter = TEXT(
+"Supported Files\0"
+"*.mgtsnp;*.slt;*.sna;*.snapshot;*.snp;*.sp;*.szx;*.z80;*.zx-state;"
+"*.csw;*.ltp;*.pzx;*.raw;*.spc;*.sta;*.tzx;*.tap;*.wav;"
+"*.d40;*.d80;*.dsk;*.fdi;*.img;*.mgt;*.opd;*.opu;*.sad;*.scl;*.td0;*.trd;*.udi;"
+"*.dck;*.rom;*.hdf;*.mdr;*.rzx;"
+"*.png;*.pok;*.scr;*.svg\0"
+"All Files (*.*)\0"
+"*.*\0"
+"Auxiliary Files (*.scr;*.pok;*.png;*.svg;*.log)\0"
+"*.png;*.pok;*.scr;*.svg;*.log\0"
+"Disk Files (*.dsk;*.udi;*.scl;*.trd;*.fdi;...)\0"
+"*.d40;*.d80;*.dsk;*.fdi;*.img;*.mgt;*.opd;*.opu;*.sad;*.scl;*.td0;*.trd;*.udi\0"
+"Dock Files (*.dck;*.rom)\0"
+"*.dck;*.rom\0"
+"Harddisk Files (*.hdf)\0"
+"*.hdf\0"
+"Microdrive Files (*.mdr)\0"
+"*.mdr\0"
+"Recording Files (*.rzx)\0"
+"*.rzx\0"
+"Snapshot Files (*.szx;*.z80;*.sna;...)\0"
+"*.mgtsnp;*.slt;*.sna;*.snapshot;*.snp;*.sp;*.szx;*.z80;*.zx-state\0"
+"Tape Files (*.tap;*.tzx;*.pzx;*.wav;*.csw;...)\0"
+"*.csw;*.ltp;*.pzx;*.raw;*.spc;*.sta;*.tzx;*.tap;*.wav\0"
+"\0" );
+
+static DWORD filter_index = 0;
+
 static char*
 run_dialog( const char *title, int is_saving )
 {
@@ -46,9 +78,10 @@ run_dialog( const char *title, int is_saving )
 
   ofn.lStructSize = sizeof( ofn );
   ofn.hwndOwner = fuse_hWnd;
-  ofn.lpstrFilter = "All Files\0*.*\0\0";
+  ofn.lpstrFilter = file_filter;
   ofn.lpstrCustomFilter = NULL;
-  ofn.nFilterIndex = 0;
+  /* TODO: select filter based on UI operation */
+  ofn.nFilterIndex = filter_index;
   ofn.lpstrFile = szFile;
   ofn.nMaxFile = sizeof( szFile );
   ofn.lpstrFileTitle = NULL;
@@ -71,6 +104,8 @@ run_dialog( const char *title, int is_saving )
   } else {
     result = GetOpenFileName( &ofn );
   }
+
+  filter_index = ofn.nFilterIndex;
 
   if( !result ) {
     return NULL;

@@ -5093,3 +5093,31 @@
 20160508 peripherals/disk/beta.c: don't enable the Beta128 interface when
          loading a snapshot on a machine with Beta built-in (fixes bug #342)
          (thanks, windale and BogDan Vatra) (Fred).
+20160508 peripherals/disk/opus.c: remove check for NULL from memory allocation
+         as we abort in those circumstances instead (Fred).
+20160508 peripherals/disk/plusd.c: remove check for NULL from memory allocation
+         as we abort in those circumstances instead (Fred).
+20160508 ui/options.dat: remove shortcut clash with the Simple 8-Bit IDE
+         interface (Fred).
+20160508 ui/{gtk,win32}/fileselector.c: add file filters in open/save dialogs on
+         Windows and GTK+ UIs (thanks, Crisis) (Sergio).
+20160508 ui/widget/filesel.c: don't show hidden files/directories in the file
+         selector on widget UIs (Sergio).
+20160508 memory.h,peripherals/disk/didaktik.c: switch to using 14K Didaktik 80
+         ROMs rather than padding to 16K (Fred).
+20160508 data/fuse.xml.in,hacking/peripheral_tests.txt,
+         lib/tests/success.d80.bz2: add smoke test for Didaktik 80 and mime type
+         for d40 and d80 files (Sergio).
+20160508 uimedia.c: remember filename when saving a recently formatted disk
+         (Sergio).
+20160508 roms/se-[01].rom: update SE ROMs to v4.07 (thanks, Andrew Owen)
+         (Sergio).
+20160509 periph.c: make floating bus work again (Phil).
+20160511 tape.c: fix regression causing some Alkatraz games to fail to load if
+         fastloading is enabled (fixes bugs #343 and #345) (thanks, Phil and
+         Sergio) (Fred).
+20160511 peripherals/disk/disciple.c: add support for DISCiPLE snapshots (patch
+         #365) (Fred).
+20160512 periph.c: really make floating bus work again (fix peripherals which
+         have asserted some lines on the bus but not others) (thanks, Stuart)
+         (Phil).

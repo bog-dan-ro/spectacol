@@ -331,8 +331,8 @@ readport_internal( libspectrum_word port )
   g_slist_foreach( ports, read_peripheral, &callback_info );
 
   if( callback_info.attached != 0xff )
-    callback_info.value |=
-      machine_current->unattached_port() & ~callback_info.attached;
+    callback_info.value &=
+      machine_current->unattached_port() | callback_info.attached;
 
   /* If we're RZX recording, store this byte */
   if( rzx_recording ) rzx_store_byte( callback_info.value );

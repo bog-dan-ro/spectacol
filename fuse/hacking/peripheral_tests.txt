@@ -20,6 +20,12 @@ Beta Disk
 * Enter LOAD d1"Success"
 * You should see "Congraturation! You sucsess!"
 
+Didaktik 80
+
+* Start fuse as ./fuse --didaktik80 --didaktik80disk lib/tests/success.d80
+* Enter LOAD *"success"
+* You should see "Congraturation! You sucsess!"
+
 DISCiPLE
 
 * Acquire the DISCiPLE system tape from
