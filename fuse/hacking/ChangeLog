@@ -5121,3 +5121,5 @@
 20160512 periph.c: really make floating bus work again (fix peripherals which
          have asserted some lines on the bus but not others) (thanks, Stuart)
          (Phil).
+20160514 peripherals/disk/didaktik.c: add support for Didaktik 80 MDOS 1
+         snapshots (patch #364) (Fred).
