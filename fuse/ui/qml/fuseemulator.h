@@ -257,6 +257,8 @@ public slots:
     void gamepadButtonPressEvent(QGamepadManager::GamepadButton button);
     void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button);
 
+    void fastLoad(int fast = 1);
+
 signals:
     void pausedChanged();
     void dataPathChanged();

@@ -51,18 +51,6 @@ void FolderListModel::setFolder(QString folder)
 
     refresh();
     emit folderChanged(folder);
-    if (m_files.empty()) {
-        m_currentIndex = -1;
-    } else {
-        m_currentIndex = 0;
-        if (m_sortCriteria == ByName) {
-            if (int *oldIndex = s_currentIndexes.take(m_folder)) {
-                m_currentIndex = *oldIndex;
-                s_currentIndexes.insert(m_folder, oldIndex);
-            }
-        }
-        emit currentIndexChanged(m_currentIndex);
-    }
 }
 
 void FolderListModel::setRootFolder(QString rootFolder)
@@ -246,4 +234,17 @@ void FolderListModel::refresh()
         return true;
     });
     endResetModel();
+    if (m_files.empty()) {
+        m_currentIndex = -1;
+    } else {
+        m_currentIndex = 0;
+        QString key = m_folder + QString::number(m_filterClass);
+        if (m_sortCriteria == ByName) {
+            if (int *oldIndex = s_currentIndexes.take(key)) {
+                m_currentIndex = *oldIndex;
+                s_currentIndexes.insert(key, oldIndex);
+            }
+        }
+        emit currentIndexChanged(m_currentIndex);
+    }
 }

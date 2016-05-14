@@ -151,12 +151,7 @@ Flickable {
 
             CheckBox {
                 id: smoothScaling
-                Keys.onUpPressed: {
-                    if (fuseSettings.showOrientationChooser)
-                        screenOrientation.forceActiveFocus(Qt.TabFocusReason);
-                    else
-                        screenFillMode.forceActiveFocus(Qt.TabFocusReason);
-                }
+                KeyNavigation.up: fuseSettings.showOrientationChooser ? screenOrientation : screenFillMode;
                 KeyNavigation.down: screenFilter
                 text: qsTr("Smooth scaling")
                 checked: fuseScreen.smoothScaling

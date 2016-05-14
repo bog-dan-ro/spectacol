@@ -191,43 +191,6 @@ ApplicationWindow {
             anchors.fill: parent
             anchors.leftMargin: (TextSizes.smallScreen && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
             onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
-
-            Image {
-                id: cassetteIcon
-                visible: false
-                anchors.margins: Screen.pixelDensity * 2
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                height: Screen.pixelDensity * 10
-                width: Screen.pixelDensity * 13
-                NumberAnimation on opacity {
-                    id: cassetteIconHideAnimation
-                    running: false
-                    to: 0
-                    duration: 2000
-                    onStopped: cassetteIcon.visible = false
-                }
-
-                source: "qrc:///images/cassette-tape.svg"
-            }
-            Image {
-                id: diskIcon
-                visible: false
-                anchors.margins: Screen.pixelDensity * 2
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                height: Screen.pixelDensity * 13
-                width: Screen.pixelDensity * 13
-                NumberAnimation on opacity {
-                    id: diskIconHideAnimation
-                    running: false
-                    to: 0
-                    duration: 2000
-                    onStopped: diskIcon.visible = false
-                }
-
-                source: "qrc:///images/floppy.svg"
-            }
         }
 
         MouseArea {
@@ -276,6 +239,47 @@ ApplicationWindow {
                     }
                 }
             }
+        }
+
+        Image {
+            id: cassetteIcon
+            visible: false
+            anchors.margins: Screen.pixelDensity * 2
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            height: Screen.pixelDensity * 10
+            width: Screen.pixelDensity * 13
+            NumberAnimation on opacity {
+                id: cassetteIconHideAnimation
+                running: false
+                to: 0
+                duration: 2000
+                onStopped: cassetteIcon.visible = false
+            }
+
+            source: "qrc:///images/cassette-fast.svg"
+            MouseArea {
+                anchors.fill: parent
+                onClicked: fuse.fastLoad();
+            }
+        }
+        Image {
+            id: diskIcon
+            visible: false
+            anchors.margins: Screen.pixelDensity * 2
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            height: Screen.pixelDensity * 13
+            width: Screen.pixelDensity * 13
+            NumberAnimation on opacity {
+                id: diskIconHideAnimation
+                running: false
+                to: 0
+                duration: 2000
+                onStopped: diskIcon.visible = false
+            }
+
+            source: "qrc:///images/floppy.svg"
         }
 
         Loader {
@@ -350,17 +354,21 @@ ApplicationWindow {
         onUiIconUpdate: {
             switch (item) {
             case FuseEmulator.Disk:
-                if (state === FuseEmulator.Active)
+                if (state === FuseEmulator.Active) {
+                    diskIconHideAnimation.stop();
                     diskIcon.visible = true
-                else if (diskIcon.visible)
+                } else if (diskIcon.visible) {
                     diskIconHideAnimation.start();
+                }
                 break;
             case FuseEmulator.Microdrive:
             case FuseEmulator.Tape:
-                if (state === FuseEmulator.Active)
+                if (state === FuseEmulator.Active) {
+                    cassetteIconHideAnimation.stop();
                     cassetteIcon.visible = true
-                else if (cassetteIcon.visible)
+                } else if (cassetteIcon.visible) {
                     cassetteIconHideAnimation.start();
+                }
                 break;
             case FuseEmulator.Mouse:
                 break;

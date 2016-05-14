@@ -30,7 +30,7 @@ CoverFlowFiles {
     filterClass: FolderListModel.Tapes
 
     Settings {
-        category: "FileBrowser"
+        category: "TapeFileBrowser"
         property alias path: browser.folder
     }
 

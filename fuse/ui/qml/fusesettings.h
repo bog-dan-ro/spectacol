@@ -32,8 +32,6 @@ class FuseSettings : public FuseObject
 
     // General Options
     Q_PROPERTY(int emulationSpeed READ emulationSpeed WRITE setEmulationSpeed NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool fastLoad READ fastLoad WRITE setFastLoad NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool accelerateLoader READ accelerateLoader WRITE setAccelerateLoader NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool autoLoad READ autoLoad WRITE setAutoLoad NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool detectLoaders READ detectLoaders WRITE setDetectLoaders NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool restrictToSpectacol READ restrictToSpectacol WRITE setRestrictToSpectacol NOTIFY settingsCurrentChanged)
@@ -76,12 +74,6 @@ public:
 
     int emulationSpeed() const;
     void setEmulationSpeed(int speed);
-
-    bool fastLoad() const;
-    void setFastLoad(bool fastLoad);
-
-    bool accelerateLoader() const;
-    void setAccelerateLoader(bool accelerateLoader);
 
     bool autoLoad() const;
     void setAutoLoad(bool autoLoad);

@@ -21,10 +21,12 @@
 #include <QSemaphore>
 #include <QSettings>
 
+#include <fuse.h>
 #include <machine.h>
 #include <settings.h>
 #include <sound.h>
-#include <fuseemulator.h>
+
+#include "fuseemulator.h"
 
 #ifdef Q_OS_ANDROID
 # include <QtAndroid>
@@ -112,26 +114,6 @@ int FuseSettings::emulationSpeed() const
 void FuseSettings::setEmulationSpeed(int speed)
 {
     safe_set(settings_current.emulation_speed,speed);
-}
-
-bool FuseSettings::fastLoad() const
-{
-    return settings_current.fastload;
-}
-
-void FuseSettings::setFastLoad(bool fastLoad)
-{
-    safe_set(settings_current.fastload, fastLoad);
-}
-
-bool FuseSettings::accelerateLoader() const
-{
-    return settings_current.accelerate_loader;
-}
-
-void FuseSettings::setAccelerateLoader(bool accelerateLoader)
-{
-    safe_set(settings_current.accelerate_loader, accelerateLoader);
 }
 
 bool FuseSettings::autoLoad() const

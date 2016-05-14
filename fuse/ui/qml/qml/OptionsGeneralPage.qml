@@ -87,34 +87,15 @@ Flickable {
                 id: swipeForMenu
                 visible: fuse.touchscreen
                 KeyNavigation.up: restrictBrowse
-                KeyNavigation.down: fastLoad
+                KeyNavigation.down: autoLoad
                 text: qsTr("Swipe to open the menu")
                 checked: fuseSettings.swipe4menu
                 onCheckedChanged: fuseSettings.swipe4menu = checked
             }
 
-
-            CheckBox {
-                id: fastLoad
-                KeyNavigation.up: fuse.touchscreen ? swipeForMenu : restrictBrowse
-                KeyNavigation.down: accelerateLoader
-                text: qsTr("Fast loading")
-                checked: fuseSettings.fastLoad
-                onCheckedChanged: fuseSettings.fastLoad = checked
-            }
-
-            CheckBox {
-                id: accelerateLoader
-                KeyNavigation.up: fastLoad
-                KeyNavigation.down: autoLoad
-                text: qsTr("Accelerate loaders")
-                checked: fuseSettings.accelerateLoader
-                onCheckedChanged: fuseSettings.accelerateLoader = checked
-            }
-
             CheckBox {
                 id: autoLoad
-                KeyNavigation.up: accelerateLoader
+                KeyNavigation.up: fuse.touchscreen ? swipeForMenu : restrictBrowse
                 KeyNavigation.down: detectLoaders
                 text: qsTr("Auto load media")
                 checked: fuseSettings.autoLoad
