@@ -64,7 +64,7 @@ Flickable {
                     id: emulationSpeed
                     focus: true
                     Keys.onUpPressed: detectLoaders.forceActiveFocus(Qt.TabFocusReason)
-                    Keys.onDownPressed: restrictBrowse.forceActiveFocus(Qt.TabFocusReason)
+                    Keys.onDownPressed: autoSave.forceActiveFocus(Qt.TabFocusReason)
                     Keys.onLeftPressed: decrease()
                     Keys.onRightPressed: increase()
                     from: 10
@@ -75,9 +75,18 @@ Flickable {
             }
 
             CheckBox {
-                id: restrictBrowse
+                id: autoSave
                 KeyNavigation.up: emulationSpeed
-                KeyNavigation.down: fuse.touchscreen ? swipeForMenu : fastLoad
+                KeyNavigation.down: restrictBrowse
+                text: qsTr("Auto save snapshot on exit")
+                checked: fuseSettings.autoSaveOnExit
+                onCheckedChanged: fuseSettings.autoSaveOnExit = checked
+            }
+
+            CheckBox {
+                id: restrictBrowse
+                KeyNavigation.up: autoSave
+                KeyNavigation.down: fuse.touchscreen ? swipeForMenu : autoLoad
                 text: qsTr("Restrict browsing to Spectacol folder")
                 checked: fuseSettings.restrictToSpectacol
                 onCheckedChanged: fuseSettings.restrictToSpectacol = checked

@@ -788,7 +788,8 @@ void FuseEmulator::uiStatusbarUpdate(ui_statusbar_item item, ui_statusbar_state 
 
 void FuseEmulator::quit()
 {
-    quickSaveSnapshot();
+    if (m_fuseSettings->autoSaveOnExit())
+        quickSaveSnapshot();
     pokeEvent([this] {
         callFunction([]{
             QCoreApplication::quit();

@@ -372,3 +372,21 @@ void FuseSettings::setSwipe4menu(bool swipe)
     s.setValue("swipe4menu", swipe);
     emit swipe4menuChanged(swipe);
 }
+
+bool FuseSettings::autoSaveOnExit() const
+{
+    QSettings s;
+    s.beginGroup(QLatin1String("General"));
+    return s.value("autoSaveOnExit", true).toBool();
+}
+
+void FuseSettings::setAutoSaveOnExit(bool autoSave)
+{
+    if (autoSave == autoSaveOnExit())
+        return;
+
+    QSettings s;
+    s.beginGroup(QLatin1String("General"));
+    s.setValue("autoSaveOnExit", autoSave);
+    emit autoSaveOnExitChanged(autoSave);
+}
