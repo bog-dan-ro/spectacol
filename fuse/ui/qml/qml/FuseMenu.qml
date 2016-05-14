@@ -24,14 +24,14 @@ Menu {
     id: fuseMenu
     MenuItem {
         visible: fuse.saveSnapshotEnabled
-        text: "Quick &save snapshot"
+        text: qsTr("Quick &save snapshot")
         onTriggered: {
             menuBar.close();
             fuse.quickSaveSnapshot();
         }
     }
     MenuItem {
-        text: "Quick &load snapshot"
+        text: qsTr("Quick &load snapshot")
         onTriggered: {
             menuBar.close();
             fuse.quickLoadSnapshot();
@@ -39,9 +39,9 @@ Menu {
     }
 
     Menu {
-        title: "Media"
+        title: qsTr("Media")
         MenuItem {
-            text: "&Open .."
+            text: qsTr("&Quick Open ..")
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "FileBrowserPage.qml";
@@ -50,7 +50,7 @@ Menu {
 
         MenuItem {
             visible: false
-            text: "&Save snapshot as ..."
+            text: qsTr("&Save snapshot as ...")
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "SaveSnapshotPage.qml";
@@ -58,10 +58,45 @@ Menu {
         }
 
         MenuItem {
-            text: "&Search online .."
+            text: qsTr("&Search online ..")
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "SearchOnlinePage.qml";
+            }
+        }
+
+        Menu {
+            title: qsTr("Tape")
+            MenuItem {
+                text: "Open"
+                onTriggered: {
+                    menuBar.close();
+                    pageLoader.source = "TapesFileBrowserPage.qml";
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Play")
+                onTriggered: {
+                    menuBar.close();
+                    fuse.tape.togglePlay();
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Rewind")
+                onTriggered: {
+                    menuBar.close();
+                    fuse.tape.togglePlay();
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Clear")
+                onTriggered: {
+                    menuBar.close();
+                    fuse.tape.togglePlay();
+                }
             }
         }
 

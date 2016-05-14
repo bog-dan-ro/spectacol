@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<FolderListModel>("Fuse", 1, 0, "FolderListModel");
     qmlRegisterUncreatableType<BreakpointsModel>("Fuse", 1, 0, "BreakpointsModel", QLatin1String("use breakpointsModel context property instead"));
     qmlRegisterUncreatableType<FuseEmulator>("Fuse", 1, 0, "FuseEmulator", QLatin1String("use fuse instead"));
+    qmlRegisterUncreatableType<FuseTape>("Fuse", 1, 0, "FuseTape", QLatin1String("use fuse.tape instead"));
 
     QQmlApplicationEngine engine;
     FuseEmulator fuse(engine.rootContext());

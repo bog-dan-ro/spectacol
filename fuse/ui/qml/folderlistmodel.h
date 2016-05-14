@@ -28,12 +28,13 @@
 class FolderListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_ENUMS(FileFields FileSortCriteria)
+    Q_ENUMS(FileFields FileSortCriteria FilterType)
     Q_PROPERTY(QString folder READ folder WRITE setFolder NOTIFY folderChanged)
     Q_PROPERTY(QString rootFolder READ rootFolder WRITE setRootFolder NOTIFY rootFolderChanged)
     Q_PROPERTY(FileSortCriteria sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged)
     Q_PROPERTY(bool showDirsFirst READ showDirsFirst WRITE setShowDirsFirst NOTIFY showDirsFirstChanged)
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
+    Q_PROPERTY(FilterType filterClass READ filterClass WRITE setFilterClass NOTIFY filterClassChanged)
 
 public:
     enum FileFields {
@@ -45,6 +46,11 @@ public:
     enum FileSortCriteria {
         ByName,
         ByDateDesc,
+    };
+
+    enum FilterType {
+        All,
+        Tapes
     };
 
 public:
@@ -66,12 +72,14 @@ public:
     int currentIndex() const;
     void setCurrentIndex(int currentIndex);
 
+    FilterType filterClass() const;
+    void setFilterClass(FilterType filterClass);
+
 public slots:
     bool isDir(int index);
     QString path(int index);
     void cdUp();
     void refresh();
-
 
 signals:
     void folderChanged(QString folder);
@@ -79,6 +87,7 @@ signals:
     void sortCriteriaChanged(FileSortCriteria sortCriteria);
     void showDirsFirstChanged(bool showDirsFirst);
     void currentIndexChanged(int currentIndex);
+    void filterClassChanged(FilterType filterClass);
 
 protected:
     // QAbstractItemModel interface
@@ -95,6 +104,7 @@ private:
     FileSortCriteria m_sortCriteria = ByName;
     bool m_showDirsFirst = true;
     int m_currentIndex = -1;
+    FilterType m_filterClass = All;
 };
 
 #endif // FOLDERLISTMODEL_H

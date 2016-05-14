@@ -37,6 +37,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QQmlContext>
+#include <QQmlEngine>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QSemaphore>
@@ -231,7 +232,9 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     , m_pokeFinderModel(this)
     , m_resetPokeFinder(true)
     , m_fuseSettings(new FuseSettings(this))
+    , m_tape(new FuseTape(this))
 {
+    QQmlEngine::setObjectOwnership(m_tape, QQmlEngine::CppOwnership);
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state){
         switch (state) {
         case Qt::ApplicationActive:
@@ -385,6 +388,7 @@ FuseEmulator::~FuseEmulator()
 {
     fuse_exiting = 1;
     m_fuseThread.wait();
+    delete m_tape;
 }
 
 bool FuseEmulator::paused() const
@@ -773,6 +777,13 @@ void FuseEmulator::resetLoadedFile()
 {
     m_loadedFileName = "";
     emit saveSnapshotEnabledChanged();
+}
+
+void FuseEmulator::uiStatusbarUpdate(ui_statusbar_item item, ui_statusbar_state state)
+{
+    callFunction([this, item, state]{
+        emit uiIconUpdate(UiItemType(item), UiState(state));
+    });
 }
 
 void FuseEmulator::quit()

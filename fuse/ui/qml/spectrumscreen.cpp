@@ -18,7 +18,7 @@
 #include "spectrumscreen.h"
 
 #include <QFileInfo>
-#include <QDebug>
+#include <QIcon>
 #include <libspectrum.h>
 
 enum {
@@ -93,18 +93,18 @@ QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString 
 {
     QImage ret;
     libspectrum_id_t fileType;
+    libspectrum_class_t fileClass;
     libspectrum_init_t init = libspectrum_default_init();
     libspectrum_init(&init);
-    libspectrum_error error = libspectrum_identify_file(init.context, &fileType, fileName.toUtf8().constData(), buffer, bufferSize);
+    libspectrum_error error = libspectrum_identify_file_with_class(init.context, &fileType, &fileClass, fileName.toUtf8().constData(), buffer, bufferSize);
     if (error != LIBSPECTRUM_ERROR_NONE) {
         libspectrum_end(init.context);
         return ret;
     }
 
-    libspectrum_class_t fileClass;
-    error = libspectrum_identify_class(init.context, &fileClass, fileType);
-    if (error != LIBSPECTRUM_ERROR_NONE || fileClass != LIBSPECTRUM_CLASS_SNAPSHOT) {
-        if (fileClass == LIBSPECTRUM_CLASS_TAPE) {
+    if (fileClass != LIBSPECTRUM_CLASS_SNAPSHOT) {
+        switch (fileClass) {
+        case LIBSPECTRUM_CLASS_TAPE: {
             // try to find first block that has the screen size
 
             libspectrum_tape *tape = libspectrum_tape_alloc(init.context);
@@ -120,6 +120,19 @@ QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString 
                 }
             }
             libspectrum_tape_free(tape);
+        }
+            break;
+
+        case LIBSPECTRUM_CLASS_DISK_DIDAKTIK:
+        case LIBSPECTRUM_CLASS_DISK_GENERIC:
+        case LIBSPECTRUM_CLASS_DISK_OPUS:
+        case LIBSPECTRUM_CLASS_DISK_PLUS3:
+        case LIBSPECTRUM_CLASS_DISK_PLUSD:
+        case LIBSPECTRUM_CLASS_DISK_TRDOS:
+            ret = QImage(":/images/floppy.svg");
+
+        default:
+            break;
         }
 
         libspectrum_end(init.context);
@@ -152,21 +165,19 @@ QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size,
 {
     Q_UNUSED(size)
     Q_UNUSED(requestedSize)
-    if (id == QLatin1Literal(".."))
-        return QImage(":/images/folder_up.png");
 
     QFileInfo inf(id);
     if (inf.isDir())
-        return QImage(":/images/folder.svg");
+        return QIcon(":/images/folder.svg").pixmap(QSize(256, 192)).toImage();
     if (!inf.isFile())
-        return QImage(":/images/zx_broken_cassette.png");
+        return QIcon(":/images/cassette-wait.svg").pixmap(QSize(256, 192)).toImage();
 
     QFile file(id);
     if (!file.open(QIODevice::ReadOnly))
-        return QImage(":/images/zx_broken_cassette.png");
+        return QImage(":/images/cassette-broken.svg");
 
     QImage ret = buff2Image(file.readAll(), inf.fileName());
     if (ret.isNull())
-        return QImage(":/images/zx_cassette_unknown.png");
+        return QImage(":/images/cassette-unknown.svg");
     return ret;
 }

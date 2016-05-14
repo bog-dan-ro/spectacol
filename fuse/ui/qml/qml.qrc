@@ -27,9 +27,6 @@
         <file>qml/CoverFlowFiles.qml</file>
         <file>qml/FancyText.qml</file>
         <file>qml/MenuView.qml</file>
-        <file>images/zx_broken_cassette.png</file>
-        <file>images/zx_cassette_unknown.png</file>
-        <file>images/zx_cassette.png</file>
         <file>images/folder.svg</file>
         <file>qml/FuseMenu.qml</file>
         <file>qml/FileBrowserPage.qml</file>
@@ -100,5 +97,11 @@
         <file>rom/trdos.rom</file>
         <file>qtquickcontrols2.conf</file>
         <file>qml/OptionsScreenPage.qml</file>
+        <file>images/floppy.svg</file>
+        <file>images/cassette-tape.svg</file>
+        <file>images/cassette-unknown.svg</file>
+        <file>images/cassette-wait.svg</file>
+        <file>images/cassette-broken.svg</file>
+        <file>qml/TapesFileBrowserPage.qml</file>
     </qresource>
 </RCC>

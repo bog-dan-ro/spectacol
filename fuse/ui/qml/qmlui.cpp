@@ -145,6 +145,12 @@ extern "C" int ui_widgets_reset( void )
     return 0;
 }
 
+extern "C" int ui_statusbar_update(ui_statusbar_item item, ui_statusbar_state state)
+{
+    g_fuseEmulator->uiStatusbarUpdate(item, state);
+    return 0;
+}
+
 void pokeEvent(const SpectrumEventFunction &event)
 {
     s_eventsMutex.lock();

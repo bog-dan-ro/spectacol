@@ -124,6 +124,21 @@ void FolderListModel::setCurrentIndex(int currentIndex)
     s_currentIndexes.insert(m_folder, pos);
 }
 
+FolderListModel::FilterType FolderListModel::filterClass() const
+{
+    return m_filterClass;
+}
+
+void FolderListModel::setFilterClass(FolderListModel::FilterType filterClass)
+{
+    if (m_filterClass == filterClass)
+        return;
+
+    m_filterClass = filterClass;
+    emit filterClassChanged(filterClass);
+    refresh();
+}
+
 bool FolderListModel::isDir(int index)
 {
     if (size_t(index) >= m_files.size())
@@ -181,13 +196,25 @@ QHash<int, QByteArray> FolderListModel::roleNames() const
 
 bool FolderListModel::canOpen(const QString &path)
 {
-    libspectrum_id_t fileType;
     QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return false;
+    libspectrum_id_t fileType;
+    libspectrum_class_t fileClass;
     const auto &buffer = f.read(1024*1024);
-    auto error = libspectrum_identify_file(m_spectrumInit.context, &fileType, path.toUtf8().constData(), (const unsigned char *)buffer.constData(), buffer.size());
-    return error == LIBSPECTRUM_ERROR_NONE && fileType != LIBSPECTRUM_ID_UNKNOWN;
+    auto error = libspectrum_identify_file_with_class(m_spectrumInit.context, &fileType, &fileClass, path.toUtf8().constData(), (const unsigned char *)buffer.constData(), buffer.size());
+    if (error != LIBSPECTRUM_ERROR_NONE || fileType == LIBSPECTRUM_ID_UNKNOWN || fileClass == LIBSPECTRUM_CLASS_UNKNOWN)
+        return false;
+
+    switch (m_filterClass) {
+    case Tapes:
+        return fileClass == LIBSPECTRUM_CLASS_TAPE;
+    // TODO: Add disk as well
+    default:
+        break;
+    }
+
+    return true;
 }
 
 void FolderListModel::refresh()

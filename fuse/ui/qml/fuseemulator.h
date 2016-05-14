@@ -21,6 +21,7 @@
 #include "breakpointsmodel.h"
 #include "disassamblemodel.h"
 #include "fuseobject.h"
+#include "fusetape.h"
 #include "pokefindermodel.h"
 #include "zxgamesmodel.h"
 
@@ -76,6 +77,7 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(QStringList joysticksModel READ joysticksModel CONSTANT)
     Q_PROPERTY(int selectedJoysticksIndex READ selectedJoysticksIndex WRITE setSelectedJoysticksIndex NOTIFY selectedJoysticksIndexChanged)
     Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
+    Q_PROPERTY(FuseTape *tape MEMBER m_tape CONSTANT)
 
     /* regs properties */
     Q_PROPERTY(QString PC READ PC WRITE setPC NOTIFY registersChanged)
@@ -109,7 +111,21 @@ public:
         Keyboard48K
     };
 
-    Q_ENUMS(ErrorLevel ControlType)
+    enum UiItemType {
+        Disk = UI_STATUSBAR_ITEM_DISK,
+        Microdrive = UI_STATUSBAR_ITEM_MICRODRIVE,
+        Mouse = UI_STATUSBAR_ITEM_MOUSE,
+        Paused = UI_STATUSBAR_ITEM_PAUSED,
+        Tape = UI_STATUSBAR_ITEM_TAPE,
+    };
+
+    enum UiState {
+        Active = UI_STATUSBAR_STATE_ACTIVE,
+        Inactive = UI_STATUSBAR_STATE_INACTIVE,
+        Gone = UI_STATUSBAR_STATE_NOT_AVAILABLE,
+    };
+
+    Q_ENUMS(ErrorLevel ControlType UiItemType UiState)
 public:
     explicit FuseEmulator(QQmlContext *ctxt, QObject *parent = 0);
     ~FuseEmulator();
@@ -191,6 +207,9 @@ public:
 
     FuseSettings *settings() const;
     void resetLoadedFile();
+
+    void uiStatusbarUpdate(ui_statusbar_item item, ui_statusbar_state state);
+
 public slots:
     void quit();
     QString snapshotsPath() const;
@@ -256,6 +275,7 @@ signals:
     void toggleOnScreenControls(ControlType type);
 
     void error(ErrorLevel level, const QString &message);
+    void uiIconUpdate(UiItemType item, UiState state);
 
 private:
     void updateScalers() const;
@@ -277,6 +297,7 @@ private:
     ZXGamesModel m_onlineGamesModel;
     std::unique_ptr<FuseSettings> m_fuseSettings;
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
+    FuseTape *m_tape = nullptr;
 };
 
 extern FuseEmulator *g_fuseEmulator;

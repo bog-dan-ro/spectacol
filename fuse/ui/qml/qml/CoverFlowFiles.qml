@@ -29,6 +29,7 @@ Item
     signal fileSelected(string filePath);
     property alias rootFolder: filesModel.rootFolder
     property alias folder: filesModel.folder
+    property alias filterClass: filesModel.filterClass
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
@@ -66,10 +67,9 @@ Item
         }
     }
 
-    CoverFlow
-    {
-        visible: true
+    CoverFlow {
         id : filesView
+
         anchors.fill: parent
         model : filesModel
         currentIndex: filesModel.currentIndex
@@ -193,8 +193,7 @@ Item
         }
     }
 
-    ShaderEffect
-    {
+    ShaderEffect {
         smooth: true
         property variant source : ShaderEffectSource {
             sourceItem: filesView

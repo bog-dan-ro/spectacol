@@ -34,7 +34,8 @@ SOURCES += \
     zxgamesmodel.cpp \
     zxrequests.cpp \
     fusesettings.cpp \
-    folderlistmodel.cpp
+    folderlistmodel.cpp \
+    fusetape.cpp
 
 HEADERS += \
     fusetexture.h \
@@ -51,7 +52,8 @@ HEADERS += \
     zxgamesmodel.h \
     zxrequests.h \
     fusesettings.h \
-    folderlistmodel.h
+    folderlistmodel.h \
+    fusetape.h
 
 RESOURCES += qml.qrc
 
