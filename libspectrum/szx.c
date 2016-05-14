@@ -2436,6 +2436,10 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
   if( libspectrum_snap_disciple_active( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
 
+  /* We don't save the Didaktik80 state at all */
+  if( libspectrum_snap_didaktik80_active( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+
   capabilities =
     libspectrum_machine_capabilities( libspectrum_snap_machine( snap ) );
 

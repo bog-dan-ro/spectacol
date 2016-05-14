@@ -244,6 +244,20 @@ libspectrum_snap_alloc( void )
   libspectrum_snap_set_disciple_rom_length( snap, 0, 0 );
   libspectrum_snap_set_disciple_ram( snap, 0, NULL );
 
+  libspectrum_snap_set_didaktik80_active( snap, 0 );
+  libspectrum_snap_set_didaktik80_paged( snap, 0 );
+  libspectrum_snap_set_didaktik80_drive_count( snap, 0 );
+  libspectrum_snap_set_didaktik80_custom_rom( snap, 0 );
+  libspectrum_snap_set_didaktik80_direction( snap, 0 );
+  libspectrum_snap_set_didaktik80_aux( snap, 0 );
+  libspectrum_snap_set_didaktik80_track ( snap, 0 );
+  libspectrum_snap_set_didaktik80_sector( snap, 0 );
+  libspectrum_snap_set_didaktik80_data  ( snap, 0 );
+  libspectrum_snap_set_didaktik80_status( snap, 0 );
+  libspectrum_snap_set_didaktik80_rom( snap, 0, NULL );
+  libspectrum_snap_set_didaktik80_rom_length( snap, 0, 0 );
+  libspectrum_snap_set_didaktik80_ram( snap, 0, NULL );
+
   return snap;
 }
 
@@ -299,6 +313,11 @@ libspectrum_snap_free( libspectrum_snap *snap )
     libspectrum_free( libspectrum_snap_disciple_rom( snap, 0 ) );
   if( libspectrum_snap_disciple_ram( snap, 0 ) )
     libspectrum_free( libspectrum_snap_disciple_ram( snap, 0 ) );
+
+  if( libspectrum_snap_didaktik80_rom( snap, 0 ) )
+    libspectrum_free( libspectrum_snap_didaktik80_rom( snap, 0 ) );
+  if( libspectrum_snap_didaktik80_ram( snap, 0 ) )
+    libspectrum_free( libspectrum_snap_didaktik80_ram( snap, 0 ) );
 
   libspectrum_free( snap );
 

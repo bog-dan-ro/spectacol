@@ -733,6 +733,20 @@ The available properties (along with their types) are:
 * size_t disciple_rom_length[1]
 * libspectrum_byte* disciple_ram[1]
 
+* int didaktik80_active;
+* int didaktik80_paged;
+* int didaktik80_drive_count;
+* int didaktik80_custom_rom;
+* int didaktik80_direction;
+* libspectrum_byte didaktik80_aux;
+* libspectrum_byte didaktik80_track;
+* libspectrum_byte didaktik80_sector;
+* libspectrum_byte didaktik80_data;
+* libspectrum_byte didaktik80_status;
+* libspectrum_byte* didaktik80_rom[1];
+* size_t didaktik80_rom_length[1];
+* libspectrum_byte* didaktik80_ram[1];
+
 Most of those should be fairly self-explanatory; those which may not
 be are:
 

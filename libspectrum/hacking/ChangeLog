@@ -1052,3 +1052,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160511 accessor.pl,doc/libspectrum.txt,sna.c,snap_accessors.txt,snapshot.c,
          szx.c,z80.c: add skeleton of support for DISCiPLE snapshots (patch
          #365) (Fred).
+20160511 accessor.pl,doc/libspectrum.txt,sna.c,snap_accessors.txt,snapshot.c,
+         szx.c,z80.c: add skeleton of support for Didaktik 80 MDOS 1 snapshots
+         (patch #364) (Fred).
