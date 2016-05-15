@@ -340,8 +340,10 @@ ApplicationWindow {
         target: fuse
         onError: messagePage.showMessage(level, message);
 
-        onShowDebugger: pageLoader.source = "DebuggerPage.qml";
-        onHideDebugger: pageLoader.source = "";
+        onShowDebugger: pageLoader.source = "DebuggerPage.qml"
+        onHideDebugger: pageLoader.source = ""
+
+        onConfigureJoystick: pageLoader.source = "Joysticks.qml"
 
         onShowMenu: menuBar.open();
         onHideMenu: menuBar.close();

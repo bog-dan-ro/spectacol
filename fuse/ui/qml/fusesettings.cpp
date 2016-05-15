@@ -32,7 +32,7 @@
 # include <QtAndroid>
 #endif
 
-#define safe_set(S,V) \
+#define safe_set(S, V) \
     pokeEvent([this, V]{ \
         if (S == V) \
             return; \
@@ -40,7 +40,7 @@
         callFunction([this]{ emit settingsCurrentChanged(); }); \
     });
 
-#define safe_set_string(S,V) \
+#define safe_set_string(S, V) \
     pokeEvent([this, V]{ \
         if (QLatin1String(S) == V) \
             return; \
@@ -113,7 +113,7 @@ int FuseSettings::emulationSpeed() const
 
 void FuseSettings::setEmulationSpeed(int speed)
 {
-    safe_set(settings_current.emulation_speed,speed);
+    safe_set(settings_current.emulation_speed, speed);
 }
 
 bool FuseSettings::autoLoad() const
@@ -408,4 +408,14 @@ void FuseSettings::setLeftMargin(bool border)
     s.setValue("leftMargin", border);
 
     emit leftMarginChanged(border);
+}
+
+bool FuseSettings::joystickPrompt() const
+{
+    return settings_current.joy_prompt;
+}
+
+void FuseSettings::setJoystickPrompt(bool joystickPrompt)
+{
+    safe_set(settings_current.joy_prompt, joystickPrompt);
 }

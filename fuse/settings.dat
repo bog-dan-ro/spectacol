@@ -34,7 +34,7 @@ emulation_speed, numeric, 100,, speed
 frame_rate, numeric, 1,, rate
 
 issue2, boolean, 0
-joy_prompt, boolean, 0,, joystick-prompt
+joy_prompt, boolean, 1,, joystick-prompt
 joy_kempston, boolean, 1,, kempston
 kempston_mouse, boolean, 1
 mouse_swap_buttons, boolean, 0

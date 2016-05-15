@@ -58,6 +58,7 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool interface1 READ interface1 WRITE setInterface1 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool interface2 READ interface2 WRITE setInterface2 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool full48kOSK READ full48kOSK WRITE setFull48kOSK NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool joystickPrompt READ joystickPrompt WRITE setJoystickPrompt NOTIFY settingsCurrentChanged)
 
 public:
     enum FillMode {
@@ -135,6 +136,9 @@ public:
 
     bool leftMargin() const;
     void setLeftMargin(bool leftMargin);
+
+    bool joystickPrompt() const;
+    void setJoystickPrompt(bool joystickPrompt);
 
 private:
     enum ScreenOrientation {

@@ -92,10 +92,19 @@ Flickable {
             CheckBox {
                 id: full48kOSK
                 KeyNavigation.up: interface2
-                KeyNavigation.down: kempstonJoystick
+                KeyNavigation.down: joystickPrompt
                 text: qsTr("Full On Screen 48k Keyboard")
                 checked: fuseSettings.full48kOSK
                 onCheckedChanged: fuseSettings.full48kOSK = checked
+            }
+
+            CheckBox {
+                id: joystickPrompt
+                KeyNavigation.up: full48kOSK
+                KeyNavigation.down: kempstonJoystick
+                text: qsTr("Snapshot joystick prompt")
+                checked: fuseSettings.joystickPrompt
+                onCheckedChanged: fuseSettings.joystickPrompt = checked
             }
 
             Button {

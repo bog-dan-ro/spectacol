@@ -275,9 +275,9 @@ signals:
     void processInputEventsChanged();
     void gamepadIdChanged();
     void toggleOnScreenControls(ControlType type);
-
     void error(ErrorLevel level, const QString &message);
     void uiIconUpdate(UiItemType item, UiState state);
+    void configureJoystick();
 
 private:
     void updateScalers() const;

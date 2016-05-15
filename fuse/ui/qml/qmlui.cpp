@@ -112,6 +112,9 @@ extern "C" void ui_joystick_poll( void )
 
 extern "C" ui_confirm_joystick_t ui_confirm_joystick( libspectrum_joystick /*libspectrum_type*/, int /*inputs*/ )
 {
+    if (settings_current.joy_prompt)
+        g_fuseEmulator->callFunction([]{emit g_fuseEmulator->configureJoystick();});
+
     return UI_CONFIRM_JOYSTICK_JOYSTICK_1;
 }
 
