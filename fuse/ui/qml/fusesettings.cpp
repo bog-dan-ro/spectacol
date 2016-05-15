@@ -390,3 +390,22 @@ void FuseSettings::setAutoSaveOnExit(bool autoSave)
     s.setValue("autoSaveOnExit", autoSave);
     emit autoSaveOnExitChanged(autoSave);
 }
+
+bool FuseSettings::leftMargin() const
+{
+    QSettings s;
+    s.beginGroup(QLatin1String("Screen"));
+    return s.value("leftMargin", false).toBool();
+}
+
+void FuseSettings::setLeftMargin(bool border)
+{
+    if (leftMargin() == border)
+        return;
+
+    QSettings s;
+    s.beginGroup(QLatin1String("Screen"));
+    s.setValue("leftMargin", border);
+
+    emit leftMarginChanged(border);
+}

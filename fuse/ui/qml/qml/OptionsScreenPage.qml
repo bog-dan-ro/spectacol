@@ -19,6 +19,7 @@ import QtQuick 2.6
 import QtQuick.Window 2.2
 import QtGamepad 1.0
 import QtQuick.Controls 2.0
+import "private"
 
 // @scope main.qml
 
@@ -140,22 +141,32 @@ Flickable {
                         else
                             screenFilter.forceActiveFocus(Qt.TabFocusReason);
                     }
-                    Keys.onLeftPressed: if (!popup.visible) decrease();
-                    Keys.onRightPressed: if (!popup.visible) increase();
+                    Keys.onLeftPressed: if (!popup.visible) decrease()
+                    Keys.onRightPressed: if (!popup.visible) increase()
 
                     model: ["Any", "Landscape", "Portrait"]
                     currentIndex: fuseSettings.screenOrientation
-                    onCurrentIndexChanged: fuseSettings.screenOrientation = currentIndex;
+                    onCurrentIndexChanged: fuseSettings.screenOrientation = currentIndex
                 }
             }
 
             CheckBox {
                 id: smoothScaling
-                KeyNavigation.up: fuseSettings.showOrientationChooser ? screenOrientation : screenFillMode;
-                KeyNavigation.down: screenFilter
+                KeyNavigation.up: fuseSettings.showOrientationChooser ? screenOrientation : screenFillMode
+                KeyNavigation.down: TextSizes.smallScreen ? leftBorder : screenFilter
                 text: qsTr("Smooth scaling")
                 checked: fuseScreen.smoothScaling
                 onCheckedChanged: fuseScreen.smoothScaling = checked
+            }
+
+            CheckBox {
+                id: leftBorder
+                visible: TextSizes.smallScreen
+                KeyNavigation.up: smoothScaling
+                KeyNavigation.down: screenFilter
+                text: qsTr("Left boder")
+                checked: fuseScreen.leftBorder
+                onCheckedChanged: fuseScreen.leftBorder = checked
             }
 
             Button {

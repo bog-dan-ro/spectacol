@@ -189,7 +189,7 @@ ApplicationWindow {
         FuseScreen {
             id: fuseScreen
             anchors.fill: parent
-            anchors.leftMargin: (TextSizes.smallScreen && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
+            anchors.leftMargin: (fuseSettings.leftMargin && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
             onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
         }
 
@@ -263,6 +263,7 @@ ApplicationWindow {
                 onClicked: fuse.fastLoad();
             }
         }
+
         Image {
             id: diskIcon
             visible: false
@@ -346,8 +347,8 @@ ApplicationWindow {
         onHideMenu: menuBar.close();
         onToggleOnScreenControls: toggleOnScreenControls(type, true)
         onShowWelcome: {
-            if (TextSizes.smallScreen)
-                fuseSettings.swipe4menu = false;
+            fuseSettings.swipe4menu = !TextSizes.smallScreen;
+            fuseSettings.leftMargin = TextSizes.smallScreen;
             pageLoader.source = "AboutPage.qml";
         }
 
