@@ -48,9 +48,8 @@ void FolderListModel::setFolder(QString folder)
     m_folder = QFileInfo(folder).absoluteFilePath();
     if (!m_folder.startsWith(m_rootFolder))
         m_folder = m_rootFolder;
-
-    refresh();
     emit folderChanged(folder);
+    refresh();
 }
 
 void FolderListModel::setRootFolder(QString rootFolder)
@@ -109,7 +108,7 @@ void FolderListModel::setCurrentIndex(int currentIndex)
     m_currentIndex = currentIndex;
     int *pos = new int;
     *pos = m_currentIndex;
-    s_currentIndexes.insert(m_folder, pos);
+    s_currentIndexes.insert(m_folder + QString::number(m_filterClass), pos);
 }
 
 FolderListModel::FilterType FolderListModel::filterClass() const
@@ -234,6 +233,7 @@ void FolderListModel::refresh()
         return true;
     });
     endResetModel();
+
     if (m_files.empty()) {
         m_currentIndex = -1;
     } else {

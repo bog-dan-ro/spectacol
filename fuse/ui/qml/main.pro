@@ -1,7 +1,7 @@
 TARGET = fuse-qml
 TEMPLATE = app
 
-CONFIG += c++11
+CONFIG += c++11 #object_parallel_to_source
 
 QT += qml quick gamepad multimedia svg
 
