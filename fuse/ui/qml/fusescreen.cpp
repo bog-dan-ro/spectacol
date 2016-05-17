@@ -141,8 +141,11 @@ QSGNode *FuseScreen::updatePaintNode(QSGNode *n, QQuickItem::UpdatePaintNodeData
         }, Qt::QueuedConnection);
         geometryChanged(boundingRect(), boundingRect());
     }
-
-    node->setFiltering(m_smoothScaling ? QSGTexture::Linear : QSGTexture::Nearest);
+    texture->setFiltering(m_smoothScaling ? QSGTexture::Linear : QSGTexture::Nearest);
+    if (node->filtering() != texture->filtering()) {
+        node->setFiltering(texture->filtering());
+        texture->rescale();
+    }
     node->setSourceRect(QRect(QPoint(0, 0), m_imageSize));
     node->setRect(QRectF(std::ceil((width() - implicitWidth()) / 2.),
 #ifdef Q_OS_ANDROID
