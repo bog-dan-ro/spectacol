@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QEvent>
 #include <QSemaphore>
+#include <QTimer>
 #include <QThread>
 
 class FunctionEvent : public QEvent
@@ -42,12 +43,17 @@ FuseObject::FuseObject(QObject *parent) : QObject(parent)
 {
 }
 
-void FuseObject::callFunction(const FuseObject::Function &func)
+void FuseObject::callFunction(const Function &func)
 {
     if (QThread::currentThread() == thread())
         func();
     else
         QCoreApplication::postEvent(this, new FunctionEvent(func));
+}
+
+void FuseObject::callFunctionDelayed(int ms, const Function &func)
+{
+    QTimer::singleShot(ms, this, func);
 }
 
 bool FuseObject::event(QEvent *ev)

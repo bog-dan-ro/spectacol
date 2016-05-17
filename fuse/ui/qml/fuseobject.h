@@ -28,6 +28,7 @@ public:
     explicit FuseObject(QObject *parent = 0);
     typedef std::function<void()> Function;
     void callFunction(const Function &func);
+    void callFunctionDelayed(int ms, const Function &func);
     bool event(QEvent *);
 
 signals:

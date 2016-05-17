@@ -113,7 +113,7 @@ extern "C" void ui_joystick_poll( void )
 extern "C" ui_confirm_joystick_t ui_confirm_joystick( libspectrum_joystick /*libspectrum_type*/, int /*inputs*/ )
 {
     if (settings_current.joy_prompt)
-        g_fuseEmulator->callFunction([]{emit g_fuseEmulator->configureJoystick();});
+        g_fuseEmulator->callFunctionDelayed(500, []{emit g_fuseEmulator->configureJoystick();});
 
     return UI_CONFIRM_JOYSTICK_JOYSTICK_1;
 }
@@ -127,7 +127,7 @@ inline SpectrumEventFunction peekEvent()
         s_events.pop_front();
     }
     s_eventsMutex.unlock();
-    return std::move(event);
+    return event;
 }
 
 extern "C" int ui_event( void )
