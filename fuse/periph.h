@@ -1,5 +1,5 @@
 /* periph.h: code for handling peripherals
-   Copyright (c) 2004-2011 Philip Kendall
+   Copyright (c) 2004-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2015 Gergely Szasz
 
@@ -163,5 +163,9 @@ int periph_postcheck( void );
 /* Register debugger page/unpage events for a peripheral */
 void periph_register_paging_events( const char *type_string, int *page_event,
 				    int *unpage_event );
+
+libspectrum_byte periph_merge_floating_bus( libspectrum_byte value,
+                                            libspectrum_byte attached,
+                                            libspectrum_byte floating_bus );
 
 #endif				/* #ifndef FUSE_PERIPH_H */

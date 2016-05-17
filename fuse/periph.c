@@ -1,5 +1,5 @@
 /* periph.c: code for handling peripherals
-   Copyright (c) 2005-2015 Philip Kendall
+   Copyright (c) 2005-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -331,13 +331,23 @@ readport_internal( libspectrum_word port )
   g_slist_foreach( ports, read_peripheral, &callback_info );
 
   if( callback_info.attached != 0xff )
-    callback_info.value &=
-      machine_current->unattached_port() | callback_info.attached;
+    callback_info.value =
+      periph_merge_floating_bus( callback_info.value, callback_info.attached,
+                                 machine_current->unattached_port() );
 
   /* If we're RZX recording, store this byte */
   if( rzx_recording ) rzx_store_byte( callback_info.value );
 
   return callback_info.value;
+}
+
+/* Merge the read value with the floating bus. Deliberately doesn't take
+   a callback_info structure to enable it to be unit tested */
+libspectrum_byte
+periph_merge_floating_bus( libspectrum_byte value, libspectrum_byte attached,
+			   libspectrum_byte floating_bus )
+{
+  return value & (floating_bus | attached);
 }
 
 /* Write a byte to a port, taking the appropriate time */
