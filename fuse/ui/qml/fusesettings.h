@@ -37,6 +37,7 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool restrictToSpectacol READ restrictToSpectacol WRITE setRestrictToSpectacol NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool swipe4menu READ swipe4menu WRITE setSwipe4menu NOTIFY swipe4menuChanged)
     Q_PROPERTY(bool autoSaveOnExit READ autoSaveOnExit WRITE setAutoSaveOnExit NOTIFY autoSaveOnExitChanged)
+    Q_PROPERTY(int loaderAcceleration READ loaderAcceleration WRITE setLoaderAcceleration NOTIFY settingsCurrentChanged)
 
     // Screen Options
     Q_PROPERTY(bool showOrientationChooser READ showOrientationChooser CONSTANT)
@@ -139,6 +140,9 @@ public:
 
     bool joystickPrompt() const;
     void setJoystickPrompt(bool joystickPrompt);
+
+    int loaderAcceleration() const;
+    void setLoaderAcceleration(int loaderAcceleration);
 
 private:
     enum ScreenOrientation {

@@ -419,3 +419,55 @@ void FuseSettings::setJoystickPrompt(bool joystickPrompt)
 {
     safe_set(settings_current.joy_prompt, joystickPrompt);
 }
+
+int FuseSettings::loaderAcceleration() const
+{
+    if (!settings_current.accelerate_loader && !settings_current.tape_traps && !settings_current.fastload)
+        return 0; // None
+
+    if (!settings_current.accelerate_loader && settings_current.tape_traps && settings_current.fastload)
+        return 1; // Safe
+
+    if (!settings_current.accelerate_loader || !settings_current.tape_traps || !settings_current.fastload) {
+        pokeEvent([]{
+            settings_current.accelerate_loader = 1;
+            settings_current.tape_traps = 1;
+            settings_current.fastload = 1;
+        });
+    }
+    return 2; // Turbo
+}
+
+void FuseSettings::setLoaderAcceleration(int acceleration)
+{
+    if (acceleration == loaderAcceleration())
+        return;
+
+    switch (acceleration) {
+    case 0: // none
+        pokeEvent([this]{
+            settings_current.accelerate_loader = 0;
+            settings_current.tape_traps = 0;
+            settings_current.fastload = 0;
+            callFunction([this]{ emit settingsCurrentChanged(); });
+        });
+        break;
+
+    case 2: // turbo
+        pokeEvent([this]{
+            settings_current.accelerate_loader = 1;
+            settings_current.tape_traps = 1;
+            settings_current.fastload = 1;
+            callFunction([this]{ emit settingsCurrentChanged(); });
+        });
+        break;
+
+    default: // safe
+        pokeEvent([this]{
+            settings_current.accelerate_loader = 0;
+            settings_current.tape_traps = 1;
+            settings_current.fastload = 1;
+            callFunction([this]{ emit settingsCurrentChanged(); });
+        });
+    }
+}

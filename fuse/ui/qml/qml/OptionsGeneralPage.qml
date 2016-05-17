@@ -114,10 +114,39 @@ Flickable {
             CheckBox {
                 id: detectLoaders
                 KeyNavigation.up: autoLoad
-                KeyNavigation.down: emulationSpeed
+                KeyNavigation.down: loaderAcceleration
                 text: qsTr("Detect loaders")
                 checked: fuseSettings.detectLoaders
                 onCheckedChanged: fuseSettings.detectLoaders = checked
+            }
+
+            Row {
+                spacing: 2.5 * Screen.pixelDensity
+                Label {
+                    text: qsTr("Loader acceleration")
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                ComboBox {
+                    id: loaderAcceleration
+                    Keys.onUpPressed: {
+                        if (popup.visible)
+                            decrease();
+                        else
+                            detectLoaders.forceActiveFocus(Qt.TabFocusReason);
+                    }
+                    Keys.onDownPressed: {
+                        if (popup.visible)
+                            increase();
+                        else
+                            emulationSpeed.forceActiveFocus(Qt.TabFocusReason);
+                    }
+                    Keys.onLeftPressed: if (!popup.visible) decrease()
+                    Keys.onRightPressed: if (!popup.visible) increase()
+
+                    model: ["None", "Safe", "Turbo"]
+                    currentIndex: fuseSettings.loaderAcceleration
+                    onCurrentIndexChanged: fuseSettings.loaderAcceleration = currentIndex
+                }
             }
 
             Button {

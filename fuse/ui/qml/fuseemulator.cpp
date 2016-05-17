@@ -804,7 +804,6 @@ QString FuseEmulator::snapshotsPath() const
 
 void FuseEmulator::load(const QString &filePath, bool removeOnFail)
 {
-    fastLoad();
     m_loadedFileName = QFileInfo(filePath).baseName();
     pokeEvent([this, removeOnFail, filePath]() {
         fuse_emulation_pause();
@@ -1128,19 +1127,6 @@ void FuseEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton butt
         event.types.joystick.button = toJoystickKey(button);
         input_event(&event);
     });
-}
-
-void FuseEmulator::fastLoad(int fast)
-{
-    pokeEvent([fast]{
-        fuse_emulation_pause();
-        settings_current.accelerate_loader = fast;
-        settings_current.tape_traps = fast;
-        settings_current.fastload = fast;
-        fuse_emulation_unpause();
-    });
-    if (fast)
-        QTimer::singleShot(5000, this, [this]{ fastLoad(0); });
 }
 
 void FuseEmulator::debuggerTrap()

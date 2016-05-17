@@ -14,9 +14,6 @@ void FuseTape::open(QString filePath)
 {
     pokeEvent([filePath]{
         fuse_emulation_pause();
-        settings_current.accelerate_loader = 0;
-        settings_current.tape_traps = 0;
-        settings_current.fastload = 0;
         tape_open(filePath.toUtf8().constData(), 0);
         fuse_emulation_unpause();
     });
