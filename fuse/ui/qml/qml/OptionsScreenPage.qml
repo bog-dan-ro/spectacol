@@ -165,8 +165,8 @@ Flickable {
                 KeyNavigation.up: smoothScaling
                 KeyNavigation.down: screenFilter
                 text: qsTr("Left boder")
-                checked: fuseScreen.leftBorder
-                onCheckedChanged: fuseScreen.leftBorder = checked
+                checked: fuseSettings.leftMargin
+                onCheckedChanged: fuseSettings.leftMargin = checked
             }
 
             Button {
