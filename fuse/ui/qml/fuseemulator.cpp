@@ -290,10 +290,14 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         case QGamepadManager::ButtonStart:
             setGamepadId(deviceId);
             m_fuseSettings->setHasStartButton(true);
+            if (m_showControlsIcons)
+                emit showControlsIconsChanged(m_showControlsIcons = false);
             emit showMenu();
             return;
         case QGamepadManager::ButtonX:
         case QGamepadManager::ButtonY:
+            if (m_showControlsIcons)
+                emit showControlsIconsChanged(m_showControlsIcons = false);
             return;
         case QGamepadManager::ButtonL2:
             quickSaveSnapshot();
@@ -341,8 +345,15 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     });
 
     connect(gm, &QGamepadManager::gamepadDisconnected, this, [this](int deviceId){
-        if (m_gamepadId == deviceId)
-            setGamepadId(-1);
+        if (m_gamepadId == deviceId) {
+            if (QGamepadManager::instance()->connectedGamepads().size())
+                setGamepadId(QGamepadManager::instance()->connectedGamepads().first());
+            else
+                setGamepadId(-1);
+
+            if (m_touchscreen && !m_showControlsIcons)
+                emit showControlsIconsChanged(m_showControlsIcons = true);
+        }
     });
 
 
@@ -718,7 +729,11 @@ void FuseEmulator::setGamepadId(int gamepadId)
     }
 
     m_gamepadId = gamepadId;
-    emit error(Info, tr("A new default gamepad was selected"));
+    if (m_gamepadId != -1)
+        emit error(Info, tr("A new default gamepad was selected"));
+    else
+        emit error(Info, tr("No gamepad was found, please connect a gamepad"));
+
     emit gamepadIdChanged();
 }
 

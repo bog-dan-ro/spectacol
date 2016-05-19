@@ -78,6 +78,7 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(int selectedJoysticksIndex READ selectedJoysticksIndex WRITE setSelectedJoysticksIndex NOTIFY selectedJoysticksIndexChanged)
     Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
     Q_PROPERTY(FuseTape *tape MEMBER m_tape CONSTANT)
+    Q_PROPERTY(bool showControlsIcons MEMBER m_showControlsIcons NOTIFY showControlsIconsChanged)
 
     /* regs properties */
     Q_PROPERTY(QString PC READ PC WRITE setPC NOTIFY registersChanged)
@@ -276,6 +277,7 @@ signals:
     void error(ErrorLevel level, const QString &message);
     void uiIconUpdate(UiItemType item, UiState state);
     void configureJoystick();
+    void showControlsIconsChanged(bool showControlsIcons);
 
 private:
     void updateScalers() const;
@@ -298,6 +300,7 @@ private:
     std::unique_ptr<FuseSettings> m_fuseSettings;
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
     FuseTape *m_tape = nullptr;
+    bool m_showControlsIcons = true;
 };
 
 extern FuseEmulator *g_fuseEmulator;

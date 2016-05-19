@@ -237,7 +237,7 @@ ApplicationWindow {
         }
 
         Button {
-            visible: fuse.touchscreen
+            visible: fuse.touchscreen && fuse.showControlsIcons
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.topMargin: mainScreen.height > mainScreen.width ? mainScreen.height / 2 : 0;
@@ -251,7 +251,7 @@ ApplicationWindow {
         }
 
         Column {
-            visible: fuse.touchscreen
+            visible: fuse.touchscreen && fuse.showControlsIcons
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: mainScreen.height > mainScreen.width ? mainScreen.height / 2 : 0;
