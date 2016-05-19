@@ -5125,3 +5125,5 @@
          snapshots (patch #364) (Fred).
 20160517 periph.[ch],unittests/unittests.c: add unit tests for combining
          floating bus and peripherals (Phil).
+20160519 roms/se-[01].rom: update to correct SE ROMs v4.07 (thanks, Andrew Owen)
+         (Sergio).
