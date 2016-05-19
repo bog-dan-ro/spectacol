@@ -53,8 +53,6 @@ typedef enum disk_type_t {
   DISK_FDI,		/* Full Disk Image ALT */
   DISK_TD0,
 
-  DISK_SDF,		/* SAM Disk Format (deprecated) */
-
   /* DISCiPLE / +D / SAM Coupe */
   DISK_MGT,		/* ALT */
   DISK_IMG,		/* OUT-OUT */
