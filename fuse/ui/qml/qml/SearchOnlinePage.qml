@@ -50,6 +50,7 @@ Rectangle {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
         buttonYKey: Qt.Key_Tab
         buttonBKey: Qt.Key_Escape
+        buttonAKey: Qt.Key_unknown
     }
 
     ColumnLayout {
