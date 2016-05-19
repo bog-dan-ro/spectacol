@@ -432,13 +432,10 @@ static void fuse_show_help( void )
    "\nAvailable command-line options:\n\n"
    "Boolean options (use `--no-<option>' to turn off):\n\n"
    "--auto-load            Automatically load tape files when opened.\n"
-   "--beeper-stereo        Add fake stereo to beeper emulation.\n"
    "--compress-rzx         Write RZX files out compressed.\n"
-   "--double-screen        Write screenshots out as double size.\n"
    "--issue2               Emulate an Issue 2 Spectrum.\n"
    "--kempston             Emulate the Kempston joystick on QAOP<space>.\n"
    "--loading-sound        Emulate the sound of tapes loading.\n"
-   "--separation           Use ACB stereo for the AY-3-8912 sound chip.\n"
    "--sound                Produce sound.\n"
    "--sound-force-8bit     Generate 8-bit sound even if 16-bit is available.\n"
    "--slt                  Turn SLT traps on.\n"
@@ -448,11 +445,16 @@ static void fuse_show_help( void )
    "--machine <type>       Which machine should be emulated?\n"
    "--playback <filename>  Play back RZX file <filename>.\n"
    "--record <filename>    Record to RZX file <filename>.\n"
+   "--separation <type>    Use ACB/ABC stereo for the AY-3-8912 sound chip.\n"
    "--snapshot <filename>  Load snapshot <filename>.\n"
    "--speed <percentage>   How fast should emulation run?\n"
    "--fb-mode <mode>       Which mode should be used for FB?\n"
    "--tape <filename>      Open tape file <filename>.\n"
-   "--version              Print version number and exit.\n\n" );
+   "--version              Print version number and exit.\n"
+   "\n"
+   "For help, please mail <fuse-emulator-devel@lists.sf.net> or use\n"
+   "the forums at <http://sourceforge.net/p/fuse-emulator/discussion/>.\n"
+   "For complete documentation, see the manual page of Fuse.\n\n" );
 }
 
 /* Stop all activities associated with actual Spectrum emulation */
