@@ -52,9 +52,11 @@ Item {
 
     property bool capsPressed: false
     property bool symbolPressed: false
+    property int _pressedKey: 0
 
     function pressCurrentKey()
     {
+        _pressedKey = 0;
         var key = zx48Keyboard.get(grid.currentIndex);
         switch(key.code)
         {
@@ -74,6 +76,8 @@ Item {
             break;
         default:
             fuse.keyPress(key.code);
+            if (gamepadMode)
+                _pressedKey = key.code;
             break;
         }
     }
@@ -87,7 +91,11 @@ Item {
         case Qt.Key_Shift:
             break;
         default:
-            fuse.keyRelease(key.code);
+            if (gamepadMode)
+                fuse.keyRelease(_pressedKey);
+            else
+                fuse.keyRelease(key.code);
+            _pressedKey = 0;
             break;
         }
     }
@@ -184,6 +192,11 @@ Item {
         cellHeight: cellWidth
         model: zx48Keyboard
         currentIndex: 24
+        onCurrentIndexChanged: {
+            if (_pressedKey)
+                fuse.keyRelease(_pressedKey);
+        }
+
         interactive: fuse.gamepadId != -1 && gamepadMode
 
         delegate: Rectangle {
