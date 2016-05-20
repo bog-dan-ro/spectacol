@@ -332,6 +332,15 @@ ApplicationWindow {
         }
     }
 
+    MessageDialog {
+        id: queryDialog
+        icon: StandardIcon.Question
+        title: "Spectacol"
+        standardButtons: StandardButton.Yes | StandardButton.No
+        onYes: fuse.setQuery(FuseEmulator.UiYes)
+        onNo: fuse.setQuery(FuseEmulator.UiNo)
+    }
+
     Connections {
         target: fuse
         onError: messagePage.showMessage(level, message);
@@ -374,6 +383,21 @@ ApplicationWindow {
             case FuseEmulator.Paused:
                 break;
             }
+        }
+
+        onOpenFile: {
+            pageLoader.source = "GetFileBrowserPage.qml"
+            messagePage.showMessage(FuseEmulator.Info, title);
+        }
+
+        onSaveFile: {
+            // TODO: Implement save dialog
+            fuse.setOpenSaveFile("");
+        }
+
+        onQuery: {
+            queryDialog.text = message;
+            queryDialog.open();
         }
     }
 

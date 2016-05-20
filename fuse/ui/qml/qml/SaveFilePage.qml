@@ -29,7 +29,7 @@ Rectangle {
     property alias fileName: fileNameEdit.text
     property alias folder: pathEdit.text
 
-    signal accpeted
+    signal accepted
     signal canceled
 
     GridLayout {
@@ -77,7 +77,7 @@ Rectangle {
         Button {
             Layout.alignment: Qt.AlignRight
             text: qsTr("Save")
-            onClicked: saveFilePage.accpeted()
+            onClicked: saveFilePage.accepted()
         }
         Button {
             text: qsTr("Cancel")

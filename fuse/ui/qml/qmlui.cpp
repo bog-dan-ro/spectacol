@@ -154,6 +154,21 @@ extern "C" int ui_statusbar_update(ui_statusbar_item item, ui_statusbar_state st
     return 0;
 }
 
+extern "C" char *ui_get_open_filename( const char *title )
+{
+    return  g_fuseEmulator->uiOpenFilename(title);
+}
+
+extern "C" char *ui_get_save_filename( const char *title )
+{
+    return  g_fuseEmulator->uiSaveFilename(title);
+}
+
+extern "C" int ui_query( const char *message )
+{
+    return  g_fuseEmulator->uiQuery(message);
+}
+
 void pokeEvent(const SpectrumEventFunction &event)
 {
     s_eventsMutex.lock();

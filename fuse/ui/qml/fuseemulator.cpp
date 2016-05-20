@@ -801,10 +801,36 @@ void FuseEmulator::uiStatusbarUpdate(ui_statusbar_item item, ui_statusbar_state 
     });
 }
 
+char *FuseEmulator::uiOpenFilename(const QByteArray &title)
+{
+    emit openFile(QString::fromUtf8(title));
+    m_waitSemaphore.acquire();
+    if (m_openSaveFilePath.isEmpty())
+        return nullptr;
+    return strdup(m_openSaveFilePath.constData());
+}
+
+char *FuseEmulator::uiSaveFilename(const QByteArray &title)
+{
+    emit saveFile(QString::fromUtf8(title));
+    m_waitSemaphore.acquire();
+    if (m_openSaveFilePath.isEmpty())
+        return nullptr;
+    return strdup(m_openSaveFilePath.constData());
+}
+
+int FuseEmulator::uiQuery(const QByteArray &message)
+{
+    emit query(QString::fromUtf8(message));
+    m_waitSemaphore.acquire();
+    return m_queryResult;
+}
+
 void FuseEmulator::quit()
 {
     if (m_fuseSettings->autoSaveOnExit())
         quickSaveSnapshot();
+
     pokeEvent([this] {
         callFunction([]{
             QCoreApplication::quit();
@@ -1142,6 +1168,18 @@ void FuseEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton butt
         event.types.joystick.button = toJoystickKey(button);
         input_event(&event);
     });
+}
+
+void FuseEmulator::setOpenSaveFile(const QByteArray &filePath)
+{
+    m_openSaveFilePath = filePath;
+    m_waitSemaphore.release();
+}
+
+void FuseEmulator::setQuery(FuseEmulator::UiQuery result)
+{
+    m_queryResult = result;
+    m_waitSemaphore.release();
 }
 
 void FuseEmulator::debuggerTrap()

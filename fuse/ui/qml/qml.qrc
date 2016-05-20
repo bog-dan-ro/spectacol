@@ -104,5 +104,6 @@
         <file>images/cassette-broken.svg</file>
         <file>qml/TapesFileBrowserPage.qml</file>
         <file>images/cassette-fast.svg</file>
+        <file>qml/GetFileBrowserPage.qml</file>
     </qresource>
 </RCC>

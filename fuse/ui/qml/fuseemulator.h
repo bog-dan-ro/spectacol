@@ -30,6 +30,7 @@
 #include <QAudioFormat>
 #include <QGamepadManager>
 #include <QPointer>
+#include <QSemaphore>
 #include <QThread>
 #include <QUrl>
 
@@ -102,6 +103,11 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(QString HL_ READ HL_ WRITE setHL_ NOTIFY registersChanged)
 
 public:
+    enum UiQuery {
+        UiNo = 0,
+        UiYes = 1
+    };
+
     enum ErrorLevel {
         Info,
         Warning,
@@ -126,7 +132,7 @@ public:
         Gone = UI_STATUSBAR_STATE_NOT_AVAILABLE,
     };
 
-    Q_ENUMS(ErrorLevel ControlType UiItemType UiState)
+    Q_ENUMS(ErrorLevel ControlType UiItemType UiState UiQuery)
 public:
     explicit FuseEmulator(QQmlContext *ctxt, QObject *parent = 0);
     ~FuseEmulator();
@@ -211,6 +217,10 @@ public:
 
     void uiStatusbarUpdate(ui_statusbar_item item, ui_statusbar_state state);
 
+    char *uiOpenFilename(const QByteArray &title);
+    char *uiSaveFilename(const QByteArray &title);
+    int uiQuery(const QByteArray &message);
+
 public slots:
     void quit();
     QString snapshotsPath() const;
@@ -258,6 +268,9 @@ public slots:
     void gamepadButtonPressEvent(QGamepadManager::GamepadButton button);
     void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button);
 
+    void setOpenSaveFile(const QByteArray &filePath);
+    void setQuery(UiQuery result);
+
 signals:
     void pausedChanged();
     void dataPathChanged();
@@ -278,6 +291,9 @@ signals:
     void uiIconUpdate(UiItemType item, UiState state);
     void configureJoystick();
     void showControlsIconsChanged(bool showControlsIcons);
+    void openFile(const QString &title);
+    void saveFile(const QString &title);
+    void query(const QString &message);
 
 private:
     void updateScalers() const;
@@ -301,6 +317,9 @@ private:
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
     FuseTape *m_tape = nullptr;
     bool m_showControlsIcons = true;
+    QSemaphore m_waitSemaphore;
+    QByteArray m_openSaveFilePath;
+    UiQuery m_queryResult = UiNo;
 };
 
 extern FuseEmulator *g_fuseEmulator;
