@@ -32,8 +32,14 @@
 #include <mutex>
 #include <deque>
 
-static std::mutex s_eventsMutex;
-static std::deque<SpectrumEventFunction> s_events;
+#ifdef Q_OS_ANDROID
+# include <QtAndroid>
+#endif
+
+namespace {
+    std::mutex s_eventsMutex;
+    std::deque<SpectrumEventFunction> s_events;
+}
 
 extern "C" int ui_init( int *, char ***)
 {
@@ -169,6 +175,27 @@ extern "C" int ui_query( const char *message )
 extern "C" void ui_pokemem_selector( const char *filename )
 {
     g_fuseEmulator->uiPokememSelector(filename);
+}
+
+extern "C" int ui_menu_activate( ui_menu_item item, int active )
+{
+    (void)active;
+    switch (item) {
+#ifdef Q_OS_ANDROID
+    case UI_MENU_ITEM_RECORDING:
+        QtAndroid::runOnAndroidThread([active] {
+            if (active)
+                QtAndroid::androidActivity().callObjectMethod("getWindow", "()Landroid/view/Window;").callMethod<void>("addFlags", "(I)V",  128/*FLAG_KEEP_SCREEN_ON*/);
+            else
+                QtAndroid::androidActivity().callObjectMethod("getWindow", "()Landroid/view/Window;").callMethod<void>("clearFlags", "(I)V",  128/*FLAG_KEEP_SCREEN_ON*/);
+        });
+        break;
+#endif
+    default:
+        break;
+
+    }
+    return 0;
 }
 
 void pokeEvent(const SpectrumEventFunction &event)
