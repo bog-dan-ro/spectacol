@@ -98,6 +98,7 @@ Item {
                 id: address
                 placeholderText: addressValidator.bottom + " ... " + addressValidator.top
                 validator: addressValidator
+                inputMethodHints: Qt.ImhDigitsOnly
                 KeyNavigation.up: bank
                 KeyNavigation.down: value
             }
@@ -113,6 +114,7 @@ Item {
                     bottom: 0
                     top: 255
                 }
+                inputMethodHints: Qt.ImhDigitsOnly
                 KeyNavigation.up: address
                 KeyNavigation.down: ok
             }
