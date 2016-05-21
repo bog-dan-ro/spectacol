@@ -5130,3 +5130,5 @@
 20160519 fuse.c: update help info and remove obsolete options (Sergio).
 20160519 man/fuse.1,peripherals/disk/disk.h: remove references to SDF disk image
          format (Sergio).
+20160521 configure.ac: CentOS 7 autotools complains that we need AM_PROG_CC_C_O
+         for compat subdir Makefile.am inclusion (Fred).

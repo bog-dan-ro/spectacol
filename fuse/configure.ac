@@ -60,6 +60,7 @@ AC_DEFINE([FUSE_COPYRIGHT], [fuse_copyright], [Define copyright of Fuse])
 
 dnl Checks for programs.
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_RANLIB
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
