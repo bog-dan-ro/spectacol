@@ -37,7 +37,7 @@ Rectangle {
     }
     Component.onDestruction: {
         fuse.processInputEvents = true;
-        fuse.paused = false
+        fuse.paused = false;
     }
 
     function addBreakpoint(type)

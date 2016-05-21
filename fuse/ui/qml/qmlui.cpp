@@ -61,10 +61,7 @@ extern "C" int ui_mouse_release( int /*suspend*/ )
 
 extern "C" int ui_error_specific( ui_error_level severity, const char *message )
 {
-    QString msg = QLatin1String(message);
-    g_fuseEmulator->callFunction([severity, msg]{
-        emit g_fuseEmulator->error(FuseEmulator::ErrorLevel(severity), msg);
-    });
+    g_fuseEmulator->showMessage(QString::fromUtf8(message), FuseEmulator::ErrorLevel(severity));
     return 0;
 }
 
@@ -167,6 +164,11 @@ extern "C" char *ui_get_save_filename( const char *title )
 extern "C" int ui_query( const char *message )
 {
     return  g_fuseEmulator->uiQuery(message);
+}
+
+extern "C" void ui_pokemem_selector( const char *filename )
+{
+    g_fuseEmulator->uiPokememSelector(filename);
 }
 
 void pokeEvent(const SpectrumEventFunction &event)

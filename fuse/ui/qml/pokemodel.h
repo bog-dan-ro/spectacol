@@ -15,19 +15,36 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-pragma Singleton
+#ifndef POKEMODEL_H
+#define POKEMODEL_H
 
-import QtQuick.Window 2.0
-import QtQuick.Controls 2.0
+#include "fuselistmodel.h"
 
-Label {
-    id: _label
-    property bool smallScreen: Math.min(Screen.height, Screen.width) / Screen.pixelDensity < 80
-    property double scale12: smallScreen ? _label.font.pixelSize / (80 / (Math.min(Screen.height, Screen.width) / Screen.pixelDensity)) : _label.font.pixelSize
-    property double scale14: scale12 * 14 / 12
-    property double scale16: scale12 * 16 / 12
-    property double scale20: scale12 * 20 / 12
-    property double scale24: scale12 * 2 // 24 / 12
-    property double scale34: scale12 * 34 / 12
-    property double scaleImage: smallScreen ? Screen.devicePixelRatio : 1
-}
+class PokeModel : public FuseListModel
+{
+    Q_OBJECT
+    Q_ENUMS(Roles)
+public:
+    enum Roles {
+        Label = Qt::DisplayRole,
+        Active = Qt::UserRole + 1,
+        Disabled
+    };
+
+public:
+    PokeModel();
+
+    // QAbstractItemModel interface
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
+
+public slots:
+    void update();
+    void addPoke(int bank, int address, int value);
+    void setActive(int index, bool active = true);
+    void clear();
+
+};
+
+#endif // POKEMODEL_H

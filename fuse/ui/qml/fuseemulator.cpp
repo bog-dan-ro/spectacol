@@ -27,6 +27,7 @@
 #include <libspectrum.h>
 #include <machine.h>
 #include <pokefinder/pokefinder.h>
+#include <pokefinder/pokemem.h>
 #include <settings.h>
 #include <snapshot.h>
 #include <ui/scaler/scaler.h>
@@ -826,6 +827,16 @@ int FuseEmulator::uiQuery(const QByteArray &message)
     return m_queryResult;
 }
 
+void FuseEmulator::uiPokememSelector(const char *filePath)
+{
+    if (pokemem_read_from_file(filePath)) {
+        showMessage(tr("Can't open \"%1\" poke file").arg(filePath), Error);
+        return;
+    }
+
+    emit showPokememSelector();
+}
+
 void FuseEmulator::quit()
 {
     if (m_fuseSettings->autoSaveOnExit())
@@ -934,7 +945,7 @@ void FuseEmulator::quickSaveSnapshot()
             QDateTime::currentDateTime().toString(_(".yyyy-MM-dd_hh:mm:ss")) +
             _(".szx");
     save(snapshotsPath() + name);
-    emit error(Info, tr("Snapshot saved to '%1").arg(name));
+    showMessage(tr("Snapshot saved to '%1").arg(name));
 }
 
 void FuseEmulator::quickLoadSnapshot()
@@ -948,7 +959,7 @@ void FuseEmulator::quickLoadSnapshot()
 
     if (list.size()) {
         load(list.first().filePath(), true);
-        emit error(Info, tr("Snapshot loaded from '%1'").arg(list.first().fileName()));
+        showMessage(tr("Snapshot loaded from '%1'").arg(list.first().fileName()));
     }
 }
 
@@ -1180,6 +1191,13 @@ void FuseEmulator::setQuery(FuseEmulator::UiQuery result)
 {
     m_queryResult = result;
     m_waitSemaphore.release();
+}
+
+void FuseEmulator::showMessage(QString message, FuseEmulator::ErrorLevel level)
+{
+    callFunction([this, message, level]{
+        emit error(level, message);
+    });
 }
 
 void FuseEmulator::debuggerTrap()

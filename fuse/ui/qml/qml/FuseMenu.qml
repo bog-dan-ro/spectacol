@@ -170,13 +170,13 @@ Menu {
     }
 
 
-        MenuItem {
-            text: "Joystick type"
-            onTriggered: {
-                menuBar.close();
-                pageLoader.source = "Joysticks.qml";
-            }
+    MenuItem {
+        text: "Joystick type"
+        onTriggered: {
+            menuBar.close();
+            pageLoader.source = "Joysticks.qml";
         }
+    }
 
     Menu {
         visible: false
@@ -201,20 +201,6 @@ Menu {
     Menu {
         title: qsTr("Machine")
         MenuItem {
-            text: qsTr("Debugger")
-            onTriggered: {
-                menuBar.close();
-                fuse.debuggerTrap();
-            }
-        }
-        MenuItem {
-            text: qsTr("Poke finder")
-            onTriggered: {
-                menuBar.close();
-                pageLoader.source = "PokeFinderPage.qml";
-            }
-        }
-        MenuItem {
             text: qsTr("Select ...  ") + fuseSettings.currentMachine
             onTriggered: {
                 menuBar.close();
@@ -235,14 +221,31 @@ Menu {
                 fuse.hardReset();
             }
         }
+
         MenuItem {
-            visible: false
+            text: qsTr("Debugger")
+            onTriggered: {
+                menuBar.close();
+                fuse.debuggerTrap();
+            }
+        }
+
+        MenuItem {
+            text: qsTr("Poke finder")
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "PokeFinderPage.qml";
+            }
+        }
+
+        MenuItem {
             text: qsTr("Poke memory")
             onTriggered: {
                 menuBar.close();
-                pageLoader.source = "PokeMemoryPage.qml";
+                pageLoader.source = "PokeManagerPage.qml";
             }
         }
+
         MenuItem {
             visible: false
             text: qsTr("Memory Browser")

@@ -18,6 +18,7 @@
 #include "folderlistmodel.h"
 #include "fuseemulator.h"
 #include "fusescreen.h"
+#include "pokemodel.h"
 #include "spectrumscreen.h"
 #include "z80assembler.h"
 
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<FuseScreen>("Fuse", 1, 0, "FuseScreen");
     qmlRegisterType<Z80Assembler>("Fuse", 1, 0, "Z80Assembler");
     qmlRegisterType<FolderListModel>("Fuse", 1, 0, "FolderListModel");
+    qmlRegisterType<PokeModel>("Fuse", 1, 0, "PokeModel");
     qmlRegisterUncreatableType<BreakpointsModel>("Fuse", 1, 0, "BreakpointsModel", QLatin1String("use breakpointsModel context property instead"));
     qmlRegisterUncreatableType<FuseEmulator>("Fuse", 1, 0, "FuseEmulator", QLatin1String("use fuse instead"));
     qmlRegisterUncreatableType<FuseTape>("Fuse", 1, 0, "FuseTape", QLatin1String("use fuse.tape instead"));

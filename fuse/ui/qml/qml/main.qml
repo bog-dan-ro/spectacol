@@ -399,6 +399,8 @@ ApplicationWindow {
             queryDialog.text = message;
             queryDialog.open();
         }
+
+        onShowPokememSelector: pageLoader.source = "PokeManagerPage.qml"
     }
 
     Component.onCompleted: {

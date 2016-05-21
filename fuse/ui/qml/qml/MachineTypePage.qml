@@ -36,7 +36,7 @@ Item {
         delegate: Rectangle {
             width: view.width
             height: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) * 2
-            color: Qt.rgba(0, 0, 0, 0.75);
+            color: Qt.rgba(0, 0, 0, 0.75)
 
             FancyText {
                 anchors.fill: parent

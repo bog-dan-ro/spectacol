@@ -15,28 +15,39 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// @scope main.qml
 
 import QtQuick 2.6
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.0
-import QtGamepad 1.0
 
-FancyBaseList {
+ListView {
     id: view
 
-    GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+    PropertyAnimation on x {
+        to: parent.width / 2 - view.width / 2
+        easing.type: Easing.InOutBack
+        easing.amplitude: 2.0
+        easing.period: 1.5
+        duration: 500
     }
+
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+
+    clip: true
+    focus: true
+    snapMode: ListView.SnapToItem
+    highlightFollowsCurrentItem: true
+    highlightRangeMode: ListView.ApplyRange
 
     Keys.onLeftPressed: decrementCurrentIndex()
     Keys.onRightPressed: incrementCurrentIndex()
-    Keys.onEscapePressed: pageLoader.source = ""
-    Keys.onReturnPressed: pageLoader.source = ""
 
-    footer: Button {
+    highlight: Rectangle {
         width: view.width
-        text: qsTr("Close (B)")
-        onClicked: pageLoader.source = ""
+        height: delegate.height
+        color: "lightgreen"
+        border.width: 0.5 * Screen.pixelDensity
+        border.color: "green"
     }
 }

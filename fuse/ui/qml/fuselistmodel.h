@@ -23,6 +23,7 @@
 
 class FuseListModel : public QAbstractListModel
 {
+    Q_OBJECT
 public:
     explicit FuseListModel(QObject *parent = nullptr);
     typedef std::function<void()> Function;

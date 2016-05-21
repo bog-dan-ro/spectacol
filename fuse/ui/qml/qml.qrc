@@ -105,5 +105,7 @@
         <file>qml/TapesFileBrowserPage.qml</file>
         <file>images/cassette-fast.svg</file>
         <file>qml/GetFileBrowserPage.qml</file>
+        <file>qml/PokeManagerPage.qml</file>
+        <file>qml/FancyBaseList.qml</file>
     </qresource>
 </RCC>

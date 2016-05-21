@@ -220,6 +220,7 @@ public:
     char *uiOpenFilename(const QByteArray &title);
     char *uiSaveFilename(const QByteArray &title);
     int uiQuery(const QByteArray &message);
+    void uiPokememSelector(const char *filePath);
 
 public slots:
     void quit();
@@ -271,6 +272,8 @@ public slots:
     void setOpenSaveFile(const QByteArray &filePath);
     void setQuery(UiQuery result);
 
+    void showMessage(QString message, ErrorLevel level = Info);
+
 signals:
     void pausedChanged();
     void dataPathChanged();
@@ -294,6 +297,7 @@ signals:
     void openFile(const QString &title);
     void saveFile(const QString &title);
     void query(const QString &message);
+    void showPokememSelector();
 
 private:
     void updateScalers() const;
