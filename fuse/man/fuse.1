@@ -4178,9 +4178,14 @@ pane shows where the Spectrum's 64K memory map (the
 .RI ` W? '
 and
 .RI ` C? '
-indicate whether each 8K chunk is writable or contended respectively),
-and the next a disassembly, which by default starts at the current
-program counter, although this can be modified either by the
+indicate whether each displayed chunk is writable or contended respectively).
+Fuse tracks the memory mapping of the overall address space in 2KB chunks but 
+will summarise the mapped pages where they are part of the same page of the 
+underlying memory source (e.g. 8KB page sizes in the Spectrum 128K and 4KB 
+pages in the Timex clones' DOCK and EXROM banks).
+.PP
+The next pane to the right has a disassembly, which by default starts 
+at the current program counter, although this can be modified either by the
 `disassemble' command (see below) or by dragging the scrollbar next to
 it. The next pane shows the current stack, and the final pane any
 `events' which are due to occur and could affect emulation. Any of

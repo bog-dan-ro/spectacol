@@ -5136,3 +5136,5 @@
          snapshot saving/loading for 2KB memory page size. Also make IF1 only
          save or load 8KB of ROM as that is what the hardware and our emulation
          support (patch #366) (Fred).
+20160521 man/fuse.1: first attempt to document debugger memory pane behaviour
+         (fixes bug #347) (Fred)
