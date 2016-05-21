@@ -666,7 +666,7 @@ static const struct menu_item_entries menu_item_lookup[] = {
 };
 
 int
-ui_menu_activate( ui_menu_item item, int active )
+_ui_menu_activate( ui_menu_item item, int active )
 {
   const struct menu_item_entries *ptr;
 

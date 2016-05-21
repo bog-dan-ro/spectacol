@@ -178,3 +178,8 @@ void ui_pokemem_selector( const char *filename )
 {
 
 }
+
+int ui_menu_activate( ui_menu_item item, int active )
+{
+    return 0;
+}
