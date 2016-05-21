@@ -705,6 +705,8 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     *buffer += disc_ram_length;
 
     if( libspectrum_snap_opus_custom_rom( snap ) ) {
+      uncompressed_length = 0;
+
       error = libspectrum_zlib_inflate( *buffer, disc_rom_length, &rom_data,
                                         &uncompressed_length );
       if( error ) return error;
@@ -894,6 +896,8 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     *buffer += disc_ram_length;
 
     if( libspectrum_snap_plusd_custom_rom( snap ) ) {
+      uncompressed_length = 0;
+
       error = libspectrum_zlib_inflate( *buffer, disc_rom_length, &rom_data,
                                         &uncompressed_length );
       if( error ) return error;

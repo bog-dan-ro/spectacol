@@ -1055,3 +1055,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160514 accessor.pl,doc/libspectrum.txt,sna.c,snap_accessors.txt,snapshot.c,
          szx.c,z80.c: add skeleton of support for Didaktik 80 MDOS 1 snapshots
          (patch #364) (Fred).
+20160521 szx.c: reset uncompressed size when loading Opus and +D custom ROM
+         (from patch #366) (Sergio).
