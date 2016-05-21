@@ -143,7 +143,7 @@ widget_get_filename( const char *title, int saving )
 }
 
 char *
-ui_get_open_filename( const char *title )
+_ui_get_open_filename( const char *title )
 {
 #if !defined AMIGA && !defined __MORPHOS__
   return widget_get_filename( title, 0 );
@@ -153,7 +153,7 @@ ui_get_open_filename( const char *title )
 }
 
 char *
-ui_get_save_filename( const char *title )
+_ui_get_save_filename( const char *title )
 {
 #if !defined AMIGA && !defined __MORPHOS__
   return widget_get_filename( title, 1 );

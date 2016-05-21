@@ -732,7 +732,7 @@ ui_confirm_save_specific( const char *message )
 }
 
 int
-ui_query( const char *message )
+_ui_query( const char *message )
 {
   widget_do_query( message );
   return widget_query.save;

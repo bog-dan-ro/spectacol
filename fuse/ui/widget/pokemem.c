@@ -68,7 +68,7 @@ int  widget_pokemem_add_custom_poke( void );
 void widget_pokemem_apply_pokes( void );
 
 void
-ui_pokemem_selector( const char *filename )
+_ui_pokemem_selector( const char *filename )
 {
   fuse_emulation_pause();
 

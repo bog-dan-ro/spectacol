@@ -158,3 +158,23 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 {
   return 0;
 }
+
+char *ui_get_open_filename( const char *title )
+{
+    return 0;
+}
+
+char *ui_get_save_filename( const char *title )
+{
+    return 0;
+}
+
+int ui_query( const char *message )
+{
+    return 0;
+}
+
+void ui_pokemem_selector( const char *filename )
+{
+
+}
