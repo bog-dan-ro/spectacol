@@ -5132,3 +5132,7 @@
          format (Sergio).
 20160521 configure.ac: CentOS 7 autotools complains that we need AM_PROG_CC_C_O
          for compat subdir Makefile.am inclusion (Fred).
+20160521 peripherals/disk/{beta.c,opus.c,plusd.c},peripherals/{if1.c,if2.c}: fix
+         snapshot saving/loading for 2KB memory page size. Also make IF1 only
+         save or load 8KB of ROM as that is what the hardware and our emulation
+         support (patch #366) (Fred).
