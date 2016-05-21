@@ -5137,4 +5137,6 @@
          save or load 8KB of ROM as that is what the hardware and our emulation
          support (patch #366) (Fred).
 20160521 man/fuse.1: first attempt to document debugger memory pane behaviour
-         (fixes bug #347) (Fred)
+         (fixes bug #347) (Fred).
+20160521 pokefinder/pokemem.c: deactivate all active pokes before clearing them
+         (patch #367) (BogDan Vatra).
