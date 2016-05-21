@@ -8,8 +8,7 @@ PathView
     signal deletePressed();
 
     anchors.fill: parent
-    pathItemCount: mainScreen.portrait ? 5 : 10
-    cacheItemCount: pathItemCount * 2
+    pathItemCount: mainScreen.portrait ? 5 : 7
     snapMode : PathView.SnapToItem
     preferredHighlightBegin : 0.5
     preferredHighlightEnd : 0.5

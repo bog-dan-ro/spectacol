@@ -91,8 +91,7 @@ Item
         onDeletePressed: removeDialog.remove()
 
         delegate: Component {
-            Image
-            {
+            Image {
                 id : album_delegate
                 property real rotAngle : PathView.onPath ? PathView.delAngle : 0
                 property real delScale : PathView.onPath ? PathView.delScale : 0.5
@@ -112,22 +111,26 @@ Item
                 NumberAnimation {id : scale_anim; target : album_delegate; property: "scale"; from : 0; to : delScale; duration : 500; easing.type: Easing.InOutQuad}
                 transform: [Rotation {id : rotation; angle : rotAngle; axis {x : 0; y: 1; z : 0} origin.x : width * 0.5; origin.y : height * 0.5}]
 
-                FancyText {
-                    font.pixelSize: TextSizes.scale20
-                    font.bold: true
-                    text : name
+                Rectangle {
                     width : parent.width
-                    elide: Text.ElideRight
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    anchors
-                    {
-                        top : parent.bottom
+                    height: TextSizes.scale14 * 3
+                    anchors {
+                        bottom : parent.bottom
                         horizontalCenter : parent.horizontalCenter
                     }
+                    color: Qt.rgba(0, 0, 0, 0.75)
+                    border.color: "gray"
+                    FancyText {
+                        anchors.fill: parent
+                        font.pixelSize: TextSizes.scale14
+                        font.bold: true
+                        text : name
+                        elide: Text.ElideRight
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        horizontalAlignment: Text.AlignHCenter
+                    }
                 }
-                MouseArea
-                {
+                MouseArea {
                     anchors.fill: parent
                     onClicked: {
                         if (isCurrentItem) {
