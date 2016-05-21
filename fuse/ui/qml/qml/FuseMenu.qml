@@ -66,6 +66,7 @@ Menu {
         }
 
         Menu {
+            visible: false
             title: qsTr("Tape")
             MenuItem {
                 text: "Open"
