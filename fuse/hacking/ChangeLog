@@ -5143,3 +5143,5 @@
 20160522 ui/gtk/{gtkdisplay.c,gtkinternals.h,gtkui.c,statusbar.c}: change the 
          resizing method for GTK+ UI (fixes bug #344) (thanks, Alberto Garcia)
          (Sergio).
+20160523 man/fuse.1: document Spectranet debugging events and order ZXCF events
+         (Sergio).
