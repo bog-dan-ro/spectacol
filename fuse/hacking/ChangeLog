@@ -5140,3 +5140,6 @@
          (fixes bug #347) (Fred).
 20160521 pokefinder/pokemem.c: deactivate all active pokes before clearing them
          (patch #367) (BogDan Vatra).
+20160522 ui/gtk/{gtkdisplay.c,gtkinternals.h,gtkui.c,statusbar.c}: change the 
+         resizing method for GTK+ UI (fixes bug #344) (thanks, Alberto Garcia)
+         (Sergio).

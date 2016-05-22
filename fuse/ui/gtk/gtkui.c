@@ -63,6 +63,8 @@ GtkWidget *gtkui_window;
 /* The area into which the screen will be drawn */
 GtkWidget *gtkui_drawing_area;
 
+static GtkWidget *menu_bar;
+
 /* The UIManager used to create the menu bar */
 GtkUIManager *ui_manager_menu = NULL;
 
@@ -149,7 +151,7 @@ static void gtkui_drag_data_received( GtkWidget *widget GCC_UNUSED,
 int
 ui_init( int *argc, char ***argv )
 {
-  GtkWidget *box, *menu_bar;
+  GtkWidget *box;
   GtkAccelGroup *accel_group;
   GtkSettings *settings;
 
@@ -975,4 +977,14 @@ gtkui_scroll_connect( GtkTreeView *list, GtkAdjustment *adj )
                     G_CALLBACK( key_press ), adj );
   g_signal_connect( list, "scroll-event",
                     G_CALLBACK( wheel_scroll_event ), adj );
+}
+
+int
+gtkui_menubar_get_height( void )
+{
+  GtkAllocation alloc;
+
+  gtk_widget_get_allocation( menu_bar, &alloc );
+
+  return alloc.height;
 }
