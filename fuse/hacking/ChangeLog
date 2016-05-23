@@ -5155,3 +5155,5 @@
          (thanks, Sergio) (Fred).
 20160523 peripherals/disk/disk.c: don't write .td0 files as UDI disk image
          format (Sergio).
+20160523 compat.h,settings.pl: use Windows line endings for plain text settings
+         (Sergio).

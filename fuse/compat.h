@@ -99,6 +99,13 @@ int mkstemp( char *templ );
 #define FUSE_DIR_SEP_STR "/"
 #endif
 
+/* End of line for text files */
+#ifdef WIN32
+#define FUSE_EOL "\r\n"
+#else
+#define FUSE_EOL "\n"
+#endif
+
 #ifndef PATH_MAX
 #define PATH_MAX 1024
 #endif

@@ -476,7 +476,7 @@ settings_string_write( compat_fd doc, const char* name, const char* config )
       ( settings_file_write( doc, name, strlen( name ) ) ||
         settings_file_write( doc, "=", 1 ) ||
         settings_file_write( doc, config, strlen( config ) ) ||
-        settings_file_write( doc, "\n", 1 ) ) )
+        settings_file_write( doc, FUSE_EOL, strlen( FUSE_EOL ) ) ) )
     return 1;
   return 0;
 }
