@@ -247,6 +247,10 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1, debugger_memory_
 			 if( !$$ ) YYABORT;
 		       }
 	    | '(' expression ')' { $$ = $2; }
+            | '[' expression ']' {
+                $$ = debugger_expression_new_unaryop( DEBUGGER_TOKEN_DEREFERENCE, $2, debugger_memory_pool );
+                if( !$$ ) YYABORT;
+              }
 	    | '+' expression %prec NEGATE { $$ = $2; }
 	    | '-' expression %prec NEGATE {
 	        $$ = debugger_expression_new_unaryop( '-', $2, debugger_memory_pool );

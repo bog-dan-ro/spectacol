@@ -58,6 +58,7 @@ enum precedence_t {
   PRECEDENCE_ADDITION,
   PRECEDENCE_MULTIPLICATION,
   PRECEDENCE_NEGATE,
+  PRECEDENCE_DEREFERENCE,
 
   PRECEDENCE_ATOMIC,
   /* Highest precedence */
@@ -110,6 +111,9 @@ unaryop_precedence( int operation )
   switch( operation ) {
 
   case '!': case '~': case '-': return PRECEDENCE_NEGATE;
+
+  case DEBUGGER_TOKEN_DEREFERENCE:
+    return PRECEDENCE_DEREFERENCE;
 
   default:
     ui_error( UI_ERROR_ERROR, "unknown unary operator %d", operation );
@@ -340,6 +344,9 @@ evaluate_unaryop( struct unaryop_type *unary )
   case '~': return ~debugger_expression_evaluate( unary->op );
   case '-': return -debugger_expression_evaluate( unary->op );
 
+  case DEBUGGER_TOKEN_DEREFERENCE:
+    return readbyte_internal( debugger_expression_evaluate( unary->op ) );
+
   }
 
   ui_error( UI_ERROR_ERROR, "unknown unary operator %d", unary->operation );
@@ -447,7 +454,9 @@ deparse_unaryop( char *buffer, size_t length,
 		 const struct unaryop_type *unaryop )
 {
   char *operand_buffer; const char *operation_string = NULL;
-  int brackets;
+  const char *operation_suffix = "";
+  int brackets_possible = 1;
+  int brackets = 0;
 
   int error;
 
@@ -460,6 +469,11 @@ deparse_unaryop( char *buffer, size_t length,
   case '!': operation_string = "!"; break;
   case '~': operation_string = "~"; break;
   case '-': operation_string = "-"; break;
+  case DEBUGGER_TOKEN_DEREFERENCE:
+    operation_string = "[";
+    operation_suffix = "]";
+    brackets_possible = 0;
+    break;
 
   default:
     ui_error( UI_ERROR_ERROR, "unknown unary operation %d",
@@ -467,12 +481,13 @@ deparse_unaryop( char *buffer, size_t length,
     fuse_abort();
   }
 
-  brackets = ( unaryop->op->precedence                  < 
-	       unaryop_precedence( unaryop->operation )   );
+  if( brackets_possible )
+    brackets = ( unaryop->op->precedence                  < 
+                 unaryop_precedence( unaryop->operation )   );
     
-  snprintf( buffer, length, "%s%s%s%s", operation_string,
+  snprintf( buffer, length, "%s%s%s%s%s", operation_string,
 	    brackets ? "( " : "", operand_buffer,
-	    brackets ? " )" : "" );
+	    brackets ? " )" : "", operation_suffix );
 
   libspectrum_free( operand_buffer );
 

@@ -103,6 +103,9 @@ im|iff1|iff2 { yylval.reg = debugger_register_hash( yytext );
 "("		{ return '('; }
 ")"		{ return ')'; }
 
+"["             { return '['; }
+"]"             { return ']'; }
+
 "!"		{ yylval.token = '!'; return NEGATE; }
 "~"		{ yylval.token = '~'; return NEGATE; }
 
