@@ -5153,3 +5153,5 @@
 20160523 machine.c: clearing pokes also undoes their effect on memory, so should
          be done before the machine's RAM reset is done (see: patch #367)
          (thanks, Sergio) (Fred).
+20160523 peripherals/disk/disk.c: don't write .td0 files as UDI disk image
+         format (Sergio).

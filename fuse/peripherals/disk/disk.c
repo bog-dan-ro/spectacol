@@ -2658,6 +2658,8 @@ disk_write( disk_t *d, const char *filename )
       d->type = DISK_D80;
     else if( !strcasecmp( ext, ".scl" ) )		/* not really a disk image */
       d->type = DISK_SCL;
+    else if( !strcasecmp( ext, ".td0" ) )		/* not supported */
+      d->type = DISK_TD0;
     else if( !strcasecmp( ext, ".log" ) )		/* ALT */
       d->type = DISK_LOG;
     else
@@ -2704,7 +2706,7 @@ disk_write( disk_t *d, const char *filename )
     write_log( file, d );
     break;
   default:
-    return d->status = DISK_WRFILE;
+    d->status = DISK_WRFILE;
     break;
   }
 
