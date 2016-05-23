@@ -329,6 +329,9 @@ machine_reset( int hard_reset )
   size_t i;
   int error;
 
+  /* Clear poke list (undoes effects of active pokes on Spectrum memory) */
+  pokemem_clear();
+
   sound_ay_reset();
 
   tape_stop();
@@ -359,9 +362,6 @@ machine_reset( int hard_reset )
 
   /* clear out old display image ready for new one */
   display_refresh_all();
-
-  /* Clear poke list */
-  pokemem_clear();
 
   return 0;
 }

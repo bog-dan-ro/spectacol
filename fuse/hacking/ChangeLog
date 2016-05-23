@@ -5145,3 +5145,6 @@
          (Sergio).
 20160523 man/fuse.1: document Spectranet debugging events and order ZXCF events
          (Sergio).
+20160523 machine.c: clearing pokes also undoes their effect on memory, so should
+         be done before the machine's RAM reset is done (see: patch #367)
+         (thanks, Sergio) (Fred).
