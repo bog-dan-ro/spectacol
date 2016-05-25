@@ -4539,8 +4539,8 @@ sources (e.g. offset 0x1234 in ROM\ 1 is specified as
 .RI ` ROM:1:0x1234 "')."
 Another available sources are:
 .RI ` Betadisk "',"
-.RI ` "Didaktik RAM" "',"
-.RI ` "Didaktik ROM" "',"
+.RI ` "Didaktik 80 RAM" "',"
+.RI ` "Didaktik 80 ROM" "',"
 .RI ` "DISCiPLE RAM" "',"
 .RI ` "DISCiPLE ROM" "',"
 .RI ` "DivIDE EPROM" "',"
@@ -4554,9 +4554,12 @@ Another available sources are:
 .RI ` Spectranet "',"
 .RI ` "Timex Dock" "',"
 .RI ` "Timex EXROM" "',"
+.RI ` uSource "',"
 .RI ` ZXATASP '
 and
 .RI ` ZXCF "'."
+Please, note that spaces in memory sources should be escaped, e.g.,
+`break Didaktik\\\ 80\\\ ROM:0:0x1234'.
 The 48K machines are treated as having a permanent
 mapping of page\ 5 at 0x4000, page\ 2 at 0x8000 and page\ 0 at 0xC000;
 the 16K\ Spectrum is treated as having page\ 5 at 0x4000 and no page at

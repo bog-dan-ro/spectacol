@@ -5159,3 +5159,5 @@
          (Sergio).
 20160524 rzx.c: use SZX format for the initial snapshot in RZX files (more from
          bug #304) (Sergio).
+20160526 debugger/commandl.l,man/fuse.1: allow strings with escaped espaces in
+         the debugger (bug #337) (Sergio).

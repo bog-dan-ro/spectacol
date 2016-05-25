@@ -47,7 +47,7 @@
 
 %}
 
-ID	[a-z][a-z0-9]+
+ID	[a-z]([a-z0-9]|\\[ ])+
 
 %option caseless
 
@@ -146,7 +146,20 @@ $[[:xdigit:]]+	{ yylval.integer = strtol( yytext+1, NULL, 16 );
 		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 		  return NUMBER; }
 
-{ID}		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
+{ID}		{ char *dest, *source;
+  yylval.string = mempool_malloc( debugger_memory_pool, strlen( yytext ) + 1 );
+  /* remove escape characters */
+  dest = yylval.string;
+  source = yytext;
+  while( *source ) {
+    if( *source != '\\' ) {
+      *dest++ = *source;
+    }
+    source++;
+  }
+  *dest = '\0';
+  return STRING; }
+
 ${ID}		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext + 1 ); return VARIABLE; }
 
 \n		{ return '\n'; }
