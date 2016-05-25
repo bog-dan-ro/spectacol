@@ -208,7 +208,7 @@ int rzx_stop_recording( void )
   length = 0;
   buffer = NULL;
   libspec_error = libspectrum_rzx_write(
-    &buffer, &length, rzx, LIBSPECTRUM_ID_UNKNOWN, fuse_creator,
+    &buffer, &length, rzx, LIBSPECTRUM_ID_SNAPSHOT_SZX, fuse_creator,
     settings_current.rzx_compression, rzx_competition_mode ? &rzx_key : NULL
   );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
@@ -515,7 +515,7 @@ rzx_finalise_recording( const char *filename )
   length = 0;
   buffer = NULL;
   libspec_error = libspectrum_rzx_write(
-    &buffer, &length, rzx, LIBSPECTRUM_ID_UNKNOWN, fuse_creator,
+    &buffer, &length, rzx, LIBSPECTRUM_ID_SNAPSHOT_SZX, fuse_creator,
     settings_current.rzx_compression, rzx_competition_mode ? &rzx_key : NULL
   );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {

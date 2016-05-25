@@ -5157,3 +5157,5 @@
          format (Sergio).
 20160523 compat.h,settings.pl: use Windows line endings for plain text settings
          (Sergio).
+20160524 rzx.c: use SZX format for the initial snapshot in RZX files (more from
+         bug #304) (Sergio).
