@@ -65,6 +65,7 @@ event_matches( debugger_event_t *event, const char *type, const char *detail )
 {
   if( strcasecmp( type, event->type ) ) return 0;
   if( strcmp( detail, "*" ) == 0 ) return 1;
+  if( strcmp( event->detail, "*" ) == 0 ) return 1;
   return strcasecmp( detail, event->detail ) == 0;
 }
 

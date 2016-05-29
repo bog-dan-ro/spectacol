@@ -72,7 +72,6 @@
 %token <token>	 COMPARISON	/* < > <= >= */
 %token <token>   EQUALITY	/* == != */
 %token <token>   NEGATE		/* ! ~ */
-%token <token>	 TIMES_DIVIDE	/* * / */
 
 %token		 BASE
 %token		 BREAK
@@ -138,7 +137,7 @@
 %left EQUALITY
 %left COMPARISON
 %left '+' '-'
-%left TIMES_DIVIDE
+%left '*' '/'
 %right NEGATE		/* Unary minus, unary plus, !, ~ */
 
 /* High precedence */
@@ -168,6 +167,10 @@ command:   BASE number { debugger_output_base = $2; }
 	 | breakpointlife EVENT STRING ':' STRING optionalcondition {
 	     debugger_breakpoint_add_event( DEBUGGER_BREAKPOINT_TYPE_EVENT,
 					    $3, $5, 0, $1, $6 );
+	   }
+	 | breakpointlife EVENT STRING ':' '*' optionalcondition {
+	     debugger_breakpoint_add_event( DEBUGGER_BREAKPOINT_TYPE_EVENT,
+					    $3, "*", 0, $1, $6 );
 	   }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
 	 | COMMANDS number '\n' debuggercommands DEBUGGER_END { debugger_breakpoint_set_commands( $2, $4 ); }
@@ -268,8 +271,12 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1, debugger_memory_
 	        $$ = debugger_expression_new_binaryop( '-', $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
-	    | expression TIMES_DIVIDE expression {
-	        $$ = debugger_expression_new_binaryop( $2, $1, $3, debugger_memory_pool );
+	    | expression '*' expression {
+	        $$ = debugger_expression_new_binaryop( '*', $1, $3, debugger_memory_pool );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression '/' expression {
+	        $$ = debugger_expression_new_binaryop( '/', $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression EQUALITY expression {

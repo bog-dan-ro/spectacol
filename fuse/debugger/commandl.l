@@ -124,8 +124,8 @@ im|iff1|iff2 { yylval.reg = debugger_register_hash( yytext );
 
 "+"		{ return '+'; }
 "-"		{ return '-'; }
-"*"		{ yylval.token = '*'; return TIMES_DIVIDE; }
-"/"		{ yylval.token = '/'; return TIMES_DIVIDE; }
+"*"		{ return '*'; }
+"/"		{ return '/'; }
 
 "&"		{ return '&'; }
 "^"		{ return '^'; }
