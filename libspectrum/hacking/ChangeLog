@@ -1057,3 +1057,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (patch #364) (Fred).
 20160521 szx.c: reset uncompressed size when loading Opus and +D custom ROM
          (from patch #366) (Sergio).
+20160530 doc/libspectrum.txt: list more disk formats (Sergio).
