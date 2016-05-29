@@ -54,8 +54,9 @@ noinst_HEADERS += \
                   z80/z80_macros.h
 
 EXTRA_DIST += \
-              z80/tests/tests.in \
+              z80/tests/README \
               z80/tests/tests.expected \
+              z80/tests/tests.in \
               z80/opcodes_base.c \
               z80/opcodes_base.dat \
               z80/opcodes_cb.dat \

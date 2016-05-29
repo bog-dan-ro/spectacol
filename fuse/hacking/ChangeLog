@@ -5161,3 +5161,6 @@
          bug #304) (Sergio).
 20160526 debugger/commandl.l,man/fuse.1: allow strings with escaped espaces in
          the debugger (bug #337) (Sergio).
+20160529 Makefile.am,lib/Makefile.am,z80/Makefile.am: distribute
+         m4/ax_create_stdint_h.m4,lib/tests/success.d80.bz2 and z80/tests/README
+         (Sergio).

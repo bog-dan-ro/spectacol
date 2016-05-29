@@ -131,6 +131,7 @@ EXTRA_DIST = AUTHORS \
 	     THANKS \
 	     keysyms.dat \
 	     keysyms.pl \
+	     m4/ax_create_stdint_h.m4 \
 	     m4/ax_pthread.m4 \
 	     m4/glib-2.0.m4 \
 	     m4/gtk-2.0.m4 \
