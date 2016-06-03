@@ -5166,3 +5166,5 @@
          (Sergio).
 20160529 debugger/{commandl.l,commandy.y,event.c}: make wildcard events work
          (fixes bug #349) (thanks, Sergio) (Phil).
+20160604 data/shell-completion/bash/fuse: add TRD file extension to bash
+         completion and remove wrong options (Sergio).

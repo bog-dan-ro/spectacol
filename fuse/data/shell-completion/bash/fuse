@@ -51,7 +51,7 @@ _fuse()
     case $prev in
         --betadisk|--discipledisk|--didaktik80disk|--opusdisk| \
         --plus3disk|--plusddisk)
-            _filedir '@(d40|D40|d80|D80|dsk|DSK|img|IMG|fdi|FDI|mgt|MGT|opd|OPD|opu|OPU|sad|SAD|scl|SCL|td0|TD0|udi|UDI)'
+            _filedir '@(d40|D40|d80|D80|dsk|DSK|img|IMG|fdi|FDI|mgt|MGT|opd|OPD|opu|OPU|sad|SAD|scl|SCL|td0|TD0|trd|TRD|udi|UDI)'
             return 0
             ;;
         --disk-try-merge)
@@ -222,7 +222,6 @@ _fuse()
             --no-movie-stop-after-rzx --no-opus --no-pal-tv2x
             --no-plus3-detect-speedlock --no-plusd --no-printer
             --no-raw-s-net --no-rs232-handshake
-            --no-rs232-rx --no-rs232-tx
             --no-rzx-autosaves --no-simpleide --no-slt --no-sound
             --no-sound-force-8bit --no-speccyboot --no-specdrum
             --no-spectranet --no-spectranet-disable --no-statusbar
@@ -258,7 +257,7 @@ _fuse()
             --zxatasp-write-protect --zxcf --zxcf-cffile --zxcf-upload
             --zxprinter' -- "$cur" ) )
     else
-        _filedir '@(csw|CSW|ltp|LTP|pzx|PZX|spc|SPC|sta|STA|tap|TAP|tzx|TZX|wav|WAV|slt|SLT|sna?(pshot)|SNA?(PSHOT)|?(mgt)snp|?(MGT)SNP|sp|SP|szx|SZX|z80|Z80|zxs|ZXS|d40|D40|d80|D80|dsk|DSK|img|IMG|fdi|FDI|mgt|MGT|opd|OPD|opu|OPU|sad|SAD|scl|SCL|td0|TD0|udi|UDI|rzx|RZX|dck|DCK|hdf|HDF|mdr|MDR)'
+        _filedir '@(csw|CSW|ltp|LTP|pzx|PZX|spc|SPC|sta|STA|tap|TAP|tzx|TZX|wav|WAV|slt|SLT|sna?(pshot)|SNA?(PSHOT)|?(mgt)snp|?(MGT)SNP|sp|SP|szx|SZX|z80|Z80|zxs|ZXS|d40|D40|d80|D80|dsk|DSK|img|IMG|fdi|FDI|mgt|MGT|opd|OPD|opu|OPU|sad|SAD|scl|SCL|td0|TD0|trd|TRD|udi|UDI|rzx|RZX|dck|DCK|hdf|HDF|mdr|MDR)'
     fi
 } &&
 complete -F _fuse -o filenames fuse
