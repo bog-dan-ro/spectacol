@@ -5180,3 +5180,5 @@
          completion and remove wrong options (Sergio).
 20160604 data/shell-completion/bash/fuse: remove shebang in bash completion. The
          script is meant to be sourced, not executed (Sergio).
+20160604 debugger/expression.c: avoid doing divide by zero in debugger
+         expressions (fixes bug #350) (Fred).

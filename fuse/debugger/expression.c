@@ -367,8 +367,14 @@ evaluate_binaryop( struct binaryop_type *binary )
   case '*': return debugger_expression_evaluate( binary->op1 ) *
 		   debugger_expression_evaluate( binary->op2 );
 
-  case '/': return debugger_expression_evaluate( binary->op1 ) /
-		   debugger_expression_evaluate( binary->op2 );
+  case '/': {
+      libspectrum_dword op2 = debugger_expression_evaluate( binary->op2 );
+      if( op2 == 0 ) {
+        ui_error( UI_ERROR_ERROR, "divide by 0" );
+        return 0;
+      }
+      return debugger_expression_evaluate( binary->op1 ) / op2;
+    }
 
   case DEBUGGER_TOKEN_EQUAL_TO:
             return debugger_expression_evaluate( binary->op1 ) ==
