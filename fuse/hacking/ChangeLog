@@ -5168,3 +5168,5 @@
          (fixes bug #349) (thanks, Sergio) (Phil).
 20160604 data/shell-completion/bash/fuse: add TRD file extension to bash
          completion and remove wrong options (Sergio).
+20160604 data/shell-completion/bash/fuse: remove shebang in bash completion. The
+         script is meant to be sourced, not executed (Sergio).

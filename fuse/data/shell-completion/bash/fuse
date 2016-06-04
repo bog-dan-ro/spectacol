@@ -1,6 +1,5 @@
-#!/bin/bash
-
 # fuse: bash completion for fuse-emulator
+
 # Copyright (c) 2015 Sergio Baldoví
 
 # This program is free software; you can redistribute it and/or modify
