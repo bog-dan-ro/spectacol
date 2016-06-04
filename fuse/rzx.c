@@ -471,7 +471,6 @@ rzx_continue_recording( const char *filename )
     error = snapshot_copy_from( snap );
     if( error ) return error;
   } else {
-    ui_error( UI_ERROR_WARNING, "RZX file cannot be continued" );
     libspectrum_free( rzx_filename );
     libspectrum_rzx_free( rzx );
     return 1;

@@ -5172,6 +5172,8 @@
 20160531 z80/z80.c: remove local argument shadowing global (Fred).
 20160531 svg.c: don't declare svg_capture_mode when we don't have libxml2
          (Fred).
+20160601 menu.c,rzx.c: always report an error if we fail to continue a RZX
+         (Fred).
 20160604 data/shell-completion/bash/fuse: add TRD file extension to bash
          completion and remove wrong options (Sergio).
 20160604 data/shell-completion/bash/fuse: remove shebang in bash completion. The

@@ -918,6 +918,7 @@ MENU_CALLBACK( menu_file_recording_recordfromsnapshot )
 MENU_CALLBACK( menu_file_recording_continuerecording )
 {
   char *rzx_filename;
+  int error;
 
   if( rzx_playback || rzx_recording ) return;
 
@@ -926,7 +927,11 @@ MENU_CALLBACK( menu_file_recording_continuerecording )
   rzx_filename = ui_get_open_filename( "Fuse - Continue Recording" );
   if( !rzx_filename ) { fuse_emulation_unpause(); return; }
 
-  rzx_continue_recording( rzx_filename );
+  error = rzx_continue_recording( rzx_filename );
+
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    ui_error( UI_ERROR_WARNING, "RZX file cannot be continued" );
+  }
 
   libspectrum_free( rzx_filename );
 
