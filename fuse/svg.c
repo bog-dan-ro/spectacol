@@ -50,11 +50,10 @@
 #define BUFSZ 128
 
 int svg_capture_active = 0;
-static svg_capture_type svg_capture_mode = SVG_CAPTURE_LINES;
-
 
 #ifdef HAVE_LIB_XML2
 
+static svg_capture_type svg_capture_mode = SVG_CAPTURE_LINES;
 
 static char *svg_fname;
 static char *svg_fnameroot;
