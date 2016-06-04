@@ -5166,6 +5166,7 @@
          (Sergio).
 20160529 debugger/{commandl.l,commandy.y,event.c}: make wildcard events work
          (fixes bug #349) (thanks, Sergio) (Phil).
+20160531 svg.[hc],menu.c: tidy up svg_capture_mode (Fred).
 20160604 data/shell-completion/bash/fuse: add TRD file extension to bash
          completion and remove wrong options (Sergio).
 20160604 data/shell-completion/bash/fuse: remove shebang in bash completion. The

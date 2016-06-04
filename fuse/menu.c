@@ -771,8 +771,7 @@ MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureinlinemode )
     if( !filename ) { fuse_emulation_unpause(); return; }
 
     ui_menu_activate( UI_MENU_ITEM_FILE_SVG_CAPTURE, 1 );
-    svg_capture_mode = SVG_CAPTURE_LINES;
-    svg_startcapture( filename );
+    svg_startcapture( filename, SVG_CAPTURE_LINES );
 
     fuse_emulation_unpause();
   }
@@ -791,8 +790,7 @@ MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureindotmode )
     if( !filename ) { fuse_emulation_unpause(); return; }
     ui_menu_activate( UI_MENU_ITEM_FILE_SVG_CAPTURE, 1 );
 
-    svg_capture_mode = SVG_CAPTURE_DOTS;
-    svg_startcapture( filename );
+    svg_startcapture( filename, SVG_CAPTURE_DOTS );
 
     fuse_emulation_unpause();
   }

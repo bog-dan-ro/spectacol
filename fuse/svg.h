@@ -30,16 +30,15 @@
 
 extern int svg_capture_active;     /* SVG capture enabled? */
 
-extern void svg_startcapture( const char *name );
+typedef enum svg_capture_type {
+  SVG_CAPTURE_DOTS,
+  SVG_CAPTURE_LINES,
+} svg_capture_type;
 
-extern void svg_stopcapture( void );
+void svg_startcapture( const char *name, svg_capture_type mode );
+void svg_stopcapture( void );
 
 void svg_capture( void );
 void svg_capture_end( void );
-
-#define SVG_CAPTURE_DOTS   1
-#define SVG_CAPTURE_LINES  2
-
-extern int svg_capture_mode;     /* SVG capture enabled? */
 
 #endif				/* #ifndef FUSE_SVG_H */
