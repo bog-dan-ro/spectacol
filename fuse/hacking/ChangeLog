@@ -5169,6 +5169,7 @@
 20160531 svg.[hc],menu.c: tidy up svg_capture_mode (Fred).
 20160531 ui/ui.h: remove prototypes for obsolete functions (Fred).
 20160531 rzx.c: remove local arguments shadowing globals (Fred).
+20160531 z80/z80.c: remove local argument shadowing global (Fred).
 20160604 data/shell-completion/bash/fuse: add TRD file extension to bash
          completion and remove wrong options (Sergio).
 20160604 data/shell-completion/bash/fuse: remove shebang in bash completion. The
