@@ -5182,3 +5182,5 @@
          script is meant to be sourced, not executed (Sergio).
 20160604 debugger/expression.c: avoid doing divide by zero in debugger
          expressions (fixes bug #350) (Fred).
+20160604 tape.c: fix use of tape traps if VERIFY is requested (thanks, Alberto
+         Garcia) (more from patch #337) (Fred).
