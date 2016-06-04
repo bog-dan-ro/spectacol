@@ -5174,6 +5174,8 @@
          (Fred).
 20160601 menu.c,rzx.c: always report an error if we fail to continue a RZX
          (Fred).
+20160601 fuse.c: use capabilities to decide whether a machine with a suitable
+         disk interface is currently running (Fred).
 20160604 data/shell-completion/bash/fuse: add TRD file extension to bash
          completion and remove wrong options (Sergio).
 20160604 data/shell-completion/bash/fuse: remove shebang in bash completion. The

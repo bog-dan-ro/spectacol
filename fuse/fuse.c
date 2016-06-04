@@ -617,13 +617,11 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
       start_files->disk_beta = filename; break;
 
     case LIBSPECTRUM_CLASS_DISK_GENERIC:
-      if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ||
-          machine_current->machine == LIBSPECTRUM_MACHINE_PLUS2A )
+      if( machine_current->capabilities &
+                 LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK )
         start_files->disk_plus3 = filename;
-      else if( machine_current->machine == LIBSPECTRUM_MACHINE_PENT ||
-          machine_current->machine == LIBSPECTRUM_MACHINE_PENT512 ||
-          machine_current->machine == LIBSPECTRUM_MACHINE_PENT1024 ||
-          machine_current->machine == LIBSPECTRUM_MACHINE_SCORP )
+      else if( machine_current->capabilities &
+                 LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK )
         start_files->disk_beta = filename; 
       else {
         if( periph_is_active( PERIPH_TYPE_BETA128 ) )
