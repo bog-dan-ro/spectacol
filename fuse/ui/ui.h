@@ -121,12 +121,6 @@ int ui_mouse_release( int suspend ); /* UI: ungrab, return 0 if done */
 /* Write the current tape out */
 int ui_tape_write( void );
 
-/* Write a +3, Beta or +D disk out */
-int ui_plus3_disk_write( specplus3_drive_number which, int saveas );
-int ui_beta_disk_write( beta_drive_number which, int saveas );
-int ui_opus_disk_write( opus_drive_number which, int saveas );
-int ui_plusd_disk_write( plusd_drive_number which, int saveas );
-int ui_disciple_disk_write( disciple_drive_number which, int saveas );
 int ui_mdr_write( int which, int saveas );
 
 /* Get a rollback point from the given list */
