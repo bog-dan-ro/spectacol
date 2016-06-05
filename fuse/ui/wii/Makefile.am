@@ -48,4 +48,5 @@ ui_wii_files = \
 ui_wii_built = ui/wii/keysyms.c
 
 ui/wii/keysyms.c: $(srcdir)/keysyms.pl $(srcdir)/keysyms.dat
+	@$(MKDIR_P) ui/wii
 	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/keysyms.pl wii $(srcdir)/keysyms.dat > $@.tmp && mv $@.tmp $@

@@ -5184,3 +5184,6 @@
          expressions (fixes bug #350) (Fred).
 20160604 tape.c: fix use of tape traps if VERIFY is requested (thanks, Alberto
          Garcia) (more from patch #337) (Fred).
+20160606 ui/{fb,gtk,sdl,svga,widget,wii,win32,xlib}/Makefile.am,z80/Makefile.am:
+         fix VPATH builds without dependency tracking (patch #368) (Alberto
+         Garcia).
