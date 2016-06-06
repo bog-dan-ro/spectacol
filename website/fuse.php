@@ -54,7 +54,8 @@ fuse_section ("Features", "What features does it have?", <<<END_SECTION
    <li>Kempston joystick emulation.</li>
    <li>Emulation of the various printers you could attach to the Spectrum.</li>
    <li>Support for the RZX input recording file format, including 'competition mode'.</li>
-   <li>Emulation of the DivIDE, Interface 1, +D, DISCiPLE, Beta 128, Opus Discovery, Kempston mouse, Fuller audio box, SpecDrum, Spectrum +3e, ZXATASP and ZXCF interfaces.</li>
+   <li>Emulation of the Currah &mu;Source, DivIDE, Fuller audio box, Interface 1, Kempston mouse, SpecDrum, Spectrum +3e, ZXATASP and ZXCF interfaces.</li>
+   <li>Emulation of the Beta 128, +D, Didaktik 80/40, DISCiPLE and Opus Discovery interfaces.</li>
    <li>Emulation of the Spectranet and SpeccyBoot interfaces.</li>
   </ul>
 
@@ -150,8 +151,8 @@ fuse_section ("Source", "Source", <<<END_SECTION
   <ul>
    <li>First, check the requirements below and ensure all the libraries you want/need are installed.</li>
    <li>Secondly, install <a href="libspectrum.php">libspectrum</a>.</li>
-   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.1.1/fuse-1.1.1.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.1.1/fuse-1.1.1.tar.gz.asc/download">PGP signature</a>).</li>
-   <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.1.1/fuse-utils-1.1.1.tar.gz/download">own package</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.1.1/fuse-utils-1.1.1.tar.gz.asc/download">PGP signature</a>). Note that
+   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz.asc/download">PGP signature</a>).</li>
+   <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz/download">own package</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz.asc/download">PGP signature</a>). Note that
 you'll still need <a href="libspectrum.php">libspectrum</a> installed to run these.</li>
    <!--
    <li>The above are also mirrored at <a href="http://www.worldofspectrum.org/">World of Spectrum</a>: <a
@@ -175,8 +176,8 @@ href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.1.1.tar.g
     <ul>
      <li><a href="http://www.gnu.org/software/libgcrypt/">libgcrypt</a>: the ability to digitally sign RZX files (note that Fuse requires version 1.1.42 or later).</li>
      <li><a href="http://www.libpng.org/pub/png/libpng.html">libpng</a>: the ability to save screenshots.</li>
-     <li><a href="http://xmlsoft.org/">libxml2</a>: the ability to load and save Fuse's current configuration.</li>
-     <li><a href="http://freecode.com/projects/libjsw">libjsw</a>: allow joystick input to be used (not required for joystick emulation).</li>
+     <li><a href="http://xmlsoft.org/">libxml2</a>: the ability to load and save Fuse's current configuration and capture BASIC video functions to SVG.</li>
+     <li><a href="http://www.libsdl.org/">SDL</a> or <a href="http://freecode.com/projects/libjsw">libjsw</a>: allow joystick input to be used (not required for joystick emulation).</li>
      <li><a href="http://www.zlib.net/">zlib</a>: support for compressed RZX files.</li>
      <li><a href="http://www.bzip.org/">libbzip2</a>: support for certain compressed files.</li>
      <li><a href="http://www.68k.org/~michael/audiofile/">libaudiofile</a>: support for loading from .wav files.</li>
@@ -191,12 +192,12 @@ END_SECTION
 #<!-- ======================================================= -->
 
 fuse_section (NULL, "What's new?", <<<END_SECTION
-  <h3>1.1.0 / 1.1.1</h3>
+  <h3>1.2.0</h3>
   <ul>
-    <li>Emulation of the Spectranet, SpeccyBoot, SpecDrum and DISCiPLE interfaces</li>
-    <li>Support for reading PZX and POK files</li>
-    <li>Support for recording FMF movies</li>
-    <li>GTK+ 3 compatibility</li>
+    <li>Emulation of the Currah &mu;Source and Didaktik 80/40 interfaces.</li>
+    <li>Capture BASIC video functions to SVG file.</li>
+    <li>Support bash completion.</li>
+    <li>Really lots of bugfixes and miscellaneous improvements.</li>
   </ul>
 
 END_SECTION
