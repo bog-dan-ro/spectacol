@@ -771,8 +771,7 @@ MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureinlinemode )
     if( !filename ) { fuse_emulation_unpause(); return; }
 
     ui_menu_activate( UI_MENU_ITEM_FILE_SVG_CAPTURE, 1 );
-    svg_capture_mode = SVG_CAPTURE_LINES;
-    svg_startcapture( filename );
+    svg_startcapture( filename, SVG_CAPTURE_LINES );
 
     fuse_emulation_unpause();
   }
@@ -791,8 +790,7 @@ MENU_CALLBACK( menu_file_scalablevectorgraphics_startcaptureindotmode )
     if( !filename ) { fuse_emulation_unpause(); return; }
     ui_menu_activate( UI_MENU_ITEM_FILE_SVG_CAPTURE, 1 );
 
-    svg_capture_mode = SVG_CAPTURE_DOTS;
-    svg_startcapture( filename );
+    svg_startcapture( filename, SVG_CAPTURE_DOTS );
 
     fuse_emulation_unpause();
   }
@@ -920,6 +918,7 @@ MENU_CALLBACK( menu_file_recording_recordfromsnapshot )
 MENU_CALLBACK( menu_file_recording_continuerecording )
 {
   char *rzx_filename;
+  int error;
 
   if( rzx_playback || rzx_recording ) return;
 
@@ -928,7 +927,11 @@ MENU_CALLBACK( menu_file_recording_continuerecording )
   rzx_filename = ui_get_open_filename( "Fuse - Continue Recording" );
   if( !rzx_filename ) { fuse_emulation_unpause(); return; }
 
-  rzx_continue_recording( rzx_filename );
+  error = rzx_continue_recording( rzx_filename );
+
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    ui_error( UI_ERROR_WARNING, "RZX file cannot be continued" );
+  }
 
   libspectrum_free( rzx_filename );
 

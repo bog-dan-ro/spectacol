@@ -215,3 +215,17 @@ libspectrum_byte disciple_data
 libspectrum_byte disciple_status
 libspectrum_byte* disciple_rom 1
 libspectrum_byte* disciple_ram 1
+
+int didaktik80_active
+int didaktik80_paged
+int didaktik80_drive_count
+int didaktik80_custom_rom
+size_t didaktik80_rom_length 1
+int didaktik80_direction
+libspectrum_byte didaktik80_aux
+libspectrum_byte didaktik80_track
+libspectrum_byte didaktik80_sector
+libspectrum_byte didaktik80_data
+libspectrum_byte didaktik80_status
+libspectrum_byte* didaktik80_rom 1
+libspectrum_byte* didaktik80_ram 1

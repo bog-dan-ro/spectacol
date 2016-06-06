@@ -50,11 +50,10 @@
 #define BUFSZ 128
 
 int svg_capture_active = 0;
-int svg_capture_mode = SVG_CAPTURE_LINES;
-
 
 #ifdef HAVE_LIB_XML2
 
+static svg_capture_type svg_capture_mode = SVG_CAPTURE_LINES;
 
 static char *svg_fname;
 static char *svg_fnameroot;
@@ -315,10 +314,13 @@ svg_closefile( void )
 
 
 
+/* some init, open file (name)*/
 void
-svg_startcapture( const char *name )  /* some init, open file (name)*/
+svg_startcapture( const char *name, svg_capture_type mode )
 {
   if( !svg_capture_active ) {
+
+    svg_capture_mode = mode;
 
     if( name == NULL || *name == '\0' )
       name = "fuse";
@@ -638,7 +640,7 @@ svg_capture( void )
 
     if( ( machine_current->machine == LIBSPECTRUM_MACHINE_TS2068 ) ||
         ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ) ) {
-      if( ( svg_capture_mode == SVG_CAPTURE_DOTS) && ( z80.pc.w == 0x263e ) )
+      if( ( svg_capture_mode == SVG_CAPTURE_DOTS ) && ( z80.pc.w == 0x263e ) )
         svg_capture_draw();
 
       if( ( svg_capture_mode == SVG_CAPTURE_LINES ) &&

@@ -148,6 +148,7 @@ fmfconv_SOURCES += fmfconv_res.rc
 listbasic_SOURCES += listbasic_res.rc
 profile2map_SOURCES += profile2map_res.rc
 raw2hdf_SOURCES += raw2hdf_res.rc
+rzxcheck_SOURCES += rzxcheck_res.rc
 rzxdump_SOURCES += rzxdump_res.rc
 rzxtool_SOURCES += rzxtool_res.rc
 scl2trd_SOURCES += scl2trd_res.rc

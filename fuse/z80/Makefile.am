@@ -34,18 +34,23 @@ BUILT_SOURCES += \
                  z80/z80_ed.c
 
 z80/opcodes_base.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_base.dat
+	@$(MKDIR_P) z80
 	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_base.dat > $@.tmp && mv $@.tmp $@
 
 z80/z80_cb.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_cb.dat
+	@$(MKDIR_P) z80
 	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_cb.dat > $@.tmp && mv $@.tmp $@
 
 z80/z80_ddfd.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfd.dat
+	@$(MKDIR_P) z80
 	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfd.dat > $@.tmp && mv $@.tmp $@
 
 z80/z80_ddfdcb.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfd.dat
+	@$(MKDIR_P) z80
 	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ddfdcb.dat > $@.tmp && mv $@.tmp $@
 
 z80/z80_ed.c: $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ed.dat
+	@$(MKDIR_P) z80
 	$(AM_V_GEN)$(PERL) -I$(srcdir)/perl $(srcdir)/z80/z80.pl $(srcdir)/z80/opcodes_ed.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS += \
@@ -54,8 +59,9 @@ noinst_HEADERS += \
                   z80/z80_macros.h
 
 EXTRA_DIST += \
-              z80/tests/tests.in \
+              z80/tests/README \
               z80/tests/tests.expected \
+              z80/tests/tests.in \
               z80/opcodes_base.c \
               z80/opcodes_base.dat \
               z80/opcodes_cb.dat \

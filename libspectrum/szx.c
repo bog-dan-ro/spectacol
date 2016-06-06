@@ -717,6 +717,8 @@ read_opus_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     *buffer += disc_ram_length;
 
     if( libspectrum_snap_opus_custom_rom( snap ) ) {
+      uncompressed_length = 0;
+
       error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
                                         *buffer, disc_rom_length, &rom_data,
                                         &uncompressed_length );
@@ -917,6 +919,8 @@ read_plsd_chunk( libspectrum_snap *snap, libspectrum_word version GCC_UNUSED,
     *buffer += disc_ram_length;
 
     if( libspectrum_snap_plusd_custom_rom( snap ) ) {
+      uncompressed_length = 0;
+
       error = libspectrum_zlib_inflate( libspectrum_snap_context(snap),
                                         *buffer, disc_rom_length, &rom_data,
                                         &uncompressed_length );
@@ -2493,6 +2497,10 @@ libspectrum_szx_write( libspectrum_byte **buffer, size_t *length,
 
   /* We don't save the DISCiPLE state at all */
   if( libspectrum_snap_disciple_active( snap ) )
+    *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
+
+  /* We don't save the Didaktik80 state at all */
+  if( libspectrum_snap_didaktik80_active( snap ) )
     *out_flags |= LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS;
 
   capabilities =

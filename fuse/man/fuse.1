@@ -54,7 +54,7 @@ TAP tape files is supported. The SLT extension to the Z80 format is
 partly supported (enough for multi-load games); however, loading of
 the old DAT-file variant is not.
 .PP
-DSK, UDI, FDI, TR0, SDF, MGT, IMG, D40, D80, SAD, TRD, SCL and OPD
+DSK, UDI, FDI, TD0, MGT, IMG, D40, D80, SAD, TRD, SCL and OPD
 disk images are supported when a disk interface is being emulated,
 including the integrated disk drives on +3, Pentagon or Scorpion
 machines as well as the +D, DISCiPLE, Opus Discovery, Beta\ 128 and
@@ -4178,9 +4178,14 @@ pane shows where the Spectrum's 64K memory map (the
 .RI ` W? '
 and
 .RI ` C? '
-indicate whether each 8K chunk is writable or contended respectively),
-and the next a disassembly, which by default starts at the current
-program counter, although this can be modified either by the
+indicate whether each displayed chunk is writable or contended respectively).
+Fuse tracks the memory mapping of the overall address space in 2KB chunks but 
+will summarise the mapped pages where they are part of the same page of the 
+underlying memory source (e.g. 8KB page sizes in the Spectrum 128K and 4KB 
+pages in the Timex clones' DOCK and EXROM banks).
+.PP
+The next pane to the right has a disassembly, which by default starts 
+at the current program counter, although this can be modified either by the
 `disassemble' command (see below) or by dragging the scrollbar next to
 it. The next pane shows the current stack, and the final pane any
 `events' which are due to occur and could affect emulation. Any of
@@ -4313,6 +4318,13 @@ rzx:end
 An RZX recording finishes playing
 .RE
 .br
+spectranet:page
+.br
+spectranet:unpage
+.RS
+The Spectranet interface is paged into or out of memory
+.RE
+.br
 tape:play
 .br
 tape:stop
@@ -4320,18 +4332,18 @@ tape:stop
 The emulated tape starts or stops playing
 .RE
 .br
-zxcf:page
-.br
-zxcf:unpage
-.RS
-The ZXCF interface is paged into or out of memory
-.RE
-.br
 zxatasp:page
 .br
 zxatasp:unpage
 .RS
 The ZXATASP interface is paged into or out of memory
+.RE
+.br
+zxcf:page
+.br
+zxcf:unpage
+.RS
+The ZXCF interface is paged into or out of memory
 .RE
 .PP
 In all cases, the event can be specified as
@@ -4527,8 +4539,8 @@ sources (e.g. offset 0x1234 in ROM\ 1 is specified as
 .RI ` ROM:1:0x1234 "')."
 Another available sources are:
 .RI ` Betadisk "',"
-.RI ` "Didaktik RAM" "',"
-.RI ` "Didaktik ROM" "',"
+.RI ` "Didaktik 80 RAM" "',"
+.RI ` "Didaktik 80 ROM" "',"
 .RI ` "DISCiPLE RAM" "',"
 .RI ` "DISCiPLE ROM" "',"
 .RI ` "DivIDE EPROM" "',"
@@ -4542,9 +4554,12 @@ Another available sources are:
 .RI ` Spectranet "',"
 .RI ` "Timex Dock" "',"
 .RI ` "Timex EXROM" "',"
+.RI ` uSource "',"
 .RI ` ZXATASP '
 and
 .RI ` ZXCF "'."
+Please, note that spaces in memory sources should be escaped, e.g.,
+`break Didaktik\\\ 80\\\ ROM:0:0x1234'.
 The 48K machines are treated as having a permanent
 mapping of page\ 5 at 0x4000, page\ 2 at 0x8000 and page\ 0 at 0xC000;
 the 16K\ Spectrum is treated as having page\ 5 at 0x4000 and no page at
@@ -4561,6 +4576,8 @@ variables, parentheses, the standard four numeric operations (`+',
 `\-', `*' and `/'), the (non-)equality operators `==' and `!=', the
 comparison operators `>', `<', `>=' and `<=', bitwise and (`&'), or
 (`|') and exclusive or (`^') and logical and (`&&') and or (`||').
+Square brackets (`[' and `]') can be used to dereference a value; for
+example `[0x4000]' will give the value of the first byte of the screen.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -4864,7 +4881,6 @@ DISCiPLE/+D file formats.
 .RE
 .PP
 .I .SAD
-.I .SDF
 .RS
 For compatibility with SAM Coup\('e disk images using these formats.
 Note that SAM Coup\('e `.DSK' images share the same format as `.MGT'.

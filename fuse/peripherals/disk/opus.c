@@ -46,6 +46,9 @@
 #include "options.h"	/* needed for get combo options */
 #include "z80/z80.h"
 
+/* 8KB ROM */
+#define OPUS_ROM_SIZE 0x2000
+/* 2KB ROM */
 #define OPUS_RAM_SIZE 0x0800
 
 static int opus_rom_memory_source, opus_ram_memory_source;
@@ -174,7 +177,7 @@ opus_reset( int hard_reset )
 
   if( machine_load_rom_bank( opus_memory_map_romcs_rom, 0,
                              settings_current.rom_opus,
-                             settings_default.rom_opus, 0x2000 ) ) {
+                             settings_default.rom_opus, OPUS_ROM_SIZE ) ) {
     settings_current.opus = 0;
     periph_activate_type( PERIPH_TYPE_OPUS, 0 );
     return;
@@ -214,7 +217,6 @@ opus_reset( int hard_reset )
   opus_fdc->current_drive = &opus_drives[ 0 ];
   fdd_select( &opus_drives[ 0 ], 1 );
   machine_current->memory_map();
-
 }
 
 void
@@ -396,16 +398,6 @@ opus_write( libspectrum_word address, libspectrum_byte b )
   }
 }
 
-static libspectrum_byte *
-alloc_and_copy_page( libspectrum_byte* source_page )
-{
-  libspectrum_byte *buffer;
-  buffer = libspectrum_new( libspectrum_byte, MEMORY_PAGE_SIZE );
-
-  memcpy( buffer, source_page, MEMORY_PAGE_SIZE );
-  return buffer;
-}
-
 static void
 opus_enabled_snapshot( libspectrum_snap *snap )
 {
@@ -423,7 +415,7 @@ opus_from_snapshot( libspectrum_snap *snap )
       machine_load_rom_bank_from_buffer(
                              opus_memory_map_romcs_rom, 0,
                              libspectrum_snap_opus_rom( snap, 0 ),
-                             0x2000, 1 ) )
+                             OPUS_ROM_SIZE, 1 ) )
     return;
 
   if( libspectrum_snap_opus_ram( snap, 0 ) ) {
@@ -461,17 +453,24 @@ opus_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
   int drive_count = 0;
+  int i;
 
   if( !periph_is_active( PERIPH_TYPE_OPUS ) ) return;
 
   libspectrum_snap_set_opus_active( snap, 1 );
 
-  buffer = alloc_and_copy_page( opus_memory_map_romcs_rom[0].page );
+  buffer = libspectrum_new( libspectrum_byte, OPUS_ROM_SIZE );
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    memcpy( buffer + i * MEMORY_PAGE_SIZE,
+            opus_memory_map_romcs_rom[ i ].page, MEMORY_PAGE_SIZE );
+
   libspectrum_snap_set_opus_rom( snap, 0, buffer );
+
   if( opus_memory_map_romcs_rom[0].save_to_snapshot )
     libspectrum_snap_set_opus_custom_rom( snap, 1 );
 
-  buffer = alloc_and_copy_page( opus_ram );
+  buffer = libspectrum_new( libspectrum_byte, OPUS_RAM_SIZE );
+  memcpy( buffer, opus_ram, OPUS_RAM_SIZE );
   libspectrum_snap_set_opus_ram( snap, 0, buffer );
 
   drive_count++; /* Drive 1 is not removable */

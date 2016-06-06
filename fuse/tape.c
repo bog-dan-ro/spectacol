@@ -363,12 +363,6 @@ int tape_load_trap( void )
     return -1;
   }
 
-  /* Verify? For now don't run the traps in that situation */
-  if( !(F_ & FLAG_C) ) {
-    tape_play( 1 );
-    return -1;
-  }
-
   /* We don't properly handle the case of partial loading, so don't run
      the traps in that situation */
   if( libspectrum_tape_block_data_length( block ) != DE + 2 ) {
@@ -412,7 +406,7 @@ static int
 trap_load_block( libspectrum_tape_block *block )
 {
   libspectrum_byte parity, *data;
-  int i = 0, length, read;
+  int i = 0, length, read, verify;
 
   /* On exit:
    *  A = calculated parity byte if parity checked, else 0 (CHECKME)
@@ -446,6 +440,7 @@ trap_load_block( libspectrum_tape_block *block )
     return 0;
   }
 
+  verify =  !(F_ & FLAG_C);
   i = A_; /* i = A' (flag byte) */
   AF_ = 0x0145;
   A = 0;
@@ -461,12 +456,7 @@ trap_load_block( libspectrum_tape_block *block )
   L = data[read - 1];
 
   /* Loading or verifying determined by the carry flag of F' */
-  if( F_ & FLAG_C ) {
-    for( i = 0; i < read; i++ ) {
-      parity ^= data[i];
-      writebyte_internal( IX+i, data[i] );
-    }
-  } else {		/* verifying */
+  if( verify ) {		/* verifying */
     for( i = 0; i < read; i++ ) {
       parity ^= data[i];
       if( data[i] != readbyte_internal(IX+i) ) {
@@ -474,6 +464,11 @@ trap_load_block( libspectrum_tape_block *block )
         L = data[i];
 	goto error_ret;
       }
+    }
+  } else {
+    for( i = 0; i < read; i++ ) {
+      parity ^= data[i];
+      writebyte_internal( IX+i, data[i] );
     }
   }
 

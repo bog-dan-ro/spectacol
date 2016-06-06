@@ -45,6 +45,11 @@
 #include "wd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 
+/* 8KB ROM */
+#define ROM_SIZE 0x2000
+/* 8KB RAM */
+#define RAM_SIZE 0x2000
+
 /* Two 8KB memory chunks accessible by the Z80 when /ROMCS is low */
 static memory_page plusd_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page plusd_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
@@ -199,7 +204,7 @@ plusd_reset( int hard_reset )
 
   if( machine_load_rom_bank( plusd_memory_map_romcs_rom, 0,
 			     settings_current.rom_plusd,
-			     settings_default.rom_plusd, 0x2000 ) ) {
+			     settings_default.rom_plusd, ROM_SIZE ) ) {
     settings_current.plusd = 0;
     periph_activate_type( PERIPH_TYPE_PLUSD, 0 );
     return;
@@ -216,7 +221,7 @@ plusd_reset( int hard_reset )
   plusd_active = 1;
 
   if( hard_reset )
-    memset( plusd_ram, 0, 0x2000 );
+    memset( plusd_ram, 0, RAM_SIZE );
 
   wd_fdc_master_reset( plusd_fdc );
 
@@ -372,16 +377,6 @@ plusd_get_fdd( plusd_drive_number which )
   return &( plusd_drives[ which ] );
 }
 
-static libspectrum_byte *
-alloc_and_copy_page( libspectrum_byte* source_page )
-{
-  libspectrum_byte *buffer;
-  buffer = libspectrum_new( libspectrum_byte, MEMORY_PAGE_SIZE );
-
-  memcpy( buffer, source_page, MEMORY_PAGE_SIZE );
-  return buffer;
-}
-
 static void
 plusd_enabled_snapshot( libspectrum_snap *snap )
 {
@@ -399,12 +394,12 @@ plusd_from_snapshot( libspectrum_snap *snap )
       machine_load_rom_bank_from_buffer(
                              plusd_memory_map_romcs_rom, 0,
                              libspectrum_snap_plusd_rom( snap, 0 ),
-                             0x2000, 1 ) )
+                             ROM_SIZE, 1 ) )
     return;
 
   if( libspectrum_snap_plusd_ram( snap, 0 ) ) {
     memcpy( plusd_ram,
-            libspectrum_snap_plusd_ram( snap, 0 ), 0x2000 );
+            libspectrum_snap_plusd_ram( snap, 0 ), RAM_SIZE );
   }
 
   /* ignore drive count for now, there will be an issue with loading snaps where
@@ -432,17 +427,23 @@ plusd_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
   int drive_count = 0;
+  int i;
 
   if( !periph_is_active( PERIPH_TYPE_PLUSD ) ) return;
 
   libspectrum_snap_set_plusd_active( snap, 1 );
 
-  buffer = alloc_and_copy_page( plusd_memory_map_romcs_rom[ 0 ].page );
+  buffer = libspectrum_new( libspectrum_byte, ROM_SIZE );
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    memcpy( buffer + i * MEMORY_PAGE_SIZE,
+            plusd_memory_map_romcs_rom[ i ].page, MEMORY_PAGE_SIZE );
   libspectrum_snap_set_plusd_rom( snap, 0, buffer );
+
   if( plusd_memory_map_romcs_rom[ 0 ].save_to_snapshot )
     libspectrum_snap_set_plusd_custom_rom( snap, 1 );
 
-  buffer = alloc_and_copy_page( plusd_ram );
+  buffer = libspectrum_new( libspectrum_byte, RAM_SIZE );
+  memcpy( buffer, plusd_ram, RAM_SIZE );
   libspectrum_snap_set_plusd_ram( snap, 0, buffer );
 
   drive_count++; /* Drive 1 is not removable */
@@ -462,7 +463,7 @@ static void
 plusd_activate( void )
 {
   if( !memory_allocated ) {
-    plusd_ram = memory_pool_allocate_persistent( 0x2000, 1 );
+    plusd_ram = memory_pool_allocate_persistent( RAM_SIZE, 1 );
     memory_allocated = 1;
   }
 }

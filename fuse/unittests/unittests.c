@@ -1,5 +1,5 @@
 /* unittests.c: unit testing framework for Fuse
-   Copyright (c) 2008-2015 Philip Kendall
+   Copyright (c) 2008-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -224,6 +224,26 @@ floating_bus_test( void )
 }
 
 #define TEST_ASSERT(x) do { if( !(x) ) { printf("Test assertion failed at %s:%d: %s\n", __FILE__, __LINE__, #x ); return 1; } } while( 0 )
+
+static int
+floating_bus_merge_test( void )
+{
+  /* If peripherals asserted all lines, should see no change */
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0xff, 0x00 ) == 0xaa ); 
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0xff, 0xff ) == 0xaa ); 
+
+  /* If peripherals asserted nothing, should pull all lines down */
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x00, 0x00 ) == 0x00 ); 
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x00, 0xff ) == 0xaa ); 
+
+  /* Tests when peripherals asserted some lines */
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0xf0, 0x00 ) == 0xa0 );
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0xf0, 0xff ) == 0xaa );
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0x00 ) == 0x0a );
+  TEST_ASSERT( periph_merge_floating_bus( 0xaa, 0x0f, 0xff ) == 0xaa );
+
+  return 0;
+}
 
 static int
 mempool_test( void )
@@ -757,6 +777,7 @@ unittests_run( void )
 
   r += contention_test();
   r += floating_bus_test();
+  r += floating_bus_merge_test();
   r += mempool_test();
   r += paging_test();
 
