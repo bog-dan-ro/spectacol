@@ -27,6 +27,7 @@
 #ifdef Q_OS_ANDROID
 # include <QtAndroid>
 #endif
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);

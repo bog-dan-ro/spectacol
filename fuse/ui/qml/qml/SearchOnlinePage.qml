@@ -70,7 +70,7 @@ Rectangle {
             onAccepted: {
                 noResults.visible = false;
                 timer.stop();
-                if (searchText.text.length == 1)
+                if (searchText.text.length === 1)
                     onlineGamesModel.search("", searchText.text);
                 else
                     onlineGamesModel.search(searchText.text);
@@ -86,12 +86,13 @@ Rectangle {
                 pageLoader.source = "";
                 fuse.copyToFavourites(model.getPath(currentIndex))
             }
+            property real __scale: width / 320. > 3 ? width / 320. : 3
             clip: true
             focus: true
             currentIndex: 0
             Layout.alignment: Qt.AlignHCenter
             Layout.fillHeight: true
-            cellWidth: 320 / TextSizes.scaleImage + 4 * Screen.pixelDensity
+            cellWidth: width / __scale
             cellHeight: cellWidth
             Layout.preferredWidth: Math.floor(parent.width / Math.ceil(cellWidth)) * Math.ceil(cellWidth)
             populate: Transition {
@@ -105,25 +106,22 @@ Rectangle {
             }
             delegate: Item {
                 width: grid.cellWidth; height: grid.cellHeight
-                ColumnLayout {
-                    anchors.fill: parent
-                    Image {
-                        Layout.margins: 2 * Screen.pixelDensity
-                        Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredHeight: 240 / TextSizes.scaleImage
-                        Layout.preferredWidth: 320 / TextSizes.scaleImage
-                        source: "image://spectrum/" + screenFile
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    FancyText {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
-                        Layout.margins: TextSizes.scale14 / 2
-                        text: title
-                        horizontalAlignment: Text.AlignHCenter
-                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
+                Image {
+                    anchors.margins: 2 * Screen.pixelDensity
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    fillMode: Image.PreserveAspectFit
+                    source: "image://spectrum/" + screenFile
+                }
+                FancyText {
+                    anchors.margins: 2 * Screen.pixelDensity
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    text: title
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 }
                 MouseArea {
                     anchors.fill: parent
