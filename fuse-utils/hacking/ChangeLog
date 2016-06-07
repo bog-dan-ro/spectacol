@@ -544,6 +544,7 @@
          rzxcheck.1,rzxdump.1,rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,
          tape2wav.1,tapeconv.1,tzxlist.1}: merge fuse-utils_1_1_0-branch changes
          onto trunk (Fred).
+20160425 ChangeLog: first updates for a "1.2.0" release (Fred).
 20160425 man/tzxlist.1,tzxlist.c: allow tzxlist dump standard data blocks (patch
          #328) (Gergely Szasz).
 20160427 tzxlist.c: share implementation between fprint_block_name() and
@@ -560,5 +561,22 @@
          rzxdump.c,rzxtool.c,scl2trd.c,snap2tzx.c,snapconv.c,tape2wav.c,
          tapeconv.c,tzxlist.c: have a go at updating copyright dates since
          v 1.1.1 (Fred).
+20160430 ChangeLog: add recent merges. Remove commits discarded in final
+         release. Tabs are evil (Sergio).
 20160501 m4/Makefile.am: fix distribution of macro files (Sergio).
+20160501 man/{audio2tape.1,createhdf.1,fmfconv.1,fuse-utils.1,listbasic.1,
+         profile2map.1,raw2hdf.1,rzxcheck.1,rzxdump.1,rzxtool.1,scl2trd.1,
+         snap2tzx.1,snapconv.1,tape2pulses.1,tape2wav.1,tapeconv.1,tzxlist.1}:
+         bump more version numbers for 1.2.0 release (Sergio).
 20160529 Makefile.am: use and distribute rzxcheck_res.rc (Sergio).
+20160529 README,man/{audio2tape.1,createhdf.1,fmfconv.1,fuse-utils.1,
+         listbasic.1,profile2map.1,raw2hdf.1,rzxcheck.1,rzxdump.1,rzxtool.1,
+         scl2trd.1,snap2tzx.1,snapconv.1,tape2wav.1,tapeconv.1,tzxlist.1}:
+         update release dates (Fred).
+20160529 configure.ac: mark release as 1.2.0-pre1 (Fred).
+20160530 man/tape2pulses.1: update more release dates (Sergio).
+20160606 ChangeLog,README,configure.ac,man/{audio2tape.1,createhdf.1,fmfconv.1,
+         fuse-utils.1,listbasic.1,profile2map.1,raw2hdf.1,rzxcheck.1,rzxdump.1,
+         rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,tape2pulses.1,tape2wav.1,
+         tapeconv.1,tzxlist.1}: update release dates and mark this release as
+         1.2.0 (Fred).
