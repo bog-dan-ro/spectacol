@@ -151,8 +151,8 @@ fuse_section ("Source", "Source", <<<END_SECTION
   <ul>
    <li>First, check the requirements below and ensure all the libraries you want/need are installed.</li>
    <li>Secondly, install <a href="libspectrum.php">libspectrum</a>.</li>
-   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz.asc/download">PGP signature</a>).</li>
-   <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz/download">own package</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz.asc/download">PGP signature</a>). Note that
+   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz.sig/download">PGP signature</a>).</li>
+   <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz/download">own package</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz.sig/download">PGP signature</a>). Note that
 you'll still need <a href="libspectrum.php">libspectrum</a> installed to run these.</li>
    <!--
    <li>The above are also mirrored at <a href="http://www.worldofspectrum.org/">World of Spectrum</a>: <a
