@@ -1033,6 +1033,14 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160424 ChangeLog,README,configure.ac,doc/libspectrum.{3,txt},
          hacking/ChangeLog: merge libspectrum_1_1_0-branch changes onto trunk
          (Fred).
+20160424 ChangeLog,Makefile.am,README,configure.ac,doc/libspectrum.txt:
+         bump version number for 1.2.0 release (Fred).
+20160425 snapshot.c: revert [r5161] store PC-1 for all snapshot formats whilst
+         in the halted state as the matching Fuse changes are reverted for now
+         (Fred).
+20160425 ChangeLog,README: first updates for a "1.2.0" release (Fred).
+20160426 Makefile.am: change version to 10:0:2 as the ABI is compatible with
+         libspectrum 1.1.1 (Sergio).
 20160427 tape_block.c: fix bugs handling TZX generalised data blocks with empty
          symbol tables (e.g. ZX81 tapes encoded as in the TZX 1.20
          specification) (patch #359) (Andre Leiradella).
@@ -1045,6 +1053,8 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160430 README,doc/libspectrum.3: list more disk formats (Sergio).
 20160501 Makefile.am,memory.c: don't use g_mem_set_vtable on newer GLib and
          distribute missing macro files (Sergio).
+20160501 doc/libspectrum.3: bump more version numbers for 1.2.0 release
+         (Sergio).
 20160503 accessor.pl,doc/libspectrum.txt,sna.c,snap_accessors.txt,snapshot.c,
          szx.c,z80.c: add skeleton of support for Currah uSource snapshots
          (patch #363) (Fred and Sergio).
@@ -1057,4 +1067,8 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (patch #364) (Fred).
 20160521 szx.c: reset uncompressed size when loading Opus and +D custom ROM
          (from patch #366) (Sergio).
+20160529 README,doc/libspectrum.3: update release dates (Fred).
+20160529 configure.ac: mark this release as 1.2.0-pre1 (Fred).
 20160530 doc/libspectrum.txt: list more disk formats (Sergio).
+20160606 ChangeLog,README,configure.ac,doc/libspectrum.3: update release dates
+         and mark this release as 1.2.0 (Fred).

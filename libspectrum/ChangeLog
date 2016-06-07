@@ -1,3 +1,42 @@
+2016-06-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * libspectrum 1.2.0 released.
+
+        * Allow finalising RZX recordings (Sergio Baldoví).
+
+        * Support for Didaktik D80 disk class (Gergely Szasz).
+
+        * Use SZX format for interspersed snapshots in RZX recordings (Sergio
+          Baldoví).
+
+        * Add libspectrum_{new,new0,renew}(), libspectrum_{m,re}alloc_n()
+          memory macros (Stuart Brady).
+
+        * Rename libspectrum_calloc() to libspectrum_malloc0_n() (Stuart Brady).
+
+        * Various minor bug fixes/improvements:
+          * Modernise autoconf support (Sergio Baldoví).
+          * Fix snapshot insertion in RZX recordings (Sergio Baldoví).
+          * Ensure we have an edge at the end of a tape - fixes loading of Moon
+            Cresta (Fredrick Meunier).
+          * Avoid reliance on undefined pointer overflow in buffer length checks
+            (Stuart Brady).
+          * Add ARRAY_SIZE macro (Stuart Brady).
+          * Fix overallocation for uncompressed Z80 v2 data blocks (Stuart
+            Brady).
+          * Check for overflow in libspectrum_calloc() (Stuart Brady).
+          * Replace automatic fallback to GLib replacement with --with-fake-glib
+            flag (Stuart Brady).
+          * const and static cleanups (Stuart Brady).
+          * Fix compilation on systems without stdint.h (Stuart Brady).
+          * C89 compilation fixes (Adrien Destugues)
+          * Refactor frame timings (Stuart Brady).
+          * Add pkg.m4 for PKG_CHECK_MODULES in case the platform doesn't have
+            pkg-config installed (Sergio Baldoví).
+          * Enable silent rules for perl and windres commands (Sergio Baldoví).
+          * Allow for the initial_level of PZX data blocks to have the default
+            value (Fredrick Meunier).
+
 2013-05-24  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * libspectrum 1.1.1 released.
