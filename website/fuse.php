@@ -196,6 +196,7 @@ fuse_section (NULL, "What's new?", <<<END_SECTION
   <ul>
     <li>Emulation of the Currah &mu;Source and Didaktik 80/40 interfaces.</li>
     <li>Capture BASIC video functions to SVG file.</li>
+    <li>Allow continuing RZX recordings.</li>
     <li>Support bash completion.</li>
     <li>Really lots of bugfixes and miscellaneous improvements.</li>
   </ul>
