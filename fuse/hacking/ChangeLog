@@ -5022,10 +5022,16 @@
 20160424 svg.c: initialise err in svg_byte() (Fred).
 20160424 ChangeLog,README,configure.ac,hacking/ChangeLog,man/fuse.1: Merge
          Release-1_1_0-branch changes onto trunk (Fred).
+20160424 ChangeLog,README,configure.ac,man/fuse.1: bump version number for 1.2.0
+         release (Fred).
 20160425 tape.c: whitespace fix (Fred).
-20160425 memory.c: use tape traps if we are using a custom ROM if the instructions
-         at the entry points have been preserved (feature request #83) (thanks,
-         Alberto Garcia) (Fred).
+20160425 memory.c: use tape traps if we are using a custom ROM if the
+         instructions at the entry points have been preserved (feature request
+         #83) (thanks, Alberto Garcia) (Fred).
+20160425 z80/{tests/tests.expected,z80.{c,h,pl},z80_checks.h,z80_ops.c}:
+         revert accurate emulation of the HALT instruction in [r5160] as it
+         causes [bugs:316] and there is no current resolution (Fred).
+20160425 ChangeLog,README: first updates for a "1.2.0" release (Fred).
 20160425 INSTALL: Cygwin no longer distributes MinGW. Update documentation.
          (Sergio).
 20160428 utils.c: prefer Scorpion to Pentagon when loading SCL/TRD disks for
@@ -5041,6 +5047,8 @@
            - Link .SCL specification.
            - All UIs warn on a machine reset.
            - All UIs could configure joystick buttons.
+         (Sergio).
+20160430 ChangeLog: remove improvements released in 1.1.1 and fix typos
          (Sergio).
 20160501 Makefile.am,autogen.sh,bitmap.h,compat/Makefile.am,
          compat/unix/{socket.c,tuntap.c},
@@ -5089,6 +5097,9 @@
 20160502 memory.h: fix typo in MEMORY_PAGES_IN_2K comment (Fred)
 20160503 peripherals/usource.c: add support for Currah uSource snapshots (patch
          #363) (Fred and Sergio).
+20160503 z80/z80c: complete revert accurate emulation of the HALT instruction
+         in [r5160] as it causes [bugs:#329] and there is no current resolution
+         (Fred).
 20160503 machine.c: standardise setting of custom ROM field to 1 or 0 (Fred).
 20160508 peripherals/disk/beta.c: don't enable the Beta128 interface when
          loading a snapshot on a machine with Beta built-in (fixes bug #342)
@@ -5153,33 +5164,51 @@
 20160523 machine.c: clearing pokes also undoes their effect on memory, so should
          be done before the machine's RAM reset is done (see: patch #367)
          (thanks, Sergio) (Fred).
+20160523 ChangeLog: add more recent changes (Fred).
 20160523 peripherals/disk/disk.c: don't write .td0 files as UDI disk image
          format (Sergio).
 20160523 compat.h,settings.pl: use Windows line endings for plain text settings
          (Sergio).
 20160524 rzx.c: use SZX format for the initial snapshot in RZX files (more from
          bug #304) (Sergio).
-20160526 debugger/commandl.l,man/fuse.1: allow strings with escaped espaces in
+20160526 debugger/commandl.l,man/fuse.1: allow strings with escaped spaces in
          the debugger (bug #337) (Sergio).
+20160528 ChangeLog: add even more recent changes (Fred).
 20160529 Makefile.am,lib/Makefile.am,z80/Makefile.am: distribute
          m4/ax_create_stdint_h.m4,lib/tests/success.d80.bz2 and z80/tests/README
          (Sergio).
 20160529 debugger/{commandl.l,commandy.y,event.c}: make wildcard events work
          (fixes bug #349) (thanks, Sergio) (Phil).
+20160529 ChangeLog: add even more recent changes (Fred).
+20160529 README,man/fuse.1: update release dates (Fred).
+20160529 configure.ac: mark release as 1.2.0-pre1 (Fred).
+20160530 configure.ac: update more copyright dates (Sergio).
+20160530 z80/z80_ops.c: revert don't trap on breakpoints whilst halted in
+         [r5171] as it contributes to [bugs:#329] and there is no current
+         resolution (thanks, Guesser) (Fred).
+20160530 ChangeLog: remove reference to trap on breakpoints (Fred).
+20160530 ChangeLog: try to gather changes to related areas (Fred).
 20160531 svg.[hc],menu.c: tidy up svg_capture_mode (Fred).
 20160531 ui/ui.h: remove prototypes for obsolete functions (Fred).
 20160531 rzx.c: remove local arguments shadowing globals (Fred).
 20160531 z80/z80.c: remove local argument shadowing global (Fred).
 20160531 svg.c: don't declare svg_capture_mode when we don't have libxml2
          (Fred).
+20160601 ChangeLog: fix typos (Fred).
+20160601 man/fuse.1: fix typo (Fred).
 20160601 menu.c,rzx.c: always report an error if we fail to continue a RZX
          (Fred).
 20160601 fuse.c: use capabilities to decide whether a machine with a suitable
          disk interface is currently running (Fred).
+20160601 AUTHORS: fix typo (Fred).
+20160602 ChangeLog: add Richard's full name, and tweak description as per
+         his advice (Phil).
+20160603 ChangeLog: fix spacing (Sergio).
 20160604 data/shell-completion/bash/fuse: add TRD file extension to bash
          completion and remove wrong options (Sergio).
 20160604 data/shell-completion/bash/fuse: remove shebang in bash completion. The
          script is meant to be sourced, not executed (Sergio).
+20160604 README: update list of supported interfaces (Sergio).
 20160604 debugger/expression.c: avoid doing divide by zero in debugger
          expressions (fixes bug #350) (Fred).
 20160604 tape.c: fix use of tape traps if VERIFY is requested (thanks, Alberto
@@ -5187,3 +5216,9 @@
 20160606 ui/{fb,gtk,sdl,svga,widget,wii,win32,xlib}/Makefile.am,z80/Makefile.am:
          fix VPATH builds without dependency tracking (patch #368) (Alberto
          Garcia).
+20160606 ChangeLog: add more recent changes (Sergio).
+20160606 ChangeLog: elaborate a bit more on the changes to contended memory for
+         Timex models (Fuse has changed all of them to follow the TS2068)
+         (Fred).
+20160606 ChangeLog,README,configure.ac,man/fuse.1: update release dates and mark
+         this release as 1.2.0 (Fred).
