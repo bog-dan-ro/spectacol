@@ -107,5 +107,6 @@
         <file>qml/GetFileBrowserPage.qml</file>
         <file>qml/PokeManagerPage.qml</file>
         <file>qml/FancyBaseList.qml</file>
+        <file>qml/FancyPane.qml</file>
     </qresource>
 </RCC>

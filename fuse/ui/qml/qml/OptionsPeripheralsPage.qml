@@ -34,17 +34,8 @@ Flickable {
         buttonAKey: Qt.Key_Space
     }
 
-    Pane {
+    FancyPane {
         id: pane
-        focus: true
-        background.opacity: 0.85
-        PropertyAnimation on x {
-            to: (pageLoader.width - pane.width) / 2
-            easing.type: Easing.InOutBack
-            easing.amplitude: 2.0
-            easing.period: 1.5
-            duration: 500
-        }
         Column {
             spacing: 2.5 * Screen.pixelDensity
             anchors.horizontalCenter: parent.horizontalCenter

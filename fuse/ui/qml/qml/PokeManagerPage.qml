@@ -55,7 +55,7 @@ Item {
         x: parent.width / 2 - width / 2
         height: TextSizes.scale34 * 7
         width: TextSizes.scale20 * 10
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnReleaseOutsideParent
         onOpened: address.forceActiveFocus(Qt.TabFocusReason);
         IntValidator {
             id: addressValidator
@@ -77,17 +77,18 @@ Item {
                 currentIndex: 8
                 Keys.onUpPressed: {
                     if (popup.visible)
-                        decrease();
+                        decrementCurrentIndex();
                     else
                         ok.forceActiveFocus(Qt.TabFocusReason);
                 }
                 Keys.onDownPressed: {
                     if (popup.visible)
-                        increase();
+                        incrementCurrentIndex();
                     else
                         address.forceActiveFocus(Qt.TabFocusReason);
                 }
-
+                Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex()
+                Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
             }
 
             Label {

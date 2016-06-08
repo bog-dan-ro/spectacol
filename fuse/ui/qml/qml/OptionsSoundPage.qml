@@ -41,17 +41,8 @@ Flickable {
         buttonAKey: Qt.Key_Space
     }
 
-    Pane {
+    FancyPane {
         id: pane
-        focus: true
-        background.opacity: 0.85
-        PropertyAnimation on x {
-            to: (pageLoader.width - pane.width) / 2
-            easing.type: Easing.InOutBack
-            easing.amplitude: 2.0
-            easing.period: 1.5
-            duration: 500
-        }
         Column {
             spacing: 2.5 * Screen.pixelDensity
             anchors.horizontalCenter: parent.horizontalCenter
@@ -99,18 +90,18 @@ Flickable {
                     id: ayStereoSeparation
                     Keys.onUpPressed: {
                         if (popup.visible)
-                            decrease();
+                            decrementCurrentIndex();
                         else
                             soundForce8Bit.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)
-                            increase();
+                            incrementCurrentIndex();
                         else
                             speakerType.forceActiveFocus(Qt.TabFocusReason);
                     }
-                    Keys.onLeftPressed: if (!popup.visible) decrease();
-                    Keys.onRightPressed: if (!popup.visible) increase();
+                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
+                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
                     model: ["None", "ACB", "ABC"]
                     currentIndex: getIndex(model, fuseSettings.AYStereoSeparation)
                     onCurrentTextChanged: fuseSettings.AYStereoSeparation = currentText
@@ -128,18 +119,18 @@ Flickable {
                     id: speakerType
                     Keys.onUpPressed: {
                         if (popup.visible)
-                            decrease();
+                            decrementCurrentIndex();
                         else
                             ayStereoSeparation.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)
-                            increase();
+                            incrementCurrentIndex();
                         else
                             soundEnabled.forceActiveFocus(Qt.TabFocusReason);
                     }
-                    Keys.onLeftPressed: if (!popup.visible) decrease();
-                    Keys.onRightPressed: if (!popup.visible) increase();
+                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
+                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
                     model: ["TV speaker", "Beeper", "Unfiltered"]
                     currentIndex: getIndex(model, fuseSettings.speakerType)
                     onCurrentTextChanged: fuseSettings.speakerType = currentText

@@ -37,17 +37,8 @@ Flickable {
         buttonXKey: Qt.Key_Backtab
     }
 
-    Pane {
+    FancyPane {
         id: pane
-        focus: true
-        background.opacity: 0.85
-        PropertyAnimation on x {
-            to: (pageLoader.width - pane.width) / 2
-            easing.type: Easing.InOutBack
-            easing.amplitude: 2.0
-            easing.period: 1.5
-            duration: 500
-        }
         Column {
             spacing: 2.5 * Screen.pixelDensity
             anchors.horizontalCenter: parent.horizontalCenter
@@ -66,18 +57,18 @@ Flickable {
                     id: screenFilter
                     Keys.onUpPressed: {
                         if (popup.visible)
-                            decrease();
+                            decrementCurrentIndex();
                         else
                             smoothScaling.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)
-                            increase();
+                            incrementCurrentIndex();
                         else
                             screenFillMode.forceActiveFocus(Qt.TabFocusReason);
                     }
-                    Keys.onLeftPressed: if (!popup.visible) decrease();
-                    Keys.onRightPressed: if (!popup.visible) increase();
+                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
+                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
 
                     model: fuse.filtersModel
                     currentIndex: fuse.selectedFilterIndex
@@ -95,21 +86,21 @@ Flickable {
                     id: screenFillMode
                     Keys.onUpPressed: {
                         if (popup.visible)
-                            decrease();
+                            decrementCurrentIndex();
                         else
                             screenFilter.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible) {
-                            increase();
+                            incrementCurrentIndex();
                         } else if (fuseSettings.showOrientationChooser) {
                             screenOrientation.forceActiveFocus(Qt.TabFocusReason);
                         } else {
                             smoothScaling.forceActiveFocus(Qt.TabFocusReason);
                         }
                     }
-                    Keys.onLeftPressed: if (!popup.visible) decrease();
-                    Keys.onRightPressed: if (!popup.visible) increase();
+                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
+                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
 
                     model: ["Preserve aspect fit", "Preserve aspect", "Stretch"]
                     currentIndex: fuseSettings.fillMode
@@ -131,18 +122,18 @@ Flickable {
                     id: screenOrientation
                     Keys.onUpPressed: {
                         if (popup.visible)
-                            decrease();
+                            decrementCurrentIndex();
                         else
                             screenFillMode.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)
-                            increase();
+                            incrementCurrentIndex();
                         else
                             screenFilter.forceActiveFocus(Qt.TabFocusReason);
                     }
-                    Keys.onLeftPressed: if (!popup.visible) decrease()
-                    Keys.onRightPressed: if (!popup.visible) increase()
+                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex()
+                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
 
                     model: ["Any", "Landscape", "Portrait"]
                     currentIndex: fuseSettings.screenOrientation
