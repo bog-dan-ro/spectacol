@@ -5222,3 +5222,5 @@
          (Fred).
 20160606 ChangeLog,README,configure.ac,man/fuse.1: update release dates and mark
          this release as 1.2.0 (Fred).
+20160608 data/fuse.desktop.in: update Name entry and add GenericName and
+         Keywords entries in .desktop file (Alberto Garcia).
