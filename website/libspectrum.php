@@ -82,7 +82,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
 
   <h3>Source</h3>
   <ul>
-   <li><a href="http://sourceforge.net/projects/fuse-emulator/files/libspectrum/1.1.1/libspectrum-1.1.1.tar.gz/download">libspectrum-1.1.1.tar.gz</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/libspectrum/1.1.1/libspectrum-1.1.1.tar.gz.asc/download">PGP signature</a>)<!-- or from <a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/libspectrum-1.1.1.tar.gz">World of Spectrum</a> (<a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/libspectrum-1.1.1.tar.gz.asc">signature</a>)-->.</li>
+   <li><a href="https://sourceforge.net/projects/fuse-emulator/files/libspectrum/1.2.0/libspectrum-1.2.0.tar.gz/download">libspectrum-1.2.0.tar.gz</a> (<a href="https://sourceforge.net/projects/fuse-emulator/files/libspectrum/1.2.0/libspectrum-1.2.0.tar.gz.sig/download">PGP signature</a>)<!-- or from <a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/libspectrum-1.1.1.tar.gz">World of Spectrum</a> (<a href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/libspectrum-1.1.1.tar.gz.asc">signature</a>)-->.</li>
    <li>The source code release above is signed with the <a href="http://wwwkeys.pgp.net:11371/pks/lookup?op=get&amp;search=0xD0767AB9">Fuse Release Key, ID <tt>D0767AB9</tt></a>, which has fingerprint <tt>064E 0BA9 688F 2699 3267 B1E5 1043 EEEB D076 7AB9</tt>. This is different from the key used to sign the 0.1.1 release as I forgot the passphrase for that key <tt>:-(</tt>.</li>
   </ul>
 
@@ -108,9 +108,9 @@ END_SECTION
 #<!-- ======================================================= -->
 
 fuse_section (NULL, "Development", <<<END_SECTION
-  <p>If you're interested in working on libspectrum, subscribe to the <a href="http://lists.sourceforge.net/lists/listinfo/fuse-emulator-devel">fuse-emulator-devel</a> mailing list and/or see the <a href="http://sourceforge.net/projects/fuse-emulator/">project page</a> on SourceForge. If you just want news of new versions, you probably want the (low volume) <a href="http://lists.sourceforge.net/lists/listinfo/fuse-emulator-announce">fuse-emulator-announce</a> list instead.</p>
+  <p>If you're interested in working on libspectrum, subscribe to the <a href="https://lists.sourceforge.net/lists/listinfo/fuse-emulator-devel">fuse-emulator-devel</a> mailing list and/or see the <a href="https://sourceforge.net/projects/fuse-emulator/">project page</a> on SourceForge. If you just want news of new versions, you probably want the (low volume) <a href="https://lists.sourceforge.net/lists/listinfo/fuse-emulator-announce">fuse-emulator-announce</a> list instead.</p>
 
-  <p>Finally, the latest development version should always be available as the 'trunk/libspectrum' directory from the <a href="http://sourceforge.net/p/fuse-emulator/code/">Subversion repository</a> on SourceForge. Don't expect any support for this, or even that it can be compiled...</p>
+  <p>Finally, the latest development version should always be available as the 'trunk/libspectrum' directory from the <a href="https://sourceforge.net/p/fuse-emulator/code/">Subversion repository</a> on SourceForge. Don't expect any support for this, or even that it can be compiled...</p>
 
 END_SECTION
 );

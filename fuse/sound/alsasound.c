@@ -23,7 +23,9 @@
 
 /* This is necessary to prevent warnings from the calls to
    snd_pcm_[hs]w_params_alloca() */
+#ifndef NDEBUG
 #define NDEBUG
+#endif
 
 #include <stdio.h>
 #include <string.h>

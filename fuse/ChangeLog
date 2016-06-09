@@ -1,3 +1,179 @@
+2016-06-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.2.0 released.
+
+        * New features:
+          * Add Currah µSource emulation (Stuart Brady).
+          * Add Didaktik 80/40 emulation (Gergely Szasz).
+          * Capture BASIC video functions to SVG file (Stefano Bodrato).
+          * Support bash completion (Sergio Baldoví).
+
+        * Emulation core improvements:
+          * Allow continuing RZX recordings if there is a final snapshot in the
+            RZX (Sergio Baldoví).
+          * Fix the prune function on RZX rollback (Sergio Baldoví).
+          * Use SZX format for the initial snapshot in RZX files (Sergio
+            Baldoví).
+          * Fix loading of EDSK files with Sector Offset block (Sergio Baldoví).
+          * Migrate disk "index event" handling to the FDD layer and have the
+            FDC layer use it for their STATUS registers (Gergely Szasz).
+          * Implement WD2797 emulation (Gergely Szasz).
+          * Centralise the "Disk icon" update code to the FDD layer (Gergely
+            Szasz).
+          * Fix disk image corruption after saving UDI files (Sergio Baldoví).
+          * Check ready status after loading a disk into floppy disk drive
+            (thanks, John Elliott) (Sergio Baldoví).
+          * Fix overlapped SEEK commands (Sergio Baldoví).
+          * Fix length of data returned by READ_DIAG (thanks, Fredrick Meunier)
+            (Sergio Baldoví).
+          * Fix writing .td0 format disk files (Sergio Baldoví).
+          * Fix speech in Cobra's Arc - Medium Case.tzx when loaded with tape
+            traps enabled (thanks, zx81 and Sergio Baldoví) (Fredrick Meunier).
+          * Skip tape traps if VERIFY is requested (UB880D).
+          * Fix loading sound with some custom loaders (Fredrick Meunier).
+          * Check if data blocks are headers for handling PZX files (Fredrick
+            Meunier).
+          * Correct display of pulses in PZX pulse block for tape browser
+            (Fredrick Meunier).
+          * Set AF, AF' and SP to 0xffff on reset (Stuart Brady).
+          * Leave most registers unchanged on a soft reset (Stuart Brady).
+          * Emulate interrupt and NMI timings more precisely (Stuart Brady).
+          * Emulate NMOS and CMOS Z80 variants (Stuart Brady).
+          * Switch to 2KB page size (Stuart Brady).
+          * Fix inaccurate output when AY envelopes are used (Matthew Westcott
+            and Fredrick Meunier).
+          * Fix some peripherals activation when loading snapshots (Sergio
+            Baldoví).
+
+        * Machine specific improvements:
+          * The address range 0x4000 - 0x7FFF is contended on the TS2068 in the
+            home, Dock and Exrom banks (thanks, Richard Atkinson). It is assumed
+            that this is the same for other Timex models (Fredrick Meunier).
+          * Clear all Opus RAM on hard reset (Stuart Brady).
+          * Ensure the ZX Printer does not require a hard reset to enable
+            (thanks, RMartins) (Fredrick Meunier).
+          * Fix timing of events when emulating Scorpion (Stuart Brady).
+          * Ensure we have successfully selected a Pentagon or a Timex machine
+            before inserting their media (Fredrick Meunier).
+          * Prefer Scorpion to Pentagon when loading SCL/TRD disks for better
+            timing compatibility (thanks, windale) (Sergio Baldoví).
+          * Fix Beta 128 type II commands (thanks, windale and BogDan Vatra)
+            (Sergio Baldoví).
+          * Don't enable the Beta 128 interface when loading a snapshot on a
+            machine with Beta built-in (thanks, windale and BogDan Vatra)
+            (Fredrick Meunier).
+          * Lock port +3 1FFDh if paging is disabled (Brian Ruthven and Fredrick
+            Meunier).
+          * Spectranet: fix segfault in error handling when setting SO_REUSEADDR
+            (Stuart Brady).
+          * Update SE ROMs to v4.07 (thanks, Andrew Owen) (Sergio Baldoví).
+
+        * Debugger improvements:
+          * Fix disassembly of LD (HL), LD (IX) and LD (IY) (BogDan Vatra).
+          * Add I and R register setting and getting to the debugger (Sergio
+            Baldoví).
+          * Show the status of the halted flag in the debugger (Stuart Brady).
+          * Fix time breakpoints later than a frame in the future (Sergio
+            Baldoví).
+          * Timex EXROM and Dock text was truncated in the debugger UI (thanks,
+            Andrew Owen and Sergio Baldoví) (Fredrick Meunier).
+          * Win32: relocate halted flag and set monospaced font (Sergio
+            Baldoví).
+          * Fix memory issues when removing a matched breakpoint (Tom Seddon).
+          * Signal the UI when the breakpoints list is changed (BogDan Vatra).
+          * Document IF token for conditional expressions in debugger section
+            (thanks, TK90XFan) (Sergio Baldoví).
+          * Fix documentation of address syntax used in debugger section
+            (Sergio Baldoví).
+          * Allow debugger to dereference memory locations (Philip Kendall).
+          * Allow strings with escaped spaces in the debugger (Sergio Baldoví).
+          * Make wildcard event breakpoints work (thanks, Sergio Baldoví)
+            (Philip Kendall).
+          * Protect divide expression from a divide by zero exception (Fredrick
+            Meunier).
+
+        * Miscellaneous improvements:
+          * Remove warnings in aosound (Rene Ladan).
+          * Fix save tape traps with SE ROM (Andrew Owen and Fredrick Meunier).
+          * Don't ignore the return code from setuid() (Sergio Baldoví).
+          * Fix condition used in --with-desktop-dir option (thanks, wiz)
+            (Sergio Baldoví).
+          * Fix uninitialised keyboard button settings in GTK UI (UB880D).
+          * Fix pause when minimising Fuse on Windows (Sergio Baldoví).
+          * Generic FDD UI handling cleanup (Alex Badea).
+          * Remove unused macros on disk peripherals (Sergio Baldoví).
+          * Fix bad prototypes for activate signal on GTK UI (Sergio Baldoví).
+          * Ensure exiting on GTK UI when there are active breakpoints (Sergio
+            Baldoví).
+          * Improve scrolling of disassembly list on Win32 UI (Sergio Baldoví).
+          * Make mousewheel scrolling on memory browser GTK+ 3.4 compatible and
+            keep the selected row (Sergio Baldoví).
+          * Ignore unused-but-set-variable warnings for option dialogs on Win32
+            UI (Sergio Baldoví).
+          * Link to autoload snapshot for NTSC Spectrum (Sergio Baldoví).
+          * Fix desktop integration rules to cope with VPATH builds (Sergio
+            Baldoví).
+          * Modernise autoconf support (Sergio Baldoví).
+          * Use unzipped tapes for peripheral tests (thanks, Phil Reynolds)
+            (Sergio Baldoví).
+          * Fix empty list in pokefinder on GTK+ 3 (Sergio Baldoví).
+          * Prefer GTK+ 3 to GTK+ 2 (Sergio Baldoví).
+          * Abort start if we can't drop root privileges (Fredrick Meunier).
+          * Use real GLib if and only if libspectrum does and make GTK+ UI
+            depend on real GLib (Stuart Brady).
+          * Split tape/Microdrive options into a new Media Options dialogue
+            (Stuart Brady).
+          * Fix memory leak in joystick UI (Sergio Baldoví).
+          * Don't show an error when rewinding an empty tape (Sergio Baldoví).
+          * GTK UI: clear out row mark in tape browser when selecting another
+            block (Sergio Baldoví).
+          * Add missing const qualifiers and casts (Stuart Brady and Sergio
+            Baldoví).
+          * Split Select ROMs menu into Machines and Peripherals (Gergely
+            Szasz).
+          * Only try to load the fallback ROM if it is different to the standard
+            one (Fredrick Meunier).
+          * Use PATH_MAX instead of FILENAME_MAX as our standard compatibility
+            define (thanks, Brian Ruthven) (Fredrick Meunier).
+          * WidgetUI: Fix build on Solaris (thanks, Brian Ruthven) (Fredrick
+            Meunier).
+          * Fix C89 compilation (Adrien Destugues).
+          * Standardise the number of joystick buttons across UIs (UB880D).
+          * Add static to functions where appropriate (Stuart Brady).
+          * Track port attachment for each data bus line (Stuart Brady).
+          * Switch to using non-recursive makefile (thanks, Stuart Brady)
+            (Sergio Baldoví).
+          * Move Windows resources that are UI-independent to data/win32
+            (Sergio Baldoví).
+          * Fix segfault due to inconsistent SETUP_CHECK() and CHECK() ordering
+            (UB880D; thanks, Guesser).
+          * Rename 'Interface I' to 'Interface 1' (thanks, Stuart Brady) (Sergio
+            Baldoví).
+          * Win32: fix compilation with mingwrt 4.0+ (Kirben).
+          * Replace various deprecated GTK+ functions: gtk_widget_modify_font,
+            GtkStock, gtk_tree_view_set_rules_hint(),
+            deprecated gdk_cursor_new() (Sergio Baldoví).
+          * Remove obsolete gtk_window_set_wmclass (Sergio Baldoví).
+          * Update URLs in documentation (Sergio Baldoví).
+          * Win32 UI: fix compilation with MinGW-w64 toolchain (lordhoto).
+          * Fix the build of SDL UI on Windows (Sergio Baldoví).
+          * Use compat_file_exists() instead of stat() in read_config_file() and
+            utils_find_file_path() (BogDan Vatra).
+          * Fix fdd_strerror() reading past the end of the fdd_error array
+            (BogDan Vatra).
+          * Use tape traps if we are using a custom ROM if the instructions at
+            the entry points have been preserved (thanks, Alberto Garcia)
+            (Fredrick Meunier).
+          * GTK+ and Win32 UI: add file filters in open/save dialogs (thanks,
+            Crisis) (Sergio Baldoví).
+          * Don't show hidden files/directories in the file selector on Widget
+            UIs (Sergio Baldoví).
+          * Remember filename when saving a recently formatted disk (Sergio
+            Baldoví).
+          * GTK UI: Change the resizing method for GTK+ UI for better
+            compatibility with GTK+ 3.20+ (thanks, Alberto Garcia) (Sergio
+            Baldoví).
+
 2013-05-24  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.1.1 released.

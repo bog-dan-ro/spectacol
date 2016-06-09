@@ -32,10 +32,6 @@ if COMPAT_GETOPT
 fuse_SOURCES += compat/getopt.c compat/getopt1.c
 endif
 
-if COMPAT_MKSTEMP
-fuse_SOURCES += compat/mkstemp.c
-endif
-
 ## Amiga routines
 if COMPAT_AMIGA
 fuse_SOURCES += \

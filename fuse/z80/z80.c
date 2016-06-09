@@ -64,7 +64,9 @@ libspectrum_byte sz53p_table[0x100]; /* OR the above two tables together */
 /* This is what everything acts on! */
 processor z80;
 
-int z80_interrupt_event, z80_nmi_event, z80_halt_event, z80_nmos_iff2_event;
+int z80_interrupt_event;
+int z80_nmi_event;
+int z80_nmos_iff2_event;
 
 static void z80_init_tables(void);
 static void z80_from_snapshot( libspectrum_snap *snap );
@@ -103,7 +105,6 @@ z80_init( void )
   z80_interrupt_event = event_register( z80_interrupt_event_fn,
 					"Retriggered interrupt" );
   z80_nmi_event = event_register( z80_nmi, "Non-maskable interrupt" );
-  z80_halt_event = event_register( NULL, "HALT dummy event" );
   z80_nmos_iff2_event = event_register( NULL, "IFF2 update dummy event" );
 
   module_register( &z80_module_info );
@@ -177,7 +178,8 @@ z80_interrupt( void )
       return 0;
     }
 
-    z80.halted = 0;
+    if( z80.halted ) { PC++; z80.halted = 0; }
+    
     IFF1=IFF2=0;
     R++; rzx_instructions_offset--;
 
@@ -228,7 +230,8 @@ z80_nmi( libspectrum_dword ts, int type, void *user_data )
   if( spectranet_available && spectranet_nmi_flipflop() )
     return;
 
-  z80.halted = 0;
+  if( z80.halted ) { PC++; z80.halted = 0; }
+
   IFF1 = 0;
   R++; tstates += 5;
 

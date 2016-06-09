@@ -54,7 +54,8 @@ fuse_section ("Features", "What features does it have?", <<<END_SECTION
    <li>Kempston joystick emulation.</li>
    <li>Emulation of the various printers you could attach to the Spectrum.</li>
    <li>Support for the RZX input recording file format, including 'competition mode'.</li>
-   <li>Emulation of the DivIDE, Interface 1, +D, DISCiPLE, Beta 128, Opus Discovery, Kempston mouse, Fuller audio box, SpecDrum, Spectrum +3e, ZXATASP and ZXCF interfaces.</li>
+   <li>Emulation of the Currah &mu;Source, DivIDE, Fuller audio box, Interface 1, Kempston mouse, SpecDrum, Spectrum +3e, ZXATASP and ZXCF interfaces.</li>
+   <li>Emulation of the Beta 128, +D, Didaktik 80/40, DISCiPLE and Opus Discovery interfaces.</li>
    <li>Emulation of the Spectranet and SpeccyBoot interfaces.</li>
   </ul>
 
@@ -103,7 +104,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <p>A native port to OS X by <a href="mailto:fredm@spamcop.net">Fredrick Meunier</a> is available on its own SourceForge project <a href="http://fuse-for-macosx.sourceforge.net/">here</a>, as well as a Spotlight importer for Mac OS X 10.4 Tiger users. Alternatively, the original version of Fuse will compile on OS X 10.3 (Panther) or later.</p>
 
   <h3>Windows</h3>
-  <p>A port to Windows of 1.1.1 by Sergio Baldovi is available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.1.1/fuse-1.1.1-win32-setup.exe/download">here</a>, and the utilities are available <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.1.1/fuse-utils-1.1.1-win32.zip/download">here</a>.</p>
+  <p>A port to Windows of 1.2.0 by Sergio Baldovi is available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0-win32-setup.exe/download">here</a>, and the utilities are available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0-win32.zip/download">here</a>.</p>
 
   <h3>Android</h3>
   <p>BogDan Vatra has ported Fuse 1.1.1 to Android OS, which could run on smartphones, tablets and TVs. Sources are available from <a href="https://github.com/bog-dan-ro/spectacol">GitHub</a> and binaries from <a href="https://play.google.com/store/apps/details?id=eu.licentia.games.spectacol">Google Play</a>.</p>
@@ -130,7 +131,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <p>Ben O'Steen has made a GP2X port, based on Fuse 0.6. Binaries and source are available from <a href="http://web.archive.org/web/20090905033548/http://www.zen71790.zen.co.uk/#fuse">his homepage</a>.</p>
 
   <h3>XBox</h3>
-  <p>Crabfists's has made an Xbox port, based on Fuse 0.6. Binaries and source are available from the <a href="http://sourceforge.net/projects/fusex/">FuseX project</a> at SourceForge.</p>
+  <p>Crabfists's has made an Xbox port, based on Fuse 0.6. Binaries and source are available from the <a href="https://sourceforge.net/projects/fusex/">FuseX project</a> at SourceForge.</p>
 
   <h3>PocketPC</h3>
   <p>Anders Holmberg's ported Fuse 0.4 to the PocketPC as <a href="http://pocketclive.emuunlim.com/">PocketClive</a>.</p>
@@ -150,8 +151,8 @@ fuse_section ("Source", "Source", <<<END_SECTION
   <ul>
    <li>First, check the requirements below and ensure all the libraries you want/need are installed.</li>
    <li>Secondly, install <a href="libspectrum.php">libspectrum</a>.</li>
-   <li>Get the <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.1.1/fuse-1.1.1.tar.gz/download">source code</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse/1.1.1/fuse-1.1.1.tar.gz.asc/download">PGP signature</a>).</li>
-   <li>The utilities which were previously packaged with Fuse are now available in their <a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.1.1/fuse-utils-1.1.1.tar.gz/download">own package</a> (<a href="http://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.1.1/fuse-utils-1.1.1.tar.gz.asc/download">PGP signature</a>). Note that
+   <li>Get the <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz/download">source code</a> (<a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz.sig/download">PGP signature</a>).</li>
+   <li>The utilities which were previously packaged with Fuse are now available in their <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz/download">own package</a> (<a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz.sig/download">PGP signature</a>). Note that
 you'll still need <a href="libspectrum.php">libspectrum</a> installed to run these.</li>
    <!--
    <li>The above are also mirrored at <a href="http://www.worldofspectrum.org/">World of Spectrum</a>: <a
@@ -175,8 +176,8 @@ href="ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/fuse-1.1.1.tar.g
     <ul>
      <li><a href="http://www.gnu.org/software/libgcrypt/">libgcrypt</a>: the ability to digitally sign RZX files (note that Fuse requires version 1.1.42 or later).</li>
      <li><a href="http://www.libpng.org/pub/png/libpng.html">libpng</a>: the ability to save screenshots.</li>
-     <li><a href="http://xmlsoft.org/">libxml2</a>: the ability to load and save Fuse's current configuration.</li>
-     <li><a href="http://freecode.com/projects/libjsw">libjsw</a>: allow joystick input to be used (not required for joystick emulation).</li>
+     <li><a href="http://xmlsoft.org/">libxml2</a>: the ability to load and save Fuse's current configuration and capture BASIC video functions to SVG.</li>
+     <li><a href="http://www.libsdl.org/">SDL</a> or <a href="http://freecode.com/projects/libjsw">libjsw</a>: allow joystick input to be used (not required for joystick emulation).</li>
      <li><a href="http://www.zlib.net/">zlib</a>: support for compressed RZX files.</li>
      <li><a href="http://www.bzip.org/">libbzip2</a>: support for certain compressed files.</li>
      <li><a href="http://www.68k.org/~michael/audiofile/">libaudiofile</a>: support for loading from .wav files.</li>
@@ -191,12 +192,13 @@ END_SECTION
 #<!-- ======================================================= -->
 
 fuse_section (NULL, "What's new?", <<<END_SECTION
-  <h3>1.1.0 / 1.1.1</h3>
+  <h3>1.2.0</h3>
   <ul>
-    <li>Emulation of the Spectranet, SpeccyBoot, SpecDrum and DISCiPLE interfaces</li>
-    <li>Support for reading PZX and POK files</li>
-    <li>Support for recording FMF movies</li>
-    <li>GTK+ 3 compatibility</li>
+    <li>Emulation of the Currah &mu;Source and Didaktik 80/40 interfaces.</li>
+    <li>Capture BASIC video functions to SVG file.</li>
+    <li>Allow continuing RZX recordings.</li>
+    <li>Support bash completion.</li>
+    <li>Really lots of bugfixes and miscellaneous improvements.</li>
   </ul>
 
 END_SECTION
@@ -205,9 +207,9 @@ END_SECTION
 #<!-- ======================================================= -->
 
 fuse_section (NULL, "Development", <<<END_SECTION
-  <p>If you're just want news of new versions and the like, the (low volume) <a href="http://lists.sourceforge.net/lists/listinfo/fuse-emulator-announce">fuse-emulator-announce</a> list is available. If you're interested in the development of Fuse, this is coordinated via the <a href="http://lists.sourceforge.net/lists/listinfo/fuse-emulator-devel">fuse-emulator-devel</a> list and the <a href="http://sourceforge.net/projects/fuse-emulator/">project page</a> on SourceForge.</p>
+  <p>If you're just want news of new versions and the like, the (low volume) <a href="https://lists.sourceforge.net/lists/listinfo/fuse-emulator-announce">fuse-emulator-announce</a> list is available. If you're interested in the development of Fuse, this is coordinated via the <a href="https://lists.sourceforge.net/lists/listinfo/fuse-emulator-devel">fuse-emulator-devel</a> list and the <a href="https://sourceforge.net/projects/fuse-emulator/">project page</a> on SourceForge.</p>
 
-  <p>The latest version of Fuse is always available by checking out the 'trunk/fuse' directory from the <a href="http://sourceforge.net/p/fuse-emulator/code/">Subversion repository</a> on SourceForge. Note that this isn't guaranteed to compile, let alone work properly. Also, don't expect any support for this version! (You'll also need libspectrum from Subversion; this is in the 'trunk/libspectrum' directory). Similarly, the utilities are available in the 'trunk/fuse-utils' directory.</p>
+  <p>The latest version of Fuse is always available by checking out the 'trunk/fuse' directory from the <a href="https://sourceforge.net/p/fuse-emulator/code/">Subversion repository</a> on SourceForge. Note that this isn't guaranteed to compile, let alone work properly. Also, don't expect any support for this version! (You'll also need libspectrum from Subversion; this is in the 'trunk/libspectrum' directory). Similarly, the utilities are available in the 'trunk/fuse-utils' directory.</p>
 
   <p>One thing which isn't in the SourceForge tracking system (and is now very outdated):</p>
 
@@ -226,7 +228,7 @@ fuse_section ("Related projects", "Are there any related projects?", <<<END_SECT
    <li>Mike Wynne's ZX81 emulator, <a href="http://www.chuntey.com/eightyone/">EightyOne</a> is also using Fuse's Z80 core.</li>
    <li>Matthew Westcott's <a href="http://matt.west.co.tt/spectrum/jsspeccy/">JSSpeccy</a> uses a Z80 core based on translating Fuse's core to Javascript.</li>
    <li>Alexander Shabarshin's <a href="http://web.archive.org/web/20030316123953/http://robots.ural.net/nedopc/sprinter/">SPRINT</a>, an emulator of the <a href="http://www.interface1.net/zx/clones/peters.html">Peters Plus</a> super-Speccy, the <a href="http://web.archive.org/web/20040402004216/http://www.petersplus.com/sprinter/">Sprinter</a>. SPRINT is using Fuse's Z80 core for its CPU emulation.</li>
-   <li><a href="http://sourceforge.net/projects/z80ex/">z80ex</a>, a Z80 emulation library based on Fuse's Z80 core, used by zemu and <a href="http://pocketspeccy.narod.ru/">PocketSpeccy</a>.</li>
+   <li><a href="https://sourceforge.net/projects/z80ex/">z80ex</a>, a Z80 emulation library based on Fuse's Z80 core, used by zemu and <a href="http://pocketspeccy.narod.ru/">PocketSpeccy</a>.</li>
   </ul>
 
 END_SECTION

@@ -1,3 +1,79 @@
+2016-06-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Version 1.2.0 released
+
+        * fmfconv
+          * Drop FFmpeg/Libav API support in fmfconv (Sergio Baldoví).
+          * Support JPEG, PNG and AVI output formats (Gergely Szasz).
+          * Set default output type to AVI instead of YUV4MPEG2 when using pipes
+            (Gergely Szasz).
+          * Move --force-resample and --srate options (Gergely Szasz).
+          * Add more details on DESCRIPTION, EXAMPLES and SEE ALSO (Sergio
+            Baldoví).
+          * Add missing options and arrange options in categories (Sergio
+            Baldoví).
+          * Set output mode to AVI when using .avi file extension (Sergio
+            Baldoví).
+          * Ensure AVI files are finalised and delete the index file on Windows
+            (Sergio Baldoví).
+          * Allow greyscale output (Gergely Szasz).
+          * Implement --version option in fmfconv (Gergely Szasz).
+          * Fix crash when writing a sequence of screenshots (Sergio Baldoví).
+          * New internal sound resampling (Gergely Szasz).
+
+        * rzxtool: 
+          * Fix snapshot insertion in rzx recordings (Sergio Baldoví).
+          * Add option for finalising rzx recordings (Sergio Baldoví).
+
+        * tzxlist
+          * Dump headers that appear to be in data blocks (Fredrick Meunier).
+          * Dump standard data blocks to files (Gergely Szasz).
+          * Don't print non-printable header characters like Fuse (Fredrick
+            Meunier).
+          * Allow tape durations longer than 20.5 minutes (UB880D).
+
+        * tape2pulses
+          * New utility to dump the pulses found in a tape file to a file for
+            analysis (Fredrick Meunier).
+
+        * tape2wav
+          * Correct default WAV sample rate (Santiago Vila).
+
+        * rzxdump: 
+          * Show block number as is needed for some operations with rzxtool
+            (Sergio Baldoví).
+          * Fix exit code when passed bad operands (Sergio Baldoví).
+          * Fix leaks and possible null pointer dereferences (Sergio Baldoví).
+
+        * scl2trd
+          * Fix exit code when passed bad operands (Sergio Baldoví).
+
+        * audio2tape
+          * Use char* for progname for consistency with utils.c (Fredrick
+            Meunier).
+          * Declare C linkage for progname (Adam Sampson).
+
+        * Various minor bug fixes/improvements:
+          * Update iconv to version from gettext-0.18.2 (Fredrick Meunier).
+          * Select glibtoolize where required (Sergio Baldoví).
+          * Ensure definitions of AC_LIB_PREPARE_PREFIX, AC_LIB_RPATH,
+            AC_LIB_LINKFLAGS_BODY and AC_LIB_APPENDTOVAR are always available
+            (Fredrick Meunier).
+          * Win32: prefer groff to man2html (Sergio Baldoví).
+          * Abort program when passed unknown options (Sergio Baldoví).
+          * Add --version option to the utilities (Sergio Baldoví).
+          * Add version info to Windows executables (Sergio Baldoví).
+          * Add --help option to the utilities (Sergio Baldoví).
+          * Add pkg.m4 for PKG_CHECK_MODULES in case the platform doesn't have
+            pkg-config installed (Sergio Baldoví).
+          * C89 compilation fixes (Adrien Destugues).
+          * Add static to functions where appropriate (Stuart Brady).
+          * Take Windows distribution rules out of main Makefile.am (Sergio
+            Baldoví).
+          * Modernise autoconf support (Sergio Baldoví).
+          * Check for libspectrum's own GLib replacement (Stuart Brady and 
+            Sergio Baldoví).
+
 2013-05-24  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Version 1.1.1 released

@@ -20,18 +20,18 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_version], [1.1.1])
+m4_define([fuse_version], [1.2.0])
 
 dnl Product full version
 m4_define([fuse_major_version], [1])
-m4_define([fuse_minor_version], [1])
-m4_define([fuse_micro_version], [1])
+m4_define([fuse_minor_version], [2])
+m4_define([fuse_micro_version], [0])
 m4_define([fuse_nano_version],  [0])
 m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
 
 dnl Package info
-m4_define([fuse_copyright], ["(c) 1999-2013 Philip Kendall and others"])
+m4_define([fuse_copyright], ["(c) 1999-2016 Philip Kendall and others"])
 m4_define([fuse_url], [http://fuse-emulator.sourceforge.net/])
 m4_define([fuse_bugreport], [http://sourceforge.net/p/fuse-emulator/bugs/])
 
@@ -105,7 +105,7 @@ AC_C_CONST
 AC_C_INLINE
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(dirname geteuid getopt_long mkstemp fsync)
+AC_CHECK_FUNCS(dirname geteuid getopt_long fsync)
 AC_CHECK_LIB([m],[cos])
 
 dnl Allow the user to say that various libraries are in one place
@@ -854,10 +854,6 @@ if test "$ac_cv_func_getopt_long" = no; then
   esac
 fi
 AM_CONDITIONAL(COMPAT_GETOPT, test "$compat_getopt" = yes)
-if test "$ac_cv_func_mkstemp" = no; then
-  missing_routines="$missing_routines"'mkstemp '
-fi
-AM_CONDITIONAL(COMPAT_MKSTEMP, test "$ac_cv_func_mkstemp" = no)
 if test "x$missing_routines" = x; then
   missing_routines='(none)'
 fi
