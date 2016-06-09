@@ -49,8 +49,6 @@ void utils_close_file( utils_file *file );
 
 int utils_write_file( const char *filename, const unsigned char *buffer,
 		      size_t length );
-int utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
-			  const char *template );
 
 int utils_find_file_path( const char *filename, char *path,
                           utils_aux_type type );

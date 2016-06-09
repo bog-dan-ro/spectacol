@@ -104,7 +104,7 @@ AC_C_CONST
 AC_C_INLINE
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(dirname geteuid getopt_long mkstemp fsync)
+AC_CHECK_FUNCS(dirname geteuid getopt_long fsync)
 AC_CHECK_LIB([m],[cos])
 
 dnl Allow the user to say that various libraries are in one place
@@ -834,10 +834,6 @@ if test "$ac_cv_func_getopt_long" = no; then
   esac
 fi
 AM_CONDITIONAL(COMPAT_GETOPT, test "$compat_getopt" = yes)
-if test "$ac_cv_func_mkstemp" = no; then
-  missing_routines="$missing_routines"'mkstemp '
-fi
-AM_CONDITIONAL(COMPAT_MKSTEMP, test "$ac_cv_func_mkstemp" = no)
 if test "x$missing_routines" = x; then
   missing_routines='(none)'
 fi

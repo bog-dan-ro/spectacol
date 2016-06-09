@@ -5225,3 +5225,6 @@
 20160608 data/fuse.desktop.in: update Name entry and add GenericName and
          Keywords entries in .desktop file (patch #369) (Alberto Garcia).
 20160609 sound/alsasound.c: avoid redefinition of NDEBUG (Sergio).
+20160609 compat/{Makefile.am,mkstemp.c},configure.ac,utils.[ch]: remove
+         utils_make_temp_file() and mkstemp() as they are no longer used (thanks
+         Phil) (Fred).
