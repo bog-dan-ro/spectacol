@@ -273,7 +273,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     if (!gm->connectedGamepads().contains(m_gamepadId))
         m_gamepadId = -1;
 
-    connect(gm, &QGamepadManager::gamepadAxisEvent, this, [this](int deviceId, QGamepadManager::GamepadAxis axis, double value){
+    connect(gm, &QGamepadManager::gamepadAxisEvent, this, [this](int deviceId, QGamepadManager::GamepadAxis axis, double value) {
         if (!m_processInputEvents || deviceId != m_gamepadId ||
                 axis == QGamepadManager::AxisInvalid)
             return;
@@ -284,7 +284,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         if (!m_processInputEvents.load() || value != 1)
             return;
 
-        if (fuse_emulation_paused && ui_widget_level == -1)
+        if (!m_paused.load() && fuse_emulation_paused && ui_widget_level == -1)
             return;
 
         switch (button) {
@@ -294,17 +294,6 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             if (m_showControlsIcons)
                 emit showControlsIconsChanged(m_showControlsIcons = false);
             emit showMenu();
-            return;
-        case QGamepadManager::ButtonX:
-        case QGamepadManager::ButtonY:
-            if (m_showControlsIcons)
-                emit showControlsIconsChanged(m_showControlsIcons = false);
-            return;
-        case QGamepadManager::ButtonL2:
-            quickSaveSnapshot();
-            return;
-        case QGamepadManager::ButtonR2:
-            quickLoadSnapshot();
             return;
         default:
             break;
@@ -319,21 +308,11 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     connect(gm, &QGamepadManager::gamepadButtonReleaseEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button) {
         if (!m_processInputEvents.load() || deviceId != m_gamepadId ||
                 button == QGamepadManager::ButtonInvalid ||
-                button == QGamepadManager::ButtonStart ||
-                button == QGamepadManager::ButtonL2 ||
-                button == QGamepadManager::ButtonR2)
+                button == QGamepadManager::ButtonStart)
             return;
 
-        if (fuse_emulation_paused && ui_widget_level == -1)
+        if (!m_paused.load() && fuse_emulation_paused && ui_widget_level == -1)
             return;
-
-        if (button == QGamepadManager::ButtonX)
-            QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(CursorJoystick); });
-
-        if (button == QGamepadManager::ButtonY)
-            QTimer::singleShot(0, [this]{ emit toggleOnScreenControls(Keyboard48K); });
-
-
 
         gamepadButtonReleaseEvent(button);
     });
@@ -1214,24 +1193,65 @@ void FuseEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double va
 
 void FuseEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button)
 {
-    pokeEvent([button] {
-        input_event_t event;
-        event.type = INPUT_EVENT_JOYSTICK_PRESS;
-        event.types.joystick.which = 0;
-        event.types.joystick.button = toJoystickKey(button);
-        input_event(&event);
-    });
+    auto action = m_fuseSettings->gamepadAction(button);
+    switch (action) {
+    case FuseSettings::JoystickFire:
+        pokeEvent([button] {
+            input_event_t event;
+            event.type = INPUT_EVENT_JOYSTICK_PRESS;
+            event.types.joystick.which = 0;
+            event.types.joystick.button = toJoystickKey(button);
+            input_event(&event);
+        });
+        break;
+    case FuseSettings::ToggleKeyboard:
+    case FuseSettings::ToggleCursorJoystick:
+        if (m_showControlsIcons)
+            emit showControlsIconsChanged(m_showControlsIcons = false);
+        break;
+
+    case FuseSettings::TogglePause:
+    case FuseSettings::QuickSaveSnapshot:
+    case FuseSettings::QuickLoadSnapshot:
+        break;
+    default:
+        keyPress(action);
+        break;
+    }
 }
 
 void FuseEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button)
 {
-    pokeEvent([button] {
-        input_event_t event;
-        event.type = INPUT_EVENT_JOYSTICK_RELEASE;
-        event.types.joystick.which = 0;
-        event.types.joystick.button = toJoystickKey(button);
-        input_event(&event);
-    });
+    auto action = m_fuseSettings->gamepadAction(button);
+    switch (action) {
+    case FuseSettings::JoystickFire:
+        pokeEvent([button] {
+            input_event_t event;
+            event.type = INPUT_EVENT_JOYSTICK_RELEASE;
+            event.types.joystick.which = 0;
+            event.types.joystick.button = toJoystickKey(button);
+            input_event(&event);
+        });
+        break;
+    case FuseSettings::ToggleKeyboard:
+        QTimer::singleShot(0, this, [this]{ emit toggleOnScreenControls(Keyboard48K); });
+        break;
+    case FuseSettings::ToggleCursorJoystick:
+        QTimer::singleShot(0, this, [this]{ emit toggleOnScreenControls(CursorJoystick); });
+        break;
+    case FuseSettings::TogglePause:
+        togglePaused();
+        break;
+    case FuseSettings::QuickSaveSnapshot:
+        quickSaveSnapshot();
+        break;
+    case FuseSettings::QuickLoadSnapshot:
+        quickLoadSnapshot();
+        break;
+    default:
+        keyRelease(action);
+        break;
+    }
 }
 
 void FuseEmulator::setOpenSaveFile(const QByteArray &filePath)
@@ -1250,6 +1270,21 @@ void FuseEmulator::showMessage(QString message, FuseEmulator::ErrorLevel level)
 {
     callFunction([this, message, level]{
         emit error(level, message);
+    });
+}
+
+void FuseEmulator::togglePaused()
+{
+    bool paused = m_paused.load();
+    if (!m_paused.compare_exchange_strong(paused, !paused))
+        return;
+
+    pokeEvent([this, paused]{
+        if (!paused)
+            fuse_emulation_pause();
+        else
+            fuse_emulation_unpause();
+        showMessage(paused ? tr("Resume spectacol") : tr("Pause spectacol"));
     });
 }
 

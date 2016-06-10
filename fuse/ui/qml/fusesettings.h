@@ -18,12 +18,15 @@
 #ifndef FUSESETTINGS_H
 #define FUSESETTINGS_H
 
+#include <mutex>
+#include <unordered_map>
+#include <QGamepadManager>
 #include "fuseobject.h"
 
 class FuseSettings : public FuseObject
 {
     Q_OBJECT
-    Q_ENUMS(FillMode)
+    Q_ENUMS(FillMode Actions)
 
     Q_PROPERTY(QStringList machinesModel READ machinesModel CONSTANT)
     Q_PROPERTY(QString currentMachine READ currentMachine NOTIFY currentMachineChanged)
@@ -66,6 +69,15 @@ public:
         PreserveAspectFit = 0,
         PreserveAspect,
         Stretch
+    };
+
+    enum Actions {
+        JoystickFire = 0,
+        ToggleKeyboard = Qt::Key_unknown + 1,
+        ToggleCursorJoystick,
+        TogglePause,
+        QuickSaveSnapshot,
+        QuickLoadSnapshot,
     };
 
 public:
@@ -144,6 +156,17 @@ public:
     int loaderAcceleration() const;
     void setLoaderAcceleration(int loaderAcceleration);
 
+public slots:
+    inline int gamepadAction(int gamepadButton) {
+        std::unique_lock<std::mutex> lock(m_gamepadActionsMutex);
+        auto it = m_gamepadActions.find(gamepadButton);
+        if (it != m_gamepadActions.end())
+            return it->second;
+        return JoystickFire;
+    }
+
+    void setGamepadAction(int gamepadButton, int action);
+
 private:
     enum ScreenOrientation {
         Sensors = 0,
@@ -163,6 +186,15 @@ signals:
 
 private:
     bool m_hasStartButton = false;
+    std::mutex m_gamepadActionsMutex;
+
+    // Default button actions map
+    std::unordered_map<int, int> m_gamepadActions = {
+        {QGamepadManager::ButtonX, ToggleKeyboard},
+        {QGamepadManager::ButtonY, ToggleCursorJoystick},
+        {QGamepadManager::ButtonL2, QuickSaveSnapshot},
+        {QGamepadManager::ButtonR2, QuickLoadSnapshot}
+    };
 };
 
 #endif // FUSESETTINGS_H

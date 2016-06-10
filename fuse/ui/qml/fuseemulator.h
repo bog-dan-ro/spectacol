@@ -301,6 +301,7 @@ signals:
     void showPokememSelector();
 
 private:
+    void togglePaused();
     void updateScalers() const;
     void startFuseThread();
     friend class FuseTexture;
@@ -326,6 +327,7 @@ private:
     QSemaphore m_waitSemaphore;
     QByteArray m_openSaveFilePath;
     UiQuery m_queryResult = UiNo;
+    std::atomic_bool m_paused;
 };
 
 extern FuseEmulator *g_fuseEmulator;

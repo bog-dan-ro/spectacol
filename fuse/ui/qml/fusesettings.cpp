@@ -32,6 +32,8 @@
 # include <QtAndroid>
 #endif
 
+typedef QLatin1String _;
+
 #define safe_set(S, V) \
     pokeEvent([this, V]{ \
         if (S == V) \
@@ -42,7 +44,7 @@
 
 #define safe_set_string(S, V) \
     pokeEvent([this, V]{ \
-        if (QLatin1String(S) == V) \
+        if (_(S) == V) \
             return; \
         free(S); \
         S = strdup(V.toLatin1().constData()); \
@@ -58,8 +60,14 @@ FuseSettings::FuseSettings(QObject *parent)
 
     {
         QSettings s;
-        s.beginGroup(QLatin1String("General"));
+        s.beginGroup(_("General"));
         m_hasStartButton = s.value("hasStartButton", false).toBool();
+        s.endGroup();
+
+        s.beginGroup(_("Gamepad"));
+        QVariantMap map = s.value(_("actionsMap")).toMap();
+        for (auto it = map.begin(); it != map.end(); ++it)
+            m_gamepadActions[it.key().toInt()] = it.value().toInt();
     }
     setScreenOrientation(screenOrientation());
 }
@@ -68,14 +76,14 @@ QStringList FuseSettings::machinesModel() const
 {
     QStringList res;
     for (int i = 0; i < machine_count; i++)
-        res << QLatin1String(libspectrum_machine_name(machine_types[i]->machine));
+        res << _(libspectrum_machine_name(machine_types[i]->machine));
     return res;
 }
 
 QString FuseSettings::currentMachine()
 {
     if (machine_current)
-        return QLatin1String(libspectrum_machine_name(machine_current->machine));
+        return _(libspectrum_machine_name(machine_current->machine));
 
     pokeEvent([this]{
         callFunction([this]{ emit currentMachineChanged(); });
@@ -168,7 +176,7 @@ void FuseSettings::setSoundForce8Bit(bool force8Bit)
 
 QString FuseSettings::AYStereoSeparation() const
 {
-    return QLatin1String(settings_current.stereo_ay);
+    return _(settings_current.stereo_ay);
 }
 
 void FuseSettings::setAYStereoSeparation(const QString &AYStereoSeparation)
@@ -178,7 +186,7 @@ void FuseSettings::setAYStereoSeparation(const QString &AYStereoSeparation)
 
 QString FuseSettings::speakerType() const
 {
-    return QLatin1String(settings_current.speaker_type);
+    return _(settings_current.speaker_type);
 }
 
 void FuseSettings::setSpeakerType(const QString &speakerType)
@@ -229,14 +237,14 @@ void FuseSettings::setInterface2(bool interface2)
 bool FuseSettings::full48kOSK() const
 {
     QSettings s;
-    s.beginGroup(QLatin1String("Peripherals"));
+    s.beginGroup(_("Peripherals"));
     return s.value("full48kOSK", true).toBool();
 }
 
 void FuseSettings::setFull48kOSK(bool full48kOSK)
 {
     QSettings s;
-    s.beginGroup(QLatin1String("Peripherals"));
+    s.beginGroup(_("Peripherals"));
     s.setValue("full48kOSK", full48kOSK);
     emit settingsCurrentChanged();
 }
@@ -244,7 +252,7 @@ void FuseSettings::setFull48kOSK(bool full48kOSK)
 bool FuseSettings::restrictToSpectacol() const
 {
     QSettings s;
-    s.beginGroup(QLatin1String("General"));
+    s.beginGroup(_("General"));
     return s.value("restrictToSpectacol", true).toBool();
 }
 
@@ -254,7 +262,7 @@ void FuseSettings::setRestrictToSpectacol(bool restrictBrowse)
         return;
 
     QSettings s;
-    s.beginGroup(QLatin1String("General"));
+    s.beginGroup(_("General"));
     s.setValue("restrictToSpectacol", restrictBrowse);
     emit settingsCurrentChanged();
 }
@@ -270,7 +278,7 @@ void FuseSettings::setHasStartButton(bool hasStartButton)
         return;
 
     QSettings s;
-    s.beginGroup(QLatin1String("General"));
+    s.beginGroup(_("General"));
     s.setValue("hasStartButton", hasStartButton);
 
     m_hasStartButton = hasStartButton;
@@ -298,7 +306,7 @@ int FuseSettings::screenOrientation() const
     return -1;
 #else
     QSettings s;
-    s.beginGroup(QLatin1String("Screen"));
+    s.beginGroup(_("Screen"));
     return s.value("orientation", Landscape).toInt();
 #endif
 }
@@ -330,7 +338,7 @@ void FuseSettings::setScreenOrientation(int orientation)
         QtAndroid::androidActivity().callMethod<void>("setRequestedOrientation", "(I)V", request);
     });
     QSettings s;
-    s.beginGroup(QLatin1String("Screen"));
+    s.beginGroup(_("Screen"));
     s.setValue("orientation", orientation);
     emit screenOrientationChanged(orientation);
 #endif
@@ -339,7 +347,7 @@ void FuseSettings::setScreenOrientation(int orientation)
 FuseSettings::FillMode FuseSettings::fillMode() const
 {
     QSettings s;
-    s.beginGroup(QLatin1String("Screen"));
+    s.beginGroup(_("Screen"));
     return (FillMode) s.value("fillMode", PreserveAspectFit).toInt();
 }
 
@@ -349,7 +357,7 @@ void FuseSettings::setFillMode(FuseSettings::FillMode fill)
         return;
 
     QSettings s;
-    s.beginGroup(QLatin1String("Screen"));
+    s.beginGroup(_("Screen"));
     s.setValue("fillMode", fill);
 
     emit fillModeChanged(fill);
@@ -358,7 +366,7 @@ void FuseSettings::setFillMode(FuseSettings::FillMode fill)
 bool FuseSettings::swipe4menu() const
 {
     QSettings s;
-    s.beginGroup(QLatin1String("General"));
+    s.beginGroup(_("General"));
     return s.value("swipe4menu", true).toBool();
 }
 
@@ -368,7 +376,7 @@ void FuseSettings::setSwipe4menu(bool swipe)
         return;
 
     QSettings s;
-    s.beginGroup(QLatin1String("General"));
+    s.beginGroup(_("General"));
     s.setValue("swipe4menu", swipe);
     emit swipe4menuChanged(swipe);
 }
@@ -376,7 +384,7 @@ void FuseSettings::setSwipe4menu(bool swipe)
 bool FuseSettings::autoSaveOnExit() const
 {
     QSettings s;
-    s.beginGroup(QLatin1String("General"));
+    s.beginGroup(_("General"));
     return s.value("autoSaveOnExit", false).toBool();
 }
 
@@ -386,7 +394,7 @@ void FuseSettings::setAutoSaveOnExit(bool autoSave)
         return;
 
     QSettings s;
-    s.beginGroup(QLatin1String("General"));
+    s.beginGroup(_("General"));
     s.setValue("autoSaveOnExit", autoSave);
     emit autoSaveOnExitChanged(autoSave);
 }
@@ -394,7 +402,7 @@ void FuseSettings::setAutoSaveOnExit(bool autoSave)
 bool FuseSettings::leftMargin() const
 {
     QSettings s;
-    s.beginGroup(QLatin1String("Screen"));
+    s.beginGroup(_("Screen"));
     return s.value("leftMargin", false).toBool();
 }
 
@@ -404,7 +412,7 @@ void FuseSettings::setLeftMargin(bool border)
         return;
 
     QSettings s;
-    s.beginGroup(QLatin1String("Screen"));
+    s.beginGroup(_("Screen"));
     s.setValue("leftMargin", border);
 
     emit leftMarginChanged(border);
@@ -470,4 +478,16 @@ void FuseSettings::setLoaderAcceleration(int acceleration)
             callFunction([this]{ emit settingsCurrentChanged(); });
         });
     }
+}
+
+void FuseSettings::setGamepadAction(int gamepadButton, int action)
+{
+    std::unique_lock<std::mutex> lock(m_gamepadActionsMutex);
+    m_gamepadActions[gamepadButton] = action;
+    QSettings s;
+    s.beginGroup(_("Gamepad"));
+    QVariantMap map;
+    for (const auto &it : m_gamepadActions)
+        map[QString::number(it.first)] = it.second;
+    s.setValue(_("actionsMap"), map);
 }

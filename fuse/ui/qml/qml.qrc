@@ -107,6 +107,7 @@
         <file>qml/GetFileBrowserPage.qml</file>
         <file>qml/PokeManagerPage.qml</file>
         <file>qml/FancyBaseList.qml</file>
+        <file>qml/CustomizeGamepadPage.qml</file>
         <file>qml/FancyPane.qml</file>
         <file>qml/BrowseTapePage.qml</file>
         <file>images/binary.svg</file>

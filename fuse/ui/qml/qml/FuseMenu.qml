@@ -343,13 +343,23 @@ Menu {
                 pageLoader.source = "OptionsMediaPage.qml";
             }
         }
+        Menu {
+            title: qsTr("(Virtual) Gamepad")
+            MenuItem {
+                text: qsTr("Customize Gamepad Buttons")
+                onTriggered: {
+                    menuBar.close();
+                    pageLoader.source = "CustomizeGamepadPage.qml";
+                }
+            }
 
-        MenuItem {
-            visible: fuse.gamepadId != -1
-            text: "Calibrate Gamepad"
-            onTriggered: {
-                menuBar.close();
-                pageLoader.source = "CalibrateGamepad.qml";
+            MenuItem {
+                visible: fuse.gamepadId != -1
+                text: qsTr("Calibrate Gamepad")
+                onTriggered: {
+                    menuBar.close();
+                    pageLoader.source = "CalibrateGamepad.qml";
+                }
             }
         }
     }
