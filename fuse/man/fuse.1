@@ -4299,51 +4299,93 @@ occurs and
 .I condition
 evaluates to true. The events which can be caught are:
 .PP
+beta128:page
+.br
+beta128:unpage
+.RS
+The Beta\ 128 interface is paged into or out of memory respectively.
+.RE
+.br
+didaktik80:page
+.br
+didaktik80:unpage
+.RS
+The Didaktik\ 80 interface is paged into or out of memory respectively.
+.RE
+.br
+disciple:page
+.br
+disciple:unpage
+.RS
+The DISCiPLE interface is paged into or out of memory respectively.
+.RE
+.br
 divide:page
 .br
 divide:unpage
 .RS
-The DivIDE interface is paged into or out of memory respectively
+The DivIDE interface is paged into or out of memory respectively.
 .RE
 .br
 if1:page
 .br
 if1:unpage
 .RS
-The Interface\ 1 shadow ROM is paged into or out of memory
+The Interface\ 1 shadow ROM is paged into or out of memory.
+.RE
+.br
+opus:page
+.br
+opus:unpage
+.RS
+The Opus Discovery is paged into or out of memory respectively.
+.RE
+.br
+plusd:page
+.br
+plusd:unpage
+.RS
+The +D interface is paged into or out of memory respectively.
 .RE
 .br
 rzx:end
 .RS
-An RZX recording finishes playing
+An RZX recording finishes playing.
+.RE
+.br
+speccyboot:page
+.br
+speccyboot:unpage
+.RS
+The SpeccyBoot interface is paged into or out of memory.
 .RE
 .br
 spectranet:page
 .br
 spectranet:unpage
 .RS
-The Spectranet interface is paged into or out of memory
+The Spectranet interface is paged into or out of memory.
 .RE
 .br
 tape:play
 .br
 tape:stop
 .RS
-The emulated tape starts or stops playing
+The emulated tape starts or stops playing.
 .RE
 .br
 zxatasp:page
 .br
 zxatasp:unpage
 .RS
-The ZXATASP interface is paged into or out of memory
+The ZXATASP interface is paged into or out of memory.
 .RE
 .br
 zxcf:page
 .br
 zxcf:unpage
 .RS
-The ZXCF interface is paged into or out of memory
+The ZXCF interface is paged into or out of memory.
 .RE
 .PP
 In all cases, the event can be specified as

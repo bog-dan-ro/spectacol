@@ -5231,3 +5231,7 @@
 20160611 peripherals/disk/didaktik.c,unittests/unittests.c: add Didaktik 80 unit
          test (Sergio).
 20160611 debugger/event.c: make breakpoints on events honour lifetime (Sergio).
+20160611 man/fuse.1,peripherals/{disk/{beta.c,didaktik.c,disciple.c,opus.c,
+         plusd.c}},speccyboot.c}: extend breakpoints on paging events to more
+         peripherals: Beta 128, +D, Didaktik 80, DISCiPLE, Opus Discovery and
+         SpeccyBoot (Sergio).

@@ -33,6 +33,7 @@
 #include <string.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "didaktik.h"
 #include "machine.h"
 #include "module.h"
@@ -125,12 +126,17 @@ static const periph_t didaktik_periph = {
   /* .activate = */ NULL,
 };
 
+/* Debugger events */
+static const char * const event_type_string = "didaktik80";
+static int page_event, unpage_event;
+
 void
 didaktik80_page( void )
 {
   didaktik80_active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+  debugger_event( page_event );
 }
 
 void
@@ -139,6 +145,7 @@ didaktik80_unpage( void )
   didaktik80_active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
+  debugger_event( unpage_event );
 }
 
 static void
@@ -206,6 +213,9 @@ didaktik80_init( void )
     didaktik_ui_drives[ i ].fdd = &didaktik_drives[ i ];
     ui_media_drive_register( &didaktik_ui_drives[ i ] );
   }
+
+  periph_register_paging_events( event_type_string, &page_event,
+                                 &unpage_event );
 }
 
 static void

@@ -33,6 +33,7 @@
 #include <string.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "machine.h"
 #include "module.h"
 #include "peripherals/printer.h"
@@ -98,6 +99,10 @@ static module_info_t plusd_module_info = {
 
 };
 
+/* Debugger events */
+static const char * const event_type_string = "plusd";
+static int page_event, unpage_event;
+
 static libspectrum_byte plusd_control_register;
 
 void
@@ -106,6 +111,7 @@ plusd_page( void )
   plusd_active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+  debugger_event( page_event );
 }
 
 void
@@ -114,6 +120,7 @@ plusd_unpage( void )
   plusd_active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
+  debugger_event( unpage_event );
 }
 
 static void
@@ -188,6 +195,9 @@ plusd_init( void )
     plusd_ui_drives[ i ].fdd = &plusd_drives[ i ];
     ui_media_drive_register( &plusd_ui_drives[ i ] );
   }
+
+  periph_register_paging_events( event_type_string, &page_event,
+                                 &unpage_event );
 }
 
 static void

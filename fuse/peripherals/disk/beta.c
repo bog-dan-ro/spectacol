@@ -43,6 +43,7 @@
 
 #include "beta.h"
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "event.h"
 #include "machine.h"
 #include "module.h"
@@ -89,6 +90,10 @@ static const periph_t beta_peripheral = {
   /* .activate = */ NULL,
 };
 
+/* Debugger events */
+static const char * const event_type_string = "beta128";
+static int page_event, unpage_event;
+
 static void beta_reset( int hard_reset );
 static void beta_memory_map( void );
 static void beta_enabled_snapshot( libspectrum_snap *snap );
@@ -114,6 +119,7 @@ beta_page( void )
   beta_active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+  debugger_event( page_event );
 }
 
 void
@@ -122,6 +128,7 @@ beta_unpage( void )
   beta_active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
+  debugger_event( unpage_event );
 }
 
 static void
@@ -177,6 +184,9 @@ beta_init( void )
     beta_ui_drives[ i ].fdd = &beta_drives[ i ];
     ui_media_drive_register( &beta_ui_drives[ i ] );
   }
+
+  periph_register_paging_events( event_type_string, &page_event,
+                                 &unpage_event );
 }
 
 static void

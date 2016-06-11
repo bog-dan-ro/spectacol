@@ -33,6 +33,7 @@
 #include <string.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "machine.h"
 #include "module.h"
 #include "opus.h"
@@ -93,12 +94,17 @@ static const periph_t opus_periph = {
   /* .activate = */ NULL,
 };
 
+/* Debugger events */
+static const char * const event_type_string = "opus";
+static int page_event, unpage_event;
+
 void
 opus_page( void )
 {
   opus_active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+  debugger_event( page_event );
 }
 
 void
@@ -107,6 +113,7 @@ opus_unpage( void )
   opus_active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
+  debugger_event( unpage_event );
 }
 
 static void
@@ -161,6 +168,9 @@ opus_init( void )
     opus_ui_drives[ i ].fdd = &opus_drives[ i ];
     ui_media_drive_register( &opus_ui_drives[ i ] );
   }
+
+  periph_register_paging_events( event_type_string, &page_event,
+                                 &unpage_event );
 }
 
 static void

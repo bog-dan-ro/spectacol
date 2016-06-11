@@ -29,6 +29,7 @@
 #include <config.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "machine.h"
 #include "memory.h"
 #include "nic/enc28j60.h"
@@ -96,6 +97,10 @@ static const periph_t speccyboot_periph = {
   /* .activate = */ NULL,
 };
 
+/* Debugger events */
+static const char * const event_type_string = "speccyboot";
+static int page_event, unpage_event;
+
 /* ---------------------------------------------------------------------------
  * ROM paging state
  * ------------------------------------------------------------------------ */
@@ -103,6 +108,24 @@ static const periph_t speccyboot_periph = {
 static int speccyboot_rom_active = 0;  /* SpeccyBoot ROM paged in? */
 static int speccyboot_memory_source;
 static memory_page speccyboot_memory_map_romcs[ MEMORY_PAGES_IN_8K ];
+
+static void
+speccyboot_page( void )
+{
+  speccyboot_rom_active = 1;
+  machine_current->ram.romcs = 1;
+  machine_current->memory_map();
+  debugger_event( page_event );
+}
+  
+static void
+speccyboot_unpage( void )
+{
+  speccyboot_rom_active = 0;
+  machine_current->ram.romcs = 0;
+  machine_current->memory_map();
+  debugger_event( unpage_event );
+}
 
 static void
 speccyboot_memory_map( void )
@@ -187,13 +210,9 @@ speccyboot_register_write( libspectrum_word port GCC_UNUSED,
    
   /* Update ROM paging status when the ROM_CS bit is cleared or set */
   if( GONE_LO( out_register_state, val, OUT_BIT_ROM_CS ) ) {
-    speccyboot_rom_active = 1;
-    machine_current->ram.romcs = 1;
-    machine_current->memory_map();
+    speccyboot_page();
   } else if( GONE_HI( out_register_state, val, OUT_BIT_ROM_CS ) ) {
-    speccyboot_rom_active = 0;
-    machine_current->ram.romcs = 0;
-    machine_current->memory_map();
+    speccyboot_unpage();
   }
 
   out_register_state = val;
@@ -213,6 +232,9 @@ speccyboot_init( void )
     speccyboot_memory_map_romcs[i].source = speccyboot_memory_source;
 
   periph_register( PERIPH_TYPE_SPECCYBOOT, &speccyboot_periph );
+
+  periph_register_paging_events( event_type_string, &page_event,
+                                 &unpage_event );
 }
 
 void
@@ -226,8 +248,7 @@ speccyboot_unittest( void )
 {
   int r = 0;
 
-  speccyboot_rom_active = 1;
-  speccyboot_memory_map();
+  speccyboot_page();
 
   r += unittests_assert_8k_page( 0x0000, speccyboot_memory_source, 0 );
   r += unittests_assert_8k_page( 0x2000, memory_source_rom, 0 );
@@ -235,8 +256,7 @@ speccyboot_unittest( void )
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
 
-  speccyboot_rom_active = 0;
-  machine_current->memory_map();
+  speccyboot_unpage();
 
   r += unittests_paging_test_48( 2 );
 
