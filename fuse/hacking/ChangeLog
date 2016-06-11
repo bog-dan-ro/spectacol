@@ -5230,3 +5230,4 @@
          Phil) (Fred).
 20160611 peripherals/disk/didaktik.c,unittests/unittests.c: add Didaktik 80 unit
          test (Sergio).
+20160611 debugger/event.c: make breakpoints on events honour lifetime (Sergio).
