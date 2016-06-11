@@ -370,6 +370,28 @@ didaktik80_get_fdd( didaktik80_drive_number which )
   return &( didaktik_drives[ which ] );
 }
 
+int
+didaktik80_unittest( void )
+{
+  int r = 0;
+
+  didaktik80_page();
+
+  r += unittests_assert_8k_page( 0x0000, didaktik_rom_memory_source, 0 );
+  r += unittests_assert_4k_page( 0x2000, didaktik_rom_memory_source, 0 );
+  r += unittests_assert_2k_page( 0x3000, didaktik_rom_memory_source, 0 );
+  r += unittests_assert_2k_page( 0x3800, didaktik_ram_memory_source, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  didaktik80_unpage();
+
+  r += unittests_paging_test_48( 2 );
+
+  return r;
+}
+
 static int
 ui_drive_is_available( void )
 {

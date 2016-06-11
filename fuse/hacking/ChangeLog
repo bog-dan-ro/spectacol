@@ -5228,3 +5228,5 @@
 20160609 compat/{Makefile.am,mkstemp.c},configure.ac,utils.[ch]: remove
          utils_make_temp_file() and mkstemp() as they are no longer used (thanks
          Phil) (Fred).
+20160611 peripherals/disk/didaktik.c,unittests/unittests.c: add Didaktik 80 unit
+         test (Sergio).
