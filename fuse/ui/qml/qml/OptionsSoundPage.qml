@@ -19,6 +19,7 @@ import QtQuick 2.6
 import QtQuick.Window 2.2
 import QtGamepad 1.0
 import QtQuick.Controls 2.0
+import QtQuick.Layouts 1.1
 
 // @scope main.qml
 
@@ -43,7 +44,7 @@ Flickable {
 
     FancyPane {
         id: pane
-        Column {
+        ColumnLayout {
             spacing: 2.5 * Screen.pixelDensity
             anchors.horizontalCenter: parent.horizontalCenter
             Label {
@@ -79,8 +80,9 @@ Flickable {
                 onCheckedChanged: fuseSettings.soundForce8Bit = checked
             }
 
-            Row {
+            RowLayout {
                 spacing: 2.5 * Screen.pixelDensity
+                Layout.fillWidth: true
                 Label {
                     text: qsTr("AY stereo separation")
                     anchors.verticalCenter: parent.verticalCenter
@@ -88,6 +90,7 @@ Flickable {
 
                 ComboBox {
                     id: ayStereoSeparation
+                    Layout.fillWidth: true
                     Keys.onUpPressed: {
                         if (popup.visible)
                             decrementCurrentIndex();
@@ -108,8 +111,9 @@ Flickable {
                 }
             }
 
-            Row {
+            RowLayout {
                 spacing: 2.5 * Screen.pixelDensity
+                Layout.fillWidth: true
                 Label {
                     text: qsTr("Speaker type")
                     anchors.verticalCenter: parent.verticalCenter
@@ -117,6 +121,7 @@ Flickable {
 
                 ComboBox {
                     id: speakerType
+                    Layout.fillWidth: true
                     Keys.onUpPressed: {
                         if (popup.visible)
                             decrementCurrentIndex();

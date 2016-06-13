@@ -19,6 +19,7 @@ import QtQuick 2.6
 import QtQuick.Window 2.2
 import QtGamepad 1.0
 import QtQuick.Controls 2.0
+import QtQuick.Layouts 1.1
 import "private"
 
 // @scope main.qml
@@ -39,14 +40,15 @@ Flickable {
 
     FancyPane {
         id: pane
-        Column {
+        ColumnLayout {
             spacing: 2.5 * Screen.pixelDensity
             anchors.horizontalCenter: parent.horizontalCenter
             Label {
                 text: qsTr("Screen Options")
             }
 
-            Row {
+            RowLayout {
+                Layout.fillWidth: true
                 spacing: 2.5 * Screen.pixelDensity
                 Label {
                     text: qsTr("Screen filter")
@@ -55,6 +57,7 @@ Flickable {
                 ComboBox {
                     focus: true
                     id: screenFilter
+                    Layout.fillWidth: true
                     Keys.onUpPressed: {
                         if (popup.visible)
                             decrementCurrentIndex();
@@ -76,14 +79,16 @@ Flickable {
                 }
             }
 
-            Row {
+            RowLayout {
                 spacing: 2.5 * Screen.pixelDensity
+                Layout.fillWidth: true
                 Label {
                     text: qsTr("Fill mode")
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 ComboBox {
                     id: screenFillMode
+                    Layout.fillWidth: true
                     Keys.onUpPressed: {
                         if (popup.visible)
                             decrementCurrentIndex();
@@ -111,15 +116,17 @@ Flickable {
                 }
             }
 
-            Row {
+            RowLayout {
                 visible: fuseSettings.showOrientationChooser
                 spacing: 2.5 * Screen.pixelDensity
+                Layout.fillWidth: true
                 Label {
                     text: qsTr("Screen orientation")
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 ComboBox {
                     id: screenOrientation
+                    Layout.fillWidth: true
                     Keys.onUpPressed: {
                         if (popup.visible)
                             decrementCurrentIndex();
