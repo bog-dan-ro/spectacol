@@ -132,7 +132,7 @@ Item {
 
         Rectangle {
             id: toolBarRect
-            height: TextSizes.scale20 * 2
+            height: commandsLine.contentHeight + commandsLine.topPadding + commandsLine.bottomPadding + Screen.pixelDensity
             Layout.fillWidth: true
             color: backgroudColor
             radius: Screen.pixelDensity
