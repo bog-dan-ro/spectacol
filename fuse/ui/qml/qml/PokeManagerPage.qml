@@ -26,6 +26,7 @@ import Fuse 1.0
 import "private" 1.0
 
 Item {
+    anchors.fill: parent
     Component.onCompleted: {
         fuse.processInputEvents = false;
         fuse.paused = true;
@@ -52,7 +53,7 @@ Item {
         id: addPoke
         modal: true
         focus: true
-        x: parent.width / 2 - width / 2
+        x: (parent.width - width) / 2
         height: TextSizes.scale34 * 7
         width: TextSizes.scale20 * 10
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnReleaseOutsideParent
@@ -145,7 +146,7 @@ Item {
 
     FancyBaseList {
         id: view
-        width: parent.width / 2
+        width: (TextSizes.smallScreen && parent.width < parent.height) ? parent.width - Screen.pixelDensity * 10 : parent.width / 2
         focus: true
 
         model: pokeModel
@@ -190,7 +191,7 @@ Item {
 
         footer: RowLayout {
             width: view.width
-            spacing: Screen.pixelDensity * 5
+            spacing: Screen.pixelDensity
             Button {
                 text: qsTr("Add (Y)")
                 onClicked: addPoke.open();
