@@ -377,7 +377,7 @@ bool FuseSettings::autoSaveOnExit() const
 {
     QSettings s;
     s.beginGroup(QLatin1String("General"));
-    return s.value("autoSaveOnExit", true).toBool();
+    return s.value("autoSaveOnExit", false).toBool();
 }
 
 void FuseSettings::setAutoSaveOnExit(bool autoSave)
