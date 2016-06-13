@@ -24,7 +24,9 @@ Pane {
     id: pane
     focus: true
     background.opacity: 0.85
+    x: (pageLoader.width - width) / 2
     PropertyAnimation on x {
+        from: 0
         to: (pageLoader.width - pane.width) / 2
         easing.type: Easing.InOutBack
         easing.amplitude: 2.0

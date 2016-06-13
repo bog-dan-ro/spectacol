@@ -22,9 +22,10 @@ import QtQuick.Controls 2.0
 
 ListView {
     id: view
-
+    x: (parent.width - view.width) / 2
     PropertyAnimation on x {
-        to: parent.width / 2 - view.width / 2
+        from: 0
+        to: (parent.width - view.width) / 2
         easing.type: Easing.InOutBack
         easing.amplitude: 2.0
         easing.period: 1.5
