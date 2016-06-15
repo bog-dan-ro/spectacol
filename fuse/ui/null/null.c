@@ -183,3 +183,8 @@ int ui_menu_activate( ui_menu_item item, int active )
 {
     return 0;
 }
+
+int ui_tape_browser_update(ui_tape_browser_update_type change, libspectrum_tape_block *block)
+{
+    return 0;
+}

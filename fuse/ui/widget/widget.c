@@ -715,7 +715,7 @@ ui_statusbar_update_speed( float speed )
 /* Tape browser update function. The dialog box is created every time it
    is displayed, so no need to do anything here */
 int
-ui_tape_browser_update( ui_tape_browser_update_type change,
+_ui_tape_browser_update( ui_tape_browser_update_type change,
                         libspectrum_tape_block *block )
 {
   return 0;
