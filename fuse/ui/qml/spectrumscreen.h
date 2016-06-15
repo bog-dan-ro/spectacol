@@ -24,6 +24,8 @@
 
 QImage buff2Image(const QByteArray &buffer, const QString &fileName = QString());
 QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString &fileName = QString());
+QImage scr2Image(const QByteArray &buffer);
+QImage scr2Image(const char *buffer, size_t bufferSize);
 
 
 class SpectrumScreenImageProvider : public QQuickImageProvider

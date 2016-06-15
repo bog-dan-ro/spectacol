@@ -22,7 +22,7 @@ import "private" 1.0
 
 Label {
     font.pixelSize: TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14
-    font.family: 'Monospace'
+    font.family: Qt.platform.os === 'android' ? 'Droid Sans Mono' : 'Monospace'
     style: Text.Outline
     styleColor: "#66ff2200"
     horizontalAlignment: Text.AlignLeft

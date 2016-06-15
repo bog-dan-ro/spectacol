@@ -64,12 +64,12 @@ static void inline plot8(uint16_t *dataPtr, libspectrum_byte data, libspectrum_b
     *dataPtr   = (data & 0x01) ? inkColor : paperColor;
 }
 
-inline QImage spectrumScreen2Image(const unsigned char *screen)
+inline QImage spectrumScreen2Image(const char *screen)
 {
     if (!screen)
         return QImage();
 
-    const unsigned char *colors = screen + 32 * 24 * 8;
+    const char *colors = screen + 32 * 24 * 8;
     QImage ret(256 ,192, QImage::Format_RGB16);
     uint16_t *bits = (uint16_t *)ret.bits();
     uint16_t pitch = ret.bytesPerLine() / 2;
@@ -115,7 +115,7 @@ QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString 
             for (auto block = libspectrum_tape_iterator_init(&iterator, tape); block;
                  block = libspectrum_tape_iterator_next( &iterator )) {
                 if (libspectrum_tape_block_data_length(block) == SPECTRUM_TAPE_BLOCK_SCREEN_SIZE) {
-                    ret = spectrumScreen2Image(libspectrum_tape_block_data(block) + 1);
+                    ret = spectrumScreen2Image((const char*)libspectrum_tape_block_data(block) + 1);
                     break;
                 }
             }
@@ -147,7 +147,7 @@ QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString 
 
     error = libspectrum_snap_read(snap, buffer, bufferSize, fileType, fileName.toUtf8().constData());
     if (error == LIBSPECTRUM_ERROR_NONE)
-        ret = spectrumScreen2Image(libspectrum_snap_pages(snap, 5));
+        ret = spectrumScreen2Image((const char*)libspectrum_snap_pages(snap, 5));
 
     libspectrum_snap_free(snap);
     libspectrum_end(init.context);
@@ -160,11 +160,39 @@ QImage buff2Image(const QByteArray &buffer, const QString &fileName)
     return buff2Image((const unsigned char *)buffer.constData(), buffer.size(), fileName);
 }
 
+QImage scr2Image(const QByteArray &buffer)
+{
+    return scr2Image(buffer.constData(), buffer.size());
+}
+
+QImage scr2Image(const char *buffer, size_t bufferSize)
+{
+    if (bufferSize < SPECTRUM_TAPE_BLOCK_SCREEN_SIZE - 2)
+        return QImage();
+    return spectrumScreen2Image(buffer);
+}
 
 QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
     Q_UNUSED(size)
     Q_UNUSED(requestedSize)
+
+    if (id.startsWith("compressed64:")) {
+        auto pos = id.indexOf(QLatin1Char(':'), 13);
+        if (pos != -1) {
+            bool ok;
+            int delta = id.mid(13, pos - 13).toInt(&ok);
+            if (ok && delta >=0) {
+                auto buff = qUncompress(QByteArray::fromBase64(id.mid(pos + 1).toLatin1(), QByteArray::Base64UrlEncoding));
+                if (buff.size() - delta >= 0) {
+                    auto img = scr2Image(buff.constData() + delta, buff.size() - delta);
+                    if (!img.isNull())
+                        return img;
+                }
+            }
+            return QIcon(":/images/binary.svg").pixmap(QSize(256, 192)).toImage();
+        }
+    }
 
     QFileInfo inf(id);
     if (inf.isDir())

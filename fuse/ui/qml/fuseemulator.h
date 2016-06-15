@@ -251,6 +251,7 @@ public slots:
     void disassamble(int address, int delta = -10, uint16_t length = 0xff);
     void activateDebugger();
     void deactivateDebugger(bool interruptable);
+    QString dumpData(const QString &base64CompressedData, int offset, int charsPerLine);
     // debug methods
 
     // pokefinder methods
@@ -319,6 +320,7 @@ private:
     ZXGamesModel m_onlineGamesModel;
     std::unique_ptr<FuseSettings> m_fuseSettings;
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
+    friend int ui_tape_browser_update(ui_tape_browser_update_type /*change*/, libspectrum_tape_block */*block*/);
     FuseTape *m_tape = nullptr;
     bool m_showControlsIcons = true;
     QSemaphore m_waitSemaphore;

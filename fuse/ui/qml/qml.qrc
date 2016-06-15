@@ -108,5 +108,7 @@
         <file>qml/PokeManagerPage.qml</file>
         <file>qml/FancyBaseList.qml</file>
         <file>qml/FancyPane.qml</file>
+        <file>qml/BrowseTapePage.qml</file>
+        <file>images/binary.svg</file>
     </qresource>
 </RCC>

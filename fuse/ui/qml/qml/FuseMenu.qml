@@ -66,7 +66,6 @@ Menu {
         }
 
         Menu {
-            visible: false
             title: qsTr("Tape")
             MenuItem {
                 text: "Open"
@@ -97,6 +96,15 @@ Menu {
                 onTriggered: {
                     menuBar.close();
                     fuse.tape.togglePlay();
+                }
+            }
+
+            MenuItem {
+                visible: fuse.tape.hasTape;
+                text: qsTr("Browse")
+                onTriggered: {
+                    menuBar.close();
+                    pageLoader.source = "BrowseTapePage.qml";
                 }
             }
         }

@@ -34,6 +34,7 @@ ListView {
 
     anchors.top: parent.top
     anchors.bottom: parent.bottom
+    anchors.margins: Screen.pixelDensity * 10
 
     clip: true
     focus: true

@@ -10,6 +10,17 @@ FuseTape::FuseTape(QObject *parent) : FuseObject(parent)
 {
 }
 
+void FuseTape::updateBrowseData()
+{
+    callFunction([this]{
+        auto hasTape = tape_get_current_block() != -1;
+        if (hasTape != m_hasTape) {
+            m_hasTape = hasTape;
+            emit hasTapeChanged(hasTape);
+        }
+    });
+}
+
 void FuseTape::open(QString filePath)
 {
     pokeEvent([filePath]{

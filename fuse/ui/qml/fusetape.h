@@ -6,9 +6,11 @@
 class FuseTape : public FuseObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool hasTape MEMBER m_hasTape NOTIFY hasTapeChanged)
 
 public:
     explicit FuseTape(QObject *parent = 0);
+    void updateBrowseData();
 
 public slots:
     void open(QString filePath);
@@ -17,8 +19,11 @@ public slots:
     void clear();
     void write(QString filePath);
 
-private:
+signals:
+    void hasTapeChanged(bool hasTape);
 
+private:
+    bool m_hasTape = false;
 };
 
 #endif // FUSETAPE_H

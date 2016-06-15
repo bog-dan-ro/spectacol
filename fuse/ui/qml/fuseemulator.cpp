@@ -1013,6 +1013,59 @@ void FuseEmulator::deactivateDebugger(bool /*interruptable*/)
 //        });
 }
 
+QString FuseEmulator::dumpData(const QString &base64CompressedData, int offset, int charsPerLine)
+{
+    if (base64CompressedData.isEmpty())
+        return QString();
+
+    auto data = qUncompress(QByteArray::fromBase64(base64CompressedData.toLatin1(), QByteArray::Base64UrlEncoding));
+
+    const int sz = data.size() - offset;
+    if (sz <= 0)
+        return QString();
+
+    auto ptr = data.constData() + offset;
+    QString res;
+
+    int pos = 0;
+    for (;pos < sz; ++pos) {
+        if (!(pos % charsPerLine)) {
+            if (!res.isEmpty())
+                res += QLatin1Char('\n');
+            res += QString(QLatin1String("%1")).arg(offset + pos, 6, 10, QLatin1Char('0')).toUpper();
+        }
+
+        res += QString(QLatin1String(" %1")).arg(uint8_t(*(ptr + pos)), 2, 16, QLatin1Char('0')).toUpper();
+        if ((pos % charsPerLine) == charsPerLine - 1) {
+            res += QLatin1String("   ");
+            auto pt = ptr + pos - charsPerLine;
+            for (int i = 0; i < charsPerLine; ++i) {
+                auto ch = *pt++;
+                if (std::isprint(ch))
+                    res += QLatin1Char(ch);
+                else
+                    res += QLatin1String(".");
+            }
+        }
+    }
+
+    for (int i = pos % charsPerLine; i < charsPerLine; ++i)
+        res += QLatin1String("   ");
+
+    res += QLatin1String("   ");
+
+    auto pt = ptr + pos - pos % charsPerLine;
+    for (int i = 0; i < pos % charsPerLine; ++i) {
+        auto ch = *pt++;
+        if (std::isprint(ch))
+            res += QLatin1Char(ch);
+        else
+            res += QLatin1String(".");
+    }
+
+    return res;
+}
+
 void FuseEmulator::pokeFinderInced()
 {
     pokeEvent([this]{

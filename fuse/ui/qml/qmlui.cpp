@@ -22,6 +22,7 @@
 #include "disassamblemodel.h"
 
 #include <fuse.h>
+#include <fusetape.h>
 #include <settings.h>
 #include <pokefinder/pokefinder.h>
 #include <ui/uidisplay.h>
@@ -195,6 +196,12 @@ extern "C" int ui_menu_activate( ui_menu_item item, int active )
         break;
 
     }
+    return 0;
+}
+
+extern "C" int ui_tape_browser_update(ui_tape_browser_update_type /*change*/, libspectrum_tape_block */*block*/)
+{
+    g_fuseEmulator->m_tape->updateBrowseData();
     return 0;
 }
 
