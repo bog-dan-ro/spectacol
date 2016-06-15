@@ -30,6 +30,7 @@ Item {
     Component.onCompleted: {
         fuse.processInputEvents = false;
         fuse.paused = true;
+        messagePage.showMessage(FuseEmulator.Info, qsTr("Long tap on an item to view the content"));
     }
     Component.onDestruction: {
         fuse.processInputEvents = true;
@@ -129,7 +130,6 @@ Item {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
-        buttonYKey: Qt.Key_X
     }
 
     FancyBaseList {
