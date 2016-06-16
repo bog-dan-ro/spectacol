@@ -17,6 +17,7 @@
 
 #include "folderlistmodel.h"
 #include "fuseemulator.h"
+#include "fuserecording.h"
 #include "fusescreen.h"
 #include "fusetapedata.h"
 #include "pokemodel.h"
@@ -40,11 +41,13 @@ int main(int argc, char *argv[])
     qmlRegisterType<Z80Assembler>("Fuse", 1, 0, "Z80Assembler");
     qmlRegisterType<FolderListModel>("Fuse", 1, 0, "FolderListModel");
     qmlRegisterType<PokeModel>("Fuse", 1, 0, "PokeModel");
+    qmlRegisterType<FuseTapeData>("Fuse", 1, 0, "FuseTapeData");
+
     qmlRegisterUncreatableType<BreakpointsModel>("Fuse", 1, 0, "BreakpointsModel", QLatin1String("use breakpointsModel context property instead"));
     qmlRegisterUncreatableType<FuseEmulator>("Fuse", 1, 0, "FuseEmulator", QLatin1String("use fuse instead"));
     qmlRegisterUncreatableType<FuseTape>("Fuse", 1, 0, "FuseTape", QLatin1String("use fuse.tape instead"));
     qmlRegisterUncreatableType<FuseSettings>("Fuse", 1, 0, "FuseSettings", QLatin1String("use fuseSettings instead"));
-    qmlRegisterType<FuseTapeData>("Fuse", 1, 0, "FuseTapeData");
+    qmlRegisterUncreatableType<FuseRecording>("Fuse", 1, 0, "FuseRecording", QLatin1String("use fuse.recording instead"));
 
     QQmlApplicationEngine engine;
     FuseEmulator fuse(engine.rootContext());

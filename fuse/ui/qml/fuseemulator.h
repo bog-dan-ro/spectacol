@@ -44,6 +44,7 @@ class QKeyEvent;
 class QMouseEvent;
 class QQmlContext;
 class FuseSettings;
+class FuseRecording;
 
 class FuseThread : public QThread
 {
@@ -79,6 +80,7 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(int selectedJoysticksIndex READ selectedJoysticksIndex WRITE setSelectedJoysticksIndex NOTIFY selectedJoysticksIndexChanged)
     Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
     Q_PROPERTY(FuseTape *tape MEMBER m_tape CONSTANT)
+    Q_PROPERTY(FuseRecording *recording MEMBER m_recording CONSTANT)
     Q_PROPERTY(bool showControlsIcons MEMBER m_showControlsIcons NOTIFY showControlsIconsChanged)
 
     /* regs properties */
@@ -217,14 +219,17 @@ public:
 
     void uiStatusbarUpdate(ui_statusbar_item item, ui_statusbar_state state);
 
-    char *uiOpenFilename(const QByteArray &title);
+    char *uiOpenFilename(const QByteArray &title, const QString &path = QString());
     char *uiSaveFilename(const QByteArray &title);
     int uiQuery(const QByteArray &message);
     void uiPokememSelector(const char *filePath);
+    int uiGetListIndex(const QStringList &list, const QString &title);
 
 public slots:
     void quit();
     QString snapshotsPath() const;
+    QString recordingsPath() const;
+    QString recordingFilePath() const;
     void load(const QString &filePath, bool removeOnFail = false);
     void save(const QString &filePath);
     void copyToFavourites(const QString &filePath);
@@ -274,6 +279,7 @@ public slots:
     void setQuery(UiQuery result);
 
     void showMessage(QString message, ErrorLevel level = Info);
+    void setListIndex(int index);
 
 signals:
     void pausedChanged();
@@ -295,10 +301,11 @@ signals:
     void uiIconUpdate(UiItemType item, UiState state);
     void configureJoystick();
     void showControlsIconsChanged(bool showControlsIcons);
-    void openFile(const QString &title);
+    void openFile(const QString &title, const QString &path);
     void saveFile(const QString &title);
     void query(const QString &message);
     void showPokememSelector();
+    void getListIndex(const QStringList &list, const QString &title);
 
 private:
     void togglePaused();
@@ -323,10 +330,13 @@ private:
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
     friend int ui_tape_browser_update(ui_tape_browser_update_type /*change*/, libspectrum_tape_block */*block*/);
     FuseTape *m_tape = nullptr;
+    friend int ui_menu_activate(ui_menu_item item, int active);
+    FuseRecording* m_recording = nullptr;
     bool m_showControlsIcons = true;
     QSemaphore m_waitSemaphore;
     QByteArray m_openSaveFilePath;
     UiQuery m_queryResult = UiNo;
+    int m_listIndex = -1;
     std::atomic_bool m_paused;
 };
 

@@ -18,6 +18,7 @@
 #include "fuseemulator.h"
 #include "fusetexture.h"
 #include "fusesettings.h"
+#include "fuserecording.h"
 
 #include "qmlui.h"
 
@@ -234,8 +235,11 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     , m_resetPokeFinder(true)
     , m_fuseSettings(new FuseSettings(this))
     , m_tape(new FuseTape(this))
+    , m_recording(new FuseRecording(this))
+
 {
     QQmlEngine::setObjectOwnership(m_tape, QQmlEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(m_recording, QQmlEngine::CppOwnership);
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state){
         switch (state) {
         case Qt::ApplicationActive:
@@ -377,9 +381,11 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
 
 FuseEmulator::~FuseEmulator()
 {
+    m_waitSemaphore.release();
     fuse_exiting = 1;
     m_fuseThread.wait();
     delete m_tape;
+    delete m_recording;
 }
 
 bool FuseEmulator::paused() const
@@ -436,7 +442,8 @@ void FuseEmulator::setDataPath(const QString &dataPath)
         s.setValue("dataPath", dataPath);
     }
     QDir dir(dataPath);
-    dir.mkpath("Snapshots");
+    dir.mkpath(_("Snapshots"));
+    dir.mkpath(_("Recordings"));
     emit dataPathChanged();
 }
 
@@ -781,9 +788,9 @@ void FuseEmulator::uiStatusbarUpdate(ui_statusbar_item item, ui_statusbar_state 
     });
 }
 
-char *FuseEmulator::uiOpenFilename(const QByteArray &title)
+char *FuseEmulator::uiOpenFilename(const QByteArray &title, const QString &path)
 {
-    emit openFile(QString::fromUtf8(title));
+    emit openFile(QString::fromUtf8(title), path);
     m_waitSemaphore.acquire();
     if (m_openSaveFilePath.isEmpty())
         return nullptr;
@@ -816,6 +823,17 @@ void FuseEmulator::uiPokememSelector(const char *filePath)
     emit showPokememSelector();
 }
 
+int FuseEmulator::uiGetListIndex(const QStringList &list, const QString &title)
+{
+    if (list.isEmpty())
+        return -1;
+
+    m_listIndex = -1;
+    emit getListIndex(list, title);
+    m_waitSemaphore.acquire();
+    return m_listIndex;
+}
+
 void FuseEmulator::quit()
 {
     if (m_fuseSettings->autoSaveOnExit())
@@ -831,6 +849,17 @@ void FuseEmulator::quit()
 QString FuseEmulator::snapshotsPath() const
 {
     return dataPath() + _("Snapshots/");
+}
+
+QString FuseEmulator::recordingsPath() const
+{
+    return dataPath() + _("Recordings/");
+}
+
+QString FuseEmulator::recordingFilePath() const
+{
+    return recordingsPath() + (m_loadedFileName.isEmpty() ? _("Generic") : m_loadedFileName) +
+            QDateTime::currentDateTime().toString(_(".yyyy-MM-dd_hh:mm:ss")) + _(".rzx");
 }
 
 void FuseEmulator::load(const QString &filePath, bool removeOnFail)
@@ -1271,6 +1300,12 @@ void FuseEmulator::showMessage(QString message, FuseEmulator::ErrorLevel level)
     callFunction([this, message, level]{
         emit error(level, message);
     });
+}
+
+void FuseEmulator::setListIndex(int index)
+{
+    m_listIndex = index;
+    m_waitSemaphore.release();
 }
 
 void FuseEmulator::togglePaused()

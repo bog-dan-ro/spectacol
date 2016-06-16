@@ -37,7 +37,8 @@ SOURCES += \
     folderlistmodel.cpp \
     fusetape.cpp \
     pokemodel.cpp \
-    fusetapedata.cpp
+    fusetapedata.cpp \
+    fuserecording.cpp
 
 HEADERS += \
     fusetexture.h \
@@ -57,7 +58,8 @@ HEADERS += \
     folderlistmodel.h \
     fusetape.h \
     pokemodel.h \
-    fusetapedata.h
+    fusetapedata.h \
+    fuserecording.h
 
 RESOURCES += qml.qrc
 

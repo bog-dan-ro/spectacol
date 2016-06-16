@@ -387,6 +387,8 @@ ApplicationWindow {
 
         onOpenFile: {
             pageLoader.source = "GetFileBrowserPage.qml"
+            if (path.length)
+                pageLoader.item.folder = path;
             messagePage.showMessage(FuseEmulator.Info, title);
         }
 
@@ -398,6 +400,12 @@ ApplicationWindow {
         onQuery: {
             queryDialog.text = message;
             queryDialog.open();
+        }
+
+        onGetListIndex: {
+            pageLoader.source = "GetListPage.qml";
+            pageLoader.item.title = title;
+            pageLoader.item.model = list;
         }
 
         onShowPokememSelector: pageLoader.source = "PokeManagerPage.qml"

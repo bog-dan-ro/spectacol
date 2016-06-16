@@ -111,5 +111,6 @@
         <file>qml/FancyPane.qml</file>
         <file>qml/BrowseTapePage.qml</file>
         <file>images/binary.svg</file>
+        <file>qml/GetListPage.qml</file>
     </qresource>
 </RCC>

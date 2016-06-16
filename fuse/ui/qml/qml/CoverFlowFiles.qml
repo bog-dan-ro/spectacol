@@ -46,7 +46,7 @@ Item
     FolderListModel {
         id: filesModel
         rootFolder: fuseSettings.restrictToSpectacol ? fuse.dataPath : "/"
-        sortCriteria: folder.indexOf(fuse.snapshotsPath(), 0) == 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
+        sortCriteria: folder.indexOf(fuse.snapshotsPath(), 0) == 0 ? FolderListModel.ByDateDesc : folder.indexOf(fuse.recordingsPath(), 0) == 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
     }
 
     MessageDialog {

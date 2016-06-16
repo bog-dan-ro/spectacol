@@ -18,6 +18,7 @@
 
 #include "qmlui.h"
 #include "fuseemulator.h"
+#include "fuserecording.h"
 #include "breakpointsmodel.h"
 #include "disassamblemodel.h"
 
@@ -160,17 +161,32 @@ extern "C" int ui_statusbar_update(ui_statusbar_item item, ui_statusbar_state st
 
 extern "C" char *ui_get_open_filename( const char *title )
 {
-    return  g_fuseEmulator->uiOpenFilename(title);
+    return g_fuseEmulator->uiOpenFilename(title);
 }
 
 extern "C" char *ui_get_save_filename( const char *title )
 {
-    return  g_fuseEmulator->uiSaveFilename(title);
+    return g_fuseEmulator->uiSaveFilename(title);
 }
 
 extern "C" int ui_query( const char *message )
 {
-    return  g_fuseEmulator->uiQuery(message);
+    return g_fuseEmulator->uiQuery(message);
+}
+
+extern "C" int ui_get_rollback_point(GSList *points)
+{
+    QStringList items;
+    while (points) {
+        items.push_front(QString::number(GPOINTER_TO_INT(points->data) / 50.0));
+        points = points->next;
+    }
+    items.pop_front();
+    g_fuseEmulator->showMessage(QObject::tr("Rollback to second"));
+    int res = g_fuseEmulator->uiGetListIndex(items, QObject::tr("Rollback to second"));
+    if (res != -1)
+        return items.size() - 2 - res;
+    return -1;
 }
 
 extern "C" void ui_pokemem_selector( const char *filename )
@@ -178,23 +194,24 @@ extern "C" void ui_pokemem_selector( const char *filename )
     g_fuseEmulator->uiPokememSelector(filename);
 }
 
-extern "C" int ui_menu_activate( ui_menu_item item, int active )
+extern "C" int ui_menu_activate(ui_menu_item item, int active)
 {
     (void)active;
     switch (item) {
-#ifdef Q_OS_ANDROID
     case UI_MENU_ITEM_RECORDING:
+        g_fuseEmulator->m_recording->setStopVisible(active);
+#ifdef Q_OS_ANDROID
         QtAndroid::runOnAndroidThread([active] {
             if (active)
                 QtAndroid::androidActivity().callObjectMethod("getWindow", "()Landroid/view/Window;").callMethod<void>("addFlags", "(I)V",  128/*FLAG_KEEP_SCREEN_ON*/);
             else
                 QtAndroid::androidActivity().callObjectMethod("getWindow", "()Landroid/view/Window;").callMethod<void>("clearFlags", "(I)V",  128/*FLAG_KEEP_SCREEN_ON*/);
         });
-        break;
 #endif
-    default:
         break;
 
+    default:
+        break;
     }
     return 0;
 }
