@@ -740,7 +740,7 @@ _ui_query( const char *message )
 
 /* FIXME: make this do something useful */
 int
-ui_get_rollback_point( GSList *points )
+_ui_get_rollback_point( GSList *points )
 {
   return -1;
 }
