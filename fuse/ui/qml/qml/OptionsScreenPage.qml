@@ -137,7 +137,7 @@ Flickable {
                         if (popup.visible)
                             incrementCurrentIndex();
                         else
-                            screenFilter.forceActiveFocus(Qt.TabFocusReason);
+                            smoothScaling.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex()
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
