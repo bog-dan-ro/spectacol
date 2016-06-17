@@ -32,7 +32,7 @@ Item {
 
     onVisibleChanged: fuse.processInputEvents = !visible
     Keys.onPressed: {
-        if (event.key === Qt.Key_Y) {
+        if (event.key === Qt.Key_Escape) {
             event.accept = true;
         } else if (event.key === Qt.Key_Return) {
             event.accept = true;
@@ -41,7 +41,7 @@ Item {
     }
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_Y) {
+        if (event.key === Qt.Key_Escape) {
             event.accept = true;
             onScreenKeyboard.visible = false;
         } else if (event.key === Qt.Key_Return) {
@@ -105,9 +105,9 @@ Item {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
         active: onScreenKeyboard.visible
         buttonAKey: Qt.Key_Return
-        buttonBKey: Qt.Key_unknown
+        buttonBKey: Qt.Key_Escape
         buttonXKey: Qt.Key_unknown
-        buttonYKey: Qt.Key_Y
+        buttonYKey: Qt.Key_unknown
     }
 
     ListModel {

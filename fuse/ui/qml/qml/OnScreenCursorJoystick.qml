@@ -30,8 +30,8 @@ Item {
                                button0, button9]
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_X)
-            parent.visible = false;
+        if (event.key === Qt.Key_Escape)
+            onScreenJoystick.visible = false;
     }
 
     GamepadKeyNavigation {
@@ -39,8 +39,8 @@ Item {
         active: onScreenJoystick.visible
         gamepad: Gamepad { deviceId: fuse.gamepadId }
         buttonAKey: Qt.Key_Return
-        buttonBKey: Qt.Key_unknown
-        buttonXKey: Qt.Key_X
+        buttonBKey: Qt.Key_Escape
+        buttonXKey: Qt.Key_unknown
         buttonYKey: Qt.Key_unknown
 
         onActiveChanged: fuse.processInputEvents = !active
