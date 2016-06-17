@@ -173,7 +173,7 @@ Menu {
     Menu {
         title: qsTr("Machine")
         MenuItem {
-            text: qsTr("Select ...  ") + fuseSettings.currentMachine
+            text: qsTr("Select ... ") + fuseSettings.currentMachine
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "MachineTypePage.qml";

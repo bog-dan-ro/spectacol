@@ -32,7 +32,7 @@ Item {
         currentIndex: fuseSettings.currentMachineIndex
         onCurrentIndexChanged: fuseSettings.currentMachineIndex = currentIndex
 
-        width: 11 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
+        width: 13 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
         delegate: Rectangle {
             width: view.width
             height: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) * 2

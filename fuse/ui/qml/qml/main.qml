@@ -49,7 +49,7 @@ ApplicationWindow {
         focus: false
         dragMargin: fuseSettings.swipe4menu ? Qt.styleHints.startDragDistance : 0
 
-        width: Math.max(mainScreen.width, mainScreen.height) / 3
+        width: 17 * (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20)
         height: mainScreen.height
         MenuView {
             id: menuView
