@@ -112,5 +112,6 @@
         <file>qml/BrowseTapePage.qml</file>
         <file>images/binary.svg</file>
         <file>qml/GetListPage.qml</file>
+        <file>qml/OnScreenJoystickButton.qml</file>
     </qresource>
 </RCC>

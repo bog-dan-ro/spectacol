@@ -84,21 +84,11 @@ Item {
     }
 
     // Fire buttonY
-    Rectangle {
+    OnScreenJoystickButton {
         id: fireButtonY
         anchors.bottom: fireButtonX.top
-        anchors.bottomMargin: (TextSizes.smallScreen ? 3.5 : 7) * Screen.pixelDensity // 0.7, 1.5 cm
-        anchors.right: parent.right
-        color: "orange"
-        opacity: 0.75
-        width: (TextSizes.smallScreen ? 7 : 15) * Screen.pixelDensity // 0.7, 1.5 cm
-        height: width
-        radius: width / 2
-        FancyText {
-            anchors.centerIn: parent
-            font.bold: true
-            text: "Y"
-        }
+        border.color: "orange"
+        text: "Y"
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
@@ -108,21 +98,11 @@ Item {
     }
 
     // Fire buttonX
-    Rectangle {
+    OnScreenJoystickButton {
         id: fireButtonX
         anchors.bottom: fireButtonB.top
-        anchors.bottomMargin: (TextSizes.smallScreen ? 3.5 : 7) * Screen.pixelDensity // 0.7, 1.5 cm
-        anchors.right: parent.right
-        color: "blue"
-        opacity: 0.75
-        width: (TextSizes.smallScreen ? 7 : 15) * Screen.pixelDensity // 0.7, 1.5 cm
-        height: width
-        radius: width / 2
-        FancyText {
-            anchors.centerIn: parent
-            font.bold: true
-            text: "X"
-        }
+        border.color: "blue"
+        text: "X"
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
@@ -132,21 +112,11 @@ Item {
     }
 
     // Fire buttonB
-    Rectangle {
+    OnScreenJoystickButton {
         id: fireButtonB
         anchors.bottom: fireButtonA.top
-        anchors.bottomMargin: (TextSizes.smallScreen ? 3.5 : 7) * Screen.pixelDensity // 0.7, 1.5 cm
-        anchors.right: parent.right
-        color: "red"
-        opacity: 0.75
-        width: (TextSizes.smallScreen ? 7 : 15) * Screen.pixelDensity // 0.7, 1.5 cm
-        height: width
-        radius: width / 2
-        FancyText {
-            anchors.centerIn: parent
-            font.bold: true
-            text: "B"
-        }
+        border.color: "red"
+        text: "B"
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
@@ -156,20 +126,11 @@ Item {
     }
 
     // Fire buttonA
-    Rectangle {
+    OnScreenJoystickButton {
         id: fireButtonA
         anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        color: "green"
-        opacity: 0.75
-        width: (TextSizes.smallScreen ? 7 : 15) * Screen.pixelDensity // 0.7, 1.5 cm
-        height: width
-        radius: width / 2
-        FancyText {
-            anchors.centerIn: parent
-            font.bold: true
-            text: "A"
-        }
+        border.color: "green"
+        text: "A"
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
