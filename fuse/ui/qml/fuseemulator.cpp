@@ -310,12 +310,26 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     });
 
     connect(gm, &QGamepadManager::gamepadButtonReleaseEvent, this, [this] (int deviceId, QGamepadManager::GamepadButton button) {
-        if (!m_processInputEvents.load() || deviceId != m_gamepadId ||
+        if (deviceId != m_gamepadId ||
                 button == QGamepadManager::ButtonInvalid ||
                 button == QGamepadManager::ButtonStart)
             return;
 
-        if (!m_paused.load() && fuse_emulation_paused && ui_widget_level == -1)
+        auto action = m_fuseSettings->gamepadAction(button);
+        switch (action) {
+        case FuseSettings::ToggleKeyboard:
+            if (m_showControlsIcons)
+                emit showControlsIconsChanged(m_showControlsIcons = false);
+            QTimer::singleShot(0, this, [this]{ emit toggleOnScreenControls(Keyboard48K); });
+            break;
+        case FuseSettings::ToggleCursorJoystick:
+            if (m_showControlsIcons)
+                emit showControlsIconsChanged(m_showControlsIcons = false);
+            QTimer::singleShot(0, this, [this]{ emit toggleOnScreenControls(CursorJoystick); });
+            break;
+        }
+
+        if (!m_processInputEvents.load() || (!m_paused.load() && fuse_emulation_paused && ui_widget_level == -1))
             return;
 
         gamepadButtonReleaseEvent(button);
@@ -1235,10 +1249,6 @@ void FuseEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button
         break;
     case FuseSettings::ToggleKeyboard:
     case FuseSettings::ToggleCursorJoystick:
-        if (m_showControlsIcons)
-            emit showControlsIconsChanged(m_showControlsIcons = false);
-        break;
-
     case FuseSettings::TogglePause:
     case FuseSettings::QuickSaveSnapshot:
     case FuseSettings::QuickLoadSnapshot:
@@ -1263,10 +1273,7 @@ void FuseEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton butt
         });
         break;
     case FuseSettings::ToggleKeyboard:
-        QTimer::singleShot(0, this, [this]{ emit toggleOnScreenControls(Keyboard48K); });
-        break;
     case FuseSettings::ToggleCursorJoystick:
-        QTimer::singleShot(0, this, [this]{ emit toggleOnScreenControls(CursorJoystick); });
         break;
     case FuseSettings::TogglePause:
         togglePaused();

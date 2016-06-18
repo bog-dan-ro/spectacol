@@ -318,16 +318,16 @@ ApplicationWindow {
     function toggleOnScreenControls(type, gamepad) {
         switch (type) {
         case FuseEmulator.CursorJoystick:
-            if (onScreenCursorJoystick.visible) {
-                onScreenCursorJoystick.visible = false;
-            } else {
-                onScreenCursorJoystick.visible = true;
-            }
+            onScreenCursorJoystick.visible = !onScreenCursorJoystick.visible;
+            if (onScreenCursorJoystick.visible)
+                onScreen48Keyboard.visible = false;
             break;
 
         case FuseEmulator.Keyboard48K:
-            onScreen48Keyboard.visible = !onScreen48Keyboard.visible;
             onScreen48Keyboard.gamepadMode = gamepad;
+            onScreen48Keyboard.visible = !onScreen48Keyboard.visible;
+            if (onScreen48Keyboard.visible)
+                onScreenCursorJoystick.visible = false;
             break;
         }
     }

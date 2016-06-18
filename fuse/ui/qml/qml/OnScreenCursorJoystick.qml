@@ -31,7 +31,7 @@ Item {
 
     Keys.onReleased: {
         if (event.key === Qt.Key_Escape)
-            onScreenJoystick.visible = false;
+            parent.visible = false;
     }
 
     GamepadKeyNavigation {

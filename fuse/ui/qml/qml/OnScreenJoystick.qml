@@ -90,7 +90,7 @@ Item {
         anchors.bottomMargin: (TextSizes.smallScreen ? 3.5 : 7) * Screen.pixelDensity // 0.7, 1.5 cm
         anchors.right: parent.right
         color: "orange"
-        opacity: 0.85
+        opacity: 0.75
         width: (TextSizes.smallScreen ? 7 : 15) * Screen.pixelDensity // 0.7, 1.5 cm
         height: width
         radius: width / 2
@@ -114,7 +114,7 @@ Item {
         anchors.bottomMargin: (TextSizes.smallScreen ? 3.5 : 7) * Screen.pixelDensity // 0.7, 1.5 cm
         anchors.right: parent.right
         color: "blue"
-        opacity: 0.85
+        opacity: 0.75
         width: (TextSizes.smallScreen ? 7 : 15) * Screen.pixelDensity // 0.7, 1.5 cm
         height: width
         radius: width / 2
@@ -138,7 +138,7 @@ Item {
         anchors.bottomMargin: (TextSizes.smallScreen ? 3.5 : 7) * Screen.pixelDensity // 0.7, 1.5 cm
         anchors.right: parent.right
         color: "red"
-        opacity: 0.85
+        opacity: 0.75
         width: (TextSizes.smallScreen ? 7 : 15) * Screen.pixelDensity // 0.7, 1.5 cm
         height: width
         radius: width / 2
@@ -161,7 +161,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         color: "green"
-        opacity: 0.85
+        opacity: 0.75
         width: (TextSizes.smallScreen ? 7 : 15) * Screen.pixelDensity // 0.7, 1.5 cm
         height: width
         radius: width / 2
