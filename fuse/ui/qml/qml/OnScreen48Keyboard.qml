@@ -30,7 +30,25 @@ Item {
     anchors.leftMargin: Screen.pixelDensity * 2
     anchors.rightMargin: Screen.pixelDensity * 2
 
-    onVisibleChanged: fuse.processInputEvents = !visible
+    onVisibleChanged: {
+        fuse.processInputEvents = !visible;
+        if (!visible) {
+            if (_pressedKey) {
+                fuse.keyRelease(_pressedKey);
+                _pressedKey = 0;
+            }
+
+            if (capsPressed) {
+                fuse.keyRelease(Qt.Key_Control);
+                capsPressed = false;
+            }
+
+            if (symbolPressed) {
+                fuse.keyRelease(Qt.Key_Shift);
+                symbolPressed = false;
+            }
+        }
+    }
     Keys.onPressed: {
         if (event.key === Qt.Key_Escape) {
             event.accept = true;
