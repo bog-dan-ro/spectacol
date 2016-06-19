@@ -42,6 +42,15 @@ Item {
         buttonBKey: Qt.Key_Escape
         buttonXKey: Qt.Key_unknown
         buttonYKey: Qt.Key_unknown
+        buttonGuideKey: Qt.Key_unknown
+        buttonL1Key: Qt.Key_unknown
+        buttonL2Key: Qt.Key_unknown
+        buttonL3Key: Qt.Key_unknown
+        buttonR1Key: Qt.Key_unknown
+        buttonR2Key: Qt.Key_unknown
+        buttonR3Key: Qt.Key_unknown
+        buttonSelectKey: Qt.Key_unknown
+        buttonStartKey: Qt.Key_unknown
 
         onActiveChanged: fuse.processInputEvents = !active
     }

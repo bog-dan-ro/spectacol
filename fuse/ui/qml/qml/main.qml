@@ -64,6 +64,8 @@ ApplicationWindow {
         onPositionChanged: {
             menuView.reset();
             if (position == 1) {
+                onScreenCursorJoystick.visible = false;
+                onScreen48Keyboard.visible = false;
                 pageLoader.source = "";
                 menuView.useGamepad = true;
                 if (!paused)
@@ -318,16 +320,16 @@ ApplicationWindow {
     function toggleOnScreenControls(type, gamepad) {
         switch (type) {
         case FuseEmulator.CursorJoystick:
-            onScreenCursorJoystick.visible = !onScreenCursorJoystick.visible;
-            if (onScreenCursorJoystick.visible)
+            if (!onScreenCursorJoystick.visible && onScreen48Keyboard.visible)
                 onScreen48Keyboard.visible = false;
+            onScreenCursorJoystick.visible = !onScreenCursorJoystick.visible;
             break;
 
         case FuseEmulator.Keyboard48K:
+            if (!onScreen48Keyboard.visible && onScreen48Keyboard.visible)
+                onScreenCursorJoystick.visible = false;
             onScreen48Keyboard.gamepadMode = gamepad;
             onScreen48Keyboard.visible = !onScreen48Keyboard.visible;
-            if (onScreen48Keyboard.visible)
-                onScreenCursorJoystick.visible = false;
             break;
         }
     }
