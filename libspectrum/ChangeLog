@@ -104,7 +104,15 @@
           * Remove various unused variables, initialisations etc (Fredrick
             Meunier).
 
-2008-11-30  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2009-01-14  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+	* libspectrum 0.5.0.1 released
+
+	* Loosen signature checks for .dsk files to allow files not strictly
+	  compliant with the specification to work (Gergely Szasz; thanks,
+	  zx81 and Simon Owen).
+
+2008-12-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * libspectrum 0.5.0 released.
 
