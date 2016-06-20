@@ -188,3 +188,8 @@ int ui_tape_browser_update(ui_tape_browser_update_type change, libspectrum_tape_
 {
     return 0;
 }
+
+int ui_get_rollback_point(GSList *points)
+{
+    return -1;
+}
