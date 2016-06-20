@@ -1405,8 +1405,7 @@ void FuseEmulator::debuggerCommand(const QString &command)
 
 void FuseEmulator::updateScalers() const
 {
-    if (!m_supportedScalers.empty())
-        return;
+    m_supportedScalers.clear();
 
     for (int i = SCALER_HALF; i < SCALER_NUM; ++i)
         if (scaler_is_supported(scaler_type(i)))
