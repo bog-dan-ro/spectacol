@@ -337,7 +337,7 @@ private:
     QByteArray m_openSaveFilePath;
     UiQuery m_queryResult = UiNo;
     int m_listIndex = -1;
-    std::atomic_bool m_paused;
+    bool m_paused = false;
 };
 
 extern FuseEmulator *g_fuseEmulator;

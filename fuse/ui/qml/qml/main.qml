@@ -326,7 +326,7 @@ ApplicationWindow {
             break;
 
         case FuseEmulator.Keyboard48K:
-            if (!onScreen48Keyboard.visible && onScreen48Keyboard.visible)
+            if (!onScreen48Keyboard.visible && onScreenCursorJoystick.visible)
                 onScreenCursorJoystick.visible = false;
             onScreen48Keyboard.gamepadMode = gamepad;
             onScreen48Keyboard.visible = !onScreen48Keyboard.visible;
