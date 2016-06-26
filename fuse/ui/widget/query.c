@@ -322,6 +322,8 @@ widget_query_finish( widget_finish_state finished )
     free( message_lines[i] );
   }
   free( message_lines );
+  message_lines = NULL;
+  num_message_lines = 0;
 
   return 0;
 }

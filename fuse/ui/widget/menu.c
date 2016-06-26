@@ -426,12 +426,23 @@ menu_get_scaler( scaler_available_fn selector )
 void
 menu_file_exit( int action )
 {
-  if( widget_do_query( "Exit Fuse?" ) || !widget_query.confirm )
-    return;
+  static int menu_exit_open = 0;
 
-  if( menu_check_media_changed() ) return;
+  if( menu_exit_open ) return;
+
+  menu_exit_open = 1;
+  if( widget_do_query( "Exit Fuse?" ) || !widget_query.confirm ) {
+    menu_exit_open = 0;
+    return;
+  }
+
+  if( menu_check_media_changed() ) {
+    menu_exit_open = 0;
+    return;
+  }
 
   fuse_exiting = 1;
+  menu_exit_open = 0;
 
   widget_end_all( WIDGET_FINISHED_OK );
 }

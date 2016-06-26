@@ -5235,3 +5235,5 @@
          plusd.c}},speccyboot.c}: extend breakpoints on paging events to more
          peripherals: Beta 128, +D, Didaktik 80, DISCiPLE, Opus Discovery and
          SpeccyBoot (Sergio).
+20160626 ui/widget/{menu.c,query.c}: fix crash on widget UIs when hitting the
+         close icon on the title bar several times (fixes bug #351) (Sergio).
