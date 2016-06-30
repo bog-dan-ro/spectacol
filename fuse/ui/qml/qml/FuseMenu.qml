@@ -97,7 +97,7 @@ Menu {
                 text: qsTr("Rewind")
                 onTriggered: {
                     menuBar.close();
-                    fuse.tape.togglePlay();
+                    fuse.tape.rewind();
                 }
             }
 
@@ -105,7 +105,7 @@ Menu {
                 text: qsTr("Clear")
                 onTriggered: {
                     menuBar.close();
-                    fuse.tape.togglePlay();
+                    fuse.tape.clear();
                 }
             }
 
