@@ -1167,6 +1167,9 @@ void FuseEmulator::pokeMemory(int address, int page, int value)
 
 void FuseEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat)
 {
+    if (m_paused)
+        return;
+
     if (ui_widget_level == -1 && autoRepeat)
         return;
 
@@ -1190,6 +1193,9 @@ void FuseEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat)
 
 void FuseEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat)
 {
+    if (m_paused)
+        return;
+
     if (ui_widget_level == -1 && autoRepeat)
         return;
 
