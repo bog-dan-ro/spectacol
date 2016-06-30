@@ -259,8 +259,8 @@ ApplicationWindow {
             anchors.topMargin: mainScreen.height > mainScreen.width ? mainScreen.height / 2 : 0;
             opacity: (onScreenCursorJoystick.visible || onScreen48Keyboard.visible) ? 0.25 : 1.0
             Image {
-                height: Screen.pixelDensity * 10
-                width: Screen.pixelDensity * 15
+                height: Screen.pixelDensity * 7
+                width: Screen.pixelDensity * 7
                 source: "qrc:///images/keyboard-icon.svg"
                 MouseArea {
                     anchors.fill: parent
@@ -268,8 +268,8 @@ ApplicationWindow {
                 }
             }
             Image {
-                height: Screen.pixelDensity * 10
-                width: Screen.pixelDensity * 13
+                height: Screen.pixelDensity * 5
+                width: Screen.pixelDensity * 7
                 source: "qrc:///images/controller-icon.svg"
                 MouseArea {
                     anchors.fill: parent
