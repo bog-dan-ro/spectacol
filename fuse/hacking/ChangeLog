@@ -5171,9 +5171,14 @@
          (Sergio).
 20160524 rzx.c: use SZX format for the initial snapshot in RZX files (more from
          bug #304) (Sergio).
+20160524 debugger/{Makefile.am,commandl.l,commandy.y,debugger.[ch],
+         debugger_internals.h,expression.c,system_variable.c},peripherals/ay.c:
+         first cut at implementing registration for debugger system variables.
+         (Phil).
 20160526 debugger/commandl.l,man/fuse.1: allow strings with escaped spaces in
          the debugger (bug #337) (Sergio).
 20160528 ChangeLog: add even more recent changes (Fred).
+20160528 deugger/system_variable.c: include file (thanks, Fred) (Phil).
 20160529 Makefile.am,lib/Makefile.am,z80/Makefile.am: distribute
          m4/ax_create_stdint_h.m4,lib/tests/success.d80.bz2 and z80/tests/README
          (Sergio).
@@ -5182,6 +5187,8 @@
 20160529 ChangeLog: add even more recent changes (Fred).
 20160529 README,man/fuse.1: update release dates (Fred).
 20160529 configure.ac: mark release as 1.2.0-pre1 (Fred).
+20160529 debugger/{debugger_internals.h,expression.c,system_variable.c}: make
+         evaluating system variables quicker (Phil).
 20160530 configure.ac: update more copyright dates (Sergio).
 20160530 z80/z80_ops.c: revert don't trap on breakpoints whilst halted in
          [r5171] as it contributes to [bugs:#329] and there is no current
@@ -5222,12 +5229,29 @@
          (Fred).
 20160606 ChangeLog,README,configure.ac,man/fuse.1: update release dates and mark
          this release as 1.2.0 (Fred).
+20160607 debugger/{commandl.l,commandy.y,system_variable.c}: remove the need
+         for "%" when accessing system variables (Phil).
+20160607 z80/{coretest.c,z80.c}: begin adding Z80 registers as debugger
+         variables (Phil).
 20160608 data/fuse.desktop.in: update Name entry and add GenericName and
          Keywords entries in .desktop file (patch #369) (Alberto Garcia).
+20160608 debugger/{command.c,commandl.l,commandy.y,debugger_internals.h,
+         expression.c},z80/z80.c: allow register names to be used as variable
+         names (Phil).
+20160608 debugger/{command.c,commandy.y,debugger.c,debugger_internals.h,
+         expression.c}: make register access just an alias for the appropriate
+         system variable (Phil).
+20160608 z80/z80.c: expose all Z80 registers as system variables (Phil).
+20160608 z80/{Makefile.am,coretest.c,z80.c,z80_debugger_variables.c,
+         z80_internals.h}: move debugger variable setup to separate file
+         (Phil).
 20160609 sound/alsasound.c: avoid redefinition of NDEBUG (Sergio).
 20160609 compat/{Makefile.am,mkstemp.c},configure.ac,utils.[ch]: remove
          utils_make_temp_file() and mkstemp() as they are no longer used (thanks
          Phil) (Fred).
+20160610 man/fuse.1: document new debugger variables syntax (Phil).
+20160610 debugger/system_variable.c,man/fuse.1,peripherals/ula.c: expose last
+         byte written to the ULA as a debugger system variable (Phil).
 20160611 peripherals/disk/didaktik.c,unittests/unittests.c: add Didaktik 80 unit
          test (Sergio).
 20160611 debugger/event.c: make breakpoints on events honour lifetime (Sergio).
@@ -5235,5 +5259,13 @@
          plusd.c}},speccyboot.c}: extend breakpoints on paging events to more
          peripherals: Beta 128, +D, Didaktik 80, DISCiPLE, Opus Discovery and
          SpeccyBoot (Sergio).
+20160612 man/fuse.1,peripherals/ula.c,spectrum.c: expose tstates since
+         interrupt as a debugger system variable (Phil).
+20160612 peripherals/ay.c: remove duplicated code (Phil).
+20160612 man/fuse.1,peripherals/ula.c: expose primary memory control port as
+         a debugger system variable (Phil).
+20160613 man/fuse.1,peripherals/ula.c: expose secondary memory control port as
+         a debugger system variable (Phil).
+20160613 z80/z80_debugger_variables.c: split long lines (thanks, Fred) (Phil).
 20160626 ui/widget/{menu.c,query.c}: fix crash on widget UIs when hitting the
          close icon on the title bar several times (fixes bug #351) (Sergio).

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2008 Philip Kendall
+## Copyright (c) 2001-2016 Philip Kendall
 ## Copyright (c) 2015 Sergio Baldoví
 
 ## $Id$
@@ -31,6 +31,7 @@ fuse_SOURCES += \
                 debugger/disassemble.c \
                 debugger/event.c \
                 debugger/expression.c \
+                debugger/system_variable.c \
                 debugger/variable.c
 
 debugger/commandl.c: debugger/commandy.c

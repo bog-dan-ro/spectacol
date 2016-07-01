@@ -1,5 +1,5 @@
 /* debugger.h: Fuse's monitor/debugger
-   Copyright (c) 2002-2013 Philip Kendall
+   Copyright (c) 2002-2016 Philip Kendall
 
    $Id$
 
@@ -84,5 +84,14 @@ void debugger_event( int event_code );
 
 /* Exit the emulator */
 void debugger_exit_emulator( void );
+
+/* Debugger system variables */
+typedef libspectrum_dword (*debugger_get_system_variable_fn_t)( void );
+typedef void (*debugger_set_system_variable_fn_t)( libspectrum_dword value );
+
+void debugger_system_variable_register(
+  const char *type, const char *detail,
+  debugger_get_system_variable_fn_t get,
+  debugger_set_system_variable_fn_t set );
 
 #endif				/* #ifndef FUSE_DEBUGGER_H */

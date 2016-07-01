@@ -1,5 +1,5 @@
 /* debugger.c: Fuse's monitor/debugger
-   Copyright (c) 2002-2011 Philip Kendall
+   Copyright (c) 2002-2016 Philip Kendall
 
    $Id$
 
@@ -48,6 +48,9 @@ int debugger_memory_pool;
 /* The event type used for time breakpoints */
 int debugger_breakpoint_event;
 
+/* The system variable type used for Z80 registers */
+const char *debugger_z80_system_variable_type = "z80";
+
 void
 debugger_init( void )
 {
@@ -59,6 +62,7 @@ debugger_init( void )
   debugger_breakpoint_event = event_register( debugger_breakpoint_time_fn, "Breakpoint" );
 
   debugger_event_init();
+  debugger_system_variable_init();
   debugger_variable_init();
   debugger_reset();
 }
@@ -75,6 +79,7 @@ debugger_end( void )
 {
   debugger_breakpoint_remove_all();
   debugger_variable_end();
+  debugger_system_variable_end();
   debugger_event_end();
 
   return 0;

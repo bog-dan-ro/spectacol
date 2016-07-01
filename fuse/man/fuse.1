@@ -4549,6 +4549,17 @@ to
 .IR value .
 .RE
 .PP
+se{t}
+.IR area : detail
+.I value
+.RS
+Set the value of the system variable
+.IR area : detail
+to
+.IR value .
+The available system variables are listed below.
+.RE
+.PP
 s{tep}
 .RS
 Equivalent to the
@@ -4612,14 +4623,62 @@ expects a breakpoint id, you can instead use a numeric expression,
 which uses a restricted version of C's syntax; exactly the same syntax
 is used for conditional breakpoints, with `0' being false and any
 other value being true. In numeric expressions, you can use integer
-constants (all calculations are done in integers), register names
-(which simply evaluate to the value of the register), debugger
-variables, parentheses, the standard four numeric operations (`+',
-`\-', `*' and `/'), the (non-)equality operators `==' and `!=', the
-comparison operators `>', `<', `>=' and `<=', bitwise and (`&'), or
+constants (all calculations are done in integers), system variables,
+debugger variables, parentheses, the standard four numeric operations
+(`+', `\-', `*' and `/'), the (non-)equality operators `==' and `!=',
+the comparison operators `>', `<', `>=' and `<=', bitwise and (`&'), or
 (`|') and exclusive or (`^') and logical and (`&&') and or (`||').
 Square brackets (`[' and `]') can be used to dereference a value; for
 example `[0x4000]' will give the value of the first byte of the screen.
+.PP
+System variables are specified via an
+.RI ` area : detail '
+syntax. The available system variables are:
+.PP
+ay:current
+.RS
+The current AY-3-8912 register.
+.RE
+ula:last
+.RS
+The last byte written to the ULA. Note that this variable can only
+be read, not written to.
+.RE
+ula:mem1ffd
+.RS
+The last byte written to memory control port used by the ZX Spectrum +2A/3;
+normally addressed at 0x1ffd, hence the name.
+.RE
+ula:mem7ffd
+.RS
+The last byte written to primary memory control port used by the ZX Spectrum
+128 and later; normally addressed at 0x7ffd, hence the name.
+.RE
+ula:tstates
+.RS
+The number of tstates since the last interrupt.
+.RE
+z80:
+.I register name
+.RS
+The value of the specified register. Both 8-bit registers and 16-bit
+register pairs are supported.
+.RE
+z80:im
+.RS
+The current interrupt mode of the Z80.
+.RE
+z80:iff1
+.br
+z80:iff2
+.RS
+1 if the specified interrupt flip-flop is currently set, or 0 if it is
+not set.
+.RE
+.PP
+The Z80 registers, interrupt mode and interrupt flip-flops can also be
+specified without the `z80:' prefix, but this syntax is deprecated and
+will be removed in Fuse 1.4.
 .\"
 .\"------------------------------------------------------------------
 .\"

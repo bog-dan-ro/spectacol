@@ -55,9 +55,6 @@ libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
    precisely, since the ULA last pulled the /INT line to the Z80 low) */
 libspectrum_dword tstates;
 
-/* The last byte written to the ULA */
-libspectrum_byte spectrum_last_ula;
-
 /* Contention patterns */
 static int contention_pattern_65432100[] = { 5, 4, 3, 2, 1, 0, 0, 6 };
 static int contention_pattern_76543210[] = { 5, 4, 3, 2, 1, 0, 7, 6 };

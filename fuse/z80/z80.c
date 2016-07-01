@@ -1,6 +1,8 @@
 /* z80.c: z80 supplementary functions
-   Copyright (c) 1999-2013 Philip Kendall
+   Copyright (c) 1999-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,6 +28,7 @@
 
 #include <libspectrum.h>
 
+#include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
 #include "memory.h"
@@ -37,6 +40,7 @@
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "z80.h"
+#include "z80_internals.h"
 #include "z80_macros.h"
 
 /* Whether a half carry occurred or not can be determined by looking at
@@ -108,6 +112,8 @@ z80_init( void )
   z80_nmos_iff2_event = event_register( NULL, "IFF2 update dummy event" );
 
   module_register( &z80_module_info );
+
+  z80_debugger_variables_init();
 }
 
 /* Initalise the tables used to set flags */

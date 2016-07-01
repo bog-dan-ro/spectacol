@@ -1,5 +1,5 @@
 /* expression.c: A numeric expression
-   Copyright (c) 2003-2015 Philip Kendall
+   Copyright (c) 2003-2016 Philip Kendall
 
    $Id$
 
@@ -38,9 +38,9 @@
 typedef enum expression_type {
 
   DEBUGGER_EXPRESSION_TYPE_INTEGER,
-  DEBUGGER_EXPRESSION_TYPE_REGISTER,
   DEBUGGER_EXPRESSION_TYPE_UNARYOP,
   DEBUGGER_EXPRESSION_TYPE_BINARYOP,
+  DEBUGGER_EXPRESSION_TYPE_SYSVAR,
   DEBUGGER_EXPRESSION_TYPE_VARIABLE,
 
 } expression_type;
@@ -86,10 +86,10 @@ struct debugger_expression {
 
   union {
     int integer;
-    int reg;
     struct unaryop_type unaryop;
     struct binaryop_type binaryop;
     char *variable;
+    int system_variable;
   } types;
 
 };
@@ -163,18 +163,15 @@ debugger_expression_new_number( libspectrum_dword number, int pool )
   return exp;
 }
 
+/* Create a new expression representing a Z80 register
+
+   Now just a pass through to the appropriate system variable.
+   This function should be removed in Fuse 1.4 */
 debugger_expression*
-debugger_expression_new_register( int which, int pool )
+debugger_expression_new_register( const char *which, int pool )
 {
-  debugger_expression *exp;
-
-  exp = mempool_new( pool, debugger_expression, 1 );
-
-  exp->type = DEBUGGER_EXPRESSION_TYPE_REGISTER;
-  exp->precedence = PRECEDENCE_ATOMIC;
-  exp->types.reg = which;
-
-  return exp;
+  return debugger_expression_new_system_variable(
+    debugger_z80_system_variable_type, which, pool );
 }
 
 debugger_expression*
@@ -195,7 +192,6 @@ debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
   return exp;
 }
 
-
 debugger_expression*
 debugger_expression_new_unaryop( int operation, debugger_expression *operand,
 				 int pool )
@@ -209,6 +205,29 @@ debugger_expression_new_unaryop( int operation, debugger_expression *operand,
 
   exp->types.unaryop.operation = operation;
   exp->types.unaryop.op = operand;
+
+  return exp;
+}
+
+debugger_expression*
+debugger_expression_new_system_variable( const char *type, const char *detail,
+                                         int pool )
+{
+  debugger_expression *exp;
+  int system_variable;
+
+  system_variable = debugger_system_variable_find( type, detail );
+  if( system_variable == -1 ) {
+    ui_error( UI_ERROR_WARNING, "System variable %s:%s not known", type,
+              detail );
+    return NULL;
+  }
+
+  exp = mempool_new( pool, debugger_expression, 1 );
+
+  exp->type = DEBUGGER_EXPRESSION_TYPE_SYSVAR;
+  exp->precedence = PRECEDENCE_ATOMIC;
+  exp->types.system_variable = system_variable;
 
   return exp;
 }
@@ -233,7 +252,7 @@ debugger_expression_delete( debugger_expression *exp )
   switch( exp->type ) {
     
   case DEBUGGER_EXPRESSION_TYPE_INTEGER:
-  case DEBUGGER_EXPRESSION_TYPE_REGISTER:
+  case DEBUGGER_EXPRESSION_TYPE_SYSVAR:
     break;
 
   case DEBUGGER_EXPRESSION_TYPE_UNARYOP:
@@ -270,10 +289,6 @@ debugger_expression_copy( debugger_expression *src )
     dest->types.integer = src->types.integer;
     break;
 
-  case DEBUGGER_EXPRESSION_TYPE_REGISTER:
-    dest->types.reg = src->types.reg;
-    break;
-
   case DEBUGGER_EXPRESSION_TYPE_UNARYOP:
     dest->types.unaryop.operation = src->types.unaryop.operation;
     dest->types.unaryop.op = debugger_expression_copy( src->types.unaryop.op );
@@ -300,10 +315,13 @@ debugger_expression_copy( debugger_expression *src )
     }
     break;
 
+  case DEBUGGER_EXPRESSION_TYPE_SYSVAR:
+    dest->types.system_variable = src->types.system_variable;
+    break;
+
   case DEBUGGER_EXPRESSION_TYPE_VARIABLE:
     dest->types.variable = utils_safe_strdup( src->types.variable );
     break;
-
   }
 
   return dest;
@@ -317,14 +335,14 @@ debugger_expression_evaluate( debugger_expression *exp )
   case DEBUGGER_EXPRESSION_TYPE_INTEGER:
     return exp->types.integer;
 
-  case DEBUGGER_EXPRESSION_TYPE_REGISTER:
-    return debugger_register_get( exp->types.reg );
-
   case DEBUGGER_EXPRESSION_TYPE_UNARYOP:
     return evaluate_unaryop( &( exp->types.unaryop ) );
 
   case DEBUGGER_EXPRESSION_TYPE_BINARYOP:
     return evaluate_binaryop( &( exp->types.binaryop ) );
+
+  case DEBUGGER_EXPRESSION_TYPE_SYSVAR:
+    return debugger_system_variable_get( exp->types.system_variable );
 
   case DEBUGGER_EXPRESSION_TYPE_VARIABLE:
     return debugger_variable_get( exp->types.variable );
@@ -435,15 +453,15 @@ debugger_expression_deparse( char *buffer, size_t length,
     }
     return 0;
 
-  case DEBUGGER_EXPRESSION_TYPE_REGISTER:
-    snprintf( buffer, length, "%s", debugger_register_text( exp->types.reg ) );
-    return 0;
-
   case DEBUGGER_EXPRESSION_TYPE_UNARYOP:
     return deparse_unaryop( buffer, length, &( exp->types.unaryop ) );
 
   case DEBUGGER_EXPRESSION_TYPE_BINARYOP:
     return deparse_binaryop( buffer, length, &( exp->types.binaryop ) );
+
+  case DEBUGGER_EXPRESSION_TYPE_SYSVAR:
+    debugger_system_variable_text( buffer, length, exp->types.system_variable );
+    return 0;
 
   case DEBUGGER_EXPRESSION_TYPE_VARIABLE:
     snprintf( buffer, length, "$%s", exp->types.variable );
