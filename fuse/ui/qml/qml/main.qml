@@ -239,6 +239,7 @@ ApplicationWindow {
         }
 
         Button {
+            id: menuButton
             visible: fuse.touchscreen && fuse.showControlsIcons
             anchors.top: parent.top
             anchors.left: parent.left
@@ -254,12 +255,14 @@ ApplicationWindow {
 
         Column {
             visible: fuse.touchscreen && fuse.showControlsIcons
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: mainScreen.height > mainScreen.width ? mainScreen.height / 2 : 0;
+            anchors.top: menuButton.bottom
+            anchors.left: parent.left
+            anchors.topMargin: Screen.pixelDensity
+            anchors.rightMargin: Screen.pixelDensity;
+            spacing: Screen.pixelDensity
             opacity: (onScreenCursorJoystick.visible || onScreen48Keyboard.visible) ? 0.25 : 1.0
             Image {
-                height: Screen.pixelDensity * 7
+                height: Screen.pixelDensity * 5
                 width: Screen.pixelDensity * 7
                 source: "qrc:///images/keyboard-icon.svg"
                 MouseArea {
@@ -277,6 +280,25 @@ ApplicationWindow {
                         onScreenCursorJoystick.source = "OnScreenJoystick.qml";
                         toggleOnScreenControls(FuseEmulator.CursorJoystick, false);
                     }
+                }
+            }
+            Image {
+                height: Screen.pixelDensity * 7
+                width: Screen.pixelDensity * 7
+                source: "qrc:///images/fastforward.svg"
+                MouseArea {
+                    anchors.fill: parent
+                    onPressed: fuse.speedup()
+                    onReleased: fuse.slowdown()
+                }
+            }
+            Image {
+                height: Screen.pixelDensity * 7
+                width: Screen.pixelDensity * 7
+                source: fuse.paused ? "qrc:///images/play.svg" : "qrc:///images/pause.svg"
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: fuse.togglePaused()
                 }
             }
         }

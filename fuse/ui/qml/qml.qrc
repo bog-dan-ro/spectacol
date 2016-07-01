@@ -113,5 +113,8 @@
         <file>images/binary.svg</file>
         <file>qml/GetListPage.qml</file>
         <file>qml/OnScreenJoystickButton.qml</file>
+        <file>images/fastforward.svg</file>
+        <file>images/pause.svg</file>
+        <file>images/play.svg</file>
     </qresource>
 </RCC>

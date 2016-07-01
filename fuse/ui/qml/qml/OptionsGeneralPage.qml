@@ -59,7 +59,7 @@ Flickable {
                     Keys.onLeftPressed: decrease()
                     Keys.onRightPressed: increase()
                     from: 10
-                    to: 1000
+                    to: 10000
                     value: fuseSettings.emulationSpeed
                     onValueChanged: fuseSettings.emulationSpeed = value
                 }

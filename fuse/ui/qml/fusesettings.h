@@ -78,6 +78,7 @@ public:
         TogglePause,
         QuickSaveSnapshot,
         QuickLoadSnapshot,
+        ToggleEmulationSpeed
     };
 
 public:

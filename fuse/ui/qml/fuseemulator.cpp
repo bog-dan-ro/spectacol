@@ -1267,6 +1267,9 @@ void FuseEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button
             input_event(&event);
         });
         break;
+    case FuseSettings::ToggleEmulationSpeed:
+        speedup();
+        break;
     case FuseSettings::ToggleKeyboard:
     case FuseSettings::ToggleCursorJoystick:
     case FuseSettings::TogglePause:
@@ -1295,6 +1298,9 @@ void FuseEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton butt
             event.types.joystick.button = toJoystickKey(button);
             input_event(&event);
         });
+        break;
+    case FuseSettings::ToggleEmulationSpeed:
+        slowdown();
         break;
     case FuseSettings::ToggleKeyboard:
     case FuseSettings::ToggleCursorJoystick:
@@ -1351,17 +1357,40 @@ void FuseEmulator::setListIndex(int index)
     m_waitSemaphore.release();
 }
 
+void FuseEmulator::speedup()
+{
+    pokeEvent([]{
+        fuse_emulation_pause();
+        settings_current.emulation_speed = 10000;
+        fuse_emulation_unpause();
+    });
+}
+
+void FuseEmulator::slowdown()
+{
+    pokeEvent([]{
+        fuse_emulation_pause();
+        settings_current.emulation_speed = 100;
+        fuse_emulation_unpause();
+    });
+}
+
 void FuseEmulator::togglePaused()
 {
     m_paused = !m_paused;
 
     pokeEvent([this]{
-        showMessage(m_paused ? tr("Pause spectacol") : tr("Resume spectacol"));
+        if (!m_touchscreen || !m_showControlsIcons)
+            showMessage(m_paused ? tr("Pause spectacol") : tr("Resume spectacol"));
         if (m_paused)
             fuse_emulation_pause();
         else
             fuse_emulation_unpause();
+        callFunction([this]{
+                emit pausedChanged();
+        });
     });
+
 }
 
 void FuseEmulator::debuggerTrap()

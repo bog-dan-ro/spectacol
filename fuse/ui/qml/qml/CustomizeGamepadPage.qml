@@ -58,6 +58,7 @@ Flickable {
         ListElement { code: FuseSettings.ToggleKeyboard; name: "Toggle Keyboard"; section: "Actions" }
         ListElement { code: FuseSettings.ToggleCursorJoystick; name: "Toggle Joystick"; section: "Actions" }
         ListElement { code: FuseSettings.TogglePause; name: "Toggle Pause"; section: "Actions" }
+        ListElement { code: FuseSettings.ToggleEmulationSpeed; name: "Toggle Emulation Speed"; section: "Actions" }
         ListElement { code: FuseSettings.QuickSaveSnapshot; name : "Save Snapshot"; section: "Actions" }
         ListElement { code: FuseSettings.QuickLoadSnapshot; name: "Load Snapshot"; section: "Actions" }
 

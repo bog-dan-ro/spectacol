@@ -281,6 +281,11 @@ public slots:
     void showMessage(QString message, ErrorLevel level = Info);
     void setListIndex(int index);
 
+    void speedup();
+    void slowdown();
+
+    void togglePaused();
+
 signals:
     void pausedChanged();
     void dataPathChanged();
@@ -308,7 +313,6 @@ signals:
     void getListIndex(const QStringList &list, const QString &title);
 
 private:
-    void togglePaused();
     void updateScalers() const;
     void startFuseThread();
     friend class FuseTexture;
