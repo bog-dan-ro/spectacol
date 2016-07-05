@@ -5269,3 +5269,6 @@
 20160613 z80/z80_debugger_variables.c: split long lines (thanks, Fred) (Phil).
 20160626 ui/widget/{menu.c,query.c}: fix crash on widget UIs when hitting the
          close icon on the title bar several times (fixes bug #351) (Sergio).
+20160705 tape.c: make sure we don't lose a tape edge when we pause and restart
+         tapes and delete lingering MIC off events when we restart a tape (fixes
+         bug #354) (thanks, Lee Tonks and windale) (Fred).
