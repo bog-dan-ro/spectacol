@@ -5272,3 +5272,4 @@
 20160705 tape.c: make sure we don't lose a tape edge when we pause and restart
          tapes and delete lingering MIC off events when we restart a tape (fixes
          bug #354) (thanks, Lee Tonks and windale) (Fred).
+20160707 man/fuse.1: document unittests option (fixes bug #326) (Sergio).

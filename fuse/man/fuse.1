@@ -1681,6 +1681,16 @@ to disable). Same as the Media Options dialog's
 option.
 .RE
 .PP
+.B \-\-unittests
+.RS
+This option runs a testing framework that automatically checks portions
+of code, comparing actual results with expected ones. It is meant to detect
+broken code before a release. There is not graphical mode, the program
+just ends with exit code 0 if all tests are good or prints error
+messages to stdout and ends with exit code greater than 0 if there are
+failed tests.
+.RE
+.PP
 .B \-\-usource
 .RS
 Emulate a \(mcSource interface. Same as the General Peripherals Options dialog's
