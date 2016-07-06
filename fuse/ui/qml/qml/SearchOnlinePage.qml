@@ -50,7 +50,8 @@ Rectangle {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
         buttonYKey: Qt.Key_Tab
         buttonBKey: Qt.Key_Escape
-        buttonAKey: Qt.Key_unknown
+        buttonAKey: searchText.focus ? Qt.Key_unknown : Qt.Key_Select
+        onButtonAKeyChanged: console.log(buttonAKey)
     }
 
     ColumnLayout {
@@ -82,7 +83,7 @@ Rectangle {
             id: grid
             KeyNavigation.tab: searchText
             KeyNavigation.up: searchText
-            Keys.onReturnPressed:{
+            Keys.onSelectPressed: {
                 pageLoader.source = "";
                 fuse.copyToFavourites(model.getPath(currentIndex))
             }
