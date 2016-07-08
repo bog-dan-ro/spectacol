@@ -285,8 +285,11 @@ disciple_reset( int hard_reset )
     return;
   }
 
-  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
-    disciple_memory_map_romcs_ram[ i ].page = &disciple_ram[ i * MEMORY_PAGE_SIZE ];
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+    struct memory_page *page = &disciple_memory_map_romcs_ram[ i ];
+    page->page = &disciple_ram[ i * MEMORY_PAGE_SIZE ];
+    page->offset = i * MEMORY_PAGE_SIZE;
+  }
 
   machine_current->ram.romcs = 1;
 

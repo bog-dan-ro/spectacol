@@ -5358,3 +5358,5 @@
 20160706 fuse.c,infrastructure/startup_manager.c: final tidy-ups: remove debug
          printf calls and FIXME comments (Phil).
 20160707 man/fuse.1: document unittests option (fixes bug #326) (Sergio).
+20160709 man/fuse.1,peripherals/disk/{disciple.c,plusd.c}: split +D memory
+         sources. Coalesce +D and DISCiPLE RAM pages (patch #373) (Sergio).

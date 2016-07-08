@@ -55,7 +55,8 @@
 /* Two 8KB memory chunks accessible by the Z80 when /ROMCS is low */
 static memory_page plusd_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
 static memory_page plusd_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
-static int plusd_memory_source;
+static int plusd_memory_source_rom;
+static int plusd_memory_source_ram;
 
 int plusd_available = 0;
 int plusd_active = 0;
@@ -184,11 +185,12 @@ plusd_init( void *context )
 
   module_register( &plusd_module_info );
 
-  plusd_memory_source = memory_source_register( "PlusD" );
+  plusd_memory_source_rom = memory_source_register( "PlusD ROM" );
+  plusd_memory_source_ram = memory_source_register( "PlusD RAM" );
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
-    plusd_memory_map_romcs_rom[ i ].source = plusd_memory_source;
+    plusd_memory_map_romcs_rom[ i ].source = plusd_memory_source_rom;
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
-    plusd_memory_map_romcs_ram[ i ].source = plusd_memory_source;
+    plusd_memory_map_romcs_ram[ i ].source = plusd_memory_source_ram;
 
   periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
 
@@ -246,8 +248,10 @@ plusd_reset( int hard_reset )
   machine_current->ram.romcs = 0;
 
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-    plusd_memory_map_romcs_ram[ i ].page = &plusd_ram[ i * MEMORY_PAGE_SIZE ];
-    plusd_memory_map_romcs_ram[ i ].writable = 1;
+    struct memory_page *page = &plusd_memory_map_romcs_ram[ i ];
+    page->page = &plusd_ram[ i * MEMORY_PAGE_SIZE ];
+    page->offset = i * MEMORY_PAGE_SIZE;
+    page->writable = 1;
   }
 
   plusd_available = 1;
@@ -501,7 +505,8 @@ plusd_unittest( void )
 
   plusd_page();
 
-  r += unittests_assert_16k_page( 0x0000, plusd_memory_source, 0 );
+  r += unittests_assert_8k_page( 0x0000, plusd_memory_source_rom, 0 );
+  r += unittests_assert_8k_page( 0x2000, plusd_memory_source_ram, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
