@@ -1072,3 +1072,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160530 doc/libspectrum.txt: list more disk formats (Sergio).
 20160606 ChangeLog,README,configure.ac,doc/libspectrum.3: update release dates
          and mark this release as 1.2.0 (Fred).
+20160622 make-perl.c,myglib/garray.c: add implementations of
+         g_array_sized_new() and g_array_remove_index_fast(). (Thanks, Sergio)
+         (Phil).

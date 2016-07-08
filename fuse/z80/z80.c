@@ -31,6 +31,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "memory.h"
 #include "module.h"
 #include "peripherals/scld.h"
@@ -101,8 +102,8 @@ z80_interrupt_event_fn( libspectrum_dword event_tstates, int type,
 }
 
 /* Set up the z80 emulation */
-void
-z80_init( void )
+int
+z80_init( void *context )
 {
   z80_init_tables();
 
@@ -114,6 +115,20 @@ z80_init( void )
   module_register( &z80_module_info );
 
   z80_debugger_variables_init();
+
+  return 0;
+}
+
+void
+z80_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_Z80, dependencies,
+                            ARRAY_SIZE( dependencies ), z80_init, NULL, NULL );
 }
 
 /* Initalise the tables used to set flags */

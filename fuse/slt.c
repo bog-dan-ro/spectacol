@@ -1,5 +1,5 @@
 /* slt.c: SLT data handling routines
-   Copyright (c) 2004 Philip Kendall
+   Copyright (c) 2004-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2015 Fredrick Meunier
 
@@ -31,6 +31,7 @@
 
 #include <libspectrum.h>
 
+#include "infrastructure/startup_manager.h"
 #include "module.h"
 #include "settings.h"
 #include "slt.h"
@@ -59,10 +60,20 @@ static module_info_t slt_module_info = {
 
 };
 
-void
-slt_init( void )
+static int
+slt_init( void *context )
 {
   module_register( &slt_module_info );
+
+  return 0;
+}
+
+void
+slt_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SLT, dependencies,
+                            ARRAY_SIZE( dependencies ), slt_init, NULL, NULL );
 }
 
 int

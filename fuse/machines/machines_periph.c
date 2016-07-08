@@ -1,5 +1,5 @@
 /* machines_periph.c: various machine-specific peripherals
-   Copyright (c) 2011 Philip Kendall
+   Copyright (c) 2011-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2015 Gergely Szasz
 
@@ -28,6 +28,7 @@
 #include <config.h>
 
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "machines_periph.h"
 #include "pentagon.h"
 #include "periph.h"
@@ -152,8 +153,8 @@ static const periph_t pentagon1024_memory = {
   NULL
 };
 
-void
-machines_periph_init( void )
+static int
+machines_periph_init( void *context )
 {
   periph_register( PERIPH_TYPE_128_MEMORY, &spec128_memory );
   periph_register( PERIPH_TYPE_PLUS3_MEMORY, &plus3_memory );
@@ -163,6 +164,17 @@ machines_periph_init( void )
   periph_register( PERIPH_TYPE_BETA128_PENTAGON, &beta128_pentagon );
   periph_register( PERIPH_TYPE_BETA128_PENTAGON_LATE, &beta128_pentagon_late );
   periph_register( PERIPH_TYPE_PENTAGON1024_MEMORY, &pentagon1024_memory );
+
+  return 0;
+}
+
+void
+machines_periph_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_MACHINES_PERIPH,
+                            dependencies, ARRAY_SIZE( dependencies ),
+                            machines_periph_init, NULL, NULL );
 }
 
 /* Peripherals generally available on all machines; the Timex machines and

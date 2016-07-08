@@ -1,5 +1,5 @@
 /* plusd.h: Routines for handling the +D interface
-   Copyright (c) 2005-2015 Stuart Brady
+   Copyright (c) 2005-2016 Stuart Brady, Philip Kendall
 
    $Id$
 
@@ -43,8 +43,7 @@ typedef enum plusd_drive_number {
 extern int plusd_available;  /* Is the +D available for use? */
 extern int plusd_active;     /* +D enabled? */
 
-void plusd_init( void );
-void plusd_end( void );
+void plusd_register_startup( void );
 
 void plusd_page( void );
 void plusd_unpage( void );

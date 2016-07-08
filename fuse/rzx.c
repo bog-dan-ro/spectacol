@@ -1,5 +1,5 @@
 /* rzx.c: .rzx files
-   Copyright (c) 2002-2015 Philip Kendall
+   Copyright (c) 2002-2016 Philip Kendall
    Copyright (c) 2014 Sergio Baldoví
    Copyright (c) 2015 Stuart Brady
 
@@ -38,6 +38,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "movie.h"
 #include "peripherals/ula.h"
@@ -119,8 +120,8 @@ static void rzx_sentinel( libspectrum_dword ts, int type,
 
 static int sentinel_event;
 
-void
-rzx_init( void )
+static int
+rzx_init( void *context )
 {
   rzx_recording = rzx_playback = 0;
 
@@ -130,6 +131,8 @@ rzx_init( void )
   sentinel_event = event_register( rzx_sentinel, "RZX sentinel" );
 
   end_event = debugger_event_register( event_type_string, end_event_detail_string );
+
+  return 0;
 }
 
 static int
@@ -741,12 +744,25 @@ int rzx_store_byte( libspectrum_byte value )
   return 0;
 }
 
-int rzx_end( void )
+static void
+rzx_end( void )
 {
-  if( rzx_recording ) return rzx_stop_recording();
-  if( rzx_playback  ) return rzx_stop_playback( 0 );
+  if( rzx_recording ) rzx_stop_recording();
+  if( rzx_playback  ) rzx_stop_playback( 0 );
+}
 
-  return 0;
+void
+rzx_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_MACHINE,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_RZX, dependencies,
+                            ARRAY_SIZE( dependencies ), rzx_init, NULL,
+                            rzx_end );
 }
 
 static GSList*

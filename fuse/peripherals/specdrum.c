@@ -1,5 +1,5 @@
 /* specdrum.c: Routines for handling the Specdrum Drum Kit
-   Copyright (c) 2011 Jon Mitchell
+   Copyright (c) 2011-2016 Jon Mitchell, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -31,6 +31,7 @@
 #include <libspectrum.h>
 
 #include "compat.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "periph.h"
@@ -66,11 +67,22 @@ static const periph_t specdrum_periph = {
   /* .activate = */ NULL,
 };
 
-void
-specdrum_init( void )
+static int
+specdrum_init( void *context )
 {
   module_register( &specdrum_module_info );
   periph_register( PERIPH_TYPE_SPECDRUM, &specdrum_periph );
+
+  return 0;
+}
+
+void
+specdrum_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SPECDRUM, dependencies,
+                            ARRAY_SIZE( dependencies ), specdrum_init, NULL,
+                            NULL );
 }
 
 static void

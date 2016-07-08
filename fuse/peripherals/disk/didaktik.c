@@ -1,5 +1,5 @@
 /* didaktik.c: Routines for handling the Didaktik 40/80 disk interface
-   Copyright (c) 2015-2016 Gergely Szasz
+   Copyright (c) 2015-2016 Gergely Szasz, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
    Copyright (c) 2016 Fredrick Meunier
@@ -35,6 +35,7 @@
 #include "compat.h"
 #include "debugger/debugger.h"
 #include "didaktik.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "peripherals/printer.h"
@@ -175,8 +176,8 @@ didaktik_set_intrq( struct wd_fdc *f )
     event_add( 0, z80_nmi_event );
 }
 
-void
-didaktik80_init( void )
+static int
+didaktik80_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -216,6 +217,8 @@ didaktik80_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
 }
 
 static void
@@ -272,11 +275,24 @@ didaktik_reset( int hard_reset )
 
 }
 
-void
+static void
 didaktik80_end( void )
 {
   didaktik80_available = 0;
   libspectrum_free( didaktik_fdc );
+}
+
+void
+didaktik80_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_DIDAKTIK, dependencies,
+                            ARRAY_SIZE( dependencies ), didaktik80_init, NULL,
+                            didaktik80_end );
 }
 
 static libspectrum_byte

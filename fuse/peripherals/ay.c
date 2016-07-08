@@ -30,6 +30,7 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "periph.h"
@@ -118,16 +119,31 @@ static periph_t ay_periph_timex = {
 static const char * const debugger_type_string = "ay";
 static const char * const current_register_detail_string = "current";
 
-void
-ay_init( void )
+static int
+ay_init( void *context )
 {
   module_register( &ay_module_info );
   periph_register( PERIPH_TYPE_AY, &ay_periph );
   periph_register( PERIPH_TYPE_AY_PLUS3, &ay_periph_plus3 );
   periph_register( PERIPH_TYPE_AY_FULL_DECODE, &ay_periph_full_decode );
   periph_register( PERIPH_TYPE_AY_TIMEX, &ay_periph_timex );
+  
+  debugger_system_variable_register(
+    debugger_type_string, current_register_detail_string, get_current_register,
+    set_current_register );
 
-  debugger_system_variable_register( debugger_type_string, current_register_detail_string, get_current_register, set_current_register );
+  return 0;
+}
+
+void
+ay_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_AY, dependencies,
+                            ARRAY_SIZE( dependencies ), ay_init, NULL, NULL );
 }
 
 static void

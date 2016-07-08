@@ -5267,9 +5267,94 @@
 20160613 man/fuse.1,peripherals/ula.c: expose secondary memory control port as
          a debugger system variable (Phil).
 20160613 z80/z80_debugger_variables.c: split long lines (thanks, Fred) (Phil).
+20160616 Makefile.am,debugger/debugger.[ch],fuse.c,infrastructure/{Makefile.am,
+         startup_manager.[ch]},peripherals/{disk/{beta.[ch],didaktik.[ch],
+         disciple.[ch],fdd.[ch],opus.[ch],plusd.[ch]},if1.[ch],if2.[ch],
+         printer.[ch]},psg.[ch],rzx.[ch],spectrum.[ch]}: initial work on a
+         startup manager to automatically handle dependency issues (Phil).
+20160616 fuse.c,infrastructure/startup_manager.h,machines/machines_periph.[ch],
+         peripherals/{ay.[ch],fuller.[ch],kempmouse.[ch],melodik.[ch],
+         scld.[ch],speccyboot.[ch],specdrum.[ch],spectranet.[ch],ula.[ch],
+         usource.[ch]},profile.[ch],slt.[ch]: move more initialisation routines
+         into startup manager (Phil).
+20160616 fuse.c,infrastructure/startup_manager.[ch],memory.[ch],
+         peripherals/{disk/{beta.c,didaktik.c,disciple.c,opus.c,plusd.c},
+         if1.c,if2.c,speccyboot.c,spectranet.c,usource.c}: add memory subsystem
+         into startup manager (Phil).
+20160616 debugger/debugger.c,fuse.c,infrastructure/startup_manager.h,
+         mempool.[ch]: add memory pool subsystem into startup manager (Phil).
+20160616 fuse.c,infrastructure/startup_manager.h,z80/{coretest.c,z80.[ch]}:
+         add Z80 subsystem into startup manager (Phil).
+20160617 debugger/debugger.c,infrastructure/startup_manager.[ch],
+         machines/machines_periph.c,memory.c,mempool.c,peripherals/{ay.c,
+         disk/{beta.c,didaktik.c,disciple.c,fdd.c,opus.c,plusd.c},fuller.c,
+         if1.c,if2.c,kempmouse.c,melodik.c,printer.c,scld.c,speccyboot.c,
+         spectranet.c,ula.c,usource.c},profile.c,psg.c,rzx.c,slt.c,spectrum.c,
+         z80/z80.[ch]: make all init functions return a value (Phil).
+20160617 fuse.c,infrastructure/startup_manager.[ch],
+         peripherals/ide/{divide.[ch],simpleide.[ch],zxatasp.[ch],zxcf.[ch]}:
+         add IDE interfaces into startup manager (Phil).
+20160617 fuse.c,infrastructure/startup_manager.h,timer/timer.[ch]: add timer
+         subsystem into startup manager (Phil).
+20160617 fuse.c,infrastructure/startup_manager.h,machine.[ch]: add machine
+         subsystem into startup manager (Phil).
+20160617 fuse.c,infrastructure/startup_manager.h,tape.[ch]: add tape subsystem
+         into startup manager (Phil).
+20160618 fuse.c,infrastructure/startup_manager.h: add creator block
+         initialisation into startup manager (Phil).
+20160618 debugger/debugger.[ch],fuse.c,infrastructure/startup_manager.[ch],
+         machine.[ch],machines/machines_periph.c,memory.[ch],mempool.[ch],
+         peripherals/{ay.c,disk/{beta.[ch],didaktik.[ch],disciple.[ch],fdd.c,
+         opus.[ch],plusd.[ch]},fuller.c,ide/{divide.[ch],simpleide.[ch],
+         zxatasp.[ch],zxcf.[ch]},if1.[ch],if2.c,kempmouse.c,melodik.c,
+         printer.[ch],scld.c,speccyboot.[ch],spectranet.[ch],ula.c,
+         usource.[ch]},profile.c,psg.[ch],rzx.[ch],slt.c,spectrum.c,tape.[ch],
+         timer/timer.[ch],z80/{coretest.c,z80.c}: use startup manager for end
+         functions as well (Phil).
+20160619 peripherals/printer.c,rzx.c: {printer,rzx}_end end the machine
+         subsystem still running, so add a dependency (thanks, Sergio) (Phil).
+20160619 debugger/debugger.c,peripherals/{disk/{beta.c,didaktik.c,disciple.c,
+         opus.c,plusd.c},ide/{divide.c,zxatasp.c,zxcf.c},if1.c,if2.c,printer.c,
+         speccyboot.c,spectranet.c,usource.c},rzx.c,tape.c: use ARRAY_SIZE
+         macro (thanks, Sergio) (Phil).
+20160619 fuse.c,infrastructure/startup_manager.[ch],sound.[ch]: add sound
+         module to startup manager; modules with no init function are now
+         supported (Phil).
+20160619 debugger/debugger.c,display.c,event.[ch],fuse.c,
+         infrastructure/startup_manager.h,peripherals/disk/fdd.c,rzx.c,
+         spectrum.c,tape.c,timer/timer.c,z80/{coretest.c,z80.c}: add event
+         subsystem into startup manager (Phil).
 20160626 ui/widget/{menu.c,query.c}: fix crash on widget UIs when hitting the
          close icon on the title bar several times (fixes bug #351) (Sergio).
+20160630 fuse.c,infrastructure/startup_manager.h: move libxml2 init into
+         startup manager (Phil).
+20160630 debugger/debugger.c,event.c,fuse.c,infrastructure/startup_manager.h,
+         machine.c,machines/machines_periph.c,memory.c,mempool.c,
+         peripherals/{ay.c,disk/{beta.c,didaktik.c,disciple.c,fdd.c,opus.c,
+         plusd.c},fuller.c,ide/{divide.c,simpleide.c,zxatasp.c,zxcf.c},if1.c,
+         if2.c,kempmouse.c,melodik.c,printer.c,scld.c,speccyboot.c,specdrum.c,
+         spectranet.c,ula.c,usource.c},profile.c,psg.c,rzx.c,slt.c,sound.c,
+         spectrum.c,tape.c,timer/timer.c,z80/z80.c: make every startup module
+         dependent on setuid() having been called (Phil).
+20160630 fuse.c,infrastructure/startup_manager.h: add libspectrum init to the
+         startup manager (Phil).
 20160705 tape.c: make sure we don't lose a tape edge when we pause and restart
          tapes and delete lingering MIC off events when we restart a tape (fixes
          bug #354) (thanks, Lee Tonks and windale) (Fred).
+20160705 fuse.c,infrastructure/startup_manager.h,settings-header.pl,
+         settings.pl: move settings_end into the startup manager, including
+         OS X conditional dependency (Phil).
+20160706 debugger/debugger.c,display.[ch],event.c,fuse.c,
+         infrastructure/startup_manager.[ch],machine.c,
+         machines/machines_periph.c,memory.c,mempool.c,peripherals/{ay.c,
+         disk/{beta.c,didaktik.c,disciple.c,fdd.c,opus.c,plusd.c},fuller.c,
+         ide/{divide.c,simpleide.c,zxatasp.c,zxcf.c},if1.c,if2.c,kempmouse.c,
+         melodik.c,printer.c,scld.c,speccyboot.c,specdrum.c,spectranet.c,ula.c,
+         usource.c},profile.c,psg.c,rzx.c,settings.pl,slt.c,sound.c,spectrum.c,
+         tape.c,timer/timer.c,z80/{coretest.c,z80.c,z80.h}: add display
+         initialisation to the startup manager (Phil).
+20160706 settings.pl: remove OS X conditional code; will be maintained in the
+         OS X port (thanks, Fred) (Phil).
+20160706 fuse.c,infrastructure/startup_manager.c: final tidy-ups: remove debug
+         printf calls and FIXME comments (Phil).
 20160707 man/fuse.1: document unittests option (fixes bug #326) (Sergio).

@@ -1,5 +1,5 @@
 /* slt.h: SLT data handling routines
-   Copyright (c) 2004 Philip Kendall
+   Copyright (c) 2004-2016 Philip Kendall
 
    $Id$
 
@@ -28,7 +28,7 @@
 
 #include <libspectrum.h>
 
-void slt_init( void );
+void slt_register_startup( void );
 
 int slt_trap( libspectrum_word address, libspectrum_byte level );
 

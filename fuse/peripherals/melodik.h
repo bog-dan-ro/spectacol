@@ -1,5 +1,5 @@
 /* melodik.h: Routines for handling the Melodik interface
-   Copyright (c) 2009-2011 Fredrick Meunier, Philip Kendall
+   Copyright (c) 2009-2016 Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -26,6 +26,6 @@
 #ifndef FUSE_MELODIK_H
 #define FUSE_MELODIK_H
 
-void melodik_init( void );
+void melodik_register_startup( void );
 
 #endif				/* #ifndef FUSE_MELODIK_H */

@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2015 Philip Kendall and others
+   Copyright (c) 1999-2016 Philip Kendall and others
 
    $Id$
 
@@ -59,6 +59,7 @@
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "machines/machines_periph.h"
@@ -145,9 +146,13 @@ typedef struct start_files_t {
 
 } start_files_t;
 
+/* Context for the display startup routine */
+static display_startup_context display_context;
+
 static int fuse_init(int argc, char **argv);
 
-static int creator_init( void );
+static void creator_register_startup( void );
+
 static void fuse_show_copyright(void);
 static void fuse_show_version( void );
 static void fuse_show_help( void );
@@ -199,6 +204,139 @@ int main(int argc, char **argv)
 
 }
 
+static int
+fuse_libspectrum_init( void *context )
+{
+  if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
+    if( libspectrum_init() ) return 1;
+  } else {
+    ui_error( UI_ERROR_ERROR,
+              "libspectrum version %s found, but %s required",
+	      libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
+    return 1;
+  }
+
+  return 0;
+}
+
+static void
+libspectrum_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DISPLAY
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_LIBSPECTRUM, dependencies,
+                            ARRAY_SIZE( dependencies ), fuse_libspectrum_init,
+                            NULL, NULL );
+}
+
+static int
+libxml2_init( void *context )
+{
+#ifdef HAVE_LIB_XML2
+  LIBXML_TEST_VERSION
+#endif
+
+  return 0;
+}
+
+static void
+libxml2_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_LIBXML2, dependencies,
+                            ARRAY_SIZE( dependencies ), libxml2_init, NULL,
+                            NULL );
+}
+
+static int
+setuid_init( void *context )
+{
+#ifdef HAVE_GETEUID
+  int error;
+
+  /* Drop root privs if we have them */
+  if( !geteuid() ) {
+    error = setuid( getuid() );
+    if( error ) {
+      ui_error( UI_ERROR_ERROR, "Could not drop root privileges" );
+      return 1;
+    }
+  }
+#endif				/* #ifdef HAVE_GETEUID */
+
+  return 0;
+}
+
+static void
+setuid_register_startup()
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DISPLAY,
+    STARTUP_MANAGER_MODULE_LIBSPECTRUM,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SETUID, dependencies,
+                            ARRAY_SIZE( dependencies ), setuid_init, NULL,
+                            NULL );
+}
+
+static int
+run_startup_manager( int *argc, char ***argv )
+{
+  startup_manager_init();
+
+  display_context.argc = argc;
+  display_context.argv = argv;
+
+  /* Get every module to register its init function */
+  ay_register_startup();
+  beta_register_startup();
+  creator_register_startup();
+  debugger_register_startup();
+  didaktik80_register_startup();
+  disciple_register_startup();
+  display_register_startup( &display_context );
+  divide_register_startup();
+  event_register_startup();
+  fdd_register_startup();
+  fuller_register_startup();
+  if1_register_startup();
+  if2_register_startup();
+  kempmouse_register_startup();
+  libspectrum_register_startup();
+  libxml2_register_startup();
+  machine_register_startup();
+  machines_periph_register_startup();
+  melodik_register_startup();
+  memory_register_startup();
+  mempool_register_startup();
+  opus_register_startup();
+  plusd_register_startup();
+  printer_register_startup();
+  profile_register_startup();
+  psg_register_startup();
+  rzx_register_startup();
+  scld_register_startup();
+  settings_register_startup();
+  setuid_register_startup();
+  simpleide_register_startup();
+  slt_register_startup();
+  sound_register_startup();
+  speccyboot_register_startup();
+  specdrum_register_startup();
+  spectranet_register_startup();
+  spectrum_register_startup();
+  tape_register_startup();
+  timer_register_startup();
+  ula_register_startup();
+  usource_register_startup();
+  z80_register_startup();
+  zxatasp_register_startup();
+  zxcf_register_startup();
+
+  return startup_manager_run();
+}
+
 static int fuse_init(int argc, char **argv)
 {
   int error, first_arg;
@@ -241,95 +379,13 @@ static int fuse_init(int argc, char **argv)
   fuse_show_copyright();
 #endif
 
-  /* FIXME: order of these initialisation calls. Work out what depends on
-     what */
-  /* FIXME FIXME 20030407: really do this soon. This is getting *far* too
-     hairy */
-  fuse_joystick_init ();
+  fuse_joystick_init();
   fuse_keyboard_init();
 
-  event_init();
-  
-#ifndef GEKKO
-  if( display_init(&argc,&argv) ) return 1;
-#endif
-
-  if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
-    if( libspectrum_init() ) return 1;
-  } else {
-    ui_error( UI_ERROR_ERROR,
-              "libspectrum version %s found, but %s required",
-	      libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
-    return 1;
-  }
-
-  /* Must be called after libspectrum_init() so we can get the gcrypt
-     version */
-  if( creator_init() ) return 1;
-
-#ifdef HAVE_GETEUID
-  /* Drop root privs if we have them */
-  if( !geteuid() ) {
-    error = setuid( getuid() );
-    if( error ) {
-      ui_error( UI_ERROR_ERROR, "Could not drop root privileges" );
-      return 1;
-    }
-  }
-#endif				/* #ifdef HAVE_GETEUID */
-
-  mempool_init();
-  memory_init();
-
-#ifdef HAVE_LIB_XML2
-LIBXML_TEST_VERSION
-#endif
-
-  debugger_init();
-
-  spectrum_init();
-  printer_init();
-  rzx_init();
-  psg_init();
-  beta_init();
-  opus_init();
-  plusd_init();
-  didaktik80_init();
-  disciple_init();
-  fdd_init_events();
-  if( simpleide_init() ) return 1;
-  if( zxatasp_init() ) return 1;
-  if( zxcf_init() ) return 1;
-  if1_init();
-  if2_init();
-  if( divide_init() ) return 1;
-  scld_init();
-  ula_init();
-  ay_init();
-  slt_init();
-  profile_init();
-  kempmouse_init();
-  fuller_init();
-  melodik_init();
-  speccyboot_init();
-  specdrum_init();
-  spectranet_init();
-  usource_init();
-  machines_periph_init();
-
-  z80_init();
-
-  if( timer_init() ) return 1;
-
-  error = timer_estimate_reset(); if( error ) return error;
-
-  error = machine_init_machines();
-  if( error ) return error;
+  if( run_startup_manager( &argc, &argv ) ) return 1;
 
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
-
-  tape_init();
 
   error = scaler_select_id( start_scaler ); libspectrum_free( start_scaler );
   if( error ) return error;
@@ -349,8 +405,8 @@ LIBXML_TEST_VERSION
   return 0;
 }
 
-static
-int creator_init( void )
+static int
+creator_init( void *context )
 {
   size_t i;
   unsigned int version[4] = { 0, 0, 0, 0 };
@@ -400,6 +456,21 @@ int creator_init( void )
   }
 
   return 0;
+}
+
+static void
+creator_end( void )
+{
+  libspectrum_creator_free( fuse_creator );
+}
+
+static void
+creator_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_CREATOR, dependencies,
+                            ARRAY_SIZE( dependencies ), creator_init, NULL,
+                            creator_end );
 }
 
 static void fuse_show_copyright(void)
@@ -855,51 +926,19 @@ do_start_files( start_files_t *start_files )
 static int fuse_end(void)
 {
   movie_stop();		/* stop movie recording */
-  /* Must happen before memory is deallocated as we read the character
-     set from memory for the text output */
-  printer_end();
 
-  /* also required before memory is deallocated on Fuse for OS X where
-     settings need to look up machine names etc. */
-  settings_end();
+  startup_manager_run_end();
 
-  psg_end();
-  rzx_end();
-  tape_end();
-  debugger_end();
-  simpleide_end();
-  zxatasp_end();
-  zxcf_end();
-  if1_end();
-  divide_end();
-  beta_end();
-  opus_end();
-  plusd_end();
-  didaktik80_end();
-  disciple_end();
-  spectranet_end();
-  speccyboot_end();
-  usource_end();
-
-  machine_end();
-
-  timer_end();
-
-  sound_end();
-  event_end();
   periph_end();
   fuse_keyboard_end();
   fuse_joystick_end();
   ui_end();
   ui_media_drive_end();
-  memory_end();
-  mempool_end();
   module_end();
   pokemem_end();
 
   svg_capture_end();
 
-  libspectrum_creator_free( fuse_creator );
   libspectrum_end();
 
   return 0;

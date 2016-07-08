@@ -1,5 +1,5 @@
 /* spectrum.h: Spectrum 48K specific routines
-   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2016 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -81,7 +81,7 @@ libspectrum_byte spectrum_unattached_port_none( void );
 
 extern int spectrum_frame_event;
 
-void spectrum_init( void );
+void spectrum_register_startup( void );
 int spectrum_frame( void );
 
 #endif			/* #ifndef FUSE_SPECTRUM_H */

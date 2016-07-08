@@ -1,5 +1,5 @@
 /* ula.c: ULA routines
-   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2016 Philip Kendall, Darren Salt
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Fredrick Meunier
 
@@ -32,6 +32,7 @@
 #include "compat.h"
 #include "debugger/debugger.h"
 #include "keyboard.h"
+#include "infrastructure/startup_manager.h"
 #include "loader.h"
 #include "machine.h"
 #include "machines/spec128.h"
@@ -143,8 +144,8 @@ set_1ffd( libspectrum_dword value )
   specplus3_memoryport2_write( 0, value );
 }
 
-void
-ula_init( void )
+static int
+ula_init( void *context )
 {
   module_register( &ula_module_info );
 
@@ -161,6 +162,20 @@ ula_init( void )
     debugger_type_string, mem1ffd_detail_string, get_1ffd, set_1ffd );
 
   ula_default_value = 0xff;
+
+  return 0;
+}
+
+void
+ula_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_ULA, dependencies,
+                            ARRAY_SIZE( dependencies ), ula_init, NULL,
+                            NULL );
 }
 
 static libspectrum_byte

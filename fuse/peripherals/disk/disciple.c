@@ -35,6 +35,7 @@
 #include "compat.h"
 #include "debugger/debugger.h"
 #include "disciple.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "peripherals/printer.h"
@@ -191,8 +192,8 @@ static const periph_t disciple_periph = {
   /* .activate = */ disciple_activate,
 };
 
-void
-disciple_init( void )
+static int
+disciple_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -239,6 +240,28 @@ disciple_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
+}
+
+static void
+disciple_end( void )
+{
+  disciple_available = 0;
+  libspectrum_free( disciple_fdc );
+}
+
+void
+disciple_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_DISCIPLE, dependencies,
+                            ARRAY_SIZE( dependencies ), disciple_init, NULL,
+                            disciple_end );
 }
 
 static void
@@ -298,13 +321,6 @@ disciple_inhibit( void )
 {
   /* TODO: check how this affects the hardware */
   disciple_inhibited = 1;
-}
-
-void
-disciple_end( void )
-{
-  disciple_available = 0;
-  libspectrum_free( disciple_fdc );
 }
 
 static libspectrum_byte

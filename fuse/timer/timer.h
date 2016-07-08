@@ -31,8 +31,7 @@
 int timer_estimate_reset( void );
 int timer_estimate_speed( void );
 
-int timer_init(void);
-void timer_end( void );
+void timer_register_startup( void );
 
 extern float current_speed;
 extern int timer_event;

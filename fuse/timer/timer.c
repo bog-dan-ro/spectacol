@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include "event.h"
+#include "infrastructure/startup_manager.h"
 #include "movie.h"
 #include "settings.h"
 #include "sound.h"
@@ -108,8 +109,8 @@ timer_estimate_reset( void )
   return 0;
 }
 
-int
-timer_init( void )
+static int
+timer_init( void *context )
 {
   start_time = timer_get_time(); if( start_time < 0 ) return 1;
 
@@ -117,13 +118,25 @@ timer_init( void )
 
   event_add( 0, timer_event );
 
-  return 0;
+  return timer_estimate_reset();
 }
 
-void
+static void
 timer_end( void )
 {
   event_remove_type( timer_event );
+}
+
+void
+timer_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_TIMER, dependencies,
+                            ARRAY_SIZE( dependencies ), timer_init, NULL,
+                            timer_end );
 }
 
 #ifdef SOUND_FIFO

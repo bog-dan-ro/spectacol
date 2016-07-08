@@ -47,6 +47,7 @@
 #include "tape.h"
 
 #include "event.h"
+#include "infrastructure/startup_manager.h"
 #include "module.h"
 #include "spectrum.h"
 #include "ui/ui.h"
@@ -93,7 +94,7 @@ main( int argc, char **argv )
   if( init_dummies() ) return 1;
 
   /* Initialise the tables used by the Z80 core */
-  z80_init();
+  z80_init( NULL );
 
   f = fopen( testsfile, "r" );
   if( !f ) {
@@ -572,6 +573,14 @@ int
 spectranet_nmi_flipflop( void )
 {
   return 0;
+}
+
+void
+startup_manager_register( startup_manager_module module,
+  startup_manager_module *dependencies, size_t dependency_count,
+  startup_manager_init_fn init_fn, void *init_context,
+  startup_manager_end_fn end_fn )
+{
 }
 
 int svg_capture_active = 0;     /* SVG capture enabled? */

@@ -42,8 +42,7 @@ extern int didaktik80_available;  /* Is the D80/40 available for use? */
 extern int didaktik80_active;     /* D80/D40 enabled? */
 extern int didaktik80_snap;       /* SNAPshot pressed */
 
-void didaktik80_init( void );
-void didaktik80_end( void );
+void didaktik80_register_startup( void );
 
 void didaktik80_page( void );
 void didaktik80_unpage( void );

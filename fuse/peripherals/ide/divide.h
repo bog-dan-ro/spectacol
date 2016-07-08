@@ -1,5 +1,5 @@
 /* divide.h: DivIDE interface routines
-   Copyright (c) 2005 Matthew Westcott
+   Copyright (c) 2005-2016 Matthew Westcott, Philip Kendall
 
    $Id$
 
@@ -41,8 +41,7 @@ void divide_set_automap( int state );
    re-evaluate whether paging will actually happen */
 void divide_refresh_page_state( void );
 
-int divide_init( void );
-int divide_end( void );
+void divide_register_startup( void );
 int divide_insert( const char *filename, libspectrum_ide_unit unit );
 int divide_commit( libspectrum_ide_unit unit );
 int divide_eject( libspectrum_ide_unit unit );

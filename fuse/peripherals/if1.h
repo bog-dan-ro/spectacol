@@ -1,5 +1,5 @@
 /* if1.h: Interface 1 handling routines
-   Copyright (c) 2004-2011 Gergely Szasz, Philip Kendall
+   Copyright (c) 2004-2016 Gergely Szasz, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -33,8 +33,7 @@
 extern int if1_active;
 extern int if1_available;
 
-void if1_init( void );
-libspectrum_error if1_end( void );
+void if1_register_startup( void );
 
 void if1_page( void );
 void if1_unpage( void );

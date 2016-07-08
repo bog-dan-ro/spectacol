@@ -30,6 +30,7 @@
 
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "machines/machines.h"
 #include "machines/scorpion.h"
@@ -63,7 +64,8 @@ static int machine_select_machine( fuse_machine_info *machine );
 static void machine_set_const_timings( fuse_machine_info *machine );
 static void machine_set_variable_timings( fuse_machine_info *machine );
 
-int machine_init_machines( void )
+static int
+machine_init_machines( void *context )
 {
   int error;
 
@@ -419,7 +421,8 @@ machine_set_variable_timings( fuse_machine_info *machine )
   }
 }
 
-int machine_end( void )
+static void
+machine_end( void )
 {
   int i;
 
@@ -429,6 +432,13 @@ int machine_end( void )
   }
 
   libspectrum_free( machine_types );
+}
 
-  return 0;
+void
+machine_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_MACHINE, dependencies,
+                            ARRAY_SIZE( dependencies ), machine_init_machines,
+                            NULL, machine_end );
 }

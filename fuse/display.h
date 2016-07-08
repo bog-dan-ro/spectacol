@@ -75,7 +75,13 @@ display_last_screen[ DISPLAY_SCREEN_WIDTH_COLS * DISPLAY_SCREEN_HEIGHT ];
 extern libspectrum_word display_line_start[ DISPLAY_HEIGHT ];
 extern libspectrum_word display_attr_start[ DISPLAY_HEIGHT ];
 
-int display_init(int *argc, char ***argv);
+typedef struct display_startup_context {
+  int *argc;
+  char ***argv;
+} display_startup_context;
+
+int display_init( int *argc, char ***argv );
+void display_register_startup( display_startup_context *context );
 void display_line(void);
 
 typedef void (*display_dirty_fn)( libspectrum_word offset );

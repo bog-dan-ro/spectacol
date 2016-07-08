@@ -1,5 +1,5 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2015 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 1999-2016 Philip Kendall, Darren Salt, Witold Filipczyk
    Copyright (c) 2015 UB880D
    Copyright (c) 2016 Fredrick Meunier
 
@@ -37,6 +37,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "loader.h"
 #include "machine.h"
 #include "memory.h"
@@ -95,8 +96,8 @@ static void tape_stop_mic_off( libspectrum_dword last_tstates, int type,
 
 /* Function definitions */
 
-void
-tape_init( void )
+static int
+tape_init( void *context )
 {
   tape = libspectrum_tape_alloc();
 
@@ -118,13 +119,28 @@ tape_init( void )
   tape_microphone = 0;
 
   next_tape_edge_tstates = 0;
+  
+  return 0;
 }
 
-void
+static void
 tape_end( void )
 {
   libspectrum_tape_free( tape );
   tape = NULL;
+}
+
+void
+tape_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_TAPE, dependencies,
+                            ARRAY_SIZE( dependencies ), tape_init, NULL,
+                            tape_end );
 }
 
 int tape_open( const char *filename, int autoload )

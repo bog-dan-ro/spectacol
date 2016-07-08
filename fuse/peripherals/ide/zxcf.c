@@ -1,5 +1,5 @@
 /* zxcf.c: ZXCF interface routines
-   Copyright (c) 2003-2015 Garry Lancaster and Philip Kendall
+   Copyright (c) 2003-2016 Garry Lancaster, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
 		 
@@ -33,6 +33,7 @@
 
 #include "debugger/debugger.h"
 #include "ide.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -110,8 +111,8 @@ static int page_event, unpage_event;
 
 /* Housekeeping functions */
 
-int
-zxcf_init( void )
+static int
+zxcf_init( void *context )
 {
   int error, i;
 
@@ -141,10 +142,24 @@ zxcf_init( void )
   return 0;
 }
 
-int
+static void
 zxcf_end( void )
 {
-  return libspectrum_ide_free( zxcf_idechn );
+  libspectrum_ide_free( zxcf_idechn );
+}
+
+void
+zxcf_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_DISPLAY,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_ZXCF, dependencies,
+                            ARRAY_SIZE( dependencies ), zxcf_init, NULL,
+                            zxcf_end );
 }
 
 static void

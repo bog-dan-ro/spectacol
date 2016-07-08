@@ -31,6 +31,7 @@
 #include <config.h>
 
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "movie.h"
 #include "options.h"
@@ -337,6 +338,14 @@ sound_end( void )
     libspectrum_free( samples );
     sound_enabled = 0;
   }
+}
+
+void
+sound_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SOUND, dependencies,
+                            ARRAY_SIZE( dependencies ), NULL, NULL, sound_end );
 }
 
 static inline void

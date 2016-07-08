@@ -34,6 +34,7 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "opus.h"
@@ -132,8 +133,8 @@ opus_set_datarq( struct wd_fdc *f )
   event_add( 0, z80_nmi_event );
 }
 
-void
-opus_init( void )
+static int
+opus_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -171,6 +172,28 @@ opus_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
+}
+
+static void
+opus_end( void )
+{
+  opus_available = 0;
+  libspectrum_free( opus_fdc );
+}
+
+void
+opus_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_OPUS, dependencies,
+                            ARRAY_SIZE( dependencies ), opus_init, NULL,
+                            opus_end );
 }
 
 static void
@@ -227,13 +250,6 @@ opus_reset( int hard_reset )
   opus_fdc->current_drive = &opus_drives[ 0 ];
   fdd_select( &opus_drives[ 0 ], 1 );
   machine_current->memory_map();
-}
-
-void
-opus_end( void )
-{
-  opus_available = 0;
-  libspectrum_free( opus_fdc );
 }
 
 /*

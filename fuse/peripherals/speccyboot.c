@@ -1,7 +1,7 @@
 /* speccyboot.c: SpeccyBoot Ethernet emulation
    See http://patrikpersson.github.io/speccyboot/
    
-   Copyright (c) 2009-2011 Patrik Persson, Philip Kendall
+   Copyright (c) 2009-2016 Patrik Persson, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    
    $Id$
@@ -30,6 +30,7 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "nic/enc28j60.h"
@@ -218,8 +219,8 @@ speccyboot_register_write( libspectrum_word port GCC_UNUSED,
   out_register_state = val;
 }
 
-void
-speccyboot_init( void )
+static int
+speccyboot_init( void *context )
 {
   int i;
 
@@ -235,12 +236,27 @@ speccyboot_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
 }
 
-void
+static void
 speccyboot_end( void )
 {
   nic_enc28j60_free( nic );
+}
+
+void
+speccyboot_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SPECCYBOOT, dependencies,
+                            ARRAY_SIZE( dependencies ), speccyboot_init, NULL,
+                            speccyboot_end );
 }
 
 int
@@ -268,12 +284,7 @@ speccyboot_unittest( void )
 /* No speccyboot support */
 
 void
-speccyboot_init( void )
-{
-}
-
-void
-speccyboot_end( void )
+speccyboot_register_startup( void )
 {
 }
 

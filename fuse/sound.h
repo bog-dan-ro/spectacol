@@ -29,6 +29,8 @@
 
 #include <libspectrum.h>
 
+void sound_register_startup( void );
+
 void sound_init( const char *device );
 void sound_pause( void );
 void sound_unpause( void );

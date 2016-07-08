@@ -1,5 +1,5 @@
 /* garray.c: Minimal replacement for GArray
-   Copyright (c) 2008 Philip Kendall
+   Copyright (c) 2008-2016 Philip Kendall
 
    $Id$
 
@@ -52,7 +52,7 @@ g_array_new( gboolean zero_terminated, gboolean clear, guint element_size )
   return array;
 }
 
-static int
+static void
 expand_array( GArray *array, guint len )
 {
   size_t new_size = array->len + len;
@@ -65,16 +65,24 @@ expand_array( GArray *array, guint len )
 
   array->data = new_data;
   array->allocated = new_size;
-
-  return 1;
 }
-  
+
+GArray*
+g_array_sized_new( gboolean zero_terminated, gboolean clear,
+                   guint element_size, guint reserved_size )
+{
+  GArray *array = g_array_new( zero_terminated, clear, element_size );
+
+  expand_array( array, reserved_size );
+
+  return array;
+}
 
 GArray*
 g_array_append_vals( GArray *array, gconstpointer data, guint len )
 {
   if( array->len + len > array->allocated )
-    if( !expand_array( array, len ) ) return array;
+    expand_array( array, len );
 
   memcpy( array->data + array->len * array->element_size,
 	  data,
@@ -89,9 +97,22 @@ GArray*
 g_array_set_size( GArray *array, guint length )
 {
   if( length > array->allocated )
-    if( !expand_array( array, length - array->allocated ) ) return array;
+    expand_array( array, length - array->allocated );
 
   array->len = length;
+
+  return array;
+}
+
+GArray*
+g_array_remove_index_fast( GArray *array, guint index )
+{
+  if( index < array->len - 1 )
+    memcpy( array->data + index * array->element_size,
+            array->data + (array->len - 1) * array->element_size,
+            array->element_size );
+
+  array->len--;
 
   return array;
 }

@@ -1,5 +1,5 @@
 /* spectrum.c: Generic Spectrum routines
-   Copyright (c) 1999-2013 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2016 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -32,6 +32,7 @@
 #include "display.h"
 #include "event.h"
 #include "keyboard.h"
+#include "infrastructure/startup_manager.h"
 #include "loader.h"
 #include "machine.h"
 #include "memory.h"
@@ -78,11 +79,25 @@ spectrum_frame_event_fn( libspectrum_dword last_tstates, int type,
   ui_error_frame();
 }
 
-void
-spectrum_init( void )
+static int
+spectrum_init( void *context )
 {
   spectrum_frame_event = event_register( spectrum_frame_event_fn,
 					 "End of frame" );
+
+  return 0;
+}
+
+void
+spectrum_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SPECTRUM, dependencies,
+                            ARRAY_SIZE( dependencies ), spectrum_init, NULL, 
+                            NULL );
 }
 
 int

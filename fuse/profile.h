@@ -1,5 +1,5 @@
 /* profile.h: Z80 profiler
-   Copyright (c) 2005 Philip Kendall
+   Copyright (c) 2005-2016 Philip Kendall
 
    $Id$
 
@@ -28,7 +28,7 @@
 
 extern int profile_active;
 
-void profile_init( void );
+void profile_register_startup( void );
 void profile_start( void );
 void profile_map( libspectrum_word pc );
 void profile_frame( libspectrum_dword frame_length );

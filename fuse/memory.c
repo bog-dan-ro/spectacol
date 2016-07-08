@@ -1,5 +1,5 @@
 /* memory.c: Routines for accessing memory
-   Copyright (c) 1999-2015 Philip Kendall
+   Copyright (c) 1999-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Fredrick Meunier
 
@@ -34,6 +34,7 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "machines/pentagon.h"
 #include "machines/spec128.h"
 #include "memory.h"
@@ -98,8 +99,8 @@ static module_info_t memory_module_info = {
 /* Set up the information about the normal page mappings.
    Memory contention and usable pages vary from machine to machine and must
    be set in the appropriate _reset function */
-void
-memory_init( void )
+static int
+memory_init( void *context )
 {
   size_t i, j;
 
@@ -134,6 +135,8 @@ memory_init( void )
     }
 
   module_register( &memory_module_info );
+
+  return 0;
 }
 
 static void
@@ -145,7 +148,7 @@ memory_pool_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
 }
 
 /* Tidy-up function called at end of emulation */
-void
+static void
 memory_end( void )
 {
   int i;
@@ -168,6 +171,15 @@ memory_end( void )
     g_array_free( memory_sources, TRUE );
     memory_sources = NULL;
   }
+}
+
+void
+memory_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_MEMORY, dependencies,
+                            ARRAY_SIZE( dependencies ), memory_init, NULL,
+                            memory_end );
 }
 
 int

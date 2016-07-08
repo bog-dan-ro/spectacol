@@ -34,6 +34,7 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "peripherals/printer.h"
@@ -159,8 +160,8 @@ static const periph_t plusd_periph = {
   /* .activate = */ plusd_activate,
 };
 
-void
-plusd_init( void )
+static int
+plusd_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -198,6 +199,28 @@ plusd_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
+}
+
+static void
+plusd_end( void )
+{
+  plusd_available = 0;
+  libspectrum_free( plusd_fdc );
+}
+
+void
+plusd_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_PLUSD, dependencies,
+                            ARRAY_SIZE( dependencies ), plusd_init, NULL,
+                            plusd_end );
 }
 
 static void
@@ -244,13 +267,6 @@ plusd_reset( int hard_reset )
   fdd_select( &plusd_drives[ 0 ], 1 );
   machine_current->memory_map();
 
-}
-
-void
-plusd_end( void )
-{
-  plusd_available = 0;
-  libspectrum_free( plusd_fdc );
 }
 
 static libspectrum_byte

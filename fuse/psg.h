@@ -1,5 +1,5 @@
 /* psg.h: recording AY chip output to .psg files
-   Copyright (c) 2003 Matthew Westcott, Philip Kendall
+   Copyright (c) 2003-2016 Matthew Westcott, Philip Kendall
 
    $Id$
 
@@ -31,7 +31,7 @@
 /* Are we currently recording a .psg file? */
 extern int psg_recording;
 
-void psg_init( void );
+void psg_register_startup( void );
 
 int psg_start_recording( const char *filename );
 int psg_stop_recording( void );
@@ -39,7 +39,5 @@ int psg_stop_recording( void );
 int psg_frame( void );
 
 int psg_write_register( libspectrum_byte reg, libspectrum_byte value );
-
-int psg_end( void );
 
 #endif			/* #ifndef FUSE_PSG_H */

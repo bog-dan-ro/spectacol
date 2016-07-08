@@ -45,6 +45,7 @@
 #include "compat.h"
 #include "debugger/debugger.h"
 #include "event.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "settings.h"
@@ -150,8 +151,8 @@ beta_select_drive( int i )
   }
 }
 
-void
-beta_init( void )
+static int
+beta_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -187,6 +188,8 @@ beta_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
 }
 
 static void
@@ -247,11 +250,24 @@ beta_reset( int hard_reset GCC_UNUSED )
 
 }
 
-void
+static void
 beta_end( void )
 {
   beta_available = 0;
   libspectrum_free( beta_fdc );
+}
+
+void
+beta_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_BETA, dependencies,
+                            ARRAY_SIZE( dependencies ), beta_init, NULL,
+                            beta_end );
 }
 
 libspectrum_byte

@@ -1,5 +1,5 @@
 /* memory.h: memory access routines
-   Copyright (c) 2003-2011 Philip Kendall
+   Copyright (c) 2003-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -117,8 +117,7 @@ extern int memory_current_screen;
 /* Which bits to look at when working out where the screen is */
 extern libspectrum_word memory_screen_mask;
 
-void memory_init( void );
-void memory_end( void );
+void memory_register_startup( void );
 libspectrum_byte *memory_pool_allocate( size_t length );
 libspectrum_byte *memory_pool_allocate_persistent( size_t length,
                                                    int persistent );

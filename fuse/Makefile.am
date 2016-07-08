@@ -170,6 +170,7 @@ include compat/Makefile.am
 include data/Makefile.am
 include debugger/Makefile.am
 include hacking/Makefile.am
+include infrastructure/Makefile.am
 include lib/Makefile.am
 include machines/Makefile.am
 include man/Makefile.am
