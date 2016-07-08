@@ -342,7 +342,6 @@ private:
     UiQuery m_queryResult = UiNo;
     int m_listIndex = -1;
     bool m_paused = false;
-    bool m_pausedAction = false;
 };
 
 extern FuseEmulator *g_fuseEmulator;

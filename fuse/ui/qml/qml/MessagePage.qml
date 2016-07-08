@@ -72,7 +72,7 @@ Rectangle {
 
         message.text = msg + text;
 
-        timer.interval = 5000 + 1000 * (text.length / 20)
+        timer.interval = 2500 * (text.length / 20)
 
         timer.restart();
         msgDialog.visible = true;

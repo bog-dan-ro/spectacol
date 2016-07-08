@@ -288,7 +288,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         if (!m_processInputEvents.load() || value != 1)
             return;
 
-        if ((!m_paused || !m_pausedAction) && fuse_emulation_paused && ui_widget_level == -1)
+        if (!m_paused && fuse_emulation_paused && ui_widget_level == -1)
             return;
 
         switch (button) {
@@ -315,13 +315,13 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
                 button == QGamepadManager::ButtonStart)
             return;
 
-        if ((!m_paused || !m_pausedAction) && fuse_emulation_paused && ui_widget_level == -1)
+        if (!m_paused && fuse_emulation_paused && ui_widget_level == -1)
             return;
 
         auto action = m_fuseSettings->gamepadAction(button);
         switch (action) {
         case FuseSettings::ToggleKeyboard:
-            if (m_paused || m_pausedAction) {
+            if (m_paused) {
                 showMessage(tr("Spectacol is paused"));
                 return;
             }
@@ -330,7 +330,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             QTimer::singleShot(0, this, [this]{ emit toggleOnScreenControls(Keyboard48K); });
             return;
         case FuseSettings::ToggleCursorJoystick:
-            if (m_paused || m_pausedAction) {
+            if (m_paused) {
                 showMessage(tr("Spectacol is paused"));
                 return;
             }
@@ -420,9 +420,6 @@ bool FuseEmulator::paused() const
 
 void FuseEmulator::setPaused(bool paused)
 {
-    if (m_paused)
-        togglePaused();
-
     pokeEvent([this, paused]{
         if (paused)
             fuse_emulation_pause();
@@ -1167,7 +1164,7 @@ void FuseEmulator::pokeMemory(int address, int page, int value)
 
 void FuseEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat)
 {
-    if (m_paused || m_pausedAction)
+    if (m_paused)
         return;
 
     if (ui_widget_level == -1 && autoRepeat)
@@ -1193,7 +1190,7 @@ void FuseEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat)
 
 void FuseEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat)
 {
-    if (m_paused || m_pausedAction)
+    if (m_paused)
         return;
 
     if (ui_widget_level == -1 && autoRepeat)
@@ -1287,7 +1284,7 @@ void FuseEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton butt
     auto action = m_fuseSettings->gamepadAction(button);
     switch (action) {
     case FuseSettings::JoystickFire:
-        if (m_paused || m_pausedAction) {
+        if (m_paused) {
             showMessage(tr("Spectacol is paused"));
             return;
         }
@@ -1309,21 +1306,21 @@ void FuseEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton butt
         togglePaused();
         break;
     case FuseSettings::QuickSaveSnapshot:
-        if (m_paused || m_pausedAction) {
+        if (m_paused) {
             showMessage(tr("Spectacol is paused"));
             return;
         }
         quickSaveSnapshot();
         break;
     case FuseSettings::QuickLoadSnapshot:
-        if (m_paused || m_pausedAction) {
+        if (m_paused) {
             showMessage(tr("Spectacol is paused"));
             return;
         }
         quickLoadSnapshot();
         break;
     default:
-        if (m_paused || m_pausedAction) {
+        if (m_paused) {
             showMessage(tr("Spectacol is paused"));
             return;
         }
@@ -1377,12 +1374,11 @@ void FuseEmulator::slowdown()
 
 void FuseEmulator::togglePaused()
 {
-    m_pausedAction = !m_pausedAction;
-
+    m_paused = !m_paused;
     pokeEvent([this]{
         if (!m_touchscreen || !m_showControlsIcons)
-            showMessage(m_pausedAction ? tr("Pause spectacol") : tr("Resume spectacol"));
-        if (m_pausedAction)
+            showMessage(m_paused ? tr("Pause spectacol") : tr("Resume spectacol"));
+        if (m_paused)
             fuse_emulation_pause();
         else
             fuse_emulation_unpause();
@@ -1390,7 +1386,6 @@ void FuseEmulator::togglePaused()
                 emit pausedChanged();
         });
     });
-
 }
 
 void FuseEmulator::debuggerTrap()
