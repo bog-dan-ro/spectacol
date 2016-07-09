@@ -17,7 +17,8 @@
           * Extend breakpoints on paging events to more peripherals: Beta 128,
             +D, Didaktik 80, DISCiPLE, Opus Discovery and SpeccyBoot (Sergio
             Baldoví).
-          * Split +D memory sources. Coalesce +D and DISCiPLE RAM pages (Sergio
+          * Split +D memory sources into RAM and ROM sections (Sergio Baldoví).
+          * Coalesce +D and DISCiPLE RAM pages so they show as 8K pages (Sergio
             Baldoví).
 
         * Miscellaneous improvements:
