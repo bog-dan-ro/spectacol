@@ -1,3 +1,11 @@
+2016-07-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * libspectrum 1.2.1 released.
+
+        * Add implementations of g_array_sized_new() and
+          g_array_remove_index_fast() for glib replacement (thanks, Sergio
+          Baldoví) (Philip Kendall).
+
 2016-06-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * libspectrum 1.2.0 released.

@@ -1075,3 +1075,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160622 make-perl.c,myglib/garray.c: add implementations of
          g_array_sized_new() and g_array_remove_index_fast(). (Thanks, Sergio)
          (Phil).
+20160709 ChangeLog,README,configure.ac,doc/{libspectrum.3,libspectrum.txt}: 
+         bump some version numbers for 1.2.1 release (Fred).
