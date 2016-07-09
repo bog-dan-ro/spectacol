@@ -5360,3 +5360,4 @@
 20160707 man/fuse.1: document unittests option (fixes bug #326) (Sergio).
 20160709 man/fuse.1,peripherals/disk/{disciple.c,plusd.c}: split +D memory
          sources. Coalesce +D and DISCiPLE RAM pages (patch #373) (Sergio).
+20160709 peripherals/joystick.c: remove stray semi-colon (Fred).

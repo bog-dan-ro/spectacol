@@ -280,7 +280,7 @@ joystick_from_snapshot( libspectrum_snap *snap )
       ui_error( UI_ERROR_INFO, "Ignoring unsupported joystick in snapshot %s", 
         libspectrum_joystick_name( libspectrum_snap_joystick_list( snap, i ) ));
       continue;
-    };
+    }
 
     if( settings_current.joystick_keyboard_output != fuse_type &&
         settings_current.joystick_1_output != fuse_type &&
