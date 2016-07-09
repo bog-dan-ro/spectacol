@@ -1,3 +1,32 @@
+2016-07-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.2.1 released.
+
+        * Emulation core improvements:
+          * Fix bugs when the detect loaders feature is being used (thanks, Lee
+            Tonks and windale) (Fredrick Meunier).
+
+        * Debugger improvements:
+          * Remove the need for "%" when accessing system variables (Philip
+            Kendall).
+          * Add Z80 registers as debugger variables (Philip Kendall).
+          * Expose last byte written to the ULA, tstates since interrupt,
+            primary and secondary memory control ports as debugger system
+            variables (Philip Kendall).
+          * Make breakpoints on events honour lifetime (Sergio Baldoví).
+          * Extend breakpoints on paging events to more peripherals: Beta 128,
+            +D, Didaktik 80, DISCiPLE, Opus Discovery and SpeccyBoot (Sergio
+            Baldoví).
+          * Split +D memory sources. Coalesce +D and DISCiPLE RAM pages (Sergio
+            Baldoví).
+
+        * Miscellaneous improvements:
+          * Update GNOME .desktop file (Alberto Garcia).
+          * Add an emulator module startup manager to automatically handle
+            dependency issues (Philip Kendall).
+          * Fix crash on widget UIs when hitting the close icon on the title bar
+            several times (Sergio Baldoví).
+
 2016-06-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.2.0 released.
