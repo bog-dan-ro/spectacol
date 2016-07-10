@@ -427,8 +427,7 @@ void FuseEmulator::setPaused(bool paused)
             fuse_emulation_unpause();
 
         callFunction([this, paused]{
-            if (paused != bool(fuse_emulation_paused))
-                emit pausedChanged();
+            emit pausedChanged();
         });
     });
 }
@@ -1383,7 +1382,7 @@ void FuseEmulator::togglePaused()
         else
             fuse_emulation_unpause();
         callFunction([this]{
-                emit pausedChanged();
+            emit pausedChanged();
         });
     });
 }
