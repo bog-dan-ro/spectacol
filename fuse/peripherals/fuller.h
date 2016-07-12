@@ -1,5 +1,5 @@
 /* fuller.h: Routines for handling the Fuller Box
-   Copyright (c) 2007-2011 Stuart Brady, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2007-2016 Stuart Brady, Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -28,6 +28,6 @@
 #ifndef FUSE_FULLER_H
 #define FUSE_FULLER_H
 
-void fuller_init( void );
+void fuller_register_startup( void );
 
 #endif				/* #ifndef FUSE_FULLER_H */

@@ -1,5 +1,5 @@
-/* usource.h: Routines for handling the Currah uSource interface
-   Copyright (c) 2007-2016 Stuart Brady, Philip Kendall
+/* z80_internals.h: routines which are internal to the Z80 core
+   Copyright (c) 2016 Philip Kendall
 
    $Id$
 
@@ -19,22 +19,13 @@
 
    Author contact information:
 
-   Philip: philip-fuse@shadowmagic.org.uk
-
-   Stuart: stuart.brady@gmail.com
+   E-mail: philip-fuse@shadowmagic.org.uk
 
 */
 
-#ifndef FUSE_USOURCE_H
-#define FUSE_USOURCE_H
+#ifndef FUSE_Z80_INTERNALS_H
+#define FUSE_Z80_INTERNALS_H
 
-extern int usource_active;
-extern int usource_available;
+void z80_debugger_variables_init();
 
-void usource_register_startup( void );
-
-void usource_toggle( void );
-
-int usource_unittest( void );
-
-#endif				/* #ifndef FUSE_USOURCE_H */
+#endif			/* #ifndef FUSE_Z80_INTERNALS */

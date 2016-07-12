@@ -1,5 +1,5 @@
 /* simpleide.h: Simple 8-bit IDE interface routines
-   Copyright (c) 2003-2004 Garry Lancaster
+   Copyright (c) 2003-2016 Garry Lancaster, Philip Kendall
 
    $Id$
 
@@ -26,8 +26,7 @@
 
 #include <libspectrum.h>
 
-int simpleide_init( void );
-int simpleide_end( void );
+void simpleide_register_startup( void );
 void simpleide_reset( int hard_reset );
 int simpleide_insert( const char *filename, libspectrum_ide_unit unit );
 int simpleide_commit( libspectrum_ide_unit unit );

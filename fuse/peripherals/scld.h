@@ -125,7 +125,7 @@ extern memory_page * timex_home[MEMORY_PAGES_IN_64K];
 extern memory_page timex_exrom[MEMORY_PAGES_IN_64K];
 extern memory_page timex_dock[MEMORY_PAGES_IN_64K];
 
-void scld_init( void );
+void scld_register_startup( void );
 
 void scld_dec_write( libspectrum_word port, libspectrum_byte b );
 void scld_hsr_write( libspectrum_word port, libspectrum_byte b );

@@ -33,7 +33,9 @@
 #include <string.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "disciple.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "peripherals/printer.h"
@@ -113,6 +115,10 @@ static module_info_t disciple_module_info = {
 
 };
 
+/* Debugger events */
+static const char * const event_type_string = "disciple";
+static int page_event, unpage_event;
+
 static libspectrum_byte disciple_control_register;
 
 void
@@ -121,6 +127,7 @@ disciple_page( void )
   disciple_active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+  debugger_event( page_event );
 }
 
 void
@@ -129,6 +136,7 @@ disciple_unpage( void )
   disciple_active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
+  debugger_event( unpage_event );
 }
 
 void
@@ -184,8 +192,8 @@ static const periph_t disciple_periph = {
   /* .activate = */ disciple_activate,
 };
 
-void
-disciple_init( void )
+static int
+disciple_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -229,6 +237,31 @@ disciple_init( void )
     disciple_ui_drives[ i ].fdd = &disciple_drives[ i ];
     ui_media_drive_register( &disciple_ui_drives[ i ] );
   }
+
+  periph_register_paging_events( event_type_string, &page_event,
+                                 &unpage_event );
+
+  return 0;
+}
+
+static void
+disciple_end( void )
+{
+  disciple_available = 0;
+  libspectrum_free( disciple_fdc );
+}
+
+void
+disciple_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_DISCIPLE, dependencies,
+                            ARRAY_SIZE( dependencies ), disciple_init, NULL,
+                            disciple_end );
 }
 
 static void
@@ -252,8 +285,11 @@ disciple_reset( int hard_reset )
     return;
   }
 
-  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
-    disciple_memory_map_romcs_ram[ i ].page = &disciple_ram[ i * MEMORY_PAGE_SIZE ];
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+    struct memory_page *page = &disciple_memory_map_romcs_ram[ i ];
+    page->page = &disciple_ram[ i * MEMORY_PAGE_SIZE ];
+    page->offset = i * MEMORY_PAGE_SIZE;
+  }
 
   machine_current->ram.romcs = 1;
 
@@ -288,13 +324,6 @@ disciple_inhibit( void )
 {
   /* TODO: check how this affects the hardware */
   disciple_inhibited = 1;
-}
-
-void
-disciple_end( void )
-{
-  disciple_available = 0;
-  libspectrum_free( disciple_fdc );
 }
 
 static libspectrum_byte

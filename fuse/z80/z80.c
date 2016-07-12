@@ -1,6 +1,8 @@
 /* z80.c: z80 supplementary functions
-   Copyright (c) 1999-2013 Philip Kendall
+   Copyright (c) 1999-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,8 +28,10 @@
 
 #include <libspectrum.h>
 
+#include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "memory.h"
 #include "module.h"
 #include "peripherals/scld.h"
@@ -37,6 +41,7 @@
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "z80.h"
+#include "z80_internals.h"
 #include "z80_macros.h"
 
 /* Whether a half carry occurred or not can be determined by looking at
@@ -97,8 +102,8 @@ z80_interrupt_event_fn( libspectrum_dword event_tstates, int type,
 }
 
 /* Set up the z80 emulation */
-void
-z80_init( void )
+int
+z80_init( void *context )
 {
   z80_init_tables();
 
@@ -108,6 +113,22 @@ z80_init( void )
   z80_nmos_iff2_event = event_register( NULL, "IFF2 update dummy event" );
 
   module_register( &z80_module_info );
+
+  z80_debugger_variables_init();
+
+  return 0;
+}
+
+void
+z80_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_Z80, dependencies,
+                            ARRAY_SIZE( dependencies ), z80_init, NULL, NULL );
 }
 
 /* Initalise the tables used to set flags */

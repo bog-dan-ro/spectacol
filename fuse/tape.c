@@ -1,5 +1,5 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2015 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 1999-2016 Philip Kendall, Darren Salt, Witold Filipczyk
    Copyright (c) 2015 UB880D
    Copyright (c) 2016 Fredrick Meunier
 
@@ -37,6 +37,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "loader.h"
 #include "machine.h"
 #include "memory.h"
@@ -79,6 +80,8 @@ int tape_edge_event;
 static int record_event;
 static int tape_mic_off_event;
 
+static libspectrum_dword next_tape_edge_tstates;
+
 /* Function prototypes */
 
 static int tape_autoload( libspectrum_machine hardware );
@@ -93,8 +96,8 @@ static void tape_stop_mic_off( libspectrum_dword last_tstates, int type,
 
 /* Function definitions */
 
-void
-tape_init( void )
+static int
+tape_init( void *context )
 {
   tape = libspectrum_tape_alloc( libspectrum_context );
 
@@ -114,13 +117,30 @@ tape_init( void )
      so we can't update the statusbar */
   tape_playing = 0;
   tape_microphone = 0;
+
+  next_tape_edge_tstates = 0;
+  
+  return 0;
 }
 
-void
+static void
 tape_end( void )
 {
   libspectrum_tape_free( tape );
   tape = NULL;
+}
+
+void
+tape_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_TAPE, dependencies,
+                            ARRAY_SIZE( dependencies ), tape_init, NULL,
+                            tape_end );
 }
 
 int tape_open( const char *filename, int autoload )
@@ -566,6 +586,8 @@ tape_play( int autoplay )
   tape_autoplay = autoplay;
   tape_microphone = 0;
 
+  event_remove_type( tape_mic_off_event );
+
   /* Update the status bar */
   ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_ACTIVE );
 
@@ -574,7 +596,8 @@ tape_play( int autoplay )
 
   loader_tape_play();
 
-  tape_next_edge( tstates, 0, NULL );
+  event_add( tstates + next_tape_edge_tstates, tape_edge_event );
+  next_tape_edge_tstates = 0;
 
   debugger_event( play_event );
 
@@ -600,7 +623,24 @@ int tape_toggle_play( int autoplay )
   }
 }
 
-int tape_stop( void )
+static void
+save_next_tape_edge( gpointer data, gpointer user_data )
+{
+  event_t *ptr = data;
+
+  if( ptr->type == tape_edge_event ) {
+    next_tape_edge_tstates = ptr->tstates - tstates;
+  }
+}
+
+static void
+tape_save_next_edge( void )
+{
+  event_foreach( save_next_tape_edge, NULL );
+}
+
+int
+tape_stop( void )
 {
   if( tape_playing ) {
 
@@ -615,6 +655,7 @@ int tape_stop( void )
       timer_estimate_reset();
     }
 
+    tape_save_next_edge();
     event_remove_type( tape_edge_event );
 
     /* Turn off any lingering MIC level in a second (some loaders like Alkatraz

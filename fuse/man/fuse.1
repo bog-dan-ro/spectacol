@@ -23,7 +23,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "6th June, 2016" "Version 1.2.0" "Emulators"
+.TH fuse 1 "6th June, 2016" "Version 1.2.1" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1679,6 +1679,16 @@ you can use
 to disable). Same as the Media Options dialog's
 .I "Use tape traps"
 option.
+.RE
+.PP
+.B \-\-unittests
+.RS
+This option runs a testing framework that automatically checks portions
+of code, comparing actual results with expected ones. It is meant to detect
+broken code before a release. There is not graphical mode, the program
+just ends with exit code 0 if all tests are good or prints error
+messages to stdout and ends with exit code greater than 0 if there are
+failed tests.
 .RE
 .PP
 .B \-\-usource
@@ -4299,51 +4309,93 @@ occurs and
 .I condition
 evaluates to true. The events which can be caught are:
 .PP
+beta128:page
+.br
+beta128:unpage
+.RS
+The Beta\ 128 interface is paged into or out of memory respectively.
+.RE
+.br
+didaktik80:page
+.br
+didaktik80:unpage
+.RS
+The Didaktik\ 80 interface is paged into or out of memory respectively.
+.RE
+.br
+disciple:page
+.br
+disciple:unpage
+.RS
+The DISCiPLE interface is paged into or out of memory respectively.
+.RE
+.br
 divide:page
 .br
 divide:unpage
 .RS
-The DivIDE interface is paged into or out of memory respectively
+The DivIDE interface is paged into or out of memory respectively.
 .RE
 .br
 if1:page
 .br
 if1:unpage
 .RS
-The Interface\ 1 shadow ROM is paged into or out of memory
+The Interface\ 1 shadow ROM is paged into or out of memory.
+.RE
+.br
+opus:page
+.br
+opus:unpage
+.RS
+The Opus Discovery is paged into or out of memory respectively.
+.RE
+.br
+plusd:page
+.br
+plusd:unpage
+.RS
+The +D interface is paged into or out of memory respectively.
 .RE
 .br
 rzx:end
 .RS
-An RZX recording finishes playing
+An RZX recording finishes playing.
+.RE
+.br
+speccyboot:page
+.br
+speccyboot:unpage
+.RS
+The SpeccyBoot interface is paged into or out of memory.
 .RE
 .br
 spectranet:page
 .br
 spectranet:unpage
 .RS
-The Spectranet interface is paged into or out of memory
+The Spectranet interface is paged into or out of memory.
 .RE
 .br
 tape:play
 .br
 tape:stop
 .RS
-The emulated tape starts or stops playing
+The emulated tape starts or stops playing.
 .RE
 .br
 zxatasp:page
 .br
 zxatasp:unpage
 .RS
-The ZXATASP interface is paged into or out of memory
+The ZXATASP interface is paged into or out of memory.
 .RE
 .br
 zxcf:page
 .br
 zxcf:unpage
 .RS
-The ZXCF interface is paged into or out of memory
+The ZXCF interface is paged into or out of memory.
 .RE
 .PP
 In all cases, the event can be specified as
@@ -4507,6 +4559,17 @@ to
 .IR value .
 .RE
 .PP
+se{t}
+.IR area : detail
+.I value
+.RS
+Set the value of the system variable
+.IR area : detail
+to
+.IR value .
+The available system variables are listed below.
+.RE
+.PP
 s{tep}
 .RS
 Equivalent to the
@@ -4549,7 +4612,8 @@ Other available sources are:
 .RI ` If2 "',"
 .RI ` "Opus RAM" "',"
 .RI ` "Opus ROM" "',"
-.RI ` PlusD "',"
+.RI ` "PlusD RAM" "',"
+.RI ` "PlusD ROM" "',"
 .RI ` SpeccyBoot "',"
 .RI ` Spectranet "',"
 .RI ` "Timex Dock" "',"
@@ -4570,14 +4634,62 @@ expects a breakpoint id, you can instead use a numeric expression,
 which uses a restricted version of C's syntax; exactly the same syntax
 is used for conditional breakpoints, with `0' being false and any
 other value being true. In numeric expressions, you can use integer
-constants (all calculations are done in integers), register names
-(which simply evaluate to the value of the register), debugger
-variables, parentheses, the standard four numeric operations (`+',
-`\-', `*' and `/'), the (non-)equality operators `==' and `!=', the
-comparison operators `>', `<', `>=' and `<=', bitwise and (`&'), or
+constants (all calculations are done in integers), system variables,
+debugger variables, parentheses, the standard four numeric operations
+(`+', `\-', `*' and `/'), the (non-)equality operators `==' and `!=',
+the comparison operators `>', `<', `>=' and `<=', bitwise and (`&'), or
 (`|') and exclusive or (`^') and logical and (`&&') and or (`||').
 Square brackets (`[' and `]') can be used to dereference a value; for
 example `[0x4000]' will give the value of the first byte of the screen.
+.PP
+System variables are specified via an
+.RI ` area : detail '
+syntax. The available system variables are:
+.PP
+ay:current
+.RS
+The current AY-3-8912 register.
+.RE
+ula:last
+.RS
+The last byte written to the ULA. Note that this variable can only
+be read, not written to.
+.RE
+ula:mem1ffd
+.RS
+The last byte written to memory control port used by the ZX Spectrum +2A/3;
+normally addressed at 0x1ffd, hence the name.
+.RE
+ula:mem7ffd
+.RS
+The last byte written to primary memory control port used by the ZX Spectrum
+128 and later; normally addressed at 0x7ffd, hence the name.
+.RE
+ula:tstates
+.RS
+The number of tstates since the last interrupt.
+.RE
+z80:
+.I register name
+.RS
+The value of the specified register. Both 8-bit registers and 16-bit
+register pairs are supported.
+.RE
+z80:im
+.RS
+The current interrupt mode of the Z80.
+.RE
+z80:iff1
+.br
+z80:iff2
+.RS
+1 if the specified interrupt flip-flop is currently set, or 0 if it is
+not set.
+.RE
+.PP
+The Z80 registers, interrupt mode and interrupt flip-flops can also be
+specified without the `z80:' prefix, but this syntax is deprecated and
+will be removed in Fuse 1.4.
 .\"
 .\"------------------------------------------------------------------
 .\"

@@ -56,7 +56,8 @@ typedef struct {
 
 } processor;
 
-void z80_init( void );
+void z80_register_startup( void );
+int z80_init( void *context );
 void z80_reset( int hard_reset );
 
 int z80_interrupt( void );

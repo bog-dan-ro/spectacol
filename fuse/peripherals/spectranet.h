@@ -1,5 +1,5 @@
 /* spectranet.h: Spectranet emulation
-   Copyright (c) 2011-2015 Philip Kendall
+   Copyright (c) 2011-2016 Philip Kendall
 
    $Id$
 
@@ -26,8 +26,7 @@
 #ifndef FUSE_SPECTRANET_H
 #define FUSE_SPECTRANET_H
 
-void spectranet_init( void );
-void spectranet_end( void );
+void spectranet_register_startup( void );
 void spectranet_page( int via_io );
 void spectranet_nmi( void );
 void spectranet_unpage( void );

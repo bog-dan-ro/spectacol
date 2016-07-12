@@ -1,3 +1,11 @@
+2016-07-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * libspectrum 1.2.1 released.
+
+        * Add implementations of g_array_sized_new() and
+          g_array_remove_index_fast() for glib replacement (thanks, Sergio
+          Baldoví) (Philip Kendall).
+
 2016-06-06  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * libspectrum 1.2.0 released.
@@ -104,7 +112,15 @@
           * Remove various unused variables, initialisations etc (Fredrick
             Meunier).
 
-2008-11-30  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2009-01-14  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+	* libspectrum 0.5.0.1 released
+
+	* Loosen signature checks for .dsk files to allow files not strictly
+	  compliant with the specification to work (Gergely Szasz; thanks,
+	  zx81 and Simon Owen).
+
+2008-12-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * libspectrum 0.5.0 released.
 

@@ -260,10 +260,13 @@ int main(void)
 "\n"
 "WIN32_DLL GArray* g_array_new( gboolean zero_terminated, gboolean clear,\n"
 "		      guint element_size );\n"
+"WIN32_DLL GArray* g_array_sized_new( gboolean zero_terminated, gboolean clear,\n"
+"                   guint element_size, guint reserved_size );\n"
 "#define g_array_append_val(a,v) g_array_append_vals( a, &(v), 1 );\n"
 "WIN32_DLL GArray* g_array_append_vals( GArray *array, gconstpointer data, guint len );\n"
 "#define g_array_index(a,t,i) (*(((t*)a->data)+i))\n"
 "WIN32_DLL GArray* g_array_set_size( GArray *array, guint length );\n"
+"WIN32_DLL GArray* g_array_remove_index_fast( GArray *array, guint index );\n"
 "WIN32_DLL gchar* g_array_free( GArray *array, gboolean free_segment );\n"
 "\n" );
   if( sizeof( void* ) == sizeof( int ) ) {

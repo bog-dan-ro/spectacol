@@ -1,5 +1,5 @@
 /* machines_periph.h: various machine-specific peripherals
-   Copyright (c) 2011 Philip Kendall
+   Copyright (c) 2011-2016 Philip Kendall
 
    $Id$
 
@@ -26,7 +26,7 @@
 #ifndef FUSE_MACHINES_PERIPH_H
 #define FUSE_MACHINES_PERIPH_H
 
-void machines_periph_init( void );
+void machines_periph_register_startup( void );
 
 void machines_periph_48( void );
 void machines_periph_128( void );

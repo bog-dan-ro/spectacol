@@ -1,5 +1,5 @@
 /* debugger.c: Fuse's monitor/debugger
-   Copyright (c) 2002-2011 Philip Kendall
+   Copyright (c) 2002-2016 Philip Kendall
 
    $Id$
 
@@ -29,6 +29,7 @@
 #include "debugger_internals.h"
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "memory.h"
 #include "mempool.h"
 #include "periph.h"
@@ -48,8 +49,11 @@ int debugger_memory_pool;
 /* The event type used for time breakpoints */
 int debugger_breakpoint_event;
 
-void
-debugger_init( void )
+/* The system variable type used for Z80 registers */
+const char *debugger_z80_system_variable_type = "z80";
+
+static int
+debugger_init( void *context )
 {
   debugger_breakpoints = NULL;
   debugger_output_base = 16;
@@ -59,8 +63,11 @@ debugger_init( void )
   debugger_breakpoint_event = event_register( debugger_breakpoint_time_fn, "Breakpoint" );
 
   debugger_event_init();
+  debugger_system_variable_init();
   debugger_variable_init();
   debugger_reset();
+
+  return 0;
 }
 
 void
@@ -70,14 +77,26 @@ debugger_reset( void )
   debugger_mode = DEBUGGER_MODE_INACTIVE;
 }
 
-int
+static void
 debugger_end( void )
 {
   debugger_breakpoint_remove_all();
   debugger_variable_end();
+  debugger_system_variable_end();
   debugger_event_end();
+}
 
-  return 0;
+void
+debugger_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_MEMPOOL,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_DEBUGGER, dependencies,
+                            ARRAY_SIZE( dependencies ), debugger_init, NULL,
+                            debugger_end );
 }
 
 /* Activate the debugger */

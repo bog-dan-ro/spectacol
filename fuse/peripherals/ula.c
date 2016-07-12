@@ -1,5 +1,5 @@
 /* ula.c: ULA routines
-   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2016 Philip Kendall, Darren Salt
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Fredrick Meunier
 
@@ -30,9 +30,13 @@
 #include <libspectrum.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "keyboard.h"
+#include "infrastructure/startup_manager.h"
 #include "loader.h"
 #include "machine.h"
+#include "machines/spec128.h"
+#include "machines/specplus3.h"
 #include "module.h"
 #include "periph.h"
 #include "settings.h"
@@ -90,15 +94,88 @@ static const periph_t ula_periph_full_decode = {
   /* .activate = */ NULL,
 };
 
-void
-ula_init( void )
+/* Debugger system variables */
+static const char * const debugger_type_string = "ula";
+static const char * const last_byte_detail_string = "last";
+static const char * const tstates_detail_string = "tstates";
+static const char * const mem7ffd_detail_string = "mem7ffd";
+static const char * const mem1ffd_detail_string = "mem1ffd";
+
+/* Adapter just to get the return type to be what the debugger is expecting */
+static libspectrum_dword
+get_last_byte( void )
+{
+  return ula_last_byte();
+}
+
+static libspectrum_dword
+get_tstates( void )
+{
+  return tstates;
+}
+
+static void
+set_tstates( libspectrum_dword value )
+{
+  tstates = value;
+}
+
+static libspectrum_dword
+get_7ffd( void )
+{
+  return machine_current->ram.last_byte;
+}
+
+static void
+set_7ffd( libspectrum_dword value )
+{
+  spec128_memoryport_write( 0, value );
+}
+
+static libspectrum_dword
+get_1ffd( void )
+{
+  return machine_current->ram.last_byte2;
+}
+
+static void
+set_1ffd( libspectrum_dword value )
+{
+  specplus3_memoryport2_write( 0, value );
+}
+
+static int
+ula_init( void *context )
 {
   module_register( &ula_module_info );
 
   periph_register( PERIPH_TYPE_ULA, &ula_periph );
   periph_register( PERIPH_TYPE_ULA_FULL_DECODE, &ula_periph_full_decode );
 
+  debugger_system_variable_register(
+    debugger_type_string, last_byte_detail_string, get_last_byte, NULL );
+  debugger_system_variable_register(
+    debugger_type_string, tstates_detail_string, get_tstates, set_tstates );
+  debugger_system_variable_register(
+    debugger_type_string, mem7ffd_detail_string, get_7ffd, set_7ffd );
+  debugger_system_variable_register(
+    debugger_type_string, mem1ffd_detail_string, get_1ffd, set_1ffd );
+
   ula_default_value = 0xff;
+
+  return 0;
+}
+
+void
+ula_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_ULA, dependencies,
+                            ARRAY_SIZE( dependencies ), ula_init, NULL,
+                            NULL );
 }
 
 static libspectrum_byte

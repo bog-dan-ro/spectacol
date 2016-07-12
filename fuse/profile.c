@@ -1,5 +1,5 @@
 /* profile.c: Z80 profiler
-   Copyright (c) 2005 Philip Kendall
+   Copyright (c) 2005-2016 Philip Kendall
 
    $Id$
 
@@ -31,6 +31,7 @@
 #include <libspectrum.h>
 
 #include "event.h"
+#include "infrastructure/startup_manager.h"
 #include "fuse.h"
 #include "module.h"
 #include "profile.h"
@@ -55,10 +56,21 @@ static module_info_t profile_module_info = {
 
 };
 
-void
-profile_init( void )
+static int
+profile_init( void *context )
 {
   module_register( &profile_module_info );
+
+  return 0;
+}
+
+void
+profile_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_PROFILE, dependencies,
+                            ARRAY_SIZE( dependencies ), profile_init, NULL,
+                            NULL );
 }
 
 static void

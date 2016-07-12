@@ -96,7 +96,7 @@ extern int machine_count;		/* of which there are this many */
 
 extern fuse_machine_info *machine_current;	/* The currently selected machine */
 
-int machine_init_machines( void );
+void machine_register_startup( void );
 
 int machine_select( libspectrum_machine type );
 int machine_select_id( const char *id );
@@ -110,7 +110,6 @@ int machine_load_rom( int page_num, const char *filename, const char *fallback,
   size_t expected_length );
 
 int machine_reset( int hard_reset );
-int machine_end( void );
 
 #ifdef __cplusplus
 };

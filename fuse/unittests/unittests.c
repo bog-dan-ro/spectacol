@@ -33,6 +33,7 @@
 #include "mempool.h"
 #include "periph.h"
 #include "peripherals/disk/beta.h"
+#include "peripherals/disk/didaktik.h"
 #include "peripherals/disk/disciple.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/disk/plusd.h"
@@ -758,6 +759,7 @@ paging_test( void )
     r += usource_unittest();
 
     r += beta_unittest();
+    r += didaktik80_unittest();
     r += disciple_unittest();
     r += opus_unittest();
     r += plusd_unittest();

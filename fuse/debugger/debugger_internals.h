@@ -1,5 +1,5 @@
 /* debugger_internals.h: The internals of Fuse's monitor/debugger
-   Copyright (c) 2002-2011 Philip Kendall
+   Copyright (c) 2002-2016 Philip Kendall
 
    $Id$
 
@@ -34,6 +34,9 @@ extern int debugger_memory_pool;
 /* The event type used to trigger time breakpoints */
 extern int debugger_breakpoint_event;
 
+/* The system variable type used for Z80 registers */
+extern const char *debugger_z80_system_variable_type;
+
 void debugger_breakpoint_time_fn( libspectrum_dword tstates, int type, void *user_data );
 
 int debugger_breakpoint_remove( size_t id );
@@ -49,10 +52,7 @@ int debugger_breakpoint_trigger( debugger_breakpoint *bp );
 int debugger_poke( libspectrum_word address, libspectrum_byte value );
 int debugger_port_write( libspectrum_word address, libspectrum_byte value );
 
-int debugger_register_hash( const char *reg );
-libspectrum_word debugger_register_get( int which );
-void debugger_register_set( int which, libspectrum_word value );
-const char* debugger_register_text( int which );
+void debugger_register_set( const char *which, libspectrum_word value );
 
 void debugger_exit_emulator( void );
 
@@ -85,12 +85,15 @@ typedef enum debugger_token {
 
 debugger_expression*
 debugger_expression_new_number( libspectrum_dword number, int pool );
-debugger_expression* debugger_expression_new_register( int which, int pool );
+debugger_expression* debugger_expression_new_register( const char *which, int pool );
 debugger_expression*
 debugger_expression_new_unaryop( int operation, debugger_expression *operand, int pool );
 debugger_expression*
 debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
 				  debugger_expression *operand2, int pool );
+debugger_expression*
+debugger_expression_new_system_variable( const char *type, const char *detail,
+                                         int pool );
 debugger_expression*
 debugger_expression_new_variable( const char *name, int pool );
 
@@ -105,6 +108,17 @@ debugger_expression_evaluate( debugger_expression* expression );
 void debugger_event_init( void );
 int debugger_event_is_registered( const char *type, const char *detail );
 void debugger_event_end( void );
+
+/* System variables handling */
+
+void debugger_system_variable_init( void );
+void debugger_system_variable_end( void );
+int debugger_system_variable_find( const char *type, const char *detail );
+libspectrum_dword debugger_system_variable_get( int system_variable );
+void debugger_system_variable_set( const char *type, const char *detail,
+                                   libspectrum_dword value );
+void debugger_system_variable_text( char *buffer, size_t length,
+                                    int system_variable );
 
 /* Variables handling */
 

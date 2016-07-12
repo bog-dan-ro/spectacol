@@ -1,5 +1,5 @@
 /* if1.c: Interface 1 handling routines
-   Copyright (c) 2004-2015 Gergely Szasz, Philip Kendall
+   Copyright (c) 2004-2016 Gergely Szasz, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -38,6 +38,7 @@
 #include "debugger/debugger.h"
 #include "fuse.h"
 #include "if1.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -303,8 +304,8 @@ update_menu( enum if1_menu_item what )
   }
 }
 
-void
-if1_init( void )
+static int
+if1_init( void *context )
 {
   int m, i;
 
@@ -352,9 +353,11 @@ if1_init( void )
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
   periph_register_paging_events( event_type_string, &page_event,
 				 &unpage_event );
+
+  return 0;
 }
 
-libspectrum_error
+static void
 if1_end( void )
 {
   int m;
@@ -362,10 +365,21 @@ if1_end( void )
   for( m = 0; m < 8; m++ ) {
     libspectrum_error error =
       libspectrum_microdrive_free( microdrive[m].cartridge );
-    if( error ) return error;
+    if( error ) return;
   }
+}
 
-  return LIBSPECTRUM_ERROR_NONE;
+void
+if1_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_IF1, dependencies,
+                            ARRAY_SIZE( dependencies ), if1_init, NULL,
+                            if1_end );
 }
 
 void

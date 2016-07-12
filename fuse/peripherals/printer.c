@@ -1,5 +1,5 @@
 /* printer.c: Printer support
-   Copyright (c) 2001-2004 Ian Collier, Russell Marks, Philip Kendall
+   Copyright (c) 2001-2016 Ian Collier, Russell Marks, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2015 Fredrick Meunier
    Copyright (c) 2016 Sergio Baldoví
@@ -37,6 +37,7 @@
 #include <ctype.h>
 
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -708,21 +709,35 @@ if(!settings_current.printer)
 parallel_data=b;
 }
 
-
-void printer_init(void)
+static int
+printer_init( void *context )
 {
-printer_graphics_enabled=printer_text_enabled=1;
-printer_graphics_file=printer_text_file=NULL;
+  printer_graphics_enabled=printer_text_enabled = 1;
+  printer_graphics_file=printer_text_file = NULL;
 
-printer_zxp_init();
-printer_text_init();
+  printer_zxp_init();
+  printer_text_init();
+
+  return 0;
 }
 
-
-void printer_end(void)
+static void
+printer_end( void )
 {
-printer_text_end();
-printer_zxp_end();
+  printer_text_end();
+  printer_zxp_end();
+}
+
+void
+printer_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_MACHINE,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_PRINTER, dependencies,
+                            ARRAY_SIZE( dependencies ), printer_init, NULL,
+                            printer_end );
 }
 
 static void zx_printer_snapshot_enabled( libspectrum_snap *snap )
