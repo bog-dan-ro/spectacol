@@ -64,7 +64,7 @@ struct _GHashTable
 static GHashNode *node_free_list = NULL;
 static GHashNode *node_allocated_list = NULL;
 
-guint
+static guint
 g_direct_hash (gconstpointer v)
 {
   return GPOINTER_TO_UINT (v);

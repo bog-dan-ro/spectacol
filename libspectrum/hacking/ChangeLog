@@ -1083,3 +1083,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (Fred).
 20160717 ChangeLog,README,configure.ac,doc/libspectrum.3: update release dates
          and mark this release as 1.2.1 (Fred).
+20160719 myglib/ghash.c: mark g_direct_hash() as static as it isn't used outside
+         of ghash.c and isn't in a header (Fred).
