@@ -5364,3 +5364,7 @@
 20160709 ChangeLog,README,configure.ac,man/fuse.1: bump versions to 1.2.1
          (Fred).
 20160709 ChangeLog: tweak +D/DISCiPLE ROM/RAM change description (Fred).
+20160710 README,configure.ac,man/fuse.1: bump some dates and mark as 1.2.1-pre1
+         (Fred).
+20160717 ChangeLog,README,configure.ac,man/fuse.1: update release dates and mark
+         this release as 1.2.1 (Fred).
