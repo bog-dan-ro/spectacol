@@ -136,7 +136,7 @@ debugger_breakpoint_add_port(
 
 int
 debugger_breakpoint_add_time(
-  debugger_breakpoint_type type, libspectrum_dword tstates,
+  debugger_breakpoint_type type, libspectrum_dword breakpoint_tstates,
   size_t ignore, debugger_breakpoint_life life, debugger_expression *condition
 );
 

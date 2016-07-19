@@ -5370,3 +5370,5 @@
          this release as 1.2.1 (Fred).
 20160719 z80/{z80_debugger_variables.c,z80_internals.h}: include header for
          z80_debugger_variables_init() definition (Fred).
+20160719 debugger/breakpoint.[ch]: rename local argument shadowing global
+         variable (Fred).
