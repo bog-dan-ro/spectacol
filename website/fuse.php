@@ -104,7 +104,7 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <p>A native port to OS X by <a href="mailto:fredm@spamcop.net">Fredrick Meunier</a> is available on its own SourceForge project <a href="http://fuse-for-macosx.sourceforge.net/">here</a>, as well as a Spotlight importer for Mac OS X 10.4 Tiger users. Alternatively, the original version of Fuse will compile on OS X 10.3 (Panther) or later.</p>
 
   <h3>Windows</h3>
-  <p>A port to Windows of 1.2.0 by Sergio Baldovi is available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0-win32-setup.exe/download">here</a>, and the utilities are available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0-win32.zip/download">here</a>.</p>
+  <p>A port to Windows of 1.2.1 by Sergio Baldovi is available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.1/fuse-1.2.1-win32-setup.exe/download">here</a>, and the utilities are available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0-win32.zip/download">here</a>.</p>
 
   <h3>Android</h3>
   <p>BogDan Vatra has ported Fuse 1.1.1 to Android OS, which could run on smartphones, tablets and TVs. Sources are available from <a href="https://github.com/bog-dan-ro/spectacol">GitHub</a> and binaries from <a href="https://play.google.com/store/apps/details?id=eu.licentia.games.spectacol">Google Play</a>.</p>
@@ -151,7 +151,7 @@ fuse_section ("Source", "Source", <<<END_SECTION
   <ul>
    <li>First, check the requirements below and ensure all the libraries you want/need are installed.</li>
    <li>Secondly, install <a href="libspectrum.php">libspectrum</a>.</li>
-   <li>Get the <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz/download">source code</a> (<a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz.sig/download">PGP signature</a>).</li>
+   <li>Get the <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.1/fuse-1.2.1.tar.gz/download">source code</a> (<a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.1/fuse-1.2.1.tar.gz.sig/download">PGP signature</a>).</li>
    <li>The utilities which were previously packaged with Fuse are now available in their <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz/download">own package</a> (<a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz.sig/download">PGP signature</a>). Note that
 you'll still need <a href="libspectrum.php">libspectrum</a> installed to run these.</li>
    <!--
@@ -192,6 +192,14 @@ END_SECTION
 #<!-- ======================================================= -->
 
 fuse_section (NULL, "What's new?", <<<END_SECTION
+  <h3>1.2.1</h3>
+  <ul>
+    <li>Add Z80 registers, last byte written to the ULA, tstates since interrupt and the primary and secondary memory control ports as debugger variables.</li>
+    <li>Extend breakpoints on paging events to more peripherals: Beta 128, +D, Didaktik 80, DISCiPLE, Opus Discovery and SpeccyBoot.</li>
+    <li>Fix crash on widget UIs when hitting the close icon on the title bar several times.</li>
+    <li>Fix loading bugs when the detect loaders feature is being used.</li>
+  </ul>
+
   <h3>1.2.0</h3>
   <ul>
     <li>Emulation of the Currah &mu;Source and Didaktik 80/40 interfaces.</li>
