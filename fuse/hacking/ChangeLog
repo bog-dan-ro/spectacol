@@ -5178,7 +5178,7 @@
 20160526 debugger/commandl.l,man/fuse.1: allow strings with escaped spaces in
          the debugger (bug #337) (Sergio).
 20160528 ChangeLog: add even more recent changes (Fred).
-20160528 deugger/system_variable.c: include file (thanks, Fred) (Phil).
+20160528 debugger/system_variable.c: include file (thanks, Fred) (Phil).
 20160529 Makefile.am,lib/Makefile.am,z80/Makefile.am: distribute
          m4/ax_create_stdint_h.m4,lib/tests/success.d80.bz2 and z80/tests/README
          (Sergio).
@@ -5368,3 +5368,5 @@
          (Fred).
 20160717 ChangeLog,README,configure.ac,man/fuse.1: update release dates and mark
          this release as 1.2.1 (Fred).
+20160719 z80/{z80_debugger_variables.c,z80_internals.h}: include header for
+         z80_debugger_variables_init() definition (Fred).

@@ -29,6 +29,7 @@
 
 #include "debugger/debugger.h"
 #include "z80.h"
+#include "z80_internals.h"
 #include "z80_macros.h"
 
 static const char * const debugger_type_string = "z80";
