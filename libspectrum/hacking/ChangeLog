@@ -1073,7 +1073,13 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160606 ChangeLog,README,configure.ac,doc/libspectrum.3: update release dates
          and mark this release as 1.2.0 (Fred).
 20160622 make-perl.c,myglib/garray.c: add implementations of
-         g_array_sized_new() and g_array_remove_index_fast(). (Thanks, Sergio)
+         g_array_sized_new() and g_array_remove_index_fast() (thanks, Sergio)
          (Phil).
 20160709 ChangeLog,README,configure.ac,doc/{libspectrum.3,libspectrum.txt}: 
          bump some version numbers for 1.2.1 release (Fred).
+20160710 README,Makefile.am,configure.ac,doc/libspectrum.3: bump release dates,
+         mark release as 1.2.1-pre1 and bump libtool version (Fred).
+20160712 Makefile.am: add comments on assigning libtool version (thanks, Sergio)
+         (Fred).
+20160717 ChangeLog,README,configure.ac,doc/libspectrum.3: update release dates
+         and mark this release as 1.2.1 (Fred).
