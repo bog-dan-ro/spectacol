@@ -67,7 +67,7 @@ static GHashNode *node_allocated_list = NULL;
 
 static libspectrum_mutex_t hash_mutex = NULL;
 
-guint
+static guint
 g_direct_hash (gconstpointer v)
 {
   return GPOINTER_TO_UINT (v);

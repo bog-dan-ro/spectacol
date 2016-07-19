@@ -82,17 +82,17 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Unix</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
-   <li><a href="https://www.archlinux.org/">Arch Linux</a> users can get version 1.1.1 from AUR as a <a href="https://aur.archlinux.org/packages/fuse-emulator/">PKGBUILD</a>.</li>
-   <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.1.1 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available.</li>
-   <li><a href="http://fedoraproject.org/">Fedora</a> has <a href="https://apps.fedoraproject.org/packages/fuse-emulator/">packages</a> of 1.1.1 available by Lucian Langa.</li>
-   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.1.1 available as <a href="http://svnweb.freebsd.org/ports/head/emulators/fuse/">emulators/fuse</a>.</li>
+   <li><a href="https://www.archlinux.org/">Arch Linux</a> users can get version 1.2.0 from AUR as a <a href="https://aur.archlinux.org/packages/fuse-emulator/">PKGBUILD</a>.</li>
+   <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.2.0 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available.</li>
+   <li><a href="http://fedoraproject.org/">Fedora</a> has <a href="https://apps.fedoraproject.org/packages/fuse-emulator/">packages</a> of 1.2.0 available by Lucian Langa.</li>
+   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.2.0 available as <a href="http://svnweb.freebsd.org/ports/head/emulators/fuse/">emulators/fuse</a>.</li>
    <li><a href="https://www.gentoo.org/">Gentoo</a> users have an <a href="https://packages.gentoo.org/packages/app-emulation/fuse">ebuild</a> of 1.1.1 available.</li>
    <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 1.1.1 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-emulator/">emulators/fuse-emulator</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-emulator-utils/">emulators/fuse-emulator-utils</a>.</li>
    <li><a href="http://www.openbsd.org/">OpenBSD</a> users have version 1.1.1 available as the fuse and fuse-utils package, with thanks to Anthony J. Bentley.</li>
-   <li><a href="https://www.opensuse.org/">openSUSE</a> users have version 1.1.1 as the <a href="https://build.opensuse.org/package/show/Emulators/Fuse">Fuse</a> package from Emulators repository.</li>
-   <li>The <a href="https://www.pld-linux.org/">Polish Linux Distribution</a> has packages of <a href="http://sophie.zarb.org/search?search=fuse-gtk&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">Fuse</a> 1.1.1 and the <a href="http://sophie.zarb.org/search?search=fuse-utils&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">utilities</a>.</li>
+   <li><a href="https://www.opensuse.org/">openSUSE</a> users have version 1.2.0 as the <a href="https://build.opensuse.org/package/show/Emulators/Fuse">Fuse</a> package from Emulators repository.</li>
+   <li>The <a href="https://www.pld-linux.org/">Polish Linux Distribution</a> has packages of <a href="http://sophie.zarb.org/search?search=fuse-gtk&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">Fuse</a> 1.2.0 and the <a href="http://sophie.zarb.org/search?search=fuse-utils&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">utilities</a>.</li>
    <li><a href="http://www.slackware.com/">Slackware</a> users can get version 1.1.1 from SlackBuilds as a <a href="http://slackbuilds.org/result/?search=fuse-emulator">build script</a>.</li>
-   <li><a href="http://www.ubuntu.com/">Ubuntu</a> has <a href="https://launchpad.net/ubuntu/+source/fuse-emulator">packages</a> of 1.1.1 available by Alberto Garcia.</li>
+   <li><a href="http://www.ubuntu.com/">Ubuntu</a> has <a href="https://launchpad.net/ubuntu/+source/fuse-emulator">packages</a> of 1.2.0 available by Alberto Garcia.</li>
   </ul>
   <p>Packages of older versions of Fuse are also available for some other distributions:</p>
   <ul>
@@ -104,10 +104,10 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <p>A native port to OS X by <a href="mailto:fredm@spamcop.net">Fredrick Meunier</a> is available on its own SourceForge project <a href="http://fuse-for-macosx.sourceforge.net/">here</a>, as well as a Spotlight importer for Mac OS X 10.4 Tiger users. Alternatively, the original version of Fuse will compile on OS X 10.3 (Panther) or later.</p>
 
   <h3>Windows</h3>
-  <p>A port to Windows of 1.2.0 by Sergio Baldovi is available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0-win32-setup.exe/download">here</a>, and the utilities are available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0-win32.zip/download">here</a>.</p>
+  <p>A port to Windows of 1.2.1 by Sergio Baldovi is available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.1/fuse-1.2.1-win32-setup.exe/download">here</a>, and the utilities are available <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0-win32.zip/download">here</a>.</p>
 
   <h3>Android</h3>
-  <p>BogDan Vatra has ported Fuse 1.1.1 to Android OS, which could run on smartphones, tablets and TVs. Sources are available from <a href="https://github.com/bog-dan-ro/spectacol">GitHub</a> and binaries from <a href="https://play.google.com/store/apps/details?id=eu.licentia.games.spectacol">Google Play</a>.</p>
+  <p>BogDan Vatra has ported Fuse 1.2.0 to Android OS, which could run on smartphones, tablets and TVs. Sources are available from <a href="https://github.com/bog-dan-ro/spectacol/releases/tag/v2.1.1">GitHub</a> and binaries from <a href="https://play.google.com/store/apps/details?id=eu.licentia.games.spectacol">Google Play</a>.</p>
 
   <h3>Haiku</h3>
   <p>Adrien Destugues has ported Fuse 1.1.1 to Haiku, available from haikuports as <a href="https://github.com/haikuports/haikuports/tree/master/app-emulation/fuse">app-emulation/fuse</a> and <a href="https://github.com/haikuports/haikuports/tree/master/app-emulation/fuse-utils">app-emulation/fuse-utils</a>.</p>
@@ -151,7 +151,7 @@ fuse_section ("Source", "Source", <<<END_SECTION
   <ul>
    <li>First, check the requirements below and ensure all the libraries you want/need are installed.</li>
    <li>Secondly, install <a href="libspectrum.php">libspectrum</a>.</li>
-   <li>Get the <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz/download">source code</a> (<a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.0/fuse-1.2.0.tar.gz.sig/download">PGP signature</a>).</li>
+   <li>Get the <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.1/fuse-1.2.1.tar.gz/download">source code</a> (<a href="https://sourceforge.net/projects/fuse-emulator/files/fuse/1.2.1/fuse-1.2.1.tar.gz.sig/download">PGP signature</a>).</li>
    <li>The utilities which were previously packaged with Fuse are now available in their <a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz/download">own package</a> (<a href="https://sourceforge.net/projects/fuse-emulator/files/fuse-utils/1.2.0/fuse-utils-1.2.0.tar.gz.sig/download">PGP signature</a>). Note that
 you'll still need <a href="libspectrum.php">libspectrum</a> installed to run these.</li>
    <!--
@@ -192,6 +192,14 @@ END_SECTION
 #<!-- ======================================================= -->
 
 fuse_section (NULL, "What's new?", <<<END_SECTION
+  <h3>1.2.1</h3>
+  <ul>
+    <li>Add Z80 registers, last byte written to the ULA, tstates since interrupt and the primary and secondary memory control ports as debugger variables.</li>
+    <li>Extend breakpoints on paging events to more peripherals: Beta 128, +D, Didaktik 80, DISCiPLE, Opus Discovery and SpeccyBoot.</li>
+    <li>Fix crash on widget UIs when hitting the close icon on the title bar several times.</li>
+    <li>Fix loading bugs when the detect loaders feature is being used.</li>
+  </ul>
+
   <h3>1.2.0</h3>
   <ul>
     <li>Emulation of the Currah &mu;Source and Didaktik 80/40 interfaces.</li>
