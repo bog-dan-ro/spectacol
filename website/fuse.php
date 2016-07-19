@@ -82,17 +82,17 @@ fuse_section ("Download", "Downloads", <<<END_SECTION
   <h3>Unix</h3>
   <p>Packages are available for some Unix distributions; in general, any problems which are specific to the packages should be sent to the package maintainer.</p>
   <ul>
-   <li><a href="https://www.archlinux.org/">Arch Linux</a> users can get version 1.1.1 from AUR as a <a href="https://aur.archlinux.org/packages/fuse-emulator/">PKGBUILD</a>.</li>
-   <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.1.1 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available.</li>
-   <li><a href="http://fedoraproject.org/">Fedora</a> has <a href="https://apps.fedoraproject.org/packages/fuse-emulator/">packages</a> of 1.1.1 available by Lucian Langa.</li>
-   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.1.1 available as <a href="http://svnweb.freebsd.org/ports/head/emulators/fuse/">emulators/fuse</a>.</li>
+   <li><a href="https://www.archlinux.org/">Arch Linux</a> users can get version 1.2.0 from AUR as a <a href="https://aur.archlinux.org/packages/fuse-emulator/">PKGBUILD</a>.</li>
+   <li><a href="http://packages.debian.org/search?keywords=fuse-emulator">Official packages</a> of 1.2.0 for <a href="http://www.debian.org/">Debian</a>, maintained by Alberto Garcia, are available.</li>
+   <li><a href="http://fedoraproject.org/">Fedora</a> has <a href="https://apps.fedoraproject.org/packages/fuse-emulator/">packages</a> of 1.2.0 available by Lucian Langa.</li>
+   <li><a href="http://www.freebsd.org/">FreeBSD</a> has a port of 1.2.0 available as <a href="http://svnweb.freebsd.org/ports/head/emulators/fuse/">emulators/fuse</a>.</li>
    <li><a href="https://www.gentoo.org/">Gentoo</a> users have an <a href="https://packages.gentoo.org/packages/app-emulation/fuse">ebuild</a> of 1.1.1 available.</li>
    <li><a href="http://www.netbsd.org/">NetBSD</a> users can get version 1.1.1 from <a href="http://www.pkgsrc.org/">pkgsrc</a> (the NetBSD Packages Collection) as <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-emulator/">emulators/fuse-emulator</a> and <a href="http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/emulators/fuse-emulator-utils/">emulators/fuse-emulator-utils</a>.</li>
    <li><a href="http://www.openbsd.org/">OpenBSD</a> users have version 1.1.1 available as the fuse and fuse-utils package, with thanks to Anthony J. Bentley.</li>
-   <li><a href="https://www.opensuse.org/">openSUSE</a> users have version 1.1.1 as the <a href="https://build.opensuse.org/package/show/Emulators/Fuse">Fuse</a> package from Emulators repository.</li>
-   <li>The <a href="https://www.pld-linux.org/">Polish Linux Distribution</a> has packages of <a href="http://sophie.zarb.org/search?search=fuse-gtk&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">Fuse</a> 1.1.1 and the <a href="http://sophie.zarb.org/search?search=fuse-utils&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">utilities</a>.</li>
+   <li><a href="https://www.opensuse.org/">openSUSE</a> users have version 1.2.0 as the <a href="https://build.opensuse.org/package/show/Emulators/Fuse">Fuse</a> package from Emulators repository.</li>
+   <li>The <a href="https://www.pld-linux.org/">Polish Linux Distribution</a> has packages of <a href="http://sophie.zarb.org/search?search=fuse-gtk&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">Fuse</a> 1.2.0 and the <a href="http://sophie.zarb.org/search?search=fuse-utils&amp;type=fuzzyname&amp;deptype=P&amp;distribution=PLD&amp;release=th&amp;arch=">utilities</a>.</li>
    <li><a href="http://www.slackware.com/">Slackware</a> users can get version 1.1.1 from SlackBuilds as a <a href="http://slackbuilds.org/result/?search=fuse-emulator">build script</a>.</li>
-   <li><a href="http://www.ubuntu.com/">Ubuntu</a> has <a href="https://launchpad.net/ubuntu/+source/fuse-emulator">packages</a> of 1.1.1 available by Alberto Garcia.</li>
+   <li><a href="http://www.ubuntu.com/">Ubuntu</a> has <a href="https://launchpad.net/ubuntu/+source/fuse-emulator">packages</a> of 1.2.0 available by Alberto Garcia.</li>
   </ul>
   <p>Packages of older versions of Fuse are also available for some other distributions:</p>
   <ul>
