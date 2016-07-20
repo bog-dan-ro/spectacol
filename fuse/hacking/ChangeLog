@@ -5372,3 +5372,5 @@
          z80_debugger_variables_init() definition (Fred).
 20160719 debugger/breakpoint.[ch]: rename local argument shadowing global
          variable (Fred).
+20160719 ui/widget/browse.c: use description for tape blocks where available
+         (Fred).
