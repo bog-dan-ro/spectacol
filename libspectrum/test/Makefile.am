@@ -26,7 +26,7 @@ noinst_PROGRAMS += test/test
 test_test_SOURCES = \
 	test/edges.c \
 	test/test.c \
-	test/test15.c
+	test/test_edges.c
 
 test_test_CFLAGS = -DSRCDIR='"$(srcdir)"'
 
@@ -62,7 +62,8 @@ EXTRA_DIST += \
 	test/sp-2000.sna.gz \
 	test/sp-ffff.sna.gz \
 	test/turbo-zeropilot.tzx \
-	test/writeprotected.mdr
+	test/writeprotected.mdr \
+	test/zero-tail.pzx
 
 CLEANFILES += \
 	test/.libs/test \

@@ -1186,6 +1186,10 @@ data_block_edge( libspectrum_tape_data_block *block,
     /* The pulse at the end of the block */
     *tstates = block->tail_length;
     *end_of_block = 1;
+    if( *tstates == 0 ) {
+      /* The tail pulse is optional - if there is no tail, there is no edge */
+      *flags |= LIBSPECTRUM_TAPE_FLAGS_NO_EDGE;
+    }
     break;
 
   default:
@@ -1196,9 +1200,11 @@ data_block_edge( libspectrum_tape_data_block *block,
 
   }
 
-  *flags |= state->level ? LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH :
-                           LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW;
-  state->level = !state->level;
+  if( !(*flags & LIBSPECTRUM_TAPE_FLAGS_NO_EDGE )) {
+    *flags |= state->level ? LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH :
+                             LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW;
+    state->level = !state->level;
+  }
 
   return LIBSPECTRUM_ERROR_NONE;
 }

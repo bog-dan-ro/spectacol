@@ -244,7 +244,7 @@ libspectrum_tape_block_init( libspectrum_tape_block *block,
   case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
     state->block_state.pulse_sequence.index = 0;
     state->block_state.pulse_sequence.pulse_count = 0;
-    state->block_state.pulse_sequence.level = 1;
+    state->block_state.pulse_sequence.level = -1;
     return LIBSPECTRUM_ERROR_NONE;
   case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
     return data_block_init( &(block->types.data_block),

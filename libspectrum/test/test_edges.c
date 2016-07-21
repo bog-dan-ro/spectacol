@@ -118,3 +118,27 @@ test_15( void )
   return check_edges( DYNAMIC_TEST_PATH( "complete-tzx.tzx" ), complete_edges_list,
 		      LIBSPECTRUM_TAPE_FLAGS_STOP | LIBSPECTRUM_TAPE_FLAGS_STOP48 );
 }
+
+static test_edge_sequence_t
+zero_tail_edges_list[] = 
+{
+  /* Data block with 0 tail */
+  {  855,   1,  96 },	/* Data short pulse 1 high */
+  {  855,   1,  80 },	/* Data short pulse 2 low */
+  {    0,   1,   9 },	/* No edge for tail, end of block */
+
+  /* Pulse block */
+  {  200,   1,  32 },	/* Following pulse 1 high */
+  {  200,   1, 275 },	/* Following pulse 2 low, end of block, end of tape,
+                           stop the tape */
+
+  { -1, 0, 0 }		/* End marker */
+
+};
+
+test_return_t
+test_28( void )
+{
+  return check_edges( DYNAMIC_TEST_PATH( "zero-tail.pzx" ),
+                      zero_tail_edges_list, 0x1ff );
+}
