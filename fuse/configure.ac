@@ -595,7 +595,7 @@ AC_CHECK_HEADER(
 
 dnl Check if CoreAudio is available
 AC_CHECK_HEADER(
-  CoreAudio/AudioHardware.h,
+  AudioToolbox/AudioToolbox.h,
   [coreaudio_available=yes],,
 )
 
@@ -632,7 +632,7 @@ elif test "$ac_cv_header_sys_audioio_h" = yes; then
   SOUND_LIBADD='sound/sunsound.$(OBJEXT)' SOUND_LIBS=''
   AC_MSG_RESULT(OpenBSD)
 elif test "$coreaudio_available" = yes; then
-  SOUND_LIBADD='sound/coreaudiosound.$(OBJEXT)' SOUND_LIBS='-framework CoreAudio -framework AudioUnit -framework CoreServices' sound_fifo=yes
+  SOUND_LIBADD='sound/coreaudiosound.$(OBJEXT)' SOUND_LIBS='-framework CoreAudio -framework AudioUnit' sound_fifo=yes
   AC_MSG_RESULT(CoreAudio)
 elif test "$wii" = yes; then
   SOUND_LIBADD='sound/wiisound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
