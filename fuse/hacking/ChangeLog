@@ -5374,3 +5374,7 @@
          variable (Fred).
 20160719 ui/widget/browse.c: use description for tape blocks where available
          (Fred).
+20160726 configure.ac,sound/coreaudiosound.c: remove lingering references to
+         deprecated Carbon APIs (Fred).
+20160731 Makefile.am,m4/glib-2.0.m4: remove the unused (since r5349) glib-2.0.m4
+         file (from patch #375) (Alberto Garcia).
