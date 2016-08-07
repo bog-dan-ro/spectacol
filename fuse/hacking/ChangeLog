@@ -5382,3 +5382,5 @@
          open file dialogs (thanks, Phil) (Sergio).
 20160807 utils.c: remove redundant whitespace (Fred).
 20160807 machines/specplus3.c: fix +3 disk autoload (part of bug #356) (Fred).
+20160807 peripherals/disk/upd_fdc.c: fix floppy drive selection when resetting a
+         +3 (part of bug #356) (Sergio).

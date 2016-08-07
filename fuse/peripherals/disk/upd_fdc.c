@@ -130,10 +130,14 @@ void
 upd_fdc_master_reset( upd_fdc *f )
 {
   int i;
+
+  f->current_drive = f->drive[0];
+
+  /* Caution with mirrored drives! The plus3 only use the US0 pin to select
+     drives, so drive 2 := drive 0 and drive 3 := drive 1 */
   for( i = 0; i < 4; i++ )
     if( f->drive[i] != NULL )
-      fdd_select( f->drive[i], i == 0 ? 1 : 0 );
-  f->current_drive = f->drive[0];
+      fdd_select( f->drive[i], f->drive[i] == f->current_drive ? 1 : 0 );
 
   f->main_status = UPD_FDC_MAIN_DATAREQ;
   for( i = 0; i < 4; i++ )
