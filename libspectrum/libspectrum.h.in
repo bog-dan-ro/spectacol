@@ -245,6 +245,10 @@ typedef enum libspectrum_id_t {
 
   LIBSPECTRUM_ID_DISK_D80,		/* .d80/.d40 Didaktik disk image */
 
+  /* Below here, present only in 1.2.2 and later */
+
+  LIBSPECTRUM_ID_COMPRESSED_ZIP,	/* zip compressed file */
+
 } libspectrum_id_t;
 
 /* And 'classes' of file */

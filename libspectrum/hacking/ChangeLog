@@ -1089,3 +1089,14 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          zero-tail.pzx}: fix handling of 0 length tail pulses after PZX data
          blocks and ensure the first PZX pulse block pulse is marked as high or
          low level as required (Fred).
+20160722 Makefile.am,internals.h,libspectrum.c,libspectrum.h.in,zip.[ch],zlib.c:
+         add support for reading zip files (patch #343) (Patrik Rak and Sergio).
+20160722 zip.[ch]: use libspectrum functions for reading LSB values (Fred).
+20160722 zip.c: mark a bunch of internal functions as static (Fred).
+20160724 zip.c: make error reporting a bit more libspectrum-like (Fred).
+20160723 zip.c: fix loading ZIP files with comments (Sergio).
+20160801 Makefile.am,configure.ac,zlib.c: disable zip suport when zlib is
+         missing (Sergio).
+20160801 zip.c: activate the const-enabled zlib API (Sergio).
+20160802 zip.c: avoid mixing declarations and code for C89 compilers (Sergio).
+20160802 zip.c: minor tweaks to make things a bit more idiomatic (Fred).

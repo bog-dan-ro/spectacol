@@ -5378,3 +5378,5 @@
          deprecated Carbon APIs (Fred).
 20160731 Makefile.am,m4/glib-2.0.m4: remove the unused (since r5349) glib-2.0.m4
          file (from patch #375) (Alberto Garcia).
+20160801 ui/{gtk,win32}/fileselector.c: add ".zip" to the file filters in
+         open file dialogs (thanks, Phil) (Sergio).

@@ -132,6 +132,7 @@ if test "$zlib" = yes; then
     AC_SEARCH_LIBS(compress2, z zdll)
   )
 fi
+AM_CONDITIONAL([HAVE_ZLIB], [test "$ac_cv_header_zlib_h" = yes])
 
 dnl Check whether to use libgcrypt
 AC_MSG_CHECKING(whether to use libgcrypt)

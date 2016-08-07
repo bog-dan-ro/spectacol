@@ -60,8 +60,12 @@ libspectrum_la_SOURCES = bzip2.c \
                          windres.rc \
 			 z80.c \
 			 z80em.c \
-			 zlib.c \
 			 zxs.c
+
+if HAVE_ZLIB
+libspectrum_la_SOURCES += zip.c \
+                          zlib.c
+endif
 
 ## The version info is made of three components: current, revision and age
 ## We update the version when we release according to the guide at
@@ -81,7 +85,8 @@ libspectrum_la_DEPENDENCIES = @WINDRES_OBJ@
 BUILT_SOURCES = libspectrum.h snap_accessors.c tape_accessors.c tape_set.c
 
 nodist_include_HEADERS = libspectrum.h
-noinst_HEADERS = internals.h
+noinst_HEADERS = internals.h \
+			 zip.h
 
 noinst_PROGRAMS =
 noinst_DATA =

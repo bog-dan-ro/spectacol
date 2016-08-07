@@ -43,11 +43,26 @@ static LPCTSTR file_filter = TEXT(
 "*.csw;*.ltp;*.pzx;*.raw;*.spc;*.sta;*.tzx;*.tap;*.wav;"
 "*.d40;*.d80;*.dsk;*.fdi;*.img;*.mgt;*.opd;*.opu;*.sad;*.scl;*.td0;*.trd;*.udi;"
 "*.dck;*.rom;*.hdf;*.mdr;*.rzx;"
-"*.png;*.pok;*.scr;*.svg\0"
+"*.png;*.pok;*.scr;*.svg"
+#ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+";*.gz;*.zip"
+#endif
+#ifdef LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION
+";*.bz2"
+#endif
+"\0"
 "All Files (*.*)\0"
 "*.*\0"
 "Auxiliary Files (*.scr;*.pok;*.png;*.svg;*.log)\0"
 "*.png;*.pok;*.scr;*.svg;*.log\0"
+#ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+"Compressed files (*.gz;*.zip;...)\0"
+"*.gz;*.zip"
+#ifdef LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION
+";*.bz2"
+#endif
+"\0"
+#endif
 "Disk Files (*.dsk;*.udi;*.scl;*.trd;*.fdi;...)\0"
 "*.d40;*.d80;*.dsk;*.fdi;*.img;*.mgt;*.opd;*.opu;*.sad;*.scl;*.td0;*.trd;*.udi\0"
 "Dock Files (*.dck;*.rom)\0"
@@ -80,7 +95,8 @@ run_dialog( const char *title, int is_saving )
   ofn.hwndOwner = fuse_hWnd;
   ofn.lpstrFilter = file_filter;
   ofn.lpstrCustomFilter = NULL;
-  /* TODO: select filter based on UI operation */
+  /* TODO: select filter based on UI operation (snapshot, recording, screenshot) */
+  /* TODO: custom filter based file action (open, save) */
   ofn.nFilterIndex = filter_index;
   ofn.lpstrFile = szFile;
   ofn.nMaxFile = sizeof( szFile );

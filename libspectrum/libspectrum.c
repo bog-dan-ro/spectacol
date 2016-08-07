@@ -546,6 +546,7 @@ libspectrum_identify_file_raw( libspectrum_id_t *type, const char *filename,
 
       { LIBSPECTRUM_ID_COMPRESSED_BZ2,"bz2", 3, "BZh",		    0, 3, 4 },
       { LIBSPECTRUM_ID_COMPRESSED_GZ, "gz",  3, "\x1f\x8b",	    0, 2, 4 },
+      { LIBSPECTRUM_ID_COMPRESSED_ZIP,"zip", 3, "PK\x03\x04",	    0, 4, 4 },
 
       { LIBSPECTRUM_ID_TAPE_Z80EM,    "raw", 1, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0Raw tape sample",  0, 64, 0 },
       { LIBSPECTRUM_ID_TAPE_CSW,      "csw", 2, "Compressed Square Wave\x1a",  0, 23, 4 },
@@ -682,6 +683,7 @@ libspectrum_identify_class( libspectrum_class_t *libspectrum_class,
   case LIBSPECTRUM_ID_COMPRESSED_BZ2:
   case LIBSPECTRUM_ID_COMPRESSED_GZ:
   case LIBSPECTRUM_ID_COMPRESSED_XFD:
+  case LIBSPECTRUM_ID_COMPRESSED_ZIP:
     *libspectrum_class = LIBSPECTRUM_CLASS_COMPRESSED; return 0;
 
   case LIBSPECTRUM_ID_DISK_DSK:
@@ -836,6 +838,34 @@ libspectrum_uncompress_file( unsigned char **new_buffer, size_t *new_length,
 
     libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
 			     "zlib not available to decompress gzipped file" );
+    if( new_filename ) libspectrum_free( *new_filename );
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+
+#endif				/* #ifdef HAVE_ZLIB_H */
+
+    break;
+
+  case LIBSPECTRUM_ID_COMPRESSED_ZIP:
+
+#ifdef HAVE_ZLIB_H
+    if( new_filename && *new_filename ) {
+      if( strlen( *new_filename ) >= 4 &&
+          !strcasecmp( &(*new_filename)[ strlen( *new_filename ) - 4 ],
+                       ".zip" ) )
+      (*new_filename)[ strlen( *new_filename ) - 4 ] = '\0';
+    }
+
+    error = libspectrum_zip_blind_read( old_buffer, old_length,
+                                        new_buffer, new_length );
+    if( error ) {
+      if( new_filename ) libspectrum_free( *new_filename );
+      return error;
+    }
+
+#else				/* #ifdef HAVE_ZLIB_H */
+
+    libspectrum_print_error( LIBSPECTRUM_ERROR_UNKNOWN,
+                             "zlib not available to decompress zipped file" );
     if( new_filename ) libspectrum_free( *new_filename );
     return LIBSPECTRUM_ERROR_UNKNOWN;
 
