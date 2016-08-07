@@ -5381,9 +5381,10 @@
 20160801 ui/{gtk,win32}/fileselector.c: add ".zip" to the file filters in
          open file dialogs (thanks, Phil) (Sergio).
 20160807 utils.c: remove redundant whitespace (Fred).
-20160807 machines/specplus3.c: fix +3 disk autoload (part of bug #356) (Fred).
+20160807 machines/specplus3.c: fix +3 disk autoload (part of bug #356) 
+         (thanks, windale and BogDan Vatra) (Fred).
 20160807 peripherals/disk/upd_fdc.c: fix floppy drive selection when resetting a
-         +3 (part of bug #356) (Sergio).
+         +3 (part of bug #356) (thanks, windale and BogDan Vatra) (Sergio).
 20160807 lib/{compressed,uncompressed}/disk_plus3.szx: update disk_plus3.szx to
          set PC = 0x08E8 as the proper entry point for "Loader" menu option
-         (part of bug #356) (Sergio).
+         (part of bug #356) (thanks, windale and BogDan Vatra) (Sergio).
