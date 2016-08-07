@@ -69,6 +69,7 @@ static int ui_drive_is_available( void );
 static const fdd_params_t *ui_drive_get_params_a( void );
 static const fdd_params_t *ui_drive_get_params_b( void );
 static int ui_drive_inserted( const ui_media_drive_info_t *drive, int new );
+static int ui_drive_autoload( void );
 
 static ui_media_drive_info_t ui_drives[ SPECPLUS3_NUM_DRIVES ] = {
   {
@@ -83,6 +84,7 @@ static ui_media_drive_info_t ui_drives[ SPECPLUS3_NUM_DRIVES ] = {
     /* .is_available = */ &ui_drive_is_available,
     /* .get_params = */ &ui_drive_get_params_a,
     /* .insert_hook = */ &ui_drive_inserted,
+    /* .autoload_hook = */ &ui_drive_autoload,
   },
   {
     /* .name = */ "+3 Disk B:",
@@ -96,6 +98,7 @@ static ui_media_drive_info_t ui_drives[ SPECPLUS3_NUM_DRIVES ] = {
     /* .is_available = */ &ui_drive_is_available,
     /* .get_params = */ &ui_drive_get_params_b,
     /* .insert_hook = */ &ui_drive_inserted,
+    /* .autoload_hook = */ &ui_drive_autoload,
   },
 };
 
@@ -179,7 +182,8 @@ specplus3_765_reset( void )
   fdd_init( &specplus3_drives[ 0 ], FDD_SHUGART, dt, 1 );
 
   dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3b_type() ];
-  fdd_init( &specplus3_drives[ 1 ], dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE, dt, 1 );
+  fdd_init( &specplus3_drives[ 1 ], dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
+            dt, 1 );
 }
 
 static int
@@ -362,14 +366,16 @@ specplus3_menu_items( void )
 }
 
 libspectrum_byte
-specplus3_fdc_status( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
+specplus3_fdc_status( libspectrum_word port GCC_UNUSED,
+                      libspectrum_byte *attached )
 {
   *attached = 0xff; /* TODO: check this */
   return upd_fdc_read_status( specplus3_fdc );
 }
 
 libspectrum_byte
-specplus3_fdc_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attached )
+specplus3_fdc_read( libspectrum_word port GCC_UNUSED,
+                    libspectrum_byte *attached )
 {
   *attached = 0xff; /* TODO: check this */
   return upd_fdc_read_data( specplus3_fdc );
@@ -435,5 +441,37 @@ ui_drive_inserted( const ui_media_drive_info_t *drive, int new )
 int
 specplus3_shutdown( void )
 {
+  return 0;
+}
+
+static int
+ui_drive_autoload( void )
+{
+  int error;
+  utils_file snap;
+  libspectrum_id_t type;
+
+  /* Look for an autoload snap. Try .szx first, then .z80 */
+  type = LIBSPECTRUM_ID_SNAPSHOT_SZX;
+  error = utils_read_auxiliary_file( "disk_plus3.szx", &snap,
+                                     UTILS_AUXILIARY_LIB );
+  if( error == -1 ) {
+    type = LIBSPECTRUM_ID_SNAPSHOT_Z80;
+    error = utils_read_auxiliary_file( "disk_plus3.z80", &snap,
+                                       UTILS_AUXILIARY_LIB );
+  }
+
+  /* If we couldn't find either, give up */
+  if( error == -1 ) {
+    ui_error( UI_ERROR_ERROR, "Couldn't find autoload snap for +3 disk" );
+    return 1;
+  }
+  if( error ) return error;
+
+  error = snapshot_read_buffer( snap.buffer, snap.length, type );
+  if( error ) { utils_close_file( &snap ); return error; }
+
+  utils_close_file( &snap );
+
   return 0;
 }
