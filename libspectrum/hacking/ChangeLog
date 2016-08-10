@@ -1100,3 +1100,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160801 zip.c: activate the const-enabled zlib API (Sergio).
 20160802 zip.c: avoid mixing declarations and code for C89 compilers (Sergio).
 20160802 zip.c: minor tweaks to make things a bit more idiomatic (Fred).
+20160810 tape.c: TZX spec says that 0 duration pauses should have no effect on
+         the current level (Fred).
