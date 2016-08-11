@@ -132,7 +132,7 @@ Scl2Trd(char *oldname, char *newname)
     if (mem) {
       memset(mem, 0, BLOCKSIZE);
       memcpy(&mem[TRD_DIRSTART], template, TRD_DIRLEN);
-      strncpy((char*)&mem[TRD_NAMEOFFSET], "Fuse", TRD_MAXNAMELENGTH);
+      strncpy((char*)&mem[TRD_NAMEOFFSET], "Fuse    ", TRD_MAXNAMELENGTH);
       fwrite((void *) mem, 1, BLOCKSIZE, fh);
       memset(mem, 0, BLOCKSIZE);
 
