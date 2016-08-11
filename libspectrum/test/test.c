@@ -770,6 +770,7 @@ static struct test_description tests[] = {
   { test_26, "Writing +3 .Z80 file", 0 },
   { test_27, "Reading old SZX file", 0 },
   { test_28, "Zero tail length PZX file", 0 },
+  { test_29, "No pilot pulse GDB TZX file", 0 },
 };
 
 static size_t test_count = ARRAY_SIZE( tests );

@@ -932,7 +932,7 @@ get_generalised_data_bit( libspectrum_tape_generalised_data_block *block,
   return r;
 }
 
-static libspectrum_byte
+libspectrum_byte
 get_generalised_data_symbol( libspectrum_tape_generalised_data_block *block,
                       libspectrum_tape_generalised_data_block_state *state )
 {

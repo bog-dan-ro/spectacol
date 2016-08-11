@@ -503,6 +503,9 @@ libspectrum_tape_pure_data_next_bit( libspectrum_tape_pure_data_block *block,
 void
 libspectrum_tape_raw_data_next_bit( libspectrum_tape_raw_data_block *block,
                              libspectrum_tape_raw_data_block_state *state );
+libspectrum_byte
+get_generalised_data_symbol( libspectrum_tape_generalised_data_block *block,
+                        libspectrum_tape_generalised_data_block_state *state );
 libspectrum_error
 generalised_data_edge( libspectrum_tape_generalised_data_block *block,
                        libspectrum_tape_generalised_data_block_state *state,

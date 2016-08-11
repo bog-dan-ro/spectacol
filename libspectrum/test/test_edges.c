@@ -142,3 +142,56 @@ test_28( void )
   return check_edges( DYNAMIC_TEST_PATH( "zero-tail.pzx" ),
                       zero_tail_edges_list, 0x1ff );
 }
+
+static test_edge_sequence_t
+no_pilot_gdb_list[] = 
+{
+  /* Set signal level block */
+  {    0,   1,  17 },	/* Set signal level low, end of block */
+
+  /* GDB with 0 tail */
+  {  771,   1,   0 },	/* Byte 1, bit 1, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 1, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 2, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 2, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 3, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 3, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 4, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 4, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 5, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 5, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 6, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 6, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 7, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 7, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 8, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 8, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 1, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 1, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 2, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 2, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 3, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 3, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 4, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 4, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 5, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 5, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 6, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 6, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 7, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 7, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 8, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 8, pulse 2 */
+  {    0,   1, 259 },	/* End of block, end of tape, stop the tape (normally no
+                           edge but not at end of tape) */
+
+  { -1, 0, 0 }		/* End marker */
+
+};
+
+test_return_t
+test_29( void )
+{
+  return check_edges( DYNAMIC_TEST_PATH( "no-pilot-gdb.tzx" ),
+                      no_pilot_gdb_list, 0x1ff );
+}

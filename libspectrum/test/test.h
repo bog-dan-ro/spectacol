@@ -30,5 +30,6 @@ test_return_t check_edges( const char *filename, test_edge_sequence_t *edges,
 
 test_return_t test_15( void );
 test_return_t test_28( void );
+test_return_t test_29( void );
 
 #endif
