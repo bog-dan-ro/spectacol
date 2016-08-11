@@ -1102,5 +1102,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160802 zip.c: minor tweaks to make things a bit more idiomatic (Fred).
 20160810 tape.c: TZX spec says that 0 duration pauses should have no effect on
          the current level (Fred).
-20160810 tape.c,tape_block.[ch],test/{no-pilot-gdb.tzx,test.[ch],test_edges.c}:
+20160811 tape.c,tape_block.[ch],test/{no-pilot-gdb.tzx,test.[ch],test_edges.c}:
          fix playback of TZX GDB blocks with no pilot tones (Fred).
+20160811 test/Makefile.am: distribute no-pilot-gdb.tzx (Fred).

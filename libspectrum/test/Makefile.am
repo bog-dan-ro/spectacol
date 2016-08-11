@@ -58,7 +58,8 @@ EXTRA_DIST += \
 	test/loop.tzx \
 	test/loop2.tzx \
 	test/loopend.tzx \
-        test/plus3.z80 \
+	test/no-pilot-gdb.tzx \
+	test/plus3.z80 \
 	test/sp-2000.sna.gz \
 	test/sp-ffff.sna.gz \
 	test/turbo-zeropilot.tzx \
