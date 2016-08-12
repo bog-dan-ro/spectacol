@@ -1105,3 +1105,6 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160811 tape.c,tape_block.[ch],test/{no-pilot-gdb.tzx,test.[ch],test_edges.c}:
          fix playback of TZX GDB blocks with no pilot tones (Fred).
 20160811 test/Makefile.am: distribute no-pilot-gdb.tzx (Fred).
+20160812 internals.h,pzx_read.c,tzx_write.c,utilities.c: fix writing GDB blocks
+         with no pilot tones and add support for converting PZX data blocks with
+         asymmetric pulses to TZX files (Fred).

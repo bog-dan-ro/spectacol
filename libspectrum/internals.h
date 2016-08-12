@@ -102,6 +102,11 @@
 #define strncasecmp _strnicmp
 #endif		/* #if !defined(HAVE_STRNCASECMP) && defined(HAVE__STRNICMP) */
 
+#ifndef MAX
+#define MAX(a,b)    (((a) > (b)) ? (a) : (b))
+#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
+#endif
+
 /* Print using the user-provided error function */
 libspectrum_error
 libspectrum_print_error( libspectrum_error error, const char *format, ... )
@@ -294,6 +299,9 @@ libspectrum_set_pause_ms( libspectrum_tape_block *block,
 void
 libspectrum_set_pause_tstates( libspectrum_tape_block *block,
                                libspectrum_dword pause_tstates );
+
+size_t
+libspectrum_bits_to_bytes( size_t bits );
 
 extern const int LIBSPECTRUM_BITS_IN_BYTE;
 
