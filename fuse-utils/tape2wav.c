@@ -207,9 +207,10 @@ write_tape( char *filename, libspectrum_tape *tape )
 
     /* Invert the microphone state */
     if( pulse_tstates ||
-        ( flags & (LIBSPECTRUM_TAPE_FLAGS_STOP |
-                   LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW |
-                   LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH ) ) ) {
+        !( flags & LIBSPECTRUM_TAPE_FLAGS_NO_EDGE ) ||
+        ( flags & ( LIBSPECTRUM_TAPE_FLAGS_STOP |
+                    LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW |
+                    LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH ) ) ) {
 
       if( flags & LIBSPECTRUM_TAPE_FLAGS_NO_EDGE ) {
         /* Do nothing */
