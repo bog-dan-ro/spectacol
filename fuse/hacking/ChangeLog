@@ -5388,3 +5388,5 @@
 20160807 lib/{compressed,uncompressed}/disk_plus3.szx: update disk_plus3.szx to
          set PC = 0x08E8 as the proper entry point for "Loader" menu option
          (part of bug #356) (thanks, windale and BogDan Vatra) (Sergio).
+20160812 tape.c: change microphone state when 0 tstate pulses do not have the no
+         edge flag set (Fred).
