@@ -5390,3 +5390,5 @@
          (part of bug #356) (thanks, windale and BogDan Vatra) (Sergio).
 20160812 tape.c: change microphone state when 0 tstate pulses do not have the no
          edge flag set (Fred).
+20160812 Makefile.am,configure.ac,m4/libxml.m4: use pkg-config to detect libpng
+         and libxml2 (more from patch #375) (Alberto Garcia).

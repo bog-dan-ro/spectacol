@@ -507,39 +507,16 @@ if test "$withval" = no; then libpng=no; else libpng=yes; fi,
 libpng=yes)
 AC_MSG_RESULT($libpng)
 if test "$libpng" = yes; then
-  AC_PATH_PROG([LIBPNG_CONFIG], [libpng-config])
-  if test -n "$LIBPNG_CONFIG"; then
-    PNG_CFLAGS=`libpng-config --cflags`
-    PNG_LIBS=`libpng-config --ldflags`
-    AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng])
-  else
-    ac_save_CPPFLAGS="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
-    ac_save_LDFLAGS="$LDFLAGS"
-    LDFLAGS="$PNG_LIBS $LDFLAGS"
-
-    AC_CHECK_LIB( png, png_write_png,
-      [AC_CHECK_HEADER(
-        png.h,
-        [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
-        [AC_CHECK_HEADERS(libpng/png.h,
-                     [CPPFLAGS="$ac_save_CPPFLAGS $PNG_CFLAGS/libpng"
-                      AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
-                     [AC_MSG_WARN(png.h not found - saving screenshots disabled)
-                      PNG_LIBS='']
-        )],
-      )],
-      [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)
-       PNG_LIBS='']
-    )
-
-    CPPFLAGS="$ac_save_CPPFLAGS"
-    LDFLAGS="$ac_save_LDFLAGS"
-  fi
-
-  AC_SUBST(PNG_CFLAGS)
-  AC_SUBST(PNG_LIBS)
+  PKG_CHECK_MODULES(
+    [PNG],
+    [libpng],
+    [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng])],
+    [AC_MSG_WARN([libpng not found - saving screenshots disabled])]
+  )
 fi
+
+AC_SUBST(PNG_CFLAGS)
+AC_SUBST(PNG_LIBS)
 
 dnl Check if a version of libasound which supplies pcm is available
 AC_MSG_CHECKING(whether ALSA requested)
@@ -737,10 +714,16 @@ AC_MSG_CHECKING(whether libxml2 support requested)
   libxml2=yes)
 AC_MSG_RESULT($libxml2)
 if test "$libxml2" = yes; then
-  AM_PATH_XML2(2.0.0,AC_DEFINE([HAVE_LIB_XML2], 1,
-               [Defined if we've got libxml2]),
-               AC_MSG_WARN(libxml2 not found - config file will use ini format))
+  PKG_CHECK_MODULES(
+    [XML],
+    [libxml-2.0],
+    [AC_DEFINE([HAVE_LIB_XML2], 1, [Defined if we've got libxml2])],
+    [AC_MSG_WARN([libxml2 not found - config file will use ini format])]
+  )
 fi
+
+AC_SUBST(XML_CFLAGS)
+AC_SUBST(XML_LIBS)
 
 dnl Work out which timer routines to use
 AC_MSG_CHECKING(which timer routines to use)
