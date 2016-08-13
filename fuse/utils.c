@@ -405,7 +405,6 @@ utils_read_auxiliary_file( const char *filename, utils_file *file,
   if( error ) return error;
 
   return 0;
-
 }
 
 int

@@ -104,6 +104,11 @@
 #define strncasecmp _strnicmp
 #endif		/* #if !defined(HAVE_STRNCASECMP) && defined(HAVE__STRNICMP) */
 
+#ifndef MAX
+#define MAX(a,b)    (((a) > (b)) ? (a) : (b))
+#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
+#endif
+
 /* Print using the user-provided error function */
 libspectrum_error
 libspectrum_print_error( libspectrum_context_t *context, libspectrum_error error, const char *format, ... )
@@ -134,6 +139,14 @@ libspectrum_gzip_inflate(libspectrum_context_t *context, const libspectrum_byte 
 libspectrum_error
 libspectrum_bzip2_inflate( libspectrum_context_t *context, const libspectrum_byte *bzptr, size_t bzlength,
 			   libspectrum_byte **outptr, size_t *outlength );
+
+libspectrum_error
+libspectrum_zip_inflate( const libspectrum_byte *zipptr, size_t ziplength,
+			  libspectrum_byte **outptr, size_t *outlength );
+
+libspectrum_error
+libspectrum_zip_blind_read( const libspectrum_byte *zipptr, size_t ziplength,
+                            libspectrum_byte **outptr, size_t *outlength );
 
 /* The TZX file signature */
 
@@ -289,6 +302,9 @@ libspectrum_set_pause_ms( libspectrum_tape_block *block,
 void
 libspectrum_set_pause_tstates( libspectrum_tape_block *block,
                                libspectrum_dword pause_tstates );
+
+size_t
+libspectrum_bits_to_bytes( size_t bits );
 
 extern const int LIBSPECTRUM_BITS_IN_BYTE;
 

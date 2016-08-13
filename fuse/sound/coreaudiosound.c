@@ -24,9 +24,7 @@
 
 #include <AssertMacros.h>
 
-#include <AudioUnit/AudioComponent.h>
-#include <AudioUnit/AudioUnit.h>
-#include <CoreAudio/AudioHardware.h>
+#include <AudioToolbox/AudioToolbox.h>
 
 #include "settings.h"
 #include "sfifo.h"

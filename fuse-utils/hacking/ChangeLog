@@ -580,3 +580,6 @@
          rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,tape2pulses.1,tape2wav.1,
          tapeconv.1,tzxlist.1}: update release dates and mark this release as
          1.2.0 (Fred).
+20160811 scl2trd.c: fix buffer over-read in scl2trd (Sergio).
+20160812 tape2pulses.c,tape2wav.c: emit an edge when 0 tstate pulses do not have
+         the no edge flag set (Fred).

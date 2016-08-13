@@ -60,3 +60,9 @@ libspectrum_set_pause_tstates( libspectrum_tape_block *block,
   libspectrum_tape_block_set_pause( block,
                                   libspectrum_tstates_to_ms( pause_tstates ) );
 }
+
+size_t
+libspectrum_bits_to_bytes( size_t bits )
+{
+  return ( bits + LIBSPECTRUM_BITS_IN_BYTE - 1 ) / LIBSPECTRUM_BITS_IN_BYTE;
+}

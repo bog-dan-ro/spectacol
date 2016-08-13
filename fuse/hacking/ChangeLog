@@ -5372,3 +5372,23 @@
          z80_debugger_variables_init() definition (Fred).
 20160719 debugger/breakpoint.[ch]: rename local argument shadowing global
          variable (Fred).
+20160719 ui/widget/browse.c: use description for tape blocks where available
+         (Fred).
+20160726 configure.ac,sound/coreaudiosound.c: remove lingering references to
+         deprecated Carbon APIs (Fred).
+20160731 Makefile.am,m4/glib-2.0.m4: remove the unused (since r5349) glib-2.0.m4
+         file (from patch #375) (Alberto Garcia).
+20160801 ui/{gtk,win32}/fileselector.c: add ".zip" to the file filters in
+         open file dialogs (thanks, Phil) (Sergio).
+20160807 utils.c: remove redundant whitespace (Fred).
+20160807 machines/specplus3.c: fix +3 disk autoload (part of bug #356) 
+         (thanks, windale and BogDan Vatra) (Fred).
+20160807 peripherals/disk/upd_fdc.c: fix floppy drive selection when resetting a
+         +3 (part of bug #356) (thanks, windale and BogDan Vatra) (Sergio).
+20160807 lib/{compressed,uncompressed}/disk_plus3.szx: update disk_plus3.szx to
+         set PC = 0x08E8 as the proper entry point for "Loader" menu option
+         (part of bug #356) (thanks, windale and BogDan Vatra) (Sergio).
+20160812 tape.c: change microphone state when 0 tstate pulses do not have the no
+         edge flag set (Fred).
+20160812 Makefile.am,configure.ac,m4/libxml.m4: use pkg-config to detect libpng
+         and libxml2 (more from patch #375) (Alberto Garcia).

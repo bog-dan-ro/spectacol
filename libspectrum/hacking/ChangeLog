@@ -1085,3 +1085,26 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          and mark this release as 1.2.1 (Fred).
 20160719 myglib/ghash.c: mark g_direct_hash() as static as it isn't used outside
          of ghash.c and isn't in a header (Fred).
+20160721 tape.c,tape_block.c,test/{Makefile.am,test.[ch],test15.c->test_edges.c,
+         zero-tail.pzx}: fix handling of 0 length tail pulses after PZX data
+         blocks and ensure the first PZX pulse block pulse is marked as high or
+         low level as required (Fred).
+20160722 Makefile.am,internals.h,libspectrum.c,libspectrum.h.in,zip.[ch],zlib.c:
+         add support for reading zip files (patch #343) (Patrik Rak and Sergio).
+20160722 zip.[ch]: use libspectrum functions for reading LSB values (Fred).
+20160722 zip.c: mark a bunch of internal functions as static (Fred).
+20160724 zip.c: make error reporting a bit more libspectrum-like (Fred).
+20160723 zip.c: fix loading ZIP files with comments (Sergio).
+20160801 Makefile.am,configure.ac,zlib.c: disable zip suport when zlib is
+         missing (Sergio).
+20160801 zip.c: activate the const-enabled zlib API (Sergio).
+20160802 zip.c: avoid mixing declarations and code for C89 compilers (Sergio).
+20160802 zip.c: minor tweaks to make things a bit more idiomatic (Fred).
+20160810 tape.c: TZX spec says that 0 duration pauses should have no effect on
+         the current level (Fred).
+20160811 tape.c,tape_block.[ch],test/{no-pilot-gdb.tzx,test.[ch],test_edges.c}:
+         fix playback of TZX GDB blocks with no pilot tones (Fred).
+20160811 test/Makefile.am: distribute no-pilot-gdb.tzx (Fred).
+20160812 internals.h,pzx_read.c,tzx_write.c,utilities.c: fix writing GDB blocks
+         with no pilot tones and add support for converting PZX data blocks with
+         asymmetric pulses to TZX files (Fred).

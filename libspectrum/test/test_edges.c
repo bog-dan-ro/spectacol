@@ -118,3 +118,80 @@ test_15( void )
   return check_edges( DYNAMIC_TEST_PATH( "complete-tzx.tzx" ), complete_edges_list,
 		      LIBSPECTRUM_TAPE_FLAGS_STOP | LIBSPECTRUM_TAPE_FLAGS_STOP48 );
 }
+
+static test_edge_sequence_t
+zero_tail_edges_list[] = 
+{
+  /* Data block with 0 tail */
+  {  855,   1,  96 },	/* Data short pulse 1 high */
+  {  855,   1,  80 },	/* Data short pulse 2 low */
+  {    0,   1,   9 },	/* No edge for tail, end of block */
+
+  /* Pulse block */
+  {  200,   1,  32 },	/* Following pulse 1 high */
+  {  200,   1, 275 },	/* Following pulse 2 low, end of block, end of tape,
+                           stop the tape */
+
+  { -1, 0, 0 }		/* End marker */
+
+};
+
+test_return_t
+test_28( void )
+{
+  return check_edges( DYNAMIC_TEST_PATH( "zero-tail.pzx" ),
+                      zero_tail_edges_list, 0x1ff );
+}
+
+static test_edge_sequence_t
+no_pilot_gdb_list[] = 
+{
+  /* Set signal level block */
+  {    0,   1,  17 },	/* Set signal level low, end of block */
+
+  /* GDB with 0 tail */
+  {  771,   1,   0 },	/* Byte 1, bit 1, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 1, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 2, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 2, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 3, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 3, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 4, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 4, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 5, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 5, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 6, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 6, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 7, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 7, pulse 2 */
+  {  771,   1,   0 },	/* Byte 1, bit 8, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 1, bit 8, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 1, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 1, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 2, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 2, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 3, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 3, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 4, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 4, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 5, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 5, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 6, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 6, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 7, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 7, pulse 2 */
+  {  771,   1,   0 },	/* Byte 2, bit 8, pulse 1 */
+  { 1542,   1,   0 },	/* Byte 2, bit 8, pulse 2 */
+  {    0,   1, 259 },	/* End of block, end of tape, stop the tape (normally no
+                           edge but not at end of tape) */
+
+  { -1, 0, 0 }		/* End marker */
+
+};
+
+test_return_t
+test_29( void )
+{
+  return check_edges( DYNAMIC_TEST_PATH( "no-pilot-gdb.tzx" ),
+                      no_pilot_gdb_list, 0x1ff );
+}
