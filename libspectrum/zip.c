@@ -306,7 +306,7 @@ read_directory( struct libspectrum_zip *z )
 
 /* Open a ZIP archive from memory */
 struct libspectrum_zip *
-libspectrum_zip_open( const libspectrum_byte *buffer, size_t length )
+libspectrum_zip_open( libspectrum_context_t *context, const libspectrum_byte *buffer, size_t length )
 {
   struct libspectrum_zip *z;
   libspectrum_error error;
@@ -319,10 +319,11 @@ libspectrum_zip_open( const libspectrum_byte *buffer, size_t length )
   z->end = buffer + length;
   z->data_size = length;
   z->state = ARCHIVE_OPEN;
+  z->context = context;
 
   error = locate_directory( z );
   if( error ) {
-    libspectrum_print_error( error, "Unrecognized ZIP archive" );
+    libspectrum_print_error( context, error, "Unrecognized ZIP archive" );
 
     libspectrum_zip_close( z );
     return NULL;
@@ -454,7 +455,7 @@ prepare_stream( struct libspectrum_zip *z )
 
   version = header.required_version & 0xff;
   if( version > ZIP_SUPPORTED_VERSION ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_SIGNATURE,
+    libspectrum_print_error( z->context, LIBSPECTRUM_ERROR_SIGNATURE,
                              "Unsupported ZIP version %u.%u", version / 10,
                              version % 10 );
     return LIBSPECTRUM_ERROR_SIGNATURE;
@@ -495,7 +496,7 @@ decompress_stream( struct libspectrum_zip *z, libspectrum_byte **buffer,
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  error = libspectrum_zip_inflate( z->ptr, file_compressed_left, buffer,
+  error = libspectrum_zip_inflate( z->context, z->ptr, file_compressed_left, buffer,
                                    buffer_size );
   if( error ) return error;
 
@@ -540,7 +541,7 @@ libspectrum_zip_read( struct libspectrum_zip *z, libspectrum_byte **buffer,
 
   case 8: /* deflate */
     if( decompress_stream( z, buffer, size ) ) {
-      libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT,
+      libspectrum_print_error( z->context, LIBSPECTRUM_ERROR_CORRUPT,
                                "ZIP decompression failed" );
       z->ptr = last;
       return LIBSPECTRUM_ERROR_CORRUPT;
@@ -549,7 +550,7 @@ libspectrum_zip_read( struct libspectrum_zip *z, libspectrum_byte **buffer,
 
   default:
     z->ptr = last;
-    libspectrum_print_error( LIBSPECTRUM_ERROR_INVALID,
+    libspectrum_print_error( z->context, LIBSPECTRUM_ERROR_INVALID,
                              "Unsupported compression method %u", compression );
     return LIBSPECTRUM_ERROR_INVALID;
   }
@@ -561,7 +562,7 @@ libspectrum_zip_read( struct libspectrum_zip *z, libspectrum_byte **buffer,
   file_crc = crc32( 0, *buffer, *size );
 
   if( file_crc != z->file_info.crc ) {
-    libspectrum_print_error( LIBSPECTRUM_ERROR_CORRUPT, "ZIP CRC mismatch" );
+    libspectrum_print_error( z->context, LIBSPECTRUM_ERROR_CORRUPT, "ZIP CRC mismatch" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
@@ -570,14 +571,14 @@ libspectrum_zip_read( struct libspectrum_zip *z, libspectrum_byte **buffer,
 
 /* Make 'best guesses' as to what to uncompress from the archive */
 libspectrum_error
-libspectrum_zip_blind_read( const libspectrum_byte *zipptr, size_t ziplength,
+libspectrum_zip_blind_read( libspectrum_context_t *context, const libspectrum_byte *zipptr, size_t ziplength,
                             libspectrum_byte **outptr, size_t *outlength )
 {
   struct libspectrum_zip *z;
   zip_stat info;
   libspectrum_error error;
 
-  z = libspectrum_zip_open( zipptr, ziplength );
+  z = libspectrum_zip_open( context, zipptr, ziplength );
   if( !z ) return LIBSPECTRUM_ERROR_INVALID;
 
   while( libspectrum_zip_next( z, &info ) == 0 ) {
@@ -588,10 +589,10 @@ libspectrum_zip_blind_read( const libspectrum_byte *zipptr, size_t ziplength,
     if( !info.size ) continue; 
 
     /* Try to identify the file by the filename */
-    error = libspectrum_identify_file_raw( &type, info.filename, NULL, 0 );
+    error = libspectrum_identify_file_raw( context, &type, info.filename, NULL, 0 );
     if( error ) continue;
 
-    error = libspectrum_identify_class( &class, type );
+    error = libspectrum_identify_class( context, &class, type );
     if( error ) continue;
 
     /* Skip files not likely to be loaded in a emulator */

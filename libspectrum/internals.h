@@ -133,7 +133,7 @@ libspectrum_uncompress_file( libspectrum_context_t *context, unsigned char **new
 			     size_t old_length, const char *old_filename );
 
 libspectrum_error
-libspectrum_gzip_inflate(libspectrum_context_t *context, const libspectrum_byte *gzptr, size_t gzlength,
+libspectrum_gzip_inflate( libspectrum_context_t *context, const libspectrum_byte *gzptr, size_t gzlength,
                           libspectrum_byte **outptr, size_t *outlength );
 
 libspectrum_error
@@ -141,11 +141,11 @@ libspectrum_bzip2_inflate( libspectrum_context_t *context, const libspectrum_byt
 			   libspectrum_byte **outptr, size_t *outlength );
 
 libspectrum_error
-libspectrum_zip_inflate( const libspectrum_byte *zipptr, size_t ziplength,
+libspectrum_zip_inflate( libspectrum_context_t *context, const libspectrum_byte *zipptr, size_t ziplength,
 			  libspectrum_byte **outptr, size_t *outlength );
 
 libspectrum_error
-libspectrum_zip_blind_read( const libspectrum_byte *zipptr, size_t ziplength,
+libspectrum_zip_blind_read( libspectrum_context_t *context, const libspectrum_byte *zipptr, size_t ziplength,
                             libspectrum_byte **outptr, size_t *outlength );
 
 /* The TZX file signature */

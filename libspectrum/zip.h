@@ -155,10 +155,11 @@ typedef struct libspectrum_zip {
   zip_file_header file_info;
   char file_name[1024];
   int file_ignore_case;
+  libspectrum_context_t *context;
 } libspectrum_zip;
 
 struct libspectrum_zip *
-libspectrum_zip_open( const libspectrum_byte *buffer, size_t length );
+libspectrum_zip_open( libspectrum_context_t *context, const libspectrum_byte *buffer, size_t length );
 
 libspectrum_error
 libspectrum_zip_next( struct libspectrum_zip *zip, zip_stat *info );

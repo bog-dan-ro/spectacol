@@ -887,7 +887,7 @@ libspectrum_uncompress_file(libspectrum_context_t *context, unsigned char **new_
       (*new_filename)[ strlen( *new_filename ) - 4 ] = '\0';
     }
 
-    error = libspectrum_zip_blind_read( old_buffer, old_length,
+    error = libspectrum_zip_blind_read( context, old_buffer, old_length,
                                         new_buffer, new_length );
     if( error ) {
       if( new_filename ) libspectrum_free( *new_filename );
