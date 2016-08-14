@@ -26,7 +26,6 @@
 
 #include <config.h>
 
-#include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -258,7 +257,7 @@ read_data_block( libspectrum_tape *tape, const libspectrum_byte **buffer,
   count = libspectrum_read_dword( buffer );
   initial_level = !!(count & 0x80000000);
   count &= 0x7fffffff;
-  count_bytes = ceil( count / (double)LIBSPECTRUM_BITS_IN_BYTE );
+  count_bytes = libspectrum_bits_to_bytes( count );
   bits_in_last_byte =
     count % LIBSPECTRUM_BITS_IN_BYTE ?
       count % LIBSPECTRUM_BITS_IN_BYTE : LIBSPECTRUM_BITS_IN_BYTE;
