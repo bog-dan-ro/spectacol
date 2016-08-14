@@ -893,6 +893,8 @@ void FuseEmulator::load(const QString &filePath, bool removeOnFail)
         fuse_emulation_pause();
         if (utils_open_file(filePath.toUtf8().constData(), settings_current.auto_load , nullptr))
             m_loadedFileName = "";
+        else
+            pokemem_autoload_pokfile();
 
         callFunction([this, filePath, removeOnFail]{
             if (m_loadedFileName.isEmpty() && removeOnFail) {
