@@ -19,6 +19,7 @@
 
 #include <QDateTime>
 #include <QDirIterator>
+#include <QSet>
 #include <QTimer>
 
 namespace {
@@ -207,13 +208,20 @@ bool FolderListModel::canOpen(const QString &path)
 void FolderListModel::refresh()
 {
     beginResetModel();
+    QSet<QString> files;
     m_files.clear();
     QDirIterator it(m_folder, QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
     while(it.hasNext()) {
         it.next();
         const auto &inf = it.fileInfo();
-        if (inf.isDir() || canOpen(inf.absoluteFilePath().toUtf8().constData()))
+        QString baseName = inf.absolutePath() + QLatin1Char('/') + inf.baseName();
+        if (inf.completeSuffix().toLower() == QLatin1String("pok") && files.contains(baseName))
+            continue;
+
+        if (inf.isDir() || canOpen(inf.absoluteFilePath().toUtf8().constData())) {
             m_files.push_back(inf);
+            files.insert(baseName);
+        }
     }
 
     std::sort(m_files.begin(), m_files.end(), [this](const QFileInfo &a, const QFileInfo &b){
