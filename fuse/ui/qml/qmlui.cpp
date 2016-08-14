@@ -19,6 +19,7 @@
 #include "qmlui.h"
 #include "fuseemulator.h"
 #include "fuserecording.h"
+#include "fusesettings.h"
 #include "breakpointsmodel.h"
 #include "disassamblemodel.h"
 
@@ -150,6 +151,9 @@ extern "C" int ui_event( void )
 extern "C" int ui_widgets_reset( void )
 {
     pokefinder_clear();
+    g_fuseEmulator->settings()->callFunction([]{
+        emit g_fuseEmulator->settings()->currentMachineChanged();
+    });
     return 0;
 }
 
