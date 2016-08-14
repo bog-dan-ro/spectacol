@@ -71,6 +71,16 @@ Item {
     property bool capsPressed: false
     property bool symbolPressed: false
     property int _pressedKey: 0
+    Timer {
+        running: gamepadMode && capsPressed && symbolPressed
+        interval: 200
+        repeat: false
+        onTriggered: {
+            fuse.keyRelease(Qt.Key_Control);
+            fuse.keyRelease(Qt.Key_Shift);
+            capsPressed = symbolPressed = false;
+        }
+    }
 
     function pressCurrentKey()
     {
