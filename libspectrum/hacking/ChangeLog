@@ -1109,3 +1109,5 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          with no pilot tones and add support for converting PZX data blocks with
          asymmetric pulses to TZX files (Fred).
 20160814 pzx_read.c: use libspectrum_bits_to_bytes() (Fred).
+20160815 configure.ac: print summary of enabled features when building
+         libspectrum (patch #376) (Alberto Garcia).

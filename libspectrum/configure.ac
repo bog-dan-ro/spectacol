@@ -126,10 +126,12 @@ AC_ARG_WITH(zlib,
 if test "$withval" = no; then zlib=no; else zlib=yes; fi,
 zlib=yes)
 AC_MSG_RESULT($zlib)
+have_zlib="no"
 if test "$zlib" = yes; then
   AC_CHECK_HEADERS(
     zlib.h,
-    AC_SEARCH_LIBS(compress2, z zdll)
+    [AC_SEARCH_LIBS(compress2, z zdll)
+     have_zlib="yes"]
   )
 fi
 AM_CONDITIONAL([HAVE_ZLIB], [test "$ac_cv_header_zlib_h" = yes])
@@ -141,8 +143,11 @@ AC_ARG_WITH(libgcrypt,
 if test "$withval" = no; then libgcrypt=no; else libgcrypt=yes; fi,
 libgcrypt=yes)
 AC_MSG_RESULT($libgcrypt)
+have_libgcrypt="no"
 if test "$libgcrypt" = yes; then
-  AC_CHECK_HEADERS(gcrypt.h,LIBS="$LIBS -lgcrypt")
+  AC_CHECK_HEADERS(gcrypt.h,
+  [LIBS="$LIBS -lgcrypt"
+   have_libgcrypt="yes"])
 fi
 
 dnl Check whether to use libbz2 (1.0 or greater)
@@ -152,10 +157,12 @@ AC_ARG_WITH(bzip2,
 if test "$withval" = no; then bzip2=no; else bzip2=yes; fi,
 bzip2=yes)
 AC_MSG_RESULT($bzip2)
+have_bzip2="no"
 if test "$bzip2" = yes; then
   AC_CHECK_HEADER(
     bzlib.h,
-    AC_CHECK_LIB(bz2,BZ2_bzDecompressInit)
+    [AC_CHECK_LIB(bz2,BZ2_bzDecompressInit)
+     have_bzip2="yes"]
   )
 fi
 
@@ -203,17 +210,20 @@ AC_ARG_WITH(libaudiofile,
 if test "$withval" = no; then libaudiofile=no; else libaudiofile=yes; fi,
 libaudiofile=yes)
 AC_MSG_RESULT($libaudiofile)
+have_libaudiofile="no"
 AS_IF([test "$libaudiofile" = yes], [
   PKG_CHECK_MODULES(
     AUDIOFILE,
     audiofile,
-    AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile]),
+    [AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile])
+     have_libaudiofile="yes"],
     [true]
   )
   if test -z "$AUDIOFILE_LIBS"; then
     AM_PATH_AUDIOFILE(
       0.2.3,
-      AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile])
+      [AC_DEFINE([HAVE_LIB_AUDIOFILE], 1, [Defined if we've got audiofile])
+       have_libaudiofile="yes"],
     )
   fi
 ])
@@ -224,3 +234,18 @@ AC_CONFIG_FILES([
 ])
 
 AC_OUTPUT
+
+dnl Status summary
+echo ""
+echo "*******************************************"
+echo "*** libspectrum is ready to be compiled ***"
+echo "*******************************************"
+echo ""
+echo "zlib support: $have_zlib"
+echo "bzip2 support: $have_bzip2"
+echo "libgcrypt support: $have_libgcrypt"
+echo "libaudiofile support: $have_libaudiofile"
+echo "Internal GLib replacement: $myglib"
+echo ""
+echo "Type 'make' to compile libspectrum"
+echo ""
