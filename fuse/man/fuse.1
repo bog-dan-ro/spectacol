@@ -68,9 +68,10 @@ format.
 See the
 .B "COMPRESSED FILES"
 section for details on reading files compressed with
-.IR bzip2 "(3)"
+.IR bzip2 "(3),"
+.IR gzip "(3)"
 or
-.IR gzip "(3)."
+.IR zip "(3)."
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -5145,11 +5146,13 @@ frequency stereo sound default compression level.
 Assuming the appropriate libraries were available when
 .IR libspectrum (3)
 was compiled, snapshots, tape images, dock cartridges and input
-recording files can be read from files compressed with
-.IR bzip2 (3)
-or
+recording files (RZX) can be read from files compressed with
+.IR bzip2 "(3),"
 .IR gzip (3)
-just as if they were uncompressed.
+or
+.IR zip (3)
+just as if they were uncompressed. In the zip case, only the first
+supported file found inside the archive is loaded.
 There is currently no support for reading compressed +3, DISCiPLE/+D
 or Beta disk images.
 .\"
@@ -5188,7 +5191,8 @@ error messages.
 .IR libspectrum "(3),"
 .IR ogg123 "(1),"
 .IR xspect "(1),"
-.IR xzx "(1)."
+.IR xzx "(1),"
+.IR zip "(3)."
 .PP
 The comp.sys.sinclair Spectrum FAQ, at
 .br

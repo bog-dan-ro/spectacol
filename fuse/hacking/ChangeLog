@@ -5396,3 +5396,4 @@
          insert a boot loader in TRD/SCL disk images when autoload is enabled
          (part of feature request #90) (thanks, windale, BogDan and Fred)
          (Sergio).
+20160817 man/fuse.1: document zip compression support (Sergio).
