@@ -5397,3 +5397,5 @@
          (part of feature request #90) (thanks, windale, BogDan and Fred)
          (Sergio).
 20160817 man/fuse.1: document zip compression support (Sergio).
+20160817 ui/gtk/fileselector.c: add ".png" to the file filters in save file
+         dialogs and check the support for ".svg" files (Sergio).

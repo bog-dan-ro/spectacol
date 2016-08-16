@@ -187,12 +187,20 @@ add_filter_auxiliary_files( GtkFileFilter *filter )
   gtk_file_filter_add_pattern( filter, "*.log" );
   gtk_file_filter_add_pattern( filter, "*.pok" );
   gtk_file_filter_add_pattern( filter, "*.scr" );
-  gtk_file_filter_add_pattern( filter, "*.svg" );
 
   gtk_file_filter_add_pattern( filter, "*.LOG" );
   gtk_file_filter_add_pattern( filter, "*.POK" );
   gtk_file_filter_add_pattern( filter, "*.SCR" );
+
+#ifdef USE_LIBPNG
+  gtk_file_filter_add_pattern( filter, "*.png" );
+  gtk_file_filter_add_pattern( filter, "*.PNG" );
+#endif
+
+#ifdef HAVE_LIB_XML2
+  gtk_file_filter_add_pattern( filter, "*.svg" );
   gtk_file_filter_add_pattern( filter, "*.SVG" );
+#endif
 }
 
 
