@@ -130,6 +130,14 @@ TRACK_LEN TYPE TRACK......DATA CLOCK..MARKS MF..MARKS WEAK..MARKS
 #define DISK_SET_TRACK( d, head, cyl ) \
    DISK_SET_TRACK_IDX( (d), (d)->sides * cyl + head )
 
+typedef struct disk_position_context_t {
+  libspectrum_byte *track;   /* current track data bytes */
+  libspectrum_byte *clocks;  /* clock marks bits */
+  libspectrum_byte *fm;      /* FM/MFM marks bits */
+  libspectrum_byte *weak;    /* weak marks bits/weak data */
+  int i;                     /* index for track and clocks */
+} disk_position_context_t;
+
 const char *disk_strerror( int error );
 /* create an unformatted disk sides -> (1/2) cylinders -> track/side,
    dens -> 'density' related to unformatted length of a track (SD = 3125,

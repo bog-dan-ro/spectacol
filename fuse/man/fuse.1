@@ -121,7 +121,8 @@ option.
 Specify whether tape and disk files should be automatically loaded
 when they are opened using the
 .I "File, Open..."
-menu option. (Enabled by default, but you can use
+menu option. In the case of TRD/SCL disk images, inserts also a boot
+loader file when none is available. (Enabled by default, but you can use
 .RB ` \-\-no\-auto\-load '
 to disable). Same as the Media Options dialog's
 .I "Auto-load media"
@@ -5006,7 +5007,9 @@ Didaktik 80 and Didaktik 40 file formats.
 .PP
 .I .TRD
 .RS
-TR-DOS disk image; for detailed information please see
+TR-DOS disk image. TRD and SCL sectors are loaded interleaved, therefore
+you might experience problems with TR\-DOS ROMs that use the turbo
+format (sequential sectors); for detailed information please see
 .I http://web.archive.org/web/20070808150548/http://www.ramsoft.bbk.org/tech/tr\-info.zip
 .RE
 .PP

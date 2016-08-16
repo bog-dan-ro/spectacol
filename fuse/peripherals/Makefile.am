@@ -47,6 +47,7 @@ fuse_SOURCES += \
                 peripherals/disk/fdd.c \
                 peripherals/disk/opus.c \
                 peripherals/disk/plusd.c \
+                peripherals/disk/trdos.c \
                 peripherals/disk/upd_fdc.c \
                 peripherals/disk/wd_fdc.c \
                 peripherals/ide/divide.c \
@@ -90,6 +91,7 @@ noinst_HEADERS += \
                   peripherals/disk/fdd.h \
                   peripherals/disk/opus.h \
                   peripherals/disk/plusd.h \
+                  peripherals/disk/trdos.h \
                   peripherals/disk/upd_fdc.h \
                   peripherals/disk/wd_fdc.h \
                   peripherals/ide/divide.h \

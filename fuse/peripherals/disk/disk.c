@@ -36,6 +36,7 @@
 #include "crc.h"
 #include "disk.h"
 #include "settings.h"
+#include "trdos.h"
 #include "ui/ui.h"
 #include "utils.h"
 
@@ -131,6 +132,26 @@ buffseek( buffer_t *buffer, long offset, int whence )
     return -1;
   buffer->index = offset;
   return 0;
+}
+
+void
+position_context_save( const disk_t *d, disk_position_context_t *c )
+{
+  c->track  = d->track;
+  c->clocks = d->clocks;
+  c->fm     = d->fm;
+  c->weak   = d->weak;
+  c->i      = d->i;
+}
+
+void
+position_context_restore( disk_t *d, const disk_position_context_t *c )
+{
+  d->track  = c->track;
+  d->clocks = c->clocks;
+  d->fm     = c->fm;
+  d->weak   = c->weak;
+  d->i      = c->i;
 }
 
 static int
@@ -1209,10 +1230,176 @@ open_sad( buffer_t *buffer, disk_t *d, int preindex )
   return d->status = DISK_OK;
 }
 
+/* 1 RANDOMIZE USR 15619: REM : RUN "        " */
+static libspectrum_byte beta128_boot_loader[] = {
+  0x00, 0x01, 0x1c, 0x00, 0xf9, 0xc0, 0x31, 0x35, 0x36, 0x31, 0x39, 0x0e, 
+  0x00, 0x00, 0x03, 0x3d, 0x00, 0x3a, 0xea, 0x3a, 0xf7, 0x22, 0x20, 0x20, 
+  0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x22, 0x0d, 
+};
+
+static int
+trdos_insert_basic_file( disk_t *d, trdos_spec_t *spec,
+                         const libspectrum_byte *data, unsigned int size )
+{
+  unsigned int fat_sector, fat_entry, n_sec, n_bytes, n_copied;
+  int i, t, s, slen, len_pre_dam, len_pre_data;
+  disk_gap_t *g = &gaps[ GAP_TRDOS ];
+  trdos_dirent_t entry;
+  libspectrum_byte trailing_data[] = { 0x80, 0xaa, 0x01, 0x00 }; /* line 1 */
+
+  /* Check free FAT entries (we don't purge deleted files) */
+  if( spec->file_count >= 128 )
+    return DISK_UNSUP;
+
+  /* Check free sectors */
+  n_sec = ( size + ARRAY_SIZE( trailing_data ) + 255 ) / 256;
+  if( spec->free_sectors < n_sec )
+    return DISK_UNSUP;
+
+  /* Calculate sector raw length */
+  slen = calc_sectorlen( ( d->density != DISK_SD && d->density != DISK_8_SD ),
+                         256, GAP_TRDOS );
+
+  /* Calculate initial gap before data in a sector */
+  len_pre_dam = 0;
+  len_pre_dam += g->sync_len + ( g->mark >= 0 ? 3 : 0 ) + 7;     /* ID */
+  len_pre_dam += g->len[2];                                      /* GAP II */
+
+  len_pre_data = len_pre_dam;
+  len_pre_data += g->sync_len + ( g->mark >= 0 ? 3 : 0 ) + 1;    /* DAM */
+
+  /* Write file data */
+  n_copied = 0;
+  s = spec->first_free_sector;
+  t = spec->first_free_track;
+  DISK_SET_TRACK_IDX( d, t );
+
+  for( i = 0; i < n_sec; i++ ) {
+    memset( head, 0, 256 );
+    n_bytes = 0;
+
+    /* Copy chunk of file body */
+    if( n_copied < size ) {
+      n_bytes = ( size - n_copied > 256 )? 256 : size - n_copied;
+      memcpy( head, data + n_copied, n_bytes );
+      n_copied += n_bytes;
+    }
+
+    /* Copy trailing parameters */
+    if( n_copied >= size ) {
+      while( n_copied - size < ARRAY_SIZE( trailing_data ) && n_bytes < 256 ) {
+        head[ n_bytes ] = trailing_data[ n_copied - size ];
+        n_copied++;
+        n_bytes++;
+      }
+    }
+
+    /* Write buffer to disk */
+    d->i = g->len[1] + ( s % 8 * 2 + s / 8 ) * slen;    /* 1 9 2 10 3 ... */  
+    d->i += len_pre_dam;
+    data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL,
+              NULL );
+
+    /* Next sector */
+    s = ( s + 1 ) % 16;
+
+    /* Next track */
+    if( s == 0 ) {
+      t = t + 1;
+      if( t >= d->cylinders ) return DISK_UNSUP;
+      DISK_SET_TRACK_IDX( d, t );
+    }
+  }
+
+  /* Write FAT entry */
+  memcpy( entry.filename, "boot    ", 8 );
+  entry.file_extension = 'B';
+  entry.param1         = size; /* assumes variables = 0 */
+  entry.param2         = size;
+  entry.file_length    = n_sec;
+  entry.start_sector   = spec->first_free_sector;
+  entry.start_track    = spec->first_free_track;
+
+  /* Copy sector to buffer, modify and write back to disk recalculating CRCs */
+  DISK_SET_TRACK_IDX( d, 0 );
+  fat_sector = spec->file_count / 16;
+  d->i = g->len[1] + ( ( fat_sector ) % 8 * 2 + ( fat_sector ) / 8 ) * slen;  
+  memcpy( head, d->track + d->i + len_pre_data, 256 );
+
+  fat_entry  = spec->file_count % 16;
+  trdos_write_dirent( head + fat_entry * 16, &entry );
+
+  d->i += len_pre_dam;
+  data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL, NULL );
+
+  /* Write specification sector */
+  spec->file_count       += 1;
+  spec->free_sectors     -= n_sec;
+  spec->first_free_sector = s;
+  spec->first_free_track  = t;
+  trdos_write_spec( head, spec );
+
+  d->i = g->len[1] + slen + len_pre_dam;    /* sector-9: 1 9 2 10 3 ... */  
+  data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL, NULL );
+
+  return DISK_OK;
+}
+
+static void
+trdos_insert_boot_loader( disk_t *d )
+{
+  trdos_spec_t spec;
+  trdos_boot_info_t info;
+  int slen, del;
+
+  /* TR-DOS specification sector */
+  DISK_SET_TRACK_IDX( d, 0 );
+  if( !id_seek( d, 9 ) || !datamark_read( d, &del ) )
+    return;
+
+  if( trdos_read_spec( &spec, d->track + d->i ) )
+    return;
+
+  /* Check free FAT entries (we don't purge deleted files) */
+  if( spec.file_count >= 128 )
+    return;
+
+  /* Check there is at least one free sector */
+  if( spec.free_sectors == 0 )
+    return;
+  /* TODO: stealth mode? some boot loaders hide between sectors 10-16 */
+
+  /* Calculate sector raw length */
+  slen = calc_sectorlen( ( d->density != DISK_SD && d->density != DISK_8_SD ),
+                         256, GAP_TRDOS );
+
+  /* Read FAT entries */
+  if( !id_seek( d, 1 ) || !datamark_read( d, &del ) )
+    return;
+
+  if( trdos_read_fat( &info, d->track + d->i, slen ) )
+    return;
+
+  /* Check actual boot file (nothing to do) */
+  if( info.have_boot_file )
+    return;
+
+  /* Insert a simple boot loader that runs the first program */
+  if( info.basic_files_count >= 1 ) {
+    memcpy( beta128_boot_loader + 22, info.first_basic_file, 8 );
+
+    trdos_insert_basic_file( d, &spec, beta128_boot_loader,
+                             ARRAY_SIZE( beta128_boot_loader ) );
+  }
+
+  /* TODO: use also a boot loader that can handle multiple basic pograms */
+}
+
 static int
 open_trd( buffer_t *buffer, disk_t *d )
 {
   int i, j, sectors, seclen;
+  disk_position_context_t context;
 
   if( buffseek( buffer, 8*256, SEEK_CUR ) == -1 )
       return d->status = DISK_OPEN;
@@ -1243,10 +1430,17 @@ open_trd( buffer_t *buffer, disk_t *d )
   for( i = 0; i < d->cylinders; i++ ) {
     for( j = 0; j < d->sides; j++ ) {
       if( trackgen( d, buffer, j, i, 1, sectors, seclen,
-    	    NO_PREINDEX, GAP_TRDOS, INTERLEAVE_2, 0x00 ) )
-	return d->status = DISK_GEOM;
+                    NO_PREINDEX, GAP_TRDOS, INTERLEAVE_2, 0x00 ) )
+        return d->status = DISK_GEOM;
     }
   }
+  
+  if( settings_current.auto_load ) {
+    position_context_save( d, &context );
+    trdos_insert_boot_loader( d );
+    position_context_restore( d, &context );
+  }
+
   return d->status = DISK_OK;
 }
 
@@ -1567,6 +1761,7 @@ open_scl( buffer_t *buffer, disk_t *d )
 {
   int i, j, s, sectors, seclen;
   int scl_deleted, scl_files, scl_i;
+  disk_position_context_t context;
 
   d->sides = 2;
   d->cylinders = 80;
@@ -1657,9 +1852,16 @@ open_scl( buffer_t *buffer, disk_t *d )
   /* now we continue with the data */
   for( i = 1; i < d->sides * d->cylinders; i++ ) {
     if( trackgen( d, buffer, i % 2, i / 2, 1, 16, 256,
-    		    NO_PREINDEX, GAP_TRDOS, INTERLEAVE_2, 0x00 ) )
+                  NO_PREINDEX, GAP_TRDOS, INTERLEAVE_2, 0x00 ) )
       return d->status = DISK_OPEN;
   }
+
+  if( settings_current.auto_load ) {
+    position_context_save( d, &context );
+    trdos_insert_boot_loader( d );
+    position_context_restore( d, &context );
+  }
+
   return d->status = DISK_OK;
 }
 

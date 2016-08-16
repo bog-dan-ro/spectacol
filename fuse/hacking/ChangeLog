@@ -5392,3 +5392,7 @@
          edge flag set (Fred).
 20160812 Makefile.am,configure.ac,m4/libxml.m4: use pkg-config to detect libpng
          and libxml2 (more from patch #375) (Alberto Garcia).
+20160816 man/fuse.1,peripherals/{Makefile.am,disk/{disk.[ch],trdos.[ch]}}:
+         insert a boot loader in TRD/SCL disk images when autoload is enabled
+         (part of feature request #90) (thanks, windale, BogDan and Fred)
+         (Sergio).
