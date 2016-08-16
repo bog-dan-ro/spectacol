@@ -281,6 +281,7 @@ LIBSPECTRUM_ID_CARTRIDGE_IF2	A .rom Interface 2 cartridge
 
 LIBSPECTRUM_ID_COMPRESSED_BZ2	A bzip2 compressed file
 LIBSPECTRUM_ID_COMPRESSED_GZ	A gzip compressed file
+LIBSPECTRUM_ID_COMPRESSED_ZIP	A zip compressed file
 
 LIBSPECTRUM_ID_DISK_DSK		A .dsk +3 disk file
 LIBSPECTRUM_ID_DISK_CPC		A plain .dsk +3 disk file
