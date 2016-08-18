@@ -48,7 +48,12 @@ int trainers()
 }
 
 PokeModel::PokeModel()
-{}
+{
+    pokeEvent([this]{
+        pokemem_autoload_pokfile();
+        update();
+    });
+}
 
 int PokeModel::rowCount(const QModelIndex &parent) const
 {
