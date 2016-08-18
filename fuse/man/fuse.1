@@ -68,9 +68,10 @@ format.
 See the
 .B "COMPRESSED FILES"
 section for details on reading files compressed with
-.IR bzip2 "(3)"
+.IR bzip2 "(3),"
+.IR gzip "(3)"
 or
-.IR gzip "(3)."
+.IR zip "(3)."
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -121,7 +122,8 @@ option.
 Specify whether tape and disk files should be automatically loaded
 when they are opened using the
 .I "File, Open..."
-menu option. (Enabled by default, but you can use
+menu option. In the case of TRD/SCL disk images, inserts also a boot
+loader file when none is available. (Enabled by default, but you can use
 .RB ` \-\-no\-auto\-load '
 to disable). Same as the Media Options dialog's
 .I "Auto-load media"
@@ -5006,7 +5008,9 @@ Didaktik 80 and Didaktik 40 file formats.
 .PP
 .I .TRD
 .RS
-TR-DOS disk image; for detailed information please see
+TR-DOS disk image. TRD and SCL sectors are loaded interleaved, therefore
+you might experience problems with TR\-DOS ROMs that use the turbo
+format (sequential sectors); for detailed information please see
 .I http://web.archive.org/web/20070808150548/http://www.ramsoft.bbk.org/tech/tr\-info.zip
 .RE
 .PP
@@ -5142,11 +5146,13 @@ frequency stereo sound default compression level.
 Assuming the appropriate libraries were available when
 .IR libspectrum (3)
 was compiled, snapshots, tape images, dock cartridges and input
-recording files can be read from files compressed with
-.IR bzip2 (3)
-or
+recording files (RZX) can be read from files compressed with
+.IR bzip2 "(3),"
 .IR gzip (3)
-just as if they were uncompressed.
+or
+.IR zip (3)
+just as if they were uncompressed. In the zip case, only the first
+supported file found inside the archive is loaded.
 There is currently no support for reading compressed +3, DISCiPLE/+D
 or Beta disk images.
 .\"
@@ -5185,7 +5191,8 @@ error messages.
 .IR libspectrum "(3),"
 .IR ogg123 "(1),"
 .IR xspect "(1),"
-.IR xzx "(1)."
+.IR xzx "(1),"
+.IR zip "(3)."
 .PP
 The comp.sys.sinclair Spectrum FAQ, at
 .br
