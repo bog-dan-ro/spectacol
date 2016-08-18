@@ -214,8 +214,8 @@ void FolderListModel::refresh()
     while(it.hasNext()) {
         it.next();
         const auto &inf = it.fileInfo();
-        QString baseName = inf.absolutePath() + QLatin1Char('/') + inf.baseName();
-        if (inf.completeSuffix().toLower() == QLatin1String("pok") && files.contains(baseName))
+        QString baseName = inf.absolutePath() + QLatin1Char('/') + inf.completeBaseName();
+        if (inf.suffix().toLower() == QLatin1String("pok") && files.contains(baseName))
             continue;
 
         if (inf.isDir() || canOpen(inf.absoluteFilePath().toUtf8().constData())) {
