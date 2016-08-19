@@ -5399,3 +5399,5 @@
 20160817 man/fuse.1: document zip compression support (Sergio).
 20160817 ui/gtk/fileselector.c: add ".png" to the file filters in save file
          dialogs and check the support for ".svg" files (Sergio).
+20160820 ui/options.dat: fix mnemonics in drives setup to avoid collisions
+         (Sergio).
