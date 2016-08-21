@@ -461,9 +461,10 @@ if test "$withval" = no; then zlib=no; else zlib=yes; fi,
 zlib=yes)
 AC_MSG_RESULT($zlib)
 if test "$zlib" = yes; then
+  zlib=no
   AC_CHECK_HEADERS(
     zlib.h,
-    AC_SEARCH_LIBS(compress2, z zdll)
+    AC_SEARCH_LIBS(compress2, z zdll, zlib=yes)
   )
 fi
 
@@ -511,7 +512,8 @@ if test "$libpng" = yes; then
     [PNG],
     [libpng],
     [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng])],
-    [AC_MSG_WARN([libpng not found - saving screenshots disabled])]
+    [AC_MSG_WARN([libpng not found - saving screenshots disabled])
+     libpng=no]
   )
 fi
 
@@ -583,40 +585,44 @@ dnl
 AC_MSG_CHECKING(which sound routines to use)
 if test "$UI" = sdl; then
   SOUND_LIBADD='sound/sdlsound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
-  AC_MSG_RESULT(SDL)
+  audio_driver="SDL"
 elif test "$dxsound_available" = yes; then
   SOUND_LIBADD='sound/dxsound.$(OBJEXT)' SOUND_LIBS='-ldsound -lole32 -ldxguid'
-  AC_MSG_RESULT(DirectX)
+  audio_driver="DirectX"
   AC_DEFINE([DIRECTSOUND_VERSION], 0x0700, [DirectX 7 or higher is required])
 elif test "$win32sound_available" = yes; then
   SOUND_LIBADD='sound/win32sound.$(OBJEXT)' SOUND_LIBS='-lwinmm'
-  AC_MSG_RESULT(win32sound)
+  audio_driver="win32sound"
 elif test "$alsa_available" = yes; then
   SOUND_LIBADD='sound/alsasound.$(OBJEXT)' SOUND_LIBS='-lasound'
-  AC_MSG_RESULT(ALSA)
+  audio_driver="ALSA"
 elif test "$ao_available" = yes; then
   SOUND_LIBADD='sound/aosound.$(OBJEXT)' SOUND_LIBS='-lao'
-  AC_MSG_RESULT(libao)
+  audio_driver="libao"
 elif test "$ac_cv_header_dsound_h" = yes; then
   # Later selection between these two
   SOUND_LIBADD='sound/sunsound.$(OBJEXT) sound/hpsound.$(OBJEXT)' SOUND_LIBS=''
-  AC_MSG_RESULT(Solaris or HP/UX)
+  audio_driver="Solaris or HP/UX"
 elif test "$ac_cv_header_sys_soundcard_h" = yes; then
   SOUND_LIBADD='sound/osssound.$(OBJEXT)' SOUND_LIBS=''
-  AC_MSG_RESULT(OSS)
+  audio_driver="OSS"
 elif test "$ac_cv_header_sys_audioio_h" = yes; then
   dnl OpenBSD
   SOUND_LIBADD='sound/sunsound.$(OBJEXT)' SOUND_LIBS=''
-  AC_MSG_RESULT(OpenBSD)
+  audio_driver="OpenBSD"
 elif test "$coreaudio_available" = yes; then
   SOUND_LIBADD='sound/coreaudiosound.$(OBJEXT)' SOUND_LIBS='-framework CoreAudio -framework AudioUnit' sound_fifo=yes
-  AC_MSG_RESULT(CoreAudio)
+  audio_driver="CoreAudio"
 elif test "$wii" = yes; then
   SOUND_LIBADD='sound/wiisound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
-  AC_MSG_RESULT(Wii)
+  audio_driver="Wii"
 else
   SOUND_LIBADD='sound/nullsound.$(OBJEXT)' SOUND_LIBS=''
-  AC_MSG_RESULT(none)
+  audio_driver="none"
+fi
+
+AC_MSG_RESULT($audio_driver)
+if test "$audio_driver" = "none"; then
   AC_DEFINE([NO_SOUND], 1, [Defined if no sound code is present])
   AC_MSG_WARN(No sound library has been found)
 fi
@@ -683,7 +689,8 @@ if test "$stick" = yes; then
         SDL_VERSION=1.2.4
         AM_PATH_SDL($SDL_VERSION,		    
           AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks]),
-          AC_MSG_WARN([SDL version $SDL_VERSION not found - joystick support disabled]))
+          AC_MSG_WARN([SDL version $SDL_VERSION not found - joystick support disabled])
+          stick=no)
       fi
       ;;
     wii)
@@ -702,7 +709,8 @@ if test "$stick" = yes; then
                      LIBS="$LIBS -ljsw";
 		     AC_DEFINE([USE_JOYSTICK], 1,
 		               [Defined if we're using hardware joysticks]),
-                     AC_MSG_WARN(jsw.h not found - joystick support disabled))
+                     AC_MSG_WARN(jsw.h not found - joystick support disabled)
+                     stick=no)
   fi
 fi
 
@@ -718,7 +726,8 @@ if test "$libxml2" = yes; then
     [XML],
     [libxml-2.0],
     [AC_DEFINE([HAVE_LIB_XML2], 1, [Defined if we've got libxml2])],
-    [AC_MSG_WARN([libxml2 not found - config file will use ini format])]
+    [AC_MSG_WARN([libxml2 not found - config file will use ini format])
+     libxml2="no"]
   )
 fi
 
@@ -859,7 +868,7 @@ dnl Decide whether to install desktop and mime files
 AC_ARG_ENABLE(desktop-integration,
 AS_HELP_STRING([--enable-desktop-integration], [add menu entry and file associations]),
 if test "$enableval" = yes; then desktopintegration=yes; else desktopintegration=no; fi,
-desktdesktopintegration=no)
+desktopintegration=no)
 AC_MSG_CHECKING(whether to install desktop file)
 AC_MSG_RESULT($desktopintegration)
 AM_CONDITIONAL(DESKTOP_INTEGRATION, test "$desktopintegration" = yes)
@@ -937,3 +946,40 @@ data/win32/installer.nsi
 ])
 
 AC_OUTPUT
+
+dnl Status summary
+echo ""
+echo "****************************"
+echo "*** Libspectrum features ***"
+echo "****************************"
+echo ""
+echo "Internal GLib replacement: ${fakeglib}"
+echo "zlib support: ${LIBSPEC_HAVE_ZLIB:-no}"
+echo "bzip2 support: ${LIBSPEC_HAVE_BZ2:-no}"
+echo "audiofile support: ${LIBSPEC_HAVE_AUDIOFILE:-no}"
+echo ""
+echo "********************"
+echo "*** Fuse options ***"
+echo "********************"
+echo ""
+echo "User interface: ${UI}"
+if test "${UI}" = "gtk"; then
+   echo "Using GTK+ 3: ${gtk3}"
+fi
+if test x"${gpm}" != "x"; then
+   echo "libgpm support: ${gpm}"
+fi
+echo "Joystick support: ${stick}"
+if test "${stick}" = "yes"; then
+   echo "Using libjsw for joystick support: ${libjsw}"
+fi
+echo "zlib support: ${zlib}"
+echo "libxml2 support: ${libxml2}"
+echo "libpng support: ${libpng}"
+echo "Audio driver: ${audio_driver}"
+echo "Spectranet support: ${build_spectranet}"
+echo "SpeccyBoot support: ${linux_tap:-no}"
+echo "Desktop integration: ${desktopintegration}"
+echo ""
+echo "Type 'make' to compile Fuse"
+echo ""

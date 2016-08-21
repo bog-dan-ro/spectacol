@@ -5401,3 +5401,5 @@
          dialogs and check the support for ".svg" files (Sergio).
 20160820 ui/options.dat: fix mnemonics in drives setup to avoid collisions
          (Sergio).
+20160822 configure.ac: print summary of enabled features when building fuse
+         (patch #378) (Alberto Garcia).
