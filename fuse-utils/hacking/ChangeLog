@@ -584,3 +584,5 @@
 20160812 tape2pulses.c,tape2wav.c: emit an edge when 0 tstate pulses do not have
          the no edge flag set (Fred).
 20160820 man/tapeconv.1: fix typo (Sergio).
+20160822 configure.ac: print summary of enabled features when building
+         fuse-utils (patch #379) (Alberto Garcia).
