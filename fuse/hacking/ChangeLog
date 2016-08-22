@@ -5409,3 +5409,5 @@
          this release as 1.2.2 (Fred).
 20160822 configure.ac: print summary of enabled features when building fuse
          (patch #378) (Alberto Garcia).
+20160822 ui/widget/{Makefile.am,about.c,menu.c,widget.[ch],widget_internals.h}:
+         add About Fuse dialog for widget UIs with less cluttered text (Sergio).

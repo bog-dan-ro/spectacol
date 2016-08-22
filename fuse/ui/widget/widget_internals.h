@@ -232,6 +232,11 @@ void widget_pokefinder_keyhandler( input_key key );
 int widget_memory_draw( void *data );
 void widget_memory_keyhandler( input_key key );
 
+/* The about fuse widget */
+
+int widget_about_draw( void *data );
+void widget_about_keyhandler( input_key key );
+
 /* The ROM selector widget */
 
 typedef struct widget_roms_info {
