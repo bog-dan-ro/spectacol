@@ -218,6 +218,7 @@ void widget_debugger_keyhandler( input_key key )
 
       text_data.title = "Debugger command";
       text_data.allow = WIDGET_INPUT_ASCII;
+      text_data.max_length = 63;
       text_data.text[0] = 0;
       if( !widget_do_text( &text_data ) )
 	debugger_command_evaluate( widget_text_text );

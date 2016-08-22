@@ -900,6 +900,7 @@ widget_filesel_keyhandler( input_key key )
       widget_text_t text_data;
       text_data.title = title;
       text_data.allow = WIDGET_INPUT_ASCII;
+      text_data.max_length = 30;
       text_data.text[0] = 0;
       if( widget_do_text( &text_data ) ||
 	  !widget_text_text || !*widget_text_text      )

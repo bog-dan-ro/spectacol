@@ -5411,3 +5411,6 @@
          (patch #378) (Alberto Garcia).
 20160822 ui/widget/{Makefile.am,about.c,menu.c,widget.[ch],widget_internals.h}:
          add About Fuse dialog for widget UIs with less cluttered text (Sergio).
+20160822 ui/widget/{debugger.c,filesel.c,options.pl,pokemem.c,text.c,
+         widget_internals.h}: set the length of text entry widgets on widget UIs
+         (Sergio).

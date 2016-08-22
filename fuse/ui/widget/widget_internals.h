@@ -194,6 +194,7 @@ typedef enum widget_text_input_allow {
 typedef struct widget_text_t {
   const char *title;
   widget_text_input_allow allow; 
+  unsigned int max_length;
   char text[40];
 } widget_text_t;
 
