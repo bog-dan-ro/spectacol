@@ -5414,3 +5414,5 @@
 20160822 ui/widget/{debugger.c,filesel.c,options.pl,pokemem.c,text.c,
          widget_internals.h}: set the length of text entry widgets on widget UIs
          (Sergio).
+20160823 ui/win32/options.pl: set the length of text entry widgets on win32 UI
+         (Sergio).
