@@ -1111,5 +1111,11 @@ hacking/ChangeLog: the small scale changelog for libspectrum
 20160814 pzx_read.c: use libspectrum_bits_to_bytes() (Fred).
 20160815 configure.ac: print summary of enabled features when building
          libspectrum (patch #376) (Alberto Garcia).
+20160816 ChangeLog,README: first updates for a "1.2.2" release (Fred).
+20160816 configure.ac,doc/{libspectrum.3,libspectrum.txt}: mark release as
+         1.2.2-pre1 (Fred).
+20160816 Makefile.am: bump libtool version (Fred).
 20160817 doc/{libspectrum.3,libspectrum.txt}: document zip compression support
          (Sergio).
+20160821 ChangeLog,README,configure.ac,doc/libspectrum.3: update release dates
+         and mark this release as 1.2.2 (Fred).

@@ -1,3 +1,25 @@
+2016-08-21  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * libspectrum 1.2.2 released.
+
+        * Support for reading zip files (Patrik Rak and Sergio Baldoví).
+
+        * Support for converting PZX data blocks with asymmetric pulses to TZX
+          GDB blocks (Fredrick Meunier).
+
+        * Various minor bug fixes/improvements:
+          * Print summary of enabled features when building libspectrum (Alberto
+            Garcia).
+          * Fix playback of TZX GDB blocks with no pilot tones (Fredrick
+            Meunier).
+          * Fix writing GDB blocks with no pilot tones (Fredrick Meunier).
+          * Fix handling of 0 length tail pulses after PZX data blocks (Fredrick
+            Meunier).
+          * TZX spec says that 0 duration pauses should have no effect on the
+            current level (Fredrick Meunier).
+          * Ensure the first PZX pulse block pulse is marked as high or low
+            level as required (Fredrick Meunier).
+
 2016-07-17  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * libspectrum 1.2.1 released.

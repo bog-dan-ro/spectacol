@@ -71,12 +71,12 @@ endif
 ## We update the version when we release according to the guide at
 ## https://autotools.io/libtool/version.html
 ## The rules of thumb, when dealing with these values are:
-## * Always increase the revision value.
 ## * Increase the current value whenever an interface has been added, removed or
 ##   changed.
+## * Always increase the revision value.
 ## * Increase the age value only if the changes made to the ABI are backward
 ##   compatible.
-libspectrum_la_LDFLAGS = -version-info 11:1:3 -no-undefined @WINDRES_LDFLAGS@
+libspectrum_la_LDFLAGS = -version-info 12:2:4 -no-undefined @WINDRES_LDFLAGS@
 
 libspectrum_la_LIBADD = @AUDIOFILE_LIBS@ @GLIB_LIBS@ -lm
 
