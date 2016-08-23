@@ -139,10 +139,10 @@ static const libspectrum_word ZXSTIF1F_PAGED = 4;
 #define ZXSTBID_PLUS3DISK "+3\0\0"
 #define ZXSTBID_DSKFILE "DSK\0"
 #define ZXSTBID_LEC "LEC\0"
-static const libspectrum_word ZXSTLECF_PAGED = 1;
+/* static const libspectrum_word ZXSTLECF_PAGED = 1; */
 
 #define ZXSTBID_LECRAMPAGE "LCRP"
-static const libspectrum_word ZXSTLCRPF_COMPRESSED = 1;
+/* static const libspectrum_word ZXSTLCRPF_COMPRESSED = 1; */
 
 #define ZXSTBID_TIMEXREGS "SCLD"
 
@@ -179,7 +179,7 @@ static const libspectrum_dword ZXSTPLUSDF_PAGED = 1;
 static const libspectrum_dword ZXSTPLUSDF_COMPRESSED = 2;
 static const libspectrum_dword ZXSTPLUSDF_SEEKLOWER = 4;
 static const libspectrum_byte ZXSTPDRT_GDOS = 0;
-static const libspectrum_byte ZXSTPDRT_UNIDOS = 1;
+/* static const libspectrum_byte ZXSTPDRT_UNIDOS = 1; */
 static const libspectrum_byte ZXSTPDRT_CUSTOM = 2;
 
 #define ZXSTBID_PLUSDDISK "PDSK"
@@ -193,7 +193,7 @@ static const libspectrum_dword ZXSTOPUSF_CUSTOMROM = 8;
 #define ZXSTBID_OPUSDISK "ODSK"
 
 #define ZXSTBID_SIMPLEIDE "SIDE"
-static const libspectrum_word ZXSTSIDE_ENABLED = 1;
+/* static const libspectrum_word ZXSTSIDE_ENABLED = 1; */
 
 #define ZXSTBID_DIVIDE "DIDE"
 static const libspectrum_word ZXSTDIVIDE_EPROM_WRITEPROTECT = 1;

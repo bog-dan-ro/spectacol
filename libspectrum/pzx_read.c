@@ -40,9 +40,6 @@ typedef struct pzx_context {
 
 } pzx_context;
 
-static const libspectrum_byte PZX_VERSION_MAJOR = 1;
-static const libspectrum_byte PZX_VERSION_MINOR = 0;
-
 /* Constants etc for each block type */
 
 #define PZX_HEADER "PZXT"

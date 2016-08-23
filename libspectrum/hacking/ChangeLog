@@ -1119,3 +1119,4 @@ hacking/ChangeLog: the small scale changelog for libspectrum
          (Sergio).
 20160821 ChangeLog,README,configure.ac,doc/libspectrum.3: update release dates
          and mark this release as 1.2.2 (Fred).
+20160823 pzx_read.c,szx.c: fix compilation warnings (Phil).
