@@ -48,15 +48,24 @@ Menu {
         }
     }
 
+    MenuItem {
+        text: qsTr("&Quick Open ..")
+        onTriggered: {
+            menuBar.close();
+            pageLoader.source = "FileBrowserPage.qml";
+        }
+    }
+
+    MenuItem {
+        text: qsTr("&Search online ..")
+        onTriggered: {
+            menuBar.close();
+            pageLoader.source = "SearchOnlinePage.qml";
+        }
+    }
+
     Menu {
         title: qsTr("Media")
-        MenuItem {
-            text: qsTr("&Quick Open ..")
-            onTriggered: {
-                menuBar.close();
-                pageLoader.source = "FileBrowserPage.qml";
-            }
-        }
 
         MenuItem {
             visible: false
@@ -64,14 +73,6 @@ Menu {
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "SaveSnapshotPage.qml";
-            }
-        }
-
-        MenuItem {
-            text: qsTr("&Search online ..")
-            onTriggered: {
-                menuBar.close();
-                pageLoader.source = "SearchOnlinePage.qml";
             }
         }
 
