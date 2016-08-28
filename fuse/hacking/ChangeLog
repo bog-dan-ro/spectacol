@@ -5419,3 +5419,5 @@
 20160823 display.c,peripherals/disk/upd_fdc.c: fix compilation warnings (Phil).
 20160828 ui/win32/options-resource.pl: set the digit filter for text entry
          widgets on win32 UI (Sergio).
+20160828 peripherals/disk/disk.c: mark position_context_save() and
+         position_context_restore() as static (Fred).

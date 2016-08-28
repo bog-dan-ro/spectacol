@@ -134,7 +134,7 @@ buffseek( buffer_t *buffer, long offset, int whence )
   return 0;
 }
 
-void
+static void
 position_context_save( const disk_t *d, disk_position_context_t *c )
 {
   c->track  = d->track;
@@ -144,7 +144,7 @@ position_context_save( const disk_t *d, disk_position_context_t *c )
   c->i      = d->i;
 }
 
-void
+static void
 position_context_restore( disk_t *d, const disk_position_context_t *c )
 {
   d->track  = c->track;
