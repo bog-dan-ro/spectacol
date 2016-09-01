@@ -499,6 +499,24 @@ void FuseSettings::setDeadZone(qreal dz)
     emit deadZoneChanged(dz);
 }
 
+int FuseSettings::messageLevel() const
+{
+    QSettings s;
+    s.beginGroup(_("General"));
+    return s.value("messageLevel", 0).toInt();
+}
+
+void FuseSettings::setMessageLevel(int level)
+{
+    if (level == messageLevel())
+        return;
+
+    QSettings s;
+    s.beginGroup(_("General"));
+    s.setValue("messageLevel", level);
+    emit messageLevelChanged(level);
+}
+
 void FuseSettings::setGamepadAction(int gamepadButton, int action)
 {
     std::unique_lock<std::mutex> lock(m_gamepadActionsMutex);

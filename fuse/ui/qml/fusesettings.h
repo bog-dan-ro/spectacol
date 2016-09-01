@@ -41,6 +41,7 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool swipe4menu READ swipe4menu WRITE setSwipe4menu NOTIFY swipe4menuChanged)
     Q_PROPERTY(bool autoSaveOnExit READ autoSaveOnExit WRITE setAutoSaveOnExit NOTIFY autoSaveOnExitChanged)
     Q_PROPERTY(int loaderAcceleration READ loaderAcceleration WRITE setLoaderAcceleration NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(int messageLevel READ messageLevel WRITE setMessageLevel NOTIFY messageLevelChanged)
 
     // Screen Options
     Q_PROPERTY(bool showOrientationChooser READ showOrientationChooser CONSTANT)
@@ -161,6 +162,9 @@ public:
     qreal deadZone() const;
     void setDeadZone(qreal dz);
 
+    int messageLevel() const;
+    void setMessageLevel(int level);
+
 public slots:
     inline int gamepadAction(int gamepadButton) {
         std::unique_lock<std::mutex> lock(m_gamepadActionsMutex);
@@ -189,6 +193,8 @@ signals:
     void autoSaveOnExitChanged(bool autoSaveOnExit);
     void leftMarginChanged(bool leftMargin);
     void deadZoneChanged(qreal deadZone);
+
+    void messageLevelChanged(int messageLevel);
 
 private:
     bool m_hasStartButton = false;

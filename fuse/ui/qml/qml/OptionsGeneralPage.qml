@@ -54,7 +54,7 @@ Flickable {
                 SpinBox {
                     id: emulationSpeed
                     focus: true
-                    Keys.onUpPressed: detectLoaders.forceActiveFocus(Qt.TabFocusReason)
+                    Keys.onUpPressed: messageLevel.forceActiveFocus(Qt.TabFocusReason)
                     Keys.onDownPressed: autoSave.forceActiveFocus(Qt.TabFocusReason)
                     Keys.onLeftPressed: decrease()
                     Keys.onRightPressed: increase()
@@ -129,7 +129,7 @@ Flickable {
                         if (popup.visible)
                             incrementCurrentIndex();
                         else
-                            emulationSpeed.forceActiveFocus(Qt.TabFocusReason);
+                            messageLevel.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onLeftPressed: if (!popup.visible)  decrementCurrentIndex()
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
@@ -137,6 +137,35 @@ Flickable {
                     model: ["None", "Safe", "Turbo"]
                     currentIndex: fuseSettings.loaderAcceleration
                     onCurrentIndexChanged: fuseSettings.loaderAcceleration = currentIndex
+                }
+            }
+
+            Row {
+                spacing: 2.5 * Screen.pixelDensity
+                Label {
+                    text: qsTr("Message level")
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                ComboBox {
+                    id: messageLevel
+                    Keys.onUpPressed: {
+                        if (popup.visible)
+                            decrementCurrentIndex();
+                        else
+                            loaderAcceleration.forceActiveFocus(Qt.TabFocusReason);
+                    }
+                    Keys.onDownPressed: {
+                        if (popup.visible)
+                            incrementCurrentIndex();
+                        else
+                            emulationSpeed.forceActiveFocus(Qt.TabFocusReason);
+                    }
+                    Keys.onLeftPressed: if (!popup.visible)  decrementCurrentIndex()
+                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
+
+                    model: ["All (Infos, Warnings & Errors)", "Warnings & Errors", "Errors"]
+                    currentIndex: fuseSettings.messageLevel
+                    onCurrentIndexChanged: fuseSettings.messageLevel = currentIndex
                 }
             }
 

@@ -396,7 +396,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         pokeEvent([this]{
             callFunction([this]{
                 QTimer::singleShot(500, [this] {
-                    emit error(Warning, tr("Your device doesn't support low latency audio.<br />You might experience sound issues."));
+                    emit error(Info, tr("Your device doesn't support low latency audio.<br />You might experience sound issues."));
                 });
             });
         });
@@ -747,7 +747,7 @@ void FuseEmulator::setGamepadId(int gamepadId)
     if (m_gamepadId != -1)
         emit error(Info, tr("A new default gamepad was selected"));
     else
-        emit error(Info, tr("No gamepad was found, please connect a gamepad"));
+        emit error(Warning, tr("No gamepad was found, please connect a gamepad"));
 
     emit gamepadIdChanged();
 }
@@ -901,7 +901,7 @@ void FuseEmulator::load(const QString &filePath, bool removeOnFail)
         callFunction([this, filePath, removeOnFail]{
             if (m_loadedFileName.isEmpty() && removeOnFail) {
                 QFile::remove(filePath);
-                emit error(Warning, tr("File \"%1\" was removed").arg(filePath));
+                emit error(Info, tr("File \"%1\" was removed").arg(filePath));
             }
             emit saveSnapshotEnabledChanged();
         });

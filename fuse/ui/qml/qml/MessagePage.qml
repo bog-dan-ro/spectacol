@@ -52,6 +52,9 @@ Rectangle {
     }
 
     function showMessage(level, text) {
+        if (level < fuseSettings.messageLevel)
+            return;
+
         var msg = "";
         switch(level) {
         case FuseEmulator.Info:
