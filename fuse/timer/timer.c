@@ -113,6 +113,7 @@ timer_estimate_reset( void )
 static int
 timer_init( void *context )
 {
+  (void)context;
   start_time = timer_get_time(); if( start_time < 0 ) return 1;
 
   timer_event = event_register( timer_frame, "Timer" );
