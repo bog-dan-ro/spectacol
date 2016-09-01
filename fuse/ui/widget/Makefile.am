@@ -36,6 +36,7 @@ endif
 CLEANFILES += $(ui_widget_built)
 
 ui_widget_files = \
+                  ui/widget/about.c \
                   ui/widget/browse.c \
                   ui/widget/debugger.c \
                   ui/widget/error.c \

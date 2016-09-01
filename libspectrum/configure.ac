@@ -27,7 +27,7 @@ m4_define([libspectrum_version], [2.0.0])
 dnl Product full version
 m4_define([libspectrum_major_version], [2])
 m4_define([libspectrum_minor_version], [0])
-m4_define([libspectrum_micro_version], [1])
+m4_define([libspectrum_micro_version], [2])
 m4_define([libspectrum_nano_version],  [0])
 m4_define([libspectrum_full_version],
           [libspectrum_major_version.libspectrum_minor_version.libspectrum_micro_version.libspectrum_nano_version])

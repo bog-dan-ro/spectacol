@@ -35,6 +35,7 @@ char *widget_text_text = NULL;	/* What we return the text in */
 
 static const char *title;	/* The window title */
 static widget_text_input_allow allow;
+static unsigned int max_length;
 
 #define WIDGET_TEXT_LENGTH 64
 static char text[WIDGET_TEXT_LENGTH];	/* The current entry text */
@@ -51,6 +52,7 @@ widget_text_draw( void *data )
   if( data ) {
     title = text_data->title;
     allow = text_data->allow;
+    max_length = text_data->max_length;
     snprintf( text, sizeof( text ), "%s", text_data->text );
   }
 
@@ -154,7 +156,7 @@ append_character( char c )
 {
   size_t length = strlen( text );
 
-  if( length < 23 ) {
+  if( length < WIDGET_TEXT_LENGTH - 1 && length < max_length ) {
     text[ length ] = c; text[ length + 1 ] = '\0';
   }
 }

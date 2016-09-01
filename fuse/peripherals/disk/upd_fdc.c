@@ -35,10 +35,10 @@
 
 #define MAX_SIZE_CODE 8
 
-static const int UPD_FDC_MAIN_DRV_0_SEEK = 0x01;
-static const int UPD_FDC_MAIN_DRV_1_SEEK = 0x02;
-static const int UPD_FDC_MAIN_DRV_2_SEEK = 0x04;
-static const int UPD_FDC_MAIN_DRV_3_SEEK = 0x08;
+/* static const int UPD_FDC_MAIN_DRV_0_SEEK = 0x01; */
+/* static const int UPD_FDC_MAIN_DRV_1_SEEK = 0x02; */
+/* static const int UPD_FDC_MAIN_DRV_2_SEEK = 0x04; */
+/* static const int UPD_FDC_MAIN_DRV_3_SEEK = 0x08; */
 static const int UPD_FDC_MAIN_BUSY       = 0x10;
 static const int UPD_FDC_MAIN_EXECUTION  = 0x20;
 static const int UPD_FDC_MAIN_DATADIR    = 0x40;
@@ -49,9 +49,9 @@ static const int UPD_FDC_MAIN_DATAREQ    = 0x80;
 static const int UPD_FDC_ST0_NOT_READY   = 0x08;
 static const int UPD_FDC_ST0_EQUIP_CHECK = 0x10;
 static const int UPD_FDC_ST0_SEEK_END    = 0x20;
-static const int UPD_FDC_ST0_INT_NORMAL  = 0x00;     /* normal termination */
+/* static const int UPD_FDC_ST0_INT_NORMAL  = 0x00; */    /* normal termination */
 static const int UPD_FDC_ST0_INT_ABNORM  = 0x40;     /* abnormal termination */
-static const int UPD_FDC_ST0_INT_INVALID = 0x80;     /* invalid command */
+/* static const int UPD_FDC_ST0_INT_INVALID = 0x80; */    /* invalid command */
 static const int UPD_FDC_ST0_INT_READY   = 0xc0;     /* ready signal change */
 
 static const int UPD_FDC_ST1_MISSING_AM  = 0x01;
@@ -70,7 +70,7 @@ static const int UPD_FDC_ST2_WRONG_CYLINDER=0x10;
 static const int UPD_FDC_ST2_DATA_ERROR  = 0x20;     /* CRC error in data field */
 static const int UPD_FDC_ST2_CONTROL_MARK= 0x40;
 
-static const int UPD_FDC_ST3_TWO_SIDE    = 0x08;
+/* static const int UPD_FDC_ST3_TWO_SIDE    = 0x08; */
 static const int UPD_FDC_ST3_TR00        = 0x10;
 static const int UPD_FDC_ST3_READY       = 0x20;
 static const int UPD_FDC_ST3_WRPROT      = 0x40;

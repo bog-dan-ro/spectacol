@@ -583,3 +583,16 @@
 20160811 scl2trd.c: fix buffer over-read in scl2trd (Sergio).
 20160812 tape2pulses.c,tape2wav.c: emit an edge when 0 tstate pulses do not have
          the no edge flag set (Fred).
+20160816 ChangeLog,configure.ac,man/{audio2tape.1,createhdf.1,fmfconv.1,
+         fuse-utils.1,listbasic.1,profile2map.1,raw2hdf.1,rzxcheck.1,rzxdump.1,
+         rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,tape2pulses.1,tape2wav.1,
+         tapeconv.1,tzxlist.1}: first updates for a "1.2.2" release (Fred).
+20160817 README: bump version to 1.2.2 (Sergio).
+20160820 man/tapeconv.1: fix typo (Sergio).
+20160821 ChangeLog,README,configure.ac,man/{audio2tape.1,createhdf.1,fmfconv.1,
+         fuse-utils.1,listbasic.1,profile2map.1,raw2hdf.1,rzxcheck.1,rzxdump.1,
+         rzxtool.1,scl2trd.1,snap2tzx.1,snapconv.1,tape2pulses.1,tape2wav.1,
+         tapeconv.1,tzxlist.1}: update release dates and mark this release as
+         1.2.2 (Fred).
+20160822 configure.ac: print summary of enabled features when building
+         fuse-utils (patch #379) (Alberto Garcia).

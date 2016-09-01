@@ -5392,10 +5392,32 @@
          edge flag set (Fred).
 20160812 Makefile.am,configure.ac,m4/libxml.m4: use pkg-config to detect libpng
          and libxml2 (more from patch #375) (Alberto Garcia).
+20160816 ChangeLog,README,configure.ac,man/fuse.1: bump versions to 1.2.2(-pre1)
+         (Fred).
 20160816 man/fuse.1,peripherals/{Makefile.am,disk/{disk.[ch],trdos.[ch]}}:
          insert a boot loader in TRD/SCL disk images when autoload is enabled
          (part of feature request #90) (thanks, windale, BogDan and Fred)
          (Sergio).
+20160817 ChangeLog: tweak zip support description (disks are not supported)
+         (Sergio).
 20160817 man/fuse.1: document zip compression support (Sergio).
 20160817 ui/gtk/fileselector.c: add ".png" to the file filters in save file
          dialogs and check the support for ".svg" files (Sergio).
+20160820 ui/options.dat: fix mnemonics in drives setup to avoid collisions
+         (Sergio).
+20160821 ChangeLog,README,configure.ac,man/fuse.1: update release dates and mark
+         this release as 1.2.2 (Fred).
+20160822 configure.ac: print summary of enabled features when building fuse
+         (patch #378) (Alberto Garcia).
+20160822 ui/widget/{Makefile.am,about.c,menu.c,widget.[ch],widget_internals.h}:
+         add About Fuse dialog for widget UIs with less cluttered text (Sergio).
+20160822 ui/widget/{debugger.c,filesel.c,options.pl,pokemem.c,text.c,
+         widget_internals.h}: set the length of text entry widgets on widget UIs
+         (Sergio).
+20160823 ui/win32/options.pl: set the length of text entry widgets on win32 UI
+         (Sergio).
+20160823 display.c,peripherals/disk/upd_fdc.c: fix compilation warnings (Phil).
+20160828 ui/win32/options-resource.pl: set the digit filter for text entry
+         widgets on win32 UI (Sergio).
+20160828 peripherals/disk/disk.c: mark position_context_save() and
+         position_context_restore() as static (Fred).

@@ -1,3 +1,29 @@
+2016-08-21  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.2.2 released.
+
+        * New features:
+          * Support loading first tape, snapshot, dock cartridge or RZX file
+            found inside .zip files (Patrik Rak and Sergio Baldoví).
+          * Support auto-booting TR-DOS disk images without a boot file (thanks,
+            windale, BogDan Vatra and Fredrick Meunier) (Sergio Baldoví).
+
+        * Emulation core improvements:
+          * Change microphone state when 0 tstate pulses do not have the no edge
+            flag set (Fredrick Meunier).
+
+        * Machine specific improvements:
+          * Fix +3 disk autoload (thanks, windale and BogDan Vatra) (Sergio
+            Baldoví and Fredrick Meunier).
+          * Fix floppy drive selection when resetting a +3 (thanks, windale and
+            BogDan Vatra) (Sergio Baldoví).
+
+        * Miscellaneous improvements:
+          * WidgetUI: Use description for tape blocks where available (Fredrick
+            Meunier).
+          * Use pkg-config to detect libpng and libxml2 (Alberto Garcia).
+          * Various minor bugfixes.
+
 2016-07-17  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.2.1 released.

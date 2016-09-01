@@ -723,10 +723,7 @@ menu_help_keyboard( int action )
 void
 menu_help_about( int action )
 {
-  widget_end_all( WIDGET_FINISHED_OK );
-  ui_error( UI_ERROR_INFO,
-           "Free Unix Spectrum Emulator (Fuse) %s %s. See %s for details.",
-            VERSION, FUSE_COPYRIGHT, PACKAGE_URL );
+  widget_do_about();
 }
 
 static int

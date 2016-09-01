@@ -20,12 +20,12 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_utils_version], [1.2.0])
+m4_define([fuse_utils_version], [1.2.2])
 
 dnl Product full version
 m4_define([fuse_utils_major_version], [1])
 m4_define([fuse_utils_minor_version], [2])
-m4_define([fuse_utils_micro_version], [0])
+m4_define([fuse_utils_micro_version], [2])
 m4_define([fuse_utils_nano_version],  [0])
 m4_define([fuse_utils_full_version],
           [fuse_utils_major_version.fuse_utils_minor_version.fuse_utils_micro_version.fuse_utils_nano_version])
@@ -83,10 +83,12 @@ AC_ARG_WITH(zlib,
 if test "$withval" = no; then zlib=no; else zlib=yes; fi,
 zlib=yes)
 AC_MSG_RESULT($zlib)
+have_zlib="no"
 if test "$zlib" = yes; then
   AC_CHECK_HEADERS(
     zlib.h,
-    AC_SEARCH_LIBS(compress2, z zdll)
+    [AC_SEARCH_LIBS(compress2, z zdll)
+     have_zlib="yes"]
   )
 fi
 
@@ -111,19 +113,21 @@ AC_ARG_WITH(libjpeg,
 )
 AC_MSG_RESULT($libjpeg)
 
+have_libjpeg="no"
 if test "$libjpeg" = yes; then
   AC_CHECK_HEADER(
     jpeglib.h,
     [AC_CHECK_LIB( jpeg, jpeg_write_scanlines,
       [AC_DEFINE([USE_LIBJPEG], 1,
         [Defined if we're going to be using the installed libjpeg])
-        JPEG_LIBS='-ljpeg'],
+        JPEG_LIBS='-ljpeg'
+        have_libjpeg="yes"],
       [AC_MSG_WARN(jpeg_write_scanlines not found - jpeg output not supported...)],
     )],
     [AC_MSG_WARN(jpeglib.h not found - jpeg output not supported...)]
   )
 fi
-AM_CONDITIONAL(HAVE_LIBJPEG, test x$JPEG_LIBS != x)
+AM_CONDITIONAL(HAVE_LIBJPEG, test "$have_libjpeg" = "yes")
 AC_SUBST(JPEG_LIBS)
 
 dnl Check if a version of libpng which supplies png_write_png is available
@@ -134,19 +138,21 @@ AC_ARG_WITH(libpng,
   libpng=yes
 )
 AC_MSG_RESULT($libpng)
+have_libpng="no"
 if test "$libpng" = yes; then
   AC_CHECK_HEADER(
     png.h,
     [AC_CHECK_LIB( png, png_write_png,
       [AC_DEFINE([USE_LIBPNG], 1,
         [Defined if we're going to be using the installed libpng])
-        PNG_LIBS='-lpng'],
+        PNG_LIBS='-lpng'
+        have_libpng="yes"],
       [AC_MSG_WARN(png_write_png not found - PNG output not supported...)],
     )],
     [AC_MSG_WARN(png.h not found - PNG output not supported...)]
   )
 fi
-AM_CONDITIONAL(HAVE_LIBPNG, test x$PNG_LIBS != x)
+AM_CONDITIONAL(HAVE_LIBPNG, test "$have_libpng" = "yes")
 AC_SUBST(PNG_LIBS)
 
 dnl Check whether to use libgcrypt
@@ -318,3 +324,19 @@ AC_CONFIG_FILES([
 ])
 
 AC_OUTPUT
+
+dnl Status summary
+echo ""
+echo "***********************************************"
+echo "*** The Fuse utils are ready to be compiled ***"
+echo "***********************************************"
+echo ""
+echo "zlib support: $have_zlib"
+echo "libjpeg support: $have_libjpeg"
+echo "libpng support: $have_libpng"
+echo "libgcrypt support: $libgcrypt"
+echo "libaudiofile support: $audiofile"
+echo "libspectrum's internal GLib replacement: $fakeglib"
+echo ""
+echo "Type 'make' to compile the Fuse utils"
+echo ""

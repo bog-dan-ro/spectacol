@@ -100,9 +100,6 @@ static libspectrum_qword display_all_dirty;
 /* Used to signify that we're redrawing the entire screen */
 static int display_redraw_all;
 
-/* Value used to signify a border line has more than one colour on it. */
-static const int display_border_mixed = 0xff;
-
 /* The last point at which we updated the screen display */
 int critical_region_x = 0, critical_region_y = 0;
 
