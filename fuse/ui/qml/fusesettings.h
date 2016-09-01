@@ -63,6 +63,7 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool interface2 READ interface2 WRITE setInterface2 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool full48kOSK READ full48kOSK WRITE setFull48kOSK NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool joystickPrompt READ joystickPrompt WRITE setJoystickPrompt NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(qreal deadZone READ deadZone WRITE setDeadZone NOTIFY deadZoneChanged)
 
 public:
     enum FillMode {
@@ -157,6 +158,9 @@ public:
     int loaderAcceleration() const;
     void setLoaderAcceleration(int loaderAcceleration);
 
+    qreal deadZone() const;
+    void setDeadZone(qreal dz);
+
 public slots:
     inline int gamepadAction(int gamepadButton) {
         std::unique_lock<std::mutex> lock(m_gamepadActionsMutex);
@@ -184,6 +188,7 @@ signals:
     void swipe4menuChanged(bool swipe4menu);
     void autoSaveOnExitChanged(bool autoSaveOnExit);
     void leftMarginChanged(bool leftMargin);
+    void deadZoneChanged(qreal deadZone);
 
 private:
     bool m_hasStartButton = false;

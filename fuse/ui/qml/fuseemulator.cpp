@@ -402,6 +402,10 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         });
     }
 #endif
+    m_deadZone = m_fuseSettings->deadZone();
+    connect(m_fuseSettings.get(), &FuseSettings::deadZoneChanged, this, [this](qreal deadZone){
+        m_deadZone = deadZone;
+    });
 }
 
 FuseEmulator::~FuseEmulator()
@@ -1214,7 +1218,8 @@ void FuseEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat)
 
 void FuseEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value)
 {
-    pokeEvent([axis, value]{
+    double deadZone = m_deadZone;
+    pokeEvent([deadZone, axis, value]{
         if (fuse_emulation_paused && ui_widget_level == -1)
             return;
 
@@ -1235,10 +1240,10 @@ void FuseEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double va
             return;
         }
         event1.types.joystick.which = event2.types.joystick.which = 0;
-        if (value <= -0.4) {
+        if (value <= -deadZone) {
             event1.type = INPUT_EVENT_JOYSTICK_PRESS;
             event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
-        } else if (value >= 0.4) {
+        } else if (value >= deadZone) {
             event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
             event2.type = INPUT_EVENT_JOYSTICK_PRESS;
         } else {

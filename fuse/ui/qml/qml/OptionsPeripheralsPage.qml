@@ -45,7 +45,7 @@ Flickable {
 
             CheckBox {
                 id: kempstonJoystick
-                KeyNavigation.up: full48kOSK
+                KeyNavigation.up: deadZone
                 KeyNavigation.down: kempstonMouse
                 focus: true
                 text: qsTr("Kempston joystick")
@@ -92,10 +92,25 @@ Flickable {
             CheckBox {
                 id: joystickPrompt
                 KeyNavigation.up: full48kOSK
-                KeyNavigation.down: kempstonJoystick
+                KeyNavigation.down: deadZone
                 text: qsTr("Snapshot joystick prompt")
                 checked: fuseSettings.joystickPrompt
                 onCheckedChanged: fuseSettings.joystickPrompt = checked
+            }
+            Row {
+                Label {
+                    text: "Joystick deadzone"
+                }
+                Slider {
+                    id: deadZone
+                    KeyNavigation.up: joystickPrompt
+                    KeyNavigation.down: kempstonJoystick
+                    from: 0
+                    to: 0.5
+                    stepSize: 0.05
+                    value: fuseSettings.deadZone
+                    onValueChanged: fuseSettings.deadZone = value
+                }
             }
 
             Button {

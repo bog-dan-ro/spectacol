@@ -480,6 +480,25 @@ void FuseSettings::setLoaderAcceleration(int acceleration)
     }
 }
 
+qreal FuseSettings::deadZone() const
+{
+    QSettings s;
+    s.beginGroup(_("Peripherals"));
+    return s.value("deadZone", 0.4).toDouble();
+}
+
+void FuseSettings::setDeadZone(qreal dz)
+{
+    if (deadZone() == dz)
+        return;
+
+    QSettings s;
+    s.beginGroup(_("Peripherals"));
+    s.setValue("deadZone", dz);
+
+    emit deadZoneChanged(dz);
+}
+
 void FuseSettings::setGamepadAction(int gamepadButton, int action)
 {
     std::unique_lock<std::mutex> lock(m_gamepadActionsMutex);
