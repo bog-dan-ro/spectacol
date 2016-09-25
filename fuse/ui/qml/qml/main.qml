@@ -90,6 +90,7 @@ ApplicationWindow {
             switch (event.key) {
             case Qt.Key_F1:
             case Qt.Key_Search:
+            case Qt.Key_Menu:
                 if (menuBar.position) {
                     menuBar.close();
                 } else {
