@@ -25,3 +25,6 @@ Be aware that, Spectacol is in **BETA** stage, so, if you find bugs or you like 
 Download it from [google play](https://play.google.com/store/apps/details?id=eu.licentia.games.spectacol)
 
 Or become a [beta tester](https://play.google.com/apps/testing/eu.licentia.games.spectacol)
+
+# Build from source code
+Check [build instruction](BUILD.md)
