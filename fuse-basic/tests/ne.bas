@@ -1,7 +1,0 @@
-10 PRINT 1 <> 2
-20 PRINT 2 <> 2
-30 PRINT 3 <> 2
-40 PRINT 0 <> 1
-50 PRINT -1 <> -2
-60 PRINT 2.7 <> 3.1
-70 PRINT -1 <> -1

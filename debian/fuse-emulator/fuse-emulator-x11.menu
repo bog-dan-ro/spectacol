@@ -1,3 +1,0 @@
-?package(fuse-emulator-x11):needs="X11" section="Applications/Emulators"\
-  title="Fuse emulator (X11 version)" command="/usr/bin/fuse-emulator-x11"
-

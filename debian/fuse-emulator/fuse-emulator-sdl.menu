@@ -1,3 +1,0 @@
-?package(fuse-emulator-sdl):needs="X11" section="Applications/Emulators"\
-  title="Fuse emulator (SDL version)" command="/usr/bin/fuse-emulator-sdl"
-

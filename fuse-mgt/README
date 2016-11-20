@@ -1,5 +1,0 @@
-This is a filesystem driver, implemented using the Filesystem in USErspace
-(FUSE) infrastructure to read images of Disciple / +D disks.
-
-The Disciple and +D interfaces were peripherals for the ZX Spectrum, a 1980s
-home computer which was very popular in the UK.

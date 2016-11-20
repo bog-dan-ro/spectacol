@@ -16,19 +16,8 @@ Step by step build:
 
 ```
 $ git clone https://github.com/bog-dan-ro/spectacol.git
+$ cd spectacol
+$ git submodule update --init --recursive
 ```
 
-- run the build scripts:
-```
-$ cd spectacol/build
-% ./android.sh -n path/to/android/ndk
-```
-if you target the Android devices, or
-```
-$ cd spectacol/build
-% ./x86.sh
-```
-if you target the desktop.
-Every time when you switch the build type you must clean & re-run the appropriate script.
-
-- open spectacol/fuse/ui/qml/qml.pro into QtCreator, choose the right kit.
+- open spectacol.pro into QtCreator, choose the right kit.

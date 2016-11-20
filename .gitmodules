@@ -1,0 +1,6 @@
+[submodule "libspectrum"]
+	path = libspectrum
+	url = git://git.code.sf.net/u/bog-dan-ro/libspectrum
+[submodule "fuse"]
+	path = fuse
+	url = git://git.code.sf.net/u/bog-dan-ro/fuse
