@@ -387,6 +387,8 @@ ApplicationWindow {
         onUiIconUpdate: {
             switch (item) {
             case FuseEmulator.Disk:
+                if (cassetteIcon.visible)
+                    cassetteIconHideAnimation.start();
                 if (state === FuseEmulator.Active) {
                     diskIconHideAnimation.stop();
                     diskIcon.visible = true
@@ -396,6 +398,8 @@ ApplicationWindow {
                 break;
             case FuseEmulator.Microdrive:
             case FuseEmulator.Tape:
+                if (diskIcon.visible)
+                    diskIconHideAnimation.start();
                 if (state === FuseEmulator.Active) {
                     cassetteIconHideAnimation.stop();
                     cassetteIcon.visible = true
