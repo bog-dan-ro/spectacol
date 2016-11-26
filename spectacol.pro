@@ -17,8 +17,4 @@ android {
     else: system($$SCRIPTS_DIR/desktop.sh -o $$OUT_PWD)
 }
 
-!exists($$LIBSPECTRUM_INSTALL_DIR/lib/libspectrum.a) || !exists($$FUSE_BUILD_DIR/fuse/libfuse.a) {
-    error("Faild to build fuse, can't continue")
-}
-
 SUBDIRS += spectacol
