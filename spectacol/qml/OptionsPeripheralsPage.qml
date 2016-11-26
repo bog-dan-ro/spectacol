@@ -83,15 +83,24 @@ Flickable {
             CheckBox {
                 id: full48kOSK
                 KeyNavigation.up: interface2
-                KeyNavigation.down: joystickPrompt
+                KeyNavigation.down: recreatedSpectrum
                 text: qsTr("Full On Screen 48k Keyboard")
                 checked: fuseSettings.full48kOSK
                 onCheckedChanged: fuseSettings.full48kOSK = checked
             }
 
             CheckBox {
-                id: joystickPrompt
+                id: recreatedSpectrum
                 KeyNavigation.up: full48kOSK
+                KeyNavigation.down: joystickPrompt
+                text: qsTr("Recreated spectrum keyboard")
+                checked: fuseSettings.recreatedSpectrum
+                onCheckedChanged: fuseSettings.recreatedSpectrum = checked
+            }
+
+            CheckBox {
+                id: joystickPrompt
+                KeyNavigation.up: recreatedSpectrum
                 KeyNavigation.down: deadZone
                 text: qsTr("Snapshot joystick prompt")
                 checked: fuseSettings.joystickPrompt

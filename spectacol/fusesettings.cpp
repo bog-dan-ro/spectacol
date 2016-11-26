@@ -519,6 +519,16 @@ void FuseSettings::setMessageLevel(int level)
     emit messageLevelChanged(level);
 }
 
+bool FuseSettings::recreatedSpectrum() const
+{
+    return settings_current.recreated_spectrum;
+}
+
+void FuseSettings::setRecreatedSpectrum(bool recreatedSpectrum)
+{
+    safe_set(settings_current.recreated_spectrum, recreatedSpectrum);
+}
+
 void FuseSettings::setGamepadAction(int gamepadButton, int action)
 {
     std::unique_lock<std::mutex> lock(m_gamepadActionsMutex);

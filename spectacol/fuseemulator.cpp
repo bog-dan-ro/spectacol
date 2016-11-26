@@ -1141,7 +1141,7 @@ void FuseEmulator::pokeMemory(int address, int page, int value)
     }
 }
 
-void FuseEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat)
+void FuseEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
 {
     if (m_paused)
         return;
@@ -1157,17 +1157,21 @@ void FuseEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat)
     if (key == INPUT_KEY_NONE)
         return;
 
-    pokeEvent([key, unicode]{
+    pokeEvent([key, unicode, virtualKeyboard]{
         input_event_t event;
         event.type = INPUT_EVENT_KEYPRESS;
         event.types.key.spectrum_key = key;
         event.types.key.native_key = unicode;
+        int recreatedSpectrum = settings_current.recreated_spectrum;
+        if (virtualKeyboard)
+            settings_current.recreated_spectrum = 0;
         input_event(&event);
+        settings_current.recreated_spectrum = recreatedSpectrum;
     });
 
 }
 
-void FuseEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat)
+void FuseEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
 {
     if (m_paused)
         return;
@@ -1183,12 +1187,16 @@ void FuseEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat)
     if (key == INPUT_KEY_NONE)
         return;
 
-    pokeEvent([key, unicode]{
+    pokeEvent([key, unicode, virtualKeyboard]{
         input_event_t event;
         event.type = INPUT_EVENT_KEYRELEASE;
         event.types.key.spectrum_key = key;
         event.types.key.native_key = unicode;
+        int recreatedSpectrum = settings_current.recreated_spectrum;
+        if (virtualKeyboard)
+            settings_current.recreated_spectrum = 0;
         input_event(&event);
+        settings_current.recreated_spectrum = recreatedSpectrum;
     });
 }
 

@@ -66,6 +66,7 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool interface2 READ interface2 WRITE setInterface2 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool full48kOSK READ full48kOSK WRITE setFull48kOSK NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool joystickPrompt READ joystickPrompt WRITE setJoystickPrompt NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool recreatedSpectrum READ recreatedSpectrum WRITE setRecreatedSpectrum NOTIFY settingsCurrentChanged)
     Q_PROPERTY(qreal deadZone READ deadZone WRITE setDeadZone NOTIFY deadZoneChanged)
 
 public:
@@ -166,6 +167,9 @@ public:
 
     int messageLevel() const;
     void setMessageLevel(int level);
+
+    bool recreatedSpectrum() const;
+    void setRecreatedSpectrum(bool recreatedSpectrum);
 
 public slots:
     inline int gamepadAction(int gamepadButton) {

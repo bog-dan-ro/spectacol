@@ -167,7 +167,7 @@ ApplicationWindow {
                 break;
             }
             if (!event.accepted && fuse.processInputEvents) {
-                fuse.keyPress(event.key, event.modifiers, event.isAutoRepeat);
+                fuse.keyPress(event.key, event.modifiers, event.isAutoRepeat, false);
                 event.accepted = true;
             }
         }
@@ -183,7 +183,7 @@ ApplicationWindow {
                 break;
             }
             if (!event.accepted && fuse.processInputEvents) {
-                fuse.keyRelease(event.key, event.modifiers, event.isAutoRepeat);
+                fuse.keyRelease(event.key, event.modifiers, event.isAutoRepeat, false);
                 event.accepted = true;
             }
         }

@@ -271,8 +271,8 @@ public slots:
 
     void pokeMemory(int address, int page, int value);
 
-    void keyPress(int qtKey, int modifiers = 0, bool autoRepeat = false);
-    void keyRelease(int qtKey, int modifiers = 0, bool autoRepeat = false);
+    void keyPress(int qtKey, int modifiers = 0, bool autoRepeat = false, bool virtualKeyboard = true);
+    void keyRelease(int qtKey, int modifiers = 0, bool autoRepeat = false, bool virtualKeyboard = true);
     void gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value);
     void gamepadButtonPressEvent(QGamepadManager::GamepadButton button);
     void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button);
