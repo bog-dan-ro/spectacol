@@ -70,9 +70,22 @@ extern "C" int ui_mouse_release( int /*suspend*/ )
     return 0;
 }
 
+static std::atomic_uint_fast32_t blockErrors;
+
+void showErrors()
+{
+    --blockErrors;
+}
+
+void hideErrors()
+{
+    ++blockErrors;
+}
+
 extern "C" int ui_error_specific( ui_error_level severity, const char *message )
 {
-    g_fuseEmulator->showMessage(QString::fromUtf8(message), FuseEmulator::ErrorLevel(severity));
+    if (!blockErrors.load())
+        g_fuseEmulator->showMessage(QString::fromUtf8(message), FuseEmulator::ErrorLevel(severity));
     return 0;
 }
 

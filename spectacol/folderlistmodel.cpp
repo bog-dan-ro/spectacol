@@ -16,6 +16,7 @@
 */
 
 #include "folderlistmodel.h"
+#include "qmlui.h"
 
 #include <QDateTime>
 #include <QDirIterator>
@@ -181,6 +182,7 @@ QHash<int, QByteArray> FolderListModel::roleNames() const
 
 bool FolderListModel::canOpen(const QString &path)
 {
+    BlockErrors silenter;
     QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return false;

@@ -39,4 +39,12 @@ inline QString formatNumber(T nr)
     return QLatin1Literal("0x") + QString(QLatin1Literal("%1")).arg(nr, sizeof(T) * 2, 16, QLatin1Char('0')).toUpper();
 }
 
+void showErrors();
+void hideErrors();
+
+struct BlockErrors {
+    BlockErrors() { hideErrors(); }
+    ~BlockErrors() { showErrors(); }
+};
+
 #endif // QMLUI_H

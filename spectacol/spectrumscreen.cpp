@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "qmlui.h"
 #include "spectrumscreen.h"
 
 #include <QFileInfo>
@@ -94,6 +95,7 @@ inline QImage spectrumScreen2Image(const char *screen)
 
 QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString &fileName)
 {
+    BlockErrors silenter;
     QImage ret;
     libspectrum_id_t fileType;
     libspectrum_class_t fileClass;
