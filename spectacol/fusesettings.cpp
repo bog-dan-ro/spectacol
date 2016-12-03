@@ -255,7 +255,7 @@ bool FuseSettings::restrictToSpectacol() const
 {
     QSettings s;
     s.beginGroup(_("General"));
-    return s.value("restrictToSpectacol", true).toBool();
+    return s.value("restrictToSpectacol", false).toBool();
 }
 
 void FuseSettings::setRestrictToSpectacol(bool restrictBrowse)
