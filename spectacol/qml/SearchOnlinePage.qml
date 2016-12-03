@@ -21,6 +21,7 @@ import QtQuick 2.6
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.0
+import Qt.labs.settings 1.0
 import QtGamepad 1.0
 import "private" 1.0
 
@@ -54,6 +55,22 @@ Rectangle {
         onButtonAKeyChanged: console.log(buttonAKey)
     }
 
+    Settings {
+        category: "OnlineSearch"
+        property alias searchString: searchText.text
+    }
+
+    function performSearch()
+    {
+        noResults.visible = false;
+        timer.stop();
+        if (searchText.text.length === 1)
+            onlineGamesModel.search("", searchText.text);
+        else
+            onlineGamesModel.search(searchText.text);
+        grid.forceActiveFocus(Qt.TabFocusReason);
+    }
+
     ColumnLayout {
         anchors.fill: parent
         Layout.topMargin: TextSizes.scale24
@@ -68,15 +85,7 @@ Rectangle {
             onTextChanged: timer.restart()
             KeyNavigation.tab: grid
             KeyNavigation.down: grid
-            onAccepted: {
-                noResults.visible = false;
-                timer.stop();
-                if (searchText.text.length === 1)
-                    onlineGamesModel.search("", searchText.text);
-                else
-                    onlineGamesModel.search(searchText.text);
-                grid.forceActiveFocus(Qt.TabFocusReason);
-            }
+            onAccepted: performSearch()
         }
 
         GridView {
@@ -154,9 +163,10 @@ Rectangle {
 
     Component.onCompleted: {
         noResults.visible = false;
-        onlineGamesModel.search();
         fuse.paused = true;
         fuse.processInputEvents = false;
+        if (searchText.text.length)
+            performSearch();
     }
     Component.onDestruction: {
         fuse.paused = false
