@@ -136,7 +136,14 @@ public:
         Gone = UI_STATUSBAR_STATE_NOT_AVAILABLE,
     };
 
-    Q_ENUMS(ErrorLevel ControlType UiItemType UiState UiQuery)
+    enum UiConfirmSave {
+        UiConfirmSaveSave = UI_CONFIRM_SAVE_SAVE,
+        UiConfirmSaveDontsave = UI_CONFIRM_SAVE_DONTSAVE,
+        UiConfirmSaveCancel = UI_CONFIRM_SAVE_CANCEL
+    };
+
+    Q_ENUMS(ErrorLevel ControlType UiItemType UiState UiQuery UiConfirmSave)
+
 public:
     explicit FuseEmulator(QQmlContext *ctxt, QObject *parent = 0);
     ~FuseEmulator();
@@ -223,6 +230,7 @@ public:
 
     char *uiOpenFilename(const QByteArray &title, const QString &path = QString());
     char *uiSaveFilename(const QByteArray &title);
+    ui_confirm_save_t uiConfirmSaveSpecific(const QByteArray &message);
     int uiQuery(const QByteArray &message);
     void uiPokememSelector(const char *filePath);
     int uiGetListIndex(const QStringList &list, const QString &title);
@@ -279,6 +287,7 @@ public slots:
 
     void setOpenSaveFile(const QByteArray &filePath);
     void setQuery(UiQuery result);
+    void setConfirmSaveSpecific(UiConfirmSave result);
 
     void showMessage(QString message, ErrorLevel level = Info);
     void setListIndex(int index);
@@ -313,6 +322,7 @@ signals:
     void query(const QString &message);
     void showPokememSelector();
     void getListIndex(const QStringList &list, const QString &title);
+    void confirmSaveSpecific(const QString &message);
 
 private:
     void updateScalers() const;
@@ -341,6 +351,7 @@ private:
     bool m_showControlsIcons = true;
     QSemaphore m_waitSemaphore;
     QByteArray m_openSaveFilePath;
+    ui_confirm_save_t m_confirmSaveResult = UI_CONFIRM_SAVE_CANCEL;
     UiQuery m_queryResult = UiNo;
     int m_listIndex = -1;
     bool m_paused = false;

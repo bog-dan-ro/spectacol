@@ -366,6 +366,16 @@ ApplicationWindow {
         onNo: fuse.setQuery(FuseEmulator.UiNo)
     }
 
+    MessageDialog {
+        id: confirmSaveSpecificDialog
+        icon: StandardIcon.Question
+        title: "Spectacol"
+        standardButtons: StandardButton.Save | StandardButton.Discard | StandardButton.Cancel
+        onAccepted: fuse.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveSave)
+        onDiscard: fuse.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveDontsave)
+        onRejected: fuse.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveCancel)
+    }
+
     Connections {
         target: fuse
         onError: messagePage.showMessage(level, message);
@@ -429,6 +439,11 @@ ApplicationWindow {
         onQuery: {
             queryDialog.text = message;
             queryDialog.open();
+        }
+
+        onConfirmSaveSpecific: {
+            confirmSaveSpecificDialog.text = message;
+            confirmSaveSpecificDialog.open();
         }
 
         onGetListIndex: {

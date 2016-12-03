@@ -810,6 +810,13 @@ char *FuseEmulator::uiSaveFilename(const QByteArray &title)
     return strdup(m_openSaveFilePath.constData());
 }
 
+ui_confirm_save_t FuseEmulator::uiConfirmSaveSpecific(const QByteArray &message)
+{
+    emit confirmSaveSpecific(QString::fromUtf8(message));
+    m_waitSemaphore.acquire();
+    return m_confirmSaveResult;
+}
+
 int FuseEmulator::uiQuery(const QByteArray &message)
 {
     emit query(QString::fromUtf8(message));
@@ -1326,6 +1333,12 @@ void FuseEmulator::setOpenSaveFile(const QByteArray &filePath)
 void FuseEmulator::setQuery(FuseEmulator::UiQuery result)
 {
     m_queryResult = result;
+    m_waitSemaphore.release();
+}
+
+void FuseEmulator::setConfirmSaveSpecific(FuseEmulator::UiConfirmSave result)
+{
+    m_confirmSaveResult = ui_confirm_save_t(result);
     m_waitSemaphore.release();
 }
 

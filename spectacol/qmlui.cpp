@@ -196,8 +196,7 @@ extern "C" char *ui_get_save_filename( const char *title )
 
 ui_confirm_save_t ui_confirm_save_specific( const char *message )
 {
-    qDebug() << message;
-    return UI_CONFIRM_SAVE_SAVE;
+    return g_fuseEmulator->uiConfirmSaveSpecific(message);
 }
 
 extern "C" int ui_query( const char *message )
