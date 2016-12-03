@@ -158,7 +158,7 @@ Item
             Button {
                 Layout.fillWidth: true
                 text: qsTr("Close (B)")
-                onClicked: pageLoader.source = ""
+                onClicked: fileSelected("")
             }
         }
     }
