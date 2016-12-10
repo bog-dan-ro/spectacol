@@ -22,7 +22,7 @@
 #include "qmlui.h"
 
 extern "C"  {
-# include <zxmemory.h>
+# include <memory_pages.h>
 # include <pokefinder/pokefinder.h>
 }
 
