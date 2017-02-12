@@ -898,9 +898,12 @@ void FuseEmulator::save(const QString &filePath)
 {
     QDir d = QFileInfo(filePath).absoluteDir();
     d.mkpath(d.absolutePath());
-    pokeEvent([filePath]() {
+    pokeEvent([this, filePath]() {
         fuse_emulation_pause();
-        snapshot_write(filePath.toUtf8().constData());
+        if (snapshot_write(filePath.toUtf8().constData()))
+            QFile::remove(filePath);
+        else
+            showMessage(tr("File saved to '%1").arg(filePath), Info);
         fuse_emulation_unpause();
     });
 }
@@ -964,7 +967,6 @@ void FuseEmulator::quickSaveSnapshot()
             QDateTime::currentDateTime().toString(_(".yyyy-MM-dd_hh:mm:ss")) +
             _(".szx");
     save(snapshotsPath() + name);
-    showMessage(tr("Snapshot saved to '%1").arg(name));
 }
 
 void FuseEmulator::quickLoadSnapshot()
