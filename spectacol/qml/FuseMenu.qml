@@ -123,6 +123,15 @@ Menu {
         Menu {
             title: qsTr("Recording")
             MenuItem {
+                visible: fuse.recording.type === FuseRecording.Recording
+                text: qsTr("Stop Recording")
+                onTriggered: {
+                    menuBar.close();
+                    fuse.recording.stop();
+                }
+            }
+            MenuItem {
+                visible: fuse.recording.type === FuseRecording.None
                 text: "Start recording"
                 onTriggered: {
                     menuBar.close();
@@ -130,6 +139,7 @@ Menu {
                 }
             }
             MenuItem {
+                visible: fuse.recording.type === FuseRecording.None
                 text: "Continue recording"
                 onTriggered: {
                     menuBar.close();
@@ -153,6 +163,7 @@ Menu {
                 }
             }
             MenuItem {
+                visible: fuse.recording.type === FuseRecording.None
                 text: "Finalise ..."
                 onTriggered: {
                     menuBar.close();
