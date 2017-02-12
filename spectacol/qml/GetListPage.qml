@@ -66,7 +66,10 @@ Item {
         footer: Button {
             width: view.width
             text: qsTr("Close (B)")
-            onClicked: pageLoader.source = ""
+            onClicked: {
+                fuse.setListIndex(-1);
+                pageLoader.source = ""
+            }
         }
 
         delegate: Rectangle {
