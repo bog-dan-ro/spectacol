@@ -202,7 +202,7 @@ Item {
         id: highlight
         Rectangle {
             id: rect
-            visible: fuse.gamepadId != -1 && gamepadMode
+            visible: gamepadMode
             width: grid.cellWidth; height: grid.cellHeight
             x: grid.currentItem.x
             y: grid.currentItem.y
@@ -234,7 +234,7 @@ Item {
                 fuse.keyRelease(_pressedKey);
         }
 
-        interactive: fuse.gamepadId != -1 && gamepadMode
+        interactive: gamepadMode
 
         delegate: Rectangle {
             id: rec

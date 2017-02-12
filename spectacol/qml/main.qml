@@ -108,6 +108,10 @@ ApplicationWindow {
                 event.accepted = true;
                 break;
 
+            case Qt.Key_F7:
+                toggleOnScreenControls(FuseEmulator.Keyboard48K, true);
+                break;
+
             case Qt.Key_F10:
                 quitDialog.open();
                 event.accepted = true;
