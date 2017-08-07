@@ -427,11 +427,18 @@ QString FuseEmulator::dataPath() const
     QString p = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + _("/Spectacol/");
     if (QDir(path) != QDir(p)) {
         QDir d(p);
-        // Make sure we can properly create folders on external partition
+        // Make sure we can properly create folders and files on external partition
         if (d.mkpath(_("test/path/on/Android"))) {
+            QFile testFile(d.absolutePath() + "/test/path/on/Android/test.file");
+            bool ok;
+            if (ok = testFile.open(QIODevice::ReadWrite)) {
+                testFile.write("test", 4);
+                testFile.close();
+                testFile.remove();
+            }
             d.rmpath(_("test/path/on/Android"));
             QDir ren(path);
-            if (!ren.exists() || ren.rename(ren.absolutePath(), d.absolutePath()))
+            if (ok && (!ren.exists() || ren.rename(ren.absolutePath(), d.absolutePath())))
                 path = p;
         }
     }
