@@ -29,6 +29,9 @@
         <file>rom/gluck.rom</file>
         <file>rom/if1-1.rom</file>
         <file>rom/if1-2.rom</file>
+        <file>rom/mf1.rom</file>
+        <file>rom/mf128.rom</file>
+        <file>rom/mf3.rom</file>
         <file>rom/plus2-0.rom</file>
         <file>rom/plus2-1.rom</file>
         <file>rom/plus3-0.rom</file>
