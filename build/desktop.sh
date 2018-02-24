@@ -44,7 +44,7 @@ rm -fr $BUILD_DIR
 mkdir -p $BUILD_DIR/fuse
 mkdir -p $BUILD_DIR/libspectrum
 
-JOBS=${JOBS:="-j10"}
+JOBS="-j$(nproc)"
 
 pushd $BUILD_DIR/libspectrum
   if [ ! -f $SRC_DIR/libspectrum/configure ]; then
@@ -58,14 +58,15 @@ pushd $BUILD_DIR/libspectrum
   make install
 popd
 
+export PKG_CONFIG_PATH=$INSTALL_PREFIX/lib/pkgconfig
 pushd $BUILD_DIR/fuse
   if [ ! -f $SRC_DIR/fuse/configure ]; then
     pushd $SRC_DIR/fuse
     ./autogen.sh
     popd
   fi
-  $SRC_DIR/fuse/configure --prefix=$INSTALL_PREFIX --disable-shared --without-alsa --without-libxml2 \
-                          --with-joystick --with-no-ui --without-png
+  $SRC_DIR/fuse/configure --prefix=$INSTALL_PREFIX --disable-shared --disable-shared --without-gtk --without-alsa \
+                          --without-sdl --without-libxml2 --with-joystick --with-no-ui --without-png
   make $JOBS
   make install
 popd

@@ -78,7 +78,6 @@ RESOURCES += qml.qrc
 QML_IMPORT_PATH =
 
 LIBS = $$FUSE_BUILD_DIR/libfuse.a $$LIBSPECTRUM_INSTALL_DIR/lib/libspectrum.a -lz
-!android: LIBS += -lxml2 -lpng -lbz2 -lasound -laudiofile
 
 #!android {
 #    QMAKE_CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer

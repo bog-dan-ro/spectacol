@@ -97,7 +97,7 @@ rm -fr $BUILD_DIR
 mkdir -p $BUILD_DIR/fuse
 mkdir -p $BUILD_DIR/libspectrum
 
-JOBS=${JOBS:="-j10"}
+JOBS="-j$(nproc)"
 
 export PATH=$TOOLCHAIN/bin:$NDK:$PATH
 
@@ -118,6 +118,7 @@ pushd $BUILD_DIR/libspectrum
   make install
 popd
 
+export PKG_CONFIG_PATH=$INSTALL_PREFIX/lib/pkgconfig
 pushd $BUILD_DIR/fuse
   if [ ! -f $SRC_DIR/fuse/configure ]; then
     pushd $SRC_DIR/fuse
