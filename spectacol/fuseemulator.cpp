@@ -431,7 +431,7 @@ QString FuseEmulator::dataPath() const
         if (d.mkpath(_("test/path/on/Android"))) {
             QFile testFile(d.absolutePath() + "/test/path/on/Android/test.file");
             bool ok;
-            if (ok = testFile.open(QIODevice::ReadWrite)) {
+            if ((ok = testFile.open(QIODevice::ReadWrite))) {
                 testFile.write("test", 4);
                 testFile.close();
                 testFile.remove();
