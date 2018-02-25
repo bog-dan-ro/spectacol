@@ -1,21 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>lib/disk_plus3.szx</file>
-        <file>lib/tape_128.szx</file>
-        <file>lib/tape_16.szx</file>
-        <file>lib/tape_2048.szx</file>
-        <file>lib/tape_2068.szx</file>
-        <file>lib/tape_48_ntsc.szx</file>
-        <file>lib/tape_48.szx</file>
-        <file>lib/tape_pentagon.szx</file>
-        <file>lib/tape_plus2a.szx</file>
-        <file>lib/tape_plus2.szx</file>
-        <file>lib/tape_plus3e.szx</file>
-        <file>lib/tape_plus3.szx</file>
-        <file>lib/tape_scorpion.szx</file>
-        <file>lib/tape_se.szx</file>
-        <file>lib/tape_ts2068.szx</file>
-
         <file>rom/128-0.rom</file>
         <file>rom/128-1.rom</file>
         <file>rom/128p-0.rom</file>
