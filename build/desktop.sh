@@ -46,6 +46,7 @@ mkdir -p $BUILD_DIR/libspectrum
 
 JOBS="-j$(nproc)"
 
+export CFLAGS="${CFLAGS} -Ofast -DCONFIG_FILE_NAME=\\\".spectacolrc\\\""
 pushd $BUILD_DIR/libspectrum
   if [ ! -f $SRC_DIR/libspectrum/configure ]; then
     pushd $SRC_DIR/libspectrum
