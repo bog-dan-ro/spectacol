@@ -97,7 +97,7 @@ extern "C" void ui_breakpoints_updated( void )
 extern "C" int ui_debugger_activate( void )
 {
     g_fuseEmulator->activateDebugger();
-    return 0;
+    return 1;
 }
 
 extern "C" int ui_debugger_deactivate( int interruptable )

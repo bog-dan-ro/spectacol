@@ -194,6 +194,11 @@ ListView {
             break;
 
         case Qt.Key_S:
+            fuse.debuggerStep();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_N:
             fuse.debuggerNext();
             event.accepted = true;
             break;

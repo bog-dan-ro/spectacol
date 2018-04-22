@@ -159,6 +159,11 @@ Item {
                 Button {
                     Layout.fillHeight: true
                     text: qsTr("Step (L1)")
+                    onClicked: fuse.debuggerStep()
+                }
+                Button {
+                    Layout.fillHeight: true
+                    text: qsTr("Next")
                     onClicked: fuse.debuggerNext()
                 }
                 Button {

@@ -1405,6 +1405,13 @@ void FuseEmulator::debuggerTrap()
     });
 }
 
+void FuseEmulator::debuggerStep()
+{
+    pokeEvent([]{
+        debugger_step();
+    });
+}
+
 void FuseEmulator::debuggerNext()
 {
     pokeEvent([]{

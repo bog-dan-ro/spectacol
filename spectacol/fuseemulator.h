@@ -253,6 +253,7 @@ public slots:
 
     // debug methods
     void debuggerTrap();
+    void debuggerStep();
     void debuggerNext();
     void debuggerRun();
 

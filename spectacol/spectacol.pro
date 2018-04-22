@@ -78,12 +78,7 @@ RESOURCES += qml.qrc
 QML_IMPORT_PATH =
 
 LIBS = $$FUSE_BUILD_DIR/libfuse.a $$LIBSPECTRUM_INSTALL_DIR/lib/libspectrum.a -lz
-
-#!android {
-#    QMAKE_CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
-#    QMAKE_CFLAGS += -fsanitize=address -fno-omit-frame-pointer
-#    QMAKE_LFLAGS += -fsanitize=address
-#}
+!android: LIBS += -lbz2
 
 DISTFILES += \
     android/AndroidManifest.xml \
