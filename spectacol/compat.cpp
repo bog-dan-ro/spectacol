@@ -86,6 +86,12 @@ extern "C" const char *compat_get_home_path()
     return path.constData();
 }
 
+extern "C" const char *compat_get_config_path()
+{
+    static const QByteArray path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation).toUtf8();
+    return path.constData();
+}
+
 extern "C" int compat_is_absolute_path(const char *path)
 {
     return QFileInfo(path).isAbsolute() ? 1 : 0;

@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.3
+import QtQuick 2.12
 import QtQuick.Controls 1.4
-import QtQuick.Layouts 1.1
-import QtQuick.Window 2.2
+import QtQuick.Layouts 1.12
+import QtQuick.Window 2.12
 import QtGamepad 1.0
 import "Utils.js" as Utils
 import "private" 1.0

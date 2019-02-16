@@ -26,16 +26,29 @@
 
 #include <QQmlApplicationEngine>
 #include <QGuiApplication>
+#include <QDir>
+#include <QStandardPaths>
 #ifdef Q_OS_ANDROID
 # include <QtAndroid>
 #endif
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
     app.setOrganizationName("Licentia");
     app.setOrganizationDomain("licentia.eu");
     app.setApplicationName("Spectacol");
+
+    QString newSettings = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/.fuserc";
+#ifdef Q_OS_ANDROID
+    QString oldSettings = QDir::homePath() + "/.fuserc";
+#else
+    QString oldSettings = QDir::homePath() + "/.spectacolrc";
+#endif
+    QDir::home().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
+    if (!QFile::exists(newSettings) && QFile::exists(oldSettings))
+        QFile::rename(oldSettings, newSettings);
 
     qmlRegisterType<FuseScreen>("Fuse", 1, 0, "FuseScreen");
     qmlRegisterType<Z80Assembler>("Fuse", 1, 0, "Z80Assembler");

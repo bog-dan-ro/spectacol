@@ -17,7 +17,7 @@
 
 // @scope main.qml
 
-import QtQuick 2.0
+import QtQuick 2.12
 import Qt.labs.settings 1.0
 import Fuse 1.0
 

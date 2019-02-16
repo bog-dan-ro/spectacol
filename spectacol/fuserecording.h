@@ -18,7 +18,7 @@ public:
     Q_ENUMS(Type)
 
 public:
-    FuseRecording(FuseEmulator *parent = 0);
+    FuseRecording(FuseEmulator *parent = nullptr);
     void setStopVisible(bool visible);
 
 public slots:

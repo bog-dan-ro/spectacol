@@ -7,15 +7,15 @@ QT += qml quick gamepad multimedia svg
 
 android: QT += androidextras
 
-LIBSPECTRUM_INSTALL_DIR =
-FUSE_BUILD_DIR =
 SCRIPTS_DIR = $$PWD/../build
 android {
-    LIBSPECTRUM_INSTALL_DIR = $$OUT_PWD/../$$ANDROID_ARCHITECTURE
-    FUSE_BUILD_DIR = $$OUT_PWD/../build/$$ANDROID_ARCHITECTURE/fuse
+    LIBSPECTRUM_INSTALL_DIR = $$OUT_PWD/$$ANDROID_ARCHITECTURE
+    FUSE_BUILD_DIR = $$OUT_PWD/build/$$ANDROID_ARCHITECTURE/fuse
+    FUSE_BUILD_COMMAND = $$SCRIPTS_DIR/android.sh -a $$ANDROID_ARCHITECTURE -n $$NDK_ROOT -o $$OUT_PWD
 } else {
-    LIBSPECTRUM_INSTALL_DIR = $$OUT_PWD/../desktop
-    FUSE_BUILD_DIR = $$OUT_PWD/../build/desktop/fuse
+    LIBSPECTRUM_INSTALL_DIR = $$OUT_PWD/desktop
+    FUSE_BUILD_DIR = $$OUT_PWD/build/desktop/fuse
+    FUSE_BUILD_COMMAND = $$SCRIPTS_DIR/desktop.sh -o $$OUT_PWD
 }
 
 INCLUDEPATH += $$FUSE_BUILD_DIR $$LIBSPECTRUM_INSTALL_DIR/include $$PWD/../fuse
@@ -52,6 +52,7 @@ SOURCES += \
     fuserecording.cpp
 
 HEADERS += \
+    $$FUSE_BUILD_DIR/config.h \
     fusetexture.h \
     fusescreen.h \
     qmlui.h \
@@ -80,6 +81,13 @@ QML_IMPORT_PATH =
 LIBS = $$FUSE_BUILD_DIR/libfuse.a $$LIBSPECTRUM_INSTALL_DIR/lib/libspectrum.a -lz
 !android: LIBS += -lbz2
 
+buildFuseTarget.target = $$FUSE_BUILD_DIR/config.h
+buildFuseTarget.commands = $$FUSE_BUILD_COMMAND
+
+PRE_TARGETDEPS += $$FUSE_BUILD_DIR/config.h
+
+QMAKE_EXTRA_TARGETS += buildFuseTarget
+
 DISTFILES += \
     android/AndroidManifest.xml \
     android/gradle/wrapper/gradle-wrapper.jar \
@@ -91,9 +99,4 @@ DISTFILES += \
     android/res/drawable/logo.png
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
-
-contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
-    ANDROID_EXTRA_LIBS = \
-        $$PWD/3rdparty/android_ssl_armv7a/libcrypto.so \
-        $$PWD/3rdparty/android_ssl_armv7a/libssl.so
-}
+android: include($$PWD/3rdparty/android_openssl/openssl.pri)

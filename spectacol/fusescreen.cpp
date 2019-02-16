@@ -52,7 +52,7 @@ bool FuseScreen::fullScreen() const
 
 void FuseScreen::setFullScreen(bool fullScreen)
 {
-    pokeEvent([this, fullScreen]{
+    pokeEvent([ fullScreen]{
         if (settings_current.full_screen == fullScreen)
             return;
 

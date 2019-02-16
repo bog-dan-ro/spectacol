@@ -5,9 +5,8 @@ set -o nounset
 
 ANDROID=$HOME/android
 NDK=$ANDROID/android-ndk
-TOOLCHAIN_VERSION=4.9
 ABI=arm
-PLATFORM=android-9
+PLATFORM=16
 OUT_DIR=$(dirname $0)
 
 while getopts ":hn:a:p:o:" optname
@@ -65,25 +64,33 @@ esac
 
 case $ABI in
   "arm")
-    SYSROOT=$NDK/platforms/$PLATFORM/arch-$ABI
-    TOOLCHAIN=$NDK/toolchains/arm-linux-androideabi-$TOOLCHAIN_VERSION/prebuilt/$HOST_OS-$HOST_ARCH
-    TOOLCHAIN_PREFIX=arm-linux-androideabi
-    CFLAGS="-mandroid -mthumb -Wno-psabi -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -DANDROID -Wa,--noexecstack -g -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64"
-    LDFLAGS="-L${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/armeabi-v7a"
+    CFLAGS="-target armv7-none-linux-androideabi -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -fno-builtin-memmove -marm"
+    LDFLAGS="-L${NDK}/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a"
+    HOST="arm-linux-androideabi"
     ;;
   "arm64")
-    PLATFORM=android-21
-    SYSROOT=$NDK/platforms/$PLATFORM/arch-$ABI
-    TOOLCHAIN=$NDK/toolchains/aarch64-linux-android-$TOOLCHAIN_VERSION/prebuilt/$HOST_OS-$HOST_ARCH
-    TOOLCHAIN_PREFIX=aarch64-linux-android
-    CFLAGS="-mandroid -ffunction-sections -funwind-tables -fstack-protector -fomit-frame-pointer -fstrict-aliasing -funswitch-loops -finline-limit=300 -DANDROID -Wa,--noexecstac -g -Os -I${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/arm64-v8a/include"
-    LDFLAGS="-L${NDK}/sources/cxx-stl/gnu-libstdc++/${TOOLCHAIN_VERSION}/libs/arm64-v8a"
+    PLATFORM=21
+    CFLAGS="-target aarch64-none-linux-android "
+    LDFLAGS="-L${NDK}/sources/cxx-stl/llvm-libc++/libs/arm64-v8a"
+    HOST="aarch64-linux-android"
     ;;
   *)
     echo "Unknown/Unhandled ABI $ABI"
     exit 1
     ;;
 esac
+
+export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$HOST_OS-$HOST_ARCH
+export AR=$TOOLCHAIN/bin/${HOST}-ar
+export AS=$TOOLCHAIN/bin/${HOST}-as
+export CC=$TOOLCHAIN/bin/clang
+export CXX=$TOOLCHAIN/bin/clang++
+export LD=$TOOLCHAIN/bin/${HOST}-ld
+export RANLIB=$TOOLCHAIN/bin/${HOST}-ranlib
+export STRIP=$TOOLCHAIN/bin/${HOST}-strip
+
+SYSROOT=$NDK/sysroot/usr
+LDFLAGS="${LDFLAGS} -L$NDK/platforms/android-${PLATFORM}/arch-$ABI/usr/lib"
 
 OUT_DIR=$(cd $OUT_DIR && pwd)
 SRC_DIR=$(dirname $0)
@@ -100,11 +107,10 @@ mkdir -p $BUILD_DIR/libspectrum
 JOBS="-j$(nproc)"
 
 export PATH=$TOOLCHAIN/bin:$NDK:$PATH
-
-export CFLAGS="${CFLAGS} --sysroot=${SYSROOT} -I${INSTALL_PREFIX}/include"
+export CFLAGS="${CFLAGS} -fstack-protector-strong -g -Ofast -DANDROID -D_REENTRANT -fPIC -D__ANDROID_API__=${PLATFORM} -I${SYSROOT}/include -I${INSTALL_PREFIX}/include"
 export CPPFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
-export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib -L${INSTALL_PREFIX}/lib -lm -ldl"
+export LDFLAGS="--sysroot=$NDK/platforms/android-${PLATFORM}/arch-$ABI -fuse-ld=lld ${LDFLAGS} -L${INSTALL_PREFIX}/lib -lc -lm -ldl"
 
 pushd $BUILD_DIR/libspectrum
   if [ ! -f $SRC_DIR/libspectrum/configure ]; then
@@ -112,7 +118,7 @@ pushd $BUILD_DIR/libspectrum
     ./autogen.sh
     popd
   fi
-  $SRC_DIR/libspectrum/configure --host=$TOOLCHAIN_PREFIX --with-sysroot=$SYSROOT --prefix=$INSTALL_PREFIX \
+  $SRC_DIR/libspectrum/configure --host $HOST --with-sysroot=$NDK/platforms/android-${PLATFORM}/arch-$ABI --prefix=$INSTALL_PREFIX \
                                  --disable-shared --with-fake-glib --without-libaudiofile
   make $JOBS
   make install
@@ -125,7 +131,7 @@ pushd $BUILD_DIR/fuse
     ./autogen.sh
     popd
   fi
-  $SRC_DIR/fuse/configure --host=$TOOLCHAIN_PREFIX --with-sysroot=$SYSROOT --prefix=$INSTALL_PREFIX \
+  $SRC_DIR/fuse/configure --host $HOST --with-sysroot=$NDK/platforms/android-${PLATFORM}/arch-$ABI --prefix=$INSTALL_PREFIX \
                           --disable-shared --without-gtk --without-alsa --without-sdl --without-libxml2 \
                           --with-joystick --with-no-ui --without-png
   make $JOBS

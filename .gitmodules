@@ -4,3 +4,6 @@
 [submodule "fuse"]
 	path = fuse
 	url = git://git.code.sf.net/u/bog-dan-ro/fuse
+[submodule "spectacol/3rdparty/android_openssl"]
+	path = spectacol/3rdparty/android_openssl
+	url = https://github.com/KDAB/android_openssl.git
