@@ -368,15 +368,6 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
 #ifdef Q_OS_ANDROID
     auto pm = QtAndroid::androidActivity().callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;");
     m_touchscreen = pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(_("android.hardware.touchscreen")).object());
-    if (!pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(_("android.hardware.audio.low_latency")).object())) {
-        pokeEvent([this]{
-            callFunction([this]{
-                QTimer::singleShot(500, [this] {
-                    emit error(Info, tr("Your device doesn't support low latency audio.<br />You might experience sound issues."));
-                });
-            });
-        });
-    }
 #endif
     m_deadZone = m_fuseSettings->deadZone();
     connect(m_fuseSettings.get(), &FuseSettings::deadZoneChanged, this, [this](qreal deadZone){
