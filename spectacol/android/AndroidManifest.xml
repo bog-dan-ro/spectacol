@@ -1,5 +1,24 @@
 <?xml version="1.0"?>
-<manifest package="eu.licentia.games.spectacol" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="4.5.7" android:versionCode="457" android:installLocation="auto">
+<manifest package="eu.licentia.games.spectacol" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.5.2.0" android:versionCode="0321520" android:installLocation="auto">
+    <!--
+        android:versionCode="0321520"  scheme:
+        - <Platform><ABI><FuseVer><SpectacolPatchVer>
+        - Platforms:
+            * 0 - arm
+            * 1 - intel (x86)
+        - ABIs:
+            * 32 - 32 bit arm or intel
+            * 64 - 64 bit arm or intel
+        - FuseVer:
+            * 152 - Fuse 1.5.2 version
+        - Spectacol Patch Version:
+            * 0 - spectacol patch version
+
+        - 0321520 -> 32 bit arm, 1.5.2 fuse ver, 0 patch version
+        - 0641520 -> 64 bit arm, 1.5.2 fuse ver, 0 patch version
+        - 1321520 -> 32 bit x86, 1.5.2 fuse ver, 0 patch version
+        - 1641520 -> 64 bit x86_64, 1.5.2 fuse ver, 0 patch version
+    -->
     <application android:banner="@drawable/banner" android:logo="@drawable/banner" android:icon="@drawable/icon" android:isGame="true" android:theme="@android:style/Theme.DeviceDefault.NoActionBar" android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="Spectacol">
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="Spectacol" android:screenOrientation="landscape" android:launchMode="singleTop">
             <intent-filter>
