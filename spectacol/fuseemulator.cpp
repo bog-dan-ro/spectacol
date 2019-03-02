@@ -146,7 +146,7 @@ void FuseThread::run()
     std::vector<QByteArray> argsVector(args.size());
     const char *argv[args.size()];
     foreach (const QString &arg, args) {
-        argsVector.push_back(arg.toLocal8Bit());
+        argsVector.push_back(arg.toUtf8());
         argv[argc++] = argsVector.back().constData();
     }
 
