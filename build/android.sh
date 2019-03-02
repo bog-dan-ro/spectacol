@@ -74,6 +74,16 @@ case $ABI in
     LDFLAGS="-L${NDK}/sources/cxx-stl/llvm-libc++/libs/arm64-v8a"
     HOST="aarch64-linux-android"
     ;;
+  "x86")
+    CFLAGS="-target i686-none-linux-android "
+    LDFLAGS="-L${NDK}/sources/cxx-stl/llvm-libc++/libs/x86"
+    HOST="i686-linux-android"
+    ;;
+  "x86_64")
+    CFLAGS="-target x86_64-none-linux-android "
+    LDFLAGS="-L${NDK}/sources/cxx-stl/llvm-libc++/libs/x86_64"
+    HOST="x86_64-linux-android"
+    ;;
   *)
     echo "Unknown/Unhandled ABI $ABI"
     exit 1
