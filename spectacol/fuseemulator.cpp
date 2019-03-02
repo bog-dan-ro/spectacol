@@ -405,16 +405,45 @@ void FuseEmulator::setPaused(bool paused)
 
 QString FuseEmulator::dataPath() const
 {
+    static QString path;
+    if (!path.isEmpty())
+        return path;
+
     QSettings s;
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-    QString path = s.value("dataPath", QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + _("/Spectacol/")).toString();
+    path = s.value("dataPath", QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + _("/Spectacol/")).toString();
 #else
-    QString path = s.value("dataPath", QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + _("/Spectacol/")).toString();
+    path = s.value("dataPath", QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + _("/Spectacol/")).toString();
 #endif
+
 #ifdef Q_OS_ANDROID
-    if (s.value(_("dataPathChanged"), false).toBool())
-        return path;
-    s.setValue(_("dataPathChanged"), true);
+    if (QtAndroid::androidSdkVersion() >= 23) {
+        // Don't ask again the user for permissions
+        if (s.value(_("permissionDenied"), false).toBool())
+            return path = QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + _("/Spectacol/");
+
+        QStringList permissions = {"android.permission.READ_EXTERNAL_STORAGE",
+                                   "android.permission.WRITE_EXTERNAL_STORAGE"};
+        bool sdcardAccessAllowed = true;
+        for (const auto &permission : permissions) {
+            if (QtAndroid::checkPermission(permission) == QtAndroid::PermissionResult::Denied)
+                sdcardAccessAllowed = false;
+        }
+        if (!sdcardAccessAllowed) {
+            sdcardAccessAllowed = true;
+            auto res = QtAndroid::requestPermissionsSync(permissions);
+            for (auto it = res.begin(); it != res.end(); ++it)
+                sdcardAccessAllowed &= it.value() == QtAndroid::PermissionResult::Granted;
+        }
+        s.setValue(_("permissionDenied"), !sdcardAccessAllowed);
+        if (!sdcardAccessAllowed)
+            return path = QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + _("/Spectacol/");
+    } else {
+        if (s.value(_("dataPathChanged"), false).toBool())
+            return path;
+        s.setValue(_("dataPathChanged"), true);
+    }
+
     QString p = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + _("/Spectacol/");
     if (QDir(path) != QDir(p)) {
         QDir d(p);
