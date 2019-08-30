@@ -529,6 +529,9 @@ int FuseEmulator::selectedJoysticksIndex() const
 
 void FuseEmulator::setSelectedJoysticksIndex(int selectedJoysticksIndex)
 {
+    m_fuseSettings->setKempstonJoystick(selectedJoysticksIndex == LIBSPECTRUM_JOYSTICK_KEMPSTON);
+    m_fuseSettings->setInterface1(selectedJoysticksIndex == LIBSPECTRUM_JOYSTICK_SINCLAIR_1);
+    m_fuseSettings->setInterface2(selectedJoysticksIndex == LIBSPECTRUM_JOYSTICK_SINCLAIR_2);
     pokeEvent([selectedJoysticksIndex, this]{
         settings_current.joystick_1_output = selectedJoysticksIndex;
         callFunction([this]{
