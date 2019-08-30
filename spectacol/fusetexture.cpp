@@ -56,7 +56,9 @@ extern "C" int uidisplay_init( int width, int height )
     } else {
         scaler_register( SCALER_TV2X );
         scaler_register( SCALER_PALTV2X );
+        scaler_register( SCALER_PALTV3X );
         scaler_register( SCALER_HQ3X );
+        scaler_register( SCALER_HQ4X );
     }
 
     if (scaler_is_supported(current_scaler))
