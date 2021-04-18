@@ -31,6 +31,7 @@ public:
 
 public slots:
     void open(QString filePath);
+    void save(QString filePath);
     void togglePlay();
     void rewind();
     void clear();

@@ -49,6 +49,15 @@ void FuseTape::open(QString filePath)
     });
 }
 
+void FuseTape::save(QString filePath)
+{
+    pokeEvent([filePath]{
+        fuse_emulation_pause();
+        tape_write(filePath.toUtf8().constData());
+        fuse_emulation_unpause();
+    });
+}
+
 void FuseTape::togglePlay()
 {
     pokeEvent([]{
