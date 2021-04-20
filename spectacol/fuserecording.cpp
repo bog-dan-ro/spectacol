@@ -16,6 +16,7 @@ FuseRecording::FuseRecording(FuseEmulator *parent)
 
 void FuseRecording::setStopVisible(bool visible)
 {
+    Q_UNUSED(visible)
     callFunction([this] {
         if (rzx_recording) {
             m_type = Recording;

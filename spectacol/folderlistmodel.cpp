@@ -38,7 +38,7 @@ FolderListModel::~FolderListModel()
 
 void FolderListModel::setFolder(QString folder)
 {
-    if (folder.startsWith(QLatin1Literal("file://")))
+    if (folder.startsWith(QLatin1String("file://")))
         folder = folder.mid(7);
 
     if (m_folder == folder)
@@ -53,7 +53,7 @@ void FolderListModel::setFolder(QString folder)
 
 void FolderListModel::setRootFolder(QString rootFolder)
 {
-    if (rootFolder.startsWith(QLatin1Literal("file://")))
+    if (rootFolder.startsWith(QLatin1String("file://")))
         rootFolder = rootFolder.mid(7);
 
     if (m_rootFolder == rootFolder)

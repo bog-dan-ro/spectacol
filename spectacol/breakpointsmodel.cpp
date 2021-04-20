@@ -85,25 +85,25 @@ QVariant breakpointType(BreakpointsModel::BreakpointType type)
 {
     switch (type) {
     case BreakpointsModel::BreakOnExecute:
-        return QLatin1Literal("X");
+        return QLatin1String("X");
 
     case BreakpointsModel::BreakOnRead:
-        return QLatin1Literal("R");
+        return QLatin1String("R");
 
     case BreakpointsModel::BreakOnWrite:
-        return QLatin1Literal("W");
+        return QLatin1String("W");
 
     case BreakpointsModel::BreakOnPortRead:
-        return QLatin1Literal("PR");
+        return QLatin1String("PR");
 
     case BreakpointsModel::BreakOnPortWrite:
-        return QLatin1Literal("PW");
+        return QLatin1String("PW");
 
     case BreakpointsModel::BreakOnTime:
-        return QLatin1Literal("T");
+        return QLatin1String("T");
 
     case BreakpointsModel::BreakOnEvent:
-        return QLatin1Literal("E");
+        return QLatin1String("E");
     }
     return QVariant();
 }

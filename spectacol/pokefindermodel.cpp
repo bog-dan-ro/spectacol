@@ -110,13 +110,13 @@ QVariant PokeFinderModel::data(const QModelIndex &index, int role) const
     case Breakpoint:
         switch (m_data[index.row()].breakpoints) {
         case 1:
-            return QLatin1Literal("Break on Read");
+            return QLatin1String("Break on Read");
         case 2:
-            return QLatin1Literal("Break on Write");
+            return QLatin1String("Break on Write");
         case 3:
-            return QLatin1Literal("Break on R/W");
+            return QLatin1String("Break on R/W");
         default:
-            return QLatin1Literal("");
+            return QLatin1String("");
         }
         break;
     }

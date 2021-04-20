@@ -36,7 +36,7 @@ inline QString formatNumber(T nr)
 {
     if (debugger_output_base == 10)
         return QString::number(nr);
-    return QLatin1Literal("0x") + QString(QLatin1Literal("%1")).arg(nr, sizeof(T) * 2, 16, QLatin1Char('0')).toUpper();
+    return QLatin1String("0x") + QString(QLatin1String("%1")).arg(nr, sizeof(T) * 2, 16, QLatin1Char('0')).toUpper();
 }
 
 void showErrors();
