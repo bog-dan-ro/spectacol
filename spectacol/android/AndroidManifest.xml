@@ -105,7 +105,7 @@
             <meta-data android:name="android.app.splash_screen_sticky" android:value="true"/>
         </activity>
     </application>
-    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="26"/>
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="26"/>
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
 
     <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.

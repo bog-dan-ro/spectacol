@@ -5,8 +5,8 @@ set -o nounset
 
 ANDROID=$HOME/android
 NDK=$ANDROID/android-ndk
-ABI=arm
-PLATFORM=16
+ABI=armeabi-v7a
+export API=21
 OUT_DIR=$(dirname $0)
 
 while getopts ":hn:a:p:o:" optname
@@ -14,7 +14,7 @@ do
   case "$optname" in
     "h")
       echo "Usage:
-      android.sh -n NDK -p PLATFORM -a ABI [-o OUTDIR]
+      android.sh -n NDK -a ABI [-o OUTDIR]
       "
       exit 1
       ;;
@@ -23,9 +23,6 @@ do
       ;;
     "n")
       NDK="$OPTARG"
-      ;;
-    "p")
-      PLATFORM="$OPTARG"
       ;;
     "o")
       OUT_DIR="$OPTARG"
@@ -62,27 +59,25 @@ case "$HOST_OS" in
         ;;
 esac
 
+export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$HOST_OS-$HOST_ARCH
+SYSROOT=$TOOLCHAIN/sysroot/usr
+
 case $ABI in
-  "arm")
-    CFLAGS="-target armv7-none-linux-androideabi -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -fno-builtin-memmove -marm"
-    LDFLAGS="-L${NDK}/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a"
-    HOST="arm-linux-androideabi"
+  "armeabi-v7a")
+    export TARGET=armv7a-linux-androideabi
+    CFLAGS=" -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -fno-builtin-memmove -marm "
     ;;
-  "arm64")
-    PLATFORM=21
-    CFLAGS="-target aarch64-none-linux-android "
-    LDFLAGS="-L${NDK}/sources/cxx-stl/llvm-libc++/libs/arm64-v8a"
-    HOST="aarch64-linux-android"
+  "arm64-v8a")
+    export TARGET=aarch64-linux-android
+    CFLAGS=""
     ;;
   "x86")
-    CFLAGS="-target i686-none-linux-android "
-    LDFLAGS="-L${NDK}/sources/cxx-stl/llvm-libc++/libs/x86"
-    HOST="i686-linux-android"
+    export TARGET=i686-linux-android
+    CFLAGS=""
     ;;
   "x86_64")
-    CFLAGS="-target x86_64-none-linux-android "
-    LDFLAGS="-L${NDK}/sources/cxx-stl/llvm-libc++/libs/x86_64"
-    HOST="x86_64-linux-android"
+    export TARGET=x86_64-linux-android
+    CFLAGS=""
     ;;
   *)
     echo "Unknown/Unhandled ABI $ABI"
@@ -90,17 +85,13 @@ case $ABI in
     ;;
 esac
 
-export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$HOST_OS-$HOST_ARCH
-export AR=$TOOLCHAIN/bin/${HOST}-ar
-export AS=$TOOLCHAIN/bin/${HOST}-as
-export CC=$TOOLCHAIN/bin/clang
-export CXX=$TOOLCHAIN/bin/clang++
-export LD=$TOOLCHAIN/bin/${HOST}-ld
-export RANLIB=$TOOLCHAIN/bin/${HOST}-ranlib
-export STRIP=$TOOLCHAIN/bin/${HOST}-strip
-
-SYSROOT=$NDK/sysroot/usr
-LDFLAGS="${LDFLAGS} -L$NDK/platforms/android-${PLATFORM}/arch-$ABI/usr/lib"
+export AR=$TOOLCHAIN/bin/llvm-ar
+export CC=$TOOLCHAIN/bin/$TARGET$API-clang
+export AS=$CC
+export CXX=$TOOLCHAIN/bin/$TARGET$API-clang++
+export LD=$TOOLCHAIN/bin/ld
+export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+export STRIP=$TOOLCHAIN/bin/llvm-strip
 
 OUT_DIR=$(cd $OUT_DIR && pwd)
 SRC_DIR=$(dirname $0)
@@ -116,11 +107,10 @@ mkdir -p $BUILD_DIR/libspectrum
 
 JOBS="-j$(nproc)"
 
-export PATH=$TOOLCHAIN/bin:$NDK:$PATH
-export CFLAGS="${CFLAGS} -fstack-protector-strong -g -Ofast -DANDROID -D_REENTRANT -fPIC -D__ANDROID_API__=${PLATFORM} -I${SYSROOT}/include -I${INSTALL_PREFIX}/include"
+export PATH=$TOOLCHAIN/bin:$PATH
+export CFLAGS="${CFLAGS} -fstack-protector-strong -g -Ofast -DANDROID -D_REENTRANT -fPIC -I${INSTALL_PREFIX}/include"
 export CPPFLAGS="${CFLAGS}"
 export CXXFLAGS="${CFLAGS}"
-export LDFLAGS="--sysroot=$NDK/platforms/android-${PLATFORM}/arch-$ABI -fuse-ld=lld ${LDFLAGS} -L${INSTALL_PREFIX}/lib -lc -lm -ldl"
 
 pushd $BUILD_DIR/libspectrum
   if [ ! -f $SRC_DIR/libspectrum/configure ]; then
@@ -128,7 +118,7 @@ pushd $BUILD_DIR/libspectrum
     ./autogen.sh
     popd
   fi
-  $SRC_DIR/libspectrum/configure --host $HOST --with-sysroot=$NDK/platforms/android-${PLATFORM}/arch-$ABI --prefix=$INSTALL_PREFIX \
+  $SRC_DIR/libspectrum/configure --host $TARGET --with-sysroot=$SYSROOT --prefix=$INSTALL_PREFIX \
                                  --disable-shared --with-fake-glib --without-libaudiofile
   make $JOBS
   make install
@@ -141,7 +131,7 @@ pushd $BUILD_DIR/fuse
     ./autogen.sh
     popd
   fi
-  $SRC_DIR/fuse/configure --host $HOST --with-sysroot=$NDK/platforms/android-${PLATFORM}/arch-$ABI --prefix=$INSTALL_PREFIX \
+  $SRC_DIR/fuse/configure --host $TARGET --with-sysroot=$SYSROOT --prefix=$INSTALL_PREFIX \
                           --disable-shared --without-gtk --without-alsa --without-sdl --without-libxml2 \
                           --with-joystick --with-no-ui --without-png
   make $JOBS
