@@ -87,6 +87,14 @@ Menu {
             }
 
             MenuItem {
+                text: "Save"
+                onTriggered: {
+                    menuBar.close();
+                    pageLoader.source = "SaveTapePage.qml";
+                }
+            }
+
+            MenuItem {
                 text: qsTr("Play")
                 onTriggered: {
                     menuBar.close();

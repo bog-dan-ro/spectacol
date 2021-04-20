@@ -17,6 +17,7 @@
 
 #include "fusetape.h"
 
+#include "fuseemulator.h"
 #include "qmlui.h"
 
 extern "C"  {
@@ -25,8 +26,18 @@ extern "C"  {
 # include <tape.h>
 }
 
-FuseTape::FuseTape(QObject *parent) : FuseObject(parent)
+FuseTape::FuseTape(FuseEmulator *emulator)
+    : FuseObject(emulator)
+    , m_fuseEmulator(emulator)
 {
+    m_saveSnapshotTimer.setInterval(2000);
+    m_saveSnapshotTimer.setSingleShot(true);
+    connect(&m_saveSnapshotTimer, &QTimer::timeout, this, [this]{
+        auto oldData = std::move(m_tapeData);
+        tape_foreach(&checkProgramName, this);
+        if (oldData != m_tapeData)
+            write(m_fuseEmulator->saveSnapshotsFilePath(m_programName));
+    });
 }
 
 void FuseTape::updateBrowseData()
@@ -37,23 +48,34 @@ void FuseTape::updateBrowseData()
             m_hasTape = hasTape;
             emit hasTapeChanged(hasTape);
         }
+        if (hasTape)
+            m_saveSnapshotTimer.start();
     });
+}
+
+void FuseTape::setProgramName(const QString& programName)
+{
+    if (m_programName == programName)
+        return;
+
+    m_programName = programName;
+    emit programNameChanged();
+}
+
+void FuseTape::refreshData()
+{
+    m_tapeData.clear();
+    tape_foreach(&checkProgramName, this);
+    m_saveSnapshotTimer.stop();
 }
 
 void FuseTape::open(QString filePath)
 {
-    pokeEvent([filePath]{
+    pokeEvent([=]{
+        m_tapeData.clear();
         fuse_emulation_pause();
         tape_open(filePath.toUtf8().constData(), 0);
-        fuse_emulation_unpause();
-    });
-}
-
-void FuseTape::save(QString filePath)
-{
-    pokeEvent([filePath]{
-        fuse_emulation_pause();
-        tape_write(filePath.toUtf8().constData());
+        tape_foreach(&checkProgramName, this);
         fuse_emulation_unpause();
     });
 }
@@ -74,17 +96,43 @@ void FuseTape::rewind()
 
 void FuseTape::clear()
 {
-    pokeEvent([]{
+    pokeEvent([this]{
+        m_tapeData.clear();
         tape_close();
     });
 }
 
 void FuseTape::write(QString filePath)
 {
-    pokeEvent([filePath]{
+    pokeEvent([=]{
         fuse_emulation_pause();
         tape_write(filePath.toUtf8().constData());
         fuse_emulation_unpause();
+        m_saveSnapshotTimer.stop();
+        m_fuseEmulator->showMessage(tr("Saved %1").arg(filePath));
     });
 }
 
+void FuseTape::checkProgramName(libspectrum_tape_block *block, void *user_data)
+{
+    auto self = reinterpret_cast<FuseTape*>(user_data);
+    QByteArray temp{256, 0};
+    tape_block_details(temp.data(), temp.size(), block);
+    if (temp.startsWith("Program: \""))
+        self->setProgramName(temp.mid(10, 8).trimmed());
+    switch (libspectrum_tape_block_type(block)) {
+    case LIBSPECTRUM_TAPE_BLOCK_ROM:
+    case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
+    case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
+    case LIBSPECTRUM_TAPE_BLOCK_GENERALISED_DATA:
+    case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
+    case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+    case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:
+    case LIBSPECTRUM_TAPE_BLOCK_TURBO:
+        self->m_tapeData.append(QByteArray(reinterpret_cast<const char *>(libspectrum_tape_block_data(block)),
+                                           libspectrum_tape_block_data_length(block)));
+        break;
+    default:
+        break;
+    }
+}

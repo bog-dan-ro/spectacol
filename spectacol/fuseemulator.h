@@ -239,7 +239,9 @@ public slots:
     void quit();
     QString snapshotsPath() const;
     QString recordingsPath() const;
+    QString savesPath() const;
     QString recordingFilePath() const;
+    QString saveSnapshotsFilePath(const QString &filePath) const;
     void load(const QString &filePath, bool removeOnFail = false);
     void save(const QString &filePath);
     void copyToFavourites(const QString &filePath);

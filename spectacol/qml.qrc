@@ -34,7 +34,6 @@
         <file>rom/tc2068-0.rom</file>
         <file>rom/tc2068-1.rom</file>
         <file>rom/trdos.rom</file>
-
         <file>images/arrow-down-left.svg</file>
         <file>images/arrow-down-right.svg</file>
         <file>images/arrow-down.svg</file>
@@ -58,7 +57,6 @@
         <file>images/keyboard-icon.svg</file>
         <file>images/pause.svg</file>
         <file>images/play.svg</file>
-
         <file>qml/AboutPage.qml</file>
         <file>qml/BreakpointsView.qml</file>
         <file>qml/BrowseTapePage.qml</file>
@@ -103,8 +101,8 @@
         <file>qml/StandardGamepad.qml</file>
         <file>qml/TapesFileBrowserPage.qml</file>
         <file>qml/Utils.js</file>
-
         <file>qtquickcontrols2.conf</file>
         <file>z80_opcodes.csv</file>
+        <file>qml/SaveTapePage.qml</file>
     </qresource>
 </RCC>

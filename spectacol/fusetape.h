@@ -18,20 +18,30 @@
 #ifndef FUSETAPE_H
 #define FUSETAPE_H
 
+#include <QTimer>
+
 #include "fuseobject.h"
 
+extern "C"  {
+# include <libspectrum.h>
+}
+
+class FuseEmulator;
 class FuseTape : public FuseObject
 {
     Q_OBJECT
     Q_PROPERTY(bool hasTape MEMBER m_hasTape NOTIFY hasTapeChanged)
+    Q_PROPERTY(QString programName MEMBER m_programName NOTIFY programNameChanged)
 
 public:
-    explicit FuseTape(QObject *parent = 0);
+    explicit FuseTape(FuseEmulator *parent = 0);
     void updateBrowseData();
+    QString programName() const;
+    void setProgramName(const QString &programName);
+    void refreshData();
 
 public slots:
     void open(QString filePath);
-    void save(QString filePath);
     void togglePlay();
     void rewind();
     void clear();
@@ -39,9 +49,17 @@ public slots:
 
 signals:
     void hasTapeChanged(bool hasTape);
+    void programNameChanged();
+
+private:
+    static void checkProgramName(libspectrum_tape_block *block, void *user_data);
 
 private:
     bool m_hasTape = false;
+    QByteArray m_tapeData;
+    QString m_programName;
+    FuseEmulator *m_fuseEmulator = nullptr;
+    QTimer m_saveSnapshotTimer;
 };
 
 #endif // FUSETAPE_H

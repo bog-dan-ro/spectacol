@@ -475,6 +475,7 @@ void FuseEmulator::setDataPath(const QString &dataPath)
     QDir dir(dataPath);
     dir.mkpath(_("Snapshots"));
     dir.mkpath(_("Recordings"));
+    dir.mkpath(_("Saves/Snapshots"));
     emit dataPathChanged();
 }
 
@@ -897,10 +898,21 @@ QString FuseEmulator::recordingsPath() const
     return dataPath() + _("Recordings/");
 }
 
+QString FuseEmulator::savesPath() const
+{
+    return dataPath() + _("Saves/");
+}
+
 QString FuseEmulator::recordingFilePath() const
 {
     return recordingsPath() + (m_loadedFileName.isEmpty() ? _("Generic") : m_loadedFileName) +
-            QDateTime::currentDateTime().toString(_(".yyyy-MM-dd_hh:mm:ss")) + _(".rzx");
+           QDateTime::currentDateTime().toString(_(".yyyy-MM-dd_hh:mm:ss")) + _(".rzx");
+}
+
+QString FuseEmulator::saveSnapshotsFilePath(const QString &filePath) const
+{
+    return savesPath() + "Snapshots/" + (filePath.isEmpty() ? _("Unnamed") : filePath) +
+           QDateTime::currentDateTime().toString(_("_yyyy-MM-dd_hh:mm:ss")) + _(".tzx");
 }
 
 void FuseEmulator::load(const QString &filePath, bool removeOnFail)
@@ -921,6 +933,8 @@ void FuseEmulator::load(const QString &filePath, bool removeOnFail)
         display_refresh_all();
         fuse_emulation_unpause();
         m_resetPokeFinder = true;
+        if (!m_loadedFileName.isEmpty())
+            m_tape->refreshData();
     });
 }
 
