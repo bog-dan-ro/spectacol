@@ -7,6 +7,8 @@ QT += qml quick gamepad multimedia svg
 
 android: QT += androidextras
 
+ANDROID_TARGET_SDK_VERSION = 29
+
 SCRIPTS_DIR = $$PWD/../build
 android {
     LIBSPECTRUM_INSTALL_DIR = $$OUT_PWD/$$ANDROID_TARGET_ARCH
@@ -90,13 +92,14 @@ QMAKE_EXTRA_TARGETS += buildFuseTarget
 
 DISTFILES += \
     android/AndroidManifest.xml \
+    android/gradle.properties \
     android/gradle/wrapper/gradle-wrapper.jar \
     android/gradlew \
-    android/res/values/libs.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
     android/gradlew.bat \
-    android/res/drawable/logo.png
+    android/res/drawable/logo.png \
+    android/res/values/libs.xml
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 android: include($$PWD/3rdparty/android_openssl/openssl.pri)
