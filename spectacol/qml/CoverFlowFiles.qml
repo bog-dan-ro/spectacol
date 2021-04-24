@@ -23,6 +23,8 @@ import Fuse 1.0
 import QtQuick.Controls 2.12
 import "private" 1.0
 
+// @scope main.qml
+
 Item
 {
     id : fileList
@@ -34,6 +36,9 @@ Item
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: fuse.gamepadId }
         buttonXKey: Qt.Key_X
+        buttonYKey: Qt.Key_Y
+        buttonL1Key: Qt.Key_C
+        buttonR1Key: Qt.Key_P
     }
 
     transform: Rotation {
@@ -41,6 +46,34 @@ Item
         axis {x : 0; y: 1; z : 0}
         origin.x : width * 0.5
         origin.y : height * 0.5
+    }
+
+
+    MessageDialog {
+        id: copyDialog
+        icon: StandardIcon.Question
+        title: "Spectacol"
+        text: qsTr("Override \"") + fuse.fileName(filesView.copyPath) + "\" ?";
+        standardButtons: StandardButton.Yes | StandardButton.No
+        onYes: {
+            fuse.copy(filesView.copyPath, fileList.folder, true);
+            filesView.copyPath = "";
+            filesModel.refresh();
+            filesView.currentIndex = 0;
+        }
+
+        function copy() {
+            if (!filesView.canCopy)
+                return;
+
+            if (!fuse.copy(filesView.copyPath, fileList.folder)) {
+                copyDialog.open();
+                return;
+            }
+            filesView.copyPath = "";
+            filesModel.refresh();
+            filesView.currentIndex = 0;
+        }
     }
 
     FolderListModel {
@@ -73,6 +106,19 @@ Item
         anchors.fill: parent
         model : filesModel
         currentIndex: filesModel.currentIndex
+        property string copyPath: ""
+        onCopyPathChanged: {
+            if (copyPath.length)
+                messagePage.showMessage(FuseEmulator.Info, "\"" + copyPath + qsTr("\" copied to clipboard. Use <b>Paste (R1)</b> button to paste it to another folder."))
+        }
+        property bool canCopy: {
+            if (!copyPath.length)
+                return false;
+            var srcPath = fuse.folderName(copyPath);
+            if (fuse.isFolder(copyPath))
+                return fileList.folder !== srcPath && !fileList.folder.startsWith(copyPath);
+            return fileList.folder !== srcPath;
+        }
 
         onReturnPressed: {
             filesModel.currentIndex = currentIndex;
@@ -89,6 +135,10 @@ Item
         }
 
         onDeletePressed: removeDialog.remove()
+        onResetPressed: fileList.folder = fuse.dataPath
+
+        onCopyPressed: copyPath = filesModel.path(filesView.currentIndex)
+        onPastePressed: copyDialog.copy()
 
         delegate: Component {
             Image {
@@ -154,6 +204,22 @@ Item
                 Layout.fillWidth: true
                 text: qsTr("Remove (X)")
                 onClicked: removeDialog.remove()
+            }
+            Button {
+                Layout.fillWidth: true
+                text: qsTr("Copy (L1)")
+                onClicked: filesView.copyPath = filesModel.path(filesView.currentIndex)
+            }
+            Button {
+                Layout.fillWidth: true
+                enabled: filesView.canCopy
+                text: qsTr("Paste (R1)")
+                onClicked: copyDialog.copy()
+            }
+            Button {
+                Layout.fillWidth: true
+                text: qsTr("Go to <b>Spectrum</b> folder (Y)")
+                onClicked: fileList.folder = fuse.dataPath
             }
             Button {
                 Layout.fillWidth: true

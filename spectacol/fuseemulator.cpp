@@ -34,6 +34,7 @@
 #include <QAudioOutput>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QDirIterator>
 
 #include <mutex>
 #include <thread>
@@ -134,7 +135,7 @@ void FuseThread::soundLowlevelFrame(libspectrum_signed_word *data, int len)
 void FuseThread::run()
 {
     int argc = 0;
-    auto args = QCoreApplication::arguments();
+    const auto args = QCoreApplication::arguments();
 #ifdef Q_OS_ANDROID
     auto intent = QtAndroid::androidActivity().callObjectMethod("getIntent", "()Landroid/content/Intent;");
     if (intent.isValid() &&
@@ -145,7 +146,7 @@ void FuseThread::run()
 #endif
     std::vector<QByteArray> argsVector(args.size());
     const char *argv[args.size()];
-    foreach (const QString &arg, args) {
+    for (const QString &arg : args) {
         argsVector.push_back(arg.toUtf8());
         argv[argc++] = argsVector.back().constData();
     }
@@ -964,18 +965,62 @@ void FuseEmulator::copyToFavourites(const QString &filePath)
     load(dest, true);
 }
 
-void FuseEmulator::remove(const QString &file)
+void FuseEmulator::remove(const QString &path)
 {
-    QFileInfo inf(file);
+    QFileInfo inf(path);
     if (inf.isDir()) {
         // remove files recursively
-        QDir dir(file);
-        foreach(const QFileInfo &item, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+        QDir dir(path);
+        for (const QFileInfo &item : dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
             remove(item.absoluteFilePath());
-        dir.rmdir(file);
+        dir.rmdir(path);
     } else {
-        QFile::remove(file);
+        QFile::remove(path);
     }
+}
+
+bool FuseEmulator::isFolder(const QString &path)
+{
+    return QFileInfo{path}.isDir();
+}
+
+QString FuseEmulator::fileName(const QString &path)
+{
+    return QFileInfo{path}.fileName();
+}
+
+QString FuseEmulator::folderName(const QString &path)
+{
+    return QFileInfo{path}.absolutePath();
+}
+
+bool FuseEmulator::copy(const QString &from, const QString &to, bool override)
+{
+    QFileInfo inf{from};
+    if (inf.isDir()) {
+        QDir src{from};
+        QDir dst{to + QDir::separator() + src.dirName()};
+        if (!override && dst.exists())
+            return false;
+
+        QDirIterator it{src.absolutePath(), QDir::Files, QDirIterator::Subdirectories};
+        while (it.hasNext()) {
+            it.next();
+            const auto item = it.fileInfo();
+            auto path = dst.absolutePath() + QDir::separator() + src.relativeFilePath(item.absolutePath());
+            dst.mkpath(path);
+            auto destFile = path + QDir::separator() + item.fileName();
+            QFile::remove(destFile);
+            QFile::copy(item.absoluteFilePath(), destFile);
+        }
+    } else {
+        auto destFile = to + QDir::separator() + inf.fileName();
+        if (!override && QFile::exists(destFile))
+            return false;
+        QFile::remove(destFile);
+        QFile::copy(inf.absoluteFilePath(), destFile);
+    }
+    return true;
 }
 
 void FuseEmulator::reset()

@@ -47,7 +47,7 @@ static inline uint32_t absolute2PageAddress(uint16_t page, uint16_t address)
 static QString bytesText(const QByteArray &bytes)
 {
     QString ret;
-    foreach (uint8_t byte, bytes)
+    for (uint8_t byte : bytes)
         ret += formatNumber(byte) + QLatin1Char(' ');
     return ret.trimmed();
 }

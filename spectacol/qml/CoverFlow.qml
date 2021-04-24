@@ -23,6 +23,9 @@ PathView
     signal upPressed()
     signal escapePressed();
     signal deletePressed();
+    signal resetPressed();
+    signal copyPressed();
+    signal pastePressed();
 
     anchors.fill: parent
     pathItemCount: mainScreen.portrait ? 5 : 7
@@ -63,6 +66,22 @@ PathView
         case Qt.Key_Delete:
         case Qt.Key_X:
             deletePressed();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_Y:
+            resetPressed();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_C:
+            copyPressed();
+            event.accepted = true;
+            break;
+
+        case Qt.Key_V:
+        case Qt.Key_P:
+            pastePressed();
             event.accepted = true;
             break;
         }

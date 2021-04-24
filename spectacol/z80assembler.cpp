@@ -121,13 +121,14 @@ QByteArray Z80Assembler::assemble(const QString &asmLine, int address, const QBy
         QString bytes = as.second;
         auto it = rules.cbegin();
 
-        foreach(const QString &capture, matches) {
+        for (const QString &capture : qAsConst(matches)) {
             bytes.replace(it->second, makeValue(it->second, capture, address));
             ++it;
         }
 
         QByteArray values;
-        foreach(QString eval, bytes.split(QLatin1Char(' '))) {
+        const auto lines = bytes.split(QLatin1Char(' '));
+        for (QString eval : lines) {
             eval = eval.replace(QLatin1String("0x0x"), QLatin1String("0x"));
             auto val = m_engine.evaluate(eval);
             if (val.isError()) {
@@ -155,11 +156,11 @@ QByteArray Z80Assembler::assemble(const QString &asmLine, int address, const QBy
 
 bool Z80Assembler::write(const QString &asmLine, int address, const QByteArray &assembledBytes) const
 {
-    QByteArray bytes = assemble(asmLine.toUpper(), address, assembledBytes);
+    const QByteArray bytes = assemble(asmLine.toUpper(), address, assembledBytes);
     if (bytes.isEmpty())
         return false;
 
-    foreach (uint8_t byte, bytes)
+    for (uint8_t byte : bytes)
         writebyte(address++, byte);
 
     return true;

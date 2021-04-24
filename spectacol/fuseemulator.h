@@ -245,7 +245,12 @@ public slots:
     void load(const QString &filePath, bool removeOnFail = false);
     void save(const QString &filePath);
     void copyToFavourites(const QString &filePath);
-    void remove(const QString &file);
+    void remove(const QString &path);
+    bool isFolder(const QString &path);
+    QString fileName(const QString &path);
+    QString folderName(const QString &path);
+
+    bool copy(const QString &from, const QString &to, bool override = false);
 
     void reset();
     void hardReset();
