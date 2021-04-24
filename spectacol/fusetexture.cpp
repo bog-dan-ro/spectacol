@@ -53,6 +53,7 @@ extern "C" int uidisplay_init( int width, int height )
         scaler_register( SCALER_HALFSKIP );
         scaler_register( SCALER_TIMEXTV );
         scaler_register( SCALER_TIMEX1_5X );
+        scaler_register( SCALER_TIMEX2X );
     } else {
         scaler_register( SCALER_TV2X );
         scaler_register( SCALER_PALTV2X );
@@ -60,6 +61,9 @@ extern "C" int uidisplay_init( int width, int height )
         scaler_register( SCALER_HQ3X );
         scaler_register( SCALER_HQ4X );
     }
+    scaler_register( SCALER_2XSAI );
+    scaler_register( SCALER_SUPER2XSAI );
+    scaler_register( SCALER_SUPEREAGLE );
 
     if (scaler_is_supported(current_scaler))
       scaler_select_scaler(current_scaler);
@@ -279,7 +283,7 @@ void FuseTexture::bind()
 void FuseTexture::update(int x, int y, int w, int h)
 {
     QMutexLocker lock(&m_syncVars);
-    m_updateRect = m_updateRect.united(QRect(x, y, w, h));
+    m_updateRect |= QRect(std::max(0, x - 1), std::max(0, y - 1), std::min<int>(m_width, w + 1), std::min<int>(m_height, h + 1));
     m_update = true;
 }
 
