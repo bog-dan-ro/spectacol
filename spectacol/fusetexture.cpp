@@ -41,41 +41,48 @@ extern "C" int uidisplay_init( int width, int height )
     FuseTexture::instance()->resize(width, height);
 
     scaler_register_clear();
-    scaler_select_bitformat( 565 );		/* 16bit always */
+    scaler_select_bitformat(565);		/* 16bit always */
 
-    scaler_register( SCALER_NORMAL );
-    scaler_register( SCALER_ADVMAME2X );
-    scaler_register( SCALER_ADVMAME3X );
-    scaler_register( SCALER_DOTMATRIX );
-    scaler_register( SCALER_HQ2X );
-    if( machine_current->timex ) {
-        scaler_register( SCALER_HALF );
-        scaler_register( SCALER_HALFSKIP );
-        scaler_register( SCALER_TIMEXTV );
-        scaler_register( SCALER_TIMEX1_5X );
-        scaler_register( SCALER_TIMEX2X );
+    scaler_register(SCALER_NORMAL);
+    scaler_register(SCALER_2XSAI);
+    scaler_register(SCALER_SUPER2XSAI);
+    scaler_register(SCALER_SUPEREAGLE);
+    scaler_register(SCALER_ADVMAME2X);
+    scaler_register(SCALER_ADVMAME3X);
+    scaler_register(SCALER_DOTMATRIX);
+    scaler_register(SCALER_PALTV);
+    scaler_register(SCALER_HQ2X);
+    if (machine_current->timex) {
+        scaler_register(SCALER_HALF);
+        scaler_register(SCALER_HALFSKIP);
+        scaler_register(SCALER_TIMEXTV);
+        scaler_register(SCALER_TIMEX1_5X);
+        scaler_register(SCALER_TIMEX2X);
     } else {
-        scaler_register( SCALER_TV2X );
-        scaler_register( SCALER_PALTV2X );
-        scaler_register( SCALER_PALTV3X );
-        scaler_register( SCALER_HQ3X );
-        scaler_register( SCALER_HQ4X );
+        scaler_register(SCALER_DOUBLESIZE);
+        scaler_register(SCALER_TRIPLESIZE);
+        scaler_register(SCALER_QUADSIZE);
+        scaler_register(SCALER_TV2X);
+        scaler_register(SCALER_TV3X);
+        scaler_register(SCALER_TV4X);
+        scaler_register(SCALER_PALTV2X);
+        scaler_register(SCALER_PALTV3X);
+        scaler_register(SCALER_PALTV4X);
+        scaler_register(SCALER_HQ3X);
+        scaler_register(SCALER_HQ4X);
     }
-    scaler_register( SCALER_2XSAI );
-    scaler_register( SCALER_SUPER2XSAI );
-    scaler_register( SCALER_SUPEREAGLE );
 
     if (scaler_is_supported(current_scaler))
-      scaler_select_scaler(current_scaler);
+        scaler_select_scaler(current_scaler);
     else
-      scaler_select_scaler( SCALER_NORMAL );
+        scaler_select_scaler(SCALER_PALTV);
 
     display_ui_initialised = 1;
     s_semaphore.release();
     return 0;
 }
 
-extern "C" int uidisplay_hotswap_gfx_mode( void )
+extern "C" int uidisplay_hotswap_gfx_mode()
 {
   fuse_emulation_pause();
 
@@ -86,7 +93,7 @@ extern "C" int uidisplay_hotswap_gfx_mode( void )
   return 0;
 }
 
-extern "C" int uidisplay_end( void )
+extern "C" int uidisplay_end()
 {
     return 0;
 }
@@ -283,7 +290,7 @@ void FuseTexture::bind()
 void FuseTexture::update(int x, int y, int w, int h)
 {
     QMutexLocker lock(&m_syncVars);
-    m_updateRect |= QRect(std::max(0, x - 1), std::max(0, y - 1), std::min<int>(m_width, w + 1), std::min<int>(m_height, h + 1));
+    m_updateRect |= QRect{x, y, w, h};
     m_update = true;
 }
 
@@ -435,39 +442,33 @@ QRect FuseTexture::updateGlPixels()
         w = m_width;
     if (!h)
         h = m_height;
-    int copy_x = x;
-    int copy_y = y;
-    int copy_w = w;
-    int copy_h = h;
+    if (scaler_flags & SCALER_FLAGS_EXPAND)
+        scaler_expander(&x, &y, &w, &h, m_width, m_height);
     uint16_t *glPixels = m_glPixels;
-    uint16_t *spectrumPixels = nullptr;
-    int specPitch = m_width * m_scale;
 
+    const int specPitch = m_width * m_scale;
+
+    uint16_t *spectrumPixels;
     if (m_scale != 1) {
-        if (scaler_flags & SCALER_FLAGS_EXPAND)
-            scaler_expander(&x, &y, &w, &h, m_width, m_height);
-
         QMutexLocker lockCopy(&m_copyPixelsMutex);
         int dest_x = x * m_scale;
         int dest_y = y * m_scale;
-        const libspectrum_byte *src = (const libspectrum_byte *)(m_spectrumPixels + x + y * m_width);
+        const libspectrum_byte *src = (const libspectrum_byte *)(m_spectrumPixels + x  + y * m_width);
         spectrumPixels = m_spectrumScaledPixels + dest_x + dest_y * specPitch;
-        libspectrum_byte *dst = (libspectrum_byte *)(spectrumPixels);
+        auto dst = reinterpret_cast<libspectrum_byte *>(spectrumPixels);
         scaler_proc16(src, m_width * sizeof(uint16_t), dst, specPitch * sizeof(uint16_t), w, h);
-        spectrumPixels += abs(copy_y - y) * m_scale * specPitch;
-        spectrumPixels += abs(copy_x - x) * m_scale;
     } else {
         spectrumPixels = m_spectrumPixels + x + y * specPitch;
     }
 
-    int glPitch = m_recreate ? m_texSize.width() : copy_w * m_scale;
-    const size_t copy_sz = copy_w * m_scale * sizeof(uint16_t);
-    for (u_int32_t i = 0; i < copy_h * m_scale; i++) {
+    int glPitch = m_recreate ? m_texSize.width() : w * m_scale;
+    const size_t copy_sz = w * m_scale * sizeof(uint16_t);
+    for (u_int32_t i = 0; i < h * m_scale; i++) {
         memcpy(glPixels, spectrumPixels, copy_sz);
         glPixels += glPitch;
         spectrumPixels += specPitch;
     }
     m_update = false;
     m_recreate = false;
-    return QRect(copy_x * m_scale, copy_y * m_scale, copy_w * m_scale, copy_h * m_scale);
+    return QRect(x * m_scale, y * m_scale, w * m_scale, h * m_scale);
 }
