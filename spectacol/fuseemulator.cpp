@@ -135,7 +135,7 @@ void FuseThread::soundLowlevelFrame(libspectrum_signed_word *data, int len)
 void FuseThread::run()
 {
     int argc = 0;
-    const auto args = QCoreApplication::arguments();
+    auto args = QCoreApplication::arguments();
 #ifdef Q_OS_ANDROID
     auto intent = QtAndroid::androidActivity().callObjectMethod("getIntent", "()Landroid/content/Intent;");
     if (intent.isValid() &&
