@@ -34,7 +34,7 @@ ApplicationWindow {
     title: qsTr("Spectacol")
 
     property int dpiMultiplier: 1
-    property bool portrait: false
+    property bool portrait: width < height
 
     MessageDialog {
         id: quitDialog
@@ -245,30 +245,30 @@ ApplicationWindow {
             onClicked: pageLoader.source = "";
         }
 
-        Button {
-            id: menuButton
+        Grid {
+            id: screenButtonsGrid
+            anchors.fill: parent
+            anchors.topMargin: mainScreen.portrait ? fuseScreen.implicitHeight : 0;
             visible: fuse.touchscreen && fuse.showControlsIcons
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.topMargin: mainScreen.height > mainScreen.width ? mainScreen.height / 2 : 0;
-            text: "="
-            onClicked: {
-                if (menuBar.position)
-                    menuBar.close();
-                else
-                    menuBar.open();
-            }
-        }
+            horizontalItemAlignment: Grid.AlignHCenter
+            verticalItemAlignment: Grid.AlignVCenter
+            columns: mainScreen.portrait ? 6 : 1
+            rows: mainScreen.portrait ? 1 : 6
+            columnSpacing: Screen.pixelDensity
+            rowSpacing: Screen.pixelDensity
 
-        Column {
-            visible: fuse.touchscreen && fuse.showControlsIcons
-            anchors.top: menuButton.bottom
-            anchors.left: parent.left
-            anchors.topMargin: Screen.pixelDensity
-            anchors.rightMargin: Screen.pixelDensity;
-            spacing: Screen.pixelDensity
-            opacity: (onScreenCursorJoystick.visible || onScreen48Keyboard.visible) ? 0.25 : 1.0
+            property real buttonsOpacity: (onScreenCursorJoystick.visible || onScreen48Keyboard.visible) ? 0.25 : 1.0
+            Button {
+                text: "="
+                onClicked: {
+                    if (menuBar.position)
+                        menuBar.close();
+                    else
+                        menuBar.open();
+                }
+            }
             Image {
+                opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 5
                 width: Screen.pixelDensity * 7
                 source: "qrc:///images/keyboard-icon.svg"
@@ -277,7 +277,17 @@ ApplicationWindow {
                     onClicked: toggleOnScreenControls(FuseEmulator.Keyboard48K, false);
                 }
             }
+
+            RoundButton {
+                id: stickyCSSSButton
+                radius: 7
+                checkable: true
+                checked: false
+                text: "Sticky CS/SS"
+            }
+
             Image {
+                opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 5
                 width: Screen.pixelDensity * 7
                 source: "qrc:///images/controller-icon.svg"
@@ -290,6 +300,7 @@ ApplicationWindow {
                 }
             }
             Image {
+                opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 7
                 width: Screen.pixelDensity * 7
                 source: "qrc:///images/fastforward.svg"
@@ -300,6 +311,7 @@ ApplicationWindow {
                 }
             }
             Image {
+                opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 7
                 width: Screen.pixelDensity * 7
                 source: fuse.paused ? "qrc:///images/play.svg" : "qrc:///images/pause.svg"

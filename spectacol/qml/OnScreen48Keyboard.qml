@@ -21,40 +21,51 @@ import QtQuick.Window 2.12
 import QtGamepad 1.0
 import "private"
 
+// @scope main.qml
+
 Item {
     id: onScreenKeyboard
     enabled: visible
 
     property bool gamepadMode: false
-    anchors.topMargin: Screen.pixelDensity * 20
-    anchors.leftMargin: Screen.pixelDensity * 2
-    anchors.rightMargin: Screen.pixelDensity * 2
+    property bool stickyCSSS: gamepadMode || stickyCSSSButton.checked
+    onStickyCSSSChanged: if (!stickyCSSS) releasePressedKeys()
+
+    anchors {
+        bottomMargin: Screen.pixelDensity * (mainScreen.portrait ? 10 : 4)
+        leftMargin: mainScreen.portrait ? 0 : Screen.pixelDensity * 2
+        rightMargin: mainScreen.portrait ? 0 : Screen.pixelDensity * 2
+    }
+
+    function releasePressedKeys()
+    {
+        if (_pressedKey) {
+            fuse.keyRelease(_pressedKey);
+            _pressedKey = 0;
+        }
+
+        if (capsPressed) {
+            fuse.keyRelease(Qt.Key_Control);
+            capsPressed = false;
+        }
+
+        if (symbolPressed) {
+            fuse.keyRelease(Qt.Key_Shift);
+            symbolPressed = false;
+        }
+    }
 
     onVisibleChanged: {
         fuse.processInputEvents = !visible;
-        if (!visible) {
-            if (_pressedKey) {
-                fuse.keyRelease(_pressedKey);
-                _pressedKey = 0;
-            }
-
-            if (capsPressed) {
-                fuse.keyRelease(Qt.Key_Control);
-                capsPressed = false;
-            }
-
-            if (symbolPressed) {
-                fuse.keyRelease(Qt.Key_Shift);
-                symbolPressed = false;
-            }
-        }
+        if (!visible)
+            releasePressedKeys()
     }
     Keys.onPressed: {
         if (event.key === Qt.Key_Escape) {
             event.accept = true;
         } else if (event.key === Qt.Key_Return) {
             event.accept = true;
-            pressCurrentKey();
+            pressKey(zx48Keyboard.get(grid.currentIndex).code);
         }
     }
 
@@ -64,7 +75,7 @@ Item {
             onScreenKeyboard.visible = false;
         } else if (event.key === Qt.Key_Return) {
             event.accept = true;
-            releaseCurrentKey();
+            releaseKey(zx48Keyboard.get(grid.currentIndex).code);
         }
     }
 
@@ -72,7 +83,7 @@ Item {
     property bool symbolPressed: false
     property int _pressedKey: 0
     Timer {
-        running: gamepadMode && capsPressed && symbolPressed
+        running: capsPressed && symbolPressed
         interval: 200
         repeat: false
         onTriggered: {
@@ -82,47 +93,59 @@ Item {
         }
     }
 
-    function pressCurrentKey()
+    function pressKey(key)
     {
         _pressedKey = 0;
-        var key = zx48Keyboard.get(grid.currentIndex);
-        switch(key.code)
+        switch(key)
         {
         case Qt.Key_Control:
-            capsPressed = !capsPressed;
-            if (capsPressed)
+            if (stickyCSSS) {
+                capsPressed = !capsPressed;
+                if (capsPressed)
+                    fuse.keyPress(Qt.Key_Control);
+                else
+                    fuse.keyRelease(Qt.Key_Control);
+            } else {
                 fuse.keyPress(Qt.Key_Control);
-            else
-                fuse.keyRelease(Qt.Key_Control);
+            }
             break;
         case Qt.Key_Shift:
-            symbolPressed = !symbolPressed;
-            if (symbolPressed)
+            if (stickyCSSS) {
+                symbolPressed = !symbolPressed;
+                if (symbolPressed)
+                    fuse.keyPress(Qt.Key_Shift);
+                else
+                    fuse.keyRelease(Qt.Key_Shift);
+            } else {
                 fuse.keyPress(Qt.Key_Shift);
-            else
-                fuse.keyRelease(Qt.Key_Shift);
+            }
             break;
         default:
-            fuse.keyPress(key.code);
+            fuse.keyPress(key);
             if (gamepadMode)
-                _pressedKey = key.code;
+                _pressedKey = key;
             break;
         }
     }
 
-    function releaseCurrentKey()
+    function releaseKey(key)
     {
-        var key = zx48Keyboard.get(grid.currentIndex);
-        switch(key.code)
+        switch(key)
         {
         case Qt.Key_Control:
         case Qt.Key_Shift:
+            if (!stickyCSSS) {
+                fuse.keyRelease(key);
+                _pressedKey = 0;
+            }
             break;
         default:
-            if (gamepadMode)
+            if (gamepadMode) {
                 fuse.keyRelease(_pressedKey);
-            else
-                fuse.keyRelease(key.code);
+            } else {
+                _pressedKey = key;
+                releasePressedKeys();
+            }
             _pressedKey = 0;
             break;
         }
@@ -223,15 +246,21 @@ Item {
         id: grid
         highlight: highlight
         focus: onScreenKeyboard.visible
-        anchors.fill: parent
-        anchors.topMargin: mainScreen.height > mainScreen.width ? mainScreen.height / 2 : 0;
-        cellWidth: (width - (mainScreen.height > mainScreen.width ? 0 : (4 * Screen.pixelDensity) / TextSizes.scaleImage)) / 10
-        cellHeight: cellWidth
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            bottom: parent.bottom
+        }
+        cellWidth: (mainScreen.portrait || gamepadMode) ? parent.width / 10 : Math.min(parent.width / 10, Screen.pixelDensity * 9)
+        cellHeight: mainScreen.portrait ? Screen.pixelDensity * 9 : cellWidth
+        width: Math.min(cellWidth * 10 + ((mainScreen.portrait || gamepadMode) ? 0 : 8 * Screen.pixelDensity), parent.width)
+        height: cellHeight * 4 + ((mainScreen.portrait || gamepadMode) ? 0 : 2 * Screen.pixelDensity)
         model: zx48Keyboard
         currentIndex: 24
         onCurrentIndexChanged: {
-            if (_pressedKey)
+            if (_pressedKey) {
                 fuse.keyRelease(_pressedKey);
+                _pressedKey = 0;
+            }
         }
 
         interactive: gamepadMode
@@ -239,9 +268,9 @@ Item {
         delegate: Rectangle {
             id: rec
             property bool pressed: true
-            width: grid.cellWidth - (2 * Screen.pixelDensity) / TextSizes.scaleImage
-            height: width
-            radius: ((mainScreen.height > mainScreen.width ? 1 : 2) * Screen.pixelDensity) / TextSizes.scaleImage
+            width: grid.cellWidth - (Screen.pixelDensity / TextSizes.scaleImage)
+            height: grid.cellHeight - (Screen.pixelDensity / TextSizes.scaleImage)
+            radius: ((mainScreen.portrait ? 1 : 2) * Screen.pixelDensity) / TextSizes.scaleImage
             color: (code == Qt.Key_Control && capsPressed) ||
                    (code == Qt.Key_Shift && symbolPressed) ? "blue"
                                                            : Qt.rgba(0.5, 0.5, 0.5, 0.75);
@@ -253,7 +282,7 @@ Item {
                 anchors.topMargin: fuseSettings.full48kOSK && keyword ? parent.height / 4 : parent.radius
                 font.family: 'Monospace'
                 font.bold: true
-                font.pixelSize: parent.height / 4
+                font.pixelSize: grid.cellWidth / 4.5
                 horizontalAlignment: fuseSettings.full48kOSK && keyword ? Text.AlignLeft : Text.AlignHCenter
                 verticalAlignment: fuseSettings.full48kOSK && keyword ? Text.AlignTop : Text.AlignVCenter
                 style: Text.Outline
@@ -273,7 +302,7 @@ Item {
                 color: buttonColor ? buttonColor : "green"
                 font.family: 'Monospace'
                 font.bold: true
-                font.pixelSize: parent.height / 6
+                font.pixelSize: grid.cellWidth / 6
                 text: extgreen ? extgreen : ""
             }
 
@@ -302,7 +331,7 @@ Item {
                 color: "white"
                 font.family: 'Monospace'
                 font.bold: true
-                font.pixelSize: keyword && keyword.length > 1 ? parent.height / 6 : parent.height / 4
+                font.pixelSize: keyword && keyword.length > 1 ? grid.cellWidth / 6 : grid.cellHeight / 4
                 text: keyword ? keyword : ""
             }
 
@@ -324,7 +353,7 @@ Item {
             MultiPointTouchArea {
                 anchors.fill: parent
                 touchPoints: TouchPoint {
-                    onPressedChanged: pressed ? fuse.keyPress(code) : fuse.keyRelease(code)
+                    onPressedChanged: pressed ? pressKey(code) : releaseKey(code)
                 }
             }
         }
