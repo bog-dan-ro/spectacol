@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="eu.licentia.games.spectacol"
-          android:versionName="1.6.0.4"
-          android:versionCode="0321604"
+          android:versionName="1.6.0.5"
+          android:versionCode="0321605"
           android:installLocation="auto"
           android:extractNativeLibs="true">
     <!--
@@ -24,7 +24,17 @@
         - 1321600 -> 32 bit x86, 1.6.0 fuse ver, 0 patch version
         - 1641600 -> 64 bit x86_64, 1.6.0 fuse ver, 0 patch version
     -->
-    <application android:banner="@drawable/banner" android:logo="@drawable/banner" android:icon="@drawable/icon" android:isGame="true" android:theme="@android:style/Theme.DeviceDefault.NoActionBar" android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="Spectacol">
+    <application
+                android:allowBackup="true"
+                android:banner="@drawable/banner"
+                android:hardwareAccelerated="true"
+                android:icon="@drawable/icon"
+                android:isGame="true"
+                android:label="Spectacol"
+                android:logo="@drawable/banner"
+                android:name="org.qtproject.qt5.android.bindings.QtApplication"
+                android:requestLegacyExternalStorage="true"
+                android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="Spectacol" android:screenOrientation="landscape" android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
