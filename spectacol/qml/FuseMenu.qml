@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,40 +15,40 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Controls 1.4
-import QtQuick.Window 2.12
-import QtGamepad 1.0
-import Fuse 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Window
+import QtGamepadLegacy
+import Spectacol
 
-Menu {
+ZxMenuItem {
     id: fuseMenu
-    MenuItem {
-        visible: fuse.saveSnapshotEnabled
+    ZxMenuItem {
+        visible: FuseEmulator.saveSnapshotEnabled
         text: qsTr("Quick &save snapshot")
         onTriggered: {
             menuBar.close();
-            fuse.quickSaveSnapshot();
+            FuseEmulator.quickSaveSnapshot();
         }
     }
-    MenuItem {
+    ZxMenuItem {
         text: qsTr("Quick &load snapshot")
         onTriggered: {
             menuBar.close();
-            fuse.quickLoadSnapshot();
+            FuseEmulator.quickLoadSnapshot();
         }
     }
 
-    MenuItem {
-        visible: fuse.recording.type !== FuseRecording.None
-        text: qsTr("Stop ") + (fuse.recording.type === FuseRecording.Playback ? qsTr("Playback") : qsTr("Recording"))
+    ZxMenuItem {
+        visible: FuseEmulator.recording.type !== FuseRecording.None
+        text: qsTr("Stop ") + (FuseEmulator.recording.type === FuseRecording.Playback ? qsTr("Playback") : qsTr("Recording"))
         onTriggered: {
             menuBar.close();
-            fuse.recording.stop();
+            FuseEmulator.recording.stop();
         }
     }
 
-    MenuItem {
+    ZxMenuItem {
         text: qsTr("&Quick Open ..")
         onTriggered: {
             menuBar.close();
@@ -56,7 +56,7 @@ Menu {
         }
     }
 
-    MenuItem {
+    ZxMenuItem {
         text: qsTr("&Search online ..")
         onTriggered: {
             menuBar.close();
@@ -64,10 +64,10 @@ Menu {
         }
     }
 
-    Menu {
-        title: qsTr("Media")
+    ZxMenuItem {
+        text: qsTr("Media")
 
-        MenuItem {
+        ZxMenuItem {
             visible: false
             text: qsTr("&Save snapshot as ...")
             onTriggered: {
@@ -76,9 +76,9 @@ Menu {
             }
         }
 
-        Menu {
-            title: qsTr("Tape")
-            MenuItem {
+        ZxMenuItem {
+            text: qsTr("Tape")
+            ZxMenuItem {
                 text: "Open"
                 onTriggered: {
                     menuBar.close();
@@ -86,7 +86,7 @@ Menu {
                 }
             }
 
-            MenuItem {
+            ZxMenuItem {
                 text: "Save"
                 onTriggered: {
                     menuBar.close();
@@ -94,32 +94,32 @@ Menu {
                 }
             }
 
-            MenuItem {
+            ZxMenuItem {
                 text: qsTr("Play")
                 onTriggered: {
                     menuBar.close();
-                    fuse.tape.togglePlay();
+                    FuseEmulator.tape.togglePlay();
                 }
             }
 
-            MenuItem {
+            ZxMenuItem {
                 text: qsTr("Rewind")
                 onTriggered: {
                     menuBar.close();
-                    fuse.tape.rewind();
+                    FuseEmulator.tape.rewind();
                 }
             }
 
-            MenuItem {
+            ZxMenuItem {
                 text: qsTr("Clear")
                 onTriggered: {
                     menuBar.close();
-                    fuse.tape.clear();
+                    FuseEmulator.tape.clear();
                 }
             }
 
-            MenuItem {
-                visible: fuse.tape.hasTape;
+            ZxMenuItem {
+                visible: FuseEmulator.tape.hasTape;
                 text: qsTr("Browse")
                 onTriggered: {
                     menuBar.close();
@@ -128,61 +128,61 @@ Menu {
             }
         }
 
-        Menu {
-            title: qsTr("Recording")
-            MenuItem {
-                visible: fuse.recording.type === FuseRecording.Recording
+        ZxMenuItem {
+            text: qsTr("Recording")
+            ZxMenuItem {
+                visible: FuseEmulator.recording.type === FuseRecording.Recording
                 text: qsTr("Stop Recording")
                 onTriggered: {
                     menuBar.close();
-                    fuse.recording.stop();
+                    FuseEmulator.recording.stop();
                 }
             }
-            MenuItem {
-                visible: fuse.recording.type === FuseRecording.None
+            ZxMenuItem {
+                visible: FuseEmulator.recording.type === FuseRecording.None
                 text: "Start recording"
                 onTriggered: {
                     menuBar.close();
-                    fuse.recording.start();
+                    FuseEmulator.recording.start();
                 }
             }
-            MenuItem {
-                visible: fuse.recording.type === FuseRecording.None
+            ZxMenuItem {
+                visible: FuseEmulator.recording.type === FuseRecording.None
                 text: "Continue recording"
                 onTriggered: {
                     menuBar.close();
-                    fuse.recording.continueRecording();
+                    FuseEmulator.recording.continueRecording();
                 }
             }
-            MenuItem {
-                visible: fuse.recording.type === FuseRecording.Recording
+            ZxMenuItem {
+                visible: FuseEmulator.recording.type === FuseRecording.Recording
                 text: "Rollback"
                 onTriggered: {
                     menuBar.close();
-                    fuse.recording.rollback();
+                    FuseEmulator.recording.rollback();
                 }
             }
-            MenuItem {
-                visible: fuse.recording.type === FuseRecording.Recording
+            ZxMenuItem {
+                visible: FuseEmulator.recording.type === FuseRecording.Recording
                 text: "Rollback to ..."
                 onTriggered: {
                     menuBar.close();
-                    fuse.recording.rollbackTo();
+                    FuseEmulator.recording.rollbackTo();
                 }
             }
-            MenuItem {
-                visible: fuse.recording.type === FuseRecording.None
+            ZxMenuItem {
+                visible: FuseEmulator.recording.type === FuseRecording.None
                 text: "Finalise ..."
                 onTriggered: {
                     menuBar.close();
-                    fuse.recording.finalise();
+                    FuseEmulator.recording.finalise();
                 }
             }
         }
     }
 
 
-    MenuItem {
+    ZxMenuItem {
         text: "Joystick type"
         onTriggered: {
             menuBar.close();
@@ -190,41 +190,41 @@ Menu {
         }
     }
 
-    Menu {
-        title: qsTr("Machine")
-        MenuItem {
-            text: qsTr("Select ... ") + fuseSettings.currentMachine
+    ZxMenuItem {
+        text: qsTr("Machine")
+        ZxMenuItem {
+            text: qsTr("Select ... ") + FuseEmulator.settings.currentMachine
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "MachineTypePage.qml";
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("Reset")
             onTriggered: {
                 menuBar.close();
-                fuse.reset();
+                FuseEmulator.reset();
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("Hard reset")
             onTriggered: {
                 menuBar.close();
-                fuse.hardReset();
+                FuseEmulator.hardReset();
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("Debugger")
             onTriggered: {
                 menuBar.close();
-                fuse.debuggerTrap();
+                FuseEmulator.debuggerTrap();
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("Poke finder")
             onTriggered: {
                 menuBar.close();
@@ -232,7 +232,7 @@ Menu {
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("Poke memory")
             onTriggered: {
                 menuBar.close();
@@ -240,19 +240,19 @@ Menu {
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("NMI")
             onTriggered: {
                 menuBar.close();
-                fuse.nmi();
+                FuseEmulator.nmi();
             }
         }
     }
 
-    Menu {
-        title: qsTr("Options")
+    ZxMenuItem {
+        text: qsTr("Options")
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("General")
             onTriggered: {
                 menuBar.close();
@@ -260,7 +260,7 @@ Menu {
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("Screen")
             onTriggered: {
                 menuBar.close();
@@ -268,7 +268,7 @@ Menu {
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("Sound")
             onTriggered: {
                 menuBar.close();
@@ -276,7 +276,7 @@ Menu {
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: qsTr("Peripherals")
             onTriggered: {
                 menuBar.close();
@@ -284,7 +284,7 @@ Menu {
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             visible: false
             text: qsTr("Media")
             onTriggered: {
@@ -292,9 +292,9 @@ Menu {
                 pageLoader.source = "OptionsMediaPage.qml";
             }
         }
-        Menu {
-            title: qsTr("(Virtual) Gamepad")
-            MenuItem {
+        ZxMenuItem {
+            text: qsTr("(Virtual) Gamepad")
+            ZxMenuItem {
                 text: qsTr("Customize Gamepad Buttons")
                 onTriggered: {
                     menuBar.close();
@@ -302,8 +302,8 @@ Menu {
                 }
             }
 
-            MenuItem {
-                visible: fuse.gamepadId != -1
+            ZxMenuItem {
+                visible: FuseEmulator.gamepadId != -1
                 text: qsTr("Calibrate Gamepad")
                 onTriggered: {
                     menuBar.close();
@@ -313,10 +313,10 @@ Menu {
         }
     }
 
-    Menu {
-        title: qsTr("Help")
+    ZxMenuItem {
+        text: qsTr("Help")
 
-        MenuItem {
+        ZxMenuItem {
             text: "About .."
             onTriggered: {
                 menuBar.close();
@@ -324,7 +324,7 @@ Menu {
             }
         }
 
-        MenuItem {
+        ZxMenuItem {
             text: "Features and bugs"
             onTriggered:  {
                 menuBar.close();
@@ -334,7 +334,7 @@ Menu {
     }
 
 
-    MenuItem {
+    ZxMenuItem {
         text: "Quit"
         onTriggered: quitDialog.open()
     }

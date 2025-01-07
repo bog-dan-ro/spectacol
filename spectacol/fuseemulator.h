@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FUSEEMULATOR_H
-#define FUSEEMULATOR_H
+#pragma once
 
 #include "breakpointsmodel.h"
 #include "disassamblemodel.h"
@@ -25,10 +24,13 @@
 #include "pokefindermodel.h"
 #include "zxgamesmodel.h"
 
+Q_MOC_INCLUDE("fuserecording.h")
+Q_MOC_INCLUDE("fusesettings.h")
 
 #include <QAudioFormat>
 #include <QGamepadManager>
 #include <QPointer>
+#include <QQmlEngine>
 #include <QSemaphore>
 #include <QThread>
 #include <QUrl>
@@ -40,7 +42,7 @@ extern "C"  {
 # include <libspectrum.h>
 }
 
-class QAudioOutput;
+class QAudioSink;
 class QIODevice;
 class QKeyEvent;
 class QMouseEvent;
@@ -60,7 +62,7 @@ protected:
     void run();
 
 private:
-    QScopedPointer<QAudioOutput> m_audioOutput;
+    QScopedPointer<QAudioSink> m_audioOutput;
     QAudioFormat m_audioFormat;
     QPointer<QIODevice> m_audioOutputDevice;
     std::chrono::time_point<std::chrono::steady_clock> m_startFrameTime;
@@ -70,6 +72,9 @@ private:
 class FuseEmulator : public FuseObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
+
     Q_PROPERTY(bool touchscreen MEMBER m_touchscreen CONSTANT)
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
     Q_PROPERTY(bool processInputEvents READ processInputEvents WRITE setProcessInputEvents NOTIFY processInputEventsChanged)
@@ -81,8 +86,14 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(QStringList joysticksModel READ joysticksModel CONSTANT)
     Q_PROPERTY(int selectedJoysticksIndex READ selectedJoysticksIndex WRITE setSelectedJoysticksIndex NOTIFY selectedJoysticksIndexChanged)
     Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
-    Q_PROPERTY(FuseTape *tape MEMBER m_tape CONSTANT)
-    Q_PROPERTY(FuseRecording *recording MEMBER m_recording CONSTANT)
+    Q_PROPERTY(const FuseTape *tape MEMBER m_tape CONSTANT)
+    Q_PROPERTY(const FuseRecording *recording MEMBER m_recording CONSTANT)
+    Q_PROPERTY(FuseSettings *settings READ settings CONSTANT)
+    Q_PROPERTY(const BreakpointsModel *breakpointsModel READ breakpointsModel CONSTANT)
+    Q_PROPERTY(const DisassambleModel* disassambleModel READ disassambleModel CONSTANT)
+    Q_PROPERTY(const PokeFinderModel* pokeFinderModel READ pokeFinderModel CONSTANT)
+    Q_PROPERTY(const ZXGamesModel* onlineGamesModel READ onlineGamesModel CONSTANT)
+
     Q_PROPERTY(bool showControlsIcons MEMBER m_showControlsIcons NOTIFY showControlsIconsChanged)
 
     /* regs properties */
@@ -111,16 +122,20 @@ public:
         UiNo = 0,
         UiYes = 1
     };
+    Q_ENUM(UiQuery)
 
     enum ErrorLevel {
         Info,
         Warning,
         Error
     };
+    Q_ENUM(ErrorLevel)
+
     enum ControlType {
         CursorJoystick,
         Keyboard48K
     };
+    Q_ENUM(ControlType)
 
     enum UiItemType {
         Disk = UI_STATUSBAR_ITEM_DISK,
@@ -129,12 +144,14 @@ public:
         Paused = UI_STATUSBAR_ITEM_PAUSED,
         Tape = UI_STATUSBAR_ITEM_TAPE,
     };
+    Q_ENUM(UiItemType)
 
     enum UiState {
         Active = UI_STATUSBAR_STATE_ACTIVE,
         Inactive = UI_STATUSBAR_STATE_INACTIVE,
         Gone = UI_STATUSBAR_STATE_NOT_AVAILABLE,
     };
+    Q_ENUM(UiState)
 
     enum UiConfirmSave {
         UiConfirmSaveSave = UI_CONFIRM_SAVE_SAVE,
@@ -142,10 +159,9 @@ public:
         UiConfirmSaveCancel = UI_CONFIRM_SAVE_CANCEL
     };
 
-    Q_ENUMS(ErrorLevel ControlType UiItemType UiState UiQuery UiConfirmSave)
-
 public:
-    explicit FuseEmulator(QQmlContext *ctxt, QObject *parent = 0);
+    static FuseEmulator *create(QQmlEngine *, QJSEngine *);
+    static FuseEmulator &instance();
     ~FuseEmulator();
 
     bool paused() const;
@@ -234,6 +250,11 @@ public:
     int uiQuery(const QByteArray &message);
     void uiPokememSelector(const char *filePath);
     int uiGetListIndex(const QStringList &list, const QString &title);
+
+    const DisassambleModel *disassambleModel() const;
+
+    const PokeFinderModel *pokeFinderModel() const;
+    const ZXGamesModel* onlineGamesModel() const;
 
 public slots:
     void quit();
@@ -333,9 +354,10 @@ signals:
     void confirmSaveSpecific(const QString &message);
 
 private:
+    explicit FuseEmulator(QObject *parent = 0);
     void updateScalers() const;
     void startFuseThread();
-    friend class FuseTexture;
+    friend class ZxImage;
 
 private:
     bool m_touchscreen = false;
@@ -365,7 +387,3 @@ private:
     bool m_paused = false;
     double m_deadZone;
 };
-
-extern FuseEmulator *g_fuseEmulator;
-
-#endif // FUSEEMULATOR_H

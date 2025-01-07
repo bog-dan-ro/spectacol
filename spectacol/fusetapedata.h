@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,8 +15,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FUSETAPEDATA_H
-#define FUSETAPEDATA_H
+#pragma once
+
+#include <QQmlEngine>
 
 #include "fuselistmodel.h"
 
@@ -27,6 +28,7 @@ extern "C"  {
 class FuseTapeData : public FuseListModel
 {
     Q_OBJECT
+    QML_ELEMENT
     enum {
         Label = Qt::DisplayRole,
         Detail = Qt::UserRole + 1,
@@ -60,5 +62,3 @@ private:
     };
     std::vector<TapeData> m_tapeBlocks;
 };
-
-#endif // FUSETAPEDATA_H

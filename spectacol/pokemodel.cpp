@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -69,10 +69,10 @@ int PokeModel::rowCount(const QModelIndex &parent) const
 QVariant PokeModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() < 0)
-        return QVariant();
+        return {};
     auto trainer = getTrainer(index.row());
     if (!trainer)
-        return QVariant();
+        return {};
     switch (role) {
     case Label:
             return QLatin1String(trainer->name);
@@ -81,7 +81,7 @@ QVariant PokeModel::data(const QModelIndex &index, int role) const
     case Disabled:
             return bool(trainer->disabled);
     default:
-        return QVariant();
+        return {};
     }
 }
 
@@ -107,17 +107,17 @@ void PokeModel::addPoke(int bank, int address, int value)
 {
     if (bank < 0 || bank > 64) {
         // Pentagon 1024 has 65 memory pages
-        g_fuseEmulator->showMessage(tr("Invalid bank: use an integer from 0 to 64"), FuseEmulator::Error);
+        FuseEmulator::instance().showMessage(tr("Invalid bank: use an integer from 0 to 64"), FuseEmulator::Error);
         return;
     }
 
     if (address < 0 || address > 0xffff) {
-        emit g_fuseEmulator->showMessage(tr("Invalid address: use an integer from 0 to 65535"), FuseEmulator::Error);
+        emit FuseEmulator::instance().showMessage(tr("Invalid address: use an integer from 0 to 65535"), FuseEmulator::Error);
         return;
     }
 
     if (bank == 8 && address < 0x4000) {
-        g_fuseEmulator->showMessage(tr("Invalid address: use an integer from 16384 to 65535"), FuseEmulator::Error);
+        FuseEmulator::instance().showMessage(tr("Invalid address: use an integer from 16384 to 65535"), FuseEmulator::Error);
         return;
     }
 

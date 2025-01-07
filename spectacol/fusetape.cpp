@@ -71,7 +71,7 @@ void FuseTape::refreshData()
 
 void FuseTape::open(QString filePath)
 {
-    pokeEvent([=]{
+    pokeEvent([this, filePath]{
         m_tapeData.clear();
         fuse_emulation_pause();
         tape_open(filePath.toUtf8().constData(), 0);
@@ -104,7 +104,7 @@ void FuseTape::clear()
 
 void FuseTape::write(QString filePath)
 {
-    pokeEvent([=]{
+    pokeEvent([this, filePath]{
         fuse_emulation_pause();
         tape_write(filePath.toUtf8().constData());
         fuse_emulation_unpause();

@@ -17,16 +17,17 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
-import QtGamepad 1.0
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtGamepadLegacy
+import Spectacol
 
-import "private" 1.0
+import "private"
 
 Item {
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+    Component.onCompleted: FuseEmulator.paused = true
+    Component.onDestruction: FuseEmulator.paused = false
 
     property alias model: view.model
     property string title
@@ -40,18 +41,18 @@ Item {
         snapMode: ListView.NoSnap
 
         GamepadKeyNavigation {
-            gamepad: Gamepad { deviceId: fuse.gamepadId }
+            gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         }
 
         Keys.onLeftPressed: decrementCurrentIndex()
         Keys.onRightPressed: incrementCurrentIndex()
         Keys.onEscapePressed: {
-            fuse.setListIndex(-1);
+            FuseEmulator.setListIndex(-1);
             pageLoader.source = "";
         }
 
         Keys.onReturnPressed: {
-            fuse.setListIndex(view.currentIndex);
+            FuseEmulator.setListIndex(view.currentIndex);
             pageLoader.source = "";
         }
 
@@ -67,7 +68,7 @@ Item {
             width: view.width
             text: qsTr("Close (B)")
             onClicked: {
-                fuse.setListIndex(-1);
+                FuseEmulator.setListIndex(-1);
                 pageLoader.source = ""
             }
         }
@@ -88,7 +89,7 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     if (view.currentIndex === model.index) {
-                        fuse.setListIndex(view.currentIndex);
+                        FuseEmulator.setListIndex(view.currentIndex);
                         pageLoader.source = "";
                     } else {
                         view.currentIndex = model.index;

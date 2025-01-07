@@ -15,13 +15,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtGamepad 1.0
-import QtQuick.Dialogs 1.2
-import QtQuick.Layouts 1.12
-import Fuse 1.0
-import QtQuick.Controls 2.12
-import "private" 1.0
+import QtGamepadLegacy
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Dialogs
+import QtQuick.Layouts
+import Spectacol
+import "private"
 
 // @scope main.qml
 
@@ -34,7 +34,7 @@ Item
     property alias filterClass: filesModel.filterClass
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonXKey: Qt.Key_X
         buttonYKey: Qt.Key_Y
         buttonL1Key: Qt.Key_C
@@ -51,12 +51,11 @@ Item
 
     MessageDialog {
         id: copyDialog
-        icon: StandardIcon.Question
         title: "Spectacol"
-        text: qsTr("Override \"") + fuse.fileName(filesView.copyPath) + "\" ?";
-        standardButtons: StandardButton.Yes | StandardButton.No
-        onYes: {
-            fuse.copy(filesView.copyPath, fileList.folder, true);
+        text: qsTr("Override \"") + FuseEmulator.fileName(filesView.copyPath) + "\" ?";
+        buttons: MessageDialog.Yes | MessageDialog.No
+        onAccepted: {
+            FuseEmulator.copy(filesView.copyPath, fileList.folder, true);
             filesView.copyPath = "";
             filesModel.refresh();
             filesView.currentIndex = 0;
@@ -66,7 +65,7 @@ Item
             if (!filesView.canCopy)
                 return;
 
-            if (!fuse.copy(filesView.copyPath, fileList.folder)) {
+            if (!FuseEmulator.copy(filesView.copyPath, fileList.folder)) {
                 copyDialog.open();
                 return;
             }
@@ -78,19 +77,18 @@ Item
 
     FolderListModel {
         id: filesModel
-        rootFolder: fuseSettings.restrictToSpectacol ? fuse.dataPath : "/"
-        sortCriteria: folder.indexOf(fuse.snapshotsPath(), 0) == 0 ? FolderListModel.ByDateDesc : folder.indexOf(fuse.recordingsPath(), 0) == 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
+        rootFolder: FuseEmulator.settings.restrictToSpectacol ? FuseEmulator.dataPath : "/"
+        sortCriteria: folder.indexOf(FuseEmulator.snapshotsPath(), 0) === 0 ? FolderListModel.ByDateDesc : folder.indexOf(FuseEmulator.recordingsPath(), 0) === 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
     }
 
     MessageDialog {
         id: removeDialog
-        icon: StandardIcon.Question
         title: "Spectacol"
         text: qsTr("Remove \"") + filePath + "\" ?";
-        standardButtons: StandardButton.Yes | StandardButton.No
+        buttons: MessageDialog.Yes | MessageDialog.No
         property string filePath
-        onYes: {
-            fuse.remove(filePath)
+        onAccepted: {
+            FuseEmulator.remove(filePath)
             filesModel.refresh();
             filesView.currentIndex = 0;
         }
@@ -114,8 +112,8 @@ Item
         property bool canCopy: {
             if (!copyPath.length)
                 return false;
-            var srcPath = fuse.folderName(copyPath);
-            if (fuse.isFolder(copyPath))
+            var srcPath = FuseEmulator.folderName(copyPath);
+            if (FuseEmulator.isFolder(copyPath))
                 return fileList.folder !== srcPath && !fileList.folder.startsWith(copyPath);
             return fileList.folder !== srcPath;
         }
@@ -135,7 +133,7 @@ Item
         }
 
         onDeletePressed: removeDialog.remove()
-        onResetPressed: fileList.folder = fuse.dataPath
+        onResetPressed: fileList.folder = FuseEmulator.dataPath
 
         onCopyPressed: copyPath = filesModel.path(filesView.currentIndex)
         onPastePressed: copyDialog.copy()
@@ -219,7 +217,7 @@ Item
             Button {
                 Layout.fillWidth: true
                 text: qsTr("Go to <b>Spectrum</b> folder (Y)")
-                onClicked: fileList.folder = fuse.dataPath
+                onClicked: fileList.folder = FuseEmulator.dataPath
             }
             Button {
                 Layout.fillWidth: true
@@ -279,29 +277,7 @@ Item
         }
         height : parent.height
 
-        vertexShader: "
-                uniform highp mat4 qt_Matrix;
-                attribute highp vec4 qt_Vertex;
-                attribute highp vec2 qt_MultiTexCoord0;
-                varying highp vec2 coord;
-                uniform highp float width;
-
-                void main()
-                {
-                    coord = qt_MultiTexCoord0;
-                    gl_Position = qt_Matrix * qt_Vertex;
-                }
-            "
-
-        fragmentShader: "
-                varying highp vec2 coord;
-                uniform sampler2D source;
-                uniform lowp float qt_Opacity;
-
-                void main()
-                {
-                    gl_FragColor = texture2D(source, vec2(coord.x, 1.0 - coord.y)) * (0.6 - coord.y) * sin(3.14 * coord.x);
-                }
-            "
+        vertexShader: "qrc:///shaders/mirror.vert.qsb"
+        fragmentShader: "qrc:///shaders/mirror.frag.qsb"
     }
 }

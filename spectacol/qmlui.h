@@ -1,6 +1,5 @@
-/* qmlui.h: convenient functions to post runnables on fuse thread.
-
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+/*
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,8 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QMLUI_H
-#define QMLUI_H
+#pragma once
 
 #include <QString>
 
@@ -46,5 +44,3 @@ struct BlockErrors {
     BlockErrors() { hideErrors(); }
     ~BlockErrors() { showErrors(); }
 };
-
-#endif // QMLUI_H

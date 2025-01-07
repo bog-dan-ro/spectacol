@@ -17,15 +17,16 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import Qt.labs.settings 1.0
+import QtCore
+import QtQuick
+import Spectacol
 
 CoverFlowFiles {
     id: browser
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+    Component.onCompleted: FuseEmulator.paused = true
+    Component.onDestruction: FuseEmulator.paused = false
 
-    folder: fuse.dataPath
+    folder: FuseEmulator.dataPath
 
     Settings {
         category: "FileBrowser"
@@ -33,7 +34,7 @@ CoverFlowFiles {
     }
 
     onFileSelected: {
-        fuse.setOpenSaveFile(filePath);
+        FuseEmulator.setOpenSaveFile(filePath);
         pageLoader.source = "";
     }
 }

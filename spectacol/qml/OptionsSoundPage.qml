@@ -15,18 +15,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.12
-import QtGamepad 1.0
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtGamepadLegacy
+import Spectacol
 
 // @scope main.qml
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+    Component.onCompleted: FuseEmulator.paused = true
+    Component.onDestruction: FuseEmulator.paused = false
     anchors.margins: Screen.pixelDensity
 
     function getIndex(data, str) {
@@ -37,7 +38,7 @@ Flickable {
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
         buttonAKey: Qt.Key_Space
     }
@@ -58,8 +59,8 @@ Flickable {
                 KeyNavigation.down: loadingSound
                 focus: true
                 text: qsTr("Sound enabled")
-                checked: fuseSettings.soundEnabled
-                onCheckedChanged: fuseSettings.soundEnabled = checked
+                checked: FuseEmulator.settings.soundEnabled
+                onCheckedChanged: FuseEmulator.settings.soundEnabled = checked
             }
 
             CheckBox {
@@ -67,8 +68,8 @@ Flickable {
                 KeyNavigation.up: soundEnabled
                 KeyNavigation.down: soundForce8Bit
                 text: qsTr("Loading sound")
-                checked: fuseSettings.loadingSound
-                onCheckedChanged: fuseSettings.loadingSound = checked
+                checked: FuseEmulator.settings.loadingSound
+                onCheckedChanged: FuseEmulator.settings.loadingSound = checked
             }
 
             CheckBox {
@@ -76,8 +77,8 @@ Flickable {
                 KeyNavigation.up: loadingSound
                 KeyNavigation.down: ayStereoSeparation
                 text: qsTr("Force 8 bit")
-                checked: fuseSettings.soundForce8Bit
-                onCheckedChanged: fuseSettings.soundForce8Bit = checked
+                checked: FuseEmulator.settings.soundForce8Bit
+                onCheckedChanged: FuseEmulator.settings.soundForce8Bit = checked
             }
 
             RowLayout {
@@ -106,8 +107,8 @@ Flickable {
                     Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
                     model: ["None", "ACB", "ABC"]
-                    currentIndex: getIndex(model, fuseSettings.AYStereoSeparation)
-                    onCurrentTextChanged: fuseSettings.AYStereoSeparation = currentText
+                    currentIndex: getIndex(model, FuseEmulator.settings.AYStereoSeparation)
+                    onCurrentTextChanged: FuseEmulator.settings.AYStereoSeparation = currentText
                 }
             }
 
@@ -137,8 +138,8 @@ Flickable {
                     Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
                     model: ["TV speaker", "Beeper", "Unfiltered"]
-                    currentIndex: getIndex(model, fuseSettings.speakerType)
-                    onCurrentTextChanged: fuseSettings.speakerType = currentText
+                    currentIndex: getIndex(model, FuseEmulator.settings.speakerType)
+                    onCurrentTextChanged: FuseEmulator.settings.speakerType = currentText
                 }
             }
 

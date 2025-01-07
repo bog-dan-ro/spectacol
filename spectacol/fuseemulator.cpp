@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,25 +16,26 @@
 */
 
 #include "fuseemulator.h"
-#include "fusetexture.h"
+#include "zximage.h"
 #include "fusesettings.h"
 #include "fuserecording.h"
 
 #include "qmlui.h"
 
-#include <QGuiApplication>
+#include <QAudioDevice>
+#include <QAudioSink>
 #include <QDateTime>
 #include <QDir>
+#include <QDirIterator>
+#include <QGuiApplication>
+#include <QKeyEvent>
+#include <QMediaDevices>
 #include <QQmlContext>
 #include <QQmlEngine>
+#include <QSemaphore>
 #include <QSettings>
 #include <QStandardPaths>
-#include <QSemaphore>
-#include <QAudioDeviceInfo>
-#include <QAudioOutput>
-#include <QKeyEvent>
 #include <QTimer>
-#include <QDirIterator>
 
 #include <mutex>
 #include <thread>
@@ -55,24 +56,24 @@ extern "C"  {
 }
 
 #ifdef Q_OS_ANDROID
-# include <QtAndroid>
+# include <QCoreApplication>
 #endif
 
 typedef QLatin1String _;
 
 extern "C" int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
-    return g_fuseEmulator->soundLowlevelInit(device, freqptr, stereoptr);
+    return FuseEmulator::instance().soundLowlevelInit(device, freqptr, stereoptr);
 }
 
 extern "C" void sound_lowlevel_end( void )
 {
-    g_fuseEmulator->soundLowlevelEnd();
+    FuseEmulator::instance().soundLowlevelEnd();
 }
 
 extern "C" void sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 {
-    g_fuseEmulator->soundLowlevelFrame(data, len);
+    FuseEmulator::instance().soundLowlevelFrame(data, len);
 }
 
 FuseThread::FuseThread()
@@ -84,22 +85,18 @@ FuseThread::FuseThread()
 int FuseThread::soundLowlevelInit(const char *, int *freqptr, int *stereoptr)
 {
     QAudioFormat format;
-    format.setCodec("audio/pcm");
-    format.setChannelCount(*stereoptr ? 2 : 1);
-    format.setSampleSize(16);
-    format.setSampleType(QAudioFormat::SignedInt);
-    format.setSampleRate(*freqptr);
-    if (format == m_audioFormat && m_audioOutput)
-        return 0;
+    format.setChannelConfig(*stereoptr ? QAudioFormat::ChannelConfig::ChannelConfigStereo
+                                       : QAudioFormat::ChannelConfig::ChannelConfigMono);
+    format.setSampleFormat(QAudioFormat::SampleFormat::Int16);
 
     m_audioFormat = format;
-    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    auto info = QMediaDevices::defaultAudioOutput();
     if (!info.isFormatSupported(format)) {
         m_audioOutputDevice.clear();
         return 0;
     }
 
-    m_audioOutput.reset(new QAudioOutput(format));
+    m_audioOutput.reset(new QAudioSink(format));
     m_audioOutputDevice = m_audioOutput->start();
     m_uSleepTotal = 0;
     return 0;
@@ -137,7 +134,7 @@ void FuseThread::run()
     int argc = 0;
     auto args = QCoreApplication::arguments();
 #ifdef Q_OS_ANDROID
-    auto intent = QtAndroid::androidActivity().callObjectMethod("getIntent", "()Landroid/content/Intent;");
+    auto intent = QJniObject{QNativeInterface::QAndroidApplication::context()}.callObjectMethod("getIntent", "()Landroid/content/Intent;");
     if (intent.isValid() &&
             intent.callObjectMethod("getAction", "()Ljava/lang/String;").toString() == _("android.intent.action.VIEW") &&
             intent.callObjectMethod("getScheme", "()Ljava/lang/String;").toString() == _("file")) {
@@ -177,8 +174,6 @@ void FuseThread::run()
         }); \
     }
 
-FuseEmulator *g_fuseEmulator = nullptr;
-
 static input_key toJoystickKey(QGamepadManager::GamepadButton button)
 {
     switch (button) {
@@ -210,7 +205,18 @@ static input_key toJoystickKey(QGamepadManager::GamepadButton button)
     }
 }
 
-FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
+FuseEmulator *FuseEmulator::create(QQmlEngine *, QJSEngine *)
+{
+    return &instance();
+}
+
+FuseEmulator &FuseEmulator::instance()
+{
+    static FuseEmulator res;
+    return res;
+}
+
+FuseEmulator::FuseEmulator(QObject *parent)
     : FuseObject(parent)
     , m_breakpointsModel(this)
     , m_disassambleModel(this)
@@ -221,6 +227,7 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
     , m_recording(new FuseRecording(this))
 
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_tape, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_recording, QQmlEngine::CppOwnership);
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state){
@@ -241,8 +248,8 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
             break;
         }
     });
+
     QGamepadManager *gm = QGamepadManager::instance();
-    g_fuseEmulator = this;
     {
         QSettings s;
         m_gamepadId = s.value("gamepadId", -1).toInt();
@@ -351,12 +358,8 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
 
     connect(&m_breakpointsModel, &BreakpointsModel::modelReset, &m_disassambleModel, &DisassambleModel::update);
 
-    ctxt->setContextProperty("fuse", this);
-    ctxt->setContextProperty("fuseSettings", m_fuseSettings.get());
-    ctxt->setContextProperty("breakpointsModel", &m_breakpointsModel);
-    ctxt->setContextProperty("disassambleModel", &m_disassambleModel);
-    ctxt->setContextProperty("pokeFinderModel", &m_pokeFinderModel);
-    ctxt->setContextProperty("onlineGamesModel", &m_onlineGamesModel);
+    // ctxt->setContextProperty("pokeFinderModel", &m_pokeFinderModel);
+    // ctxt->setContextProperty("onlineGamesModel", &m_onlineGamesModel);
 
     qRegisterMetaType<ErrorLevel>("ErrorLevel");
 
@@ -367,8 +370,8 @@ FuseEmulator::FuseEmulator(QQmlContext *ctxt, QObject *parent)
         settings_current.autosave_settings = 1;
     });
 #ifdef Q_OS_ANDROID
-    auto pm = QtAndroid::androidActivity().callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;");
-    m_touchscreen = pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QAndroidJniObject::fromString(_("android.hardware.touchscreen")).object());
+    auto pm = QJniObject{QNativeInterface::QAndroidApplication::context()}.callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;");
+    m_touchscreen = pm.callMethod<jboolean>("hasSystemFeature","(Ljava/lang/String;)Z", QJniObject::fromString(_("android.hardware.touchscreen")).object());
 #endif
     m_deadZone = m_fuseSettings->deadZone();
     connect(m_fuseSettings.get(), &FuseSettings::deadZoneChanged, this, [this](qreal deadZone){
@@ -412,16 +415,17 @@ QString FuseEmulator::dataPath() const
 
     QSettings s;
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-    path = s.value("dataPath", QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + _("/Spectacol/")).toString();
+    path = s.value("dataPath", QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation).last() + _("/Spectacol/")).toString();
 #else
     path = s.value("dataPath", QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + _("/Spectacol/")).toString();
 #endif
 
 #ifdef Q_OS_ANDROID
-    if (QtAndroid::androidSdkVersion() >= 23) {
+#if 0
+    if (QNativeInterface::QAndroidApplication::sdkVersion() >= 23) {
         // Don't ask again the user for permissions
         if (s.value(_("permissionDenied"), false).toBool())
-            return path = QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + _("/Spectacol/");
+            return path = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation).last() + _("/Spectacol/");
 
         QStringList permissions = {"android.permission.READ_EXTERNAL_STORAGE",
                                    "android.permission.WRITE_EXTERNAL_STORAGE"};
@@ -438,13 +442,13 @@ QString FuseEmulator::dataPath() const
         }
         s.setValue(_("permissionDenied"), !sdcardAccessAllowed);
         if (!sdcardAccessAllowed)
-            return path = QStandardPaths::standardLocations(QStandardPaths::DataLocation).last() + _("/Spectacol/");
+            return path = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation).last() + _("/Spectacol/");
     } else {
         if (s.value(_("dataPathChanged"), false).toBool())
             return path;
         s.setValue(_("dataPathChanged"), true);
     }
-
+#endif
     QString p = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + _("/Spectacol/");
     if (QDir(path) != QDir(p)) {
         QDir d(p);
@@ -1544,4 +1548,19 @@ void FuseEmulator::updateScalers() const
 void FuseEmulator::startFuseThread()
 {
     m_fuseThread.start(QThread::HighPriority);
+}
+
+const DisassambleModel *FuseEmulator::disassambleModel() const
+{
+    return &m_disassambleModel;
+}
+
+const PokeFinderModel *FuseEmulator::pokeFinderModel() const
+{
+    return &m_pokeFinderModel;
+}
+
+const ZXGamesModel *FuseEmulator::onlineGamesModel() const
+{
+    return &m_onlineGamesModel;
 }

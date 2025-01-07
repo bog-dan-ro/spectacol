@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,13 +105,13 @@ QVariant breakpointType(BreakpointsModel::BreakpointType type)
     case BreakpointsModel::BreakOnEvent:
         return QLatin1String("E");
     }
-    return QVariant();
+    return {};
 }
 
 QVariant BreakpointsModel::data(const QModelIndex &index, int role) const
 {
     if (size_t(index.row()) >= m_breakPoints.size())
-        return QVariant();
+        return {};
 
     const auto &value = m_breakPoints[index.row()];
     switch (role) {
@@ -133,7 +133,7 @@ QVariant BreakpointsModel::data(const QModelIndex &index, int role) const
     case AbsoluteAddress:
         return absoluteAddress(value.value.address);
     }
-    return QVariant();
+    return {};
 }
 
 QHash<int, QByteArray> BreakpointsModel::roleNames() const
@@ -173,7 +173,7 @@ QVariant BreakpointsModel::breakPointValue(const BreakpointsModel::DebuggerBreak
     case BreakOnEvent:
         return bp.value.event->type + ":" + bp.value.event->detail;
     }
-    return QVariant();
+    return {};
 }
 
 

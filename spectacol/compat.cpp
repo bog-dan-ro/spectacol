@@ -1,6 +1,6 @@
 /* compat.cpp: various Qt compatibility functions
 
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ static QByteArray contextType(int type) {
     case UTILS_AUXILIARY_LIB:
         return "lib";
     case UTILS_AUXILIARY_ROM:
-        return "rom";
+        return "roms";
     case UTILS_AUXILIARY_WIDGET:
         return "ui";
     }
@@ -117,7 +117,9 @@ extern "C" int compat_get_next_path(path_context *ctx)
         return 1;
 
     case 1: {
-        QByteArray type(QStandardPaths::writableLocation(QStandardPaths::DataLocation).toUtf8() + QDir::separator().toLatin1() + contextType(ctx->type));
+        QByteArray type(
+            QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation).toUtf8()
+            + QDir::separator().toLatin1() + contextType(ctx->type));
         strncpy( ctx->path, type.constData(), PATH_MAX );
         return 1;
     }

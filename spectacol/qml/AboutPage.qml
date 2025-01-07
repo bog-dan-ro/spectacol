@@ -15,21 +15,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Window
+import QtGamepadLegacy
+import Spectacol
 import "private"
 // @scope main.qml
 Pane {
     anchors.fill: parent
     background.opacity: 0.85
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+    Component.onCompleted: FuseEmulator.paused = true
+    Component.onDestruction: FuseEmulator.paused = false
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
     }
     focus: true
@@ -103,7 +104,7 @@ Pane {
                     Layout.fillWidth: true
 
                     fillMode: Image.PreserveAspectFit
-                    source: "qrc:///images/gamepad.png"
+                    source: ":/images/gamepad.png"
                 }
                 FancyText {
                     Layout.fillWidth: true
@@ -129,7 +130,7 @@ Pane {
                     Layout.fillWidth: true
 
                     fillMode: Image.PreserveAspectFit
-                    source: "qrc:///images/gamepad.png"
+                    source: ":/images/gamepad.png"
                 }
                 FancyText {
                     Layout.fillWidth: true

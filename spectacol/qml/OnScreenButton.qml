@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import Fuse 1.0
-import "private" 1.0
+import QtQuick
+import QtQuick.Window
+import Spectacol
+import "private"
 
 Rectangle {
     id: button
@@ -41,9 +41,9 @@ Rectangle {
         if (buttons) {
             for (var i = 0; i < buttons.length ; ++i)
                 if (press)
-                    fuse.keyPress(buttons[i]);
+                    FuseEmulator.keyPress(buttons[i]);
                 else
-                    fuse.keyRelease(buttons[i]);
+                    FuseEmulator.keyRelease(buttons[i]);
         }
     }
 
@@ -71,17 +71,17 @@ Rectangle {
         font.pixelSize: TextSizes.scale16
         anchors.centerIn: parent
     }
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         if (event.key === Qt.Key_Return && buttons) {
             for (var i = 0; i < buttons.length ; ++i)
-                fuse.keyPress(buttons[i]);
+                FuseEmulator.keyPress(buttons[i]);
             event.accepted = true;
         }
     }
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Return && buttons) {
             for (var i = 0; i < buttons.length ; ++i)
-                fuse.keyRelease(buttons[i]);
+                FuseEmulator.keyRelease(buttons[i]);
             event.accepted = true;
         }
     }

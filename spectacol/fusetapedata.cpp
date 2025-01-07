@@ -39,7 +39,7 @@ int FuseTapeData::rowCount(const QModelIndex &parent) const
 QVariant FuseTapeData::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || size_t(index.row()) >= m_tapeBlocks.size())
-        return QVariant();
+        return {};
     switch (role) {
     case Label:
         return m_tapeBlocks[index.row()].label;
@@ -51,7 +51,7 @@ QVariant FuseTapeData::data(const QModelIndex &index, int role) const
         return index.row() == tape_get_current_block();
 
     default:
-        return QVariant();
+        return {};
     }
 }
 

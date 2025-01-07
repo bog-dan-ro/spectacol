@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DISASSAMBLEMODEL_H
-#define DISASSAMBLEMODEL_H
+#pragma once
 
 #include "fuselistmodel.h"
 
@@ -34,11 +33,10 @@ extern "C"  {
 class DisassambleModel : public FuseListModel
 {
     Q_OBJECT
-    Q_ENUMS(Origin)
 
     Q_PROPERTY(int delta READ delta NOTIFY deltaChanged)
     enum {
-        Background = Qt::BackgroundColorRole + 1,
+        Background = Qt::BackgroundRole + 1,
         Foreground = Qt::ForegroundRole + 1,
         SelectedBackground = Qt::UserRole + 1,
         SelectedForeground,
@@ -70,6 +68,7 @@ public:
         Start,
         End
     };
+    Q_ENUM(Origin)
 
 public:
     explicit DisassambleModel(QObject *parent = nullptr);
@@ -106,5 +105,3 @@ private:
     mutable std::mutex m_mutex;
     DisassambleDataVector m_disassambleData;
 };
-
-#endif // DISASSAMBLEMODEL_H

@@ -17,13 +17,14 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
-import Qt.labs.settings 1.0
-import QtGamepad 1.0
-import "private" 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
+import QtQuick.Controls
+import QtCore
+import QtGamepadLegacy
+import Spectacol
+import "private"
 
 Rectangle {
     color: Qt.rgba(0, 0, 0, 0.75);
@@ -34,13 +35,13 @@ Rectangle {
         running: false
         onTriggered: {
             noResults.visible = false;
-            onlineGamesModel.search(searchText.text);
+            FuseEmulator.onlineGamesModel.search(searchText.text);
         }
     }
 
     Connections {
-        target: onlineGamesModel
-        onNoResults: {
+        target: FuseEmulator.onlineGamesModel
+        function onNoResults () {
             noResults.visible = true;
             searchText.forceActiveFocus(Qt.TabFocusReason);
         }
@@ -48,7 +49,7 @@ Rectangle {
 
     GamepadKeyNavigation {
         id: gamepadKeyNavigation
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonYKey: Qt.Key_Tab
         buttonBKey: Qt.Key_Escape
         buttonAKey: searchText.focus ? Qt.Key_unknown : Qt.Key_Return
@@ -65,15 +66,16 @@ Rectangle {
         noResults.visible = false;
         timer.stop();
         if (searchText.text.length === 1)
-            onlineGamesModel.search("", searchText.text);
+            FuseEmulator.onlineGamesModel.search("", searchText.text);
         else
-            onlineGamesModel.search(searchText.text);
+            FuseEmulator.onlineGamesModel.search(searchText.text);
         grid.forceActiveFocus(Qt.TabFocusReason);
     }
 
     ColumnLayout {
         anchors.fill: parent
-        Layout.topMargin: TextSizes.scale24
+        anchors.margins: TextSizes.scale24
+        // Layout.topMargin: TextSizes.scale24
         FancyTextField {
             id: searchText
             focus: false
@@ -94,7 +96,7 @@ Rectangle {
             KeyNavigation.up: searchText
             Keys.onReturnPressed: {
                 pageLoader.source = "";
-                fuse.copyToFavourites(model.getPath(currentIndex))
+                FuseEmulator.copyToFavourites(model.getPath(currentIndex))
             }
             property real __scale: width / 320. > 3 ? width / 320. : 3
             clip: true
@@ -108,7 +110,7 @@ Rectangle {
             populate: Transition {
                 NumberAnimation { properties: "x,y"; duration: 200 }
             }
-            model: onlineGamesModel
+            model: FuseEmulator.onlineGamesModel
             highlight: Rectangle {
                 border.width: 0.25 * Screen.pixelDensity
                 color: Qt.rgba(0.0, 0.85, 0.0, 0.75)
@@ -139,7 +141,7 @@ Rectangle {
                         if (grid.currentIndex != index)
                             grid.currentIndex = index;
                         else {
-                            fuse.copyToFavourites(path);
+                            FuseEmulator.copyToFavourites(path);
                             pageLoader.source = "";
                         }
                     }
@@ -163,13 +165,13 @@ Rectangle {
 
     Component.onCompleted: {
         noResults.visible = false;
-        fuse.paused = true;
-        fuse.processInputEvents = false;
+        FuseEmulator.paused = true;
+        FuseEmulator.processInputEvents = false;
         if (searchText.text.length)
             performSearch();
     }
     Component.onDestruction: {
-        fuse.paused = false
-        fuse.processInputEvents = true;
+        FuseEmulator.paused = false
+        FuseEmulator.processInputEvents = true;
     }
 }

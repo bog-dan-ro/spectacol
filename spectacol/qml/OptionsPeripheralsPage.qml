@@ -15,21 +15,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
-import QtQuick.Controls 2.12
+import QtQuick
+import QtQuick.Window
+import QtGamepadLegacy
+import QtQuick.Controls
+import Spectacol
 
 // @scope main.qml
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+    Component.onCompleted: FuseEmulator.paused = true
+    Component.onDestruction: FuseEmulator.paused = false
     anchors.margins: Screen.pixelDensity
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
         buttonAKey: Qt.Key_Space
     }
@@ -49,8 +50,8 @@ Flickable {
                 KeyNavigation.down: kempstonMouse
                 focus: true
                 text: qsTr("Kempston joystick")
-                checked: fuseSettings.kempstonJoystick
-                onCheckedChanged: fuseSettings.kempstonJoystick = checked
+                checked: FuseEmulator.settings.kempstonJoystick
+                onCheckedChanged: FuseEmulator.settings.kempstonJoystick = checked
             }
 
             CheckBox {
@@ -58,8 +59,8 @@ Flickable {
                 KeyNavigation.up: kempstonJoystick
                 KeyNavigation.down: interface1
                 text: qsTr("Kempston mouse")
-                checked: fuseSettings.kempstonMouse
-                onCheckedChanged: fuseSettings.kempstonMouse = checked
+                checked: FuseEmulator.settings.kempstonMouse
+                onCheckedChanged: FuseEmulator.settings.kempstonMouse = checked
             }
 
             CheckBox {
@@ -67,8 +68,8 @@ Flickable {
                 KeyNavigation.up: kempstonMouse
                 KeyNavigation.down: interface2
                 text: qsTr("Interface 1")
-                checked: fuseSettings.interface1
-                onCheckedChanged: fuseSettings.interface1 = checked
+                checked: FuseEmulator.settings.interface1
+                onCheckedChanged: FuseEmulator.settings.interface1 = checked
             }
 
             CheckBox {
@@ -76,8 +77,8 @@ Flickable {
                 KeyNavigation.up: interface1
                 KeyNavigation.down: full48kOSK
                 text: qsTr("Interface 2")
-                checked: fuseSettings.interface2
-                onCheckedChanged: fuseSettings.interface2 = checked
+                checked: FuseEmulator.settings.interface2
+                onCheckedChanged: FuseEmulator.settings.interface2 = checked
             }
 
             CheckBox {
@@ -85,8 +86,8 @@ Flickable {
                 KeyNavigation.up: interface2
                 KeyNavigation.down: recreatedSpectrum
                 text: qsTr("Full On Screen 48k Keyboard")
-                checked: fuseSettings.full48kOSK
-                onCheckedChanged: fuseSettings.full48kOSK = checked
+                checked: FuseEmulator.settings.full48kOSK
+                onCheckedChanged: FuseEmulator.settings.full48kOSK = checked
             }
 
             CheckBox {
@@ -94,8 +95,8 @@ Flickable {
                 KeyNavigation.up: full48kOSK
                 KeyNavigation.down: joystickPrompt
                 text: qsTr("Recreated spectrum keyboard")
-                checked: fuseSettings.recreatedSpectrum
-                onCheckedChanged: fuseSettings.recreatedSpectrum = checked
+                checked: FuseEmulator.settings.recreatedSpectrum
+                onCheckedChanged: FuseEmulator.settings.recreatedSpectrum = checked
             }
 
             CheckBox {
@@ -103,8 +104,8 @@ Flickable {
                 KeyNavigation.up: recreatedSpectrum
                 KeyNavigation.down: deadZone
                 text: qsTr("Snapshot joystick prompt")
-                checked: fuseSettings.joystickPrompt
-                onCheckedChanged: fuseSettings.joystickPrompt = checked
+                checked: FuseEmulator.settings.joystickPrompt
+                onCheckedChanged: FuseEmulator.settings.joystickPrompt = checked
             }
             Row {
                 Label {
@@ -117,8 +118,8 @@ Flickable {
                     from: 0
                     to: 0.5
                     stepSize: 0.05
-                    value: fuseSettings.deadZone
-                    onValueChanged: fuseSettings.deadZone = value
+                    value: FuseEmulator.settings.deadZone
+                    onValueChanged: FuseEmulator.settings.deadZone = value
                 }
             }
 

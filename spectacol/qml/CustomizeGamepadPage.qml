@@ -15,23 +15,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Layouts 1.12
-import QtGamepad 1.0
-import QtQuick.Controls 2.12
-import Fuse 1.0
+import QtQuick
+import QtQuick.Window
+import QtQuick.Layouts
+import QtGamepadLegacy
+import QtQuick.Controls
+import Spectacol
 
 // @scope main.qml
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+    Component.onCompleted: FuseEmulator.paused = true
+    Component.onDestruction: FuseEmulator.paused = false
     anchors.margins: Screen.pixelDensity
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonAKey: Qt.Key_Space
         buttonBKey: Qt.Key_Escape
         buttonYKey: Qt.Key_Tab
@@ -164,8 +164,8 @@ Flickable {
                     id: shortcut
                     Layout.fillWidth: true
                     model: actionsModel
-                    currentIndex: actionIndex(fuseSettings.gamepadAction(buttonsModel.get(gamepadButton.currentIndex).code))
-                    onCurrentIndexChanged: fuseSettings.setGamepadAction(buttonsModel.get(gamepadButton.currentIndex).code, actionsModel.get(currentIndex).code)
+                    currentIndex: actionIndex(FuseEmulator.settings.gamepadAction(buttonsModel.get(gamepadButton.currentIndex).code))
+                    onCurrentIndexChanged: FuseEmulator.settings.setGamepadAction(buttonsModel.get(gamepadButton.currentIndex).code, actionsModel.get(currentIndex).code)
                     textRole: "name"
                     Keys.onUpPressed: {
                         if (shortcut.popup.visible)

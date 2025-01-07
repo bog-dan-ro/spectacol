@@ -15,23 +15,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.12
+import QtQuick
+import QtQuick.Window
+import QtGamepadLegacy
+import QtQuick.Controls
+import QtQuick.Layouts
+import Spectacol
 import "private"
 
 // @scope main.qml
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+    Component.onCompleted: FuseEmulator.paused = true
+    Component.onDestruction: FuseEmulator.paused = false
     anchors.margins: Screen.pixelDensity
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonAKey: Qt.Key_Space
         buttonBKey: Qt.Key_Escape
         buttonYKey: Qt.Key_Tab
@@ -52,11 +53,11 @@ Flickable {
                 spacing: 2.5 * Screen.pixelDensity
                 Label {
                     text: qsTr("Screen filter")
-                    anchors.verticalCenter: parent.verticalCenter
                 }
                 ComboBox {
                     focus: true
                     id: screenFilter
+                    Layout.minimumWidth: 50 * Screen.pixelDensity
                     Layout.fillWidth: true
                     Keys.onUpPressed: {
                         if (popup.visible)
@@ -73,9 +74,9 @@ Flickable {
                     Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
 
-                    model: fuse.filtersModel
-                    currentIndex: fuse.selectedFilterIndex
-                    onCurrentIndexChanged: fuse.selectedFilterIndex = currentIndex
+                    model: FuseEmulator.filtersModel
+                    currentIndex: FuseEmulator.selectedFilterIndex
+                    onCurrentIndexChanged: FuseEmulator.selectedFilterIndex = currentIndex
                 }
             }
 
@@ -84,10 +85,10 @@ Flickable {
                 Layout.fillWidth: true
                 Label {
                     text: qsTr("Fill mode")
-                    anchors.verticalCenter: parent.verticalCenter
                 }
                 ComboBox {
                     id: screenFillMode
+                    Layout.minimumWidth: 50 * Screen.pixelDensity
                     Layout.fillWidth: true
                     Keys.onUpPressed: {
                         if (popup.visible)
@@ -98,7 +99,7 @@ Flickable {
                     Keys.onDownPressed: {
                         if (popup.visible) {
                             incrementCurrentIndex();
-                        } else if (fuseSettings.showOrientationChooser) {
+                        } else if (FuseEmulator.settings.showOrientationChooser) {
                             screenOrientation.forceActiveFocus(Qt.TabFocusReason);
                         } else {
                             smoothScaling.forceActiveFocus(Qt.TabFocusReason);
@@ -108,21 +109,20 @@ Flickable {
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
 
                     model: ["Preserve aspect fit", "Preserve aspect", "Stretch"]
-                    currentIndex: fuseSettings.fillMode
+                    currentIndex: FuseEmulator.settings.fillMode
                     onCurrentIndexChanged: {
-                        fuseSettings.fillMode = currentIndex;
-                        fuseScreen.updateFillMode();
+                        FuseEmulator.settings.fillMode = currentIndex;
+                        zxScreen.updateFillMode();
                     }
                 }
             }
 
             RowLayout {
-                visible: fuseSettings.showOrientationChooser
+                visible: FuseEmulator.settings.showOrientationChooser
                 spacing: 2.5 * Screen.pixelDensity
                 Layout.fillWidth: true
                 Label {
                     text: qsTr("Screen orientation")
-                    anchors.verticalCenter: parent.verticalCenter
                 }
                 ComboBox {
                     id: screenOrientation
@@ -143,18 +143,18 @@ Flickable {
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
 
                     model: ["Any", "Landscape", "Portrait"]
-                    currentIndex: fuseSettings.screenOrientation
-                    onCurrentIndexChanged: fuseSettings.screenOrientation = currentIndex
+                    currentIndex: FuseEmulator.settings.screenOrientation
+                    onCurrentIndexChanged: FuseEmulator.settings.screenOrientation = currentIndex
                 }
             }
 
             CheckBox {
                 id: smoothScaling
-                KeyNavigation.up: fuseSettings.showOrientationChooser ? screenOrientation : screenFillMode
+                KeyNavigation.up: FuseEmulator.settings.showOrientationChooser ? screenOrientation : screenFillMode
                 KeyNavigation.down: TextSizes.smallScreen ? leftBorder : screenFilter
                 text: qsTr("Smooth scaling")
-                checked: fuseScreen.smoothScaling
-                onCheckedChanged: fuseScreen.smoothScaling = checked
+                checked: zxScreen.smoothScaling
+                onCheckedChanged: zxScreen.smoothScaling = checked
             }
 
             CheckBox {
@@ -163,12 +163,12 @@ Flickable {
                 KeyNavigation.up: smoothScaling
                 KeyNavigation.down: screenFilter
                 text: qsTr("Left boder")
-                checked: fuseSettings.leftMargin
-                onCheckedChanged: fuseSettings.leftMargin = checked
+                checked: FuseEmulator.settings.leftMargin
+                onCheckedChanged: FuseEmulator.settings.leftMargin = checked
             }
 
             Button {
-                anchors.horizontalCenter: parent.horizontalCenter
+                Layout.alignment: Qt.AlignHCenter
                 text: qsTr("Close (B)")
                 onClicked: pageLoader.source = ""
             }

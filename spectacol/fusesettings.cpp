@@ -31,7 +31,7 @@ extern "C"  {
 }
 
 #ifdef Q_OS_ANDROID
-# include <QtAndroid>
+#  include <QCoreApplication>
 #endif
 
 typedef QLatin1String _;
@@ -111,7 +111,7 @@ void FuseSettings::setCurrentMachineIndex(int idx)
         }
         machine_select(machine_types[idx]->machine);
         waitFuseThread.release();
-        callFunction([this]{ emit currentMachineChanged(); emit settingsCurrentChanged(); g_fuseEmulator->resetLoadedFile();});
+        callFunction([this]{ emit currentMachineChanged(); emit settingsCurrentChanged(); FuseEmulator::instance().resetLoadedFile();});
     });
     waitFuseThread.acquire();
 }
@@ -292,11 +292,12 @@ bool FuseSettings::showOrientationChooser() const
 #ifndef Q_OS_ANDROID
     return false;
 #else
-    static const auto uiMode = QAndroidJniObject::getStaticObjectField("android/content/Context", "UI_MODE_SERVICE", "Ljava/lang/String;");
-    auto service =  QtAndroid::androidActivity().callObjectMethod("getSystemService",
-                                                            "(Ljava/lang/String;)Ljava/lang/Object;",
-                                                            uiMode.object());
-    static const auto typeTv = QAndroidJniObject::getStaticField<jint>("android.content.res.Configuration", "UI_MODE_TYPE_TELEVISION");
+    static const auto uiMode = QJniObject::getStaticObjectField("android/content/Context", "UI_MODE_SERVICE", "Ljava/lang/String;");
+    auto service = QJniObject{QNativeInterface::QAndroidApplication::context()}
+                       .callObjectMethod("getSystemService",
+                                         "(Ljava/lang/String;)Ljava/lang/Object;",
+                                         uiMode.object());
+    static const auto typeTv = QJniObject::getStaticField<jint>("android.content.res.Configuration", "UI_MODE_TYPE_TELEVISION");
     return service.callMethod<jint>("getCurrentModeType") != typeTv;
 #endif
 }
@@ -319,9 +320,9 @@ void FuseSettings::setScreenOrientation(int orientation)
     Q_UNUSED(orientation);
     return;
 #else
-    static const int fullSensor = QAndroidJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_FULL_SENSOR");
-    static const int sensorLandscape = QAndroidJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_SENSOR_LANDSCAPE");
-    static const int sensorPortrait = QAndroidJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_SENSOR_PORTRAIT");
+    static const int fullSensor = QJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_FULL_SENSOR");
+    static const int sensorLandscape = QJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_SENSOR_LANDSCAPE");
+    static const int sensorPortrait = QJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_SENSOR_PORTRAIT");
     int request;
     switch (orientation) {
     case Sensors:
@@ -336,8 +337,8 @@ void FuseSettings::setScreenOrientation(int orientation)
     default:
         return;
     }
-    QtAndroid::runOnAndroidThread([request]{
-        QtAndroid::androidActivity().callMethod<void>("setRequestedOrientation", "(I)V", request);
+    QNativeInterface::QAndroidApplication::runOnAndroidMainThread([request]{
+        QJniObject{QNativeInterface::QAndroidApplication::context()}.callMethod<void>("setRequestedOrientation", "(I)V", request);
     });
     QSettings s;
     s.beginGroup(_("Screen"));

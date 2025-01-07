@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FUSEOBJECT_H
-#define FUSEOBJECT_H
+#pragma once
 
 #include <QObject>
 
@@ -25,8 +24,9 @@
 class FuseObject : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit FuseObject(QObject *parent = 0);
+    explicit FuseObject(QObject *parent = nullptr);
     typedef std::function<void()> Function;
     void callFunction(const Function &func);
     void callFunctionDelayed(int ms, const Function &func);
@@ -36,5 +36,3 @@ signals:
 
 public slots:
 };
-
-#endif // FUSEOBJECT_H

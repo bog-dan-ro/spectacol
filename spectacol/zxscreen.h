@@ -1,6 +1,5 @@
-/* fusecreen.h: QML Item representing the fuse screen
-
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+/*
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,12 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FUSESCREEN_H
-#define FUSESCREEN_H
+#pragma once
 
 #include "fusesettings.h"
 
-#include <QQuickItem>
+#include <QQmlEngine>
+#include <QQuickRhiItem>
 
 #include <vector>
 
@@ -29,14 +28,15 @@ class DisassambleModel;
 class BreakpointsModel;
 class QAbstractItemModel;
 
-class FuseScreen : public QQuickItem
+class ZxScreen : public QQuickRhiItem
 {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY screenChanged)
     Q_PROPERTY(bool smoothScaling READ smoothScaling WRITE setSmoothScaling NOTIFY smoothScalingChanged)
 
 public:
-    FuseScreen();
+    ZxScreen();
 
     bool fullScreen() const;
     void setFullScreen(bool fullScreen);
@@ -47,24 +47,20 @@ public:
 public slots:
     void updateFillMode();
 
-
 signals:
     void screenChanged();
     void smoothScalingChanged(bool smoothScaling);
 
-    // QQuickItem interface
 protected:
-    QSGNode *updatePaintNode(QSGNode *n, UpdatePaintNodeData *);
+    // QQuickRhiItem interface
+    QQuickRhiItemRenderer *createRenderer() final;
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event) final;
+    void mouseMoveEvent(QMouseEvent *event) final;
+    void mouseReleaseEvent(QMouseEvent *event) final;
 
 private:
-    qreal m_aspectRatio = 4/3;
-    QSize m_imageSize = QSize(1, 1);
+    qreal m_aspectRatio = 4.0/3.0;
     FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
     bool m_smoothScaling = false;
 };
-
-#endif // FUSESCREEN_H

@@ -157,7 +157,7 @@ int FolderListModel::rowCount(const QModelIndex &parent) const
 QVariant FolderListModel::data(const QModelIndex &index, int role) const
 {
     if (size_t(index.row()) >= m_files.size())
-        return QVariant();
+        return {};
 
     switch (role) {
     case Name:
@@ -167,7 +167,7 @@ QVariant FolderListModel::data(const QModelIndex &index, int role) const
     case IsDir:
         return m_files[index.row()].isDir();
     }
-    return QVariant();
+    return {};
 }
 
 QHash<int, QByteArray> FolderListModel::roleNames() const

@@ -23,7 +23,7 @@ int ZXGamesModel::rowCount(const QModelIndex &) const
 QVariant ZXGamesModel::data(const QModelIndex &index, int role) const
 {
     if (size_t(index.row()) >= m_data.size())
-        return QVariant();
+        return {};
 
     auto path = [this, &index] {
         const QString &path = m_data[index.row()].path;
@@ -43,7 +43,7 @@ QVariant ZXGamesModel::data(const QModelIndex &index, int role) const
     case ScreenFile:
         return path();
     }
-    return QVariant();
+    return {};
 }
 
 bool ZXGamesModel::canFetchMore(const QModelIndex &/*parent*/) const
@@ -129,7 +129,7 @@ void ZXGamesModel::search(const QString &title, const QString &firstTitle)
 QString ZXGamesModel::getPath(int index)
 {
     if (size_t(index) >= m_data.size())
-        return QString();
+        return {};
 
     return m_data[index].path;
 }

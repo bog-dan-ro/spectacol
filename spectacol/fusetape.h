@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FUSETAPE_H
-#define FUSETAPE_H
+#pragma once
 
 #include <QTimer>
+#include <QQmlEngine>
 
 #include "fuseobject.h"
 
@@ -30,6 +30,8 @@ class FuseEmulator;
 class FuseTape : public FuseObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("use fuse.tape instead")
     Q_PROPERTY(bool hasTape MEMBER m_hasTape NOTIFY hasTapeChanged)
     Q_PROPERTY(QString programName MEMBER m_programName NOTIFY programNameChanged)
 
@@ -61,5 +63,3 @@ private:
     FuseEmulator *m_fuseEmulator = nullptr;
     QTimer m_saveSnapshotTimer;
 };
-
-#endif // FUSETAPE_H
