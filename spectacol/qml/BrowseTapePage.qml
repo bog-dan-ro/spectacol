@@ -17,25 +17,24 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
-import Fuse 1.0
-
-import "private" 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Window
+import QtGamepadLegacy
+import Spectacol
+import "private"
 
 Item {
     Component.onCompleted: {
-        fuse.processInputEvents = false;
-        fuse.paused = true;
-        if (fuse.touchscreen)
+        FuseEmulator.processInputEvents = false;
+        FuseEmulator.paused = true;
+        if (FuseEmulator.touchscreen)
             messagePage.showMessage(FuseEmulator.Info, qsTr("Long tap on an item to view the content"));
     }
     Component.onDestruction: {
-        fuse.processInputEvents = true;
-        fuse.paused = false;
+        FuseEmulator.processInputEvents = true;
+        FuseEmulator.paused = false;
     }
 
     anchors.fill: parent
@@ -110,7 +109,7 @@ Item {
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignTop
-                        text: fuse.dumpData(base64CompressedData, offset.value, TextSizes.smallScreen? 8 : 16);
+                        text: FuseEmulator.dumpData(base64CompressedData, offset.value, TextSizes.smallScreen? 8 : 16);
                     }
                 }
                 Image {
@@ -128,7 +127,7 @@ Item {
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
     }

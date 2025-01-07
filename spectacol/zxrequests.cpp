@@ -136,7 +136,7 @@ ZXUpdateRequest::ZXUpdateRequest(ZXGamesModel *parent, const QString &identifier
                 QString name = obj.value(QLatin1String("name")).toString();
                 if (name.endsWith(emulator_ext)) {
                     QString md5 = obj.value(QLatin1String("md5")).toString().toLower();
-                    QString path = g_fuseEmulator->saveFilePath(name);
+                    QString path = FuseEmulator::instance().saveFilePath(name);
                     QFile f(path);
                     if (!f.open(QIODevice::ReadOnly) ||
                             QCryptographicHash::hash(f.readAll(), QCryptographicHash::Md5).toHex().toLower() != md5) {
@@ -144,8 +144,11 @@ ZXUpdateRequest::ZXUpdateRequest(ZXGamesModel *parent, const QString &identifier
                         if (workable_servers.empty())
                             return;
 
-                        auto download_url = QLatin1String("https://") + workable_servers.at(qrand() % workable_servers.size()).toString() +
-                                rootObject.value(QLatin1String("dir")).toString() + QLatin1Char('/') + name;
+                        auto download_url
+                            = QLatin1String("https://")
+                              + workable_servers.at(rand() % workable_servers.size()).toString()
+                              + rootObject.value(QLatin1String("dir")).toString() + QLatin1Char('/')
+                              + name;
 
                         QNetworkRequest req(download_url);
                         req.setPriority(QNetworkRequest::HighPriority);

@@ -15,21 +15,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
-import QtQuick.Controls 2.12
+import QtQuick
+import QtQuick.Window
+import QtGamepadLegacy
+import QtQuick.Controls
+import Spectacol
 
 // @scope main.qml
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+    Component.onCompleted: FuseEmulator.paused = true
+    Component.onDestruction: FuseEmulator.paused = false
     anchors.margins: Screen.pixelDensity
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonAKey: Qt.Key_Space
         buttonBKey: Qt.Key_Escape
         buttonYKey: Qt.Key_Tab
@@ -60,8 +61,8 @@ Flickable {
                     Keys.onRightPressed: increase()
                     from: 10
                     to: 10000
-                    value: fuseSettings.emulationSpeed
-                    onValueChanged: fuseSettings.emulationSpeed = value
+                    value: FuseEmulator.settings.emulationSpeed
+                    onValueChanged: FuseEmulator.settings.emulationSpeed = value
                 }
             }
 
@@ -70,36 +71,36 @@ Flickable {
                 KeyNavigation.up: emulationSpeed
                 KeyNavigation.down: restrictBrowse
                 text: qsTr("Auto save snapshot on exit")
-                checked: fuseSettings.autoSaveOnExit
-                onCheckedChanged: fuseSettings.autoSaveOnExit = checked
+                checked: FuseEmulator.settings.autoSaveOnExit
+                onCheckedChanged: FuseEmulator.settings.autoSaveOnExit = checked
             }
 
             CheckBox {
                 id: restrictBrowse
                 KeyNavigation.up: autoSave
-                KeyNavigation.down: fuse.touchscreen ? swipeForMenu : autoLoad
+                KeyNavigation.down: FuseEmulator.touchscreen ? swipeForMenu : autoLoad
                 text: qsTr("Restrict browsing to Spectacol folder")
-                checked: fuseSettings.restrictToSpectacol
-                onCheckedChanged: fuseSettings.restrictToSpectacol = checked
+                checked: FuseEmulator.settings.restrictToSpectacol
+                onCheckedChanged: FuseEmulator.settings.restrictToSpectacol = checked
             }
 
             CheckBox {
                 id: swipeForMenu
-                visible: fuse.touchscreen
+                visible: FuseEmulator.touchscreen
                 KeyNavigation.up: restrictBrowse
                 KeyNavigation.down: autoLoad
                 text: qsTr("Swipe to open the menu")
-                checked: fuseSettings.swipe4menu
-                onCheckedChanged: fuseSettings.swipe4menu = checked
+                checked: FuseEmulator.settings.swipe4menu
+                onCheckedChanged: FuseEmulator.settings.swipe4menu = checked
             }
 
             CheckBox {
                 id: autoLoad
-                KeyNavigation.up: fuse.touchscreen ? swipeForMenu : restrictBrowse
+                KeyNavigation.up: FuseEmulator.touchscreen ? swipeForMenu : restrictBrowse
                 KeyNavigation.down: detectLoaders
                 text: qsTr("Auto load media")
-                checked: fuseSettings.autoLoad
-                onCheckedChanged: fuseSettings.autoLoad = checked
+                checked: FuseEmulator.settings.autoLoad
+                onCheckedChanged: FuseEmulator.settings.autoLoad = checked
             }
 
             CheckBox {
@@ -107,8 +108,8 @@ Flickable {
                 KeyNavigation.up: autoLoad
                 KeyNavigation.down: loaderAcceleration
                 text: qsTr("Detect loaders")
-                checked: fuseSettings.detectLoaders
-                onCheckedChanged: fuseSettings.detectLoaders = checked
+                checked: FuseEmulator.settings.detectLoaders
+                onCheckedChanged: FuseEmulator.settings.detectLoaders = checked
             }
 
             Row {
@@ -135,8 +136,8 @@ Flickable {
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
 
                     model: ["None", "Safe", "Turbo"]
-                    currentIndex: fuseSettings.loaderAcceleration
-                    onCurrentIndexChanged: fuseSettings.loaderAcceleration = currentIndex
+                    currentIndex: FuseEmulator.settings.loaderAcceleration
+                    onCurrentIndexChanged: FuseEmulator.settings.loaderAcceleration = currentIndex
                 }
             }
 
@@ -164,8 +165,8 @@ Flickable {
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
 
                     model: ["All (Infos, Warnings & Errors)", "Warnings & Errors", "Errors"]
-                    currentIndex: fuseSettings.messageLevel
-                    onCurrentIndexChanged: fuseSettings.messageLevel = currentIndex
+                    currentIndex: FuseEmulator.settings.messageLevel
+                    onCurrentIndexChanged: FuseEmulator.settings.messageLevel = currentIndex
                 }
             }
 

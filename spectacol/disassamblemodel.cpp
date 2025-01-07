@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -220,7 +220,7 @@ std::shared_ptr<DisassambleModel::DisassambleDataVector> DisassambleModel::disas
         address = debugger_search_instruction(address, delta);
     delta = 0;
 
-    BreakpointsModel* breakpointsModel = g_fuseEmulator->breakpointsModel();
+    BreakpointsModel* breakpointsModel = FuseEmulator::instance().breakpointsModel();
     std::lock_guard<std::mutex> lock(m_mutex);
     std::lock_guard<std::mutex> lockBreakpoints(breakpointsModel->breakpointsMutex());
     m_address = address;

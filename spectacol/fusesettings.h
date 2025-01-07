@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,12 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FUSESETTINGS_H
-#define FUSESETTINGS_H
+#pragma once
 
 #include "fuseobject.h"
 
 #include <QGamepadManager>
+#include <QQmlEngine>
 
 #include <mutex>
 #include <unordered_map>
@@ -28,7 +28,8 @@
 class FuseSettings : public FuseObject
 {
     Q_OBJECT
-    Q_ENUMS(FillMode Actions)
+    QML_ELEMENT
+    QML_UNCREATABLE("use fuseSettings instead")
 
     Q_PROPERTY(QStringList machinesModel READ machinesModel CONSTANT)
     Q_PROPERTY(QString currentMachine READ currentMachine NOTIFY currentMachineChanged)
@@ -75,6 +76,7 @@ public:
         PreserveAspect,
         Stretch
     };
+    Q_ENUM(FillMode)
 
     enum Actions {
         JoystickFire = 0,
@@ -85,6 +87,7 @@ public:
         QuickLoadSnapshot,
         ToggleEmulationSpeed
     };
+    Q_ENUM(Actions)
 
 public:
     explicit FuseSettings(QObject *parent = 0);
@@ -214,5 +217,3 @@ private:
         {QGamepadManager::ButtonR2, QuickLoadSnapshot}
     };
 };
-
-#endif // FUSESETTINGS_H

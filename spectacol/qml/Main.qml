@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Dialogs 1.2
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
-import Fuse 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Dialogs
+import QtQuick.Layouts
+import QtQuick.Window
+import QtGamepadLegacy
+import Spectacol
 import "private"
 
 ApplicationWindow {
@@ -38,17 +38,16 @@ ApplicationWindow {
 
     MessageDialog {
         id: quitDialog
-        icon: StandardIcon.Question
         title: "Spectacol"
         text: "Quit ?"
-        standardButtons: StandardButton.Yes | StandardButton.No
-        onYes: fuse.quit()
+        buttons: MessageDialog.Yes | MessageDialog.No
+        onAccepted: FuseEmulator.quit()
     }
 
     Drawer {
         id: menuBar
         focus: false
-        dragMargin: fuseSettings.swipe4menu ? Qt.styleHints.startDragDistance : 0
+        dragMargin: FuseEmulator.settings.swipe4menu ? Qt.styleHints.startDragDistance : 0
 
         width: 17 * (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20)
         height: mainScreen.height
@@ -61,10 +60,10 @@ ApplicationWindow {
             }
         }
         property bool paused: false
-        onPausedChanged: fuse.paused = paused
+        onPausedChanged: FuseEmulator.paused = paused
         onPositionChanged: {
             menuView.reset();
-            if (position == 1) {
+            if (position === 1) {
                 onScreenCursorJoystick.visible = false;
                 onScreen48Keyboard.visible = false;
                 pageLoader.source = "";
@@ -73,7 +72,7 @@ ApplicationWindow {
                     paused = true;
             }
 
-            if (position == 0) {
+            if (position === 0) {
                 menuView.useGamepad = false;
                 if (paused)
                     paused = false;
@@ -87,7 +86,7 @@ ApplicationWindow {
         color: "black"
         focus: true
 
-        Keys.onPressed: {
+        Keys.onPressed: (event)=> {
             switch (event.key) {
             case Qt.Key_F1:
             case Qt.Key_Search:
@@ -120,7 +119,7 @@ ApplicationWindow {
                 break;
 
             case Qt.Key_F11:
-                fuseScreen.fullScreen = !fuseScreen.fullScreen;
+                zxScreen.fullScreen = !zxScreen.fullScreen;
                 event.accepted = true;
                 break;
 
@@ -163,7 +162,7 @@ ApplicationWindow {
                         pageLoader.source = "";
                         event.accepted = true;
                     } else {
-                        if (fuseSettings.hasStartButton || fuse.touchscreen)
+                        if (FuseEmulator.settings.hasStartButton || FuseEmulator.touchscreen)
                             quitDialog.open();
                         else
                             menuBar.open();
@@ -172,13 +171,13 @@ ApplicationWindow {
                 }
                 break;
             }
-            if (!event.accepted && fuse.processInputEvents) {
-                fuse.keyPress(event.key, event.modifiers, event.isAutoRepeat, false);
+            if (!event.accepted && FuseEmulator.processInputEvents) {
+                FuseEmulator.keyPress(event.key, event.modifiers, event.isAutoRepeat, false);
                 event.accepted = true;
             }
         }
 
-        Keys.onReleased: {
+        Keys.onReleased: (event)=> {
             switch (event.key) {
             case Qt.Key_Return:
             case Qt.Key_Enter:
@@ -188,16 +187,16 @@ ApplicationWindow {
                 }
                 break;
             }
-            if (!event.accepted && fuse.processInputEvents) {
-                fuse.keyRelease(event.key, event.modifiers, event.isAutoRepeat, false);
+            if (!event.accepted && FuseEmulator.processInputEvents) {
+                FuseEmulator.keyRelease(event.key, event.modifiers, event.isAutoRepeat, false);
                 event.accepted = true;
             }
         }
 
-        FuseScreen {
-            id: fuseScreen
-            anchors.fill: parent
-            anchors.leftMargin: (fuseSettings.leftMargin && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
+        ZxScreen {
+            id: zxScreen
+            anchors.centerIn: parent
+            anchors.leftMargin: (FuseEmulator.settings.leftMargin && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
             onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
 
             Row {
@@ -219,7 +218,7 @@ ApplicationWindow {
                         onStopped: {cassetteIcon.visible = false; cassetteIcon.opacity = 1}
                     }
 
-                    source: "qrc:///images/cassette-tape.svg"
+                    source: "qrc:/images/cassette-tape.svg"
                 }
 
                 Image {
@@ -235,7 +234,7 @@ ApplicationWindow {
                         onStopped: {diskIcon.visible = false; diskIcon.opacity = 1}
                     }
 
-                    source: "qrc:///images/floppy.svg"
+                    source: "qrc:/images/floppy.svg"
                 }
             }
         }
@@ -248,8 +247,8 @@ ApplicationWindow {
         Grid {
             id: screenButtonsGrid
             anchors.fill: parent
-            anchors.topMargin: mainScreen.portrait ? fuseScreen.implicitHeight : 0;
-            visible: fuse.touchscreen && fuse.showControlsIcons
+            anchors.topMargin: mainScreen.portrait ? zxScreen.implicitHeight : 0;
+            visible: FuseEmulator.touchscreen && FuseEmulator.showControlsIcons
             horizontalItemAlignment: Grid.AlignHCenter
             verticalItemAlignment: Grid.AlignVCenter
             columns: mainScreen.portrait ? 6 : 1
@@ -271,7 +270,7 @@ ApplicationWindow {
                 opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 5
                 width: Screen.pixelDensity * 7
-                source: "qrc:///images/keyboard-icon.svg"
+                source: "qrc:/images/keyboard-icon.svg"
                 MouseArea {
                     anchors.fill: parent
                     onClicked: toggleOnScreenControls(FuseEmulator.Keyboard48K, false);
@@ -290,7 +289,7 @@ ApplicationWindow {
                 opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 5
                 width: Screen.pixelDensity * 7
-                source: "qrc:///images/controller-icon.svg"
+                source: "qrc:/images/controller-icon.svg"
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
@@ -303,21 +302,21 @@ ApplicationWindow {
                 opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 7
                 width: Screen.pixelDensity * 7
-                source: "qrc:///images/fastforward.svg"
+                source: "qrc:/images/fastforward.svg"
                 MouseArea {
                     anchors.fill: parent
-                    onPressed: fuse.speedup()
-                    onReleased: fuse.slowdown()
+                    onPressed: FuseEmulator.speedup()
+                    onReleased: FuseEmulator.slowdown()
                 }
             }
             Image {
                 opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 7
                 width: Screen.pixelDensity * 7
-                source: fuse.paused ? "qrc:///images/play.svg" : "qrc:///images/pause.svg"
+                source: FuseEmulator.paused ? "qrc:/images/play.svg" : "qrc:/images/pause.svg"
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: fuse.togglePaused()
+                    onClicked: FuseEmulator.togglePaused()
                 }
             }
         }
@@ -377,42 +376,42 @@ ApplicationWindow {
 
     MessageDialog {
         id: queryDialog
-        icon: StandardIcon.Question
         title: "Spectacol"
-        standardButtons: StandardButton.Yes | StandardButton.No
-        onYes: fuse.setQuery(FuseEmulator.UiYes)
-        onNo: fuse.setQuery(FuseEmulator.UiNo)
+        buttons: MessageDialog.Yes | MessageDialog.No
+        onAccepted: FuseEmulator.setQuery(FuseEmulator.UiYes)
+        onRejected: FuseEmulator.setQuery(FuseEmulator.UiNo)
     }
 
     MessageDialog {
         id: confirmSaveSpecificDialog
-        icon: StandardIcon.Question
         title: "Spectacol"
-        standardButtons: StandardButton.Save | StandardButton.Discard | StandardButton.Cancel
-        onAccepted: fuse.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveSave)
-        onDiscard: fuse.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveDontsave)
-        onRejected: fuse.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveCancel)
+        buttons: MessageDialog.Save | MessageDialog.Discard | MessageDialog.Cancel
+        onAccepted: FuseEmulator.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveSave)
+        // TODO: FIX ME
+        // onDiscard: FuseEmulator.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveDontsave)
+        onRejected: FuseEmulator.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveCancel)
     }
 
     Connections {
-        target: fuse
-        onError: messagePage.showMessage(level, message);
+        target: FuseEmulator
 
-        onShowDebugger: pageLoader.source = "DebuggerPage.qml"
-        onHideDebugger: pageLoader.source = ""
+        function onError (level, message) { messagePage.showMessage(level, message); }
 
-        onConfigureJoystick: pageLoader.source = "Joysticks.qml"
+        function onShowDebugger() { pageLoader.source = "DebuggerPage.qml"; }
+        function onHideDebugger() { pageLoader.source = ""; }
 
-        onShowMenu: menuBar.open();
-        onHideMenu: menuBar.close();
-        onToggleOnScreenControls: toggleOnScreenControls(type, true)
-        onShowWelcome: {
-            fuseSettings.swipe4menu = !TextSizes.smallScreen;
-            fuseSettings.leftMargin = TextSizes.smallScreen;
+        function onConfigureJoystick() { pageLoader.source = "Joysticks.qml"; }
+
+        function onShowMenu() { menuBar.open(); }
+        function onHideMenu() { menuBar.close(); }
+        function onToggleOnScreenControls(type) { toggleOnScreenControls(type, true); }
+        function onShowWelcome() {
+            FuseEmulator.settings.swipe4menu = !TextSizes.smallScreen;
+            FuseEmulator.settings.leftMargin = TextSizes.smallScreen;
             pageLoader.source = "AboutPage.qml";
         }
 
-        onUiIconUpdate: {
+        function onUiIconUpdate(item, state) {
             switch (item) {
             case FuseEmulator.Disk:
                 if (cassetteIcon.visible)
@@ -442,56 +441,56 @@ ApplicationWindow {
             }
         }
 
-        onOpenFile: {
+        function onOpenFile(title, path) {
             pageLoader.source = "GetFileBrowserPage.qml"
             if (path.length)
                 pageLoader.item.folder = path;
             messagePage.showMessage(FuseEmulator.Info, title);
         }
 
-        onSaveFile: {
+        function onSaveFile(title) {
             // TODO: Implement save dialog
-            fuse.setOpenSaveFile("");
+            FuseEmulator.setOpenSaveFile("");
         }
 
-        onQuery: {
+        function onQuery(message) {
             queryDialog.text = message;
             queryDialog.open();
         }
 
-        onConfirmSaveSpecific: {
+        function onConfirmSaveSpecific(message) {
             confirmSaveSpecificDialog.text = message;
             confirmSaveSpecificDialog.open();
         }
 
-        onGetListIndex: {
+        function onGetListIndex(list, title) {
             pageLoader.source = "GetListPage.qml";
             pageLoader.item.title = title;
             pageLoader.item.model = list;
         }
 
-        onShowPokememSelector: pageLoader.source = "PokeManagerPage.qml"
+        function onShowPokememSelector() { pageLoader.source = "PokeManagerPage.qml"; }
     }
 
     Component.onCompleted: {
         // Check gamepads status
-        if (fuse.gamepadId == -1) {
+        if (FuseEmulator.gamepadId === -1) {
             var len = GamepadManager.connectedGamepads.length;
             if (len > 0) {
                 for (var i = 0; i < len; ++i) {
                     var id = GamepadManager.connectedGamepads[i];
                     if (!GamepadManager.isConfigurationNeeded(id)) {
-                        fuse.gamepadId = id;
+                        FuseEmulator.gamepadId = id;
                         break;
                     }
                 }
 
-                if (fuse.gamepadId == -1) {
-                    fuse.gamepadId = GamepadManager.connectedGamepads[0];
+                if (FuseEmulator.gamepadId === -1) {
+                    FuseEmulator.gamepadId = GamepadManager.connectedGamepads[0];
                     pageLoader.source = "CalibrateGamepad.qml";
                 }
             } else {
-                if (!fuse.touchscreen)
+                if (!FuseEmulator.touchscreen)
                     messagePage.showMessage(FuseEmulator.Info, qsTr("No gamepad was found, please connect a gamepad"));
             }
         }

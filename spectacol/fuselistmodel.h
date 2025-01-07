@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FUSELISTMODEL_H
-#define FUSELISTMODEL_H
+#pragma once
 
 #include <QAbstractListModel>
 
@@ -31,5 +30,3 @@ public:
     void callFunction(const Function &func);
     bool event(QEvent *);
 };
-
-#endif // FUSELISTMODEL_H

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import Fuse 1.0
-import "private" 1.0
+import QtQuick
+import QtQuick.Window
+import Spectacol
+import "private"
 
 Rectangle {
     id: msgDialog
@@ -52,7 +52,7 @@ Rectangle {
     }
 
     function showMessage(level, text) {
-        if (level < fuseSettings.messageLevel)
+        if (level < FuseEmulator.settings.messageLevel)
             return;
 
         var msg = "";

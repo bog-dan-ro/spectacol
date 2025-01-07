@@ -17,20 +17,21 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
-import "private" 1.0
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import Spectacol
+import "private"
 
 Item {
     FancyList {
         id: view
-        Component.onCompleted: fuse.processInputEvents = false
-        Component.onDestruction: fuse.processInputEvents = true
+        Component.onCompleted: FuseEmulator.processInputEvents = false
+        Component.onDestruction: FuseEmulator.processInputEvents = true
 
-        model: fuseSettings.machinesModel
-        currentIndex: fuseSettings.currentMachineIndex
-        onCurrentIndexChanged: fuseSettings.currentMachineIndex = currentIndex
+        model: FuseEmulator.settings.machinesModel
+        currentIndex: FuseEmulator.settings.currentMachineIndex
+        onCurrentIndexChanged: FuseEmulator.settings.currentMachineIndex = currentIndex
 
         width: 13 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
         delegate: Rectangle {

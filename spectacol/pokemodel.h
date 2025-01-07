@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,21 +15,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef POKEMODEL_H
-#define POKEMODEL_H
+#pragma once
+
+#include <QQmlEngine>
 
 #include "fuselistmodel.h"
 
 class PokeModel : public FuseListModel
 {
     Q_OBJECT
-    Q_ENUMS(Roles)
+    QML_ELEMENT
+
 public:
     enum Roles {
         Label = Qt::DisplayRole,
         Active = Qt::UserRole + 1,
         Disabled
     };
+    Q_ENUM(Roles)
 
 public:
     PokeModel();
@@ -46,5 +49,3 @@ public slots:
     void clear();
 
 };
-
-#endif // POKEMODEL_H

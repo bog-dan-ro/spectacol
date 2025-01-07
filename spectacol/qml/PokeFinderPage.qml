@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,37 +17,37 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
 import QtQml.Models 2.2
-import QtQuick.Controls 2.12
-import Fuse 1.0
-import QtGamepad 1.0
-import "private" 1.0
+import QtQuick.Controls
+import Spectacol
+import QtGamepadLegacy
+import "private"
 
 Rectangle {
     id: pokeFinderPage
     color: Qt.rgba(0, 0, 0, 0.75);
 
     Component.onCompleted: {
-        fuse.processInputEvents = false;
-        fuse.pokeFinderResetIfNeeded();
-        fuse.paused = true;
+        FuseEmulator.processInputEvents = false;
+        FuseEmulator.pokeFinderResetIfNeeded();
+        FuseEmulator.paused = true;
     }
     Component.onDestruction: {
-        fuse.processInputEvents = true;
-        fuse.paused = false;
+        FuseEmulator.processInputEvents = true;
+        FuseEmulator.paused = false;
     }
 
     function addBreakpoint(type)
     {
         var model = visualModel.items.get(view.currentIndex).model;
-        fuse.addBreakpointPage(model.offset, model.page, type);
+        FuseEmulator.addBreakpointPage(model.offset, model.page, type);
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_B
         buttonYKey: Qt.Key_Y
@@ -58,7 +58,7 @@ Rectangle {
         buttonR2Key: Qt.Key_E
     }
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         switch (event.key) {
         case Qt.Key_Escape:
         case Qt.Key_B:
@@ -67,17 +67,17 @@ Rectangle {
             break;
 
         case Qt.Key_Y:
-            fuse.pokeFinderInced();
+            FuseEmulator.pokeFinderInced();
             event.accepted = true;
             break;
 
         case Qt.Key_X:
-            fuse.pokeFinderDeced();
+            FuseEmulator.pokeFinderDeced();
             event.accepted = true;
             break;
 
         case Qt.Key_E:
-            fuse.pokeFinderReset();
+            FuseEmulator.pokeFinderReset();
             event.accepted = true;
             break;
 
@@ -118,7 +118,7 @@ Rectangle {
                 validator: IntValidator {bottom: 0; top: 255;}
                 placeholderText: qsTr("Enter a numeric value")
                 onAccepted: {
-                    fuse.pokeFinderSearch(value.text);
+                    FuseEmulator.pokeFinderSearch(value.text);
                     view.forceActiveFocus(Qt.TabFocusReason);
                 }
             }
@@ -134,25 +134,25 @@ Rectangle {
                     id: buttonInc
                     Layout.fillWidth: true
                     text: qsTr("Incremented <b>(Y)</b>")
-                    onClicked: fuse.pokeFinderInced()
+                    onClicked: FuseEmulator.pokeFinderInced()
                 }
                 Button {
                     id: buttonDec
                     Layout.fillWidth: true
                     text: qsTr("Decremented <b>(X)</b>")
-                    onClicked: fuse.pokeFinderDeced()
+                    onClicked: FuseEmulator.pokeFinderDeced()
                 }
                 Button {
                     id: buttonSearch
                     Layout.fillWidth: true
                     text: qsTr("Search <b>(A)</b>")
-                    onClicked: fuse.pokeFinderSearch(value.text)
+                    onClicked: FuseEmulator.pokeFinderSearch(value.text)
                 }
                 Button {
                     id: buttonReset
                     Layout.fillWidth: true
                     text: qsTr("Reset <b>(L2, R2)</b>")
-                    onClicked: fuse.pokeFinderReset()
+                    onClicked: FuseEmulator.pokeFinderReset()
                 }
                 Button {
                     id: buttonBW
@@ -181,12 +181,12 @@ Rectangle {
                 FancyText {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignRight
-                    text: qsTr("Possible locations: ") + fuse.pokeFinderCount
+                    text: qsTr("Possible locations: ") + FuseEmulator.pokeFinderCount
                 }
 
                 VisualDataModel {
                     id: visualModel
-                    model: pokeFinderModel
+                    model: FuseEmulator.pokeFinderModel
                     delegate: Rectangle {
                         property color paper: view.currentIndex !== index ? Qt.rgba(0, 0, 0, 0.9) : "white"
                         property color ink: view.currentIndex !== index ? "white": Qt.rgba(0, 0, 0, 0.9)
@@ -265,7 +265,7 @@ Rectangle {
                         snapMode: ListView.SnapToItem
                         highlightFollowsCurrentItem: true
                         focus: true
-                        activeFocusOnTab: fuse.pokeFinderCount <= 20
+                        activeFocusOnTab: FuseEmulator.pokeFinderCount <= 20
 
                         KeyNavigation.right: value
                         KeyNavigation.left: value
@@ -274,7 +274,7 @@ Rectangle {
 
                         model: visualModel
 
-                        currentIndex: fuse.pokeFinderCount <= 20 ? 0 : -1
+                        currentIndex: FuseEmulator.pokeFinderCount <= 20 ? 0 : -1
 
                         header: Rectangle {
                             height: 2 * TextSizes.scale12

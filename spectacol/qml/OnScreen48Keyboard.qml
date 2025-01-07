@@ -15,10 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
+import QtGamepadLegacy
+import Spectacol
 import "private"
 
 // @scope main.qml
@@ -40,27 +41,27 @@ Item {
     function releasePressedKeys()
     {
         if (_pressedKey) {
-            fuse.keyRelease(_pressedKey);
+            FuseEmulator.keyRelease(_pressedKey);
             _pressedKey = 0;
         }
 
         if (capsPressed) {
-            fuse.keyRelease(Qt.Key_Control);
+            FuseEmulator.keyRelease(Qt.Key_Control);
             capsPressed = false;
         }
 
         if (symbolPressed) {
-            fuse.keyRelease(Qt.Key_Shift);
+            FuseEmulator.keyRelease(Qt.Key_Shift);
             symbolPressed = false;
         }
     }
 
     onVisibleChanged: {
-        fuse.processInputEvents = !visible;
+        FuseEmulator.processInputEvents = !visible;
         if (!visible)
             releasePressedKeys()
     }
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         if (event.key === Qt.Key_Escape) {
             event.accept = true;
         } else if (event.key === Qt.Key_Return) {
@@ -69,7 +70,7 @@ Item {
         }
     }
 
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Escape) {
             event.accept = true;
             onScreenKeyboard.visible = false;
@@ -87,8 +88,8 @@ Item {
         interval: 200
         repeat: false
         onTriggered: {
-            fuse.keyRelease(Qt.Key_Control);
-            fuse.keyRelease(Qt.Key_Shift);
+            FuseEmulator.keyRelease(Qt.Key_Control);
+            FuseEmulator.keyRelease(Qt.Key_Shift);
             capsPressed = symbolPressed = false;
         }
     }
@@ -102,26 +103,26 @@ Item {
             if (stickyCSSS) {
                 capsPressed = !capsPressed;
                 if (capsPressed)
-                    fuse.keyPress(Qt.Key_Control);
+                    FuseEmulator.keyPress(Qt.Key_Control);
                 else
-                    fuse.keyRelease(Qt.Key_Control);
+                    FuseEmulator.keyRelease(Qt.Key_Control);
             } else {
-                fuse.keyPress(Qt.Key_Control);
+                FuseEmulator.keyPress(Qt.Key_Control);
             }
             break;
         case Qt.Key_Shift:
             if (stickyCSSS) {
                 symbolPressed = !symbolPressed;
                 if (symbolPressed)
-                    fuse.keyPress(Qt.Key_Shift);
+                    FuseEmulator.keyPress(Qt.Key_Shift);
                 else
-                    fuse.keyRelease(Qt.Key_Shift);
+                    FuseEmulator.keyRelease(Qt.Key_Shift);
             } else {
-                fuse.keyPress(Qt.Key_Shift);
+                FuseEmulator.keyPress(Qt.Key_Shift);
             }
             break;
         default:
-            fuse.keyPress(key);
+            FuseEmulator.keyPress(key);
             if (gamepadMode)
                 _pressedKey = key;
             break;
@@ -135,13 +136,13 @@ Item {
         case Qt.Key_Control:
         case Qt.Key_Shift:
             if (!stickyCSSS) {
-                fuse.keyRelease(key);
+                FuseEmulator.keyRelease(key);
                 _pressedKey = 0;
             }
             break;
         default:
             if (gamepadMode) {
-                fuse.keyRelease(_pressedKey);
+                FuseEmulator.keyRelease(_pressedKey);
             } else {
                 _pressedKey = key;
                 releasePressedKeys();
@@ -153,7 +154,7 @@ Item {
 
     GamepadKeyNavigation {
         id: gamepad
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         active: onScreenKeyboard.visible
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
@@ -258,7 +259,7 @@ Item {
         currentIndex: 24
         onCurrentIndexChanged: {
             if (_pressedKey) {
-                fuse.keyRelease(_pressedKey);
+                FuseEmulator.keyRelease(_pressedKey);
                 _pressedKey = 0;
             }
         }
@@ -279,12 +280,12 @@ Item {
                 anchors.fill: parent
                 anchors.leftMargin: parent.radius
                 anchors.rightMargin: parent.radius
-                anchors.topMargin: fuseSettings.full48kOSK && keyword ? parent.height / 4 : parent.radius
+                anchors.topMargin: FuseEmulator.settings.full48kOSK && keyword ? parent.height / 4 : parent.radius
                 font.family: 'Monospace'
                 font.bold: true
                 font.pixelSize: grid.cellWidth / 4.5
-                horizontalAlignment: fuseSettings.full48kOSK && keyword ? Text.AlignLeft : Text.AlignHCenter
-                verticalAlignment: fuseSettings.full48kOSK && keyword ? Text.AlignTop : Text.AlignVCenter
+                horizontalAlignment: FuseEmulator.settings.full48kOSK && keyword ? Text.AlignLeft : Text.AlignHCenter
+                verticalAlignment: FuseEmulator.settings.full48kOSK && keyword ? Text.AlignTop : Text.AlignVCenter
                 style: Text.Outline
                 styleColor: "black"
                 color: !keyword && buttonColor ? buttonColor : "white"
@@ -294,7 +295,7 @@ Item {
             }
 
             Text {
-                visible: fuseSettings.full48kOSK
+                visible: FuseEmulator.settings.full48kOSK
                 anchors.left: parent.left
                 anchors.margins: parent.radius
                 style: Text.Outline
@@ -307,7 +308,7 @@ Item {
             }
 
             Text {
-                visible: fuseSettings.full48kOSK
+                visible: FuseEmulator.settings.full48kOSK
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.rightMargin: parent.radius
@@ -322,7 +323,7 @@ Item {
             }
 
             Text {
-                visible: fuseSettings.full48kOSK
+                visible: FuseEmulator.settings.full48kOSK
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.topMargin: parent.height / 6 * 3
@@ -336,7 +337,7 @@ Item {
             }
 
             Text {
-                visible: fuseSettings.full48kOSK
+                visible: FuseEmulator.settings.full48kOSK
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.leftMargin: parent.radius

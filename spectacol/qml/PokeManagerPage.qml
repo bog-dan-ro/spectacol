@@ -17,27 +17,27 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
-import QtQuick.Layouts 1.12
-import QtGamepad 1.0
-import Fuse 1.0
-import "private" 1.0
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtGamepadLegacy
+import Spectacol
+import "private"
 
 Item {
     anchors.fill: parent
     Component.onCompleted: {
-        fuse.processInputEvents = false;
-        fuse.paused = true;
+        FuseEmulator.processInputEvents = false;
+        FuseEmulator.paused = true;
     }
     Component.onDestruction: {
-        fuse.processInputEvents = true;
-        fuse.paused = false;
+        FuseEmulator.processInputEvents = true;
+        FuseEmulator.paused = false;
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonAKey: Qt.Key_Space
         buttonBKey: Qt.Key_Escape
         buttonYKey: Qt.Key_Y
@@ -151,7 +151,7 @@ Item {
 
         model: pokeModel
 
-        Keys.onPressed: {
+        Keys.onPressed: (event) => {
             switch (event.key) {
             case Qt.Key_Left:
                 decrementCurrentIndex();

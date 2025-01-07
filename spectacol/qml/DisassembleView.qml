@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import Fuse 1.0
-import "private" 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
+import Spectacol
+import "private"
 
 
 ListView {
@@ -40,7 +40,7 @@ ListView {
 
     VisualDataModel {
         id: visualModel
-        model: disassambleModel
+        model: FuseEmulator.disassambleModel
         delegate: Rectangle {
             function toggleEdit()
             {
@@ -69,8 +69,8 @@ ListView {
                     view.forceActiveFocus(Qt.TabFocusReason);
                     view.currentIndex = model.index;
                 }
-                onDoubleClicked: fuse.addBreakpoint(model.address)
-                onPressAndHold: fuse.addBreakpoint(model.address)
+                onDoubleClicked: FuseEmulator.addBreakpoint(model.address)
+                onPressAndHold: FuseEmulator.addBreakpoint(model.address)
             }
             RowLayout {
                 anchors.fill: parent
@@ -114,7 +114,7 @@ ListView {
                     text: model.disassable
                     onEditingFinished: {
                         assembler.write(text, model.address, model.bytes)
-                        disassambleModel.update();
+                        FuseEmulator.disassambleModel.update();
                         validator = null;
                         if (!readOnly)
                             toggleEdit();
@@ -140,10 +140,10 @@ ListView {
         }
     }
 
-    Keys.onPressed: {
+    Keys.onPressed: (event) => {
         switch (event.key) {
         case Qt.Key_Home:
-            fuse.disassamble(0, 0);
+            FuseEmulator.disassamble(0, 0);
             view.currentIndex = 0;
             event.accepted = true;
             break;
@@ -157,7 +157,7 @@ ListView {
             if (view.currentIndex > 1) {
                 decrementCurrentIndex();
             } else {
-                fuse.disassambleFetchUp(10);
+                FuseEmulator.disassambleFetchUp(10);
                 decrementCurrentIndex();
             }
             event.accepted = true;
@@ -174,7 +174,7 @@ ListView {
             break;
 
         case Qt.Key_End:
-            fuse.disassamble(0xffff);
+            FuseEmulator.disassamble(0xffff);
             event.accepted = true;
             break;
 
@@ -189,22 +189,22 @@ ListView {
             break;
 
         case Qt.Key_C:
-            fuse.debuggerRun();
+            FuseEmulator.debuggerRun();
             event.accepted = true;
             break;
 
         case Qt.Key_S:
-            fuse.debuggerStep();
+            FuseEmulator.debuggerStep();
             event.accepted = true;
             break;
 
         case Qt.Key_N:
-            fuse.debuggerNext();
+            FuseEmulator.debuggerNext();
             event.accepted = true;
             break;
 
         case Qt.Key_X:
-            fuse.addBreakpoint(disassambleModel.address(view.currentIndex));
+            FuseEmulator.addBreakpoint(FuseEmulator.disassambleModel.address(view.currentIndex));
             event.accepted = true;
             break;
         }

@@ -15,9 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
+import QtQuick
+import QtQuick.Window
+import QtGamepadLegacy
+import Spectacol
 import "private"
 
 Item {
@@ -77,8 +78,8 @@ Item {
             radius: width / 2
             anchors {
                 centerIn: parent
-                onHorizontalCenterOffsetChanged: fuse.gamepadAxisEvent(GamepadManager.AxisLeftX, anchors.horizontalCenterOffset / parent.radius)
-                onVerticalCenterOffsetChanged: fuse.gamepadAxisEvent(GamepadManager.AxisLeftY, anchors.verticalCenterOffset / parent.radius)
+                onHorizontalCenterOffsetChanged: FuseEmulator.gamepadAxisEvent(GamepadManager.AxisLeftX, anchors.horizontalCenterOffset / parent.radius)
+                onVerticalCenterOffsetChanged: FuseEmulator.gamepadAxisEvent(GamepadManager.AxisLeftY, anchors.verticalCenterOffset / parent.radius)
             }
         }
     }
@@ -92,7 +93,7 @@ Item {
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
-                onPressedChanged: pressed ? fuse.gamepadButtonPressEvent(GamepadManager.ButtonY) : fuse.gamepadButtonReleaseEvent(GamepadManager.ButtonY)
+                onPressedChanged: pressed ? FuseEmulator.gamepadButtonPressEvent(GamepadManager.ButtonY) : FuseEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY)
             }
         }
     }
@@ -106,7 +107,7 @@ Item {
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
-                onPressedChanged: pressed ? fuse.gamepadButtonPressEvent(GamepadManager.ButtonX) : fuse.gamepadButtonReleaseEvent(GamepadManager.ButtonX)
+                onPressedChanged: pressed ? FuseEmulator.gamepadButtonPressEvent(GamepadManager.ButtonX) : FuseEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX)
             }
         }
     }
@@ -120,7 +121,7 @@ Item {
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
-                onPressedChanged: pressed ? fuse.gamepadButtonPressEvent(GamepadManager.ButtonB) : fuse.gamepadButtonReleaseEvent(GamepadManager.ButtonB)
+                onPressedChanged: pressed ? FuseEmulator.gamepadButtonPressEvent(GamepadManager.ButtonB) : FuseEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB)
             }
         }
     }
@@ -134,7 +135,7 @@ Item {
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
-                onPressedChanged: pressed ? fuse.gamepadButtonPressEvent(GamepadManager.ButtonA) : fuse.gamepadButtonReleaseEvent(GamepadManager.ButtonA)
+                onPressedChanged: pressed ? FuseEmulator.gamepadButtonPressEvent(GamepadManager.ButtonA) : FuseEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA)
             }
         }
     }

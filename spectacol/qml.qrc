@@ -57,52 +57,7 @@
         <file>images/keyboard-icon.svg</file>
         <file>images/pause.svg</file>
         <file>images/play.svg</file>
-        <file>qml/AboutPage.qml</file>
-        <file>qml/BreakpointsView.qml</file>
-        <file>qml/BrowseTapePage.qml</file>
-        <file>qml/CalibrateGamepad.qml</file>
-        <file>qml/CoverFlowFiles.qml</file>
-        <file>qml/CoverFlow.qml</file>
-        <file>qml/CustomizeGamepadPage.qml</file>
-        <file>qml/DebuggerPage.qml</file>
-        <file>qml/DisassembleView.qml</file>
-        <file>qml/FancyBaseList.qml</file>
-        <file>qml/FancyList.qml</file>
-        <file>qml/FancyPane.qml</file>
-        <file>qml/FancyTextField.qml</file>
-        <file>qml/FancyText.qml</file>
-        <file>qml/FileBrowserPage.qml</file>
-        <file>qml/FiltersPage.qml</file>
-        <file>qml/FuseMenu.qml</file>
-        <file>qml/GetFileBrowserPage.qml</file>
-        <file>qml/GetListPage.qml</file>
-        <file>qml/Joysticks.qml</file>
-        <file>qml/MachineTypePage.qml</file>
-        <file>qml/main.qml</file>
-        <file>qml/MenuView.qml</file>
-        <file>qml/MessagePage.qml</file>
-        <file>qml/OnScreen48Keyboard.qml</file>
-        <file>qml/OnScreenButton.qml</file>
-        <file>qml/OnScreenCursorJoystick.qml</file>
-        <file>qml/OnScreenJoystickButton.qml</file>
-        <file>qml/OnScreenJoystick.qml</file>
-        <file>qml/OptionsGeneralPage.qml</file>
-        <file>qml/OptionsPeripheralsPage.qml</file>
-        <file>qml/OptionsScreenPage.qml</file>
-        <file>qml/OptionsSoundPage.qml</file>
-        <file>qml/PokeFinderPage.qml</file>
-        <file>qml/PokeManagerPage.qml</file>
-        <file>qml/private/qmldir</file>
-        <file>qml/private/TextSizes.qml</file>
-        <file>qml/RegistersView.qml</file>
-        <file>qml/SaveFilePage.qml</file>
-        <file>qml/SaveSnapshotPage.qml</file>
-        <file>qml/SearchOnlinePage.qml</file>
-        <file>qml/StandardGamepad.qml</file>
-        <file>qml/TapesFileBrowserPage.qml</file>
-        <file>qml/Utils.js</file>
-        <file>qtquickcontrols2.conf</file>
         <file>z80_opcodes.csv</file>
-        <file>qml/SaveTapePage.qml</file>
+        <file>qtquickcontrols2.conf</file>
     </qresource>
 </RCC>

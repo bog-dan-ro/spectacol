@@ -1,4 +1,4 @@
-This application is not collecting any data about you or your device.
+This application does not collect any data about you or your device.
 
-If you have any questions about this Privacy Policy, You can contact us:
-By visiting this page on our website: https://github.com/bog-dan-ro/spectacol
+If you have any questions about this Privacy Policy, You can contact us
+by visiting this page on our website: https://github.com/bog-dan-ro/spectacol

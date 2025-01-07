@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,23 +18,19 @@
 #include "folderlistmodel.h"
 #include "fuseemulator.h"
 #include "fuserecording.h"
-#include "fusescreen.h"
+#include "zxscreen.h"
 #include "fusetapedata.h"
 #include "pokemodel.h"
 #include "spectrumscreen.h"
 #include "z80assembler.h"
 
-#include <QQmlApplicationEngine>
-#include <QGuiApplication>
 #include <QDir>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
 #include <QStandardPaths>
-#ifdef Q_OS_ANDROID
-# include <QtAndroid>
-#endif
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
     app.setOrganizationName("Licentia");
     app.setOrganizationDomain("licentia.eu");
@@ -50,24 +46,25 @@ int main(int argc, char *argv[])
     if (!QFile::exists(newSettings) && QFile::exists(oldSettings))
         QFile::rename(oldSettings, newSettings);
 
-    qmlRegisterType<FuseScreen>("Fuse", 1, 0, "FuseScreen");
-    qmlRegisterType<Z80Assembler>("Fuse", 1, 0, "Z80Assembler");
-    qmlRegisterType<FolderListModel>("Fuse", 1, 0, "FolderListModel");
-    qmlRegisterType<PokeModel>("Fuse", 1, 0, "PokeModel");
-    qmlRegisterType<FuseTapeData>("Fuse", 1, 0, "FuseTapeData");
-
-    qmlRegisterUncreatableType<BreakpointsModel>("Fuse", 1, 0, "BreakpointsModel", QLatin1String("use breakpointsModel context property instead"));
-    qmlRegisterUncreatableType<FuseEmulator>("Fuse", 1, 0, "FuseEmulator", QLatin1String("use fuse instead"));
-    qmlRegisterUncreatableType<FuseTape>("Fuse", 1, 0, "FuseTape", QLatin1String("use fuse.tape instead"));
-    qmlRegisterUncreatableType<FuseSettings>("Fuse", 1, 0, "FuseSettings", QLatin1String("use fuseSettings instead"));
-    qmlRegisterUncreatableType<FuseRecording>("Fuse", 1, 0, "FuseRecording", QLatin1String("use fuse.recording instead"));
+#if defined(Q_OS_WIN)
+#elif defined(Q_OS_ANDROID)
+#else
+    QDir appPath{QCoreApplication::applicationDirPath()};
+    appPath.cdUp();
+    QString libsPath = appPath.absoluteFilePath("lib");
+    QString pluginsPath = appPath.absoluteFilePath("plugins");
+    QString qmlPath = appPath.absoluteFilePath("qml");
+#endif
+    QCoreApplication::addLibraryPath(libsPath);
+    QCoreApplication::addLibraryPath(pluginsPath);
 
     QQmlApplicationEngine engine;
-    FuseEmulator fuse(engine.rootContext());
+    engine.addImportPath(qmlPath);
+
     engine.addImageProvider("spectrum", new SpectrumScreenImageProvider);
-    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
+    engine.loadFromModule("Spectacol", "Main");
 #ifdef Q_OS_ANDROID
-    QtAndroid::hideSplashScreen();
+    QNativeInterface::QAndroidApplication::hideSplashScreen();
 #endif
     return app.exec();
 }

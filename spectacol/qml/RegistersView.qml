@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,10 +17,11 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import "private" 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
+import Spectacol
+import "private"
 
 Flickable {
     anchors.margins: Screen.pixelDensity * 3
@@ -35,77 +36,77 @@ Flickable {
         horizontalItemAlignment: Grid.AlignRight
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "PC :" + fuse.PC
+            text: "PC :" + FuseEmulator.PC
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "SP :" + fuse.SP
+            text: "SP :" + FuseEmulator.SP
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "AF :" + fuse.AF
+            text: "AF :" + FuseEmulator.AF
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "AF' :" + fuse.AF_
+            text: "AF' :" + FuseEmulator.AF_
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "BC :" + fuse.BC
+            text: "BC :" + FuseEmulator.BC
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "BC' :" + fuse.BC_
+            text: "BC' :" + FuseEmulator.BC_
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "DE :" + fuse.DE
+            text: "DE :" + FuseEmulator.DE
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "DE' :" + fuse.DE_
+            text: "DE' :" + FuseEmulator.DE_
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "HL :" + fuse.HL
+            text: "HL :" + FuseEmulator.HL
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "HL' :" + fuse.HL_
-        }
-
-        FancyText {
-            font.pixelSize: TextSizes.scale12
-            text: "IX :" + fuse.IX
+            text: "HL' :" + FuseEmulator.HL_
         }
 
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "IY :" + fuse.IY
+            text: "IX :" + FuseEmulator.IX
+        }
+
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "IY :" + FuseEmulator.IY
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "I :" + fuse.I
+            text: "I :" + FuseEmulator.I
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "R :" + fuse.R
+            text: "R :" + FuseEmulator.R
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "IFF1 :" + fuse.IFF1
+            text: "IFF1 :" + FuseEmulator.IFF1
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "IFF2 :" + fuse.IFF2
+            text: "IFF2 :" + FuseEmulator.IFF2
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "R7 :" + fuse.R7
+            text: "R7 :" + FuseEmulator.R7
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "IM :" + fuse.IM
+            text: "IM :" + FuseEmulator.IM
         }
     }
 }

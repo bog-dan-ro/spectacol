@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,8 +15,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef BEAKPOINTSMODEL_H
-#define BEAKPOINTSMODEL_H
+#pragma once
+
+#include <QQmlEngine>
 
 #include "fuselistmodel.h"
 
@@ -58,7 +59,8 @@ namespace std
 class BreakpointsModel : public FuseListModel
 {
     Q_OBJECT
-    Q_ENUMS(BreakpointType BreakpointLife)
+    QML_ELEMENT
+    QML_UNCREATABLE("use breakpointsModel context property instead")
     enum {
         Id = Qt::UserRole + 1,
         Type,
@@ -80,11 +82,13 @@ public:
         BreakOnTime = DEBUGGER_BREAKPOINT_TYPE_TIME,
         BreakOnEvent = DEBUGGER_BREAKPOINT_TYPE_EVENT
     };
+    Q_ENUM(BreakpointType)
 
     enum BreakpointLife {
         Permanent = DEBUGGER_BREAKPOINT_LIFE_PERMANENT,
         Oneshot
     };
+    Q_ENUM(BreakpointLife)
 
 private:
     struct DebuggerEvent {
@@ -126,9 +130,9 @@ public:
     const Addresses &addresses() const { return m_addresses; }
 
     // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
+    int rowCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 private:
     QVariant breakPointValue(const DebuggerBreakpoint &bp) const;
@@ -138,5 +142,3 @@ private:
     std::vector<DebuggerBreakpoint> m_breakPoints, m_breakPointsTmp;
     Addresses m_addresses;
 };
-
-#endif // BEAKPOINTSMODEL_H

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef Z80ASSEMBLER_H
-#define Z80ASSEMBLER_H
+#pragma once
 
+#include <QQmlEngine>
 #include <QJSEngine>
 #include <QValidator>
 
@@ -27,6 +27,7 @@
 class Z80Assembler : public QValidator
 {
     Q_OBJECT
+    QML_ELEMENT
 public:
     explicit Z80Assembler(QObject *parent = 0);
     Q_INVOKABLE bool write(const QString &asmLine, int address, const QByteArray &assembledBytes = QByteArray()) const;
@@ -44,5 +45,3 @@ private:
     std::vector<RulesType> m_assembleRules;
     mutable QJSEngine m_engine;
 };
-
-#endif // Z80ASSEMBLER_H

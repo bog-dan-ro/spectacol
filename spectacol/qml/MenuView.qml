@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,17 +15,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Controls 1.4
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtQuick.Window
+import QtGamepadLegacy
+import Spectacol
 import "Utils.js" as Utils
-import "private" 1.0
+import "private"
 
 ColumnLayout {
-    property Menu rootMenu: null
-    property Menu currentMenu: rootMenu
+    property ZxMenuItem rootMenu: null
+    property ZxMenuItem currentMenu: rootMenu
     property var menus: []
     property alias useGamepad: gamepadKeyNavigation.active
 
@@ -41,9 +42,9 @@ ColumnLayout {
 
     function openMenu(menu, index)
     {
-        if (menu.type === MenuItemType.Menu)
+        if (menu.children.length)
             pushMenu(menu, index);
-        else if (menu.type === MenuItemType.Item)
+        else
             menu.trigger();
     }
 
@@ -60,8 +61,8 @@ ColumnLayout {
     onCurrentMenuChanged: {
         menuModel.clear();
         if (currentMenu !== null) {
-            var i, items = currentMenu.items, len = currentMenu.items.length;
-            for (i = 0; i < len; ++i) {
+            let items = currentMenu.children, len = currentMenu.children.length;
+            for (let i = 0; i < len; ++i) {
                 var item = items[i];
                 if (item.visible)
                     menuModel.append({"modelData": item});
@@ -103,7 +104,7 @@ ColumnLayout {
 
     function showParentMenu()
     {
-        title.text = (menus.length > 1 ? "&lt;/../" : "&lt;/") + Utils.shortcutText(currentMenu.title);
+        title.text = (menus.length > 1 ? "&lt;/../" : "&lt;/") + Utils.shortcutText(currentMenu.text);
     }
 
     spacing: 0.5 * Screen.pixelDensity
@@ -155,14 +156,14 @@ ColumnLayout {
                     Layout.fillHeight: true
                     height: parent.height
                     font.pixelSize: TextSizes.scale16
-                    text: modelData.type === MenuItemType.Item ? Utils.shortcutText(modelData.text) : Utils.shortcutText(modelData.title)
+                    text: Utils.shortcutText(modelData.text)
                 }
                 FancyText {
                     Layout.fillHeight: true
-                    visible: modelData.type === MenuItemType.Menu
+                    visible: modelData.children.length > 0
                     font.pixelSize: TextSizes.scale20
                     font.bold: true
-                    text: modelData.type === MenuItemType.Menu ? ">" : ""
+                    text: modelData.children.length > 0 ? ">" : ""
                 }
             }
 
@@ -176,9 +177,9 @@ ColumnLayout {
 
     GamepadKeyNavigation {
         id: gamepadKeyNavigation
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         active: false
-        onActiveChanged: fuse.processInputEvents = !active
+        onActiveChanged: FuseEmulator.processInputEvents = !active
         upKey: Qt.Key_Up
         downKey: Qt.Key_Down
         buttonAKey: Qt.Key_Return

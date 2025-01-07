@@ -19,12 +19,12 @@ void FuseRecording::setStopVisible(bool visible)
     Q_UNUSED(visible)
     callFunction([this] {
         if (rzx_recording) {
-            m_type = Recording;
+            m_type = Type::Recording;
         } else {
             if (rzx_playback)
-                m_type = Playback;
+                m_type = Type::Playback;
             else
-                m_type = None;
+                m_type = Type::None;
         }
         emit typeChanged(m_type);
     });

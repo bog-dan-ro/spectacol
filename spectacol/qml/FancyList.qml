@@ -17,16 +17,17 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
-import QtGamepad 1.0
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtGamepadLegacy
+import Spectacol
 
 FancyBaseList {
     id: view
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
     }
 
     Keys.onLeftPressed: decrementCurrentIndex()

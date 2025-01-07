@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,24 +17,25 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import Qt.labs.settings 1.0
+import QtQuick
+import QtCore
+import Spectacol
 
 CoverFlowFiles {
     id: browser
-    Component.onCompleted: fuse.paused = true
-    Component.onDestruction: fuse.paused = false
+    Component.onCompleted: FuseEmulator.paused = true
+    Component.onDestruction: FuseEmulator.paused = false
 
-    folder: fuse.dataPath
+    folder: FuseEmulator.dataPath
 
     Settings {
         category: "FileBrowser"
         property alias path: browser.folder
     }
 
-    onFileSelected: {
+    onFileSelected: (filePath) => {
         if (filePath)
-            fuse.load(filePath);
+            FuseEmulator.load(filePath);
         pageLoader.source = "";
     }
 }

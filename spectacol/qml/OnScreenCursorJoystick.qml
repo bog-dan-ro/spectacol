@@ -15,10 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import QtGamepad 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
+import QtGamepadLegacy
+import Spectacol
 
 Item {
     id: onScreenJoystick
@@ -29,7 +30,7 @@ Item {
                                button1, button2, button3, button4,
                                button0, button9]
 
-    Keys.onReleased: {
+    Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Escape)
             parent.visible = false;
     }
@@ -37,7 +38,7 @@ Item {
     GamepadKeyNavigation {
         id: gamepad
         active: onScreenJoystick.visible
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
         buttonXKey: Qt.Key_unknown
@@ -52,7 +53,7 @@ Item {
         buttonSelectKey: Qt.Key_unknown
         buttonStartKey: Qt.Key_unknown
 
-        onActiveChanged: fuse.processInputEvents = !active
+        onActiveChanged: FuseEmulator.processInputEvents = !active
     }
 
     RowLayout {
@@ -108,7 +109,7 @@ Item {
                 OnScreenButton {
                     id: button57
                     text: ""
-                    imageSource: "qrc:///images/arrow-up-left.svg"
+                    imageSource: ":/images/arrow-up-left.svg"
                     buttons: [Qt.Key_5, Qt.Key_7]
                 }
                 OnScreenButton {
@@ -118,13 +119,13 @@ Item {
                     KeyNavigation.right: button8
                     KeyNavigation.down: button6
                     text: "7"
-                    imageSource: "qrc:///images/arrow-up.svg"
+                    imageSource: ":/images/arrow-up.svg"
                     buttons: [Qt.Key_7]
                 }
                 OnScreenButton {
                     id: button87
                     text: ""
-                    imageSource: "qrc:///images/arrow-up-right.svg"
+                    imageSource: ":/images/arrow-up-right.svg"
                     buttons: [Qt.Key_8, Qt.Key_7]
                 }
                 OnScreenButton {
@@ -134,7 +135,7 @@ Item {
                     KeyNavigation.right: button8
                     KeyNavigation.down: button6
                     text: "5"
-                    imageSource: "qrc:///images/arrow-left.svg"
+                    imageSource: ":/images/arrow-left.svg"
                     buttons: [Qt.Key_5]
                 }
 
@@ -147,13 +148,13 @@ Item {
                     KeyNavigation.right: button0
                     KeyNavigation.down: button6
                     text: "8"
-                    imageSource: "qrc:///images/arrow-right.svg"
+                    imageSource: ":/images/arrow-right.svg"
                     buttons: [Qt.Key_8]
                 }
                 OnScreenButton {
                     id: button56
                     text: ""
-                    imageSource: "qrc:///images/arrow-down-left.svg"
+                    imageSource: ":/images/arrow-down-left.svg"
                     buttons: [Qt.Key_5, Qt.Key_6]
                 }
                 OnScreenButton {
@@ -163,13 +164,13 @@ Item {
                     KeyNavigation.right: button8
                     KeyNavigation.down: button1
                     text: "6"
-                    imageSource: "qrc:///images/arrow-down.svg"
+                    imageSource: ":/images/arrow-down.svg"
                     buttons: [Qt.Key_6]
                 }
                 OnScreenButton {
                     id: button86
                     text: ""
-                    imageSource: "qrc:///images/arrow-down-right.svg"
+                    imageSource: ":/images/arrow-down-right.svg"
                     buttons: [Qt.Key_8, Qt.Key_6]
                 }
             }
@@ -199,7 +200,7 @@ Item {
                 KeyNavigation.right: button5
                 KeyNavigation.down: button6
                 text: "0"
-                imageSource: "qrc:///images/draw-fire.svg"
+                imageSource: ":/images/draw-fire.svg"
                 buttons: [Qt.Key_0]
             }
         }

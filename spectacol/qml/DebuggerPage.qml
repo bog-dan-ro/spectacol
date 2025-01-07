@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,23 +17,24 @@
 
 // @scope main.qml
 
-import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
-import QtGamepad 1.0
-import "private" 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
+import QtQuick.Controls
+import QtGamepadLegacy
+import Spectacol
+import "private"
 
 Item {
-    Component.onCompleted: fuse.processInputEvents = false
+    Component.onCompleted: FuseEmulator.processInputEvents = false
 
     Component.onDestruction: {
-        fuse.processInputEvents = true;
-        fuse.debuggerRun();
+        FuseEmulator.processInputEvents = true;
+        FuseEmulator.debuggerRun();
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: fuse.gamepadId }
+        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
         buttonXKey: Qt.Key_X
@@ -123,7 +124,7 @@ Item {
                         KeyNavigation.backtab: disassembleView
                         BreakpointsView {
                             anchors.fill: parent
-                            onBreakpointSelected: fuse.disassamble(item.absoluteAddress);
+                            onBreakpointSelected: FuseEmulator.disassamble(item.absoluteAddress);
                         }
                     }
                 }
@@ -151,7 +152,7 @@ Item {
                     Layout.fillHeight: true
                     Layout.leftMargin: toolBarRect.border.width
                     onAccepted: {
-                        fuse.debuggerCommand(text);
+                        FuseEmulator.debuggerCommand(text);
                         selectAll();
                     }
                     placeholderText: qsTr("Type a command here")
@@ -159,18 +160,18 @@ Item {
                 Button {
                     Layout.fillHeight: true
                     text: qsTr("Step (L1)")
-                    onClicked: fuse.debuggerStep()
+                    onClicked: FuseEmulator.debuggerStep()
                 }
                 Button {
                     Layout.fillHeight: true
                     text: qsTr("Next")
-                    onClicked: fuse.debuggerNext()
+                    onClicked: FuseEmulator.debuggerNext()
                 }
                 Button {
                     Layout.fillHeight: true
                     Layout.rightMargin: toolBarRect.border.width
                     text: qsTr("Continue (R1)")
-                    onClicked: fuse.debuggerRun()
+                    onClicked: FuseEmulator.debuggerRun()
                 }
                 Button {
                     Layout.fillHeight: true

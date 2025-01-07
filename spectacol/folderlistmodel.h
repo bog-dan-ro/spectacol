@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,12 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FOLDERLISTMODEL_H
-#define FOLDERLISTMODEL_H
+#pragma once
 
 #include <QAbstractListModel>
 #include <QFileInfo>
 #include <QCache>
+#include <QQmlEngine>
 
 #include <vector>
 
@@ -31,7 +31,7 @@ extern "C"  {
 class FolderListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_ENUMS(FileFields FileSortCriteria FilterType)
+    QML_ELEMENT
     Q_PROPERTY(QString folder READ folder WRITE setFolder NOTIFY folderChanged)
     Q_PROPERTY(QString rootFolder READ rootFolder WRITE setRootFolder NOTIFY rootFolderChanged)
     Q_PROPERTY(FileSortCriteria sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged)
@@ -45,16 +45,19 @@ public:
         Path = Qt::UserRole,
         IsDir
     };
+    Q_ENUM(FileFields)
 
     enum FileSortCriteria {
         ByName,
         ByDateDesc,
     };
+    Q_ENUM(FileSortCriteria)
 
     enum FilterType {
         All,
         Tapes
     };
+    Q_ENUM(FilterType)
 
 public:
     FolderListModel(QObject *parent = nullptr);
@@ -108,5 +111,3 @@ private:
     int m_currentIndex = -1;
     FilterType m_filterClass = All;
 };
-
-#endif // FOLDERLISTMODEL_H
