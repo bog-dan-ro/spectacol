@@ -193,48 +193,53 @@ ApplicationWindow {
             }
         }
 
-        ZxScreen {
-            id: zxScreen
-            anchors.centerIn: parent
+        Item {
+            anchors.fill: parent
             anchors.leftMargin: (FuseEmulator.settings.leftMargin && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
-            onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
 
-            Row {
-                anchors.margins: Screen.pixelDensity * 2
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                spacing: Screen.pixelDensity * 5
+            ZxScreen {
+                id: zxScreen
+                anchors.centerIn: parent
 
-                Image {
-                    id: cassetteIcon
-                    visible: false
-                    height: Screen.pixelDensity * 10
-                    width: Screen.pixelDensity * 13
-                    NumberAnimation on opacity {
-                        id: cassetteIconHideAnimation
-                        running: false
-                        to: 0
-                        duration: 2000
-                        onStopped: {cassetteIcon.visible = false; cassetteIcon.opacity = 1}
+                onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
+
+                Row {
+                    anchors.margins: Screen.pixelDensity * 2
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    spacing: Screen.pixelDensity * 5
+
+                    Image {
+                        id: cassetteIcon
+                        visible: false
+                        height: Screen.pixelDensity * 10
+                        width: Screen.pixelDensity * 13
+                        NumberAnimation on opacity {
+                            id: cassetteIconHideAnimation
+                            running: false
+                            to: 0
+                            duration: 2000
+                            onStopped: {cassetteIcon.visible = false; cassetteIcon.opacity = 1}
+                        }
+
+                        source: "qrc:/images/cassette-tape.svg"
                     }
 
-                    source: "qrc:/images/cassette-tape.svg"
-                }
+                    Image {
+                        id: diskIcon
+                        visible: false
+                        height: Screen.pixelDensity * 13
+                        width: Screen.pixelDensity * 13
+                        NumberAnimation on opacity {
+                            id: diskIconHideAnimation
+                            running: false
+                            to: 0
+                            duration: 2000
+                            onStopped: {diskIcon.visible = false; diskIcon.opacity = 1}
+                        }
 
-                Image {
-                    id: diskIcon
-                    visible: false
-                    height: Screen.pixelDensity * 13
-                    width: Screen.pixelDensity * 13
-                    NumberAnimation on opacity {
-                        id: diskIconHideAnimation
-                        running: false
-                        to: 0
-                        duration: 2000
-                        onStopped: {diskIcon.visible = false; diskIcon.opacity = 1}
+                        source: "qrc:/images/floppy.svg"
                     }
-
-                    source: "qrc:/images/floppy.svg"
                 }
             }
         }

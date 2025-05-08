@@ -109,7 +109,7 @@ Item {
                 OnScreenButton {
                     id: button57
                     text: ""
-                    imageSource: ":/images/arrow-up-left.svg"
+                    imageSource: "qrc:///images/arrow-up-left.svg"
                     buttons: [Qt.Key_5, Qt.Key_7]
                 }
                 OnScreenButton {
@@ -119,13 +119,13 @@ Item {
                     KeyNavigation.right: button8
                     KeyNavigation.down: button6
                     text: "7"
-                    imageSource: ":/images/arrow-up.svg"
+                    imageSource: "qrc:///images/arrow-up.svg"
                     buttons: [Qt.Key_7]
                 }
                 OnScreenButton {
                     id: button87
                     text: ""
-                    imageSource: ":/images/arrow-up-right.svg"
+                    imageSource: "qrc:///images/arrow-up-right.svg"
                     buttons: [Qt.Key_8, Qt.Key_7]
                 }
                 OnScreenButton {
@@ -135,7 +135,7 @@ Item {
                     KeyNavigation.right: button8
                     KeyNavigation.down: button6
                     text: "5"
-                    imageSource: ":/images/arrow-left.svg"
+                    imageSource: "qrc:///images/arrow-left.svg"
                     buttons: [Qt.Key_5]
                 }
 
@@ -148,13 +148,13 @@ Item {
                     KeyNavigation.right: button0
                     KeyNavigation.down: button6
                     text: "8"
-                    imageSource: ":/images/arrow-right.svg"
+                    imageSource: "qrc:///images/arrow-right.svg"
                     buttons: [Qt.Key_8]
                 }
                 OnScreenButton {
                     id: button56
                     text: ""
-                    imageSource: ":/images/arrow-down-left.svg"
+                    imageSource: "qrc:///images/arrow-down-left.svg"
                     buttons: [Qt.Key_5, Qt.Key_6]
                 }
                 OnScreenButton {
@@ -164,13 +164,13 @@ Item {
                     KeyNavigation.right: button8
                     KeyNavigation.down: button1
                     text: "6"
-                    imageSource: ":/images/arrow-down.svg"
+                    imageSource: "qrc:///images/arrow-down.svg"
                     buttons: [Qt.Key_6]
                 }
                 OnScreenButton {
                     id: button86
                     text: ""
-                    imageSource: ":/images/arrow-down-right.svg"
+                    imageSource: "qrc:///images/arrow-down-right.svg"
                     buttons: [Qt.Key_8, Qt.Key_6]
                 }
             }
@@ -200,7 +200,7 @@ Item {
                 KeyNavigation.right: button5
                 KeyNavigation.down: button6
                 text: "0"
-                imageSource: ":/images/draw-fire.svg"
+                imageSource: "qrc:///images/draw-fire.svg"
                 buttons: [Qt.Key_0]
             }
         }

@@ -104,7 +104,7 @@ Pane {
                     Layout.fillWidth: true
 
                     fillMode: Image.PreserveAspectFit
-                    source: ":/images/gamepad.png"
+                    source: "qrc:///images/gamepad.png"
                 }
                 FancyText {
                     Layout.fillWidth: true
@@ -130,7 +130,7 @@ Pane {
                     Layout.fillWidth: true
 
                     fillMode: Image.PreserveAspectFit
-                    source: ":/images/gamepad.png"
+                    source: "qrc:///images/gamepad.png"
                 }
                 FancyText {
                     Layout.fillWidth: true
