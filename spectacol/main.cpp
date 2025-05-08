@@ -29,18 +29,20 @@
 #include <QQmlApplicationEngine>
 #include <QStandardPaths>
 
+using namespace Qt::StringLiterals;
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
-    app.setOrganizationName("Licentia");
-    app.setOrganizationDomain("licentia.eu");
-    app.setApplicationName("Spectacol");
 
-    QString newSettings = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/.fuserc";
+    QGuiApplication app(argc, argv);
+    app.setOrganizationName(u"Licentia"_s);
+    app.setOrganizationDomain(u"licentia.eu"_s);
+    app.setApplicationName(u"Spectacol"_s);
+
+    QString newSettings = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + u"/.fuserc"_s;
 #ifdef Q_OS_ANDROID
-    QString oldSettings = QDir::homePath() + "/.fuserc";
+    QString oldSettings = QDir::homePath() + u"/.fuserc"_s;
 #else
-    QString oldSettings = QDir::homePath() + "/.spectacolrc";
+    QString oldSettings = QDir::homePath() + u"/.spectacolrc"_s;
 #endif
     QDir::home().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
     if (!QFile::exists(newSettings) && QFile::exists(oldSettings))
@@ -51,9 +53,9 @@ int main(int argc, char *argv[])
 #else
     QDir appPath{QCoreApplication::applicationDirPath()};
     appPath.cdUp();
-    QString libsPath = appPath.absoluteFilePath("lib");
-    QString pluginsPath = appPath.absoluteFilePath("plugins");
-    QString qmlPath = appPath.absoluteFilePath("qml");
+    QString libsPath = appPath.absoluteFilePath(u"lib"_s);
+    QString pluginsPath = appPath.absoluteFilePath(u"plugins"_s);
+    QString qmlPath = appPath.absoluteFilePath(u"qml"_s);
 #endif
     QCoreApplication::addLibraryPath(libsPath);
     QCoreApplication::addLibraryPath(pluginsPath);
@@ -61,8 +63,8 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     engine.addImportPath(qmlPath);
 
-    engine.addImageProvider("spectrum", new SpectrumScreenImageProvider);
-    engine.loadFromModule("Spectacol", "Main");
+    engine.addImageProvider(u"spectrum"_s, new SpectrumScreenImageProvider);
+    engine.loadFromModule(u"Spectacol"_s, u"Main"_s);
 #ifdef Q_OS_ANDROID
     QNativeInterface::QAndroidApplication::hideSplashScreen();
 #endif

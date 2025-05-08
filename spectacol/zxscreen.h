@@ -36,7 +36,7 @@ class ZxScreen : public QQuickRhiItem
     Q_PROPERTY(bool smoothScaling READ smoothScaling WRITE setSmoothScaling NOTIFY smoothScalingChanged)
 
 public:
-    ZxScreen();
+    explicit ZxScreen(QQuickItem *parent = nullptr);
 
     bool fullScreen() const;
     void setFullScreen(bool fullScreen);
@@ -60,7 +60,9 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) final;
 
 private:
-    qreal m_aspectRatio = 4.0/3.0;
+    QSizeF m_textureSize;
+    qreal m_devicePixelRatio = 1.0;
     FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
     bool m_smoothScaling = false;
+    QPointer<QQuickItem> m_parentItem;
 };

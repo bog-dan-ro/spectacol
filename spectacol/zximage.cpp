@@ -314,9 +314,6 @@ void ZxRhiRenderer::initialize(QRhiCommandBuffer * /*cb*/)
         m_textureFormat = finalTex->format();
         m_pipeline.reset();
     }
-
-    if (!m_pipeline) {
-    }
 }
 
 void ZxRhiRenderer::synchronize(QQuickRhiItem *item)

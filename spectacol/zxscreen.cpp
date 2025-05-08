@@ -35,7 +35,17 @@ extern "C"  {
 # include <ui/ui.h>
 }
 
-ZxScreen::ZxScreen()
+
+static double fitFactor(double i, double s)
+{
+    if (i < s)
+        return std::floor(s / i);
+
+    return 1. / std::ceil(i / s);
+}
+
+ZxScreen::ZxScreen(QQuickItem *parent)
+    : QQuickRhiItem(parent)
 {
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
@@ -43,12 +53,19 @@ ZxScreen::ZxScreen()
     QSettings s;
     s.beginGroup(QLatin1String("Screen"));
     m_smoothScaling = s.value("smoothScaling", false).toBool();
-    setWidth(384);
-    setHeight(288);
-    connect(ZxImage::instance(), &ZxImage::needsUpdate, this, &ZxScreen::update, Qt::QueuedConnection);
+    setWidth(320);
+    setHeight(240);
+    connect(this, &QQuickItem::parentChanged, this, &ZxScreen::updateFillMode);
+    connect(this, &QQuickItem::windowChanged, this, &ZxScreen::updateFillMode);
+    connect(ZxImage::instance(), &ZxImage::needsUpdate, this, [this] {
+        if (window() && m_devicePixelRatio != window()->effectiveDevicePixelRatio()) {
+            m_devicePixelRatio = window()->effectiveDevicePixelRatio();
+            updateFillMode();
+        }
+        update();
+    }, Qt::QueuedConnection);
     connect(ZxImage::instance(), &ZxImage::geometryChanged, this, [this](QSize size) {
-        setWidth(size.width());
-        setHeight(size.height());
+        m_textureSize = size;
         updateFillMode();
     }, Qt::QueuedConnection);
 
@@ -92,7 +109,53 @@ void ZxScreen::setSmoothScaling(bool smoothScaling)
 void ZxScreen::updateFillMode()
 {
     m_fillMode = FuseEmulator::instance().settings()->fillMode();
-    geometryChanged(boundingRect(), boundingRect());
+
+    if (!window() || !m_textureSize.isValid())
+        return;
+
+    if (m_parentItem != parentItem()) {
+        if (m_parentItem) {
+            disconnect(m_parentItem, &QQuickItem::widthChanged, this, &ZxScreen::updateFillMode);
+            disconnect(m_parentItem, &QQuickItem::heightChanged, this, &ZxScreen::updateFillMode);
+        }
+        m_parentItem = parentItem();
+        if (m_parentItem) {
+            connect(m_parentItem, &QQuickItem::widthChanged, this, &ZxScreen::updateFillMode);
+            connect(m_parentItem, &QQuickItem::heightChanged, this, &ZxScreen::updateFillMode);
+        }
+    }
+    if (!m_parentItem)
+        return;
+
+    m_devicePixelRatio = window()->effectiveDevicePixelRatio();
+
+    QSizeF parentSize = m_parentItem->size();
+
+    switch (m_fillMode) {
+    case FuseSettings::PreserveAspect: {
+        auto wf = fitFactor(m_textureSize.width(), parentSize.width() * m_devicePixelRatio);
+        auto hf = fitFactor(m_textureSize.height(), parentSize.height() * m_devicePixelRatio);
+        auto factor = std::min(wf, hf);
+        factor /= m_devicePixelRatio;
+        setWidth(m_textureSize.width() * factor);
+        setHeight(m_textureSize.height() * factor);
+    }
+    break;
+
+    case FuseSettings::PreserveAspectFit: {
+        auto wf = parentSize.width() / m_textureSize.width();
+        auto hf = parentSize.height() / m_textureSize.height();
+        auto factor = std::min(wf, hf);
+        setWidth(m_textureSize.width() * factor);
+        setHeight(m_textureSize.height() * factor);
+    }
+    break;
+
+    case FuseSettings::Stretch:
+        setWidth(parentSize.width());
+        setHeight(parentSize.height());
+        break;
+    }
     update();
 }
 
@@ -100,45 +163,6 @@ QQuickRhiItemRenderer *ZxScreen::createRenderer()
 {
     return new ZxRhiRenderer();
 }
-
-static double fitFactor(double i, double s)
-{
-    if (i < s)
-        return std::floor(s / i);
-
-    return 1. / std::ceil(i / s);
-}
-
-void ZxScreen::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
-{
-    QQuickItem::geometryChange(newGeometry, oldGeometry);
-    if (!newGeometry.width() || !newGeometry.height())
-        return;
-
-    QRectF itemRect = newGeometry;
-    switch (m_fillMode) {
-    case FuseSettings::PreserveAspect: {
-        auto wf = fitFactor(ZxImage::instance()->imageSize().width(), newGeometry.width());
-        auto hf = fitFactor(ZxImage::instance()->imageSize().height(), newGeometry.height());
-        auto factor = (wf < 0 || hf < 0) ? std::max(wf, hf) : std::min(wf, hf);
-        itemRect.setWidth(ZxImage::instance()->imageSize().width() * factor);
-        itemRect.setHeight(ZxImage::instance()->imageSize().height() * factor);
-    }
-        break;
-
-    case FuseSettings::PreserveAspectFit:
-        if (itemRect.width() > itemRect.height())
-            itemRect.setWidth(itemRect.height() * m_aspectRatio);
-        else
-            itemRect.setHeight(itemRect.width() / m_aspectRatio);
-        break;
-
-    case FuseSettings::Stretch:
-        break;
-    }
-    setImplicitSize(itemRect.width(), itemRect.height());
-}
-
 
 void ZxScreen::mousePressEvent(QMouseEvent *event)
 {
