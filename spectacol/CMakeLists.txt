@@ -163,5 +163,5 @@ qt_add_qml_module(spectacol
         qml/private/TextSizes.qml
 )
 
-target_link_libraries(spectacol PRIVATE fuse libspectrum Qt::Quick Qt::Multimedia Qt::GamepadLegacy Qt6::GuiPrivate z)
+target_link_libraries(spectacol PRIVATE fuse libspectrum Qt::Quick Qt::Multimedia Qt::GamepadLegacy Qt::GuiPrivate Qt::ShaderTools z)
 target_compile_definitions(spectacol PRIVATE TIMER_ALWAYS_SLEEP)
