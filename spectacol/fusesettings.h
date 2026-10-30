@@ -50,6 +50,7 @@ class FuseSettings : public FuseObject
     Q_PROPERTY(bool showOrientationChooser READ showOrientationChooser CONSTANT)
     Q_PROPERTY(int screenOrientation READ screenOrientation WRITE setScreenOrientation NOTIFY screenOrientationChanged)
     Q_PROPERTY(FillMode fillMode READ fillMode WRITE setFillMode NOTIFY fillModeChanged)
+    Q_PROPERTY(bool smoothScaling READ smoothScaling WRITE setSmoothScaling NOTIFY smoothScalingChanged)
     Q_PROPERTY(bool leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
 
     // Sound Options
@@ -146,6 +147,9 @@ public:
     FillMode fillMode() const;
     void setFillMode(FillMode fill);
 
+    bool smoothScaling() const;
+    void setSmoothScaling(bool smoothScaling);
+
     bool swipe4menu() const;
     void setSwipe4menu(bool swipe4menu);
 
@@ -194,6 +198,7 @@ signals:
     void hasStartButtonChanged(bool hasStartButton);
     void screenOrientationChanged(int currentOrientation);
     void fillModeChanged(FillMode fillMode);
+    void smoothScalingChanged(bool smoothScaling);
     void swipe4menuChanged(bool swipe4menu);
     void autoSaveOnExitChanged(bool autoSaveOnExit);
     void leftMarginChanged(bool leftMargin);

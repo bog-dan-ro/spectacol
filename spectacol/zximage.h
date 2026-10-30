@@ -17,18 +17,17 @@
 
 #pragma once
 
-#include "fusesettings.h"
-
+#include <QImage>
 #include <QMutex>
-#include <QQuickRhiItemRenderer>
-#include <rhi/qrhi.h>
+#include <QSGTexture>
 
 #include <memory>
 
 extern "C"  {
 # include <libspectrum.h>
-# include <display.h>
 }
+
+class QRhiTexture;
 
 class ZxImage : public QObject
 {
@@ -53,7 +52,7 @@ public:
     // FUSE thread only
     void resize(uint32_t w, uint32_t h);
     void rescale();
-    void putpixel( int x, int y, int colour );
+    void putPixel(int x, int y, int colour);
     void plot8(int x, int y, libspectrum_byte data, libspectrum_byte ink, libspectrum_byte paper);
     void plot16(int x, int y, libspectrum_word data, libspectrum_byte ink, libspectrum_byte paper);
 
@@ -85,31 +84,28 @@ private:
     QRect m_frameDirty;
 };
 
-class ZxRhiRenderer : public QQuickRhiItemRenderer
+// The ZX screen texture, it uploads only the parts of the frame that changed
+class ZxTexture : public QSGTexture
 {
-protected:
-    // QQuickRhiItemRenderer interface
-    void initialize(QRhiCommandBuffer *cb) override;
-    void synchronize(QQuickRhiItem *item) override;
-    void render(QRhiCommandBuffer *cb) override;
-private:
-    void invalidatePipeline();
-    bool recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates);
+public:
+    ZxTexture();
+    ~ZxTexture() override;
+
+    // Render thread, while the GUI thread is blocked
+    void setFrame(ZxImage::Frame frame);
+
+    // QSGTexture interface
+    qint64 comparisonKey() const final;
+    QRhiTexture *rhiTexture() const final;
+    QSize textureSize() const final;
+    bool hasAlphaChannel() const final;
+    bool hasMipmaps() const final;
+    void commitTextureOperations(QRhi *rhi, QRhiResourceUpdateBatch *resourceUpdates) final;
 
 private:
-    QRhi *m_rhi = nullptr;
-    int m_sampleCount = 1;
-    QRhiTexture::Format m_textureFormat = QRhiTexture::RGBA8;
-    FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
-    bool m_smoothScaling = false;
-    QSize m_imageSize;
-    bool m_pipelineFailed = false;
-    std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
-    std::unique_ptr<QRhiBuffer> m_vertexBuffer;
-    std::unique_ptr<QRhiBuffer> m_uniformBuffer;
-    std::unique_ptr<QRhiBuffer> m_pushConstantsBuffer;
+    QImage m_image;
+    QRect m_dirty;
+    QSize m_size;
+    QSize m_failedSize;
     std::unique_ptr<QRhiTexture> m_texture;
-    std::unique_ptr<QRhiSampler> m_sampler;
-    std::unique_ptr<QRhiShaderResourceBindings> m_srb;
 };
-

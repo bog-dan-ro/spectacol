@@ -200,6 +200,7 @@ ApplicationWindow {
             ZxScreen {
                 id: zxScreen
                 anchors.fill: parent
+                mouseGrabSuspended: pageLoader.source != "" || menuBar.position > 0 || !FuseEmulator.processInputEvents
 
                 onFullScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
 
@@ -246,6 +247,8 @@ ApplicationWindow {
 
         MouseArea {
             anchors.fill: parent
+            // let the clicks reach the ZX screen (Kempston mouse) when no page is open
+            enabled: pageLoader.source != ""
             onClicked: pageLoader.source = "";
         }
 

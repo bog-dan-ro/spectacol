@@ -61,13 +61,18 @@ extern "C" int ui_end(void)
     return ui_widget_end();
 }
 
-extern "C" int ui_mouse_grab( int /*startup*/ )
+extern "C" int ui_mouse_grab( int startup )
 {
-    return 0;
+    // like the other FUSE UIs, grab it only when the user clicks on the screen
+    if (startup)
+        return 0;
+    FuseEmulator::instance().setMouseGrabbed(true);
+    return 1;
 }
 
 extern "C" int ui_mouse_release( int /*suspend*/ )
 {
+    FuseEmulator::instance().setMouseGrabbed(false);
     return 0;
 }
 

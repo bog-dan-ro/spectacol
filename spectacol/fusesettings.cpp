@@ -356,6 +356,25 @@ void FuseSettings::setFillMode(FuseSettings::FillMode fill)
     emit fillModeChanged(fill);
 }
 
+bool FuseSettings::smoothScaling() const
+{
+    QSettings s;
+    s.beginGroup(_("Screen"));
+    return s.value("smoothScaling", false).toBool();
+}
+
+void FuseSettings::setSmoothScaling(bool smoothScaling)
+{
+    if (this->smoothScaling() == smoothScaling)
+        return;
+
+    QSettings s;
+    s.beginGroup(_("Screen"));
+    s.setValue("smoothScaling", smoothScaling);
+
+    emit smoothScalingChanged(smoothScaling);
+}
+
 bool FuseSettings::swipe4menu() const
 {
     QSettings s;

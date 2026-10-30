@@ -20,20 +20,17 @@
 #include "fusesettings.h"
 
 #include <QQmlEngine>
-#include <QQuickRhiItem>
+#include <QQuickItem>
 
-#include <vector>
+#include <optional>
 
-class DisassambleModel;
-class BreakpointsModel;
-class QAbstractItemModel;
-
-class ZxScreen : public QQuickRhiItem
+class ZxScreen : public QQuickItem
 {
     Q_OBJECT
     QML_ELEMENT
     Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY fullScreenChanged)
-    Q_PROPERTY(bool smoothScaling READ smoothScaling WRITE setSmoothScaling NOTIFY smoothScalingChanged)
+    // Releases the Kempston mouse while something covers the screen (pages, menus)
+    Q_PROPERTY(bool mouseGrabSuspended READ mouseGrabSuspended WRITE setMouseGrabSuspended NOTIFY mouseGrabSuspendedChanged)
 
 public:
     explicit ZxScreen(QQuickItem *parent = nullptr);
@@ -41,36 +38,36 @@ public:
     bool fullScreen() const;
     void setFullScreen(bool fullScreen);
 
-    bool smoothScaling() const;
-    void setSmoothScaling(bool smoothScaling);
-
-    FuseSettings::FillMode fillMode() const;
-
-    // Where the ZX image goes inside an output of outputSize pixels
-    static QRect imageRect(QSize imageSize, QSize outputSize, FuseSettings::FillMode fillMode);
-
-public slots:
-    void updateFillMode();
+    bool mouseGrabSuspended() const;
+    void setMouseGrabSuspended(bool suspended);
 
 signals:
     void fullScreenChanged(bool fullScreen);
-    void smoothScalingChanged(bool smoothScaling);
+    void mouseGrabSuspendedChanged(bool mouseGrabSuspended);
 
 protected:
-    // QQuickRhiItem interface
-    QQuickRhiItemRenderer *createRenderer() final;
+    // QQuickItem interface
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *) final;
     void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) final;
     void itemChange(ItemChange change, const ItemChangeData &value) final;
     void mousePressEvent(QMouseEvent *event) final;
     void mouseMoveEvent(QMouseEvent *event) final;
     void mouseReleaseEvent(QMouseEvent *event) final;
+    void hoverEnterEvent(QHoverEvent *event) final;
+    void hoverMoveEvent(QHoverEvent *event) final;
 
 private:
+    QRectF imageRect(QSize imageSize) const;
     void updateImplicitSize();
+    void updateMouseGrab(bool grabbed);
+    void sendMouseMotion(QPointF position);
 
 private:
     QSize m_imageSize;
     FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
     bool m_smoothScaling = false;
     bool m_fullScreen = false;
+    bool m_mouseGrabSuspended = false;
+    std::optional<QPointF> m_lastMousePosition = std::nullopt;
+    QPointF m_mouseMotionRemainder;
 };

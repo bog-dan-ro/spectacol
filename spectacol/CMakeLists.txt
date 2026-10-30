@@ -67,7 +67,7 @@ qt_add_resources(spectacol "resources"
 )
 
 qt_add_shaders(spectacol "spectacol_shaders"
-    GLSL "310es,450"
+    GLSL "100es,120,150,310es,450"
     PRECOMPILE
     OPTIMIZED
     PREFIX
@@ -75,8 +75,6 @@ qt_add_shaders(spectacol "spectacol_shaders"
     FILES
         shaders/mirror.frag
         shaders/mirror.vert
-        shaders/simple.frag
-        shaders/simple.vert
 )
 
 set_source_files_properties(

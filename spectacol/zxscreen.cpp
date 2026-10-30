@@ -1,4 +1,4 @@
-/* fusecreen.cpp: QML Item representing the fuse screen
+/* zxscreen.cpp: QML Item representing the ZX Spectrum screen
 
     Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
 
@@ -18,23 +18,20 @@
 
 #include "zxscreen.h"
 
-#include "breakpointsmodel.h"
-#include "disassamblemodel.h"
 #include "zximage.h"
 #include "fuseemulator.h"
 #include "qmlui.h"
 
-#include <QtMath>
-#include <QSettings>
+#include <QQuickWindow>
 #include <QSGSimpleTextureNode>
 
-extern "C"  {
-# include <input.h>
-# include <keyboard.h>
-# include <settings.h>
-# include <ui/ui.h>
-}
+#include <cmath>
+#include <utility>
 
+extern "C"  {
+# include <display.h>
+# include <settings.h>
+}
 
 static double fitFactor(double i, double s)
 {
@@ -44,17 +41,60 @@ static double fitFactor(double i, double s)
     return 1. / std::ceil(i / s);
 }
 
+// Where the image goes inside an output of outputSize pixels
+static QRect imageRect(QSize imageSize, QSize outputSize, FuseSettings::FillMode fillMode)
+{
+    if (imageSize.isEmpty() || outputSize.isEmpty())
+        return {};
+
+    QSize size = outputSize;
+    switch (fillMode) {
+    case FuseSettings::PreserveAspect: {
+        auto wf = fitFactor(imageSize.width(), outputSize.width());
+        auto hf = fitFactor(imageSize.height(), outputSize.height());
+        size = (QSizeF(imageSize) * (std::min)(wf, hf)).toSize();
+    }
+    break;
+
+    case FuseSettings::PreserveAspectFit:
+        size = imageSize.scaled(outputSize, Qt::KeepAspectRatio);
+        break;
+
+    case FuseSettings::Stretch:
+        break;
+    }
+
+    const int x = (outputSize.width() - size.width()) / 2;
+#ifdef Q_OS_ANDROID
+    // keep it at the top, in portrait mode the on screen controls go below it
+    const int y = 0;
+#else
+    const int y = (outputSize.height() - size.height()) / 2;
+#endif
+    return {QPoint{x, y}, size};
+}
+
 ZxScreen::ZxScreen(QQuickItem *parent)
-    : QQuickRhiItem(parent)
+    : QQuickItem(parent)
 {
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
-    // ZxRhiRenderer scales the image, the item's texture is drawn 1:1, don't blur it
-    setSmooth(false);
-    m_fillMode = FuseEmulator::instance().settings()->fillMode();
-    QSettings s;
-    s.beginGroup(QLatin1String("Screen"));
-    m_smoothScaling = s.value("smoothScaling", false).toBool();
+    setAcceptedMouseButtons(Qt::LeftButton | Qt::MiddleButton | Qt::RightButton);
+
+    auto settings = FuseEmulator::instance().settings();
+    m_fillMode = settings->fillMode();
+    m_smoothScaling = settings->smoothScaling();
+    connect(settings, &FuseSettings::fillModeChanged, this, [this](FuseSettings::FillMode fillMode) {
+        m_fillMode = fillMode;
+        updateImplicitSize();
+        update();
+    });
+    connect(settings, &FuseSettings::smoothScalingChanged, this, [this](bool smoothScaling) {
+        m_smoothScaling = smoothScaling;
+        update();
+    });
+    connect(&FuseEmulator::instance(), &FuseEmulator::mouseGrabbedChanged, this, &ZxScreen::updateMouseGrab);
+
     connect(ZxImage::instance(), &ZxImage::needsUpdate, this, &ZxScreen::update, Qt::QueuedConnection);
     connect(ZxImage::instance(), &ZxImage::geometryChanged, this, [this](QSize size) {
         m_imageSize = size;
@@ -85,110 +125,135 @@ void ZxScreen::setFullScreen(bool fullScreen)
     });
 }
 
-bool ZxScreen::smoothScaling() const
+bool ZxScreen::mouseGrabSuspended() const
 {
-    return m_smoothScaling;
+    return m_mouseGrabSuspended;
 }
 
-void ZxScreen::setSmoothScaling(bool smoothScaling)
+void ZxScreen::setMouseGrabSuspended(bool suspended)
 {
-    if (m_smoothScaling == smoothScaling)
+    if (m_mouseGrabSuspended == suspended)
         return;
 
-    m_smoothScaling = smoothScaling;
-    QSettings s;
-    s.beginGroup(QLatin1String("Screen"));
-    s.setValue("smoothScaling", smoothScaling);
-    emit smoothScalingChanged(smoothScaling);
-    update();
+    m_mouseGrabSuspended = suspended;
+    FuseEmulator::instance().setMouseGrabSuspended(suspended);
+    emit mouseGrabSuspendedChanged(suspended);
 }
 
-FuseSettings::FillMode ZxScreen::fillMode() const
+QRectF ZxScreen::imageRect(QSize imageSize) const
 {
-    return m_fillMode;
-}
-
-QRect ZxScreen::imageRect(QSize imageSize, QSize outputSize, FuseSettings::FillMode fillMode)
-{
-    if (imageSize.isEmpty() || outputSize.isEmpty())
-        return {};
-
-    QSize size = outputSize;
-    switch (fillMode) {
-    case FuseSettings::PreserveAspect: {
-        auto wf = fitFactor(imageSize.width(), outputSize.width());
-        auto hf = fitFactor(imageSize.height(), outputSize.height());
-        size = (QSizeF(imageSize) * std::min(wf, hf)).toSize();
-    }
-    break;
-
-    case FuseSettings::PreserveAspectFit:
-        size = imageSize.scaled(outputSize, Qt::KeepAspectRatio);
-        break;
-
-    case FuseSettings::Stretch:
-        break;
-    }
-
-    const int x = (outputSize.width() - size.width()) / 2;
-#ifdef Q_OS_ANDROID
-    // keep it at the top, in portrait mode the on screen controls go below it
-    const int y = 0;
-#else
-    const int y = (outputSize.height() - size.height()) / 2;
-#endif
-    return {QPoint{x, y}, size};
-}
-
-void ZxScreen::updateFillMode()
-{
-    m_fillMode = FuseEmulator::instance().settings()->fillMode();
-    updateImplicitSize();
-    update();
+    // compute it in device pixels, so the image is scaled by whole pixels
+    const qreal dpr = window() ? window()->effectiveDevicePixelRatio() : 1.0;
+    const QRect rect = ::imageRect(imageSize, (size() * dpr).toSize(), m_fillMode);
+    return {QPointF(rect.topLeft()) / dpr, QSizeF(rect.size()) / dpr};
 }
 
 void ZxScreen::updateImplicitSize()
 {
     // The implicit size is the size of the image on the screen, Main.qml uses it to place the on screen controls.
-    // Compute it the same way as QQuickRhiItem computes its texture size.
-    const qreal dpr = window() ? window()->effectiveDevicePixelRatio() : 1.0;
-    const QSize outputSize = (size() * dpr).toSize();
-    const QSizeF imageSize = QSizeF(imageRect(m_imageSize, outputSize, m_fillMode).size()) / dpr;
+    const QSizeF imageSize = imageRect(m_imageSize).size();
     setImplicitSize(imageSize.width(), imageSize.height());
 }
 
-QQuickRhiItemRenderer *ZxScreen::createRenderer()
+QSGNode *ZxScreen::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    return new ZxRhiRenderer();
+    auto node = static_cast<QSGSimpleTextureNode *>(oldNode);
+    auto frame = ZxImage::instance()->takeFrame();
+    const QRectF rect = imageRect(frame.image.size());
+    if (rect.isEmpty()) {
+        delete node;
+        return nullptr;
+    }
+
+    if (!node) {
+        node = new QSGSimpleTextureNode;
+        node->setOwnsTexture(true);
+        node->setTexture(new ZxTexture);
+    }
+    static_cast<ZxTexture *>(node->texture())->setFrame(std::move(frame));
+    node->setFiltering(m_smoothScaling ? QSGTexture::Linear : QSGTexture::Nearest);
+    node->setRect(rect);
+    // the texture object is the same, but its content changed
+    node->markDirty(QSGNode::DirtyMaterial);
+    return node;
 }
 
 void ZxScreen::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
-    QQuickRhiItem::geometryChange(newGeometry, oldGeometry);
-    if (newGeometry.size() != oldGeometry.size())
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+    if (newGeometry.size() != oldGeometry.size()) {
         updateImplicitSize();
+        update();
+    }
 }
 
 void ZxScreen::itemChange(ItemChange change, const ItemChangeData &value)
 {
-    QQuickRhiItem::itemChange(change, value);
+    QQuickItem::itemChange(change, value);
     if (change == ItemSceneChange || change == ItemDevicePixelRatioHasChanged) {
         updateImplicitSize();
         update();
     }
 }
 
+void ZxScreen::updateMouseGrab(bool grabbed)
+{
+    // While FUSE has the Kempston mouse grabbed, hide the cursor and send the movements
+    // even when no button is pressed
+    m_lastMousePosition.reset();
+    m_mouseMotionRemainder = {};
+    setAcceptHoverEvents(grabbed);
+    if (grabbed)
+        setCursor(Qt::BlankCursor);
+    else
+        unsetCursor();
+}
+
+void ZxScreen::sendMouseMotion(QPointF position)
+{
+    if (!FuseEmulator::instance().mouseGrabbed())
+        return;
+
+    if (m_lastMousePosition) {
+        // move the Spectrum pointer as much as the host cursor moves over the image
+        const QSizeF imageSize = imageRect(m_imageSize).size();
+        if (!imageSize.isEmpty()) {
+            const QPointF delta = position - *m_lastMousePosition;
+            m_mouseMotionRemainder += QPointF(delta.x() * DISPLAY_ASPECT_WIDTH / imageSize.width(),
+                                              delta.y() * DISPLAY_SCREEN_HEIGHT / imageSize.height());
+            const int dx = int(m_mouseMotionRemainder.x());
+            const int dy = int(m_mouseMotionRemainder.y());
+            if (dx || dy) {
+                m_mouseMotionRemainder -= QPointF(dx, dy);
+                FuseEmulator::instance().mouseMotion(dx, dy);
+            }
+        }
+    }
+    m_lastMousePosition = position;
+}
+
 void ZxScreen::mousePressEvent(QMouseEvent *event)
 {
-    FuseEmulator::instance().mousePress(event);
+    FuseEmulator::instance().mouseButton(event->button(), true);
 }
 
 void ZxScreen::mouseMoveEvent(QMouseEvent *event)
 {
-    FuseEmulator::instance().mouseMove(event);
+    sendMouseMotion(event->position());
 }
 
 void ZxScreen::mouseReleaseEvent(QMouseEvent *event)
 {
-    FuseEmulator::instance().mouseRelease(event);
+    FuseEmulator::instance().mouseButton(event->button(), false);
+}
+
+void ZxScreen::hoverEnterEvent(QHoverEvent *event)
+{
+    // don't turn the jump from where the cursor left the item into a movement
+    m_lastMousePosition = event->position();
+}
+
+void ZxScreen::hoverMoveEvent(QHoverEvent *event)
+{
+    sendMouseMotion(event->position());
 }

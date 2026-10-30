@@ -78,6 +78,7 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(bool touchscreen MEMBER m_touchscreen CONSTANT)
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
     Q_PROPERTY(bool processInputEvents READ processInputEvents WRITE setProcessInputEvents NOTIFY processInputEventsChanged)
+    Q_PROPERTY(bool mouseGrabbed READ mouseGrabbed NOTIFY mouseGrabbedChanged)
     Q_PROPERTY(int gamepadId READ gamepadId WRITE setGamepadId NOTIFY gamepadIdChanged)
     Q_PROPERTY(QString dataPath READ dataPath WRITE setDataPath NOTIFY dataPathChanged)
     Q_PROPERTY(bool saveSnapshotEnabled READ saveSnapshotEnabled NOTIFY saveSnapshotEnabledChanged)
@@ -235,9 +236,13 @@ public:
     void soundLowlevelFrame(libspectrum_signed_word *data, int len);
     void soundLowlevelEnd(void) {}
 
-    void mousePress(QMouseEvent *event);
-    void mouseMove(QMouseEvent *event);
-    void mouseRelease(QMouseEvent *event);
+    // Kempston mouse
+    void mouseButton(Qt::MouseButton button, bool pressed);
+    void mouseMotion(int dx, int dy);
+    void setMouseGrabSuspended(bool suspended);
+    bool mouseGrabbed() const { return m_mouseGrabbed; }
+    // called on the FUSE thread
+    void setMouseGrabbed(bool grabbed);
 
     FuseSettings *settings() const;
     void resetLoadedFile();
@@ -340,6 +345,7 @@ signals:
     void showMenu();
     void hideMenu();
     void processInputEventsChanged();
+    void mouseGrabbedChanged(bool mouseGrabbed);
     void gamepadIdChanged();
     void toggleOnScreenControls(ControlType type);
     void error(ErrorLevel level, const QString &message);
@@ -371,6 +377,7 @@ private:
     std::atomic_bool m_debuggerActivated;
     bool m_resetPokeFinder;
     std::atomic_bool m_processInputEvents;
+    bool m_mouseGrabbed = false;
     int m_gamepadId = -1;
     ZXGamesModel m_onlineGamesModel;
     std::unique_ptr<FuseSettings> m_fuseSettings;

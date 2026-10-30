@@ -110,10 +110,7 @@ Flickable {
 
                     model: ["Preserve aspect fit", "Preserve aspect", "Stretch"]
                     currentIndex: FuseEmulator.settings.fillMode
-                    onCurrentIndexChanged: {
-                        FuseEmulator.settings.fillMode = currentIndex;
-                        zxScreen.updateFillMode();
-                    }
+                    onCurrentIndexChanged: FuseEmulator.settings.fillMode = currentIndex
                 }
             }
 
@@ -153,8 +150,8 @@ Flickable {
                 KeyNavigation.up: FuseEmulator.settings.showOrientationChooser ? screenOrientation : screenFillMode
                 KeyNavigation.down: TextSizes.smallScreen ? leftBorder : screenFilter
                 text: qsTr("Smooth scaling")
-                checked: zxScreen.smoothScaling
-                onCheckedChanged: zxScreen.smoothScaling = checked
+                checked: FuseEmulator.settings.smoothScaling
+                onCheckedChanged: FuseEmulator.settings.smoothScaling = checked
             }
 
             CheckBox {

@@ -784,33 +784,57 @@ void FuseEmulator::soundLowlevelFrame(libspectrum_signed_word *data, int len)
     return m_fuseThread.soundLowlevelFrame(data, len);
 }
 
-void FuseEmulator::mousePress(QMouseEvent *event)
+void FuseEmulator::mouseButton(Qt::MouseButton button, bool pressed)
 {
     if (!m_processInputEvents)
         return;
 
-    int button = event->button();
-    pokeEvent([button]{
-        ui_mouse_button( button, 1 );
+    int fuseButton;
+    switch (button) {
+    case Qt::LeftButton:
+        fuseButton = 1;
+        break;
+    case Qt::MiddleButton:
+        fuseButton = 2;
+        break;
+    case Qt::RightButton:
+        fuseButton = 3;
+        break;
+    default:
+        return;
+    }
+    pokeEvent([fuseButton, pressed]{
+        ui_mouse_button(fuseButton, pressed);
     });
 }
 
-void FuseEmulator::mouseMove(QMouseEvent *event)
+void FuseEmulator::mouseMotion(int dx, int dy)
 {
     if (!m_processInputEvents)
         return;
 
-    Q_UNUSED(event)
+    pokeEvent([dx, dy]{
+        ui_mouse_motion(dx, dy);
+    });
 }
 
-void FuseEmulator::mouseRelease(QMouseEvent *event)
+void FuseEmulator::setMouseGrabSuspended(bool suspended)
 {
-    if (!m_processInputEvents)
-        return;
+    pokeEvent([suspended]{
+        if (suspended)
+            ui_mouse_suspend();
+        else
+            ui_mouse_resume();
+    });
+}
 
-    int button = event->button();
-    pokeEvent([button]{
-        ui_mouse_button( button, 0 );
+void FuseEmulator::setMouseGrabbed(bool grabbed)
+{
+    callFunction([this, grabbed]{
+        if (m_mouseGrabbed == grabbed)
+            return;
+        m_mouseGrabbed = grabbed;
+        emit mouseGrabbedChanged(grabbed);
     });
 }
 
