@@ -150,7 +150,9 @@ void FuseThread::run()
 
     fuse_main(argc, (char**)argv);
     m_audioOutput.reset();
-    qApp->quit();
+    // don't call quit() directly, from a secondary thread it waits for the GUI thread,
+    // which might be waiting for us in FuseEmulator::stopFuseThread
+    QMetaObject::invokeMethod(qApp, &QCoreApplication::quit, Qt::QueuedConnection);
 }
 
 #define setRegisterValue(reg) \
@@ -230,6 +232,8 @@ FuseEmulator::FuseEmulator(QObject *parent)
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_tape, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_recording, QQmlEngine::CppOwnership);
+    // FUSE draws into ZxImage, which is a static too, stop it before the statics are destroyed
+    connect(qGuiApp, &QCoreApplication::aboutToQuit, this, &FuseEmulator::stopFuseThread);
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state){
         switch (state) {
         case Qt::ApplicationActive:
@@ -1548,6 +1552,20 @@ void FuseEmulator::updateScalers() const
 void FuseEmulator::startFuseThread()
 {
     m_fuseThread.start(QThread::HighPriority);
+}
+
+void FuseEmulator::stopFuseThread()
+{
+    if (!m_fuseThread.isRunning())
+        return;
+
+    pokeEvent([]{
+        fuse_exiting = 1;
+    });
+    // unblock FUSE if it waits for a file dialog or a query, as cancelled
+    m_openSaveFilePath.clear();
+    m_waitSemaphore.release();
+    m_fuseThread.wait();
 }
 
 const DisassambleModel *FuseEmulator::disassambleModel() const

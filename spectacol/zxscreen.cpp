@@ -69,15 +69,18 @@ ZxScreen::ZxScreen(QQuickItem *parent)
 
 bool ZxScreen::fullScreen() const
 {
-    return settings_current.full_screen;
+    return m_fullScreen;
 }
 
 void ZxScreen::setFullScreen(bool fullScreen)
 {
-    pokeEvent([ fullScreen]{
-        if (settings_current.full_screen == fullScreen)
-            return;
+    if (m_fullScreen == fullScreen)
+        return;
 
+    m_fullScreen = fullScreen;
+    emit fullScreenChanged(fullScreen);
+    // FUSE doesn't use it, it only saves it in its config
+    pokeEvent([fullScreen]{
         settings_current.full_screen = fullScreen;
     });
 }

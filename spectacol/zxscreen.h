@@ -32,7 +32,7 @@ class ZxScreen : public QQuickRhiItem
 {
     Q_OBJECT
     QML_ELEMENT
-    Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY screenChanged)
+    Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY fullScreenChanged)
     Q_PROPERTY(bool smoothScaling READ smoothScaling WRITE setSmoothScaling NOTIFY smoothScalingChanged)
 
 public:
@@ -53,7 +53,7 @@ public slots:
     void updateFillMode();
 
 signals:
-    void screenChanged();
+    void fullScreenChanged(bool fullScreen);
     void smoothScalingChanged(bool smoothScaling);
 
 protected:
@@ -72,4 +72,5 @@ private:
     QSize m_imageSize;
     FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
     bool m_smoothScaling = false;
+    bool m_fullScreen = false;
 };

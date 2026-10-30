@@ -357,6 +357,7 @@ private:
     explicit FuseEmulator(QObject *parent = 0);
     void updateScalers() const;
     void startFuseThread();
+    void stopFuseThread();
     friend class ZxImage;
 
 private:

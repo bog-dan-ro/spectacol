@@ -201,7 +201,7 @@ ApplicationWindow {
                 id: zxScreen
                 anchors.fill: parent
 
-                onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
+                onFullScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
 
                 Row {
                     anchors.margins: Screen.pixelDensity * 2

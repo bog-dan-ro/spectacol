@@ -37,9 +37,20 @@ private:
     ZxImage();
     ~ZxImage();
 public:
+    struct Frame
+    {
+        QImage image;
+        QRect dirty;
+    };
+
     static ZxImage *instance();
 
+    // Any thread
     QSize imageSize() const;
+    // Returns the last finished frame and the area changed since the previous call
+    Frame takeFrame();
+
+    // FUSE thread only
     void resize(uint32_t w, uint32_t h);
     void rescale();
     void putpixel( int x, int y, int colour );
@@ -51,22 +62,27 @@ public:
     void saveScreen();
     void restoreScreen();
 
-    inline QMutex &mutex() { return m_syncVars; }
-    inline const QImage &rgbImage() const { return m_rgbImage; }
-    inline std::vector<QRhiTextureUploadEntry> &updates() {return m_updates;}
-
 signals:
     void needsUpdate();
     void geometryChanged(QSize size);
 
 private:
-    std::vector<QRhiTextureUploadEntry> m_updates;
+    void publishFrame();
+
+private:
+    // FUSE thread only. FUSE draws into m_rgbImage through m_rgbPixels, which bypasses
+    // QImage's copy on write, so m_rgbImage must never be shallow copied.
     QImage m_rgbImage, m_savedImage;
     uint32_t *m_rgbPixels = nullptr;
     uint32_t m_rgbPixelsWidth = 0;
+    QRect m_dirty;
 
-    bool m_recreate = false;
+    // Guarded by m_syncVars. publishFrame() copies the dirty part of m_rgbImage to
+    // m_frameImage; the renderer gets shallow copies of it, which the next publishFrame()
+    // detaches from, so they never change while QRhi uploads them.
     mutable QMutex m_syncVars;
+    QImage m_frameImage;
+    QRect m_frameDirty;
 };
 
 class ZxRhiRenderer : public QQuickRhiItemRenderer
@@ -77,7 +93,8 @@ protected:
     void synchronize(QQuickRhiItem *item) override;
     void render(QRhiCommandBuffer *cb) override;
 private:
-    void recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates, QSize imageSize);
+    void invalidatePipeline();
+    bool recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates);
 
 private:
     QRhi *m_rhi = nullptr;
@@ -85,6 +102,8 @@ private:
     QRhiTexture::Format m_textureFormat = QRhiTexture::RGBA8;
     FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
     bool m_smoothScaling = false;
+    QSize m_imageSize;
+    bool m_pipelineFailed = false;
     std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
     std::unique_ptr<QRhiBuffer> m_vertexBuffer;
     std::unique_ptr<QRhiBuffer> m_uniformBuffer;

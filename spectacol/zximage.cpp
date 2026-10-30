@@ -22,7 +22,8 @@
 
 #include <QFile>
 
-#include <vector>
+#include <cstring>
+#include <utility>
 
 extern "C"  {
 # include <fuse.h>
@@ -126,7 +127,6 @@ extern "C" void uidisplay_frame_restore( void )
 
 ZxImage::ZxImage()
 {
-    m_updates.reserve(100);
     FuseEmulator::instance().startFuseThread();
 }
 
@@ -140,70 +140,86 @@ ZxImage *ZxImage::instance()
 
 void ZxImage::resize(uint32_t w, uint32_t h)
 {
+    m_rgbImage = QImage{int(w), int(h), QImage::Format_RGBA8888};
+    m_rgbImage.fill(Qt::black);
+    m_rgbPixelsWidth = m_rgbImage.bytesPerLine() / 4;
+    m_rgbPixels = reinterpret_cast<uint32_t *>(m_rgbImage.bits());
     {
         QMutexLocker lock(&m_syncVars);
-        m_rgbImage = QImage{int(w), int(h), QImage::Format_RGBA8888};
-        m_rgbImage.fill(Qt::black);
-        m_rgbPixelsWidth = m_rgbImage.bytesPerLine() / 4;
-        m_rgbPixels = reinterpret_cast<uint32_t *>(m_rgbImage.bits());
-        // the pending updates point to the old image
-        m_updates.clear();
+        m_frameImage = m_rgbImage.copy();
+        m_frameDirty = {};
     }
     rescale();
 }
 
 void ZxImage::rescale()
 {
-    {
-        QMutexLocker lock(&m_syncVars);
-        m_recreate = true;
-    }
     update(0, 0, m_rgbImage.width(), m_rgbImage.height());
-    emit needsUpdate();
+    // don't wait for the frame end, the emulation might be paused
+    publishFrame();
     emit geometryChanged(m_rgbImage.size());
 }
 
 QSize ZxImage::imageSize() const
 {
     QMutexLocker lock(&m_syncVars);
-    return m_rgbImage.size();
+    return m_frameImage.size();
+}
+
+ZxImage::Frame ZxImage::takeFrame()
+{
+    QMutexLocker lock(&m_syncVars);
+    return {m_frameImage, std::exchange(m_frameDirty, {})};
 }
 
 void ZxImage::update(int x, int y, int w, int h)
 {
-    QMutexLocker lock(&m_syncVars);
-
-    QRhiTextureSubresourceUploadDescription desc{m_rgbImage};
-    const QPoint topLeft{x, y};
-    desc.setSourceTopLeft(topLeft);
-    desc.setDestinationTopLeft(topLeft);
-    desc.setSourceSize({w, h});
-    m_updates.emplace_back(0, 0, desc);
+    m_dirty |= QRect{x, y, w, h};
 }
 
 void ZxImage::frameEnd()
 {
-    QMutexLocker lock(&m_syncVars);
-    if (!m_updates.empty() || m_recreate) {
-        m_recreate = false;
-        emit needsUpdate();
+    publishFrame();
+}
+
+void ZxImage::publishFrame()
+{
+    const QRect dirty = m_dirty & m_rgbImage.rect();
+    m_dirty = {};
+    if (dirty.isEmpty())
+        return;
+
+    {
+        QMutexLocker lock(&m_syncVars);
+        // bits() detaches m_frameImage if the renderer still holds a copy of it
+        auto *framePixels = reinterpret_cast<uint32_t *>(m_frameImage.bits());
+        const auto framePixelsWidth = m_frameImage.bytesPerLine() / 4;
+        for (int y = dirty.top(); y <= dirty.bottom(); ++y) {
+            std::memcpy(framePixels + framePixelsWidth * y + dirty.left(),
+                        m_rgbPixels + m_rgbPixelsWidth * y + dirty.left(),
+                        dirty.width() * sizeof(uint32_t));
+        }
+        m_frameDirty |= dirty;
     }
+    emit needsUpdate();
 }
 
 void ZxImage::saveScreen()
 {
-    m_savedImage = m_rgbImage;
+    m_savedImage = m_rgbImage.copy();
 }
 
 void ZxImage::restoreScreen()
 {
-    m_rgbImage = m_savedImage;
+    if (m_savedImage.size() != m_rgbImage.size())
+        return;
+    // copy the pixels, m_rgbPixels must keep pointing to m_rgbImage's buffer
+    std::memcpy(m_rgbPixels, m_savedImage.constBits(), m_rgbImage.sizeInBytes());
     update(0, 0, m_rgbImage.width(), m_rgbImage.height());
 }
 
 void ZxImage::putpixel(int x, int y, int colour)
 {
-    QMutexLocker lock(&m_syncVars);
     Q_ASSERT(colour < 16);
     Q_ASSERT(uint32_t(x) < m_rgbImage.width() && uint32_t(y) < m_rgbImage.height());
 
@@ -221,7 +237,6 @@ void ZxImage::putpixel(int x, int y, int colour)
 
 void ZxImage::plot8(int x, int y, libspectrum_byte data, libspectrum_byte ink, libspectrum_byte paper)
 {
-    QMutexLocker lock(&m_syncVars);
     Q_ASSERT(ink < 16 && paper < 16);
     const auto inkColor = palette[ink];
     const auto paperColor = palette[paper];
@@ -264,7 +279,6 @@ void ZxImage::plot8(int x, int y, libspectrum_byte data, libspectrum_byte ink, l
 
 void ZxImage::plot16(int x, int y, libspectrum_word data, libspectrum_byte ink, libspectrum_byte paper)
 {
-    QMutexLocker lock(&m_syncVars);
     Q_ASSERT(ink < 16 && paper < 16);
 
     const auto inkColor = palette[ink];
@@ -301,23 +315,35 @@ static QShader getShader(const QString &name)
         qWarning() << "Failed to open shader file:" << name;
         return QShader();
     }
-    return QShader::fromSerialized(f.readAll());
+    auto shader = QShader::fromSerialized(f.readAll());
+    if (!shader.isValid())
+        qWarning() << "Invalid shader file:" << name;
+    return shader;
+}
+
+template <typename Resource>
+static bool createResource(Resource *resource, const char *name)
+{
+    if (resource->create())
+        return true;
+    qWarning("ZxRhiRenderer: failed to create the %s", name);
+    return false;
 }
 
 void ZxRhiRenderer::initialize(QRhiCommandBuffer * /*cb*/)
 {
     if (m_rhi != rhi()) {
         m_rhi = rhi();
-        m_pipeline.reset();
+        invalidatePipeline();
     }
     if (m_sampleCount != renderTarget()->sampleCount()) {
         m_sampleCount = renderTarget()->sampleCount();
-        m_pipeline.reset();
+        invalidatePipeline();
     }
     QRhiTexture *finalTex = m_sampleCount > 1 ? resolveTexture() : colorTexture();
     if (m_textureFormat != finalTex->format()) {
         m_textureFormat = finalTex->format();
-        m_pipeline.reset();
+        invalidatePipeline();
     }
 }
 
@@ -330,31 +356,30 @@ void ZxRhiRenderer::synchronize(QQuickRhiItem *item)
     m_fillMode = zxScreen->fillMode();
     if (m_smoothScaling != zxScreen->smoothScaling()) {
         m_smoothScaling = zxScreen->smoothScaling();
-        m_pipeline.reset();
+        invalidatePipeline();
     }
 }
 
 void ZxRhiRenderer::render(QRhiCommandBuffer *cb)
 {
+    const auto frame = ZxImage::instance()->takeFrame();
     auto resourceUpdates = m_rhi->nextResourceUpdateBatch();
-    QSize imageSize;
-    {
-        auto zxImage = ZxImage::instance();
-        QMutexLocker lock(&zxImage->mutex());
-        auto &updates = zxImage->updates();
-        imageSize = zxImage->rgbImage().size();
-        if (!m_pipeline || m_texture->pixelSize() != imageSize) {
-            recreatePipeline(resourceUpdates, imageSize);
-            // the new texture has no content, upload the whole image now
-            if (m_pipeline)
-                resourceUpdates->uploadTexture(m_texture.get(), zxImage->rgbImage());
-            updates.clear();
-        } else if (!updates.empty()) {
-            QRhiTextureUploadDescription desc;
-            desc.setEntries(updates.cbegin(), updates.cend());
-            resourceUpdates->uploadTexture(m_texture.get(), desc);
-            updates.clear();
+    if (m_imageSize != frame.image.size() || (!m_pipeline && !m_pipelineFailed)) {
+        m_imageSize = frame.image.size();
+        m_pipelineFailed = false;
+        if (recreatePipeline(resourceUpdates)) {
+            // the new texture has no content, upload the whole image
+            resourceUpdates->uploadTexture(m_texture.get(), frame.image);
+        } else if (!m_imageSize.isEmpty()) {
+            // don't retry every frame, wait until the image size or the render target changes
+            m_pipelineFailed = true;
         }
+    } else if (m_pipeline && !frame.dirty.isEmpty()) {
+        QRhiTextureSubresourceUploadDescription desc(frame.image);
+        desc.setSourceTopLeft(frame.dirty.topLeft());
+        desc.setSourceSize(frame.dirty.size());
+        desc.setDestinationTopLeft(frame.dirty.topLeft());
+        resourceUpdates->uploadTexture(m_texture.get(), QRhiTextureUploadEntry(0, 0, desc));
     }
 
     if (m_pipeline) {
@@ -367,7 +392,7 @@ void ZxRhiRenderer::render(QRhiCommandBuffer *cb)
     cb->beginPass(renderTarget(), Qt::black, { 1.0f, 0 }, resourceUpdates);
     if (m_pipeline) {
         const QSize outputSize = renderTarget()->pixelSize();
-        const QRect rect = ZxScreen::imageRect(imageSize, outputSize, m_fillMode);
+        const QRect rect = ZxScreen::imageRect(m_imageSize, outputSize, m_fillMode);
         // QRhiViewport's origin is bottom-left
         cb->setViewport(QRhiViewport(rect.x(), outputSize.height() - rect.y() - rect.height(),
                                      rect.width(), rect.height()));
@@ -380,13 +405,20 @@ void ZxRhiRenderer::render(QRhiCommandBuffer *cb)
     cb->endPass();
 }
 
-void ZxRhiRenderer::recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates, QSize imageSize)
+void ZxRhiRenderer::invalidatePipeline()
 {
     m_pipeline.reset();
-    if (imageSize.isEmpty())
-        return;
-    m_texture.reset(m_rhi->newTexture(QRhiTexture::RGBA8, imageSize));
-    m_texture->create();
+    m_pipelineFailed = false;
+}
+
+bool ZxRhiRenderer::recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates)
+{
+    m_pipeline.reset();
+    if (m_imageSize.isEmpty())
+        return false;
+    m_texture.reset(m_rhi->newTexture(QRhiTexture::RGBA8, m_imageSize));
+    if (!createResource(m_texture.get(), "texture"))
+        return false;
 
     static const float vertices[] = {
         // Triangle strip that makes 2 CCW triangles
@@ -398,19 +430,22 @@ void ZxRhiRenderer::recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates, Q
     };
 
     m_vertexBuffer.reset(m_rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, sizeof(vertices)));
-    m_vertexBuffer->create();
-    resourceUpdates->uploadStaticBuffer(m_vertexBuffer.get(), vertices);
+    if (!createResource(m_vertexBuffer.get(), "vertex buffer"))
+        return false;
 
     m_uniformBuffer.reset(m_rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 64));
-    m_uniformBuffer->create();
+    if (!createResource(m_uniformBuffer.get(), "uniform buffer"))
+        return false;
 
     m_pushConstantsBuffer.reset(m_rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 64));
-    m_pushConstantsBuffer->create();
+    if (!createResource(m_pushConstantsBuffer.get(), "push constants buffer"))
+        return false;
 
     const auto filter = m_smoothScaling ? QRhiSampler::Linear : QRhiSampler::Nearest;
     m_sampler.reset(m_rhi->newSampler(filter, filter, QRhiSampler::None,
                                       QRhiSampler::Mirror, QRhiSampler::Mirror));
-    m_sampler->create();
+    if (!createResource(m_sampler.get(), "sampler"))
+        return false;
 
     m_srb.reset(m_rhi->newShaderResourceBindings());
     m_srb->setBindings({
@@ -418,12 +453,18 @@ void ZxRhiRenderer::recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates, Q
         QRhiShaderResourceBinding::uniformBuffer(1, QRhiShaderResourceBinding::VertexStage | QRhiShaderResourceBinding::FragmentStage, m_pushConstantsBuffer.get()),
         QRhiShaderResourceBinding::sampledTexture(2, QRhiShaderResourceBinding::FragmentStage, m_texture.get(), m_sampler.get()),
     });
-    m_srb->create();
+    if (!createResource(m_srb.get(), "shader resource bindings"))
+        return false;
 
-    m_pipeline.reset(m_rhi->newGraphicsPipeline());
-    m_pipeline->setShaderStages({
-        { QRhiShaderStage::Vertex, getShader(QLatin1String(":/shaders/simple.vert.qsb")) },
-        { QRhiShaderStage::Fragment, getShader(QLatin1String(":/shaders/simple.frag.qsb")) }
+    const auto vertexShader = getShader(QLatin1String(":/shaders/simple.vert.qsb"));
+    const auto fragmentShader = getShader(QLatin1String(":/shaders/simple.frag.qsb"));
+    if (!vertexShader.isValid() || !fragmentShader.isValid())
+        return false;
+
+    std::unique_ptr<QRhiGraphicsPipeline> pipeline{m_rhi->newGraphicsPipeline()};
+    pipeline->setShaderStages({
+        { QRhiShaderStage::Vertex, vertexShader },
+        { QRhiShaderStage::Fragment, fragmentShader }
     });
 
     QRhiVertexInputLayout inputLayout;
@@ -432,14 +473,19 @@ void ZxRhiRenderer::recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates, Q
         QRhiVertexInputAttribute(0, 0, QRhiVertexInputAttribute::Float4, 0),
         QRhiVertexInputAttribute(0, 1, QRhiVertexInputAttribute::Float2, 4 * sizeof(float))
     });
-    m_pipeline->setVertexInputLayout(inputLayout);
-    m_pipeline->setSampleCount(m_sampleCount);
+    pipeline->setVertexInputLayout(inputLayout);
+    pipeline->setSampleCount(m_sampleCount);
 
-    m_pipeline->setShaderResourceBindings(m_srb.get());
-    m_pipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
-    m_pipeline->setCullMode(QRhiGraphicsPipeline::None);
-    m_pipeline->setFrontFace(QRhiGraphicsPipeline::CCW);
-    m_pipeline->setTopology(QRhiGraphicsPipeline::TriangleStrip);
+    pipeline->setShaderResourceBindings(m_srb.get());
+    pipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
+    pipeline->setCullMode(QRhiGraphicsPipeline::None);
+    pipeline->setFrontFace(QRhiGraphicsPipeline::CCW);
+    pipeline->setTopology(QRhiGraphicsPipeline::TriangleStrip);
 
-    m_pipeline->create();
+    if (!createResource(pipeline.get(), "graphics pipeline"))
+        return false;
+
+    resourceUpdates->uploadStaticBuffer(m_vertexBuffer.get(), vertices);
+    m_pipeline = std::move(pipeline);
+    return true;
 }
