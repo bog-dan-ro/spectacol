@@ -36,6 +36,7 @@ Q_MOC_INCLUDE("fusesettings.h")
 #include <QUrl>
 
 #include <atomic>
+#include <memory>
 
 extern "C"  {
 # include <ui/ui.h>
@@ -54,19 +55,19 @@ class FuseThread : public QThread
 {
 public:
     FuseThread();
+    ~FuseThread() override;
     int soundLowlevelInit(const char */*device*/, int *freqptr, int *stereoptr);
     void soundLowlevelFrame(libspectrum_signed_word *data, int len);
-    void soundLowlevelEnd(void) {}
+    void soundLowlevelEnd();
 
 protected:
     void run();
 
 private:
-    QScopedPointer<QAudioSink> m_audioOutput;
+    // Created, used and destroyed only on the FUSE thread
+    std::unique_ptr<QAudioSink> m_audioOutput;
+    QIODevice *m_audioOutputDevice = nullptr;
     QAudioFormat m_audioFormat;
-    QPointer<QIODevice> m_audioOutputDevice;
-    std::chrono::time_point<std::chrono::steady_clock> m_startFrameTime;
-    int64_t m_uSleepTotal = 0;
 };
 
 class FuseEmulator : public FuseObject
@@ -234,7 +235,7 @@ public:
 
     int soundLowlevelInit(const char */*device*/, int *freqptr, int *stereoptr);
     void soundLowlevelFrame(libspectrum_signed_word *data, int len);
-    void soundLowlevelEnd(void) {}
+    void soundLowlevelEnd();
 
     // Kempston mouse
     void mouseButton(Qt::MouseButton button, bool pressed);

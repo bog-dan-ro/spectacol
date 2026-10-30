@@ -16,7 +16,6 @@
 */
 
 #include "fuseemulator.h"
-#include "zximage.h"
 #include "fusesettings.h"
 #include "fuserecording.h"
 
@@ -25,6 +24,7 @@
 #include <QAudioDevice>
 #include <QAudioSink>
 #include <QDateTime>
+#include <QDeadlineTimer>
 #include <QDir>
 #include <QDirIterator>
 #include <QGuiApplication>
@@ -37,7 +37,6 @@
 #include <QStandardPaths>
 #include <QTimer>
 
-#include <mutex>
 #include <thread>
 
 extern "C"  {
@@ -50,6 +49,7 @@ extern "C"  {
 # include <pokefinder/pokemem.h>
 # include <settings.h>
 # include <snapshot.h>
+# include <sound.h>
 # include <ui/scaler/scaler.h>
 # include <utils.h>
 # include <z80/z80.h>
@@ -82,51 +82,80 @@ FuseThread::FuseThread()
     setPriority(QThread::HighestPriority);
 }
 
+FuseThread::~FuseThread() = default;
+
+static constexpr std::chrono::microseconds AudioBufferDuration{80'000};
+
 int FuseThread::soundLowlevelInit(const char *, int *freqptr, int *stereoptr)
 {
-    QAudioFormat format;
-    format.setChannelConfig(*stereoptr ? QAudioFormat::ChannelConfig::ChannelConfigStereo
-                                       : QAudioFormat::ChannelConfig::ChannelConfigMono);
-    format.setSampleFormat(QAudioFormat::SampleFormat::Int16);
+    soundLowlevelEnd();
 
-    m_audioFormat = format;
-    auto info = QMediaDevices::defaultAudioOutput();
-    if (!info.isFormatSupported(format)) {
-        m_audioOutputDevice.clear();
-        return 0;
+    const auto device = QMediaDevices::defaultAudioOutput();
+    if (device.isNull()) {
+        qWarning() << "No audio output device, the sound is disabled";
+        return 1;
     }
 
-    m_audioOutput.reset(new QAudioSink(format));
+    QAudioFormat format;
+    format.setSampleFormat(QAudioFormat::Int16);
+    format.setSampleRate(*freqptr);
+    format.setChannelCount(*stereoptr != SOUND_STEREO_AY_NONE ? 2 : 1);
+    // FUSE can generate any sample rate and mono instead of stereo, tell it what we got
+    if (!device.isFormatSupported(format))
+        format.setSampleRate(device.preferredFormat().sampleRate());
+    if (!device.isFormatSupported(format) && format.channelCount() == 2)
+        format.setChannelCount(1);
+    if (!device.isFormatSupported(format)) {
+        qWarning() << "The audio output doesn't support" << format << ", the sound is disabled";
+        return 1;
+    }
+    *freqptr = format.sampleRate();
+    if (format.channelCount() == 1)
+        *stereoptr = SOUND_STEREO_AY_NONE;
+
+    m_audioOutput = std::make_unique<QAudioSink>(device, format);
+    m_audioOutput->setBufferSize(format.bytesForDuration(AudioBufferDuration.count()));
     m_audioOutputDevice = m_audioOutput->start();
-    m_uSleepTotal = 0;
+    if (!m_audioOutputDevice) {
+        qWarning() << "Can't start the audio output:" << m_audioOutput->error() << ", the sound is disabled";
+        m_audioOutput.reset();
+        return 1;
+    }
+    m_audioOutputDevice->write(QByteArray(format.bytesForDuration(AudioBufferDuration.count() / 2), 0));
+    m_audioFormat = format;
     return 0;
 }
 
 void FuseThread::soundLowlevelFrame(libspectrum_signed_word *data, int len)
 {
-    if (!m_audioOutputDevice) {
-        std::this_thread::sleep_for(std::chrono::microseconds(m_audioFormat.durationForBytes(len * 2)));
+    if (!m_audioOutputDevice)
         return;
-    }
-    auto now = std::chrono::steady_clock::now();
-    if (m_uSleepTotal) {
-        auto sleepTime = m_uSleepTotal - std::chrono::duration_cast<std::chrono::microseconds>(now - m_startFrameTime).count();
-        if (sleepTime > 0)
-            std::this_thread::sleep_for(std::chrono::microseconds(sleepTime));
-    }
 
-    m_startFrameTime = now;
-    m_uSleepTotal = m_audioFormat.durationForBytes(len * 2);
-    while (len) {
-        auto written = m_audioOutputDevice->write((const char *)data, len * 2);
-        if (!written) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            continue;
+    auto bytes = reinterpret_cast<const char *>(data);
+    qint64 size = len * qint64(sizeof(libspectrum_signed_word));
+    const QDeadlineTimer deadline{std::chrono::duration_cast<std::chrono::milliseconds>(
+        AudioBufferDuration + std::chrono::microseconds(m_audioFormat.durationForBytes(size))) * 2};
+    while (size > 0) {
+        const auto written = m_audioOutputDevice->write(bytes, size);
+        if (written < 0 || m_audioOutput->error() != QAudio::NoError) {
+            qWarning() << "Audio output error:" << m_audioOutput->error() << ", the sound is disabled";
+            soundLowlevelEnd();
+            return;
         }
-        written /= 2;
-        data += written;
-        len -= written;
+        bytes += written;
+        size -= written;
+        if (size > 0) {
+            if (deadline.hasExpired())
+                return;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
+}
+
+void FuseThread::soundLowlevelEnd()
+{
+    m_audioOutputDevice = nullptr;
+    m_audioOutput.reset();
 }
 
 void FuseThread::run()
@@ -149,7 +178,7 @@ void FuseThread::run()
     }
 
     fuse_main(argc, (char**)argv);
-    m_audioOutput.reset();
+    soundLowlevelEnd();
     // don't call quit() directly, from a secondary thread it waits for the GUI thread,
     // which might be waiting for us in FuseEmulator::stopFuseThread
     QMetaObject::invokeMethod(qApp, &QCoreApplication::quit, Qt::QueuedConnection);
@@ -777,6 +806,11 @@ QString FuseEmulator::saveFilePath(const QString &fileName)
 int FuseEmulator::soundLowlevelInit(const char *device, int *freqptr, int *stereoptr)
 {
     return m_fuseThread.soundLowlevelInit(device, freqptr, stereoptr);
+}
+
+void FuseEmulator::soundLowlevelEnd()
+{
+    m_fuseThread.soundLowlevelEnd();
 }
 
 void FuseEmulator::soundLowlevelFrame(libspectrum_signed_word *data, int len)
