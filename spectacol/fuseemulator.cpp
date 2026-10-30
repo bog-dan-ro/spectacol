@@ -774,9 +774,16 @@ int FuseEmulator::pokeFinderCount() const
 
 void FuseEmulator::setProcessInputEvents(bool processEvents)
 {
-   bool expect = !processEvents;
-   if (m_processInputEvents.compare_exchange_strong(expect, processEvents))
-       emit processInputEventsChanged();
+    // Several pages and on-screen controls block the input independently,
+    // e.g. a page opened from the menu while the menu is still closing.
+    if (processEvents) {
+        if (!m_inputEventsBlockers || --m_inputEventsBlockers)
+            return;
+    } else if (m_inputEventsBlockers++) {
+        return;
+    }
+    m_processInputEvents.store(processEvents);
+    emit processInputEventsChanged();
 }
 
 void FuseEmulator::setGamepadId(int gamepadId)

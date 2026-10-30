@@ -39,22 +39,14 @@ struct trainer_t *getTrainer(int index)
     return reinterpret_cast<trainer_t*>(item->data);
 }
 
-int trainers()
-{
-    int count = 0;
-    GSList *item = trainer_list;
-    for (;item; ++count)
-        item = item->next;
-    return count;
-}
-
 }
 
 PokeModel::PokeModel()
 {
-    pokeEvent([this]{
+    QPointer<PokeModel> self = this;
+    pokeEvent([self]{
         pokemem_autoload_pokfile();
-        update();
+        publishTrainers(self);
     });
 }
 
@@ -63,23 +55,21 @@ int PokeModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
 
-    return trainers();
+    return m_trainers.size();
 }
 
 QVariant PokeModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() < 0)
+    if (!index.isValid() || size_t(index.row()) >= m_trainers.size())
         return {};
-    auto trainer = getTrainer(index.row());
-    if (!trainer)
-        return {};
+    const auto &trainer = m_trainers[index.row()];
     switch (role) {
     case Label:
-            return QLatin1String(trainer->name);
+            return trainer.name;
     case Active:
-            return bool(trainer->active);
+            return trainer.active;
     case Disabled:
-            return bool(trainer->disabled);
+            return trainer.disabled;
     default:
         return {};
     }
@@ -95,11 +85,27 @@ QHash<int, QByteArray> PokeModel::roleNames() const
     return roles;
 }
 
+void PokeModel::publishTrainers(const QPointer<PokeModel> &self)
+{
+    auto trainers = std::make_shared<Trainers>();
+    for (GSList *item = trainer_list; item; item = item->next) {
+        auto trainer = reinterpret_cast<trainer_t*>(item->data);
+        trainers->push_back({QLatin1String(trainer->name), bool(trainer->active), bool(trainer->disabled)});
+    }
+    FuseEmulator::instance().callFunction([self, trainers]{
+        if (!self)
+            return;
+        self->beginResetModel();
+        self->m_trainers = std::move(*trainers);
+        self->endResetModel();
+    });
+}
+
 void PokeModel::update()
 {
-    callFunction([this]{
-        beginResetModel();
-        endResetModel();
+    QPointer<PokeModel> self = this;
+    pokeEvent([self]{
+        publishTrainers(self);
     });
 }
 
@@ -121,39 +127,42 @@ void PokeModel::addPoke(int bank, int address, int value)
         return;
     }
 
-    pokeEvent([this, bank, address, value]{
+    QPointer<PokeModel> self = this;
+    pokeEvent([self, bank, address, value]{
         auto trainer = pokemem_trainer_list_add(bank, address, value);
         if (!trainer->disabled)
             pokemem_trainer_activate(trainer);
-        callFunction([this] {
-            beginResetModel();
-            endResetModel();
-        });
+        publishTrainers(self);
     });
 }
 
 void PokeModel::setActive(int row, bool active)
 {
-    pokeEvent([this, row, active] {
-        if (auto trainer = getTrainer(row)) {
-            if (active)
-                pokemem_trainer_activate(trainer);
-            else
-                pokemem_trainer_deactivate(trainer);
-            callFunction([this, row] {
-                emit dataChanged(index(row), index(row));
-            });
-        }
+    QPointer<PokeModel> self = this;
+    pokeEvent([self, row, active] {
+        auto trainer = getTrainer(row);
+        if (!trainer)
+            return;
+        if (active)
+            pokemem_trainer_activate(trainer);
+        else
+            pokemem_trainer_deactivate(trainer);
+        // FUSE refuses to activate a disabled trainer, report what it did
+        const bool isActive = trainer->active;
+        FuseEmulator::instance().callFunction([self, row, isActive] {
+            if (!self || size_t(row) >= self->m_trainers.size())
+                return;
+            self->m_trainers[row].active = isActive;
+            emit self->dataChanged(self->index(row), self->index(row), {Active});
+        });
     });
 }
 
 void PokeModel::clear()
 {
-    pokeEvent([this]{
+    QPointer<PokeModel> self = this;
+    pokeEvent([self]{
         pokemem_clear();
-        callFunction([this] {
-            beginResetModel();
-            endResetModel();
-        });
+        publishTrainers(self);
     });
 }

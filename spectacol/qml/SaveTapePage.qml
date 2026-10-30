@@ -16,7 +16,6 @@
 */
 
 import QtQuick
-import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Controls
@@ -33,7 +32,7 @@ Rectangle {
     {
         FuseEmulator.tape.write(FuseEmulator.savesPath() + fileNameEdit.text +
                         (fileNameEdit.text.charAt(fileNameEdit.text.length - 4) === '.' ? "" : ".tzx"))
-        onClicked: pageLoader.source = ""
+        pageLoader.source = ""
     }
 
     ColumnLayout {
@@ -52,7 +51,7 @@ Rectangle {
             }
             FancyText {
                 id: ext
-                text: ".txz"
+                text: ".tzx"
             }
         }
 

@@ -25,10 +25,13 @@ extern "C"  {
 # include <libspectrum.h>
 }
 
+// The tape belongs to the FUSE thread: the blocks are read there, asynchronously,
+// and the block selection is sent there.
 class FuseTapeData : public FuseListModel
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_PROPERTY(int currentBlock READ currentBlock NOTIFY currentBlockChanged)
     enum {
         Label = Qt::DisplayRole,
         Detail = Qt::UserRole + 1,
@@ -44,14 +47,15 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+    int currentBlock() const { return m_currentBlock; }
+
+signals:
+    void currentBlockChanged();
+
 public slots:
-    int currentIndex() const;
-    void setCurrentIndex(int block);
+    void selectBlock(int block);
     QByteArray base64CompressedBlockData(int index) const;
     int getBufferLength(int index);
-
-private:
-    static void addBlockInfo(libspectrum_tape_block *block, void *user_data);
 
 private:
     struct TapeData {
@@ -60,5 +64,12 @@ private:
         QByteArray data;
         int length = 0;
     };
-    std::vector<TapeData> m_tapeBlocks;
+    using TapeBlocks = std::vector<TapeData>;
+
+    static void addBlockInfo(libspectrum_tape_block *block, void *user_data);
+    void setCurrentBlock(int block);
+
+private:
+    TapeBlocks m_tapeBlocks;
+    int m_currentBlock = -1;
 };

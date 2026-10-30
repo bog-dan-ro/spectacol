@@ -226,6 +226,7 @@ public:
     int pokeFinderCount() const;
 
     bool processInputEvents() const { return m_processInputEvents.load(); }
+    // Like paused, it nests: every false must be balanced by a true.
     void setProcessInputEvents(bool processEvents);
 
     int gamepadId() const { return m_gamepadId; }
@@ -378,6 +379,7 @@ private:
     std::atomic_bool m_debuggerActivated;
     bool m_resetPokeFinder;
     std::atomic_bool m_processInputEvents;
+    int m_inputEventsBlockers = 0;
     bool m_mouseGrabbed = false;
     int m_gamepadId = -1;
     ZXGamesModel m_onlineGamesModel;

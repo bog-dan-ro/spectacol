@@ -18,6 +18,7 @@
 // @scope main.qml
 
 import QtQuick
+import QtQml.Models
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
@@ -28,7 +29,13 @@ Item {
     property alias focused: view.focus
     signal breakpointSelected(var item)
 
-    VisualDataModel {
+    function removeCurrent() {
+        if (view.currentIndex < 0 || view.currentIndex >= view.count)
+            return;
+        FuseEmulator.debuggerCommand("delete " + visualModel.items.get(view.currentIndex).model.id);
+    }
+
+    DelegateModel {
         id: visualModel
         model: FuseEmulator.breakpointsModel
         delegate: Rectangle {
@@ -51,7 +58,7 @@ Item {
                     text: model.id
                 }
 
-                Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyText {
                     Layout.fillHeight: true
@@ -64,7 +71,7 @@ Item {
                     text: model.type + "," + model.life
                 }
 
-                Item { Layout.fillWidth: false; width: 1.5 * Screen.pixelDensity }
+                Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyText {
                     Layout.fillHeight: true
@@ -93,12 +100,10 @@ Item {
         highlightFollowsCurrentItem: true
         focus: true
 
-        Layout.fillHeight: true
-        Layout.fillWidth: true
         Keys.onPressed: (event) => {
             switch (event.key) {
             case Qt.Key_Y:
-                FuseEmulator.debuggerCommand("delete " + visualModel.items.get(view.currentIndex).model.id);
+                removeCurrent();
                 break;
             case Qt.Key_X:
                 FuseEmulator.debuggerCommand("delete");
@@ -108,18 +113,23 @@ Item {
 
         model: visualModel
         footer: RowLayout {
+            width: view.width
             Button {
                 Layout.alignment: Qt.AlignVCenter
-                enabled: view.currentIndex !== -1
+                Layout.fillWidth: true
+                Layout.maximumWidth: implicitWidth
+                enabled: view.currentIndex >= 0 && view.currentIndex < view.count
                 text:"Remove <b>(Y)</b>"
-                onClicked: FuseEmulator.debuggerCommand("delete " + visualModel.items.get(view.currentIndex).model.id)
+                onClicked: removeCurrent()
             }
             Item {
                 Layout.fillWidth: true
             }
             Button {
                 Layout.alignment: Qt.AlignVCenter
-                enabled: view.currentIndex !== -1
+                Layout.fillWidth: true
+                Layout.maximumWidth: implicitWidth
+                enabled: view.count > 0
                 text:"Remove All <b>(X)</b>"
                 onClicked: FuseEmulator.debuggerCommand("delete")
             }

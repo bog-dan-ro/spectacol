@@ -18,7 +18,6 @@
 // @scope main.qml
 
 import QtQuick
-import QtQuick.Layouts
 import QtCore
 import Spectacol
 
@@ -29,7 +28,7 @@ SaveFilePage {
 
     title: qsTr("Snapshot name:")
     folder: FuseEmulator.dataPath + "/Snapshots/"
-    onAccpeted: {
+    onAccepted: {
         pageLoader.source = "";
     }
 

@@ -16,7 +16,6 @@
 */
 
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Window
 import QtGamepadLegacy
 import Spectacol
@@ -63,19 +62,19 @@ Item {
     }
     Keys.onPressed: (event) => {
         if (event.key === Qt.Key_Escape) {
-            event.accept = true;
+            event.accepted = true;
         } else if (event.key === Qt.Key_Return) {
-            event.accept = true;
+            event.accepted = true;
             pressKey(zx48Keyboard.get(grid.currentIndex).code);
         }
     }
 
     Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Escape) {
-            event.accept = true;
+            event.accepted = true;
             onScreenKeyboard.visible = false;
         } else if (event.key === Qt.Key_Return) {
-            event.accept = true;
+            event.accepted = true;
             releaseKey(zx48Keyboard.get(grid.currentIndex).code);
         }
     }
@@ -223,7 +222,7 @@ Item {
     }
 
     Component {
-        id: highlight
+        id: highlightComponent
         Rectangle {
             id: rect
             visible: gamepadMode
@@ -245,7 +244,7 @@ Item {
 
     GridView {
         id: grid
-        highlight: highlight
+        highlight: highlightComponent
         focus: onScreenKeyboard.visible
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -268,12 +267,11 @@ Item {
 
         delegate: Rectangle {
             id: rec
-            property bool pressed: true
             width: grid.cellWidth - (Screen.pixelDensity / TextSizes.scaleImage)
             height: grid.cellHeight - (Screen.pixelDensity / TextSizes.scaleImage)
             radius: ((mainScreen.portrait ? 1 : 2) * Screen.pixelDensity) / TextSizes.scaleImage
-            color: (code == Qt.Key_Control && capsPressed) ||
-                   (code == Qt.Key_Shift && symbolPressed) ? "blue"
+            color: (code === Qt.Key_Control && capsPressed) ||
+                   (code === Qt.Key_Shift && symbolPressed) ? "blue"
                                                            : Qt.rgba(0.5, 0.5, 0.5, 0.75);
             Text {
                 id: letterItem
@@ -299,7 +297,7 @@ Item {
                 anchors.left: parent.left
                 anchors.margins: parent.radius
                 style: Text.Outline
-                styleColor: buttonColor && buttonColor == "black" ? "white" : "black"
+                styleColor: buttonColor === "black" ? "white" : "black"
                 color: buttonColor ? buttonColor : "green"
                 font.family: 'Monospace'
                 font.bold: true

@@ -252,6 +252,6 @@ void FolderListModel::refresh()
                 s_currentIndexes.insert(key, oldIndex);
             }
         }
-        emit currentIndexChanged(m_currentIndex);
     }
+    emit currentIndexChanged(m_currentIndex);
 }

@@ -20,7 +20,7 @@ import QtQuick
 Canvas {
     id: canvas
     anchors.fill: parent
-    property color backgroundColor: Qt.transparent
+    property color backgroundColor: "transparent"
     property color strokeColor: "black"
     property color gamepadFillColor: "lightgray"
 

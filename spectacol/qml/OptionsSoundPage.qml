@@ -28,7 +28,6 @@ Flickable {
     contentHeight: pane.height
     Component.onCompleted: FuseEmulator.paused = true
     Component.onDestruction: FuseEmulator.paused = false
-    anchors.margins: Screen.pixelDensity
 
     function getIndex(data, str) {
         for (var i = 0; i < data.length; ++i)
@@ -77,7 +76,7 @@ Flickable {
                 Layout.fillWidth: true
                 Label {
                     text: qsTr("AY stereo separation")
-                    anchors.verticalCenter: parent.verticalCenter
+                    Layout.alignment: Qt.AlignVCenter
                 }
 
                 ComboBox {
@@ -108,7 +107,7 @@ Flickable {
                 Layout.fillWidth: true
                 Label {
                     text: qsTr("Speaker type")
-                    anchors.verticalCenter: parent.verticalCenter
+                    Layout.alignment: Qt.AlignVCenter
                 }
 
                 ComboBox {
@@ -136,7 +135,7 @@ Flickable {
 
 
             Button {
-                anchors.horizontalCenter: parent.horizontalCenter
+                Layout.alignment: Qt.AlignHCenter
                 text: qsTr("Close (B)")
                 onClicked: pageLoader.source = ""
             }

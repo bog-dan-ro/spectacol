@@ -75,7 +75,9 @@ Rectangle {
 
         message.text = msg + text;
 
-        timer.interval = 2500 * (text.length / 20)
+        // about 2.5s for every 20 characters, but long enough to notice and not
+        // longer than it takes to read the 3 visible lines
+        timer.interval = Math.min(8000, Math.max(2500, 2500 * text.length / 20));
 
         timer.restart();
         msgDialog.visible = true;

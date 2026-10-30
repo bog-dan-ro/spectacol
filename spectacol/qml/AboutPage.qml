@@ -34,8 +34,9 @@ Pane {
         buttonBKey: Qt.Key_Escape
     }
     focus: true
-    Keys.onLeftPressed: tabbar.currentIndex--
-    Keys.onRightPressed: tabbar.currentIndex++
+    // don't assign the index: it would break the TabBar <-> SwipeView bindings
+    Keys.onLeftPressed: view.decrementCurrentIndex()
+    Keys.onRightPressed: view.incrementCurrentIndex()
 
     ColumnLayout {
         anchors.fill: parent
@@ -70,7 +71,7 @@ Pane {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignTop
                     text: qsTr("Spectacol (in Romanian it means <b>show</b>) is a <a href=\"https://github.com/bog-dan-ro/spectacol\"><b>free (GPL v3+)</b></a> ZX Spectrum emulator
-                            based on famous <a href=\"http://fuse-emulator.sf.net\">FUSE Spectrum emulator</a>. <br />
+                            based on famous <a href=\"https://fuse-emulator.sourceforge.net\">FUSE Spectrum emulator</a>. <br />
                             FUSE emulator has, by far, the richest ZX features list. <b>Spectacol</b> enables the following features:
                             <ul>
                                 <li> Loads all ZX Spectrum files

@@ -18,12 +18,12 @@
 // @scope main.qml
 
 import QtQuick
+import QtQml.Models
 import QtQuick.Layouts
 import QtQuick.Window
-import QtQml.Models 2.2
 import QtQuick.Controls
-import Spectacol
 import QtGamepadLegacy
+import Spectacol
 import "private"
 
 Rectangle {
@@ -40,10 +40,25 @@ Rectangle {
         FuseEmulator.paused = false;
     }
 
+    readonly property bool hasCurrentLocation: view.currentIndex >= 0 && view.currentIndex < view.count
+
     function addBreakpoint(type)
     {
-        var model = visualModel.items.get(view.currentIndex).model;
+        if (!hasCurrentLocation)
+            return;
+        const model = visualModel.items.get(view.currentIndex).model;
         FuseEmulator.addBreakpointPage(model.offset, model.page, type);
+    }
+
+    // The locations are listed only when there are at most 20 of them.
+    function resetCurrentLocation()
+    {
+        view.currentIndex = FuseEmulator.pokeFinderCount <= 20 ? 0 : -1;
+    }
+
+    Connections {
+        target: FuseEmulator
+        function onPokeFinderCountChanged() { resetCurrentLocation(); }
     }
 
     GamepadKeyNavigation {
@@ -157,14 +172,14 @@ Rectangle {
                 Button {
                     id: buttonBW
                     Layout.fillWidth: true
-                    enabled: view.currentIndex !== -1
+                    enabled: hasCurrentLocation
                     text: qsTr("Break on write <b>(L1)</b>")
                     onClicked: addBreakpoint(BreakpointsModel.BreakOnWrite);
                 }
                 Button {
                     id: buttonBR
                     Layout.fillWidth: true
-                    enabled: view.currentIndex !== -1
+                    enabled: hasCurrentLocation
                     text: qsTr("Break on read <b>(R1)</b>")
                     onClicked: addBreakpoint(BreakpointsModel.BreakOnRead);
                 }
@@ -184,7 +199,7 @@ Rectangle {
                     text: qsTr("Possible locations: ") + FuseEmulator.pokeFinderCount
                 }
 
-                VisualDataModel {
+                DelegateModel {
                     id: visualModel
                     model: FuseEmulator.pokeFinderModel
                     delegate: Rectangle {
@@ -207,7 +222,7 @@ Rectangle {
                                 text: model.page
                             }
 
-                            Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
+                            Item { Layout.fillWidth: false; Layout.preferredWidth: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                             FancyText {
                                 Layout.fillHeight: true
@@ -220,11 +235,12 @@ Rectangle {
                                 text: model.offsetText
                             }
 
-                            Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
+                            Item { Layout.fillWidth: false; Layout.preferredWidth: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                             FancyText {
                                 Layout.fillHeight: true
                                 Layout.fillWidth: false
+                                Layout.preferredWidth: 3 * TextSizes.scale12
                                 horizontalAlignment: Text.AlignLeft
                                 font.pixelSize: TextSizes.scale12
                                 color: ink
@@ -232,7 +248,7 @@ Rectangle {
                                 text: model.value
                             }
 
-                            Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
+                            Item { Layout.fillWidth: false; Layout.preferredWidth: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                             FancyText {
                                 Layout.fillHeight: true
@@ -274,9 +290,10 @@ Rectangle {
 
                         model: visualModel
 
-                        currentIndex: FuseEmulator.pokeFinderCount <= 20 ? 0 : -1
+                        Component.onCompleted: resetCurrentLocation()
 
-                        header: Rectangle {
+                        header: Item {
+                            width: view.width
                             height: 2 * TextSizes.scale12
                             RowLayout {
                                 anchors.fill: parent
@@ -284,41 +301,42 @@ Rectangle {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: false
                                     Layout.preferredWidth: 5 * TextSizes.scale12
-                                    Layout.alignment: Qt.AlignRight
+                                    horizontalAlignment: Text.AlignRight
                                     font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Bank"
                                 }
 
-                                Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
+                                Item { Layout.fillWidth: false; Layout.preferredWidth: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                                 FancyText {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: false
                                     Layout.preferredWidth: 6 * TextSizes.scale12
-                                    Layout.alignment: Qt.AlignLeft
+                                    horizontalAlignment: Text.AlignHCenter
                                     font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Offset"
                                 }
 
-                                Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
+                                Item { Layout.fillWidth: false; Layout.preferredWidth: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                                 FancyText {
                                     Layout.fillHeight: true
                                     Layout.fillWidth: false
-                                    horizontalAlignment: Text.AlignHCenter
+                                    Layout.preferredWidth: 3 * TextSizes.scale12
+                                    horizontalAlignment: Text.AlignLeft
                                     font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Value"
                                 }
 
-                                Item { Layout.fillWidth: false; width: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
+                                Item { Layout.fillWidth: false; Layout.preferredWidth: TextSizes.smallScreen ? 0 : 1.5 * Screen.pixelDensity }
 
                                 FancyText {
                                     Layout.fillHeight: true
-                                    Layout.fillWidth: false
-                                    horizontalAlignment: Text.AlignRight
+                                    Layout.fillWidth: true
+                                    horizontalAlignment: Text.AlignLeft
                                     font.pixelSize: TextSizes.scale12
                                     style: Text.Normal
                                     text: "Breakpoint"

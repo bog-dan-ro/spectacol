@@ -78,21 +78,33 @@ void DisassambleModel::disassambleMore(DisassambleModel::Origin origin, int size
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         if (!m_disassambleData.empty()) {
-            if (origin == Start)
+            if (origin == Start) {
                 addr = m_disassambleData.front().address;
-            else
-                addr = m_disassambleData.back().address;
-            if (!addr)
-                return;
+                if (!addr)
+                    return;
+            } else {
+                // continue after the last instruction, don't disassemble it again
+                const auto &last = m_disassambleData.back();
+                const int next = last.address + last.bytes.size();
+                if (next > 0xffff)
+                    return; // m_canFetchMore stays false (see fetchMore)
+                addr = next;
+            }
         }
     }
     auto data = disassambleTemp(addr, origin == Start ? -size : 0, size);
-    callFunction([this, size, origin, data]{
+    callFunction([this, origin, data]{
+        if (data->empty())
+            return;
         std::lock_guard<std::mutex> lock(m_mutex);
         int first = (origin == Start) ? 0 : m_disassambleData.size();
-        beginInsertRows(QModelIndex(), first, first + size -1);
+        beginInsertRows(QModelIndex(), first, first + int(data->size()) - 1);
         m_disassambleData.insert(origin == Start ? m_disassambleData.begin() : m_disassambleData.end(), data->begin(), data->end());
         endInsertRows();
+        if (origin == End) {
+            const auto &last = m_disassambleData.back();
+            m_canFetchMore = last.address + last.bytes.size() <= 0xffff;
+        }
     });
 }
 
@@ -169,6 +181,9 @@ bool DisassambleModel::canFetchMore(const QModelIndex &parent) const
 void DisassambleModel::fetchMore(const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid());
+    // Don't let the view request the same block again while this one is pending,
+    // disassambleMore sets it back once the rows are inserted.
+    m_canFetchMore = false;
     pokeEvent([this]{
         disassambleMore(End, 50);
     });

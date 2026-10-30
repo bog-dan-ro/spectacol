@@ -30,8 +30,6 @@ FancyBaseList {
         gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
     }
 
-    Keys.onLeftPressed: decrementCurrentIndex()
-    Keys.onRightPressed: incrementCurrentIndex()
     Keys.onEscapePressed: pageLoader.source = ""
     Keys.onReturnPressed: pageLoader.source = ""
 

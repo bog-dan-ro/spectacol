@@ -103,7 +103,13 @@ Item
 
         anchors.fill: parent
         model : filesModel
-        currentIndex: filesModel.currentIndex
+        // Follow the model's remembered index for each folder. This is not a binding
+        // because tapping a cover, copy and remove assign currentIndex directly.
+        Component.onCompleted: currentIndex = filesModel.currentIndex
+        Connections {
+            target: filesModel
+            function onCurrentIndexChanged() { filesView.currentIndex = filesModel.currentIndex; }
+        }
         property string copyPath: ""
         onCopyPathChanged: {
             if (copyPath.length)
@@ -238,7 +244,7 @@ Item
             color: "gray"
             opacity: 0.85
         }
-        property bool root: filesModel.rootFolder == filesModel.folder
+        property bool root: filesModel.rootFolder === filesModel.folder
         padding: TextSizes.scale20 / 2
         font.pixelSize: TextSizes.scale20
         text : filesModel.folder + (root ? " X" : "  \u2191")
@@ -253,7 +259,7 @@ Item
             onClicked: {
                 filesModel.currentIndex = filesView.currentIndex;
                 if (artist_text_label.root)
-                    pageLoader.source = "";
+                    fileSelected("");
                 else
                     filesModel.cdUp();
             }

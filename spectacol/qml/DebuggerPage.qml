@@ -40,7 +40,7 @@ Item {
         buttonXKey: Qt.Key_X
         buttonYKey: Qt.Key_Y
         buttonL1Key: Qt.Key_S
-        buttonR1Key: Qt.key_C
+        buttonR1Key: Qt.Key_C
     }
 
     readonly property color backgroudColor : Qt.rgba(0, 0, 0, 0.85);
@@ -58,7 +58,7 @@ Item {
                 border.width: (disassembleView.focus ? 1 : 0.5) * Screen.pixelDensity
                 border.color: "white"
 
-                width: 18 * TextSizes.scale14
+                Layout.preferredWidth: 18 * TextSizes.scale14
                 Layout.fillHeight: true
 
                 DisassembleView {
@@ -90,7 +90,7 @@ Item {
             }
             ColumnLayout {
                 spacing: TextSizes.smallScreen ? 0 : 2.5 * Screen.pixelDensity
-                width: 18 * TextSizes.scale14
+                Layout.preferredWidth: 18 * TextSizes.scale14
                 Layout.fillWidth: false
                 Layout.fillHeight: true
                 Rectangle {
@@ -99,7 +99,7 @@ Item {
                     radius: Screen.pixelDensity
                     border.width: (focus ? 1 : 0.5) * Screen.pixelDensity
                     border.color: "white"
-                    height: 14 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
+                    Layout.preferredHeight: 14 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
                     Layout.fillWidth: true
                     RegistersView {
                         anchors.fill: parent
@@ -133,7 +133,7 @@ Item {
 
         Rectangle {
             id: toolBarRect
-            height: commandsLine.contentHeight + commandsLine.topPadding + commandsLine.bottomPadding + Screen.pixelDensity
+            Layout.preferredHeight: commandsLine.contentHeight + commandsLine.topPadding + commandsLine.bottomPadding + Screen.pixelDensity
             Layout.fillWidth: true
             color: backgroudColor
             radius: Screen.pixelDensity

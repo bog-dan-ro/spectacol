@@ -50,10 +50,6 @@ Item {
         height: parent.height - Screen.pixelDensity * 10
         width: parent.width - Screen.pixelDensity * 10
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnReleaseOutsideParent
-        onOpened: {
-            height = parent.height - Screen.pixelDensity * 10;
-            width = parent.width - Screen.pixelDensity * 10;
-        }
         ColumnLayout {
             anchors.fill: parent
             RowLayout {
@@ -138,10 +134,8 @@ Item {
             id: tapeData
         }
 
-        Keys.onLeftPressed: decrementCurrentIndex()
-        Keys.onRightPressed: incrementCurrentIndex()
         Keys.onEscapePressed: pageLoader.source = ""
-        Keys.onReturnPressed: model.setCurrentIndex(currentIndex)
+        Keys.onReturnPressed: tapeData.selectBlock(currentIndex)
 
         footer: Button {
             width: view.width
@@ -152,7 +146,7 @@ Item {
         highlightRangeMode: ListView.NoHighlightRange
         highlightMoveVelocity: -1
         model: tapeData
-        currentIndex: tapeData.currentIndex()
+        currentIndex: tapeData.currentBlock
 
         width: 20 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
         delegate: Rectangle {
@@ -183,7 +177,7 @@ Item {
                     if (view.currentIndex !== model.index)
                         view.currentIndex = model.index;
                     else
-                        tapeData.setCurrentIndex(model.index);
+                        tapeData.selectBlock(model.index);
                 }
 
                 onPressAndHold: {

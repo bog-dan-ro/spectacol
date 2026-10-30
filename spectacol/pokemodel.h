@@ -21,6 +21,13 @@
 
 #include "fuselistmodel.h"
 
+#include <QPointer>
+
+#include <memory>
+#include <vector>
+
+// FUSE's trainer list belongs to the FUSE thread: the model shows a copy of it,
+// taken there after every change.
 class PokeModel : public FuseListModel
 {
     Q_OBJECT
@@ -48,4 +55,17 @@ public slots:
     void setActive(int index, bool active = true);
     void clear();
 
+private:
+    struct Trainer {
+        QString name;
+        bool active = false;
+        bool disabled = false;
+    };
+    using Trainers = std::vector<Trainer>;
+
+    // must be called on the FUSE thread, self can be gone when it's done
+    static void publishTrainers(const QPointer<PokeModel> &self);
+
+private:
+    Trainers m_trainers;
 };

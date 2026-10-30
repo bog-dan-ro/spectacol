@@ -24,35 +24,31 @@ Rectangle {
     id: button
     property variant buttons
     property alias imageSource: image.source
-    property alias imageWidth: image.sourceSize.width
-    property alias imageHeight: image.sourceSize.height
     property alias text: buttonText.text
-    property alias animationRunning: animation.running
+    property real size: Screen.pixelDensity * 12
     property bool pressed1: false
     property bool pressed2: false
+    property bool keyHeld: false // pressed with Return (gamepad A)
+    // The keys are sent by the joystick: several buttons share keys (e.g. 7 and
+    // the 5+7 diagonal) and FUSE must not see a key released while another
+    // button still holds it.
+    readonly property bool held: pressed1 || pressed2 || keyHeld
 
-    width: imageWidth + Screen.pixelDensity * 2
-    height: imageHeight + Screen.pixelDensity * 2
+    function releaseAll() {
+        pressed1 = false;
+        pressed2 = false;
+        keyHeld = false;
+    }
+
+    implicitWidth: size
+    implicitHeight: size
     radius: Screen.pixelDensity * 2
     color: "transparent"
     border.color: "gray"
 
-    function pressReleaseButtons(press) {
-        if (buttons) {
-            for (var i = 0; i < buttons.length ; ++i)
-                if (press)
-                    FuseEmulator.keyPress(buttons[i]);
-                else
-                    FuseEmulator.keyRelease(buttons[i]);
-        }
-    }
-
-    onPressed1Changed: pressReleaseButtons(pressed1)
-    onPressed2Changed: pressReleaseButtons(pressed2)
-
     SequentialAnimation on color {
         id: animation
-        running: button.focus || pressed1 || pressed2
+        running: button.focus || button.held
         alwaysRunToEnd: true
         loops: Animation.Infinite
         ColorAnimation { from: "transparent"; to: "#009688"; duration: 500 }
@@ -63,8 +59,8 @@ Rectangle {
         anchors.centerIn: parent
         opacity: 0.5
         fillMode: Image.Stretch
-        sourceSize.width: Screen.pixelDensity * 10
-        sourceSize.height: Screen.pixelDensity * 10
+        sourceSize.width: button.size - Screen.pixelDensity * 2
+        sourceSize.height: button.size - Screen.pixelDensity * 2
     }
     FancyText {
         id: buttonText
@@ -73,15 +69,13 @@ Rectangle {
     }
     Keys.onPressed: (event) => {
         if (event.key === Qt.Key_Return && buttons) {
-            for (var i = 0; i < buttons.length ; ++i)
-                FuseEmulator.keyPress(buttons[i]);
+            keyHeld = true;
             event.accepted = true;
         }
     }
     Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Return && buttons) {
-            for (var i = 0; i < buttons.length ; ++i)
-                FuseEmulator.keyRelease(buttons[i]);
+            keyHeld = false;
             event.accepted = true;
         }
     }

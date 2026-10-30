@@ -28,7 +28,6 @@ Flickable {
     contentHeight: pane.height
     Component.onCompleted: FuseEmulator.paused = true
     Component.onDestruction: FuseEmulator.paused = false
-    anchors.margins: Screen.pixelDensity
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
@@ -184,7 +183,7 @@ Flickable {
 
                     Connections {
                         target: shortcut.popup
-                        onOpened: {
+                        function onOpened() {
                             shortcut.popup.contentItem.section.property = "section";
                             shortcut.popup.contentItem.section.delegate = sectionHeading;
                             shortcut.popup.contentItem.section.criteria = ViewSection.FullString;
@@ -194,7 +193,7 @@ Flickable {
             }
 
             Button {
-                anchors.horizontalCenter: parent.horizontalCenter
+                Layout.alignment: Qt.AlignHCenter
                 text: qsTr("Close (B)")
                 onClicked: pageLoader.source = ""
             }

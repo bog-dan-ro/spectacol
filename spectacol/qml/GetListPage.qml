@@ -26,12 +26,25 @@ import Spectacol
 import "private"
 
 Item {
+    // FUSE blocks until it gets an answer, so the page must answer however it is
+    // closed (Back, F1, a tap outside, opening the menu...), not only from its buttons.
+    property bool answered: false
     Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
+    Component.onDestruction: {
+        if (!answered)
+            FuseEmulator.setListIndex(-1);
+        FuseEmulator.paused = false;
+    }
 
     property alias model: view.model
     property string title
     anchors.fill: parent
+
+    function answer(index) {
+        answered = true;
+        FuseEmulator.setListIndex(index);
+        pageLoader.source = "";
+    }
 
     FancyBaseList {
         id: view
@@ -44,17 +57,8 @@ Item {
             gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
         }
 
-        Keys.onLeftPressed: decrementCurrentIndex()
-        Keys.onRightPressed: incrementCurrentIndex()
-        Keys.onEscapePressed: {
-            FuseEmulator.setListIndex(-1);
-            pageLoader.source = "";
-        }
-
-        Keys.onReturnPressed: {
-            FuseEmulator.setListIndex(view.currentIndex);
-            pageLoader.source = "";
-        }
+        Keys.onEscapePressed: answer(-1)
+        Keys.onReturnPressed: answer(view.currentIndex)
 
         header: FancyText {
             x: parent.x
@@ -67,10 +71,7 @@ Item {
         footer: Button {
             width: view.width
             text: qsTr("Close (B)")
-            onClicked: {
-                FuseEmulator.setListIndex(-1);
-                pageLoader.source = ""
-            }
+            onClicked: answer(-1)
         }
 
         delegate: Rectangle {
@@ -89,8 +90,7 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     if (view.currentIndex === model.index) {
-                        FuseEmulator.setListIndex(view.currentIndex);
-                        pageLoader.source = "";
+                        answer(view.currentIndex);
                     } else {
                         view.currentIndex = model.index;
                     }

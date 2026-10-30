@@ -16,9 +16,7 @@
 */
 
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Window
-import QtGamepadLegacy
 import Spectacol
 
 ZxMenuItem {
@@ -303,7 +301,7 @@ ZxMenuItem {
             }
 
             ZxMenuItem {
-                visible: FuseEmulator.gamepadId != -1
+                visible: FuseEmulator.gamepadId !== -1
                 text: qsTr("Calibrate Gamepad")
                 onTriggered: {
                     menuBar.close();

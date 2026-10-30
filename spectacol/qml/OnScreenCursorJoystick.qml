@@ -30,6 +30,60 @@ Item {
                                button1, button2, button3, button4,
                                button0, button9]
 
+    // The left side has 5 rows of buttons, shrink them on short (landscape phone) screens.
+    readonly property real buttonSize: Math.max(0, Math.min(Screen.pixelDensity * 12,
+                                                            (height - Screen.pixelDensity * 4) / 5))
+
+    // The keys held by the pressed buttons. Several buttons share keys (e.g. 7 and
+    // the 5+7 diagonal), so FUSE only gets the difference: sliding from one button
+    // to another must not release a key that the new button still holds.
+    readonly property var wantedKeys: {
+        const keys = [];
+        for (const but of buttonList) {
+            if (!but.held || !but.buttons)
+                continue;
+            for (const key of but.buttons) {
+                if (!keys.includes(key))
+                    keys.push(key);
+            }
+        }
+        return keys;
+    }
+    property var sentKeys: []
+    onWantedKeysChanged: {
+        for (const key of sentKeys) {
+            if (!wantedKeys.includes(key))
+                FuseEmulator.keyRelease(key);
+        }
+        for (const key of wantedKeys) {
+            if (!sentKeys.includes(key))
+                FuseEmulator.keyPress(key);
+        }
+        sentKeys = wantedKeys;
+    }
+
+    onVisibleChanged: {
+        if (!visible) {
+            for (const but of buttonList)
+                but.releaseAll();
+        }
+    }
+
+    // Balance FuseEmulator.processInputEvents, also when the Loader replaces this item.
+    property bool inputBlocked: false
+    function blockInput(block) {
+        if (inputBlocked === block)
+            return;
+        inputBlocked = block;
+        FuseEmulator.processInputEvents = !block;
+    }
+
+    Component.onDestruction: {
+        for (const key of sentKeys)
+            FuseEmulator.keyRelease(key);
+        blockInput(false);
+    }
+
     Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Escape)
             parent.visible = false;
@@ -53,19 +107,19 @@ Item {
         buttonSelectKey: Qt.Key_unknown
         buttonStartKey: Qt.Key_unknown
 
-        onActiveChanged: FuseEmulator.processInputEvents = !active
+        onActiveChanged: blockInput(active)
     }
 
     RowLayout {
         anchors.fill: parent
         ColumnLayout {
-            width: Screen.pixelDensity * 24
             Layout.fillHeight: true
             GridLayout {
                 columns: 2
                 rows: 2
                 OnScreenButton {
                     id: button1
+                    size: onScreenJoystick.buttonSize
                     focus: onScreenJoystick.visible
                     KeyNavigation.up: button6
                     KeyNavigation.left: button0
@@ -76,6 +130,7 @@ Item {
                 }
                 OnScreenButton {
                     id: button2
+                    size: onScreenJoystick.buttonSize
                     KeyNavigation.up: button6
                     KeyNavigation.left: button1
                     KeyNavigation.down: button4
@@ -84,6 +139,7 @@ Item {
                 }
                 OnScreenButton {
                     id: button3
+                    size: onScreenJoystick.buttonSize
                     KeyNavigation.up: button1
                     KeyNavigation.right: button4
                     KeyNavigation.down: button7
@@ -92,6 +148,7 @@ Item {
                 }
                 OnScreenButton {
                     id: button4
+                    size: onScreenJoystick.buttonSize
                     KeyNavigation.up: button2
                     KeyNavigation.left: button3
                     KeyNavigation.down: button7
@@ -108,12 +165,14 @@ Item {
                 rows: 3
                 OnScreenButton {
                     id: button57
+                    size: onScreenJoystick.buttonSize
                     text: ""
                     imageSource: "qrc:///images/arrow-up-left.svg"
                     buttons: [Qt.Key_5, Qt.Key_7]
                 }
                 OnScreenButton {
                     id: button7
+                    size: onScreenJoystick.buttonSize
                     KeyNavigation.up: button4
                     KeyNavigation.left: button5
                     KeyNavigation.right: button8
@@ -124,12 +183,14 @@ Item {
                 }
                 OnScreenButton {
                     id: button87
+                    size: onScreenJoystick.buttonSize
                     text: ""
                     imageSource: "qrc:///images/arrow-up-right.svg"
                     buttons: [Qt.Key_8, Qt.Key_7]
                 }
                 OnScreenButton {
                     id: button5
+                    size: onScreenJoystick.buttonSize
                     KeyNavigation.up: button7
                     KeyNavigation.left: button0
                     KeyNavigation.right: button8
@@ -139,10 +200,11 @@ Item {
                     buttons: [Qt.Key_5]
                 }
 
-                OnScreenButton {}
+                OnScreenButton { size: onScreenJoystick.buttonSize }
 
                 OnScreenButton {
                     id: button8
+                    size: onScreenJoystick.buttonSize
                     KeyNavigation.up: button7
                     KeyNavigation.left: button5
                     KeyNavigation.right: button0
@@ -153,12 +215,14 @@ Item {
                 }
                 OnScreenButton {
                     id: button56
+                    size: onScreenJoystick.buttonSize
                     text: ""
                     imageSource: "qrc:///images/arrow-down-left.svg"
                     buttons: [Qt.Key_5, Qt.Key_6]
                 }
                 OnScreenButton {
                     id: button6
+                    size: onScreenJoystick.buttonSize
                     KeyNavigation.up: button7
                     KeyNavigation.left: button5
                     KeyNavigation.right: button8
@@ -169,6 +233,7 @@ Item {
                 }
                 OnScreenButton {
                     id: button86
+                    size: onScreenJoystick.buttonSize
                     text: ""
                     imageSource: "qrc:///images/arrow-down-right.svg"
                     buttons: [Qt.Key_8, Qt.Key_6]
@@ -186,6 +251,7 @@ Item {
             }
             OnScreenButton {
                 id: button9
+                size: onScreenJoystick.buttonSize
                 KeyNavigation.up: button4
                 KeyNavigation.left: button8
                 KeyNavigation.right: button5
@@ -195,6 +261,7 @@ Item {
             }
             OnScreenButton {
                 id: button0
+                size: onScreenJoystick.buttonSize
                 KeyNavigation.up: button9
                 KeyNavigation.left: button8
                 KeyNavigation.right: button5
@@ -207,10 +274,8 @@ Item {
     }
 
     function pressButton(x, y, which) {
-        var len = buttonList.length;
-        for (var i = 0; i < len; ++i) {
-            var but = buttonList[i];
-            var rc = but.mapToItem(touchArea, 0, 0, but.width, but.height);
+        for (const but of buttonList) {
+            const rc = but.mapToItem(touchArea, 0, 0, but.width, but.height);
             if (x < rc.x || x > rc.x + rc.width ||
                 y < rc.y || y > rc.y + rc.height) {
                 switch(which) {
@@ -239,9 +304,7 @@ Item {
     }
 
     function releaseButton(which) {
-        var len = buttonList.length;
-        for (var i = 0; i < len; ++i) {
-            var but = buttonList[i];
+        for (const but of buttonList) {
             switch(which) {
             case 1:
                 if (but.pressed1)

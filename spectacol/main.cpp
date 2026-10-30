@@ -48,20 +48,14 @@ int main(int argc, char *argv[])
     if (!QFile::exists(newSettings) && QFile::exists(oldSettings))
         QFile::rename(oldSettings, newSettings);
 
-#if defined(Q_OS_WIN)
-#elif defined(Q_OS_ANDROID)
-#else
+    QQmlApplicationEngine engine;
+#if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID)
     QDir appPath{QCoreApplication::applicationDirPath()};
     appPath.cdUp();
-    QString libsPath = appPath.absoluteFilePath(u"lib"_s);
-    QString pluginsPath = appPath.absoluteFilePath(u"plugins"_s);
-    QString qmlPath = appPath.absoluteFilePath(u"qml"_s);
+    QCoreApplication::addLibraryPath(appPath.absoluteFilePath(u"lib"_s));
+    QCoreApplication::addLibraryPath(appPath.absoluteFilePath(u"plugins"_s));
+    engine.addImportPath(appPath.absoluteFilePath(u"qml"_s));
 #endif
-    QCoreApplication::addLibraryPath(libsPath);
-    QCoreApplication::addLibraryPath(pluginsPath);
-
-    QQmlApplicationEngine engine;
-    engine.addImportPath(qmlPath);
 
     engine.addImageProvider(u"spectrum"_s, new SpectrumScreenImageProvider);
     engine.loadFromModule(u"Spectacol"_s, u"Main"_s);

@@ -16,6 +16,7 @@
 */
 
 #include "z80assembler.h"
+#include "qmlui.h"
 
 #include <QDebug>
 #include <QFile>
@@ -160,8 +161,12 @@ bool Z80Assembler::write(const QString &asmLine, int address, const QByteArray &
     if (bytes.isEmpty())
         return false;
 
-    for (uint8_t byte : bytes)
-        writebyte(address++, byte);
+    // The memory belongs to the FUSE thread. Like the debugger's poke command, use
+    // writebyte_internal: no contention, no t-states, no breakpoint checks.
+    pokeEvent([bytes, address]() mutable {
+        for (uint8_t byte : bytes)
+            writebyte_internal(address++, byte);
+    });
 
     return true;
 }

@@ -23,8 +23,15 @@ import Spectacol
 
 CoverFlowFiles {
     id: browser
+    // FUSE blocks until it gets an answer, so the page must answer however it is
+    // closed (Back, F1, a tap outside, opening the menu...), not only on select.
+    property bool answered: false
     Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
+    Component.onDestruction: {
+        if (!answered)
+            FuseEmulator.setOpenSaveFile("");
+        FuseEmulator.paused = false;
+    }
 
     folder: FuseEmulator.dataPath
 
@@ -33,7 +40,8 @@ CoverFlowFiles {
         property alias path: browser.folder
     }
 
-    onFileSelected: {
+    onFileSelected: (filePath) => {
+        answered = true;
         FuseEmulator.setOpenSaveFile(filePath);
         pageLoader.source = "";
     }

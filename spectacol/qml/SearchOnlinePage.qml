@@ -53,7 +53,6 @@ Rectangle {
         buttonYKey: Qt.Key_Tab
         buttonBKey: Qt.Key_Escape
         buttonAKey: searchText.focus ? Qt.Key_unknown : Qt.Key_Return
-        onButtonAKeyChanged: console.log(buttonAKey)
     }
 
     Settings {
@@ -95,18 +94,20 @@ Rectangle {
             KeyNavigation.tab: searchText
             KeyNavigation.up: searchText
             Keys.onReturnPressed: {
+                FuseEmulator.copyToFavourites(model.getPath(currentIndex));
                 pageLoader.source = "";
-                FuseEmulator.copyToFavourites(model.getPath(currentIndex))
             }
-            property real __scale: width / 320. > 3 ? width / 320. : 3
             clip: true
             focus: true
             currentIndex: 0
             Layout.alignment: Qt.AlignHCenter
             Layout.fillHeight: true
-            cellWidth: width / __scale
+            // Cells are 320px wide, or a third of the column when that is narrower.
+            // The grid shows whole cells, centered. Everything derives from the column's
+            // width, not from the grid's own width which the layout sets from these.
+            cellWidth: Math.max(1, Math.floor(Math.min(320, parent.width / 3)))
             cellHeight: cellWidth
-            Layout.preferredWidth: Math.floor(parent.width / Math.ceil(cellWidth)) * Math.ceil(cellWidth)
+            Layout.preferredWidth: Math.max(1, Math.floor(parent.width / cellWidth)) * cellWidth
             populate: Transition {
                 NumberAnimation { properties: "x,y"; duration: 200 }
             }
@@ -138,7 +139,7 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        if (grid.currentIndex != index)
+                        if (grid.currentIndex !== index)
                             grid.currentIndex = index;
                         else {
                             FuseEmulator.copyToFavourites(path);
@@ -160,7 +161,7 @@ Rectangle {
         visible: false
         anchors.centerIn: parent
         font.pixelSize: TextSizes.scale16
-        text: qsTr("No resutls")
+        text: qsTr("No results")
     }
 
     Component.onCompleted: {

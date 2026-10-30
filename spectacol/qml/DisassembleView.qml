@@ -18,6 +18,7 @@
 // @scope main.qml
 
 import QtQuick
+import QtQml.Models
 import QtQuick.Layouts
 import QtQuick.Window
 import Spectacol
@@ -32,16 +33,36 @@ ListView {
     highlightFollowsCurrentItem: true
     highlightMoveDuration: 100
 
-    currentIndex: disassambleModel.delta
+    // Not a binding: the navigation keys and clicks below assign currentIndex
+    // directly, which would remove a binding after the first interaction.
+    Component.onCompleted: currentIndex = FuseEmulator.disassambleModel.delta
+    Connections {
+        target: FuseEmulator.disassambleModel
+        function onDeltaChanged() { view.currentIndex = FuseEmulator.disassambleModel.delta; }
+    }
 
     Z80Assembler {
         id: assembler
     }
 
-    VisualDataModel {
+    DelegateModel {
         id: visualModel
         model: FuseEmulator.disassambleModel
         delegate: Rectangle {
+            id: row
+            // Required properties keep their last value while a delegate is being released
+            // (e.g. by a model reset), the context properties become undefined.
+            required property int index
+            required property int address
+            required property string addressText
+            required property var bytes
+            required property string bytesText
+            required property string disassable
+            required property color background
+            required property color foreground
+            required property color selectedBackground
+            required property color selectedForeground
+
             function toggleEdit()
             {
                 asmEdit.readOnly = !asmEdit.readOnly;
@@ -57,8 +78,8 @@ ListView {
                 return true;
             }
 
-            property color paper: view.currentIndex !== index ? background : selectedBackground
-            property color ink: view.currentIndex !== index ? foreground : selectedForeground
+            readonly property color paper: view.currentIndex !== row.index ? row.background : row.selectedBackground
+            readonly property color ink: view.currentIndex !== row.index ? row.foreground : row.selectedForeground
 
             width: view.width
             height: asmEdit.contentHeight + asmEdit.topPadding + asmEdit.bottomPadding + Screen.pixelDensity
@@ -67,10 +88,10 @@ ListView {
                 anchors.fill: parent
                 onClicked: {
                     view.forceActiveFocus(Qt.TabFocusReason);
-                    view.currentIndex = model.index;
+                    view.currentIndex = row.index;
                 }
-                onDoubleClicked: FuseEmulator.addBreakpoint(model.address)
-                onPressAndHold: FuseEmulator.addBreakpoint(model.address)
+                onDoubleClicked: FuseEmulator.addBreakpoint(row.address)
+                onPressAndHold: FuseEmulator.addBreakpoint(row.address)
             }
             RowLayout {
                 anchors.fill: parent
@@ -81,8 +102,8 @@ ListView {
                     font.pixelSize: TextSizes.scale12
                     style: Text.Normal
                     Layout.preferredWidth: 4 * TextSizes.scale12
-                    color: ink
-                    text: model.addressText
+                    color: row.ink
+                    text: row.addressText
                 }
 
                 Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
@@ -94,9 +115,9 @@ ListView {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: TextSizes.scale16 / 2
                     style: Text.Normal
-                    color: ink
+                    color: row.ink
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    text: model.bytesText
+                    text: row.bytesText
                 }
 
                 Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
@@ -107,33 +128,30 @@ ListView {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
                     font.pixelSize: TextSizes.scale12
-                    color: ink
+                    color: row.ink
                     font.bold: false
                     readOnly: true
                     inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhPreferUppercase | Qt.ImhNoPredictiveText
-                    text: model.disassable
+                    text: row.disassable
                     onEditingFinished: {
-                        assembler.write(text, model.address, model.bytes)
+                        assembler.write(text, row.address, row.bytes)
                         FuseEmulator.disassambleModel.update();
                         validator = null;
                         if (!readOnly)
-                            toggleEdit();
+                            row.toggleEdit();
                     }
-                    Keys.onReturnPressed: toggleEdit()
-                    Keys.onEnterPressed: toggleEdit()
+                    Keys.onReturnPressed: row.toggleEdit()
+                    Keys.onEnterPressed: row.toggleEdit()
 
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
                             view.forceActiveFocus(Qt.TabFocusReason);
-                            view.currentIndex = model.index;
+                            view.currentIndex = row.index;
                         }
 
-                        onDoubleClicked:
-                            toggleEdit();
-
-                        onPressAndHold:
-                            toggleEdit();
+                        onDoubleClicked: row.toggleEdit()
+                        onPressAndHold: row.toggleEdit()
                     }
                 }
             }
@@ -185,7 +203,8 @@ ListView {
 
         case Qt.Key_Enter:
         case Qt.Key_Return:
-            event.accepted = currentItem.toggleEdit();
+            if (currentItem)
+                event.accepted = currentItem.toggleEdit();
             break;
 
         case Qt.Key_C:
@@ -203,10 +222,13 @@ ListView {
             event.accepted = true;
             break;
 
-        case Qt.Key_X:
-            FuseEmulator.addBreakpoint(FuseEmulator.disassambleModel.address(view.currentIndex));
+        case Qt.Key_X: {
+            const address = FuseEmulator.disassambleModel.address(view.currentIndex);
+            if (address !== -1)
+                FuseEmulator.addBreakpoint(address);
             event.accepted = true;
             break;
+        }
         }
     }
     model: visualModel

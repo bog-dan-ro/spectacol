@@ -50,24 +50,24 @@ StandardGamepad {
 
     Gamepad {
         id: gamepad
-        onButtonAChanged: confGamepad.buttonAPressed = value
-        onButtonBChanged: confGamepad.buttonBPressed = value
-        onButtonXChanged: confGamepad.buttonXPressed = value
-        onButtonYChanged: confGamepad.buttonYPressed = value
-        onButtonL1Changed: confGamepad.buttonL1Pressed = value
-        onButtonR1Changed: confGamepad.buttonR1Pressed = value
-        onButtonL2Changed: confGamepad.buttonL2Pressed = value
-        onButtonR2Changed: confGamepad.buttonR2Pressed = value
-        onButtonUpChanged: confGamepad.buttonUpPressed = value
-        onButtonLeftChanged: confGamepad.buttonLeftPressed = value
-        onButtonDownChanged: confGamepad.buttonDownPressed = value
-        onButtonRightChanged: confGamepad.buttonRightPressed = value
-        onButtonStartChanged: confGamepad.buttonStartPressed = value
-        onButtonSelectChanged: confGamepad.buttonSelectPressed = value
-        onAxisLeftXChanged: confGamepad.axisLeftX = value
-        onAxisLeftYChanged: confGamepad.axisLeftY = value
-        onAxisRightXChanged: confGamepad.axisRightX = value
-        onAxisRightYChanged: confGamepad.axisRightY = value
+        onButtonAChanged: (value) => confGamepad.buttonAPressed = value
+        onButtonBChanged: (value) => confGamepad.buttonBPressed = value
+        onButtonXChanged: (value) => confGamepad.buttonXPressed = value
+        onButtonYChanged: (value) => confGamepad.buttonYPressed = value
+        onButtonL1Changed: (value) => confGamepad.buttonL1Pressed = value
+        onButtonR1Changed: (value) => confGamepad.buttonR1Pressed = value
+        onButtonL2Changed: (value) => confGamepad.buttonL2Pressed = value
+        onButtonR2Changed: (value) => confGamepad.buttonR2Pressed = value
+        onButtonUpChanged: (value) => confGamepad.buttonUpPressed = value
+        onButtonLeftChanged: (value) => confGamepad.buttonLeftPressed = value
+        onButtonDownChanged: (value) => confGamepad.buttonDownPressed = value
+        onButtonRightChanged: (value) => confGamepad.buttonRightPressed = value
+        onButtonStartChanged: (value) => confGamepad.buttonStartPressed = value
+        onButtonSelectChanged: (value) => confGamepad.buttonSelectPressed = value
+        onAxisLeftXChanged: (value) => confGamepad.axisLeftX = value
+        onAxisLeftYChanged: (value) => confGamepad.axisLeftY = value
+        onAxisRightXChanged: (value) => confGamepad.axisRightX = value
+        onAxisRightYChanged: (value) => confGamepad.axisRightY = value
     }
 
     property var __buttons: [GamepadManager.ButtonStart,
@@ -169,17 +169,27 @@ StandardGamepad {
         }
     }
 
+    // FuseEmulator.processInputEvents nests, block it only once for the whole sequence
+    property bool inputBlocked: false
+    function blockInput(block)
+    {
+        if (inputBlocked === block)
+            return;
+        inputBlocked = block;
+        FuseEmulator.processInputEvents = !block;
+    }
+
     function configureNext()
     {
-        FuseEmulator.processInputEvents = false;
+        blockInput(true);
         if (__buttons.length > 0) {
-            var but = __buttons.shift();
+            const but = __buttons.shift();
             GamepadManager.configureButton(deviceId, but);
             configureText.text = qsTr("Press button <b>") + pressButton(but) + ("</b> on your gamepad");
             configureText.visible = true;
             cancelButtonText.visible = but !== GamepadManager.ButtonStart;
         } else if (__axes.length > 0) {
-            var axis = __axes.shift();
+            const axis = __axes.shift();
             GamepadManager.configureAxis(deviceId, axis);
             configureText.text = qsTr("Press <b>") + pressAxis(axis) + ("</b> axis on your gamepad");
             configureText.visible = true;
@@ -188,7 +198,7 @@ StandardGamepad {
             configureText.visible = false;
             cancelButtonText.visible = false;
             configureDone();
-            FuseEmulator.processInputEvents = true;
+            blockInput(false);
         }
     }
 
@@ -200,15 +210,16 @@ StandardGamepad {
 
     Connections {
         target: GamepadManager
-        onButtonConfigured: {
+        // The parameter must keep its name: it shadows the root's deviceId alias.
+        function onButtonConfigured(deviceId, button) {
             if (deviceId === confGamepad.deviceId)
                 configTimer.restart();
         }
-        onAxisConfigured: {
+        function onAxisConfigured(deviceId, axis) {
             if (deviceId === confGamepad.deviceId)
                 configTimer.restart();
         }
-        onConfigurationCanceled: {
+        function onConfigurationCanceled(deviceId) {
             if (deviceId === confGamepad.deviceId)
                 configTimer.restart();
         }
@@ -220,4 +231,8 @@ StandardGamepad {
         GamepadManager.setCancelConfigureButton(deviceId, GamepadManager.ButtonStart);
         configTimer.restart();
     }
+
+    // The page can be closed half way (Back, Escape, F1, a tap outside),
+    // don't leave the keyboard and the gamepad disabled.
+    Component.onDestruction: blockInput(false)
 }

@@ -154,7 +154,6 @@ ColumnLayout {
                 FancyText {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    height: parent.height
                     font.pixelSize: TextSizes.scale16
                     text: Utils.shortcutText(modelData.text)
                 }

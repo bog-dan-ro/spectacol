@@ -58,16 +58,14 @@ Rectangle {
             FancyTextField {
                 id: pathEdit
                 Layout.fillWidth: true
-                text: folder
-                placeholderText: folder === "" ? qsTr("Enter file path") : ""
+                placeholderText: qsTr("Enter file path")
             }
             Button {
-                FileDialog {
+                FolderDialog {
                     id: browseFolder
-                    selectFolder: true
-                    selectExisting: false
-                    onAccepted: pathEdit.text = fileUrl
-                    folder: pathEdit.text
+                    // the folder is a local path (Linux, Android), the dialog uses urls
+                    currentFolder: "file://" + pathEdit.text
+                    onAccepted: pathEdit.text = decodeURIComponent(selectedFolder.toString().replace(/^file:\/\//, ""))
                 }
                 text: qsTr("Browse")
                 onClicked: browseFolder.open()

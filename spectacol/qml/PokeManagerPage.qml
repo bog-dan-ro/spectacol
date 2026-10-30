@@ -175,9 +175,10 @@ Item {
             CheckBox {
                 width: view.width
                 checked: model.active
-                enabled: !model.dissabled
+                enabled: !model.disabled
                 text: model.label
-                onCheckedChanged: pokeModel.setActive(model.index, checked)
+                // only the user's clicks: checked also changes when the model updates
+                onToggled: pokeModel.setActive(model.index, checked)
                 background: Rectangle {color: Qt.rgba(0, 0, 0, 0.75)}
             }
         }

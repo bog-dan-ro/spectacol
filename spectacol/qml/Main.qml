@@ -33,7 +33,6 @@ ApplicationWindow {
 
     title: qsTr("Spectacol")
 
-    property int dpiMultiplier: 1
     property bool portrait: width < height
 
     MessageDialog {
@@ -61,8 +60,14 @@ ApplicationWindow {
         }
         property bool paused: false
         onPausedChanged: FuseEmulator.paused = paused
+        // position changes on every frame of the animation and of a drag,
+        // rebuild the menu only when the drawer starts to open
+        property bool wasClosed: true
         onPositionChanged: {
-            menuView.reset();
+            if (wasClosed && position > 0) {
+                wasClosed = false;
+                menuView.reset();
+            }
             if (position === 1) {
                 onScreenCursorJoystick.visible = false;
                 onScreen48Keyboard.visible = false;
@@ -73,6 +78,7 @@ ApplicationWindow {
             }
 
             if (position === 0) {
+                wasClosed = true;
                 menuView.useGamepad = false;
                 if (paused)
                     paused = false;
@@ -95,7 +101,7 @@ ApplicationWindow {
                 if (menuBar.position) {
                     menuBar.close();
                 } else {
-                    if (pageLoader.source != "") {
+                    if (pageLoader.status !== Loader.Null) {
                         pageLoader.source = "";
                     } else {
                         menuBar.open();
@@ -147,7 +153,7 @@ ApplicationWindow {
                     menuView.popMenu();
                     event.accepted = true;
                 } else {
-                    if (pageLoader.source != "") {
+                    if (pageLoader.status !== Loader.Null) {
                         pageLoader.source = "";
                         event.accepted = true;
                     }
@@ -158,7 +164,7 @@ ApplicationWindow {
                     menuView.popMenu();
                     event.accepted = true;
                 } else {
-                    if (pageLoader.source != "") {
+                    if (pageLoader.status !== Loader.Null) {
                         pageLoader.source = "";
                         event.accepted = true;
                     } else {
@@ -200,7 +206,7 @@ ApplicationWindow {
             ZxScreen {
                 id: zxScreen
                 anchors.fill: parent
-                mouseGrabSuspended: pageLoader.source != "" || menuBar.position > 0 || !FuseEmulator.processInputEvents
+                mouseGrabSuspended: pageLoader.status !== Loader.Null || menuBar.position > 0 || !FuseEmulator.processInputEvents
 
                 onFullScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
 
@@ -215,6 +221,7 @@ ApplicationWindow {
                         visible: false
                         height: Screen.pixelDensity * 10
                         width: Screen.pixelDensity * 13
+                        sourceSize: Qt.size(width, height)
                         NumberAnimation on opacity {
                             id: cassetteIconHideAnimation
                             running: false
@@ -231,6 +238,7 @@ ApplicationWindow {
                         visible: false
                         height: Screen.pixelDensity * 13
                         width: Screen.pixelDensity * 13
+                        sourceSize: Qt.size(width, height)
                         NumberAnimation on opacity {
                             id: diskIconHideAnimation
                             running: false
@@ -248,7 +256,7 @@ ApplicationWindow {
         MouseArea {
             anchors.fill: parent
             // let the clicks reach the ZX screen (Kempston mouse) when no page is open
-            enabled: pageLoader.source != ""
+            enabled: pageLoader.status !== Loader.Null
             onClicked: pageLoader.source = "";
         }
 
@@ -278,6 +286,7 @@ ApplicationWindow {
                 opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 5
                 width: Screen.pixelDensity * 7
+                sourceSize: Qt.size(width, height)
                 source: "qrc:/images/keyboard-icon.svg"
                 MouseArea {
                     anchors.fill: parent
@@ -297,30 +306,31 @@ ApplicationWindow {
                 opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 5
                 width: Screen.pixelDensity * 7
+                sourceSize: Qt.size(width, height)
                 source: "qrc:/images/controller-icon.svg"
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {
-                        onScreenCursorJoystick.source = "OnScreenJoystick.qml";
-                        toggleOnScreenControls(FuseEmulator.CursorJoystick, false);
-                    }
+                    onClicked: toggleOnScreenControls(FuseEmulator.CursorJoystick, false)
                 }
             }
             Image {
                 opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 7
                 width: Screen.pixelDensity * 7
+                sourceSize: Qt.size(width, height)
                 source: "qrc:/images/fastforward.svg"
                 MouseArea {
                     anchors.fill: parent
                     onPressed: FuseEmulator.speedup()
                     onReleased: FuseEmulator.slowdown()
+                    onCanceled: FuseEmulator.slowdown()
                 }
             }
             Image {
                 opacity: parent.buttonsOpacity
                 height: Screen.pixelDensity * 7
                 width: Screen.pixelDensity * 7
+                sourceSize: Qt.size(width, height)
                 source: FuseEmulator.paused ? "qrc:/images/play.svg" : "qrc:/images/pause.svg"
                 MouseArea {
                     anchors.fill: parent
@@ -336,7 +346,6 @@ ApplicationWindow {
             focus: visible
             enabled: visible
             z: parent.z + 10
-            source: "OnScreenCursorJoystick.qml"
             onVisibleChanged: if (!visible) mainRectangle.forceActiveFocus(Qt.TabFocusReason);
         }
 
@@ -356,7 +365,16 @@ ApplicationWindow {
             visible: status === Loader.Ready
             focus: visible
             enabled: visible
-            onVisibleChanged: if (!visible) mainRectangle.forceActiveFocus(Qt.TabFocusReason);
+            onVisibleChanged: {
+                if (visible) {
+                    // otherwise their gamepad navigation stays active under the page,
+                    // and they don't get the focus back when the page closes
+                    onScreenCursorJoystick.visible = false;
+                    onScreen48Keyboard.visible = false;
+                } else {
+                    mainRectangle.forceActiveFocus(Qt.TabFocusReason);
+                }
+            }
         }
 
         MessagePage {
@@ -366,10 +384,16 @@ ApplicationWindow {
     }
 
     function toggleOnScreenControls(type, gamepad) {
+        if (pageLoader.visible)
+            return;
         switch (type) {
         case FuseEmulator.CursorJoystick:
-            if (!onScreenCursorJoystick.visible && onScreen48Keyboard.visible)
-                onScreen48Keyboard.visible = false;
+            if (!onScreenCursorJoystick.visible) {
+                if (onScreen48Keyboard.visible)
+                    onScreen48Keyboard.visible = false;
+                // switch only while hidden: the touch joystick has no gamepad navigation
+                onScreenCursorJoystick.source = gamepad ? "OnScreenCursorJoystick.qml" : "OnScreenJoystick.qml";
+            }
             onScreenCursorJoystick.visible = !onScreenCursorJoystick.visible;
             break;
 
@@ -394,10 +418,34 @@ ApplicationWindow {
         id: confirmSaveSpecificDialog
         title: "Spectacol"
         buttons: MessageDialog.Save | MessageDialog.Discard | MessageDialog.Cancel
-        onAccepted: FuseEmulator.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveSave)
-        // TODO: FIX ME
-        // onDiscard: FuseEmulator.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveDontsave)
-        onRejected: FuseEmulator.setConfirmSaveSpecific(FuseEmulator.UiConfirmSaveCancel)
+
+        // FUSE blocks until it gets exactly one answer.
+        property bool answered: false
+        function answer(result) {
+            if (answered)
+                return;
+            answered = true;
+            FuseEmulator.setConfirmSaveSpecific(result);
+        }
+
+        // Discard has the DestructiveRole, so it emits neither accepted nor rejected.
+        onButtonClicked: (button, role) => {
+            switch (button) {
+            case MessageDialog.Save:
+                answer(FuseEmulator.UiConfirmSaveSave);
+                break;
+            case MessageDialog.Discard:
+                answer(FuseEmulator.UiConfirmSaveDontsave);
+                break;
+            default:
+                answer(FuseEmulator.UiConfirmSaveCancel);
+                break;
+            }
+        }
+        // buttonClicked comes first, so these only answer when the dialog was closed
+        // without clicking a button (e.g. Escape)
+        onAccepted: answer(FuseEmulator.UiConfirmSaveCancel)
+        onRejected: answer(FuseEmulator.UiConfirmSaveCancel)
     }
 
     Connections {
@@ -451,6 +499,10 @@ ApplicationWindow {
 
         function onOpenFile(title, path) {
             pageLoader.source = "GetFileBrowserPage.qml"
+            if (pageLoader.status !== Loader.Ready) {
+                FuseEmulator.setOpenSaveFile(""); // FUSE is waiting for an answer
+                return;
+            }
             if (path.length)
                 pageLoader.item.folder = path;
             messagePage.showMessage(FuseEmulator.Info, title);
@@ -468,11 +520,16 @@ ApplicationWindow {
 
         function onConfirmSaveSpecific(message) {
             confirmSaveSpecificDialog.text = message;
+            confirmSaveSpecificDialog.answered = false;
             confirmSaveSpecificDialog.open();
         }
 
         function onGetListIndex(list, title) {
             pageLoader.source = "GetListPage.qml";
+            if (pageLoader.status !== Loader.Ready) {
+                FuseEmulator.setListIndex(-1); // FUSE is waiting for an answer
+                return;
+            }
             pageLoader.item.title = title;
             pageLoader.item.model = list;
         }

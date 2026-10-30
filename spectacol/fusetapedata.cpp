@@ -17,7 +17,13 @@
 
 #include "fusetapedata.h"
 
+#include "fuseemulator.h"
+#include "qmlui.h"
 #include "spectrumscreen.h"
+
+#include <QPointer>
+
+#include <memory>
 
 extern "C"  {
 # include <tape.h>
@@ -25,7 +31,21 @@ extern "C"  {
 
 FuseTapeData::FuseTapeData()
 {
-    tape_foreach(&addBlockInfo, this);
+    // The page that owns this model can be closed before the FUSE thread answers.
+    QPointer<FuseTapeData> self = this;
+    pokeEvent([self] {
+        auto blocks = std::make_shared<TapeBlocks>();
+        tape_foreach(&addBlockInfo, blocks.get());
+        const int current = tape_get_current_block();
+        FuseEmulator::instance().callFunction([self, blocks, current] {
+            if (!self)
+                return;
+            self->beginResetModel();
+            self->m_tapeBlocks = std::move(*blocks);
+            self->endResetModel();
+            self->setCurrentBlock(current);
+        });
+    });
 }
 
 int FuseTapeData::rowCount(const QModelIndex &parent) const
@@ -48,7 +68,7 @@ QVariant FuseTapeData::data(const QModelIndex &index, int role) const
         return m_tapeBlocks[index.row()].detail;
 
     case Current:
-        return index.row() == tape_get_current_block();
+        return index.row() == m_currentBlock;
 
     default:
         return {};
@@ -65,15 +85,27 @@ QHash<int, QByteArray> FuseTapeData::roleNames() const
     return res;
 }
 
-int FuseTapeData::currentIndex() const
+void FuseTapeData::selectBlock(int block)
 {
-    return tape_get_current_block();
+    QPointer<FuseTapeData> self = this;
+    pokeEvent([self, block] {
+        tape_select_block(block);
+        const int current = tape_get_current_block();
+        FuseEmulator::instance().callFunction([self, current] {
+            if (self)
+                self->setCurrentBlock(current);
+        });
+    });
 }
 
-void FuseTapeData::setCurrentIndex(int block)
+void FuseTapeData::setCurrentBlock(int block)
 {
-    tape_select_block(block);
-    emit dataChanged(index(0), index(m_tapeBlocks.size() - 1));
+    if (m_currentBlock == block)
+        return;
+    m_currentBlock = block;
+    emit currentBlockChanged();
+    if (!m_tapeBlocks.empty())
+        emit dataChanged(index(0), index(m_tapeBlocks.size() - 1), {Current});
 }
 
 QByteArray FuseTapeData::base64CompressedBlockData(int index) const
@@ -92,13 +124,13 @@ int FuseTapeData::getBufferLength(int index)
 
 void FuseTapeData::addBlockInfo(libspectrum_tape_block *block, void *user_data)
 {
-    auto self = reinterpret_cast<FuseTapeData*>(user_data);
+    auto blocks = reinterpret_cast<TapeBlocks*>(user_data);
 
     char temp[256];
     libspectrum_tape_block_description(temp + 1, 255, block);
     temp[0] = ' ';
     TapeData tapeData;
-    tapeData.label = QByteArray::number(uint(self->m_tapeBlocks.size() + 1)) + QByteArray(temp);
+    tapeData.label = QByteArray::number(uint(blocks->size() + 1)) + QByteArray(temp);
     tapeData.length = libspectrum_tape_block_data_length(block);
     tapeData.data = QByteArray((const char *)libspectrum_tape_block_data(block), tapeData.length);
     tapeData.data = qCompress(tapeData.data, 9).toBase64(QByteArray::Base64UrlEncoding);
@@ -107,5 +139,5 @@ void FuseTapeData::addBlockInfo(libspectrum_tape_block *block, void *user_data)
         tapeData.detail = details;
         libspectrum_free(details);
     }
-    self->m_tapeBlocks.push_back(tapeData);
+    blocks->push_back(tapeData);
 }
