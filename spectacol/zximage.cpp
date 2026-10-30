@@ -146,6 +146,8 @@ void ZxImage::resize(uint32_t w, uint32_t h)
         m_rgbImage.fill(Qt::black);
         m_rgbPixelsWidth = m_rgbImage.bytesPerLine() / 4;
         m_rgbPixels = reinterpret_cast<uint32_t *>(m_rgbImage.bits());
+        // the pending updates point to the old image
+        m_updates.clear();
     }
     rescale();
 }
@@ -163,6 +165,7 @@ void ZxImage::rescale()
 
 QSize ZxImage::imageSize() const
 {
+    QMutexLocker lock(&m_syncVars);
     return m_rgbImage.size();
 }
 
@@ -181,8 +184,10 @@ void ZxImage::update(int x, int y, int w, int h)
 void ZxImage::frameEnd()
 {
     QMutexLocker lock(&m_syncVars);
-    if (!m_updates.empty() || m_recreate)
+    if (!m_updates.empty() || m_recreate) {
+        m_recreate = false;
         emit needsUpdate();
+    }
 }
 
 void ZxImage::saveScreen()
@@ -303,7 +308,7 @@ void ZxRhiRenderer::initialize(QRhiCommandBuffer * /*cb*/)
 {
     if (m_rhi != rhi()) {
         m_rhi = rhi();
-        m_sampleCount = renderTarget()->sampleCount();
+        m_pipeline.reset();
     }
     if (m_sampleCount != renderTarget()->sampleCount()) {
         m_sampleCount = renderTarget()->sampleCount();
@@ -322,33 +327,28 @@ void ZxRhiRenderer::synchronize(QQuickRhiItem *item)
     Q_ASSERT(zxScreen);
     if (!zxScreen)
         return;
-    m_itemSize = zxScreen->size();
+    m_fillMode = zxScreen->fillMode();
+    if (m_smoothScaling != zxScreen->smoothScaling()) {
+        m_smoothScaling = zxScreen->smoothScaling();
+        m_pipeline.reset();
+    }
 }
 
 void ZxRhiRenderer::render(QRhiCommandBuffer *cb)
 {
-    QSize imageSize;
     auto resourceUpdates = m_rhi->nextResourceUpdateBatch();
+    QSize imageSize;
     {
         auto zxImage = ZxImage::instance();
         QMutexLocker lock(&zxImage->mutex());
         auto &updates = zxImage->updates();
         imageSize = zxImage->rgbImage().size();
         if (!m_pipeline || m_texture->pixelSize() != imageSize) {
-            recreatePipeline(cb);
-
-            if (!m_pipeline || m_texture->pixelSize() != imageSize)
-                return;
-
-            if (!imageSize.isNull()) {
-                updates.clear();
-                QRhiTextureSubresourceUploadDescription desc{zxImage->rgbImage()};
-                const QPoint topLeft{0, 0};
-                desc.setSourceTopLeft(topLeft);
-                desc.setDestinationTopLeft(topLeft);
-                desc.setSourceSize(imageSize);
-                updates.emplace_back(0, 0, desc);
-            }
+            recreatePipeline(resourceUpdates, imageSize);
+            // the new texture has no content, upload the whole image now
+            if (m_pipeline)
+                resourceUpdates->uploadTexture(m_texture.get(), zxImage->rgbImage());
+            updates.clear();
         } else if (!updates.empty()) {
             QRhiTextureUploadDescription desc;
             desc.setEntries(updates.cbegin(), updates.cend());
@@ -357,36 +357,35 @@ void ZxRhiRenderer::render(QRhiCommandBuffer *cb)
         }
     }
 
-    QMatrix4x4 modelViewProjection = m_rhi->clipSpaceCorrMatrix();
-    // modelViewProjection.scale(float(imageSize.width()) / m_itemSize.width(),
-    //                           float(imageSize.height()) / m_itemSize.height());
-    // qDebug() << float(imageSize.width()) / m_itemSize.width()
-    //          << float(imageSize.height()) / m_itemSize.height();
-    resourceUpdates->updateDynamicBuffer(m_ubuf.get(), 0, 64, modelViewProjection.constData());
+    if (m_pipeline) {
+        const QMatrix4x4 modelViewProjection = m_rhi->clipSpaceCorrMatrix();
+        resourceUpdates->updateDynamicBuffer(m_uniformBuffer.get(), 0, 64, modelViewProjection.constData());
+        resourceUpdates->updateDynamicBuffer(m_pushConstantsBuffer.get(), 0, 64, modelViewProjection.constData());
+    }
 
-    const QColor clearColor = QColor::fromRgbF(1, 1, 1, 1);
-    cb->beginPass(renderTarget(), clearColor, { 1.0f, 0 }, resourceUpdates);
-
-    const QSize outputSize = renderTarget()->pixelSize();
-    cb->setViewport(QRhiViewport(0, 0, outputSize.width(), outputSize.height()));
-
-    cb->setGraphicsPipeline(m_pipeline.get());
-    cb->setShaderResources();
-    const QRhiCommandBuffer::VertexInput vbufBinding(m_vbuf.get(), 0);
-    cb->setVertexInput(0, 1, &vbufBinding);
-    cb->draw(4);
-
+    // always submit the batch and clear the item, even if there is nothing to draw yet
+    cb->beginPass(renderTarget(), Qt::black, { 1.0f, 0 }, resourceUpdates);
+    if (m_pipeline) {
+        const QSize outputSize = renderTarget()->pixelSize();
+        const QRect rect = ZxScreen::imageRect(imageSize, outputSize, m_fillMode);
+        // QRhiViewport's origin is bottom-left
+        cb->setViewport(QRhiViewport(rect.x(), outputSize.height() - rect.y() - rect.height(),
+                                     rect.width(), rect.height()));
+        cb->setGraphicsPipeline(m_pipeline.get());
+        cb->setShaderResources();
+        const QRhiCommandBuffer::VertexInput vbufBinding(m_vertexBuffer.get(), 0);
+        cb->setVertexInput(0, 1, &vbufBinding);
+        cb->draw(4);
+    }
     cb->endPass();
 }
 
-void ZxRhiRenderer::recreatePipeline(QRhiCommandBuffer *cb)
+void ZxRhiRenderer::recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates, QSize imageSize)
 {
     m_pipeline.reset();
-    auto zxImage = ZxImage::instance();
-    auto sz = zxImage->rgbImage().size();
-    if (sz.isNull())
+    if (imageSize.isEmpty())
         return;
-    m_texture.reset(m_rhi->newTexture(QRhiTexture::RGBA8, sz));
+    m_texture.reset(m_rhi->newTexture(QRhiTexture::RGBA8, imageSize));
     m_texture->create();
 
     static const float vertices[] = {
@@ -398,39 +397,44 @@ void ZxRhiRenderer::recreatePipeline(QRhiCommandBuffer *cb)
         1.0f, -1.0f, 0.0f, 1.0f,     1.0f, 1.0f  // Bottom-right
     };
 
-    m_vbuf.reset(m_rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, sizeof(vertices)));
-    m_vbuf->create();
-    auto resourceUpdates = m_rhi->nextResourceUpdateBatch();
-    resourceUpdates->uploadStaticBuffer(m_vbuf.get(), vertices);
+    m_vertexBuffer.reset(m_rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, sizeof(vertices)));
+    m_vertexBuffer->create();
+    resourceUpdates->uploadStaticBuffer(m_vertexBuffer.get(), vertices);
 
-    m_ubuf.reset(m_rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 64));
-    m_ubuf->create();
+    m_uniformBuffer.reset(m_rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 64));
+    m_uniformBuffer->create();
 
-    m_sampler.reset(m_rhi->newSampler(QRhiSampler::Nearest, QRhiSampler::Nearest, QRhiSampler::None,
-                                      QRhiSampler::ClampToEdge, QRhiSampler::ClampToEdge));
+    m_pushConstantsBuffer.reset(m_rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 64));
+    m_pushConstantsBuffer->create();
+
+    const auto filter = m_smoothScaling ? QRhiSampler::Linear : QRhiSampler::Nearest;
+    m_sampler.reset(m_rhi->newSampler(filter, filter, QRhiSampler::None,
+                                      QRhiSampler::Mirror, QRhiSampler::Mirror));
     m_sampler->create();
 
     m_srb.reset(m_rhi->newShaderResourceBindings());
     m_srb->setBindings({
-        QRhiShaderResourceBinding::sampledTexture(0, QRhiShaderResourceBinding::FragmentStage, m_texture.get(), m_sampler.get()),
-        QRhiShaderResourceBinding::uniformBuffer(1, QRhiShaderResourceBinding::VertexStage, m_ubuf.get())
+        QRhiShaderResourceBinding::uniformBuffer(0, QRhiShaderResourceBinding::VertexStage | QRhiShaderResourceBinding::FragmentStage, m_uniformBuffer.get()),
+        QRhiShaderResourceBinding::uniformBuffer(1, QRhiShaderResourceBinding::VertexStage | QRhiShaderResourceBinding::FragmentStage, m_pushConstantsBuffer.get()),
+        QRhiShaderResourceBinding::sampledTexture(2, QRhiShaderResourceBinding::FragmentStage, m_texture.get(), m_sampler.get()),
     });
     m_srb->create();
-
-    QRhiVertexInputLayout inputLayout;
-    inputLayout.setBindings({ QRhiVertexInputBinding(6 * sizeof(float)) });
-    inputLayout.setAttributes({
-        QRhiVertexInputAttribute(0, 0, QRhiVertexInputAttribute::Float2, 0),
-        QRhiVertexInputAttribute(0, 1, QRhiVertexInputAttribute::Float2, 4 * sizeof(float))
-    });
 
     m_pipeline.reset(m_rhi->newGraphicsPipeline());
     m_pipeline->setShaderStages({
         { QRhiShaderStage::Vertex, getShader(QLatin1String(":/shaders/simple.vert.qsb")) },
         { QRhiShaderStage::Fragment, getShader(QLatin1String(":/shaders/simple.frag.qsb")) }
     });
-    m_pipeline->setSampleCount(m_sampleCount);
+
+    QRhiVertexInputLayout inputLayout;
+    inputLayout.setBindings({ QRhiVertexInputBinding(6 * sizeof(float)) });
+    inputLayout.setAttributes({
+        QRhiVertexInputAttribute(0, 0, QRhiVertexInputAttribute::Float4, 0),
+        QRhiVertexInputAttribute(0, 1, QRhiVertexInputAttribute::Float2, 4 * sizeof(float))
+    });
     m_pipeline->setVertexInputLayout(inputLayout);
+    m_pipeline->setSampleCount(m_sampleCount);
+
     m_pipeline->setShaderResourceBindings(m_srb.get());
     m_pipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
     m_pipeline->setCullMode(QRhiGraphicsPipeline::None);
@@ -438,6 +442,4 @@ void ZxRhiRenderer::recreatePipeline(QRhiCommandBuffer *cb)
     m_pipeline->setTopology(QRhiGraphicsPipeline::TriangleStrip);
 
     m_pipeline->create();
-
-    cb->resourceUpdate(resourceUpdates);
 }

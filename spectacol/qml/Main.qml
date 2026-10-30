@@ -199,7 +199,7 @@ ApplicationWindow {
 
             ZxScreen {
                 id: zxScreen
-                anchors.centerIn: parent
+                anchors.fill: parent
 
                 onScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
 

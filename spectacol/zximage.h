@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "fusesettings.h"
+
 #include <QMutex>
 #include <QQuickRhiItemRenderer>
 #include <rhi/qrhi.h>
@@ -64,7 +66,7 @@ private:
     uint32_t m_rgbPixelsWidth = 0;
 
     bool m_recreate = false;
-    QMutex m_syncVars;
+    mutable QMutex m_syncVars;
 };
 
 class ZxRhiRenderer : public QQuickRhiItemRenderer
@@ -75,18 +77,20 @@ protected:
     void synchronize(QQuickRhiItem *item) override;
     void render(QRhiCommandBuffer *cb) override;
 private:
-    void recreatePipeline(QRhiCommandBuffer *cb);
+    void recreatePipeline(QRhiResourceUpdateBatch *resourceUpdates, QSize imageSize);
 
 private:
     QRhi *m_rhi = nullptr;
     int m_sampleCount = 1;
     QRhiTexture::Format m_textureFormat = QRhiTexture::RGBA8;
+    FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
+    bool m_smoothScaling = false;
     std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
-    std::unique_ptr<QRhiBuffer> m_vbuf;
-    std::unique_ptr<QRhiBuffer> m_ubuf;
+    std::unique_ptr<QRhiBuffer> m_vertexBuffer;
+    std::unique_ptr<QRhiBuffer> m_uniformBuffer;
+    std::unique_ptr<QRhiBuffer> m_pushConstantsBuffer;
     std::unique_ptr<QRhiTexture> m_texture;
     std::unique_ptr<QRhiSampler> m_sampler;
     std::unique_ptr<QRhiShaderResourceBindings> m_srb;
-    QSizeF m_itemSize;
 };
 

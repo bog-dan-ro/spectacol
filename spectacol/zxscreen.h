@@ -44,6 +44,11 @@ public:
     bool smoothScaling() const;
     void setSmoothScaling(bool smoothScaling);
 
+    FuseSettings::FillMode fillMode() const;
+
+    // Where the ZX image goes inside an output of outputSize pixels
+    static QRect imageRect(QSize imageSize, QSize outputSize, FuseSettings::FillMode fillMode);
+
 public slots:
     void updateFillMode();
 
@@ -54,15 +59,17 @@ signals:
 protected:
     // QQuickRhiItem interface
     QQuickRhiItemRenderer *createRenderer() final;
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) final;
+    void itemChange(ItemChange change, const ItemChangeData &value) final;
     void mousePressEvent(QMouseEvent *event) final;
     void mouseMoveEvent(QMouseEvent *event) final;
     void mouseReleaseEvent(QMouseEvent *event) final;
 
 private:
-    QSizeF m_textureSize;
-    qreal m_devicePixelRatio = 1.0;
+    void updateImplicitSize();
+
+private:
+    QSize m_imageSize;
     FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
     bool m_smoothScaling = false;
-    QPointer<QQuickItem> m_parentItem;
 };

@@ -49,27 +49,22 @@ ZxScreen::ZxScreen(QQuickItem *parent)
 {
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
+    // ZxRhiRenderer scales the image, the item's texture is drawn 1:1, don't blur it
+    setSmooth(false);
     m_fillMode = FuseEmulator::instance().settings()->fillMode();
     QSettings s;
     s.beginGroup(QLatin1String("Screen"));
     m_smoothScaling = s.value("smoothScaling", false).toBool();
-    setWidth(320);
-    setHeight(240);
-    connect(this, &QQuickItem::parentChanged, this, &ZxScreen::updateFillMode);
-    connect(this, &QQuickItem::windowChanged, this, &ZxScreen::updateFillMode);
-    connect(ZxImage::instance(), &ZxImage::needsUpdate, this, [this] {
-        if (window() && m_devicePixelRatio != window()->effectiveDevicePixelRatio()) {
-            m_devicePixelRatio = window()->effectiveDevicePixelRatio();
-            updateFillMode();
-        }
+    connect(ZxImage::instance(), &ZxImage::needsUpdate, this, &ZxScreen::update, Qt::QueuedConnection);
+    connect(ZxImage::instance(), &ZxImage::geometryChanged, this, [this](QSize size) {
+        m_imageSize = size;
+        updateImplicitSize();
         update();
     }, Qt::QueuedConnection);
-    connect(ZxImage::instance(), &ZxImage::geometryChanged, this, [this](QSize size) {
-        m_textureSize = size;
-        updateFillMode();
-    }, Qt::QueuedConnection);
 
-    updateFillMode();
+    // FUSE might have set up the display before the above connection was made
+    m_imageSize = ZxImage::instance()->imageSize();
+    updateImplicitSize();
 }
 
 bool ZxScreen::fullScreen() const
@@ -101,67 +96,83 @@ void ZxScreen::setSmoothScaling(bool smoothScaling)
     QSettings s;
     s.beginGroup(QLatin1String("Screen"));
     s.setValue("smoothScaling", smoothScaling);
-    setSmoothScaling(m_smoothScaling);
     emit smoothScalingChanged(smoothScaling);
     update();
+}
+
+FuseSettings::FillMode ZxScreen::fillMode() const
+{
+    return m_fillMode;
+}
+
+QRect ZxScreen::imageRect(QSize imageSize, QSize outputSize, FuseSettings::FillMode fillMode)
+{
+    if (imageSize.isEmpty() || outputSize.isEmpty())
+        return {};
+
+    QSize size = outputSize;
+    switch (fillMode) {
+    case FuseSettings::PreserveAspect: {
+        auto wf = fitFactor(imageSize.width(), outputSize.width());
+        auto hf = fitFactor(imageSize.height(), outputSize.height());
+        size = (QSizeF(imageSize) * std::min(wf, hf)).toSize();
+    }
+    break;
+
+    case FuseSettings::PreserveAspectFit:
+        size = imageSize.scaled(outputSize, Qt::KeepAspectRatio);
+        break;
+
+    case FuseSettings::Stretch:
+        break;
+    }
+
+    const int x = (outputSize.width() - size.width()) / 2;
+#ifdef Q_OS_ANDROID
+    // keep it at the top, in portrait mode the on screen controls go below it
+    const int y = 0;
+#else
+    const int y = (outputSize.height() - size.height()) / 2;
+#endif
+    return {QPoint{x, y}, size};
 }
 
 void ZxScreen::updateFillMode()
 {
     m_fillMode = FuseEmulator::instance().settings()->fillMode();
-
-    if (!window() || !m_textureSize.isValid())
-        return;
-
-    if (m_parentItem != parentItem()) {
-        if (m_parentItem) {
-            disconnect(m_parentItem, &QQuickItem::widthChanged, this, &ZxScreen::updateFillMode);
-            disconnect(m_parentItem, &QQuickItem::heightChanged, this, &ZxScreen::updateFillMode);
-        }
-        m_parentItem = parentItem();
-        if (m_parentItem) {
-            connect(m_parentItem, &QQuickItem::widthChanged, this, &ZxScreen::updateFillMode);
-            connect(m_parentItem, &QQuickItem::heightChanged, this, &ZxScreen::updateFillMode);
-        }
-    }
-    if (!m_parentItem)
-        return;
-
-    m_devicePixelRatio = window()->effectiveDevicePixelRatio();
-
-    QSizeF parentSize = m_parentItem->size();
-
-    switch (m_fillMode) {
-    case FuseSettings::PreserveAspect: {
-        auto wf = fitFactor(m_textureSize.width(), parentSize.width() * m_devicePixelRatio);
-        auto hf = fitFactor(m_textureSize.height(), parentSize.height() * m_devicePixelRatio);
-        auto factor = std::min(wf, hf);
-        factor /= m_devicePixelRatio;
-        setWidth(m_textureSize.width() * factor);
-        setHeight(m_textureSize.height() * factor);
-    }
-    break;
-
-    case FuseSettings::PreserveAspectFit: {
-        auto wf = parentSize.width() / m_textureSize.width();
-        auto hf = parentSize.height() / m_textureSize.height();
-        auto factor = std::min(wf, hf);
-        setWidth(m_textureSize.width() * factor);
-        setHeight(m_textureSize.height() * factor);
-    }
-    break;
-
-    case FuseSettings::Stretch:
-        setWidth(parentSize.width());
-        setHeight(parentSize.height());
-        break;
-    }
+    updateImplicitSize();
     update();
+}
+
+void ZxScreen::updateImplicitSize()
+{
+    // The implicit size is the size of the image on the screen, Main.qml uses it to place the on screen controls.
+    // Compute it the same way as QQuickRhiItem computes its texture size.
+    const qreal dpr = window() ? window()->effectiveDevicePixelRatio() : 1.0;
+    const QSize outputSize = (size() * dpr).toSize();
+    const QSizeF imageSize = QSizeF(imageRect(m_imageSize, outputSize, m_fillMode).size()) / dpr;
+    setImplicitSize(imageSize.width(), imageSize.height());
 }
 
 QQuickRhiItemRenderer *ZxScreen::createRenderer()
 {
     return new ZxRhiRenderer();
+}
+
+void ZxScreen::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+{
+    QQuickRhiItem::geometryChange(newGeometry, oldGeometry);
+    if (newGeometry.size() != oldGeometry.size())
+        updateImplicitSize();
+}
+
+void ZxScreen::itemChange(ItemChange change, const ItemChangeData &value)
+{
+    QQuickRhiItem::itemChange(change, value);
+    if (change == ItemSceneChange || change == ItemDevicePixelRatioHasChanged) {
+        updateImplicitSize();
+        update();
+    }
 }
 
 void ZxScreen::mousePressEvent(QMouseEvent *event)
