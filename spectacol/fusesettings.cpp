@@ -166,16 +166,6 @@ void FuseSettings::setLoadingSound(bool loadingSound)
     safe_set(settings_current.sound_load, loadingSound);
 }
 
-bool FuseSettings::soundForce8Bit() const
-{
-    return settings_current.sound_force_8bit;
-}
-
-void FuseSettings::setSoundForce8Bit(bool force8Bit)
-{
-    safe_set(settings_current.sound_force_8bit, force8Bit);
-}
-
 QString FuseSettings::AYStereoSeparation() const
 {
     return _(settings_current.stereo_ay);

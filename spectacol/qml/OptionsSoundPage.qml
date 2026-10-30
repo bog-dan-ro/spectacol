@@ -66,19 +66,10 @@ Flickable {
             CheckBox {
                 id: loadingSound
                 KeyNavigation.up: soundEnabled
-                KeyNavigation.down: soundForce8Bit
+                KeyNavigation.down: ayStereoSeparation
                 text: qsTr("Loading sound")
                 checked: FuseEmulator.settings.loadingSound
                 onCheckedChanged: FuseEmulator.settings.loadingSound = checked
-            }
-
-            CheckBox {
-                id: soundForce8Bit
-                KeyNavigation.up: loadingSound
-                KeyNavigation.down: ayStereoSeparation
-                text: qsTr("Force 8 bit")
-                checked: FuseEmulator.settings.soundForce8Bit
-                onCheckedChanged: FuseEmulator.settings.soundForce8Bit = checked
             }
 
             RowLayout {
@@ -96,7 +87,7 @@ Flickable {
                         if (popup.visible)
                             decrementCurrentIndex();
                         else
-                            soundForce8Bit.forceActiveFocus(Qt.TabFocusReason);
+                            loadingSound.forceActiveFocus(Qt.TabFocusReason);
                     }
                     Keys.onDownPressed: {
                         if (popup.visible)

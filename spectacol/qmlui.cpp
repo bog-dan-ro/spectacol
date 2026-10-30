@@ -17,11 +17,10 @@
 */
 
 #include "qmlui.h"
+#include "breakpointsmodel.h"
 #include "fuseemulator.h"
 #include "fuserecording.h"
 #include "fusesettings.h"
-#include "breakpointsmodel.h"
-#include "disassamblemodel.h"
 
 #include <QAudioDevice>
 #include <QMediaDevices>
@@ -34,6 +33,7 @@ extern "C"  {
 # include <fusetape.h>
 # include <settings.h>
 # include <pokefinder/pokefinder.h>
+# include <ui/ui_internals.h>
 # include <ui/uidisplay.h>
 # include <ui/widget/widget.h>
 }
@@ -200,7 +200,7 @@ ui_confirm_save_t ui_confirm_save_specific( const char *message )
     return FuseEmulator::instance().uiConfirmSaveSpecific(message);
 }
 
-extern "C" int ui_query( const char *message )
+extern "C" int ui_query_message(const char *message)
 {
     return FuseEmulator::instance().uiQuery(message);
 }

@@ -55,7 +55,6 @@ class FuseSettings : public FuseObject
     // Sound Options
     Q_PROPERTY(bool soundEnabled READ soundEnabled WRITE setSoundEnabled NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool loadingSound READ loadingSound WRITE setLoadingSound NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool soundForce8Bit READ soundForce8Bit WRITE setSoundForce8Bit NOTIFY settingsCurrentChanged)
     Q_PROPERTY(QString AYStereoSeparation READ AYStereoSeparation WRITE setAYStereoSeparation NOTIFY settingsCurrentChanged)
     Q_PROPERTY(QString speakerType READ speakerType WRITE setSpeakerType NOTIFY settingsCurrentChanged)
 
@@ -111,9 +110,6 @@ public:
 
     bool loadingSound() const;
     void setLoadingSound(bool loadingSound);
-
-    bool soundForce8Bit() const;
-    void setSoundForce8Bit(bool force8Bit);
 
     QString AYStereoSeparation() const;
     void setAYStereoSeparation(const QString &AYStereoSeparation);

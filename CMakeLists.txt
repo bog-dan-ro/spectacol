@@ -8,11 +8,7 @@ project(Spectacol
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 23)
 
-set(QT_REQUIRED_VERSION "6.7")
-
-find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Quick Multimedia ShaderTools)
-
-qt_standard_project_setup(REQUIRES ${QT_REQUIRED_VERSION})
+set(QT_REQUIRED_VERSION "6.11")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -27,7 +23,15 @@ FetchContent_Declare(
     GIT_TAG dev
 )
 
+# QtGamepadLegacy is built with Qt's internal build system, so it must find Qt
+# before we do: otherwise Qt's BuildInternals can't promote the 3rd party targets
+# (e.g. Threads::Threads) we already imported to global, and Qt6QmlConfig skips
+# loading Qt6QmlBuildInternals (qt_internal_add_qml_module).
 FetchContent_MakeAvailable(QtGamepad)
+
+find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Quick Multimedia ShaderTools GuiPrivate)
+
+qt_standard_project_setup(REQUIRES ${QT_REQUIRED_VERSION})
 
 macro(FetchAndBuildLibrary lib_name lib_repo lib_tag configure_flags)
     FetchContent_Declare(
@@ -87,8 +91,8 @@ macro(FetchAndBuildLibrary lib_name lib_repo lib_tag configure_flags)
     )
 endmacro()
 
-FetchAndBuildLibrary(libspectrum "git://git.code.sf.net/u/bog-dan-ro/libspectrum" master "--disable-shared --with-fake-glib --without-bzip2 --without-libgcrypt --without-libaudiofile")
-FetchAndBuildLibrary(fuse "git://git.code.sf.net/u/bog-dan-ro/fuse" master "--disable-shared --without-gtk --without-alsa --without-sdl --without-libxml2 --with-joystick --with-no-ui --without-png")
+FetchAndBuildLibrary(libspectrum "git://git.code.sf.net/u/bog-dan-ro/libspectrum" master "--disable-shared --with-fake-glib --without-bzip2 --without-libgcrypt")
+FetchAndBuildLibrary(fuse "git://git.code.sf.net/u/bog-dan-ro/fuse" master "--disable-shared --without-gtk --with-audio-driver=null --without-sdl --without-libxml2 --with-joystick --with-no-ui --without-png")
 
 add_subdirectory(spectacol)
 

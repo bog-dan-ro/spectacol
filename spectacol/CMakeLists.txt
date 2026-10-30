@@ -67,6 +67,7 @@ qt_add_resources(spectacol "resources"
 )
 
 qt_add_shaders(spectacol "spectacol_shaders"
+    GLSL "310es,450"
     PRECOMPILE
     OPTIMIZED
     PREFIX

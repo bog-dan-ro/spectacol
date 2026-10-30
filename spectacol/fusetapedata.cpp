@@ -102,7 +102,10 @@ void FuseTapeData::addBlockInfo(libspectrum_tape_block *block, void *user_data)
     tapeData.length = libspectrum_tape_block_data_length(block);
     tapeData.data = QByteArray((const char *)libspectrum_tape_block_data(block), tapeData.length);
     tapeData.data = qCompress(tapeData.data, 9).toBase64(QByteArray::Base64UrlEncoding);
-    tape_block_details(temp, 256, block);
-    tapeData.detail = temp;
+    char *details = nullptr;
+    if (!tape_block_details(&details, block)) {
+        tapeData.detail = details;
+        libspectrum_free(details);
+    }
     self->m_tapeBlocks.push_back(tapeData);
 }

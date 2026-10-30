@@ -116,10 +116,13 @@ void FuseTape::write(QString filePath)
 void FuseTape::checkProgramName(libspectrum_tape_block *block, void *user_data)
 {
     auto self = reinterpret_cast<FuseTape*>(user_data);
-    QByteArray temp{256, 0};
-    tape_block_details(temp.data(), temp.size(), block);
-    if (temp.startsWith("Program: \""))
-        self->setProgramName(temp.mid(10, 8).trimmed());
+    char *details = nullptr;
+    if (!tape_block_details(&details, block)) {
+        const QByteArray temp{details};
+        libspectrum_free(details);
+        if (temp.startsWith("Program: \""))
+            self->setProgramName(QString::fromUtf8(temp.mid(10, temp.lastIndexOf('"') - 10)).left(8).trimmed());
+    }
     switch (libspectrum_tape_block_type(block)) {
     case LIBSPECTRUM_TAPE_BLOCK_ROM:
     case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:

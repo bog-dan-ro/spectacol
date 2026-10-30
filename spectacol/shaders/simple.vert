@@ -1,15 +1,24 @@
 #version 450
 
-layout(location = 0) in vec4 position;
-layout(location = 1) in vec2 texcoord;
+layout(push_constant) uniform Push
+{
+        vec4 SourceSize;
+        vec4 OriginalSize;
+        vec4 OutputSize;
+        uint FrameCount;
+} params;
 
-layout(location = 0) out vec2 v_texcoord;
+layout(std140, set = 0, binding = 0) uniform UBO
+{
+        mat4 MVP;
+} global;
 
-layout(std140, binding = 1) uniform MVP {
-    mat4 u_mvp;
-};
+layout(location = 0) in vec4 Position;
+layout(location = 1) in vec2 TexCoord;
+layout(location = 0) out vec2 vTexCoord;
 
-void main() {
-    v_texcoord = texcoord;
-    gl_Position = u_mvp * position;
+void main()
+{
+   gl_Position = global.MVP * Position;
+   vTexCoord = TexCoord;
 }

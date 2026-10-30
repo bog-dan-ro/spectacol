@@ -92,6 +92,12 @@ extern "C" const char *compat_get_config_path()
     return path.constData();
 }
 
+extern "C" const char *compat_get_fallback_config_path()
+{
+    // No legacy location to fall back to, don't pick up a standalone fuse's ~/.fuserc
+    return nullptr;
+}
+
 extern "C" int compat_is_absolute_path(const char *path)
 {
     return QFileInfo(path).isAbsolute() ? 1 : 0;
