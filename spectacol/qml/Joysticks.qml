@@ -25,12 +25,10 @@ import "private"
 Item {
     FancyList {
         id: view
-        Component.onCompleted: FuseEmulator.paused = true
-        Component.onDestruction: FuseEmulator.paused = false
 
-        model: FuseEmulator.joysticksModel
-        currentIndex: FuseEmulator.selectedJoysticksIndex
-        onCurrentIndexChanged: FuseEmulator.selectedJoysticksIndex = currentIndex
+        model: ZxEmulator.joysticksModel
+        currentIndex: ZxEmulator.selectedJoysticksIndex
+        onCurrentIndexChanged: ZxEmulator.selectedJoysticksIndex = currentIndex
 
         width: 7 * (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20)
         delegate: Rectangle {

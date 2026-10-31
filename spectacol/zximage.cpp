@@ -17,117 +17,17 @@
 */
 
 #include "zximage.h"
-#include "fuseemulator.h"
 
-#include <QtEndian>
 #include <rhi/qrhi.h>
 
-#include <cstring>
+#include <algorithm>
+#include <span>
 #include <utility>
 
-extern "C"  {
-# include <display.h>
-# include <machine.h>
-# include <ui/scaler/scaler.h>
-# include <ui/uidisplay.h>
-}
-
-// A pixel of a QImage::Format_RGBA8888 image, which stores the bytes in R, G, B, A order
-inline constexpr uint32_t zxColor(uint32_t r, uint32_t g, uint32_t b)
-{
-    return qFromLittleEndian((0xffu << 24) | ((b & 0xffu) << 16) | ((g & 0xffu) << 8) | (r & 0xffu));
-}
-
-static const uint32_t palette[16] = {
-    zxColor(  0,   0,   0),
-    zxColor(  0,   0, 192),
-    zxColor(192,   0,   0),
-    zxColor(192,   0, 192),
-    zxColor(  0, 192,   0),
-    zxColor(  0, 192, 192),
-    zxColor(192, 192,   0),
-    zxColor(192, 192, 192),
-    zxColor(  0,   0,   0),
-    zxColor(  0,   0, 255),
-    zxColor(255,   0,   0),
-    zxColor(255,   0, 255),
-    zxColor(  0, 255,   0),
-    zxColor(  0, 255, 255),
-    zxColor(255, 255,   0),
-    zxColor(255, 255, 255)
-};
-
-extern "C" int uidisplay_init( int width, int height )
-{
-    ZxImage::instance()->resize(width, height);
-
-    // FUSE calls this on every machine change, selecting the same scaler again
-    // would only rescale the image one more time
-    if (current_scaler != SCALER_NORMAL) {
-        scaler_register_clear();
-        scaler_register(SCALER_NORMAL);
-        scaler_select_scaler(SCALER_NORMAL);
-    }
-    display_ui_initialised = 1;
-    return 0;
-}
-
-extern "C" int uidisplay_hotswap_gfx_mode()
-{
-    // runs on the FUSE thread, so there is no need to pause the emulation
-    ZxImage::instance()->rescale();
-    return 0;
-}
-
-extern "C" int uidisplay_end()
-{
-    return 0;
-}
-
-extern "C" void uidisplay_putpixel( int x, int y, int colour )
-{
-    ZxImage::instance()->putPixel(x, y, colour);
-}
-
-/* Print the 8 pixels in `data' using ink colour `ink' and paper
-   colour `paper' to the screen at ( (8*x) , y ) */
-extern "C" void uidisplay_plot8( int x, int y, libspectrum_byte data,
-                 libspectrum_byte ink, libspectrum_byte paper )
-{
-    ZxImage::instance()->plot8(x, y, data, ink, paper);
-}
-
-/* Print the 16 pixels in `data' using ink colour `ink' and paper
-   colour `paper' to the screen at ( (16*x) , y ) */
-extern "C" void uidisplay_plot16( int x, int y, libspectrum_word data,
-                 libspectrum_byte ink, libspectrum_byte paper )
-{
-    ZxImage::instance()->plot16(x, y, data, ink, paper);
-}
-
-extern "C" void uidisplay_area( int x, int y, int w, int h )
-{
-    ZxImage::instance()->update(x, y, w, h);
-}
-
-extern "C" void uidisplay_frame_end( void )
-{
-    ZxImage::instance()->frameEnd();
-}
-
-extern "C" void uidisplay_frame_save( void )
-{
-    ZxImage::instance()->saveScreen();
-}
-
-extern "C" void uidisplay_frame_restore( void )
-{
-    ZxImage::instance()->restoreScreen();
-}
-
 ZxImage::ZxImage()
+    : m_frameImage(int(zxkit::VideoFrame::kDefaultWidth), int(zxkit::VideoFrame::kDefaultHeight), QImage::Format_RGBA8888)
 {
-    FuseEmulator::instance().startFuseThread();
+    m_frameImage.fill(Qt::black);
 }
 
 ZxImage::~ZxImage() = default;
@@ -138,26 +38,40 @@ ZxImage *ZxImage::instance()
     return &self;
 }
 
-void ZxImage::resize(uint32_t w, uint32_t h)
+void ZxImage::presentFrame(const zxkit::VideoFramePtr &frame)
 {
-    m_rgbImage = QImage{int(w), int(h), QImage::Format_RGBA8888};
-    m_rgbImage.fill(Qt::black);
-    m_rgbPixelsWidth = m_rgbImage.bytesPerLine() / 4;
-    m_rgbPixels = reinterpret_cast<uint32_t *>(m_rgbImage.bits());
+    if (!frame)
+        return;
+
+    const auto pixels = frame.readLock();
+    const QSize size(int(pixels->width()), int(pixels->height()));
+    bool resized = false;
     {
         QMutexLocker lock(&m_syncVars);
-        m_frameImage = m_rgbImage.copy();
-        m_frameDirty = {};
+        if (m_frameImage.size() != size) {
+            m_frameImage = QImage(size, QImage::Format_RGBA8888);
+            m_frameDirty = m_frameImage.rect();
+            resized = true;
+        }
+        int top = size.height();
+        int bottom = -1;
+        for (int y = 0; y < size.height(); ++y) {
+            const auto row = pixels->scanline(uint32_t(y));
+            // constScanLine() doesn't detach the image from the renderer's copy, scanLine() does
+            const auto current = std::span(reinterpret_cast<const uint32_t *>(m_frameImage.constScanLine(y)), row.size());
+            if (!resized && std::ranges::equal(row, current))
+                continue;
+            std::ranges::copy(row, reinterpret_cast<uint32_t *>(m_frameImage.scanLine(y)));
+            top = std::min(top, y);
+            bottom = y;
+        }
+        if (bottom < 0)
+            return; // nothing changed
+        m_frameDirty |= QRect(0, top, size.width(), bottom - top + 1);
     }
-    rescale();
-}
-
-void ZxImage::rescale()
-{
-    update(0, 0, m_rgbImage.width(), m_rgbImage.height());
-    // don't wait for the frame end, the emulation might be paused
-    publishFrame();
-    emit geometryChanged(m_rgbImage.size());
+    if (resized)
+        emit geometryChanged(size);
+    emit needsUpdate();
 }
 
 QSize ZxImage::imageSize() const
@@ -170,146 +84,6 @@ ZxImage::Frame ZxImage::takeFrame()
 {
     QMutexLocker lock(&m_syncVars);
     return {m_frameImage, std::exchange(m_frameDirty, {})};
-}
-
-void ZxImage::update(int x, int y, int w, int h)
-{
-    m_dirty |= QRect{x, y, w, h};
-}
-
-void ZxImage::frameEnd()
-{
-    publishFrame();
-}
-
-void ZxImage::publishFrame()
-{
-    const QRect dirty = m_dirty & m_rgbImage.rect();
-    m_dirty = {};
-    if (dirty.isEmpty())
-        return;
-
-    {
-        QMutexLocker lock(&m_syncVars);
-        // bits() detaches m_frameImage if the renderer still holds a copy of it
-        auto *framePixels = reinterpret_cast<uint32_t *>(m_frameImage.bits());
-        const auto framePixelsWidth = m_frameImage.bytesPerLine() / 4;
-        for (int y = dirty.top(); y <= dirty.bottom(); ++y) {
-            std::memcpy(framePixels + framePixelsWidth * y + dirty.left(),
-                        m_rgbPixels + m_rgbPixelsWidth * y + dirty.left(),
-                        dirty.width() * sizeof(uint32_t));
-        }
-        m_frameDirty |= dirty;
-    }
-    emit needsUpdate();
-}
-
-void ZxImage::saveScreen()
-{
-    m_savedImage = m_rgbImage.copy();
-}
-
-void ZxImage::restoreScreen()
-{
-    if (m_savedImage.size() != m_rgbImage.size())
-        return;
-    // copy the pixels, m_rgbPixels must keep pointing to m_rgbImage's buffer
-    std::memcpy(m_rgbPixels, m_savedImage.constBits(), m_rgbImage.sizeInBytes());
-    update(0, 0, m_rgbImage.width(), m_rgbImage.height());
-}
-
-void ZxImage::putPixel(int x, int y, int colour)
-{
-    Q_ASSERT(colour < 16);
-
-    const auto rgbColor = palette[colour];
-
-    if (machine_current->timex) {
-        // the image is twice as big, every pixel is a 2x2 block
-        x <<= 1;
-        y <<= 1;
-        Q_ASSERT(x + 1 < m_rgbImage.width() && y + 1 < m_rgbImage.height());
-        m_rgbPixels[x + m_rgbPixelsWidth * y] = rgbColor;
-        m_rgbPixels[x + 1 + m_rgbPixelsWidth * y] = rgbColor;
-        m_rgbPixels[x + m_rgbPixelsWidth * (y + 1)] = rgbColor;
-        m_rgbPixels[x + 1 + m_rgbPixelsWidth * (y + 1)] = rgbColor;
-    } else {
-        Q_ASSERT(x < m_rgbImage.width() && y < m_rgbImage.height());
-        m_rgbPixels[x + m_rgbPixelsWidth * y] = rgbColor;
-    }
-}
-
-void ZxImage::plot8(int x, int y, libspectrum_byte data, libspectrum_byte ink, libspectrum_byte paper)
-{
-    Q_ASSERT(ink < 16 && paper < 16);
-    const auto inkColor = palette[ink];
-    const auto paperColor = palette[paper];
-
-    if (machine_current->timex) {
-        x <<= 4;
-        y <<= 1;
-        for (int i = 0; i < 2; ++i) {
-            auto *dataPtr = m_rgbPixels + x + m_rgbPixelsWidth * y++;
-            *(dataPtr++) = ( data & 0x80 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x80 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x40 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x40 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x20 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x20 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x10 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x10 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x08 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x08 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x04 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x04 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x02 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x02 ) ? inkColor : paperColor;
-            *(dataPtr++) = ( data & 0x01 ) ? inkColor : paperColor;
-            *dataPtr     = ( data & 0x01 ) ? inkColor : paperColor;
-        }
-    } else {
-        x <<= 3;
-        auto *dataPtr = m_rgbPixels + x + m_rgbPixelsWidth * y;
-        *dataPtr++ = (data & 0x80) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x40) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x20) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x10) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x08) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x04) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x02) ? inkColor : paperColor;
-        *dataPtr   = (data & 0x01) ? inkColor : paperColor;
-    }
-}
-
-void ZxImage::plot16(int x, int y, libspectrum_word data, libspectrum_byte ink, libspectrum_byte paper)
-{
-    Q_ASSERT(ink < 16 && paper < 16);
-
-    const auto inkColor = palette[ink];
-    const auto paperColor = palette[paper];
-
-    x <<= 4;
-    y <<= 1;
-
-    for (int i = 0; i < 2; ++i) {
-        auto *dataPtr = m_rgbPixels + x + m_rgbPixelsWidth * y++;
-        *dataPtr++ = (data & 0x8000) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x4000) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x2000) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x1000) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0800) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0400) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0200) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0100) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0080) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0040) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0020) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0010) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0008) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0004) ? inkColor : paperColor;
-        *dataPtr++ = (data & 0x0002) ? inkColor : paperColor;
-        *dataPtr   = (data & 0x0001) ? inkColor : paperColor;
-    }
 }
 
 ZxTexture::ZxTexture() = default;

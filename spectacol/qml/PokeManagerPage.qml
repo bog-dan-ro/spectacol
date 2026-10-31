@@ -28,16 +28,14 @@ import "private"
 Item {
     anchors.fill: parent
     Component.onCompleted: {
-        FuseEmulator.processInputEvents = false;
-        FuseEmulator.paused = true;
+        ZxEmulator.processInputEvents = false;
     }
     Component.onDestruction: {
-        FuseEmulator.processInputEvents = true;
-        FuseEmulator.paused = false;
+        ZxEmulator.processInputEvents = true;
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Space
         buttonBKey: Qt.Key_Escape
         buttonYKey: Qt.Key_Y

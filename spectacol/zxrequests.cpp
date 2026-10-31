@@ -18,7 +18,7 @@
 #include "zxrequests.h"
 
 #include "zxgamesmodel.h"
-#include "fuseemulator.h"
+#include "zxemulator.h"
 
 #include <QCryptographicHash>
 
@@ -32,9 +32,11 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
+using namespace Qt::StringLiterals;
+
 namespace {
-    const QString zxSpectrumSearchTitle = QLatin1String("&fl[]=identifier&fl[]=title&sort[]=titleSorter+asc&rows=%1&page=%2&output=json");
-    const QLatin1String metadata("https://archive.org/metadata/");
+    const QString zxSpectrumSearchTitle = u"&fl[]=identifier&fl[]=title&sort[]=titleSorter+asc&rows=%1&page=%2&output=json"_s;
+    const QString metadata = u"https://archive.org/metadata/"_s;
 }
 
 ZXRequest::ZXRequest(ZXGamesModel *parent)
@@ -61,13 +63,13 @@ ZXSearchRequest::ZXSearchRequest(ZXGamesModel *parent)
     connect(m_reply.data(), &QNetworkReply::finished, this, [this] {
         if (!m_aborted && !m_data.isEmpty()) {
             QJsonDocument doc = QJsonDocument::fromJson(m_data);
-            auto response = doc.object().value(QLatin1String("response")).toObject();
-            size_t numFound = response.value(QLatin1String("numFound")).toInt();
-            auto docs = response.value(QLatin1String("docs")).toArray();
+            auto response = doc.object().value(u"response"_s).toObject();
+            size_t numFound = response.value(u"numFound"_s).toInt();
+            auto docs = response.value(u"docs"_s).toArray();
             std::vector<ZXGamesModel::ZXData> data;
             for (const auto &doc : docs) {
                 auto obj = doc.toObject();
-                data.emplace_back(obj.value(QLatin1String("title")).toString(), obj.value(QLatin1String("identifier")).toString());
+                data.emplace_back(obj.value(u"title"_s).toString(), obj.value(u"identifier"_s).toString());
             }
             m_model->setSearchData(data, numFound);
         }
@@ -97,12 +99,12 @@ ZXFetchRequest::ZXFetchRequest(ZXGamesModel *parent, size_t start, size_t count)
     m_reply = parent->networkManager().get(req);
     connect(m_reply.data(), &QNetworkReply::finished, this, [this] {
         if (!m_aborted && !m_data.isEmpty()) {
-            auto response = QJsonDocument::fromJson(m_data).object().value(QLatin1String("response")).toObject();
-            auto docs = response.value(QLatin1String("docs")).toArray();
+            auto response = QJsonDocument::fromJson(m_data).object().value(u"response"_s).toObject();
+            auto docs = response.value(u"docs"_s).toArray();
             std::vector<ZXGamesModel::ZXData> data;
-            for (const auto &doc : docs) {
+            for (const auto &doc : std::as_const(docs)) {
                 auto obj = doc.toObject();
-                data.emplace_back(obj.value(QLatin1String("title")).toString(), obj.value(QLatin1String("identifier")).toString());
+                data.emplace_back(obj.value(u"title"_s).toString(), obj.value(u"identifier"_s).toString());
             }
             m_model->setFetchedData(data);
         }
@@ -128,26 +130,26 @@ ZXUpdateRequest::ZXUpdateRequest(ZXGamesModel *parent, const QString &identifier
         if (!m_aborted && !m_data.isEmpty()) {
             QJsonDocument doc = QJsonDocument::fromJson(m_data);
             auto rootObject = doc.object();
-            auto files = rootObject.value(QLatin1String("files")).toArray();
-            auto metadata = rootObject.value(QLatin1String("metadata")).toObject();
-            QString emulator_ext = QLatin1Char('.') + metadata.value(QLatin1String("emulator_ext")).toString();
-            for (const auto &file : files) {
+            auto files = rootObject.value(u"files"_s).toArray();
+            auto metadata = rootObject.value(u"metadata"_s).toObject();
+            QString emulator_ext = u'.' + metadata.value(u"emulator_ext"_s).toString();
+            for (const auto &file : std::as_const(files)) {
                 auto obj = file.toObject();
-                QString name = obj.value(QLatin1String("name")).toString();
+                QString name = obj.value(u"name"_s).toString();
                 if (name.endsWith(emulator_ext)) {
-                    QString md5 = obj.value(QLatin1String("md5")).toString().toLower();
-                    QString path = FuseEmulator::instance().saveFilePath(name);
+                    QString md5 = obj.value(u"md5"_s).toString().toLower();
+                    QString path = ZxEmulator::instance().saveFilePath(name);
                     QFile f(path);
                     if (!f.open(QIODevice::ReadOnly) ||
                             QCryptographicHash::hash(f.readAll(), QCryptographicHash::Md5).toHex().toLower() != md5) {
-                        auto workable_servers = rootObject.value(QLatin1String("workable_servers")).toArray();
+                        auto workable_servers = rootObject.value(u"workable_servers"_s).toArray();
                         if (workable_servers.empty())
                             return;
 
                         auto download_url
-                            = QLatin1String("https://")
+                            = u"https://"_s
                               + workable_servers.at(rand() % workable_servers.size()).toString()
-                              + rootObject.value(QLatin1String("dir")).toString() + QLatin1Char('/')
+                              + rootObject.value(u"dir"_s).toString() + u'/'
                               + name;
 
                         QNetworkRequest req(download_url);

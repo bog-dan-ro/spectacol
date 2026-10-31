@@ -18,10 +18,14 @@
 #include "folderlistmodel.h"
 #include "qmlui.h"
 
+#include <zxkit/media/MediaPreview.h>
+
 #include <QDateTime>
 #include <QDirIterator>
 #include <QSet>
 #include <QTimer>
+
+using namespace Qt::StringLiterals;
 
 namespace {
     static QCache<QString, int> s_currentIndexes;
@@ -38,7 +42,7 @@ FolderListModel::~FolderListModel()
 
 void FolderListModel::setFolder(QString folder)
 {
-    if (folder.startsWith(QLatin1String("file://")))
+    if (folder.startsWith(u"file://"_s))
         folder = folder.mid(7);
 
     if (m_folder == folder)
@@ -53,7 +57,7 @@ void FolderListModel::setFolder(QString folder)
 
 void FolderListModel::setRootFolder(QString rootFolder)
 {
-    if (rootFolder.startsWith(QLatin1String("file://")))
+    if (rootFolder.startsWith(u"file://"_s))
         rootFolder = rootFolder.mid(7);
 
     if (m_rootFolder == rootFolder)
@@ -186,17 +190,17 @@ bool FolderListModel::canOpen(const QString &path)
     QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return false;
-    libspectrum_id_t fileType;
-    libspectrum_class_t fileClass;
-    const auto &buffer = f.read(1024*1024);
-    auto error = libspectrum_identify_file_with_class(&fileType, &fileClass, path.toUtf8().constData(), (const unsigned char *)buffer.constData(), buffer.size());
-    if (error != LIBSPECTRUM_ERROR_NONE || fileType == LIBSPECTRUM_ID_UNKNOWN || fileClass == LIBSPECTRUM_CLASS_UNKNOWN)
+    const auto buffer = f.read(64);
+    const std::span<const uint8_t> span(reinterpret_cast<const uint8_t *>(buffer.constData()), size_t(buffer.size()));
+    const auto fileClass = zxkit::classifyMediaFile(path.toStdString(), span);
+    if (fileClass == zxkit::MediaClass::Unknown)
         return false;
 
     switch (m_filterClass) {
     case Tapes:
-        return fileClass == LIBSPECTRUM_CLASS_TAPE;
-    // TODO: Add disk as well
+        return fileClass == zxkit::MediaClass::Tape;
+    case Disks:
+        return fileClass == zxkit::MediaClass::Disk;
     default:
         break;
     }
@@ -213,8 +217,8 @@ void FolderListModel::refresh()
     while(it.hasNext()) {
         it.next();
         const auto &inf = it.fileInfo();
-        QString baseName = inf.absolutePath() + QLatin1Char('/') + inf.completeBaseName();
-        if (inf.suffix().toLower() == QLatin1String("pok") && files.contains(baseName))
+        QString baseName = inf.absolutePath() + u'/' + inf.completeBaseName();
+        if (inf.suffix().toLower() == u"pok"_s && files.contains(baseName))
             continue;
 
         if (inf.isDir() || canOpen(inf.absoluteFilePath().toUtf8().constData())) {

@@ -52,22 +52,22 @@ Rectangle {
     }
 
     function showMessage(level, text) {
-        if (level < FuseEmulator.settings.messageLevel)
+        if (level < ZxEmulator.settings.messageLevel)
             return;
 
         var msg = "";
         switch(level) {
-        case FuseEmulator.Info:
+        case ZxEmulator.Info:
             msgDialog.border.color = "white"
             msg = qsTr("<b>Info:</b> ");
             break;
 
-        case FuseEmulator.Warning:
+        case ZxEmulator.Warning:
             msgDialog.border.color = "yellow"
             msg = qsTr("<b>Warning:</b> ");
             break;
 
-        case FuseEmulator.Error:
+        case ZxEmulator.Error:
             msgDialog.border.color = "red"
             msg = qsTr("<b>Error:</b> ");
             break;

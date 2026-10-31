@@ -27,14 +27,12 @@ import "private"
 
 Item {
     Component.onCompleted: {
-        FuseEmulator.processInputEvents = false;
-        FuseEmulator.paused = true;
-        if (FuseEmulator.touchscreen)
-            messagePage.showMessage(FuseEmulator.Info, qsTr("Long tap on an item to view the content"));
+        ZxEmulator.processInputEvents = false;
+        if (ZxEmulator.touchscreen)
+            messagePage.showMessage(ZxEmulator.Info, qsTr("Long tap on an item to view the content"));
     }
     Component.onDestruction: {
-        FuseEmulator.processInputEvents = true;
-        FuseEmulator.paused = false;
+        ZxEmulator.processInputEvents = true;
     }
 
     anchors.fill: parent
@@ -105,7 +103,7 @@ Item {
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignTop
-                        text: FuseEmulator.dumpData(base64CompressedData, offset.value, TextSizes.smallScreen? 8 : 16);
+                        text: ZxEmulator.dumpData(base64CompressedData, offset.value, TextSizes.smallScreen? 8 : 16);
                     }
                 }
                 Image {
@@ -123,14 +121,14 @@ Item {
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
     }
 
     FancyBaseList {
         id: view
-        FuseTapeData {
+        ZxTapeData {
             id: tapeData
         }
 

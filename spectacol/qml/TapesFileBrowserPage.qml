@@ -23,10 +23,8 @@ import Spectacol
 
 CoverFlowFiles {
     id: browser
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
-    folder: FuseEmulator.dataPath
+    folder: ZxEmulator.dataPath
     filterClass: FolderListModel.Tapes
 
     Settings {
@@ -36,7 +34,7 @@ CoverFlowFiles {
 
     onFileSelected: {
         if (filePath)
-            FuseEmulator.tape.open(filePath);
+            ZxEmulator.tape.open(filePath);
         pageLoader.source = "";
     }
 }

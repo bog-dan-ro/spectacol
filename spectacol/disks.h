@@ -17,22 +17,33 @@
 
 #pragma once
 
+#include <QQmlEngine>
+
 #include <QObject>
 
-#include <functional>
-
-class FuseObject : public QObject
+class ZxEmulator;
+class Disks : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("use ZxEmulator.disks instead")
+    Q_PROPERTY(int count READ count NOTIFY countChanged FINAL)
 
 public:
-    explicit FuseObject(QObject *parent = nullptr);
-    typedef std::function<void()> Function;
-    void callFunction(const Function &func);
-    void callFunctionDelayed(int ms, const Function &func);
-    bool event(QEvent *);
+    explicit Disks(ZxEmulator *parent = nullptr);
 
-signals:
+    int count() const;
 
 public slots:
+    void insertDisk(int idx, const QString &path);
+    void ejectDisk(int idx);
+
+signals:
+    void countChanged();
+
+private:
+    void updateCount();
+
+    ZxEmulator *m_zxEmulator = nullptr;
+    int m_count = 0;
 };

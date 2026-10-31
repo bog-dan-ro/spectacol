@@ -35,10 +35,10 @@ ListView {
 
     // Not a binding: the navigation keys and clicks below assign currentIndex
     // directly, which would remove a binding after the first interaction.
-    Component.onCompleted: currentIndex = FuseEmulator.disassambleModel.delta
+    Component.onCompleted: currentIndex = ZxEmulator.disassambleModel.delta
     Connections {
-        target: FuseEmulator.disassambleModel
-        function onDeltaChanged() { view.currentIndex = FuseEmulator.disassambleModel.delta; }
+        target: ZxEmulator.disassambleModel
+        function onDeltaChanged() { view.currentIndex = ZxEmulator.disassambleModel.delta; }
     }
 
     Z80Assembler {
@@ -47,7 +47,7 @@ ListView {
 
     DelegateModel {
         id: visualModel
-        model: FuseEmulator.disassambleModel
+        model: ZxEmulator.disassambleModel
         delegate: Rectangle {
             id: row
             // Required properties keep their last value while a delegate is being released
@@ -74,6 +74,7 @@ ListView {
                 asmEdit.readOnly = false;
                 asmEdit.selectAll();
                 asmEdit.forceActiveFocus(Qt.TabFocusReason);
+                assembler.address = row.address;
                 asmEdit.validator = assembler;
                 return true;
             }
@@ -90,8 +91,8 @@ ListView {
                     view.forceActiveFocus(Qt.TabFocusReason);
                     view.currentIndex = row.index;
                 }
-                onDoubleClicked: FuseEmulator.addBreakpoint(row.address)
-                onPressAndHold: FuseEmulator.addBreakpoint(row.address)
+                onDoubleClicked: ZxEmulator.addBreakpoint(row.address)
+                onPressAndHold: ZxEmulator.addBreakpoint(row.address)
             }
             RowLayout {
                 anchors.fill: parent
@@ -134,8 +135,10 @@ ListView {
                     inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhPreferUppercase | Qt.ImhNoPredictiveText
                     text: row.disassable
                     onEditingFinished: {
-                        assembler.write(text, row.address, row.bytes)
-                        FuseEmulator.disassambleModel.update();
+                        // Unchanged text: keep the bytes (another encoding could print the same)
+                        if (text !== row.disassable)
+                            assembler.write(text, row.address);
+                        ZxEmulator.disassambleModel.update();
                         validator = null;
                         if (!readOnly)
                             row.toggleEdit();
@@ -161,7 +164,7 @@ ListView {
     Keys.onPressed: (event) => {
         switch (event.key) {
         case Qt.Key_Home:
-            FuseEmulator.disassamble(0, 0);
+            ZxEmulator.disassamble(0, 0);
             view.currentIndex = 0;
             event.accepted = true;
             break;
@@ -175,7 +178,7 @@ ListView {
             if (view.currentIndex > 1) {
                 decrementCurrentIndex();
             } else {
-                FuseEmulator.disassambleFetchUp(10);
+                ZxEmulator.disassambleFetchUp(10);
                 decrementCurrentIndex();
             }
             event.accepted = true;
@@ -192,7 +195,7 @@ ListView {
             break;
 
         case Qt.Key_End:
-            FuseEmulator.disassamble(0xffff);
+            ZxEmulator.disassamble(0xffff);
             event.accepted = true;
             break;
 
@@ -208,24 +211,24 @@ ListView {
             break;
 
         case Qt.Key_C:
-            FuseEmulator.debuggerRun();
+            ZxEmulator.debuggerRun();
             event.accepted = true;
             break;
 
         case Qt.Key_S:
-            FuseEmulator.debuggerStep();
+            ZxEmulator.debuggerStep();
             event.accepted = true;
             break;
 
         case Qt.Key_N:
-            FuseEmulator.debuggerNext();
+            ZxEmulator.debuggerNext();
             event.accepted = true;
             break;
 
         case Qt.Key_X: {
-            const address = FuseEmulator.disassambleModel.address(view.currentIndex);
+            const address = ZxEmulator.disassambleModel.address(view.currentIndex);
             if (address !== -1)
-                FuseEmulator.addBreakpoint(address);
+                ZxEmulator.addBreakpoint(address);
             event.accepted = true;
             break;
         }

@@ -176,9 +176,9 @@ ColumnLayout {
 
     GamepadKeyNavigation {
         id: gamepadKeyNavigation
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         active: false
-        onActiveChanged: FuseEmulator.processInputEvents = !active
+        onActiveChanged: ZxEmulator.processInputEvents = !active
         upKey: Qt.Key_Up
         downKey: Qt.Key_Down
         buttonAKey: Qt.Key_Return

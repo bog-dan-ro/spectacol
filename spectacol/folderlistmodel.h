@@ -24,10 +24,6 @@
 
 #include <vector>
 
-extern "C"  {
-# include <libspectrum.h>
-}
-
 class FolderListModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -55,7 +51,8 @@ public:
 
     enum FilterType {
         All,
-        Tapes
+        Tapes,
+        Disks
     };
     Q_ENUM(FilterType)
 
@@ -90,10 +87,10 @@ public slots:
 signals:
     void folderChanged(QString folder);
     void rootFolderChanged(QString rootFolder);
-    void sortCriteriaChanged(FileSortCriteria sortCriteria);
+    void sortCriteriaChanged(FolderListModel::FileSortCriteria sortCriteria);
     void showDirsFirstChanged(bool showDirsFirst);
     void currentIndexChanged(int currentIndex);
-    void filterClassChanged(FilterType filterClass);
+    void filterClassChanged(FolderListModel::FilterType filterClass);
 
 protected:
     // QAbstractItemModel interface

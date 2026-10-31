@@ -26,15 +26,18 @@ import Spectacol
 import "private"
 
 Item {
-    Component.onCompleted: FuseEmulator.processInputEvents = false
+    // The debugger pauses and runs the emulation itself (Continue runs it with the page open)
+    readonly property bool pausesEmulation: false
+
+    Component.onCompleted: ZxEmulator.processInputEvents = false
 
     Component.onDestruction: {
-        FuseEmulator.processInputEvents = true;
-        FuseEmulator.debuggerRun();
+        ZxEmulator.processInputEvents = true;
+        ZxEmulator.debuggerRun();
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
         buttonXKey: Qt.Key_X
@@ -124,7 +127,7 @@ Item {
                         KeyNavigation.backtab: disassembleView
                         BreakpointsView {
                             anchors.fill: parent
-                            onBreakpointSelected: FuseEmulator.disassamble(item.absoluteAddress);
+                            onBreakpointSelected: ZxEmulator.disassamble(item.absoluteAddress);
                         }
                     }
                 }
@@ -152,7 +155,7 @@ Item {
                     Layout.fillHeight: true
                     Layout.leftMargin: toolBarRect.border.width
                     onAccepted: {
-                        FuseEmulator.debuggerCommand(text);
+                        ZxEmulator.debuggerCommand(text);
                         selectAll();
                     }
                     placeholderText: qsTr("Type a command here")
@@ -160,18 +163,18 @@ Item {
                 Button {
                     Layout.fillHeight: true
                     text: qsTr("Step (L1)")
-                    onClicked: FuseEmulator.debuggerStep()
+                    onClicked: ZxEmulator.debuggerStep()
                 }
                 Button {
                     Layout.fillHeight: true
                     text: qsTr("Next")
-                    onClicked: FuseEmulator.debuggerNext()
+                    onClicked: ZxEmulator.debuggerNext()
                 }
                 Button {
                     Layout.fillHeight: true
                     Layout.rightMargin: toolBarRect.border.width
                     text: qsTr("Continue (R1)")
-                    onClicked: FuseEmulator.debuggerRun()
+                    onClicked: ZxEmulator.debuggerRun()
                 }
                 Button {
                     Layout.fillHeight: true

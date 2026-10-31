@@ -25,11 +25,9 @@ import Spectacol
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
         buttonAKey: Qt.Key_Space
     }
@@ -49,8 +47,8 @@ Flickable {
                 KeyNavigation.down: kempstonMouse
                 focus: true
                 text: qsTr("Kempston joystick")
-                checked: FuseEmulator.settings.kempstonJoystick
-                onCheckedChanged: FuseEmulator.settings.kempstonJoystick = checked
+                checked: ZxEmulator.settings.kempstonJoystick
+                onCheckedChanged: ZxEmulator.settings.kempstonJoystick = checked
             }
 
             CheckBox {
@@ -58,8 +56,8 @@ Flickable {
                 KeyNavigation.up: kempstonJoystick
                 KeyNavigation.down: interface1
                 text: qsTr("Kempston mouse")
-                checked: FuseEmulator.settings.kempstonMouse
-                onCheckedChanged: FuseEmulator.settings.kempstonMouse = checked
+                checked: ZxEmulator.settings.kempstonMouse
+                onCheckedChanged: ZxEmulator.settings.kempstonMouse = checked
             }
 
             CheckBox {
@@ -67,8 +65,8 @@ Flickable {
                 KeyNavigation.up: kempstonMouse
                 KeyNavigation.down: interface2
                 text: qsTr("Interface 1")
-                checked: FuseEmulator.settings.interface1
-                onCheckedChanged: FuseEmulator.settings.interface1 = checked
+                checked: ZxEmulator.settings.interface1
+                onCheckedChanged: ZxEmulator.settings.interface1 = checked
             }
 
             CheckBox {
@@ -76,8 +74,8 @@ Flickable {
                 KeyNavigation.up: interface1
                 KeyNavigation.down: full48kOSK
                 text: qsTr("Interface 2")
-                checked: FuseEmulator.settings.interface2
-                onCheckedChanged: FuseEmulator.settings.interface2 = checked
+                checked: ZxEmulator.settings.interface2
+                onCheckedChanged: ZxEmulator.settings.interface2 = checked
             }
 
             CheckBox {
@@ -85,8 +83,8 @@ Flickable {
                 KeyNavigation.up: interface2
                 KeyNavigation.down: recreatedSpectrum
                 text: qsTr("Full On Screen 48k Keyboard")
-                checked: FuseEmulator.settings.full48kOSK
-                onCheckedChanged: FuseEmulator.settings.full48kOSK = checked
+                checked: ZxEmulator.settings.full48kOSK
+                onCheckedChanged: ZxEmulator.settings.full48kOSK = checked
             }
 
             CheckBox {
@@ -94,8 +92,8 @@ Flickable {
                 KeyNavigation.up: full48kOSK
                 KeyNavigation.down: joystickPrompt
                 text: qsTr("Recreated spectrum keyboard")
-                checked: FuseEmulator.settings.recreatedSpectrum
-                onCheckedChanged: FuseEmulator.settings.recreatedSpectrum = checked
+                checked: ZxEmulator.settings.recreatedSpectrum
+                onCheckedChanged: ZxEmulator.settings.recreatedSpectrum = checked
             }
 
             CheckBox {
@@ -103,8 +101,8 @@ Flickable {
                 KeyNavigation.up: recreatedSpectrum
                 KeyNavigation.down: deadZone
                 text: qsTr("Snapshot joystick prompt")
-                checked: FuseEmulator.settings.joystickPrompt
-                onCheckedChanged: FuseEmulator.settings.joystickPrompt = checked
+                checked: ZxEmulator.settings.joystickPrompt
+                onCheckedChanged: ZxEmulator.settings.joystickPrompt = checked
             }
             Row {
                 Label {
@@ -117,8 +115,8 @@ Flickable {
                     from: 0
                     to: 0.5
                     stepSize: 0.05
-                    value: FuseEmulator.settings.deadZone
-                    onValueChanged: FuseEmulator.settings.deadZone = value
+                    value: ZxEmulator.settings.deadZone
+                    onValueChanged: ZxEmulator.settings.deadZone = value
                 }
             }
 

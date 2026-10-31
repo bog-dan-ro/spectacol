@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2016-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,30 +18,28 @@
 #pragma once
 
 #include <QQmlEngine>
-#include <QJSEngine>
 #include <QValidator>
 
-#include <vector>
-#include <tuple>
-
+// The debugger's inline assembler: validates and writes one instruction with ZxKit's assembler
 class Z80Assembler : public QValidator
 {
     Q_OBJECT
     QML_ELEMENT
+    // Where the instruction goes: relative jumps depend on it
+    Q_PROPERTY(int address MEMBER m_address NOTIFY addressChanged)
+
 public:
-    explicit Z80Assembler(QObject *parent = 0);
-    Q_INVOKABLE bool write(const QString &asmLine, int address, const QByteArray &assembledBytes = QByteArray()) const;
+    explicit Z80Assembler(QObject *parent = nullptr);
+
+    // Assembles `asmLine` at `address` and writes it to the memory (ROM included)
+    Q_INVOKABLE bool write(const QString &asmLine, int address) const;
 
     // QValidator interface
     State validate(QString &value, int &pos) const override;
 
-private:
-    QByteArray assemble(const QString &asmLine, int address, const QByteArray &assembledBytes = QByteArray()) const;
+signals:
+    void addressChanged();
 
 private:
-    typedef std::pair<QString, QString> RulesType;
-    std::vector<RulesType> m_rules;
-    typedef std::pair<QString, QString> AssembleRules;
-    std::vector<RulesType> m_assembleRules;
-    mutable QJSEngine m_engine;
+    int m_address = 0;
 };

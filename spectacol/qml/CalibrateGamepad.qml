@@ -169,14 +169,14 @@ StandardGamepad {
         }
     }
 
-    // FuseEmulator.processInputEvents nests, block it only once for the whole sequence
+    // ZxEmulator.processInputEvents nests, block it only once for the whole sequence
     property bool inputBlocked: false
     function blockInput(block)
     {
         if (inputBlocked === block)
             return;
         inputBlocked = block;
-        FuseEmulator.processInputEvents = !block;
+        ZxEmulator.processInputEvents = !block;
     }
 
     function configureNext()
@@ -226,7 +226,7 @@ StandardGamepad {
     }
 
     Component.onCompleted: {
-        deviceId = FuseEmulator.gamepadId;
+        deviceId = ZxEmulator.gamepadId;
         GamepadManager.resetConfiguration(deviceId);
         GamepadManager.setCancelConfigureButton(deviceId, GamepadManager.ButtonStart);
         configTimer.restart();

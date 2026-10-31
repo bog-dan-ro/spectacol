@@ -16,44 +16,26 @@
 */
 
 #include "breakpointsmodel.h"
-
 #include "disassamblemodel.h"
-#include "fuseemulator.h"
+#include "zxemulator.h"
 #include "qmlui.h"
 
-extern "C"  {
-# include <debugger/debugger.h>
-# include <machine.h>
-# include <z80/z80.h>
-}
+#include <iterator>
 
-static inline uint32_t absolute2PageAddress(uint16_t page, uint16_t address)
-{
-    uint32_t absAdd = 0;
-    switch (page) {
-    case 5:
-        absAdd = 0x4000;
-        break;
-    case 2:
-        absAdd = 0x8000;
-        break;
-    default:
-        absAdd = 0xc000;
-        break;
-    }
-    return address - absAdd;
-}
+#include <zxkit/debug/Disassembler.h>
+
+using namespace Qt::StringLiterals;
 
 static QString bytesText(const QByteArray &bytes)
 {
     QString ret;
     for (uint8_t byte : bytes)
-        ret += formatNumber(byte) + QLatin1Char(' ');
+        ret += formatNumber(byte) + u' ';
     return ret.trimmed();
 }
 
 DisassambleModel::DisassambleModel(QObject *parent)
-    : FuseListModel(parent)
+    : QAbstractListModel(parent)
 {
     qRegisterMetaType<Origin>("Origin");
 }
@@ -61,68 +43,52 @@ DisassambleModel::DisassambleModel(QObject *parent)
 void DisassambleModel::disassamble(uint16_t address, int delta, uint16_t instructions)
 {
     auto data = disassambleTemp(address, delta, instructions);
-    callFunction([this, data](){
-        m_canFetchMore = false;
-        beginResetModel();
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_disassambleData = *data;
-        endResetModel();
-        m_canFetchMore = m_address + m_length < 0xffff;
-        emit deltaChanged();
-    });
+    m_canFetchMore = false;
+    beginResetModel();
+    m_disassambleData = std::move(data);
+    endResetModel();
+    m_canFetchMore = m_address + m_length < 0xffff;
+    emit deltaChanged();
 }
 
 void DisassambleModel::disassambleMore(DisassambleModel::Origin origin, int size)
 {
     uint16_t addr = 0;
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (!m_disassambleData.empty()) {
-            if (origin == Start) {
-                addr = m_disassambleData.front().address;
-                if (!addr)
-                    return;
-            } else {
-                // continue after the last instruction, don't disassemble it again
-                const auto &last = m_disassambleData.back();
-                const int next = last.address + last.bytes.size();
-                if (next > 0xffff)
-                    return; // m_canFetchMore stays false (see fetchMore)
-                addr = next;
-            }
+    if (!m_disassambleData.empty()) {
+        if (origin == Start) {
+            addr = m_disassambleData.front().address;
+            if (!addr)
+                return;
+        } else {
+            const auto &last = m_disassambleData.back();
+            const int next = last.address + last.bytes.size();
+            if (next > 0xffff)
+                return;
+            addr = uint16_t(next);
         }
     }
-    auto data = disassambleTemp(addr, origin == Start ? -size : 0, size);
-    callFunction([this, origin, data]{
-        if (data->empty())
-            return;
-        std::lock_guard<std::mutex> lock(m_mutex);
-        int first = (origin == Start) ? 0 : m_disassambleData.size();
-        beginInsertRows(QModelIndex(), first, first + int(data->size()) - 1);
-        m_disassambleData.insert(origin == Start ? m_disassambleData.begin() : m_disassambleData.end(), data->begin(), data->end());
-        endInsertRows();
-        if (origin == End) {
-            const auto &last = m_disassambleData.back();
-            m_canFetchMore = last.address + last.bytes.size() <= 0xffff;
-        }
-    });
+    auto data = disassambleTemp(addr, origin == Start ? -size : 0, uint16_t(size));
+    if (data.empty())
+        return;
+    const int first = (origin == Start) ? 0 : int(m_disassambleData.size());
+    beginInsertRows(QModelIndex(), first, first + int(data.size()) - 1);
+    m_disassambleData.insert(origin == Start ? m_disassambleData.begin() : m_disassambleData.end(),
+                             std::make_move_iterator(data.begin()), std::make_move_iterator(data.end()));
+    endInsertRows();
+    if (origin == End) {
+        const auto &last = m_disassambleData.back();
+        m_canFetchMore = last.address + last.bytes.size() <= 0xffff;
+    }
 }
 
 void DisassambleModel::update()
 {
-    pokeEvent([this]{
-        if (m_disassambleData.empty())
-            return;
+    if (m_disassambleData.empty())
+        return;
 
-        auto data = disassambleTemp(m_disassambleData[0].address, 0, m_disassambleData.size());
-        callFunction([this, data] {
-            m_canFetchMore = false;
-            std::lock_guard<std::mutex> lock(m_mutex);
-            m_disassambleData = *data;
-            m_canFetchMore = m_address + m_length < 0xffff;
-            emit dataChanged(index(0), index(m_disassambleData.size() - 1));
-        });
-    });
+    m_disassambleData = disassambleTemp(m_disassambleData[0].address, 0, uint16_t(m_disassambleData.size()));
+    m_canFetchMore = m_address + m_length < 0xffff;
+    emit dataChanged(index(0), index(int(m_disassambleData.size()) - 1));
 }
 
 int DisassambleModel::address(int index)
@@ -135,7 +101,7 @@ int DisassambleModel::address(int index)
 int DisassambleModel::rowCount(const QModelIndex &parent) const
 {
     Q_ASSERT(!parent.isValid());
-    return m_disassambleData.size();
+    return int(m_disassambleData.size());
 }
 
 QVariant DisassambleModel::data(const QModelIndex &index, int role) const
@@ -156,7 +122,7 @@ QVariant DisassambleModel::data(const QModelIndex &index, int role) const
         return formatNumber(dd.address);
 
     case Address:
-        return (int)dd.address;
+        return int(dd.address);
 
     case Bytes:
         return dd.bytes;
@@ -181,12 +147,8 @@ bool DisassambleModel::canFetchMore(const QModelIndex &parent) const
 void DisassambleModel::fetchMore(const QModelIndex &parent)
 {
     Q_ASSERT(!parent.isValid());
-    // Don't let the view request the same block again while this one is pending,
-    // disassambleMore sets it back once the rows are inserted.
     m_canFetchMore = false;
-    pokeEvent([this]{
-        disassambleMore(End, 50);
-    });
+    disassambleMore(End, 50);
 }
 
 QHash<int, QByteArray> DisassambleModel::roleNames() const
@@ -204,20 +166,20 @@ QHash<int, QByteArray> DisassambleModel::roleNames() const
     return ret;
 }
 
-QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std::unordered_set<int> &types, uint16_t address)
+QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std::unordered_set<int> &types, uint16_t address, uint16_t currentPc)
 {
     switch (colorType) {
     case Ink:
         return Qt::white;
 
     case Paper:
-        if (types.find(DEBUGGER_BREAKPOINT_TYPE_EXECUTE) != types.end() && address == z80.pc.w)
+        if (types.find(BreakpointsModel::BreakOnExecute) != types.end() && address == currentPc)
             return Qt::darkMagenta;
 
-        if (types.find(DEBUGGER_BREAKPOINT_TYPE_EXECUTE) != types.end())
+        if (types.find(BreakpointsModel::BreakOnExecute) != types.end())
             return Qt::red;
 
-        if (address == z80.pc.w)
+        if (address == currentPc)
             return Qt::blue;
 
         return QColor(0, 0, 0, 200);
@@ -226,60 +188,49 @@ QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std:
     return QColor();
 }
 
-std::shared_ptr<DisassambleModel::DisassambleDataVector> DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t instructions)
+DisassambleModel::DisassambleDataVector DisassambleModel::disassambleTemp(uint16_t address, int delta, uint16_t instructions)
 {
-    std::shared_ptr<DisassambleModel::DisassambleDataVector> disassambledData(new DisassambleModel::DisassambleDataVector);
-    disassambledData->reserve(instructions);
+    DisassambleDataVector disassambledData;
+    disassambledData.reserve(instructions);
     uint16_t pc = address;
-    if (address && delta)
-        address = debugger_search_instruction(address, delta);
+    if (address && delta < 0) {
+        const int backBytes = -delta * 2;
+        address = (address > backBytes) ? uint16_t(address - backBytes) : 0;
+    }
     delta = 0;
 
-    BreakpointsModel* breakpointsModel = FuseEmulator::instance().breakpointsModel();
-    std::lock_guard<std::mutex> lock(m_mutex);
-    std::lock_guard<std::mutex> lockBreakpoints(breakpointsModel->breakpointsMutex());
     m_address = address;
     m_delta = 0;
     m_length = 0;
 
-    char buff[100];
-    const auto &addresses = breakpointsModel->addresses();
+    const auto &addresses = ZxEmulator::instance().breakpointsModel()->addresses();
+    const auto emulator = ZxEmulator::instance().emulator().readLock();
+    const uint16_t currentPc = emulator->registers().PC;
+    const auto &mmu = emulator->mmu();
     while (instructions--) {
         if (pc == address)
             m_delta = -delta;
-        size_t len;
-        debugger_disassemble(buff, sizeof(buff), &len, address);
-        QByteArray bytes;
-        for (size_t i = 0; i < len; ++i)
-            bytes.push_back(readbyte(address + i));
 
-        debugger_breakpoint_address addr;
-        addr.source = memory_source_any;
-        addr.page = 0;
-        addr.offset = address;
-        auto it = addresses.find(addr);
-        if (it == addresses.end()) {
-            addr.source = memory_source_ram;
-            addr.page = machine_current->ram.current_page;
-            addr.offset = absolute2PageAddress(addr.page, address);
-            it = addresses.find(addr);
-        }
+        const auto inst = zxkit::Disassembler::disassembleOne([&mmu](uint16_t a) { return mmu.peek(a); }, address,
+                                                              emulator->cpu().isZ80nEnabled());
 
-        if (it != addresses.end()) // we have a breakpoint
-            disassambledData->emplace_back(DisassambleData(address, bytes, QLatin1String(buff), it->second));
+        const QByteArray bytes(QByteArrayView(inst.bytes).first(inst.length));
+        const QString mnemonic = QString::fromStdString(inst.mnemonic);
+        if (auto it = addresses.find(address); it != addresses.end())
+            disassambledData.emplace_back(address, currentPc, bytes, mnemonic, it->second);
         else
-            disassambledData->emplace_back(DisassambleData(address, bytes, QLatin1String(buff)));
+            disassambledData.emplace_back(address, currentPc, bytes, mnemonic);
 
-        address += len;
+        address += inst.length;
         ++delta;
-        m_length += len;
+        m_length += inst.length;
     }
     return disassambledData;
 }
 
-DisassambleModel::DisassambleData::DisassambleData(uint16_t address, const QByteArray &bytes, const QString &disassamble, const std::unordered_set<int> &types)
-    : background(color(Paper, types, address))
-    , foreground(color(Ink, types, address))
+DisassambleModel::DisassambleData::DisassambleData(uint16_t address, uint16_t currentPc, const QByteArray &bytes, const QString &disassamble, const std::unordered_set<int> &types)
+    : background(color(Paper, types, address, currentPc))
+    , foreground(color(Ink, types, address, currentPc))
     , address(address)
     , bytes(bytes)
     , disassamble(disassamble)

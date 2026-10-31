@@ -23,11 +23,9 @@ import Spectacol
 
 SaveFilePage {
     id: saveSnapshotPage
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
     title: qsTr("Snapshot name:")
-    folder: FuseEmulator.dataPath + "/Snapshots/"
+    folder: ZxEmulator.dataPath + "/Snapshots/"
     onAccepted: {
         pageLoader.source = "";
     }

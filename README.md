@@ -1,19 +1,18 @@
 # Spectacol
 
-Spectacol (in Romanian it means **show**) is a [free](http://www.gnu.org/licenses/gpl-3.0.en.html) [ZX Spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum) emulator based on famous [FUSE spectrum emulator](http://fuse-emulator.sourceforge.net/) but it uses its own UI made in QML.
+Spectacol (in Romanian it means **show**) is a [free](http://www.gnu.org/licenses/gpl-3.0.en.html) [ZX Spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum) emulator built on [ZxKit](https://github.com/bog-dan-ro/ZxKit), a modern C++23 ZX Spectrum emulation library, with its own UI made in QML.
 
-Why QML? Well, first and foremost because I love Qt and also because I needed a framework which allows me to quickly target [lots of platforms](http://doc.qt.io/qt-5/supported-platforms.html) painlessly.
+Why QML? Well, first and foremost because I love Qt and also because I needed a framework which allows me to quickly target [lots of platforms](https://doc.qt.io/qt-6/supported-platforms.html) painlessly.
 
-Why [FUSE](http://fuse-emulator.sourceforge.net/)? Because it has, by far, the richest ZX features list.
 **Spectacol**, currently, enables the following features:
- - Loads all ZX Spectrum files
- - Accurate 16K, 48K, 128K, +2, +2A and +3 emulation
+ - Loads all ZX Spectrum files: tapes, snapshots, disks and RZX recordings
+ - Accurate 16K, 48K, 128K, +2, +2A, +3, Pentagon, Scorpion and Timex emulation, the Romanian HC-2000 (with CP/M) and CoBra, and the **ZX Spectrum Next** (NextZXOS boots from its SD card image, which Spectacol downloads for you)
  - Quick load & save snapshots. It is quite useful when you play games
  - Easily select the Joystick type
  - Poke finder, disassambler & **inline assambler**. Allows the user to crack the games and gain infinite lives quickly.
- - Last but not least, FUSE is very high-efficient, it needs only ~15% of CPU on a Nexus 10 to emulate your games
+ - Last but not least, it is very efficient: it needs very little CPU to emulate your games
 
-In addition to FUSE's features, Spectacol adds:
+On top of that, Spectacol adds:
  - The UI is design with gamepad controls in mind. The user will be able to play all the games that support Joysticks using the gamepad
  - **Online search** allows the user to access **thousands** of ZX Spectrum apps & games! The search results are downloaded locally and they can be used to start the games offline
  - On screen numeric cursor (available only when a gamepad is present), allows the user to quickly start & control the games

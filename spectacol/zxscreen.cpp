@@ -19,19 +19,13 @@
 #include "zxscreen.h"
 
 #include "zximage.h"
-#include "fuseemulator.h"
-#include "qmlui.h"
+#include "zxemulator.h"
 
 #include <QQuickWindow>
 #include <QSGSimpleTextureNode>
 
 #include <cmath>
 #include <utility>
-
-extern "C"  {
-# include <display.h>
-# include <settings.h>
-}
 
 static double fitFactor(double i, double s)
 {
@@ -42,25 +36,25 @@ static double fitFactor(double i, double s)
 }
 
 // Where the image goes inside an output of outputSize pixels
-static QRect imageRect(QSize imageSize, QSize outputSize, FuseSettings::FillMode fillMode)
+static QRect imageRect(QSize imageSize, QSize outputSize, ZxSettings::FillMode fillMode)
 {
     if (imageSize.isEmpty() || outputSize.isEmpty())
         return {};
 
     QSize size = outputSize;
     switch (fillMode) {
-    case FuseSettings::PreserveAspect: {
+    case ZxSettings::PreserveAspect: {
         auto wf = fitFactor(imageSize.width(), outputSize.width());
         auto hf = fitFactor(imageSize.height(), outputSize.height());
         size = (QSizeF(imageSize) * (std::min)(wf, hf)).toSize();
     }
     break;
 
-    case FuseSettings::PreserveAspectFit:
+    case ZxSettings::PreserveAspectFit:
         size = imageSize.scaled(outputSize, Qt::KeepAspectRatio);
         break;
 
-    case FuseSettings::Stretch:
+    case ZxSettings::Stretch:
         break;
     }
 
@@ -81,19 +75,19 @@ ZxScreen::ZxScreen(QQuickItem *parent)
     setFocus(true);
     setAcceptedMouseButtons(Qt::LeftButton | Qt::MiddleButton | Qt::RightButton);
 
-    auto settings = FuseEmulator::instance().settings();
+    auto settings = ZxEmulator::instance().settings();
     m_fillMode = settings->fillMode();
     m_smoothScaling = settings->smoothScaling();
-    connect(settings, &FuseSettings::fillModeChanged, this, [this](FuseSettings::FillMode fillMode) {
+    connect(settings, &ZxSettings::fillModeChanged, this, [this](ZxSettings::FillMode fillMode) {
         m_fillMode = fillMode;
         updateImplicitSize();
         update();
     });
-    connect(settings, &FuseSettings::smoothScalingChanged, this, [this](bool smoothScaling) {
+    connect(settings, &ZxSettings::smoothScalingChanged, this, [this](bool smoothScaling) {
         m_smoothScaling = smoothScaling;
         update();
     });
-    connect(&FuseEmulator::instance(), &FuseEmulator::mouseGrabbedChanged, this, &ZxScreen::updateMouseGrab);
+    connect(&ZxEmulator::instance(), &ZxEmulator::mouseGrabbedChanged, this, &ZxScreen::updateMouseGrab);
 
     connect(ZxImage::instance(), &ZxImage::needsUpdate, this, &ZxScreen::update, Qt::QueuedConnection);
     connect(ZxImage::instance(), &ZxImage::geometryChanged, this, [this](QSize size) {
@@ -102,7 +96,7 @@ ZxScreen::ZxScreen(QQuickItem *parent)
         update();
     }, Qt::QueuedConnection);
 
-    // FUSE might have set up the display before the above connection was made
+    // The emulator might have published a frame before the above connection was made
     m_imageSize = ZxImage::instance()->imageSize();
     updateImplicitSize();
 }
@@ -119,10 +113,6 @@ void ZxScreen::setFullScreen(bool fullScreen)
 
     m_fullScreen = fullScreen;
     emit fullScreenChanged(fullScreen);
-    // FUSE doesn't use it, it only saves it in its config
-    pokeEvent([fullScreen]{
-        settings_current.full_screen = fullScreen;
-    });
 }
 
 bool ZxScreen::mouseGrabSuspended() const
@@ -136,7 +126,7 @@ void ZxScreen::setMouseGrabSuspended(bool suspended)
         return;
 
     m_mouseGrabSuspended = suspended;
-    FuseEmulator::instance().setMouseGrabSuspended(suspended);
+    ZxEmulator::instance().setMouseGrabSuspended(suspended);
     emit mouseGrabSuspendedChanged(suspended);
 }
 
@@ -198,7 +188,7 @@ void ZxScreen::itemChange(ItemChange change, const ItemChangeData &value)
 
 void ZxScreen::updateMouseGrab(bool grabbed)
 {
-    // While FUSE has the Kempston mouse grabbed, hide the cursor and send the movements
+    // While the emulated Kempston mouse is grabbed, hide the cursor and send the movements
     // even when no button is pressed
     m_lastMousePosition.reset();
     m_mouseMotionRemainder = {};
@@ -211,7 +201,7 @@ void ZxScreen::updateMouseGrab(bool grabbed)
 
 void ZxScreen::sendMouseMotion(QPointF position)
 {
-    if (!FuseEmulator::instance().mouseGrabbed())
+    if (!ZxEmulator::instance().mouseGrabbed())
         return;
 
     if (m_lastMousePosition) {
@@ -219,13 +209,13 @@ void ZxScreen::sendMouseMotion(QPointF position)
         const QSizeF imageSize = imageRect(m_imageSize).size();
         if (!imageSize.isEmpty()) {
             const QPointF delta = position - *m_lastMousePosition;
-            m_mouseMotionRemainder += QPointF(delta.x() * DISPLAY_ASPECT_WIDTH / imageSize.width(),
-                                              delta.y() * DISPLAY_SCREEN_HEIGHT / imageSize.height());
+            m_mouseMotionRemainder += QPointF(delta.x() * 320.0 / imageSize.width(),
+                                              delta.y() * 240.0 / imageSize.height());
             const int dx = int(m_mouseMotionRemainder.x());
             const int dy = int(m_mouseMotionRemainder.y());
             if (dx || dy) {
                 m_mouseMotionRemainder -= QPointF(dx, dy);
-                FuseEmulator::instance().mouseMotion(dx, dy);
+                ZxEmulator::instance().mouseMotion(dx, dy);
             }
         }
     }
@@ -234,7 +224,7 @@ void ZxScreen::sendMouseMotion(QPointF position)
 
 void ZxScreen::mousePressEvent(QMouseEvent *event)
 {
-    FuseEmulator::instance().mouseButton(event->button(), true);
+    ZxEmulator::instance().mouseButton(event->button(), true);
 }
 
 void ZxScreen::mouseMoveEvent(QMouseEvent *event)
@@ -244,7 +234,7 @@ void ZxScreen::mouseMoveEvent(QMouseEvent *event)
 
 void ZxScreen::mouseReleaseEvent(QMouseEvent *event)
 {
-    FuseEmulator::instance().mouseButton(event->button(), false);
+    ZxEmulator::instance().mouseButton(event->button(), false);
 }
 
 void ZxScreen::hoverEnterEvent(QHoverEvent *event)

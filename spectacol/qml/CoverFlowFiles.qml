@@ -34,7 +34,7 @@ Item
     property alias filterClass: filesModel.filterClass
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonXKey: Qt.Key_X
         buttonYKey: Qt.Key_Y
         buttonL1Key: Qt.Key_C
@@ -52,10 +52,10 @@ Item
     MessageDialog {
         id: copyDialog
         title: "Spectacol"
-        text: qsTr("Override \"") + FuseEmulator.fileName(filesView.copyPath) + "\" ?";
+        text: qsTr("Override \"") + ZxEmulator.fileName(filesView.copyPath) + "\" ?";
         buttons: MessageDialog.Yes | MessageDialog.No
         onAccepted: {
-            FuseEmulator.copy(filesView.copyPath, fileList.folder, true);
+            ZxEmulator.copy(filesView.copyPath, fileList.folder, true);
             filesView.copyPath = "";
             filesModel.refresh();
             filesView.currentIndex = 0;
@@ -65,7 +65,7 @@ Item
             if (!filesView.canCopy)
                 return;
 
-            if (!FuseEmulator.copy(filesView.copyPath, fileList.folder)) {
+            if (!ZxEmulator.copy(filesView.copyPath, fileList.folder)) {
                 copyDialog.open();
                 return;
             }
@@ -77,8 +77,8 @@ Item
 
     FolderListModel {
         id: filesModel
-        rootFolder: FuseEmulator.settings.restrictToSpectacol ? FuseEmulator.dataPath : "/"
-        sortCriteria: folder.indexOf(FuseEmulator.snapshotsPath(), 0) === 0 ? FolderListModel.ByDateDesc : folder.indexOf(FuseEmulator.recordingsPath(), 0) === 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
+        rootFolder: ZxEmulator.settings.restrictToSpectacol ? ZxEmulator.dataPath : "/"
+        sortCriteria: folder.indexOf(ZxEmulator.snapshotsPath(), 0) === 0 ? FolderListModel.ByDateDesc : folder.indexOf(ZxEmulator.recordingsPath(), 0) === 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
     }
 
     MessageDialog {
@@ -88,7 +88,7 @@ Item
         buttons: MessageDialog.Yes | MessageDialog.No
         property string filePath
         onAccepted: {
-            FuseEmulator.remove(filePath)
+            ZxEmulator.remove(filePath)
             filesModel.refresh();
             filesView.currentIndex = 0;
         }
@@ -113,13 +113,13 @@ Item
         property string copyPath: ""
         onCopyPathChanged: {
             if (copyPath.length)
-                messagePage.showMessage(FuseEmulator.Info, "\"" + copyPath + qsTr("\" copied to clipboard. Use <b>Paste (R1)</b> button to paste it to another folder."))
+                messagePage.showMessage(ZxEmulator.Info, "\"" + copyPath + qsTr("\" copied to clipboard. Use <b>Paste (R1)</b> button to paste it to another folder."))
         }
         property bool canCopy: {
             if (!copyPath.length)
                 return false;
-            var srcPath = FuseEmulator.folderName(copyPath);
-            if (FuseEmulator.isFolder(copyPath))
+            var srcPath = ZxEmulator.folderName(copyPath);
+            if (ZxEmulator.isFolder(copyPath))
                 return fileList.folder !== srcPath && !fileList.folder.startsWith(copyPath);
             return fileList.folder !== srcPath;
         }
@@ -139,7 +139,7 @@ Item
         }
 
         onDeletePressed: removeDialog.remove()
-        onResetPressed: fileList.folder = FuseEmulator.dataPath
+        onResetPressed: fileList.folder = ZxEmulator.dataPath
 
         onCopyPressed: copyPath = filesModel.path(filesView.currentIndex)
         onPastePressed: copyDialog.copy()
@@ -223,7 +223,7 @@ Item
             Button {
                 Layout.fillWidth: true
                 text: qsTr("Go to <b>Spectrum</b> folder (Y)")
-                onClicked: fileList.folder = FuseEmulator.dataPath
+                onClicked: fileList.folder = ZxEmulator.dataPath
             }
             Button {
                 Layout.fillWidth: true

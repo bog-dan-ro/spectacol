@@ -25,11 +25,9 @@ import Spectacol
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Space
         buttonBKey: Qt.Key_Escape
         buttonYKey: Qt.Key_Tab
@@ -60,8 +58,8 @@ Flickable {
                     Keys.onRightPressed: increase()
                     from: 10
                     to: 10000
-                    value: FuseEmulator.settings.emulationSpeed
-                    onValueChanged: FuseEmulator.settings.emulationSpeed = value
+                    value: ZxEmulator.settings.emulationSpeed
+                    onValueChanged: ZxEmulator.settings.emulationSpeed = value
                 }
             }
 
@@ -70,36 +68,36 @@ Flickable {
                 KeyNavigation.up: emulationSpeed
                 KeyNavigation.down: restrictBrowse
                 text: qsTr("Auto save snapshot on exit")
-                checked: FuseEmulator.settings.autoSaveOnExit
-                onCheckedChanged: FuseEmulator.settings.autoSaveOnExit = checked
+                checked: ZxEmulator.settings.autoSaveOnExit
+                onCheckedChanged: ZxEmulator.settings.autoSaveOnExit = checked
             }
 
             CheckBox {
                 id: restrictBrowse
                 KeyNavigation.up: autoSave
-                KeyNavigation.down: FuseEmulator.touchscreen ? swipeForMenu : autoLoad
+                KeyNavigation.down: ZxEmulator.touchscreen ? swipeForMenu : autoLoad
                 text: qsTr("Restrict browsing to Spectacol folder")
-                checked: FuseEmulator.settings.restrictToSpectacol
-                onCheckedChanged: FuseEmulator.settings.restrictToSpectacol = checked
+                checked: ZxEmulator.settings.restrictToSpectacol
+                onCheckedChanged: ZxEmulator.settings.restrictToSpectacol = checked
             }
 
             CheckBox {
                 id: swipeForMenu
-                visible: FuseEmulator.touchscreen
+                visible: ZxEmulator.touchscreen
                 KeyNavigation.up: restrictBrowse
                 KeyNavigation.down: autoLoad
                 text: qsTr("Swipe to open the menu")
-                checked: FuseEmulator.settings.swipe4menu
-                onCheckedChanged: FuseEmulator.settings.swipe4menu = checked
+                checked: ZxEmulator.settings.swipe4menu
+                onCheckedChanged: ZxEmulator.settings.swipe4menu = checked
             }
 
             CheckBox {
                 id: autoLoad
-                KeyNavigation.up: FuseEmulator.touchscreen ? swipeForMenu : restrictBrowse
+                KeyNavigation.up: ZxEmulator.touchscreen ? swipeForMenu : restrictBrowse
                 KeyNavigation.down: detectLoaders
                 text: qsTr("Auto load media")
-                checked: FuseEmulator.settings.autoLoad
-                onCheckedChanged: FuseEmulator.settings.autoLoad = checked
+                checked: ZxEmulator.settings.autoLoad
+                onCheckedChanged: ZxEmulator.settings.autoLoad = checked
             }
 
             CheckBox {
@@ -107,8 +105,8 @@ Flickable {
                 KeyNavigation.up: autoLoad
                 KeyNavigation.down: loaderAcceleration
                 text: qsTr("Detect loaders")
-                checked: FuseEmulator.settings.detectLoaders
-                onCheckedChanged: FuseEmulator.settings.detectLoaders = checked
+                checked: ZxEmulator.settings.detectLoaders
+                onCheckedChanged: ZxEmulator.settings.detectLoaders = checked
             }
 
             Row {
@@ -135,8 +133,8 @@ Flickable {
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
 
                     model: ["None", "Safe", "Turbo"]
-                    currentIndex: FuseEmulator.settings.loaderAcceleration
-                    onCurrentIndexChanged: FuseEmulator.settings.loaderAcceleration = currentIndex
+                    currentIndex: ZxEmulator.settings.loaderAcceleration
+                    onCurrentIndexChanged: ZxEmulator.settings.loaderAcceleration = currentIndex
                 }
             }
 
@@ -164,8 +162,8 @@ Flickable {
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
 
                     model: ["All (Infos, Warnings & Errors)", "Warnings & Errors", "Errors"]
-                    currentIndex: FuseEmulator.settings.messageLevel
-                    onCurrentIndexChanged: FuseEmulator.settings.messageLevel = currentIndex
+                    currentIndex: ZxEmulator.settings.messageLevel
+                    onCurrentIndexChanged: ZxEmulator.settings.messageLevel = currentIndex
                 }
             }
 

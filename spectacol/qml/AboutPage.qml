@@ -26,11 +26,9 @@ import "private"
 Pane {
     anchors.fill: parent
     background.opacity: 0.85
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
     }
     focus: true
@@ -71,18 +69,17 @@ Pane {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignTop
                     text: qsTr("Spectacol (in Romanian it means <b>show</b>) is a <a href=\"https://github.com/bog-dan-ro/spectacol\"><b>free (GPL v3+)</b></a> ZX Spectrum emulator
-                            based on famous <a href=\"https://fuse-emulator.sourceforge.net\">FUSE Spectrum emulator</a>. <br />
-                            FUSE emulator has, by far, the richest ZX features list. <b>Spectacol</b> enables the following features:
+                            built on <a href=\"https://github.com/bog-dan-ro/ZxKit\">ZxKit</a>, a modern C++ ZX Spectrum emulation library. <b>Spectacol</b> enables the following features:
                             <ul>
-                                <li> Loads all ZX Spectrum files
-                                <li> Accurate 16K, 48K, 128K, +2, +2A and +3 emulation
+                                <li> Loads all ZX Spectrum files: tapes, snapshots, disks and RZX recordings
+                                <li> Accurate 16K, 48K, 128K, +2, +2A, +3, Pentagon, Scorpion and Timex emulation, the Romanian HC-2000 (with CP/M) and CoBra, and the <b>ZX Spectrum Next</b>
                                 <li> Quick load & save snapshots. It is quite useful when you play games
                                 <li> Easily select the Joystick type
                                 <li> Poke finder, disassambler & <b>inline assambler</b>. Allows the user to <i>crack</i> the games and gain infinite lives quickly
-                                <li> Last but not least, FUSE is very high-efficient, it needs only ~15% of CPU on a Nexus 10 to emulate your games
+                                <li> Last but not least, it is very efficient: it needs very little CPU to emulate your games
                             </ul>
                             <p>
-                            In addition to FUSE's features, Spectacol adds:
+                            On top of that, Spectacol adds:
                             </p>
                             <ul>
                                 <li> The UI is design with gamepad controls in mind. The user will be able to play all the games that support Joysticks using the gamepad.

@@ -26,8 +26,6 @@ import Spectacol
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
     function getIndex(data, str) {
         for (var i = 0; i < data.length; ++i)
@@ -37,7 +35,7 @@ Flickable {
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
         buttonAKey: Qt.Key_Space
     }
@@ -58,8 +56,8 @@ Flickable {
                 KeyNavigation.down: loadingSound
                 focus: true
                 text: qsTr("Sound enabled")
-                checked: FuseEmulator.settings.soundEnabled
-                onCheckedChanged: FuseEmulator.settings.soundEnabled = checked
+                checked: ZxEmulator.settings.soundEnabled
+                onCheckedChanged: ZxEmulator.settings.soundEnabled = checked
             }
 
             CheckBox {
@@ -67,8 +65,8 @@ Flickable {
                 KeyNavigation.up: soundEnabled
                 KeyNavigation.down: ayStereoSeparation
                 text: qsTr("Loading sound")
-                checked: FuseEmulator.settings.loadingSound
-                onCheckedChanged: FuseEmulator.settings.loadingSound = checked
+                checked: ZxEmulator.settings.loadingSound
+                onCheckedChanged: ZxEmulator.settings.loadingSound = checked
             }
 
             RowLayout {
@@ -97,8 +95,8 @@ Flickable {
                     Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
                     model: ["None", "ACB", "ABC"]
-                    currentIndex: getIndex(model, FuseEmulator.settings.AYStereoSeparation)
-                    onCurrentTextChanged: FuseEmulator.settings.AYStereoSeparation = currentText
+                    currentIndex: getIndex(model, ZxEmulator.settings.AYStereoSeparation)
+                    onCurrentTextChanged: ZxEmulator.settings.AYStereoSeparation = currentText
                 }
             }
 
@@ -128,8 +126,8 @@ Flickable {
                     Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
                     model: ["TV speaker", "Beeper", "Unfiltered"]
-                    currentIndex: getIndex(model, FuseEmulator.settings.speakerType)
-                    onCurrentTextChanged: FuseEmulator.settings.speakerType = currentText
+                    currentIndex: getIndex(model, ZxEmulator.settings.speakerType)
+                    onCurrentTextChanged: ZxEmulator.settings.speakerType = currentText
                 }
             }
 

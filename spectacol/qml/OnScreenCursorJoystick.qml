@@ -35,7 +35,7 @@ Item {
                                                             (height - Screen.pixelDensity * 4) / 5))
 
     // The keys held by the pressed buttons. Several buttons share keys (e.g. 7 and
-    // the 5+7 diagonal), so FUSE only gets the difference: sliding from one button
+    // the 5+7 diagonal), so the emulator only gets the difference: sliding from one button
     // to another must not release a key that the new button still holds.
     readonly property var wantedKeys: {
         const keys = [];
@@ -53,11 +53,11 @@ Item {
     onWantedKeysChanged: {
         for (const key of sentKeys) {
             if (!wantedKeys.includes(key))
-                FuseEmulator.keyRelease(key);
+                ZxEmulator.keyRelease(key);
         }
         for (const key of wantedKeys) {
             if (!sentKeys.includes(key))
-                FuseEmulator.keyPress(key);
+                ZxEmulator.keyPress(key);
         }
         sentKeys = wantedKeys;
     }
@@ -69,18 +69,18 @@ Item {
         }
     }
 
-    // Balance FuseEmulator.processInputEvents, also when the Loader replaces this item.
+    // Balance ZxEmulator.processInputEvents, also when the Loader replaces this item.
     property bool inputBlocked: false
     function blockInput(block) {
         if (inputBlocked === block)
             return;
         inputBlocked = block;
-        FuseEmulator.processInputEvents = !block;
+        ZxEmulator.processInputEvents = !block;
     }
 
     Component.onDestruction: {
         for (const key of sentKeys)
-            FuseEmulator.keyRelease(key);
+            ZxEmulator.keyRelease(key);
         blockInput(false);
     }
 
@@ -92,7 +92,7 @@ Item {
     GamepadKeyNavigation {
         id: gamepad
         active: onScreenJoystick.visible
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
         buttonXKey: Qt.Key_unknown

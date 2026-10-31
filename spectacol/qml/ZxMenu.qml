@@ -20,29 +20,29 @@ import QtQuick.Window
 import Spectacol
 
 ZxMenuItem {
-    id: fuseMenu
+    id: zxMenu
     ZxMenuItem {
-        visible: FuseEmulator.saveSnapshotEnabled
+        visible: ZxEmulator.saveSnapshotEnabled
         text: qsTr("Quick &save snapshot")
         onTriggered: {
             menuBar.close();
-            FuseEmulator.quickSaveSnapshot();
+            ZxEmulator.quickSaveSnapshot();
         }
     }
     ZxMenuItem {
         text: qsTr("Quick &load snapshot")
         onTriggered: {
             menuBar.close();
-            FuseEmulator.quickLoadSnapshot();
+            ZxEmulator.quickLoadSnapshot();
         }
     }
 
     ZxMenuItem {
-        visible: FuseEmulator.recording.type !== FuseRecording.None
-        text: qsTr("Stop ") + (FuseEmulator.recording.type === FuseRecording.Playback ? qsTr("Playback") : qsTr("Recording"))
+        visible: ZxEmulator.recording.type !== ZxRecording.None
+        text: qsTr("Stop ") + (ZxEmulator.recording.type === ZxRecording.Playback ? qsTr("Playback") : qsTr("Recording"))
         onTriggered: {
             menuBar.close();
-            FuseEmulator.recording.stop();
+            ZxEmulator.recording.stop();
         }
     }
 
@@ -96,7 +96,7 @@ ZxMenuItem {
                 text: qsTr("Play")
                 onTriggered: {
                     menuBar.close();
-                    FuseEmulator.tape.togglePlay();
+                    ZxEmulator.tape.togglePlay();
                 }
             }
 
@@ -104,7 +104,7 @@ ZxMenuItem {
                 text: qsTr("Rewind")
                 onTriggered: {
                     menuBar.close();
-                    FuseEmulator.tape.rewind();
+                    ZxEmulator.tape.rewind();
                 }
             }
 
@@ -112,12 +112,12 @@ ZxMenuItem {
                 text: qsTr("Clear")
                 onTriggered: {
                     menuBar.close();
-                    FuseEmulator.tape.clear();
+                    ZxEmulator.tape.clear();
                 }
             }
 
             ZxMenuItem {
-                visible: FuseEmulator.tape.hasTape;
+                visible: ZxEmulator.tape.hasTape;
                 text: qsTr("Browse")
                 onTriggered: {
                     menuBar.close();
@@ -127,53 +127,73 @@ ZxMenuItem {
         }
 
         ZxMenuItem {
+            visible: ZxEmulator.disks.count > 0
+            text: qsTr("Disks")
+            ZxMenuItem {
+                text: qsTr("Insert")
+                onTriggered: {
+                    menuBar.close();
+                    pageLoader.source = "DisksInsertPage.qml";
+                }
+            }
+
+            ZxMenuItem {
+                text: qsTr("Eject")
+                onTriggered: {
+                    menuBar.close();
+                    pageLoader.source = "DisksEjectPage.qml";
+                }
+            }
+        }
+
+        ZxMenuItem {
             text: qsTr("Recording")
             ZxMenuItem {
-                visible: FuseEmulator.recording.type === FuseRecording.Recording
+                visible: ZxEmulator.recording.type === ZxRecording.Recording
                 text: qsTr("Stop Recording")
                 onTriggered: {
                     menuBar.close();
-                    FuseEmulator.recording.stop();
+                    ZxEmulator.recording.stop();
                 }
             }
             ZxMenuItem {
-                visible: FuseEmulator.recording.type === FuseRecording.None
+                visible: ZxEmulator.recording.type === ZxRecording.None
                 text: "Start recording"
                 onTriggered: {
                     menuBar.close();
-                    FuseEmulator.recording.start();
+                    ZxEmulator.recording.start();
                 }
             }
             ZxMenuItem {
-                visible: FuseEmulator.recording.type === FuseRecording.None
+                visible: ZxEmulator.recording.type === ZxRecording.None
                 text: "Continue recording"
                 onTriggered: {
                     menuBar.close();
-                    FuseEmulator.recording.continueRecording();
+                    ZxEmulator.recording.continueRecording();
                 }
             }
             ZxMenuItem {
-                visible: FuseEmulator.recording.type === FuseRecording.Recording
+                visible: ZxEmulator.recording.type === ZxRecording.Recording
                 text: "Rollback"
                 onTriggered: {
                     menuBar.close();
-                    FuseEmulator.recording.rollback();
+                    ZxEmulator.recording.rollback();
                 }
             }
             ZxMenuItem {
-                visible: FuseEmulator.recording.type === FuseRecording.Recording
+                visible: ZxEmulator.recording.type === ZxRecording.Recording
                 text: "Rollback to ..."
                 onTriggered: {
                     menuBar.close();
-                    FuseEmulator.recording.rollbackTo();
+                    ZxEmulator.recording.rollbackTo();
                 }
             }
             ZxMenuItem {
-                visible: FuseEmulator.recording.type === FuseRecording.None
+                visible: ZxEmulator.recording.type === ZxRecording.None
                 text: "Finalise ..."
                 onTriggered: {
                     menuBar.close();
-                    FuseEmulator.recording.finalise();
+                    ZxEmulator.recording.finalise();
                 }
             }
         }
@@ -191,7 +211,7 @@ ZxMenuItem {
     ZxMenuItem {
         text: qsTr("Machine")
         ZxMenuItem {
-            text: qsTr("Select ... ") + FuseEmulator.settings.currentMachine
+            text: qsTr("Select ... ") + ZxEmulator.settings.currentMachine
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "MachineTypePage.qml";
@@ -202,7 +222,7 @@ ZxMenuItem {
             text: qsTr("Reset")
             onTriggered: {
                 menuBar.close();
-                FuseEmulator.reset();
+                ZxEmulator.reset();
             }
         }
 
@@ -210,7 +230,7 @@ ZxMenuItem {
             text: qsTr("Hard reset")
             onTriggered: {
                 menuBar.close();
-                FuseEmulator.hardReset();
+                ZxEmulator.hardReset();
             }
         }
 
@@ -218,7 +238,7 @@ ZxMenuItem {
             text: qsTr("Debugger")
             onTriggered: {
                 menuBar.close();
-                FuseEmulator.debuggerTrap();
+                ZxEmulator.debuggerTrap();
             }
         }
 
@@ -242,7 +262,7 @@ ZxMenuItem {
             text: qsTr("NMI")
             onTriggered: {
                 menuBar.close();
-                FuseEmulator.nmi();
+                ZxEmulator.nmi();
             }
         }
     }
@@ -301,7 +321,7 @@ ZxMenuItem {
             }
 
             ZxMenuItem {
-                visible: FuseEmulator.gamepadId !== -1
+                visible: ZxEmulator.gamepadId !== -1
                 text: qsTr("Calibrate Gamepad")
                 onTriggered: {
                     menuBar.close();

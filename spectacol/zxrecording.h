@@ -17,16 +17,43 @@
 
 #pragma once
 
-#include <QAbstractListModel>
+#include <QQmlEngine>
 
-#include <functional>
+#include <QObject>
 
-class FuseListModel : public QAbstractListModel
+class ZxEmulator;
+class ZxRecording : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("use ZxEmulator.recording instead")
+
+    Q_PROPERTY(Type type MEMBER m_type NOTIFY typeChanged)
+
 public:
-    explicit FuseListModel(QObject *parent = nullptr);
-    typedef std::function<void()> Function;
-    void callFunction(const Function &func);
-    bool event(QEvent *);
+    enum class Type {
+        None,
+        Playback,
+        Recording
+    };
+    Q_ENUM(Type)
+
+public:
+    explicit ZxRecording(ZxEmulator *parent = nullptr);
+    void setStopVisible(bool visible);
+
+public slots:
+    void start();
+    void continueRecording();
+    void rollback();
+    void rollbackTo();
+    void finalise();
+    void stop();
+
+signals:
+    void typeChanged(Type type);
+
+private:
+    ZxEmulator *m_emulator;
+    Type m_type = Type::None;
 };

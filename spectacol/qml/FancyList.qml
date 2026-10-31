@@ -27,7 +27,7 @@ FancyBaseList {
     id: view
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
     }
 
     Keys.onEscapePressed: pageLoader.source = ""

@@ -74,8 +74,8 @@ Item {
             radius: width / 2
             anchors {
                 centerIn: parent
-                onHorizontalCenterOffsetChanged: FuseEmulator.gamepadAxisEvent(GamepadManager.AxisLeftX, anchors.horizontalCenterOffset / parent.radius)
-                onVerticalCenterOffsetChanged: FuseEmulator.gamepadAxisEvent(GamepadManager.AxisLeftY, anchors.verticalCenterOffset / parent.radius)
+                onHorizontalCenterOffsetChanged: ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftX, anchors.horizontalCenterOffset / parent.radius)
+                onVerticalCenterOffsetChanged: ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftY, anchors.verticalCenterOffset / parent.radius)
             }
         }
     }
@@ -89,7 +89,7 @@ Item {
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
-                onPressedChanged: pressed ? FuseEmulator.gamepadButtonPressEvent(GamepadManager.ButtonY) : FuseEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY)
+                onPressedChanged: pressed ? ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonY) : ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY)
             }
         }
     }
@@ -103,7 +103,7 @@ Item {
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
-                onPressedChanged: pressed ? FuseEmulator.gamepadButtonPressEvent(GamepadManager.ButtonX) : FuseEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX)
+                onPressedChanged: pressed ? ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonX) : ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX)
             }
         }
     }
@@ -117,7 +117,7 @@ Item {
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
-                onPressedChanged: pressed ? FuseEmulator.gamepadButtonPressEvent(GamepadManager.ButtonB) : FuseEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB)
+                onPressedChanged: pressed ? ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonB) : ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB)
             }
         }
     }
@@ -131,7 +131,7 @@ Item {
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: TouchPoint {
-                onPressedChanged: pressed ? FuseEmulator.gamepadButtonPressEvent(GamepadManager.ButtonA) : FuseEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA)
+                onPressedChanged: pressed ? ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonA) : ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA)
             }
         }
     }

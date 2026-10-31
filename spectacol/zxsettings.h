@@ -17,19 +17,22 @@
 
 #pragma once
 
-#include "fuseobject.h"
+#include <QObject>
 
 #include <QGamepadManager>
 #include <QQmlEngine>
 
 #include <mutex>
+#include <string>
 #include <unordered_map>
 
-class FuseSettings : public FuseObject
+class ZxEmulator;
+
+class ZxSettings : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
-    QML_UNCREATABLE("use fuseSettings instead")
+    QML_UNCREATABLE("use ZxEmulator.settings instead")
 
     Q_PROPERTY(QStringList machinesModel READ machinesModel CONSTANT)
     Q_PROPERTY(QString currentMachine READ currentMachine NOTIFY currentMachineChanged)
@@ -90,12 +93,18 @@ public:
     Q_ENUM(Actions)
 
 public:
-    explicit FuseSettings(QObject *parent = 0);
+    explicit ZxSettings(ZxEmulator &emulator);
+
+    /// Applies the saved settings (machine, peripherals, sound, speed) to the emulator.
+    void applyToEmulator();
 
     QStringList machinesModel() const;
     QString currentMachine();
     int currentMachineIndex() const;
     void setCurrentMachineIndex(int idx);
+    /// Selects a machine by its ZxKit id (e.g. "next"); false if there is no such machine.
+    bool selectMachine(const QString &machineId);
+    QStringList machineIds() const;
 
     int emulationSpeed() const;
     void setEmulationSpeed(int speed);
@@ -186,6 +195,9 @@ public slots:
     void setGamepadAction(int gamepadButton, int action);
 
 private:
+    /// `persist`: remember the machine for the next start (the user picked it)
+    void applyMachine(int idx, bool persist);
+
     enum ScreenOrientation {
         Sensors = 0,
         Landscape,
@@ -197,7 +209,7 @@ signals:
     void settingsCurrentChanged();
     void hasStartButtonChanged(bool hasStartButton);
     void screenOrientationChanged(int currentOrientation);
-    void fillModeChanged(FillMode fillMode);
+    void fillModeChanged(ZxSettings::FillMode fillMode);
     void smoothScalingChanged(bool smoothScaling);
     void swipe4menuChanged(bool swipe4menu);
     void autoSaveOnExitChanged(bool autoSaveOnExit);
@@ -207,7 +219,28 @@ signals:
     void messageLevelChanged(int messageLevel);
 
 private:
+    ZxEmulator &m_zxEmulator;
     bool m_hasStartButton = false;
+    int m_currentMachineIndex = 1; // Default to 48k
+    std::string m_savedMachineId = "48k";
+    int m_pendingMachineIndex = -1; // the Next, waiting for its SD card image
+    bool m_pendingMachinePersist = false;
+    int m_emulationSpeed = 100;
+    bool m_autoLoad = true;
+    bool m_detectLoaders = true;
+    bool m_soundEnabled = true;
+    bool m_loadingSound = true;
+    QString m_ayStereo;
+    QString m_speakerType;
+    bool m_kempstonJoystick = true;
+    bool m_kempstonMouse = false;
+    bool m_interface1 = false;
+    bool m_interface2 = true;
+    bool m_joystickPrompt = true;
+    int m_loaderAcceleration = 1;
+    bool m_recreatedSpectrum = false;
+    std::vector<std::string> m_machineIds;
+    QStringList m_machineNames;
     std::mutex m_gamepadActionsMutex;
 
     // Default button actions map

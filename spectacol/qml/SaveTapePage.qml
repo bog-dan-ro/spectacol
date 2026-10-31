@@ -25,12 +25,10 @@ Rectangle {
     id: saveFilePage
     color: Qt.rgba(0, 0, 0, 0.75);
 
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
     function writeTape()
     {
-        FuseEmulator.tape.write(FuseEmulator.savesPath() + fileNameEdit.text +
+        ZxEmulator.tape.write(ZxEmulator.savesPath() + fileNameEdit.text +
                         (fileNameEdit.text.charAt(fileNameEdit.text.length - 4) === '.' ? "" : ".tzx"))
         pageLoader.source = ""
     }
@@ -41,12 +39,12 @@ Rectangle {
         RowLayout {
             FancyText {
                 id: title
-                text: FuseEmulator.savesPath()
+                text: ZxEmulator.savesPath()
             }
             FancyTextField {
                 id: fileNameEdit
                 focus: true
-                text: FuseEmulator.tape.programName
+                text: ZxEmulator.tape.programName
                 onAccepted: writeTape()
             }
             FancyText {

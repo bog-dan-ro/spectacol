@@ -24,12 +24,10 @@ import "private"
 
 FancyList {
     id: view
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
-    model: FuseEmulator.filtersModel
-    currentIndex: FuseEmulator.selectedFilterIndex
-    onCurrentIndexChanged: FuseEmulator.selectedFilterIndex = currentIndex
+    model: ZxEmulator.filtersModel
+    currentIndex: ZxEmulator.selectedFilterIndex
+    onCurrentIndexChanged: ZxEmulator.selectedFilterIndex = currentIndex
 
     width: 20 * TextSizes.scale14
     delegate: Rectangle {

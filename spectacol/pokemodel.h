@@ -19,16 +19,13 @@
 
 #include <QQmlEngine>
 
-#include "fuselistmodel.h"
+#include <QAbstractListModel>
 
-#include <QPointer>
 
-#include <memory>
 #include <vector>
 
-// FUSE's trainer list belongs to the FUSE thread: the model shows a copy of it,
-// taken there after every change.
-class PokeModel : public FuseListModel
+// The pokes (trainers) the user applied to the running program
+class PokeModel : public QAbstractListModel
 {
     Q_OBJECT
     QML_ELEMENT
@@ -63,8 +60,6 @@ private:
     };
     using Trainers = std::vector<Trainer>;
 
-    // must be called on the FUSE thread, self can be gone when it's done
-    static void publishTrainers(const QPointer<PokeModel> &self);
 
 private:
     Trainers m_trainers;

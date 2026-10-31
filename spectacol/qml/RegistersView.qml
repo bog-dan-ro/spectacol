@@ -35,77 +35,77 @@ Flickable {
         horizontalItemAlignment: Grid.AlignRight
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "PC :" + FuseEmulator.PC
+            text: "PC :" + ZxEmulator.PC
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "SP :" + FuseEmulator.SP
+            text: "SP :" + ZxEmulator.SP
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "AF :" + FuseEmulator.AF
+            text: "AF :" + ZxEmulator.AF
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "AF' :" + FuseEmulator.AF_
+            text: "AF' :" + ZxEmulator.AF_
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "BC :" + FuseEmulator.BC
+            text: "BC :" + ZxEmulator.BC
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "BC' :" + FuseEmulator.BC_
+            text: "BC' :" + ZxEmulator.BC_
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "DE :" + FuseEmulator.DE
+            text: "DE :" + ZxEmulator.DE
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "DE' :" + FuseEmulator.DE_
+            text: "DE' :" + ZxEmulator.DE_
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "HL :" + FuseEmulator.HL
+            text: "HL :" + ZxEmulator.HL
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "HL' :" + FuseEmulator.HL_
-        }
-
-        FancyText {
-            font.pixelSize: TextSizes.scale12
-            text: "IX :" + FuseEmulator.IX
+            text: "HL' :" + ZxEmulator.HL_
         }
 
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "IY :" + FuseEmulator.IY
+            text: "IX :" + ZxEmulator.IX
+        }
+
+        FancyText {
+            font.pixelSize: TextSizes.scale12
+            text: "IY :" + ZxEmulator.IY
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "I :" + FuseEmulator.I
+            text: "I :" + ZxEmulator.I
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "R :" + FuseEmulator.R
+            text: "R :" + ZxEmulator.R
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "IFF1 :" + FuseEmulator.IFF1
+            text: "IFF1 :" + ZxEmulator.IFF1
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "IFF2 :" + FuseEmulator.IFF2
+            text: "IFF2 :" + ZxEmulator.IFF2
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "R7 :" + FuseEmulator.R7
+            text: "R7 :" + ZxEmulator.R7
         }
         FancyText {
             font.pixelSize: TextSizes.scale12
-            text: "IM :" + FuseEmulator.IM
+            text: "IM :" + ZxEmulator.IM
         }
     }
 }

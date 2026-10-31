@@ -26,11 +26,9 @@ import Spectacol
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Space
         buttonBKey: Qt.Key_Escape
         buttonYKey: Qt.Key_Tab
@@ -51,15 +49,15 @@ Flickable {
 
     ListModel {
         id: actionsModel
-        ListElement { code: FuseSettings.JoystickFire; name: "Joystick fire" }
+        ListElement { code: ZxSettings.JoystickFire; name: "Joystick fire" }
 
         // Actions shortcuts
-        ListElement { code: FuseSettings.ToggleKeyboard; name: "Toggle Keyboard"; section: "Actions" }
-        ListElement { code: FuseSettings.ToggleCursorJoystick; name: "Toggle Joystick"; section: "Actions" }
-        ListElement { code: FuseSettings.TogglePause; name: "Toggle Pause"; section: "Actions" }
-        ListElement { code: FuseSettings.ToggleEmulationSpeed; name: "Toggle Emulation Speed"; section: "Actions" }
-        ListElement { code: FuseSettings.QuickSaveSnapshot; name : "Save Snapshot"; section: "Actions" }
-        ListElement { code: FuseSettings.QuickLoadSnapshot; name: "Load Snapshot"; section: "Actions" }
+        ListElement { code: ZxSettings.ToggleKeyboard; name: "Toggle Keyboard"; section: "Actions" }
+        ListElement { code: ZxSettings.ToggleCursorJoystick; name: "Toggle Joystick"; section: "Actions" }
+        ListElement { code: ZxSettings.TogglePause; name: "Toggle Pause"; section: "Actions" }
+        ListElement { code: ZxSettings.ToggleEmulationSpeed; name: "Toggle Emulation Speed"; section: "Actions" }
+        ListElement { code: ZxSettings.QuickSaveSnapshot; name : "Save Snapshot"; section: "Actions" }
+        ListElement { code: ZxSettings.QuickLoadSnapshot; name: "Load Snapshot"; section: "Actions" }
 
         // Keys shortcuts
         ListElement { code: Qt.Key_Enter; name:"Enter"; section: "Keys" }
@@ -163,8 +161,8 @@ Flickable {
                     id: shortcut
                     Layout.fillWidth: true
                     model: actionsModel
-                    currentIndex: actionIndex(FuseEmulator.settings.gamepadAction(buttonsModel.get(gamepadButton.currentIndex).code))
-                    onCurrentIndexChanged: FuseEmulator.settings.setGamepadAction(buttonsModel.get(gamepadButton.currentIndex).code, actionsModel.get(currentIndex).code)
+                    currentIndex: actionIndex(ZxEmulator.settings.gamepadAction(buttonsModel.get(gamepadButton.currentIndex).code))
+                    onCurrentIndexChanged: ZxEmulator.settings.setGamepadAction(buttonsModel.get(gamepadButton.currentIndex).code, actionsModel.get(currentIndex).code)
                     textRole: "name"
                     Keys.onUpPressed: {
                         if (shortcut.popup.visible)

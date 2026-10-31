@@ -30,7 +30,7 @@ Rectangle {
     property bool pressed2: false
     property bool keyHeld: false // pressed with Return (gamepad A)
     // The keys are sent by the joystick: several buttons share keys (e.g. 7 and
-    // the 5+7 diagonal) and FUSE must not see a key released while another
+    // the 5+7 diagonal) and the emulator must not see a key released while another
     // button still holds it.
     readonly property bool held: pressed1 || pressed2 || keyHeld
 

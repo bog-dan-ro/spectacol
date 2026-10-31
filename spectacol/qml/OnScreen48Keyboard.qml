@@ -40,23 +40,23 @@ Item {
     function releasePressedKeys()
     {
         if (_pressedKey) {
-            FuseEmulator.keyRelease(_pressedKey);
+            ZxEmulator.keyRelease(_pressedKey);
             _pressedKey = 0;
         }
 
         if (capsPressed) {
-            FuseEmulator.keyRelease(Qt.Key_Control);
+            ZxEmulator.keyRelease(Qt.Key_Control);
             capsPressed = false;
         }
 
         if (symbolPressed) {
-            FuseEmulator.keyRelease(Qt.Key_Shift);
+            ZxEmulator.keyRelease(Qt.Key_Shift);
             symbolPressed = false;
         }
     }
 
     onVisibleChanged: {
-        FuseEmulator.processInputEvents = !visible;
+        ZxEmulator.processInputEvents = !visible;
         if (!visible)
             releasePressedKeys()
     }
@@ -87,8 +87,8 @@ Item {
         interval: 200
         repeat: false
         onTriggered: {
-            FuseEmulator.keyRelease(Qt.Key_Control);
-            FuseEmulator.keyRelease(Qt.Key_Shift);
+            ZxEmulator.keyRelease(Qt.Key_Control);
+            ZxEmulator.keyRelease(Qt.Key_Shift);
             capsPressed = symbolPressed = false;
         }
     }
@@ -102,26 +102,26 @@ Item {
             if (stickyCSSS) {
                 capsPressed = !capsPressed;
                 if (capsPressed)
-                    FuseEmulator.keyPress(Qt.Key_Control);
+                    ZxEmulator.keyPress(Qt.Key_Control);
                 else
-                    FuseEmulator.keyRelease(Qt.Key_Control);
+                    ZxEmulator.keyRelease(Qt.Key_Control);
             } else {
-                FuseEmulator.keyPress(Qt.Key_Control);
+                ZxEmulator.keyPress(Qt.Key_Control);
             }
             break;
         case Qt.Key_Shift:
             if (stickyCSSS) {
                 symbolPressed = !symbolPressed;
                 if (symbolPressed)
-                    FuseEmulator.keyPress(Qt.Key_Shift);
+                    ZxEmulator.keyPress(Qt.Key_Shift);
                 else
-                    FuseEmulator.keyRelease(Qt.Key_Shift);
+                    ZxEmulator.keyRelease(Qt.Key_Shift);
             } else {
-                FuseEmulator.keyPress(Qt.Key_Shift);
+                ZxEmulator.keyPress(Qt.Key_Shift);
             }
             break;
         default:
-            FuseEmulator.keyPress(key);
+            ZxEmulator.keyPress(key);
             if (gamepadMode)
                 _pressedKey = key;
             break;
@@ -135,13 +135,13 @@ Item {
         case Qt.Key_Control:
         case Qt.Key_Shift:
             if (!stickyCSSS) {
-                FuseEmulator.keyRelease(key);
+                ZxEmulator.keyRelease(key);
                 _pressedKey = 0;
             }
             break;
         default:
             if (gamepadMode) {
-                FuseEmulator.keyRelease(_pressedKey);
+                ZxEmulator.keyRelease(_pressedKey);
             } else {
                 _pressedKey = key;
                 releasePressedKeys();
@@ -153,7 +153,7 @@ Item {
 
     GamepadKeyNavigation {
         id: gamepad
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         active: onScreenKeyboard.visible
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
@@ -258,7 +258,7 @@ Item {
         currentIndex: 24
         onCurrentIndexChanged: {
             if (_pressedKey) {
-                FuseEmulator.keyRelease(_pressedKey);
+                ZxEmulator.keyRelease(_pressedKey);
                 _pressedKey = 0;
             }
         }
@@ -278,12 +278,12 @@ Item {
                 anchors.fill: parent
                 anchors.leftMargin: parent.radius
                 anchors.rightMargin: parent.radius
-                anchors.topMargin: FuseEmulator.settings.full48kOSK && keyword ? parent.height / 4 : parent.radius
+                anchors.topMargin: ZxEmulator.settings.full48kOSK && keyword ? parent.height / 4 : parent.radius
                 font.family: 'Monospace'
                 font.bold: true
                 font.pixelSize: grid.cellWidth / 4.5
-                horizontalAlignment: FuseEmulator.settings.full48kOSK && keyword ? Text.AlignLeft : Text.AlignHCenter
-                verticalAlignment: FuseEmulator.settings.full48kOSK && keyword ? Text.AlignTop : Text.AlignVCenter
+                horizontalAlignment: ZxEmulator.settings.full48kOSK && keyword ? Text.AlignLeft : Text.AlignHCenter
+                verticalAlignment: ZxEmulator.settings.full48kOSK && keyword ? Text.AlignTop : Text.AlignVCenter
                 style: Text.Outline
                 styleColor: "black"
                 color: !keyword && buttonColor ? buttonColor : "white"
@@ -293,7 +293,7 @@ Item {
             }
 
             Text {
-                visible: FuseEmulator.settings.full48kOSK
+                visible: ZxEmulator.settings.full48kOSK
                 anchors.left: parent.left
                 anchors.margins: parent.radius
                 style: Text.Outline
@@ -306,7 +306,7 @@ Item {
             }
 
             Text {
-                visible: FuseEmulator.settings.full48kOSK
+                visible: ZxEmulator.settings.full48kOSK
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.rightMargin: parent.radius
@@ -321,7 +321,7 @@ Item {
             }
 
             Text {
-                visible: FuseEmulator.settings.full48kOSK
+                visible: ZxEmulator.settings.full48kOSK
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.topMargin: parent.height / 6 * 3
@@ -335,7 +335,7 @@ Item {
             }
 
             Text {
-                visible: FuseEmulator.settings.full48kOSK
+                visible: ZxEmulator.settings.full48kOSK
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.leftMargin: parent.radius

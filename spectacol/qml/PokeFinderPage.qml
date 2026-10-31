@@ -31,13 +31,11 @@ Rectangle {
     color: Qt.rgba(0, 0, 0, 0.75);
 
     Component.onCompleted: {
-        FuseEmulator.processInputEvents = false;
-        FuseEmulator.pokeFinderResetIfNeeded();
-        FuseEmulator.paused = true;
+        ZxEmulator.processInputEvents = false;
+        ZxEmulator.pokeFinderResetIfNeeded();
     }
     Component.onDestruction: {
-        FuseEmulator.processInputEvents = true;
-        FuseEmulator.paused = false;
+        ZxEmulator.processInputEvents = true;
     }
 
     readonly property bool hasCurrentLocation: view.currentIndex >= 0 && view.currentIndex < view.count
@@ -47,22 +45,22 @@ Rectangle {
         if (!hasCurrentLocation)
             return;
         const model = visualModel.items.get(view.currentIndex).model;
-        FuseEmulator.addBreakpointPage(model.offset, model.page, type);
+        ZxEmulator.addBreakpointPage(model.offset, model.page, type);
     }
 
     // The locations are listed only when there are at most 20 of them.
     function resetCurrentLocation()
     {
-        view.currentIndex = FuseEmulator.pokeFinderCount <= 20 ? 0 : -1;
+        view.currentIndex = ZxEmulator.pokeFinderCount <= 20 ? 0 : -1;
     }
 
     Connections {
-        target: FuseEmulator
+        target: ZxEmulator
         function onPokeFinderCountChanged() { resetCurrentLocation(); }
     }
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_B
         buttonYKey: Qt.Key_Y
@@ -82,17 +80,17 @@ Rectangle {
             break;
 
         case Qt.Key_Y:
-            FuseEmulator.pokeFinderInced();
+            ZxEmulator.pokeFinderInced();
             event.accepted = true;
             break;
 
         case Qt.Key_X:
-            FuseEmulator.pokeFinderDeced();
+            ZxEmulator.pokeFinderDeced();
             event.accepted = true;
             break;
 
         case Qt.Key_E:
-            FuseEmulator.pokeFinderReset();
+            ZxEmulator.pokeFinderReset();
             event.accepted = true;
             break;
 
@@ -133,7 +131,7 @@ Rectangle {
                 validator: IntValidator {bottom: 0; top: 255;}
                 placeholderText: qsTr("Enter a numeric value")
                 onAccepted: {
-                    FuseEmulator.pokeFinderSearch(value.text);
+                    ZxEmulator.pokeFinderSearch(value.text);
                     view.forceActiveFocus(Qt.TabFocusReason);
                 }
             }
@@ -149,25 +147,25 @@ Rectangle {
                     id: buttonInc
                     Layout.fillWidth: true
                     text: qsTr("Incremented <b>(Y)</b>")
-                    onClicked: FuseEmulator.pokeFinderInced()
+                    onClicked: ZxEmulator.pokeFinderInced()
                 }
                 Button {
                     id: buttonDec
                     Layout.fillWidth: true
                     text: qsTr("Decremented <b>(X)</b>")
-                    onClicked: FuseEmulator.pokeFinderDeced()
+                    onClicked: ZxEmulator.pokeFinderDeced()
                 }
                 Button {
                     id: buttonSearch
                     Layout.fillWidth: true
                     text: qsTr("Search <b>(A)</b>")
-                    onClicked: FuseEmulator.pokeFinderSearch(value.text)
+                    onClicked: ZxEmulator.pokeFinderSearch(value.text)
                 }
                 Button {
                     id: buttonReset
                     Layout.fillWidth: true
                     text: qsTr("Reset <b>(L2, R2)</b>")
-                    onClicked: FuseEmulator.pokeFinderReset()
+                    onClicked: ZxEmulator.pokeFinderReset()
                 }
                 Button {
                     id: buttonBW
@@ -196,12 +194,12 @@ Rectangle {
                 FancyText {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignRight
-                    text: qsTr("Possible locations: ") + FuseEmulator.pokeFinderCount
+                    text: qsTr("Possible locations: ") + ZxEmulator.pokeFinderCount
                 }
 
                 DelegateModel {
                     id: visualModel
-                    model: FuseEmulator.pokeFinderModel
+                    model: ZxEmulator.pokeFinderModel
                     delegate: Rectangle {
                         property color paper: view.currentIndex !== index ? Qt.rgba(0, 0, 0, 0.9) : "white"
                         property color ink: view.currentIndex !== index ? "white": Qt.rgba(0, 0, 0, 0.9)
@@ -281,7 +279,7 @@ Rectangle {
                         snapMode: ListView.SnapToItem
                         highlightFollowsCurrentItem: true
                         focus: true
-                        activeFocusOnTab: FuseEmulator.pokeFinderCount <= 20
+                        activeFocusOnTab: ZxEmulator.pokeFinderCount <= 20
 
                         KeyNavigation.right: value
                         KeyNavigation.left: value

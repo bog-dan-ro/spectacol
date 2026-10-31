@@ -25,12 +25,12 @@ import "private"
 Item {
     FancyList {
         id: view
-        Component.onCompleted: FuseEmulator.processInputEvents = false
-        Component.onDestruction: FuseEmulator.processInputEvents = true
+        Component.onCompleted: ZxEmulator.processInputEvents = false
+        Component.onDestruction: ZxEmulator.processInputEvents = true
 
-        model: FuseEmulator.settings.machinesModel
-        currentIndex: FuseEmulator.settings.currentMachineIndex
-        onCurrentIndexChanged: FuseEmulator.settings.currentMachineIndex = currentIndex
+        model: ZxEmulator.settings.machinesModel
+        currentIndex: ZxEmulator.settings.currentMachineIndex
+        onCurrentIndexChanged: ZxEmulator.settings.currentMachineIndex = currentIndex
 
         width: 13 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
         delegate: Rectangle {

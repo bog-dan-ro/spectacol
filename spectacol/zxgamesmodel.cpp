@@ -1,10 +1,12 @@
 #include "zxgamesmodel.h"
 #include "zxrequests.h"
 
+using namespace Qt::StringLiterals;
+
 namespace {
-    const QString zxSpectrumLibraryGames = QLatin1String("https://archive.org/advancedsearch.php?q=collection:(zx_spectrum_library_games)");
-    const QString zxSpectrumSearchTitle = QLatin1String(" AND title:(%1)");
-    const QLatin1String zxSpectrumSearchFirstTitle(" AND firstTitle:");
+    const QString zxSpectrumLibraryGames = u"https://archive.org/advancedsearch.php?q=collection:(zx_spectrum_library_games)"_s;
+    const QString zxSpectrumSearchTitle = u" AND title:(%1)"_s;
+    const QString zxSpectrumSearchFirstTitle = u" AND firstTitle:"_s;
 }
 
 ZXGamesModel::ZXGamesModel(QObject *parent) : QAbstractListModel(parent)
@@ -116,7 +118,7 @@ void ZXGamesModel::search(const QString &title, const QString &firstTitle)
     m_fetchStart = 0;
     m_data.clear();
 
-    m_searchString = QLatin1String("https://archive.org/advancedsearch.php?q=collection:(zx_spectrum_library_games)");
+    m_searchString = u"https://archive.org/advancedsearch.php?q=collection:(zx_spectrum_library_games)"_s;
     if (!title.isEmpty())
         m_searchString += zxSpectrumSearchTitle.arg(title.toHtmlEscaped());
 

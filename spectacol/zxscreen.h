@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "fusesettings.h"
+#include "zxsettings.h"
 
 #include <QQmlEngine>
 #include <QQuickItem>
@@ -64,7 +64,7 @@ private:
 
 private:
     QSize m_imageSize;
-    FuseSettings::FillMode m_fillMode = FuseSettings::PreserveAspectFit;
+    ZxSettings::FillMode m_fillMode = ZxSettings::PreserveAspectFit;
     bool m_smoothScaling = false;
     bool m_fullScreen = false;
     bool m_mouseGrabSuspended = false;

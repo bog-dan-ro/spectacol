@@ -32,12 +32,12 @@ Item {
     function removeCurrent() {
         if (view.currentIndex < 0 || view.currentIndex >= view.count)
             return;
-        FuseEmulator.debuggerCommand("delete " + visualModel.items.get(view.currentIndex).model.id);
+        ZxEmulator.debuggerCommand("delete " + visualModel.items.get(view.currentIndex).model.id);
     }
 
     DelegateModel {
         id: visualModel
-        model: FuseEmulator.breakpointsModel
+        model: ZxEmulator.breakpointsModel
         delegate: Rectangle {
             property color paper: view.currentIndex !== index ? Qt.rgba(0, 0, 0, 0.9) : "white"
             property color ink: view.currentIndex !== index ? "white": Qt.rgba(0, 0, 0, 0.9)
@@ -106,7 +106,7 @@ Item {
                 removeCurrent();
                 break;
             case Qt.Key_X:
-                FuseEmulator.debuggerCommand("delete");
+                ZxEmulator.debuggerCommand("delete");
                 break;
             }
         }
@@ -131,7 +131,7 @@ Item {
                 Layout.maximumWidth: implicitWidth
                 enabled: view.count > 0
                 text:"Remove All <b>(X)</b>"
-                onClicked: FuseEmulator.debuggerCommand("delete")
+                onClicked: ZxEmulator.debuggerCommand("delete")
             }
         }
     }

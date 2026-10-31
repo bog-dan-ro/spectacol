@@ -20,25 +20,21 @@
 #include <QTimer>
 #include <QQmlEngine>
 
-#include "fuseobject.h"
+#include <QObject>
 
-extern "C"  {
-# include <libspectrum.h>
-}
-
-class FuseEmulator;
-class FuseTape : public FuseObject
+class ZxEmulator;
+class ZxTape : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
-    QML_UNCREATABLE("use fuse.tape instead")
+    QML_UNCREATABLE("use ZxEmulator.tape instead")
     Q_PROPERTY(bool hasTape MEMBER m_hasTape NOTIFY hasTapeChanged)
     Q_PROPERTY(QString programName MEMBER m_programName NOTIFY programNameChanged)
 
 public:
-    explicit FuseTape(FuseEmulator *parent = 0);
+    explicit ZxTape(ZxEmulator *parent = 0);
     void updateBrowseData();
-    QString programName() const;
+    QString programName() const { return m_programName; }
     void setProgramName(const QString &programName);
     void refreshData();
 
@@ -54,12 +50,11 @@ signals:
     void programNameChanged();
 
 private:
-    static void checkProgramName(libspectrum_tape_block *block, void *user_data);
+    void setHasTape(bool hasTape);
 
-private:
     bool m_hasTape = false;
     QByteArray m_tapeData;
     QString m_programName;
-    FuseEmulator *m_fuseEmulator = nullptr;
+    ZxEmulator *m_zxEmulator = nullptr;
     QTimer m_saveSnapshotTimer;
 };

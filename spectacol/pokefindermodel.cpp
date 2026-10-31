@@ -18,69 +18,50 @@
 #include "pokefindermodel.h"
 
 #include "breakpointsmodel.h"
-#include "fuseemulator.h"
+#include "zxemulator.h"
 #include "qmlui.h"
 
-extern "C"  {
-# include <memory_pages.h>
-# include <pokefinder/pokefinder.h>
-}
+using namespace Qt::StringLiterals;
 
 #define MAX_POSSIBLE 20
 
 PokeFinderModel::PokeFinderModel(QObject *parent)
-    : FuseListModel(parent)
+    : QAbstractListModel(parent)
 {
 }
 
 void PokeFinderModel::update()
 {
+    std::vector<zxkit::PokeCandidate> candidates;
     {
-        auto breakpointsModel = FuseEmulator::instance().breakpointsModel();
-        std::lock_guard<std::mutex> lock(m_mutex);
-        std::lock_guard<std::mutex> lockBreakpoints(breakpointsModel->breakpointsMutex());
-        m_dataTmp.clear();
-        const auto &addresses = breakpointsModel->addresses();
-        if (pokefinder_count && pokefinder_count <= MAX_POSSIBLE) {
-            for (size_t page = 0; page < MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES; page++ ) {
-                memory_page *mapping = &memory_map_ram[page];
-                const uint16_t bank = mapping->page_num;
-
-                for (size_t offset = 0; offset < MEMORY_PAGE_SIZE; offset++) {
-                    if( ! (pokefinder_impossible[page][offset/8] & 1 << (offset & 7)) ) {
-                        const uint16_t bank_offset = mapping->offset + offset;
-                        const uint8_t value = mapping->page[offset];
-                        debugger_breakpoint_address addr;
-                        addr.source = memory_source_ram;
-                        addr.page = bank;
-                        addr.offset = bank_offset;
-                        auto it = addresses.find(addr);
-                        uint8_t breakpoints = NoBreakpoint;
-                        if (it != addresses.end()) {
-                            if (it->second.find(DEBUGGER_BREAKPOINT_TYPE_READ) != it->second.end())
-                                breakpoints = OnRead;
-
-                            if (it->second.find(DEBUGGER_BREAKPOINT_TYPE_WRITE) != it->second.end())
-                                breakpoints |= OnWrite;
-                        }
-                        m_dataTmp.emplace_back(PokeFinderData(bank, bank_offset, value, breakpoints));
-                    }
-                }
-            }
-        }
+        const auto emulator = ZxEmulator::instance().emulator().readLock();
+        const auto &pf = emulator->debugger().pokeFinder();
+        if (pf.count() > 0 && pf.count() <= MAX_POSSIBLE)
+            candidates = pf.results(MAX_POSSIBLE);
     }
-    callFunction([this]{
-        bool changed = m_dataTmp.size() == m_data.size();
-        if (!changed)
-            beginResetModel();
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_data = std::move(m_dataTmp);
-        m_dataTmp.clear();
-        if (!changed)
-            endResetModel();
-        else
-            emit dataChanged(index(0), index(m_data.size()-1));
-    });
+
+    std::vector<PokeFinderData> data;
+    const auto &addresses = ZxEmulator::instance().breakpointsModel()->addresses();
+    for (const auto &cand : candidates) {
+        uint8_t breakpoints = NoBreakpoint;
+        const uint16_t absAddr = uint16_t(0x4000 + cand.offset);
+        if (auto it = addresses.find(absAddr); it != addresses.end()) {
+            if (it->second.contains(BreakpointsModel::BreakOnRead))
+                breakpoints = OnRead;
+            if (it->second.contains(BreakpointsModel::BreakOnWrite))
+                breakpoints |= OnWrite;
+        }
+        data.emplace_back(PokeFinderData(cand.page16k, cand.offset, cand.currentValue, breakpoints));
+    }
+
+    const bool sameSize = data.size() == m_data.size();
+    if (!sameSize)
+        beginResetModel();
+    m_data = std::move(data);
+    if (!sameSize)
+        endResetModel();
+    else if (!m_data.empty())
+        emit dataChanged(index(0), index(int(m_data.size()) - 1));
 }
 
 int PokeFinderModel::rowCount(const QModelIndex &parent) const
@@ -110,13 +91,13 @@ QVariant PokeFinderModel::data(const QModelIndex &index, int role) const
     case Breakpoint:
         switch (m_data[index.row()].breakpoints) {
         case 1:
-            return QLatin1String("Break on Read");
+            return u"Break on Read"_s;
         case 2:
-            return QLatin1String("Break on Write");
+            return u"Break on Write"_s;
         case 3:
-            return QLatin1String("Break on R/W");
+            return u"Break on R/W"_s;
         default:
-            return QLatin1String("");
+            return u""_s;
         }
         break;
     }

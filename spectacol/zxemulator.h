@@ -19,58 +19,36 @@
 
 #include "breakpointsmodel.h"
 #include "disassamblemodel.h"
-#include "fuseobject.h"
-#include "fusetape.h"
+#include "disks.h"
+#include "zxtape.h"
 #include "pokefindermodel.h"
 #include "zxgamesmodel.h"
 
-Q_MOC_INCLUDE("fuserecording.h")
-Q_MOC_INCLUDE("fusesettings.h")
+Q_MOC_INCLUDE("zxrecording.h")
+Q_MOC_INCLUDE("zxsettings.h")
 
 #include <QAudioFormat>
 #include <QGamepadManager>
 #include <QPointer>
 #include <QQmlEngine>
-#include <QSemaphore>
-#include <QThread>
 #include <QUrl>
 
-#include <atomic>
-#include <memory>
+#include <zxkit/core/Engine.h>
+#include <zxkit/core/Events.h>
 
-extern "C"  {
-# include <ui/ui.h>
-# include <libspectrum.h>
-}
+#include <atomic>
+#include <exception>
+#include <memory>
 
 class QAudioSink;
 class QIODevice;
 class QKeyEvent;
 class QMouseEvent;
 class QQmlContext;
-class FuseSettings;
-class FuseRecording;
+class ZxSettings;
+class ZxRecording;
 
-class FuseThread : public QThread
-{
-public:
-    FuseThread();
-    ~FuseThread() override;
-    int soundLowlevelInit(const char */*device*/, int *freqptr, int *stereoptr);
-    void soundLowlevelFrame(libspectrum_signed_word *data, int len);
-    void soundLowlevelEnd();
-
-protected:
-    void run();
-
-private:
-    // Created, used and destroyed only on the FUSE thread
-    std::unique_ptr<QAudioSink> m_audioOutput;
-    QIODevice *m_audioOutputDevice = nullptr;
-    QAudioFormat m_audioFormat;
-};
-
-class FuseEmulator : public FuseObject
+class ZxEmulator : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
@@ -88,9 +66,10 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(QStringList joysticksModel READ joysticksModel CONSTANT)
     Q_PROPERTY(int selectedJoysticksIndex READ selectedJoysticksIndex WRITE setSelectedJoysticksIndex NOTIFY selectedJoysticksIndexChanged)
     Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
-    Q_PROPERTY(const FuseTape *tape MEMBER m_tape CONSTANT)
-    Q_PROPERTY(const FuseRecording *recording MEMBER m_recording CONSTANT)
-    Q_PROPERTY(FuseSettings *settings READ settings CONSTANT)
+    Q_PROPERTY(const ZxTape *tape MEMBER m_tape CONSTANT)
+    Q_PROPERTY(Disks *disks MEMBER m_disks CONSTANT)
+    Q_PROPERTY(const ZxRecording *recording MEMBER m_recording CONSTANT)
+    Q_PROPERTY(ZxSettings *settings READ settings CONSTANT)
     Q_PROPERTY(const BreakpointsModel *breakpointsModel READ breakpointsModel CONSTANT)
     Q_PROPERTY(const DisassambleModel* disassambleModel READ disassambleModel CONSTANT)
     Q_PROPERTY(const PokeFinderModel* pokeFinderModel READ pokeFinderModel CONSTANT)
@@ -120,12 +99,6 @@ class FuseEmulator : public FuseObject
     Q_PROPERTY(QString HL_ READ HL_ WRITE setHL_ NOTIFY registersChanged)
 
 public:
-    enum UiQuery {
-        UiNo = 0,
-        UiYes = 1
-    };
-    Q_ENUM(UiQuery)
-
     enum ErrorLevel {
         Info,
         Warning,
@@ -140,31 +113,50 @@ public:
     Q_ENUM(ControlType)
 
     enum UiItemType {
-        Disk = UI_STATUSBAR_ITEM_DISK,
-        Microdrive = UI_STATUSBAR_ITEM_MICRODRIVE,
-        Mouse = UI_STATUSBAR_ITEM_MOUSE,
-        Paused = UI_STATUSBAR_ITEM_PAUSED,
-        Tape = UI_STATUSBAR_ITEM_TAPE,
+        Disk = 0,
+        Microdrive,
+        Mouse,
+        Paused,
+        Tape,
     };
     Q_ENUM(UiItemType)
 
     enum UiState {
-        Active = UI_STATUSBAR_STATE_ACTIVE,
-        Inactive = UI_STATUSBAR_STATE_INACTIVE,
-        Gone = UI_STATUSBAR_STATE_NOT_AVAILABLE,
+        Active = 0,
+        Inactive,
+        Gone,
     };
     Q_ENUM(UiState)
 
-    enum UiConfirmSave {
-        UiConfirmSaveSave = UI_CONFIRM_SAVE_SAVE,
-        UiConfirmSaveDontsave = UI_CONFIRM_SAVE_DONTSAVE,
-        UiConfirmSaveCancel = UI_CONFIRM_SAVE_CANCEL
-    };
-
 public:
-    static FuseEmulator *create(QQmlEngine *, QJSEngine *);
-    static FuseEmulator &instance();
-    ~FuseEmulator();
+    static ZxEmulator *create(QQmlEngine *, QJSEngine *);
+    static ZxEmulator &instance();
+    ~ZxEmulator();
+
+    zxkit::Engine &engine() { return *m_engine; }
+    const zxkit::Engine &engine() const { return *m_engine; }
+    /// The emulated machine, shared with the Engine thread: lock it to use it.
+    /// The Engine holds the lock for a scanline at a time, so a lock never waits long.
+    const zxkit::Shared<zxkit::Emulator> &emulator() const { return m_engine->emulator(); }
+
+    /// Runs `fn(emulator)` with the emulator locked, shows the error if it throws.
+    template <typename F>
+    bool withEmulator(F &&fn)
+    {
+        try {
+            auto emulator = m_engine->emulator().writeLock();
+            std::forward<F>(fn)(*emulator);
+            return true;
+        } catch (const std::exception &e) {
+            showMessage(QString::fromUtf8(e.what()), Error);
+            return false;
+        }
+    }
+    /// Loads any media file (the file is read before locking the emulator).
+    bool loadMediaFile(const QString &filePath);
+    /// Saves a snapshot, the tape or a screenshot (the file is written after unlocking the emulator).
+    bool saveMediaFile(const QString &filePath);
+    zxkit::Z80Registers registers() const;
 
     bool paused() const;
     void setPaused(bool paused);
@@ -234,29 +226,19 @@ public:
 
     QString saveFilePath(const QString& fileName);
 
-    int soundLowlevelInit(const char */*device*/, int *freqptr, int *stereoptr);
-    void soundLowlevelFrame(libspectrum_signed_word *data, int len);
-    void soundLowlevelEnd();
+    void writeAudioSamples(std::span<const int16_t> samples, uint32_t sampleRate, uint8_t channels);
+    /// Emulation speed, in percent of the machine's real speed.
+    void setSpeed(int percent);
 
     // Kempston mouse
     void mouseButton(Qt::MouseButton button, bool pressed);
     void mouseMotion(int dx, int dy);
     void setMouseGrabSuspended(bool suspended);
     bool mouseGrabbed() const { return m_mouseGrabbed; }
-    // called on the FUSE thread
     void setMouseGrabbed(bool grabbed);
 
-    FuseSettings *settings() const;
+    ZxSettings *settings() const;
     void resetLoadedFile();
-
-    void uiStatusbarUpdate(ui_statusbar_item item, ui_statusbar_state state);
-
-    char *uiOpenFilename(const QByteArray &title, const QString &path = QString());
-    char *uiSaveFilename(const QByteArray &title);
-    ui_confirm_save_t uiConfirmSaveSpecific(const QByteArray &message);
-    int uiQuery(const QByteArray &message);
-    void uiPokememSelector(const char *filePath);
-    int uiGetListIndex(const QStringList &list, const QString &title);
 
     const DisassambleModel *disassambleModel() const;
 
@@ -321,13 +303,10 @@ public slots:
     void gamepadButtonPressEvent(QGamepadManager::GamepadButton button);
     void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button);
 
-    void setOpenSaveFile(const QByteArray &filePath);
-    void setQuery(UiQuery result);
-    void setConfirmSaveSpecific(UiConfirmSave result);
 
-    void showMessage(QString message, ErrorLevel level = Info);
-    void setListIndex(int index);
+    void showMessage(QString message, ZxEmulator::ErrorLevel level = Info);
 
+    // Fast forward, while the button is held
     void speedup();
     void slowdown();
 
@@ -349,52 +328,51 @@ signals:
     void processInputEventsChanged();
     void mouseGrabbedChanged(bool mouseGrabbed);
     void gamepadIdChanged();
-    void toggleOnScreenControls(ControlType type);
-    void error(ErrorLevel level, const QString &message);
-    void uiIconUpdate(UiItemType item, UiState state);
+    void toggleOnScreenControls(ZxEmulator::ControlType type);
+    void error(ZxEmulator::ErrorLevel level, const QString &message);
+    void uiIconUpdate(ZxEmulator::UiItemType item, ZxEmulator::UiState state);
     void configureJoystick();
     void showControlsIconsChanged(bool showControlsIcons);
-    void openFile(const QString &title, const QString &path);
-    void saveFile(const QString &title);
-    void query(const QString &message);
-    void showPokememSelector();
-    void getListIndex(const QStringList &list, const QString &title);
-    void confirmSaveSpecific(const QString &message);
 
 private:
-    explicit FuseEmulator(QObject *parent = 0);
-    void updateScalers() const;
-    void startFuseThread();
-    void stopFuseThread();
+    explicit ZxEmulator(QObject *parent = 0);
+    void stopEngine();
     friend class ZxImage;
 
 private:
     bool m_touchscreen = false;
     QString m_loadedFileName;
-    mutable std::vector<int> m_supportedScalers;
+    int m_selectedFilterIndex = 0;
+    int m_selectedJoystickIndex = 1;
     BreakpointsModel m_breakpointsModel;
     DisassambleModel m_disassambleModel;
     PokeFinderModel m_pokeFinderModel;
-    FuseThread m_fuseThread;
-    std::atomic_bool m_debuggerActivated;
-    bool m_resetPokeFinder;
-    std::atomic_bool m_processInputEvents;
+    // Owned here, the Engine only gets Weak references to them
+    zxkit::CallbackHandle<zxkit::VideoFrameCallback> m_videoFrameCallback;
+    zxkit::CallbackHandle<zxkit::AudioCallback> m_audioCallback;
+    zxkit::CallbackHandle<zxkit::PauseCallback> m_pauseCallback;
+    zxkit::CallbackHandle<zxkit::ResumeCallback> m_resumeCallback;
+    zxkit::CallbackHandle<zxkit::LogCallback> m_logCallback;
+    std::unique_ptr<zxkit::Engine> m_engine;
+    std::unique_ptr<QAudioSink> m_audioOutput;
+    QIODevice *m_audioOutputDevice = nullptr;
+    QAudioFormat m_audioFormat;
+    std::atomic_bool m_debuggerActivated{false};
+    bool m_resetPokeFinder = true;
+    std::atomic_bool m_processInputEvents{true};
     int m_inputEventsBlockers = 0;
     bool m_mouseGrabbed = false;
     int m_gamepadId = -1;
     ZXGamesModel m_onlineGamesModel;
-    std::unique_ptr<FuseSettings> m_fuseSettings;
+    std::unique_ptr<ZxSettings> m_settings;
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
-    friend int ui_tape_browser_update(ui_tape_browser_update_type /*change*/, libspectrum_tape_block */*block*/);
-    FuseTape *m_tape = nullptr;
-    friend int ui_menu_activate(ui_menu_item item, int active);
-    FuseRecording* m_recording = nullptr;
+    ZxTape *m_tape = nullptr;
+    Disks *m_disks = nullptr;
+    ZxRecording* m_recording = nullptr;
     bool m_showControlsIcons = true;
-    QSemaphore m_waitSemaphore;
-    QByteArray m_openSaveFilePath;
-    ui_confirm_save_t m_confirmSaveResult = UI_CONFIRM_SAVE_CANCEL;
-    UiQuery m_queryResult = UiNo;
-    int m_listIndex = -1;
-    bool m_paused = false;
-    double m_deadZone;
+    bool m_paused = false; // togglePaused()
+    int m_pauseCount = 0;  // setPaused() nests
+    // The audio plays only in real time (100%, no fast forward): read on the Engine thread
+    std::atomic_bool m_realTimeAudio{true};
+    double m_deadZone = 0.4;
 };

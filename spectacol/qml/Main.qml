@@ -40,26 +40,26 @@ ApplicationWindow {
         title: "Spectacol"
         text: "Quit ?"
         buttons: MessageDialog.Yes | MessageDialog.No
-        onAccepted: FuseEmulator.quit()
+        onAccepted: ZxEmulator.quit()
     }
 
     Drawer {
         id: menuBar
         focus: false
-        dragMargin: FuseEmulator.settings.swipe4menu ? Qt.styleHints.startDragDistance : 0
+        dragMargin: ZxEmulator.settings.swipe4menu ? Qt.styleHints.startDragDistance : 0
 
         width: 17 * (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20)
         height: mainScreen.height
         MenuView {
             id: menuView
             anchors.fill: parent
-            rootMenu: FuseMenu {}
+            rootMenu: ZxMenu {}
             transform: Translate {
                 x: (menuBar.position - 1.0) * menuView.width
             }
         }
         property bool paused: false
-        onPausedChanged: FuseEmulator.paused = paused
+        onPausedChanged: ZxEmulator.paused = paused
         // position changes on every frame of the animation and of a drag,
         // rebuild the menu only when the drawer starts to open
         property bool wasClosed: true
@@ -116,7 +116,7 @@ ApplicationWindow {
                 break;
 
             case Qt.Key_F7:
-                toggleOnScreenControls(FuseEmulator.Keyboard48K, true);
+                toggleOnScreenControls(ZxEmulator.Keyboard48K, true);
                 break;
 
             case Qt.Key_F10:
@@ -168,7 +168,7 @@ ApplicationWindow {
                         pageLoader.source = "";
                         event.accepted = true;
                     } else {
-                        if (FuseEmulator.settings.hasStartButton || FuseEmulator.touchscreen)
+                        if (ZxEmulator.settings.hasStartButton || ZxEmulator.touchscreen)
                             quitDialog.open();
                         else
                             menuBar.open();
@@ -177,8 +177,8 @@ ApplicationWindow {
                 }
                 break;
             }
-            if (!event.accepted && FuseEmulator.processInputEvents) {
-                FuseEmulator.keyPress(event.key, event.modifiers, event.isAutoRepeat, false);
+            if (!event.accepted && ZxEmulator.processInputEvents) {
+                ZxEmulator.keyPress(event.key, event.modifiers, event.isAutoRepeat, false);
                 event.accepted = true;
             }
         }
@@ -193,20 +193,20 @@ ApplicationWindow {
                 }
                 break;
             }
-            if (!event.accepted && FuseEmulator.processInputEvents) {
-                FuseEmulator.keyRelease(event.key, event.modifiers, event.isAutoRepeat, false);
+            if (!event.accepted && ZxEmulator.processInputEvents) {
+                ZxEmulator.keyRelease(event.key, event.modifiers, event.isAutoRepeat, false);
                 event.accepted = true;
             }
         }
 
         Item {
             anchors.fill: parent
-            anchors.leftMargin: (FuseEmulator.settings.leftMargin && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
+            anchors.leftMargin: (ZxEmulator.settings.leftMargin && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
 
             ZxScreen {
                 id: zxScreen
                 anchors.fill: parent
-                mouseGrabSuspended: pageLoader.status !== Loader.Null || menuBar.position > 0 || !FuseEmulator.processInputEvents
+                mouseGrabSuspended: pageLoader.status !== Loader.Null || menuBar.position > 0 || !ZxEmulator.processInputEvents
 
                 onFullScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
 
@@ -264,7 +264,7 @@ ApplicationWindow {
             id: screenButtonsGrid
             anchors.fill: parent
             anchors.topMargin: mainScreen.portrait ? zxScreen.implicitHeight : 0;
-            visible: FuseEmulator.touchscreen && FuseEmulator.showControlsIcons
+            visible: ZxEmulator.touchscreen && ZxEmulator.showControlsIcons
             horizontalItemAlignment: Grid.AlignHCenter
             verticalItemAlignment: Grid.AlignVCenter
             columns: mainScreen.portrait ? 6 : 1
@@ -290,7 +290,7 @@ ApplicationWindow {
                 source: "qrc:/images/keyboard-icon.svg"
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: toggleOnScreenControls(FuseEmulator.Keyboard48K, false);
+                    onClicked: toggleOnScreenControls(ZxEmulator.Keyboard48K, false);
                 }
             }
 
@@ -310,7 +310,7 @@ ApplicationWindow {
                 source: "qrc:/images/controller-icon.svg"
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: toggleOnScreenControls(FuseEmulator.CursorJoystick, false)
+                    onClicked: toggleOnScreenControls(ZxEmulator.CursorJoystick, false)
                 }
             }
             Image {
@@ -321,9 +321,9 @@ ApplicationWindow {
                 source: "qrc:/images/fastforward.svg"
                 MouseArea {
                     anchors.fill: parent
-                    onPressed: FuseEmulator.speedup()
-                    onReleased: FuseEmulator.slowdown()
-                    onCanceled: FuseEmulator.slowdown()
+                    onPressed: ZxEmulator.speedup()
+                    onReleased: ZxEmulator.slowdown()
+                    onCanceled: ZxEmulator.slowdown()
                 }
             }
             Image {
@@ -331,10 +331,10 @@ ApplicationWindow {
                 height: Screen.pixelDensity * 7
                 width: Screen.pixelDensity * 7
                 sourceSize: Qt.size(width, height)
-                source: FuseEmulator.paused ? "qrc:/images/play.svg" : "qrc:/images/pause.svg"
+                source: ZxEmulator.paused ? "qrc:/images/play.svg" : "qrc:/images/pause.svg"
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: FuseEmulator.togglePaused()
+                    onClicked: ZxEmulator.togglePaused()
                 }
             }
         }
@@ -363,6 +363,9 @@ ApplicationWindow {
             id: pageLoader
             anchors.fill: parent
             visible: status === Loader.Ready
+            // Every page pauses the emulation while it is open, unless it says otherwise
+            readonly property bool pausing: status === Loader.Ready && item !== null && item.pausesEmulation !== false
+            onPausingChanged: ZxEmulator.paused = pausing
             focus: visible
             enabled: visible
             onVisibleChanged: {
@@ -387,7 +390,7 @@ ApplicationWindow {
         if (pageLoader.visible)
             return;
         switch (type) {
-        case FuseEmulator.CursorJoystick:
+        case ZxEmulator.CursorJoystick:
             if (!onScreenCursorJoystick.visible) {
                 if (onScreen48Keyboard.visible)
                     onScreen48Keyboard.visible = false;
@@ -397,7 +400,7 @@ ApplicationWindow {
             onScreenCursorJoystick.visible = !onScreenCursorJoystick.visible;
             break;
 
-        case FuseEmulator.Keyboard48K:
+        case ZxEmulator.Keyboard48K:
             if (!onScreen48Keyboard.visible && onScreenCursorJoystick.visible)
                 onScreenCursorJoystick.visible = false;
             onScreen48Keyboard.gamepadMode = gamepad;
@@ -406,50 +409,16 @@ ApplicationWindow {
         }
     }
 
-    MessageDialog {
-        id: queryDialog
-        title: "Spectacol"
-        buttons: MessageDialog.Yes | MessageDialog.No
-        onAccepted: FuseEmulator.setQuery(FuseEmulator.UiYes)
-        onRejected: FuseEmulator.setQuery(FuseEmulator.UiNo)
-    }
-
-    MessageDialog {
-        id: confirmSaveSpecificDialog
-        title: "Spectacol"
-        buttons: MessageDialog.Save | MessageDialog.Discard | MessageDialog.Cancel
-
-        // FUSE blocks until it gets exactly one answer.
-        property bool answered: false
-        function answer(result) {
-            if (answered)
-                return;
-            answered = true;
-            FuseEmulator.setConfirmSaveSpecific(result);
+    Connections {
+        target: NextSdCard
+        function onDownloadRequested() {
+            menuBar.close();
+            pageLoader.source = "NextSdCardPage.qml";
         }
-
-        // Discard has the DestructiveRole, so it emits neither accepted nor rejected.
-        onButtonClicked: (button, role) => {
-            switch (button) {
-            case MessageDialog.Save:
-                answer(FuseEmulator.UiConfirmSaveSave);
-                break;
-            case MessageDialog.Discard:
-                answer(FuseEmulator.UiConfirmSaveDontsave);
-                break;
-            default:
-                answer(FuseEmulator.UiConfirmSaveCancel);
-                break;
-            }
-        }
-        // buttonClicked comes first, so these only answer when the dialog was closed
-        // without clicking a button (e.g. Escape)
-        onAccepted: answer(FuseEmulator.UiConfirmSaveCancel)
-        onRejected: answer(FuseEmulator.UiConfirmSaveCancel)
     }
 
     Connections {
-        target: FuseEmulator
+        target: ZxEmulator
 
         function onError (level, message) { messagePage.showMessage(level, message); }
 
@@ -462,101 +431,63 @@ ApplicationWindow {
         function onHideMenu() { menuBar.close(); }
         function onToggleOnScreenControls(type) { toggleOnScreenControls(type, true); }
         function onShowWelcome() {
-            FuseEmulator.settings.swipe4menu = !TextSizes.smallScreen;
-            FuseEmulator.settings.leftMargin = TextSizes.smallScreen;
+            ZxEmulator.settings.swipe4menu = !TextSizes.smallScreen;
+            ZxEmulator.settings.leftMargin = TextSizes.smallScreen;
             pageLoader.source = "AboutPage.qml";
         }
 
         function onUiIconUpdate(item, state) {
             switch (item) {
-            case FuseEmulator.Disk:
+            case ZxEmulator.Disk:
                 if (cassetteIcon.visible)
                     cassetteIconHideAnimation.start();
-                if (state === FuseEmulator.Active) {
+                if (state === ZxEmulator.Active) {
                     diskIconHideAnimation.stop();
                     diskIcon.visible = true
                 } else if (diskIcon.visible) {
                     diskIconHideAnimation.start();
                 }
                 break;
-            case FuseEmulator.Microdrive:
-            case FuseEmulator.Tape:
+            case ZxEmulator.Microdrive:
+            case ZxEmulator.Tape:
                 if (diskIcon.visible)
                     diskIconHideAnimation.start();
-                if (state === FuseEmulator.Active) {
+                if (state === ZxEmulator.Active) {
                     cassetteIconHideAnimation.stop();
                     cassetteIcon.visible = true
                 } else if (cassetteIcon.visible) {
                     cassetteIconHideAnimation.start();
                 }
                 break;
-            case FuseEmulator.Mouse:
+            case ZxEmulator.Mouse:
                 break;
-            case FuseEmulator.Paused:
+            case ZxEmulator.Paused:
                 break;
             }
         }
 
-        function onOpenFile(title, path) {
-            pageLoader.source = "GetFileBrowserPage.qml"
-            if (pageLoader.status !== Loader.Ready) {
-                FuseEmulator.setOpenSaveFile(""); // FUSE is waiting for an answer
-                return;
-            }
-            if (path.length)
-                pageLoader.item.folder = path;
-            messagePage.showMessage(FuseEmulator.Info, title);
-        }
-
-        function onSaveFile(title) {
-            // TODO: Implement save dialog
-            FuseEmulator.setOpenSaveFile("");
-        }
-
-        function onQuery(message) {
-            queryDialog.text = message;
-            queryDialog.open();
-        }
-
-        function onConfirmSaveSpecific(message) {
-            confirmSaveSpecificDialog.text = message;
-            confirmSaveSpecificDialog.answered = false;
-            confirmSaveSpecificDialog.open();
-        }
-
-        function onGetListIndex(list, title) {
-            pageLoader.source = "GetListPage.qml";
-            if (pageLoader.status !== Loader.Ready) {
-                FuseEmulator.setListIndex(-1); // FUSE is waiting for an answer
-                return;
-            }
-            pageLoader.item.title = title;
-            pageLoader.item.model = list;
-        }
-
-        function onShowPokememSelector() { pageLoader.source = "PokeManagerPage.qml"; }
     }
 
     Component.onCompleted: {
         // Check gamepads status
-        if (FuseEmulator.gamepadId === -1) {
+        if (ZxEmulator.gamepadId === -1) {
             var len = GamepadManager.connectedGamepads.length;
             if (len > 0) {
                 for (var i = 0; i < len; ++i) {
                     var id = GamepadManager.connectedGamepads[i];
                     if (!GamepadManager.isConfigurationNeeded(id)) {
-                        FuseEmulator.gamepadId = id;
+                        ZxEmulator.gamepadId = id;
                         break;
                     }
                 }
 
-                if (FuseEmulator.gamepadId === -1) {
-                    FuseEmulator.gamepadId = GamepadManager.connectedGamepads[0];
+                if (ZxEmulator.gamepadId === -1) {
+                    ZxEmulator.gamepadId = GamepadManager.connectedGamepads[0];
                     pageLoader.source = "CalibrateGamepad.qml";
                 }
             } else {
-                if (!FuseEmulator.touchscreen)
-                    messagePage.showMessage(FuseEmulator.Info, qsTr("No gamepad was found, please connect a gamepad"));
+                if (!ZxEmulator.touchscreen)
+                    messagePage.showMessage(ZxEmulator.Info, qsTr("No gamepad was found, please connect a gamepad"));
             }
         }
     }

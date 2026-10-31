@@ -37,8 +37,20 @@ qt_add_resources(spectacol "resources"
         roms/256s-2.rom
         roms/256s-3.rom
         roms/48.rom
+        roms/cobra1_boot.rom
+        roms/cobra1_sys-0.rom
+        roms/cobra1_sys-1.rom
+        roms/cobra1_sys-2.rom
+        roms/cobra1_sys-3.rom
+        roms/cobra2_TS_4_OS-0.rom
+        roms/cobra2_TS_4_OS-1.rom
+        roms/cobra2_TS_4_OS-2.rom
+        roms/cobra2_TS_4_OS-3.rom
         roms/disciple.rom
         roms/gluck.rom
+        roms/hc-if1.rom
+        roms/hc2000-basic.rom
+        roms/hc2000-cpm.rom
         roms/if1-1.rom
         roms/if1-2.rom
         roms/mf1.rom
@@ -62,8 +74,6 @@ qt_add_resources(spectacol "resources"
         roms/tc2068-0.rom
         roms/tc2068-1.rom
         roms/trdos.rom
-
-        z80_opcodes.csv
 )
 
 qt_add_shaders(spectacol "spectacol_shaders"
@@ -87,25 +97,16 @@ qt_add_qml_module(spectacol
     URI Spectacol
     VERSION 1.0
     SOURCES
-        ${fuse_import_SOURCE_DIR}/compat/unix/socket.c
-        ${fuse_import_SOURCE_DIR}/compat/unix/osname.c
-        ${fuse_import_SOURCE_DIR}/compat/unix/tuntap.c
-        ${fuse_import_SOURCE_DIR}/timer/native.c
-        ${fuse_import_SOURCE_DIR}/timer/timer.c
         breakpointsmodel.cpp breakpointsmodel.h
-        compat.cpp
         disassamblemodel.cpp disassamblemodel.h
         folderlistmodel.cpp folderlistmodel.h
-        fuseemulator.cpp fuseemulator.h
-        fuselistmodel.cpp fuselistmodel.h
-        fuseobject.cpp fuseobject.h
-        fuserecording.cpp fuserecording.h
+        zxemulator.cpp zxemulator.h
+        zxrecording.cpp zxrecording.h
         zxscreen.cpp zxscreen.h
-        fusesettings.cpp fusesettings.h
-        fusetape.cpp fusetape.h
-        fusetapedata.cpp fusetapedata.h
+        zxsettings.cpp zxsettings.h
+        zxtape.cpp zxtape.h
+        zxtapedata.cpp zxtapedata.h
         zximage.cpp zximage.h
-        keysyms.cpp
         pokefindermodel.cpp pokefindermodel.h
         pokemodel.cpp pokemodel.h
         qmlui.cpp qmlui.h
@@ -124,6 +125,9 @@ qt_add_qml_module(spectacol
         qml/CustomizeGamepadPage.qml
         qml/DebuggerPage.qml
         qml/DisassembleView.qml
+        qml/DisksEjectPage.qml
+        qml/DisksInsertPage.qml
+        qml/DrivesList.qml
         qml/FancyBaseList.qml
         qml/FancyList.qml
         qml/FancyPane.qml
@@ -131,14 +135,13 @@ qt_add_qml_module(spectacol
         qml/FancyTextField.qml
         qml/FileBrowserPage.qml
         qml/FiltersPage.qml
-        qml/FuseMenu.qml
-        qml/GetFileBrowserPage.qml
-        qml/GetListPage.qml
+        qml/ZxMenu.qml
         qml/Joysticks.qml
         qml/MachineTypePage.qml
         qml/Main.qml
         qml/MenuView.qml
         qml/MessagePage.qml
+        qml/NextSdCardPage.qml
         qml/OnScreen48Keyboard.qml
         qml/OnScreenButton.qml
         qml/OnScreenCursorJoystick.qml
@@ -160,7 +163,8 @@ qt_add_qml_module(spectacol
         qml/Utils.js
         qml/ZxMenuItem.qml
         qml/private/TextSizes.qml
+        SOURCES disks.h disks.cpp
+        SOURCES nextsdcard.h nextsdcard.cpp
 )
 
-target_link_libraries(spectacol PRIVATE fuse libspectrum Qt::Quick Qt::Multimedia Qt::GamepadLegacy Qt::GuiPrivate Qt::ShaderTools z)
-target_compile_definitions(spectacol PRIVATE TIMER_ALWAYS_SLEEP)
+target_link_libraries(spectacol PRIVATE ZX::Kit Qt::Quick Qt::Multimedia Qt::GamepadLegacy Qt::GuiPrivate Qt::ShaderTools)

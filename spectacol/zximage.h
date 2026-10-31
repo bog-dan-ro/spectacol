@@ -21,11 +21,8 @@
 #include <QMutex>
 #include <QSGTexture>
 
-#include <memory>
+#include <zxkit/video/VideoFrame.h>
 
-extern "C"  {
-# include <libspectrum.h>
-}
 
 class QRhiTexture;
 
@@ -49,36 +46,16 @@ public:
     // Returns the last finished frame and the area changed since the previous call
     Frame takeFrame();
 
-    // FUSE thread only
-    void resize(uint32_t w, uint32_t h);
-    void rescale();
-    void putPixel(int x, int y, int colour);
-    void plot8(int x, int y, libspectrum_byte data, libspectrum_byte ink, libspectrum_byte paper);
-    void plot16(int x, int y, libspectrum_word data, libspectrum_byte ink, libspectrum_byte paper);
-
-    void update(int x, int y, int w, int h);
-    void frameEnd();
-    void saveScreen();
-    void restoreScreen();
+    // Engine thread: copies the rows that changed since the previous frame
+    void presentFrame(const zxkit::VideoFramePtr &frame);
 
 signals:
     void needsUpdate();
     void geometryChanged(QSize size);
 
 private:
-    void publishFrame();
-
-private:
-    // FUSE thread only. FUSE draws into m_rgbImage through m_rgbPixels, which bypasses
-    // QImage's copy on write, so m_rgbImage must never be shallow copied.
-    QImage m_rgbImage, m_savedImage;
-    uint32_t *m_rgbPixels = nullptr;
-    uint32_t m_rgbPixelsWidth = 0;
-    QRect m_dirty;
-
-    // Guarded by m_syncVars. publishFrame() copies the dirty part of m_rgbImage to
-    // m_frameImage; the renderer gets shallow copies of it, which the next publishFrame()
-    // detaches from, so they never change while QRhi uploads them.
+    // The renderer gets shallow copies of m_frameImage: presentFrame() detaches
+    // from them, so they never change while QRhi uploads them.
     mutable QMutex m_syncVars;
     QImage m_frameImage;
     QRect m_frameDirty;

@@ -19,22 +19,16 @@
 
 #include <QString>
 
-#include <functional>
-
-extern "C" {
-# include <debugger/debugger.h>
-}
-
-typedef std::function<void()> SpectrumEventFunction;
-
-void pokeEvent(const SpectrumEventFunction &event);
+int debuggerOutputBase();
+void setDebuggerOutputBase(int base);
 
 template <typename T>
 inline QString formatNumber(T nr)
 {
-    if (debugger_output_base == 10)
+    using namespace Qt::StringLiterals;
+    if (debuggerOutputBase() == 10)
         return QString::number(nr);
-    return QLatin1String("0x") + QString(QLatin1String("%1")).arg(nr, sizeof(T) * 2, 16, QLatin1Char('0')).toUpper();
+    return u"0x"_s + u"%1"_s.arg(nr, sizeof(T) * 2, 16, u'0').toUpper();
 }
 
 void showErrors();

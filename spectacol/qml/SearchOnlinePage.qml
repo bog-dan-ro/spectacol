@@ -35,12 +35,12 @@ Rectangle {
         running: false
         onTriggered: {
             noResults.visible = false;
-            FuseEmulator.onlineGamesModel.search(searchText.text);
+            ZxEmulator.onlineGamesModel.search(searchText.text);
         }
     }
 
     Connections {
-        target: FuseEmulator.onlineGamesModel
+        target: ZxEmulator.onlineGamesModel
         function onNoResults () {
             noResults.visible = true;
             searchText.forceActiveFocus(Qt.TabFocusReason);
@@ -49,7 +49,7 @@ Rectangle {
 
     GamepadKeyNavigation {
         id: gamepadKeyNavigation
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonYKey: Qt.Key_Tab
         buttonBKey: Qt.Key_Escape
         buttonAKey: searchText.focus ? Qt.Key_unknown : Qt.Key_Return
@@ -65,9 +65,9 @@ Rectangle {
         noResults.visible = false;
         timer.stop();
         if (searchText.text.length === 1)
-            FuseEmulator.onlineGamesModel.search("", searchText.text);
+            ZxEmulator.onlineGamesModel.search("", searchText.text);
         else
-            FuseEmulator.onlineGamesModel.search(searchText.text);
+            ZxEmulator.onlineGamesModel.search(searchText.text);
         grid.forceActiveFocus(Qt.TabFocusReason);
     }
 
@@ -94,7 +94,7 @@ Rectangle {
             KeyNavigation.tab: searchText
             KeyNavigation.up: searchText
             Keys.onReturnPressed: {
-                FuseEmulator.copyToFavourites(model.getPath(currentIndex));
+                ZxEmulator.copyToFavourites(model.getPath(currentIndex));
                 pageLoader.source = "";
             }
             clip: true
@@ -111,7 +111,7 @@ Rectangle {
             populate: Transition {
                 NumberAnimation { properties: "x,y"; duration: 200 }
             }
-            model: FuseEmulator.onlineGamesModel
+            model: ZxEmulator.onlineGamesModel
             highlight: Rectangle {
                 border.width: 0.25 * Screen.pixelDensity
                 color: Qt.rgba(0.0, 0.85, 0.0, 0.75)
@@ -142,7 +142,7 @@ Rectangle {
                         if (grid.currentIndex !== index)
                             grid.currentIndex = index;
                         else {
-                            FuseEmulator.copyToFavourites(path);
+                            ZxEmulator.copyToFavourites(path);
                             pageLoader.source = "";
                         }
                     }
@@ -166,13 +166,11 @@ Rectangle {
 
     Component.onCompleted: {
         noResults.visible = false;
-        FuseEmulator.paused = true;
-        FuseEmulator.processInputEvents = false;
+        ZxEmulator.processInputEvents = false;
         if (searchText.text.length)
             performSearch();
     }
     Component.onDestruction: {
-        FuseEmulator.paused = false
-        FuseEmulator.processInputEvents = true;
+        ZxEmulator.processInputEvents = true;
     }
 }

@@ -22,7 +22,6 @@
 #include <QNetworkAccessManager>
 #include <QUrl>
 
-#include <memory>
 #include <unordered_set>
 #include <vector>
 

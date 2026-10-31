@@ -27,11 +27,9 @@ import "private"
 
 Flickable {
     contentHeight: pane.height
-    Component.onCompleted: FuseEmulator.paused = true
-    Component.onDestruction: FuseEmulator.paused = false
 
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: FuseEmulator.gamepadId }
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Space
         buttonBKey: Qt.Key_Escape
         buttonYKey: Qt.Key_Tab
@@ -73,9 +71,9 @@ Flickable {
                     Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
 
-                    model: FuseEmulator.filtersModel
-                    currentIndex: FuseEmulator.selectedFilterIndex
-                    onCurrentIndexChanged: FuseEmulator.selectedFilterIndex = currentIndex
+                    model: ZxEmulator.filtersModel
+                    currentIndex: ZxEmulator.selectedFilterIndex
+                    onCurrentIndexChanged: ZxEmulator.selectedFilterIndex = currentIndex
                 }
             }
 
@@ -98,7 +96,7 @@ Flickable {
                     Keys.onDownPressed: {
                         if (popup.visible) {
                             incrementCurrentIndex();
-                        } else if (FuseEmulator.settings.showOrientationChooser) {
+                        } else if (ZxEmulator.settings.showOrientationChooser) {
                             screenOrientation.forceActiveFocus(Qt.TabFocusReason);
                         } else {
                             smoothScaling.forceActiveFocus(Qt.TabFocusReason);
@@ -108,13 +106,13 @@ Flickable {
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
 
                     model: ["Preserve aspect fit", "Preserve aspect", "Stretch"]
-                    currentIndex: FuseEmulator.settings.fillMode
-                    onCurrentIndexChanged: FuseEmulator.settings.fillMode = currentIndex
+                    currentIndex: ZxEmulator.settings.fillMode
+                    onCurrentIndexChanged: ZxEmulator.settings.fillMode = currentIndex
                 }
             }
 
             RowLayout {
-                visible: FuseEmulator.settings.showOrientationChooser
+                visible: ZxEmulator.settings.showOrientationChooser
                 spacing: 2.5 * Screen.pixelDensity
                 Layout.fillWidth: true
                 Label {
@@ -139,18 +137,18 @@ Flickable {
                     Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
 
                     model: ["Any", "Landscape", "Portrait"]
-                    currentIndex: FuseEmulator.settings.screenOrientation
-                    onCurrentIndexChanged: FuseEmulator.settings.screenOrientation = currentIndex
+                    currentIndex: ZxEmulator.settings.screenOrientation
+                    onCurrentIndexChanged: ZxEmulator.settings.screenOrientation = currentIndex
                 }
             }
 
             CheckBox {
                 id: smoothScaling
-                KeyNavigation.up: FuseEmulator.settings.showOrientationChooser ? screenOrientation : screenFillMode
+                KeyNavigation.up: ZxEmulator.settings.showOrientationChooser ? screenOrientation : screenFillMode
                 KeyNavigation.down: TextSizes.smallScreen ? leftBorder : screenFilter
                 text: qsTr("Smooth scaling")
-                checked: FuseEmulator.settings.smoothScaling
-                onCheckedChanged: FuseEmulator.settings.smoothScaling = checked
+                checked: ZxEmulator.settings.smoothScaling
+                onCheckedChanged: ZxEmulator.settings.smoothScaling = checked
             }
 
             CheckBox {
@@ -159,8 +157,8 @@ Flickable {
                 KeyNavigation.up: smoothScaling
                 KeyNavigation.down: screenFilter
                 text: qsTr("Left boder")
-                checked: FuseEmulator.settings.leftMargin
-                onCheckedChanged: FuseEmulator.settings.leftMargin = checked
+                checked: ZxEmulator.settings.leftMargin
+                onCheckedChanged: ZxEmulator.settings.leftMargin = checked
             }
 
             Button {

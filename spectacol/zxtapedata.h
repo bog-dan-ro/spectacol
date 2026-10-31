@@ -19,15 +19,9 @@
 
 #include <QQmlEngine>
 
-#include "fuselistmodel.h"
+#include <QAbstractListModel>
 
-extern "C"  {
-# include <libspectrum.h>
-}
-
-// The tape belongs to the FUSE thread: the blocks are read there, asynchronously,
-// and the block selection is sent there.
-class FuseTapeData : public FuseListModel
+class ZxTapeData : public QAbstractListModel
 {
     Q_OBJECT
     QML_ELEMENT
@@ -40,7 +34,7 @@ class FuseTapeData : public FuseListModel
         Current
     };
 public:
-    FuseTapeData();
+    ZxTapeData();
 
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const override;
@@ -66,7 +60,6 @@ private:
     };
     using TapeBlocks = std::vector<TapeData>;
 
-    static void addBlockInfo(libspectrum_tape_block *block, void *user_data);
     void setCurrentBlock(int block);
 
 private:

@@ -17,12 +17,11 @@
 
 #pragma once
 
-#include "fuselistmodel.h"
+#include <QAbstractListModel>
 
 #include <vector>
-#include <mutex>
 
-class PokeFinderModel : public FuseListModel
+class PokeFinderModel : public QAbstractListModel
 {
     enum {
         Page = Qt::UserRole + 1,
@@ -57,6 +56,5 @@ private:
         uint8_t breakpoints;
     };
 
-    mutable std::mutex m_mutex;
-    std::vector<PokeFinderData> m_data, m_dataTmp;
+    std::vector<PokeFinderData> m_data;
 };

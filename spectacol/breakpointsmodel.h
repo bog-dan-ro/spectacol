@@ -19,44 +19,15 @@
 
 #include <QQmlEngine>
 
-#include "fuselistmodel.h"
+#include <QAbstractListModel>
 
-#include <vector>
-#include <mutex>
+#include <zxkit/debug/Breakpoints.h>
+
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
-extern "C"  {
-# include <debugger/breakpoint.h>
-}
-
-namespace std
-{
-    template<>
-    struct hash<debugger_breakpoint_address>
-    {
-        typedef debugger_breakpoint_address argument_type;
-        typedef std::size_t result_type;
-
-        result_type operator()(argument_type const& s) const
-        {
-            return s.source << 24 | s.page << 16 | s.offset;
-        }
-    };
-
-    template<>
-    struct equal_to<debugger_breakpoint_address>
-    {
-        typedef debugger_breakpoint_address argument_type;
-        bool
-        operator()(const argument_type &a, const argument_type &b) const
-        {
-            return a.source == b.source && a.page == b.page && a.offset == b.offset;
-        }
-    };
-}
-
-class BreakpointsModel : public FuseListModel
+class BreakpointsModel : public QAbstractListModel
 {
     Q_OBJECT
     QML_ELEMENT
@@ -74,59 +45,42 @@ class BreakpointsModel : public FuseListModel
 
 public:
     enum BreakpointType {
-        BreakOnExecute = DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
-        BreakOnRead = DEBUGGER_BREAKPOINT_TYPE_READ,
-        BreakOnWrite = DEBUGGER_BREAKPOINT_TYPE_WRITE,
-        BreakOnPortRead = DEBUGGER_BREAKPOINT_TYPE_PORT_READ,
-        BreakOnPortWrite = DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE,
-        BreakOnTime = DEBUGGER_BREAKPOINT_TYPE_TIME,
-        BreakOnEvent = DEBUGGER_BREAKPOINT_TYPE_EVENT
+        BreakOnExecute = int(zxkit::BreakpointType::Execute),
+        BreakOnRead = int(zxkit::BreakpointType::MemoryRead),
+        BreakOnWrite = int(zxkit::BreakpointType::MemoryWrite),
+        BreakOnPortRead = int(zxkit::BreakpointType::PortRead),
+        BreakOnPortWrite = int(zxkit::BreakpointType::PortWrite),
+        BreakOnTime = int(zxkit::BreakpointType::RasterLine),
+        BreakOnEvent
     };
     Q_ENUM(BreakpointType)
 
     enum BreakpointLife {
-        Permanent = DEBUGGER_BREAKPOINT_LIFE_PERMANENT,
+        Permanent = 0,
         Oneshot
     };
     Q_ENUM(BreakpointLife)
 
 private:
-    struct DebuggerEvent {
-        explicit DebuggerEvent(const debugger_event_t &event)
-        {
-            type = event.type;
-            detail = event.detail;
-        }
-        QByteArray type;
-        QByteArray detail;
-    };
-
     struct DebuggerBreakpoint {
-        explicit DebuggerBreakpoint(debugger_breakpoint *bp);
-        ~DebuggerBreakpoint();
-
-        int id;
-        BreakpointType type;
-        union debugger_breakpoint_value {
-          debugger_breakpoint_address address;
-          debugger_breakpoint_port port;
-          debugger_breakpoint_time time;
-          DebuggerEvent *event;
-        } value;
-        size_t ignore;
-        BreakpointLife life;
+        int id = 0;
+        BreakpointType type = BreakOnExecute;
+        uint16_t address = 0;
+        uint16_t mask = 0xFFFF;
+        int page = -1;
+        size_t ignore = 0;
+        BreakpointLife life = Permanent;
         QByteArray condition;
         QByteArray commands;
     };
 
 public:
-    typedef std::unordered_map<debugger_breakpoint_address, std::unordered_set<int>> Addresses;
+    using Addresses = std::unordered_map<uint16_t, std::unordered_set<int>>;
 
 public:
     explicit BreakpointsModel(QObject *parent = nullptr);
     void breakpointsUpdated();
 
-    std::mutex &breakpointsMutex() const { return m_mutex; }
     const Addresses &addresses() const { return m_addresses; }
 
     // QAbstractItemModel interface
@@ -138,7 +92,6 @@ private:
     QVariant breakPointValue(const DebuggerBreakpoint &bp) const;
 
 private:
-    mutable std::mutex m_mutex;
-    std::vector<DebuggerBreakpoint> m_breakPoints, m_breakPointsTmp;
+    std::vector<DebuggerBreakpoint> m_breakPoints;
     Addresses m_addresses;
 };

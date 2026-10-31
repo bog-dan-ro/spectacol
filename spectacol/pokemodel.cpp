@@ -17,45 +17,19 @@
 
 #include "pokemodel.h"
 
-
-#include "fuseemulator.h"
+#include "zxemulator.h"
 #include "qmlui.h"
 
-extern "C"  {
-# include <pokefinder/pokemem.h>
-}
+using namespace Qt::StringLiterals;
 
-namespace {
-
-struct trainer_t *getTrainer(int index)
-{
-    auto item = trainer_list;
-    for (;item && index; --index)
-        item = item->next;
-
-    if (index || !item)
-        return nullptr;
-
-    return reinterpret_cast<trainer_t*>(item->data);
-}
-
-}
-
-PokeModel::PokeModel()
-{
-    QPointer<PokeModel> self = this;
-    pokeEvent([self]{
-        pokemem_autoload_pokfile();
-        publishTrainers(self);
-    });
-}
+PokeModel::PokeModel() = default;
 
 int PokeModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
 
-    return m_trainers.size();
+    return int(m_trainers.size());
 }
 
 QVariant PokeModel::data(const QModelIndex &index, int role) const
@@ -65,11 +39,11 @@ QVariant PokeModel::data(const QModelIndex &index, int role) const
     const auto &trainer = m_trainers[index.row()];
     switch (role) {
     case Label:
-            return trainer.name;
+        return trainer.name;
     case Active:
-            return trainer.active;
+        return trainer.active;
     case Disabled:
-            return trainer.disabled;
+        return trainer.disabled;
     default:
         return {};
     }
@@ -85,84 +59,50 @@ QHash<int, QByteArray> PokeModel::roleNames() const
     return roles;
 }
 
-void PokeModel::publishTrainers(const QPointer<PokeModel> &self)
-{
-    auto trainers = std::make_shared<Trainers>();
-    for (GSList *item = trainer_list; item; item = item->next) {
-        auto trainer = reinterpret_cast<trainer_t*>(item->data);
-        trainers->push_back({QLatin1String(trainer->name), bool(trainer->active), bool(trainer->disabled)});
-    }
-    FuseEmulator::instance().callFunction([self, trainers]{
-        if (!self)
-            return;
-        self->beginResetModel();
-        self->m_trainers = std::move(*trainers);
-        self->endResetModel();
-    });
-}
-
 void PokeModel::update()
 {
-    QPointer<PokeModel> self = this;
-    pokeEvent([self]{
-        publishTrainers(self);
-    });
+    beginResetModel();
+    endResetModel();
 }
 
 void PokeModel::addPoke(int bank, int address, int value)
 {
     if (bank < 0 || bank > 64) {
-        // Pentagon 1024 has 65 memory pages
-        FuseEmulator::instance().showMessage(tr("Invalid bank: use an integer from 0 to 64"), FuseEmulator::Error);
+        ZxEmulator::instance().showMessage(tr("Invalid bank: use an integer from 0 to 64"), ZxEmulator::Error);
         return;
     }
 
     if (address < 0 || address > 0xffff) {
-        emit FuseEmulator::instance().showMessage(tr("Invalid address: use an integer from 0 to 65535"), FuseEmulator::Error);
+        emit ZxEmulator::instance().showMessage(tr("Invalid address: use an integer from 0 to 65535"), ZxEmulator::Error);
         return;
     }
 
     if (bank == 8 && address < 0x4000) {
-        FuseEmulator::instance().showMessage(tr("Invalid address: use an integer from 16384 to 65535"), FuseEmulator::Error);
+        ZxEmulator::instance().showMessage(tr("Invalid address: use an integer from 16384 to 65535"), ZxEmulator::Error);
         return;
     }
 
-    QPointer<PokeModel> self = this;
-    pokeEvent([self, bank, address, value]{
-        auto trainer = pokemem_trainer_list_add(bank, address, value);
-        if (!trainer->disabled)
-            pokemem_trainer_activate(trainer);
-        publishTrainers(self);
-    });
+    Trainer trn;
+    trn.name = u"Custom (%1, %2)"_s.arg(address).arg(value);
+    trn.active = true;
+    beginResetModel();
+    m_trainers.push_back(trn);
+    endResetModel();
+
+    ZxEmulator::instance().pokeMemory(address, bank, value);
 }
 
 void PokeModel::setActive(int row, bool active)
 {
-    QPointer<PokeModel> self = this;
-    pokeEvent([self, row, active] {
-        auto trainer = getTrainer(row);
-        if (!trainer)
-            return;
-        if (active)
-            pokemem_trainer_activate(trainer);
-        else
-            pokemem_trainer_deactivate(trainer);
-        // FUSE refuses to activate a disabled trainer, report what it did
-        const bool isActive = trainer->active;
-        FuseEmulator::instance().callFunction([self, row, isActive] {
-            if (!self || size_t(row) >= self->m_trainers.size())
-                return;
-            self->m_trainers[row].active = isActive;
-            emit self->dataChanged(self->index(row), self->index(row), {Active});
-        });
-    });
+    if (row < 0 || size_t(row) >= m_trainers.size())
+        return;
+    m_trainers[row].active = active;
+    emit dataChanged(index(row), index(row), {Active});
 }
 
 void PokeModel::clear()
 {
-    QPointer<PokeModel> self = this;
-    pokeEvent([self]{
-        pokemem_clear();
-        publishTrainers(self);
-    });
+    beginResetModel();
+    m_trainers.clear();
+    endResetModel();
 }
