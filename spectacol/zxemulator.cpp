@@ -24,6 +24,7 @@
 #include <zxkit/input/Joystick.h>
 #include <zxkit/input/Mouse.h>
 #include <zxkit/media/MediaPreview.h>
+#include <zxkit/peripherals/expansion/ExpansionPeripherals.h>
 
 #include <QAudioDevice>
 #include <QAudioSink>
@@ -41,8 +42,12 @@
 #include <QStandardPaths>
 #include <QTimer>
 
+#include <algorithm>
+#include <array>
 #include <cctype>
 #include <optional>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 using namespace Qt::StringLiterals;
@@ -127,7 +132,41 @@ MappedZxKeys mapQtKeyToZx(int qtKey, int modifiers)
     }
 }
 
-uint8_t toKempstonMask(QGamepadManager::GamepadButton button)
+// The Recreated ZX Spectrum keyboard (Elite Systems), in its game mode, types a character when a
+// key goes down and another when it goes up (FUSE's input.c). The characters, as US keys
+// (upper case and the shifted symbols: typed with Shift):
+//   down: a c e g i k m o q s u w y A C E G I K M O Q S U W Y 0 2 4 6 8 < - [ ; , / { ! %
+//   up:   b d f h j l n p r t v x z B D F H J L N P R T V X Z 1 3 5 7 9 > = ] : . ? } $ ^
+// for the keys 1 2 3 4 5 6 7 8 9 0 Q W E R T Y U I O P A S D F G H J K L ENTER CAPS Z X C V B N M SYMBOL SPACE
+std::optional<std::pair<zxkit::ZxKey, bool>> recreatedKey(int qtKey, int modifiers)
+{
+    using zxkit::ZxKey;
+    static constexpr std::string_view kDown = "acegikmoqsuwyACEGIKMOQSUWY02468<-[;,/{!%";
+    static constexpr std::string_view kUp = "bdfhjlnprtvxzBDFHJLNPRTVXZ13579>=]:.?}$^";
+    static constexpr std::array<ZxKey, 40> kKeys{
+        ZxKey::Num1, ZxKey::Num2, ZxKey::Num3, ZxKey::Num4, ZxKey::Num5, ZxKey::Num6, ZxKey::Num7, ZxKey::Num8,
+        ZxKey::Num9, ZxKey::Num0, ZxKey::Q, ZxKey::W, ZxKey::E, ZxKey::R, ZxKey::T, ZxKey::Y, ZxKey::U, ZxKey::I,
+        ZxKey::O, ZxKey::P, ZxKey::A, ZxKey::S, ZxKey::D, ZxKey::F, ZxKey::G, ZxKey::H, ZxKey::J, ZxKey::K,
+        ZxKey::L, ZxKey::Enter, ZxKey::CapsShift, ZxKey::Z, ZxKey::X, ZxKey::C, ZxKey::V, ZxKey::B, ZxKey::N,
+        ZxKey::M, ZxKey::SymbolShift, ZxKey::Space};
+
+    char c = 0;
+    if (qtKey >= Qt::Key_A && qtKey <= Qt::Key_Z)
+        c = static_cast<char>(((modifiers & Qt::ShiftModifier) ? 'A' : 'a') + (qtKey - Qt::Key_A));
+    else if (qtKey >= Qt::Key_0 && qtKey <= Qt::Key_9)
+        c = static_cast<char>('0' + (qtKey - Qt::Key_0));
+    else if (qtKey >= 0x20 && qtKey < 0x7F)
+        c = static_cast<char>(qtKey); // Qt's key codes for the other printable keys are their ASCII codes
+    if (c == 0)
+        return std::nullopt;
+    if (const auto down = kDown.find(c); down != std::string_view::npos)
+        return std::pair{kKeys[down], true};
+    if (const auto up = kUp.find(c); up != std::string_view::npos)
+        return std::pair{kKeys[up], false};
+    return std::nullopt;
+}
+
+uint8_t toJoystickMask(QGamepadManager::GamepadButton button)
 {
     switch (button) {
     case QGamepadManager::ButtonUp:    return zxkit::JoystickButtons::Up;
@@ -180,6 +219,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
     , m_settings(std::make_unique<ZxSettings>(*this))
     , m_tape(new ZxTape(this))
     , m_disks(new Disks(this))
+    , m_sdCard(new SdCardFiles(this))
     , m_recording(new ZxRecording(this))
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
@@ -214,6 +254,10 @@ ZxEmulator::ZxEmulator(QObject *parent)
         showMessage(QString::fromUtf8(msg.data(), qsizetype(msg.size())), errLvl);
     });
 
+    m_mediaActivityCallback = zxkit::CallbackHandle<zxkit::MediaActivityCallback>([this](const zxkit::MediaActivity &activity) {
+        QMetaObject::invokeMethod(this, [this, activity] { updateMediaActivity(activity); }, Qt::QueuedConnection);
+    });
+
     zxkit::EmulatorConfig cfg;
     cfg.machineId = "48k";
     cfg.audioSampleRate = 48'000;
@@ -232,10 +276,13 @@ ZxEmulator::ZxEmulator(QObject *parent)
         .paused = m_pauseCallback.weak(),
         .resumed = m_resumeCallback.weak(),
         .log = m_logCallback.weak(),
+        .mediaActivity = m_mediaActivityCallback.weak(),
     };
     m_engine = std::make_unique<zxkit::Engine>(std::move(cfg), std::move(engineConfig));
     emulator().writeLock()->setRewindEnabled(true, 300);
     m_settings->applyToEmulator();
+    m_selectedJoystickIndex = std::clamp(QSettings().value("joystick", int(CursorKeys)).toInt(), int(NoJoystick), int(FullerJoystick));
+    attachJoystick(m_selectedJoystickIndex);
 
     connect(qGuiApp, &QCoreApplication::aboutToQuit, this, &ZxEmulator::stopEngine);
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state) {
@@ -489,14 +536,13 @@ void ZxEmulator::setSelectedFilterIndex(int selectedFilterIndex)
 
 QStringList ZxEmulator::joysticksModel() const
 {
+    // The order of JoystickKind
     return {
         u"None"_s,
         u"Cursor"_s,
         u"Kempston"_s,
         u"Sinclair 1"_s,
         u"Sinclair 2"_s,
-        u"Timex 1"_s,
-        u"Timex 2"_s,
         u"Fuller"_s
     };
 }
@@ -508,11 +554,75 @@ int ZxEmulator::selectedJoysticksIndex() const
 
 void ZxEmulator::setSelectedJoysticksIndex(int selectedJoysticksIndex)
 {
+    if (selectedJoysticksIndex < NoJoystick || selectedJoysticksIndex > FullerJoystick
+        || selectedJoysticksIndex == m_selectedJoystickIndex)
+        return;
+    setJoystickButtons(0); // release everything on the old one
     m_selectedJoystickIndex = selectedJoysticksIndex;
-    m_settings->setKempstonJoystick(selectedJoysticksIndex == 2);
-    m_settings->setInterface1(selectedJoysticksIndex == 3);
-    m_settings->setInterface2(selectedJoysticksIndex == 4);
+    attachJoystick(selectedJoysticksIndex);
+    QSettings().setValue("joystick", selectedJoysticksIndex);
     emit selectedJoysticksIndexChanged();
+}
+
+void ZxEmulator::attachJoystick(int kind)
+{
+    // The Sinclair (Interface 2) and Cursor joysticks are keys; the Kempston and Fuller ones are interfaces
+    if (kind == KempstonJoystick)
+        m_settings->setKempstonJoystick(true);
+    withEmulator([kind](zxkit::Emulator &emulator) {
+        const bool attached = emulator.findPeripheral("fuller").has_value();
+        if (kind == FullerJoystick && !attached)
+            emulator.attachPeripheral(std::make_unique<zxkit::FullerBoxPeripheral>());
+        else if (kind != FullerJoystick && attached)
+            emulator.detachPeripheral("fuller");
+    });
+}
+
+void ZxEmulator::setJoystickButtons(uint8_t buttons)
+{
+    using B = zxkit::JoystickButtons;
+    using K = zxkit::ZxKey;
+    const uint8_t changed = buttons ^ m_joystickButtons;
+    m_joystickButtons = buttons;
+    if (!changed)
+        return;
+
+    // Left, right, up, down, fire (FUSE's tables)
+    static constexpr std::array<uint8_t, 5> kBits{B::Left, B::Right, B::Up, B::Down, B::Fire1};
+    static constexpr std::array<K, 5> kCursorKeys{K::Num5, K::Num8, K::Num7, K::Num6, K::Num0};
+    static constexpr std::array<K, 5> kSinclair1Keys{K::Num6, K::Num7, K::Num9, K::Num8, K::Num0};
+    static constexpr std::array<K, 5> kSinclair2Keys{K::Num1, K::Num2, K::Num4, K::Num3, K::Num5};
+
+    auto emulator = this->emulator().writeLock();
+    const auto pressKeys = [&](const std::array<K, 5> &keys) {
+        for (std::size_t i = 0; i < kBits.size(); ++i) {
+            if (changed & kBits[i])
+                emulator->setKeyState(keys[i], (buttons & kBits[i]) != 0);
+        }
+    };
+    switch (m_selectedJoystickIndex) {
+    case CursorKeys:
+        pressKeys(kCursorKeys);
+        break;
+    case Sinclair1:
+        pressKeys(kSinclair1Keys);
+        break;
+    case Sinclair2:
+        pressKeys(kSinclair2Keys);
+        break;
+    case KempstonJoystick:
+        withPeripheral<zxkit::KempstonJoystickPeripheral>(*emulator, "kempston", [buttons](auto &kempston) {
+            kempston.setButtons(buttons);
+        });
+        break;
+    case FullerJoystick:
+        withPeripheral<zxkit::FullerBoxPeripheral>(*emulator, "fuller", [buttons](auto &fuller) {
+            fuller.setButtons(buttons);
+        });
+        break;
+    default:
+        break;
+    }
 }
 
 QString ZxEmulator::PC() const { return formatNumber(registers().PC); }
@@ -740,6 +850,21 @@ QString ZxEmulator::saveSnapshotsFilePath(const QString &filePath) const
            QDateTime::currentDateTime().toString(u"_yyyy-MM-dd_hh:mm:ss"_s) + u".tzx"_s;
 }
 
+void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
+{
+    const zxkit::MediaActivity previous = std::exchange(m_mediaActivity, activity);
+    if (activity.tapePlaying != previous.tapePlaying) {
+        emit uiIconUpdate(Tape, activity.tapePlaying ? Active : Inactive);
+        m_tape->setPlaying(activity.tapePlaying);
+    }
+    // One icon for all the storage: the floppy drives and the SD card
+    const bool storageBusy = activity.busyDisks != 0 || activity.sdCardBusy;
+    if (storageBusy != (previous.busyDisks != 0 || previous.sdCardBusy))
+        emit uiIconUpdate(Disk, storageBusy ? Active : Inactive);
+    if (activity.tapeBlock != previous.tapeBlock)
+        emit tapeBlockChanged(int(activity.tapeBlock));
+}
+
 void ZxEmulator::load(const QString &filePath, bool removeOnFail)
 {
     m_loadedFileName = QFileInfo(filePath).baseName();
@@ -784,6 +909,10 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
     m_resetPokeFinder = true;
     m_tape->refreshData();
     emit saveSnapshotEnabledChanged();
+
+    // A snapshot is a game ready to play: offer to pick the joystick the gamepad plays it with
+    if (mediaClass == zxkit::MediaClass::Snapshot && m_settings && m_settings->joystickPrompt() && m_gamepadId != -1)
+        emit configureJoystick();
 }
 
 void ZxEmulator::save(const QString &filePath)
@@ -944,6 +1073,7 @@ void ZxEmulator::deactivateDebugger(bool /*interruptable*/)
         return;
 
     setPaused(false);
+    emit hideDebugger();
 }
 
 QString ZxEmulator::dumpData(const QString &base64CompressedData, int offset, int charsPerLine)
@@ -1048,10 +1178,16 @@ void ZxEmulator::pokeMemory(int address, int page, int value)
     }
 }
 
-void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool /*virtualKeyboard*/)
+void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
 {
     if (m_paused || autoRepeat)
         return;
+
+    if (!virtualKeyboard && m_settings->recreatedSpectrum()) {
+        if (const auto key = recreatedKey(qtKey, modifiers))
+            emulator().writeLock()->setKeyState(key->first, key->second);
+        return;
+    }
 
     const auto mapped = mapQtKeyToZx(qtKey, modifiers);
     if (!mapped.primary && !mapped.modifier)
@@ -1064,9 +1200,12 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool /*virt
         emulator->setKeyState(*mapped.primary, true);
 }
 
-void ZxEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat, bool /*virtualKeyboard*/)
+void ZxEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
 {
     if (m_paused || autoRepeat)
+        return;
+    // The Recreated keyboard tells its releases with characters too (see keyPress)
+    if (!virtualKeyboard && m_settings->recreatedSpectrum())
         return;
 
     const auto mapped = mapQtKeyToZx(qtKey, modifiers);
@@ -1082,32 +1221,29 @@ void ZxEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat, bool /*vi
 
 void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value)
 {
-    const double deadZone = m_deadZone;
-    withPeripheral<zxkit::KempstonJoystickPeripheral>(*emulator().writeLock(), "kempston", [deadZone, axis, value](auto &kemp) {
-        uint8_t negBit = 0;
-        uint8_t posBit = 0;
-        switch (axis) {
-        case QGamepadManager::AxisLeftX:
-        case QGamepadManager::AxisRightX:
-            negBit = zxkit::JoystickButtons::Left;
-            posBit = zxkit::JoystickButtons::Right;
-            break;
-        case QGamepadManager::AxisLeftY:
-        case QGamepadManager::AxisRightY:
-            negBit = zxkit::JoystickButtons::Up;
-            posBit = zxkit::JoystickButtons::Down;
-            break;
-        default:
-            return;
-        }
+    uint8_t negBit = 0;
+    uint8_t posBit = 0;
+    switch (axis) {
+    case QGamepadManager::AxisLeftX:
+    case QGamepadManager::AxisRightX:
+        negBit = zxkit::JoystickButtons::Left;
+        posBit = zxkit::JoystickButtons::Right;
+        break;
+    case QGamepadManager::AxisLeftY:
+    case QGamepadManager::AxisRightY:
+        negBit = zxkit::JoystickButtons::Up;
+        posBit = zxkit::JoystickButtons::Down;
+        break;
+    default:
+        return;
+    }
 
-        uint8_t buttons = kemp.buttons() & static_cast<uint8_t>(~(negBit | posBit));
-        if (value <= -deadZone)
-            buttons |= negBit;
-        else if (value >= deadZone)
-            buttons |= posBit;
-        kemp.setButtons(buttons);
-    });
+    uint8_t buttons = m_joystickButtons & static_cast<uint8_t>(~(negBit | posBit));
+    if (value <= -m_deadZone)
+        buttons |= negBit;
+    else if (value >= m_deadZone)
+        buttons |= posBit;
+    setJoystickButtons(buttons);
 }
 
 void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button)
@@ -1115,9 +1251,7 @@ void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button)
     auto action = m_settings->gamepadAction(button);
     switch (action) {
     case ZxSettings::JoystickFire:
-        withPeripheral<zxkit::KempstonJoystickPeripheral>(*emulator().writeLock(), "kempston", [button](auto &kemp) {
-            kemp.setButtons(kemp.buttons() | toKempstonMask(button));
-        });
+        setJoystickButtons(m_joystickButtons | toJoystickMask(button));
         break;
     case ZxSettings::ToggleEmulationSpeed:
         speedup();
@@ -1143,9 +1277,7 @@ void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button
             showMessage(tr("Spectacol is paused"));
             return;
         }
-        withPeripheral<zxkit::KempstonJoystickPeripheral>(*emulator().writeLock(), "kempston", [button](auto &kemp) {
-            kemp.setButtons(kemp.buttons() & static_cast<uint8_t>(~toKempstonMask(button)));
-        });
+        setJoystickButtons(m_joystickButtons & static_cast<uint8_t>(~toJoystickMask(button)));
         break;
     case ZxSettings::ToggleEmulationSpeed:
         slowdown();

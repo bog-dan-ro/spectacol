@@ -16,28 +16,38 @@
 */
 
 // @scope main.qml
+pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Window
 import QtGamepadLegacy
 import Spectacol
-import "private"
 
-Item {
-    Component.onCompleted: {
-        ZxEmulator.processInputEvents = false;
-        if (ZxEmulator.touchscreen)
-            messagePage.showMessage(ZxEmulator.Info, qsTr("Long tap on an item to view the content"));
-    }
-    Component.onDestruction: {
-        ZxEmulator.processInputEvents = true;
-    }
+Sheet {
+    id: page
+    crumb: qsTr("Tape")
+    title: qsTr("Blocks")
+    preferredWidth: Theme.sp(130)
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Play from here"), action: () => tapeData.selectBlock(view.currentIndex) },
+        { pad: "X", key: "V", text: qsTr("View data"), action: () => page.showBlock(view.currentIndex) },
+        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => pageLoader.source = "" }
+    ]
 
-    anchors.fill: parent
+    Component.onCompleted: ZxEmulator.processInputEvents = false
+    Component.onDestruction: ZxEmulator.processInputEvents = true
 
     property string base64CompressedData: ""
+    // docked (desktop layout): the tape plays on while the blocks are shown
+    readonly property bool pausesEmulation: !Theme.desktopMode
+
+    function showBlock(index) {
+        base64CompressedData = tapeData.base64CompressedBlockData(index);
+        offset.value = tabbar.currentIndex;
+        offset.to = tapeData.getBufferLength(index);
+        showData.open();
+    }
 
     Popup {
         id: showData
@@ -45,8 +55,14 @@ Item {
         focus: true
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
-        height: parent.height - Screen.pixelDensity * 10
-        width: parent.width - Screen.pixelDensity * 10
+        height: parent.height - Theme.sp(10)
+        width: parent.width - Theme.sp(10)
+        background: Rectangle {
+            radius: Theme.radius
+            color: Theme.raised
+            border.width: Theme.line
+            border.color: Theme.outline
+        }
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnReleaseOutsideParent
         ColumnLayout {
             anchors.fill: parent
@@ -98,17 +114,18 @@ Item {
                     clip: true
                     FancyText {
                         id: aboutText
+                        mono: true
                         textFormat: Text.Normal
                         style: Text.Normal
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignLeft
                         verticalAlignment: Text.AlignTop
-                        text: ZxEmulator.dumpData(base64CompressedData, offset.value, TextSizes.smallScreen? 8 : 16);
+                        text: ZxEmulator.dumpData(page.base64CompressedData, offset.value, Theme.smallScreen ? 8 : 16);
                     }
                 }
                 Image {
                     fillMode: Image.PreserveAspectFit
-                    source: "image://spectrum/compressed64:" + offset.value + ":" + base64CompressedData
+                    source: page.base64CompressedData === "" ? "" : "image://spectrum/compressed64:" + offset.value + ":" + page.base64CompressedData
                 }
             }
 
@@ -126,64 +143,81 @@ Item {
         buttonBKey: Qt.Key_Escape
     }
 
-    FancyBaseList {
+    ZxTapeData {
+        id: tapeData
+    }
+
+    ListView {
         id: view
-        ZxTapeData {
-            id: tapeData
-        }
-
-        Keys.onEscapePressed: pageLoader.source = ""
-        Keys.onReturnPressed: tapeData.selectBlock(currentIndex)
-
-        footer: Button {
-            width: view.width
-            text: qsTr("Close (B)")
-            onClicked: pageLoader.source = ""
-        }
-
-        highlightRangeMode: ListView.NoHighlightRange
-        highlightMoveVelocity: -1
+        anchors.fill: parent
+        anchors.margins: Theme.sp(2)
+        clip: true
+        focus: true
+        spacing: Theme.sp(0.5)
+        boundsBehavior: Flickable.StopAtBounds
+        highlightMoveDuration: Theme.reduceMotion ? 0 : 100
+        ScrollIndicator.vertical: ScrollIndicator {}
         model: tapeData
-        currentIndex: tapeData.currentBlock
+        // the block playing (after the last one when the tape has ended); then the user's
+        Component.onCompleted: currentIndex = Math.max(0, Math.min(tapeData.currentBlock, count - 1))
 
-        width: 20 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
-        delegate: Rectangle {
-            width: view.width
-            height: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) * 4
-            color: Qt.rgba(0, 0, 0, 0.75)
-
-            FancyText {
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.leftMargin: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) / 2
-                anchors.topMargin: anchors.leftMargin
-                font.pixelSize: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
-                text: (isCurrent ? "\u21f6 " : "  ") + label
+        Keys.onReturnPressed: tapeData.selectBlock(currentIndex)
+        Keys.onEnterPressed: tapeData.selectBlock(currentIndex)
+        Keys.onPressed: (event) => {
+            if (event.key === Qt.Key_V || event.key === Qt.Key_X) {
+                page.showBlock(currentIndex);
+                event.accepted = true;
             }
-            FancyText {
+        }
+
+        highlight: Rectangle {
+            radius: Theme.radiusSmall
+            color: Theme.accentFill
+            border.width: Theme.focusLine
+            border.color: Theme.accent
+        }
+
+        delegate: Item {
+            id: block
+            required property int index
+            required property string label
+            required property bool isCurrent
+            width: view.width
+            height: Math.max(Theme.rowHeight, blockColumn.implicitHeight + Theme.sp(4))
+
+            Text {
+                id: playing
+                x: Theme.sp(3)
+                anchors.verticalCenter: parent.verticalCenter
+                width: Theme.sp(5)
+                text: block.isCurrent ? "▶" : ""
+                font.pixelSize: Theme.body
+                color: Theme.accent
+            }
+            Column {
+                id: blockColumn
+                anchors.left: playing.right
                 anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.rightMargin: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) / 2
-                anchors.bottomMargin: anchors.rightMargin
-                horizontalAlignment: Text.AlignRight
-                font.pixelSize: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
-                text: detail
+                anchors.rightMargin: Theme.sp(3)
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.sp(0.5)
+                Text {
+                    width: parent.width
+                    text: block.label
+                    elide: Text.ElideRight
+                    font.pixelSize: Theme.body
+                    color: Theme.text
+                }
             }
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    if (view.currentIndex !== model.index)
-                        view.currentIndex = model.index;
+                    if (view.currentIndex !== block.index)
+                        view.currentIndex = block.index;
                     else
-                        tapeData.selectBlock(model.index);
+                        tapeData.selectBlock(block.index);
                 }
-
-                onPressAndHold: {
-                    base64CompressedData = tapeData.base64CompressedBlockData(model.index);
-                    offset.value = tabbar.currentIndex;
-                    offset.to = tapeData.getBufferLength(model.index);
-                    showData.open();
-                }
+                onPressAndHold: page.showBlock(block.index)
             }
         }
     }

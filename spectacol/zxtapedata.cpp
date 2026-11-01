@@ -44,6 +44,7 @@ ZxTapeData::ZxTapeData()
         m_tapeBlocks.push_back(std::move(td));
     }
     m_currentBlock = current;
+    connect(&ZxEmulator::instance(), &ZxEmulator::tapeBlockChanged, this, &ZxTapeData::setCurrentBlock);
 }
 
 int ZxTapeData::rowCount(const QModelIndex &parent) const

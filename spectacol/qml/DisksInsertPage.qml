@@ -31,7 +31,7 @@ Item {
     DrivesList {
         visible: page.drive < 0
         focus: visible
-        title: qsTr("Insert disk into")
+        title: qsTr("Insert a disk into")
         onDriveSelected: (drive) => page.drive = drive
     }
 

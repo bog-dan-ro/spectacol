@@ -16,37 +16,185 @@
 */
 
 // @scope main.qml
+pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Window
+import QtQuick.Controls
+import QtGamepadLegacy
 import Spectacol
-import "private"
 
-Item {
-    FancyList {
-        id: view
-        Component.onCompleted: ZxEmulator.processInputEvents = false
-        Component.onDestruction: ZxEmulator.processInputEvents = true
+// The machines, grouped by family. The arrows move, Return (the gamepad's A) or a click switches
+Sheet {
+    id: page
 
-        model: ZxEmulator.settings.machinesModel
-        currentIndex: ZxEmulator.settings.currentMachineIndex
-        onCurrentIndexChanged: ZxEmulator.settings.currentMachineIndex = currentIndex
+    readonly property var groups: [qsTr("Sinclair"), qsTr("Timex"), qsTr("Clones"), qsTr("Romanian"), qsTr("Next")]
+    property int focusIndex: ZxEmulator.settings.currentMachineIndex
 
-        width: 13 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
-        delegate: Rectangle {
-            width: view.width
-            height: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) * 2
-            color: Qt.rgba(0, 0, 0, 0.75)
+    function groupOf(name: string): int {
+        if (name.startsWith("Timex"))
+            return 1;
+        if (/Pentagon|Scorpion/.test(name))
+            return 2;
+        if (/HC-2000|CoBra/.test(name))
+            return 3;
+        if (/Next/.test(name))
+            return 4;
+        return 0;
+    }
 
-            FancyText {
-                anchors.fill: parent
-                anchors.leftMargin: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) / 2
-                font.pixelSize: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
-                text: modelData
+    function shortName(name: string): string {
+        return name.startsWith("ZX Spectrum ") && !/Next/.test(name) ? name.substring(12) : name;
+    }
+
+    function choose(index: int) {
+        if (index !== ZxEmulator.settings.currentMachineIndex)
+            ZxEmulator.settings.currentMachineIndex = index;
+        pageLoader.source = "";
+    }
+
+    // The chip next to the focused one in a direction, by position
+    function moveFocus(dx: int, dy: int) {
+        const chips = [];
+        for (const group of groupsColumn.children) {
+            if (group.chips)
+                chips.push(...group.chips());
+        }
+        const current = chips.find(c => c.machineIndex === focusIndex);
+        if (!current)
+            return;
+        const at = (c) => c.mapToItem(groupsColumn, c.width / 2, c.height / 2);
+        const here = at(current);
+        let best = null, bestScore = Infinity;
+        for (const chip of chips) {
+            if (chip === current)
+                continue;
+            const p = at(chip);
+            const ddx = p.x - here.x, ddy = p.y - here.y;
+            if ((dy !== 0 && Math.sign(ddy) !== dy) || (dy !== 0 && Math.abs(ddy) < 1))
+                continue;
+            if (dx !== 0 && (Math.abs(ddy) > 1 || Math.sign(ddx) !== dx))
+                continue;
+            const score = dy !== 0 ? Math.abs(ddy) * 1000 + Math.abs(ddx) : Math.abs(ddx);
+            if (score < bestScore) {
+                best = chip;
+                bestScore = score;
             }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: view.currentIndex = model.index
+        }
+        if (best) {
+            focusIndex = best.machineIndex;
+            flick.ensureVisible(best);
+        }
+    }
+
+    crumb: qsTr("Machine")
+    title: qsTr("Choose a machine")
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Switch"), action: () => page.choose(page.focusIndex) },
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+    ]
+
+    Component.onCompleted: ZxEmulator.processInputEvents = false
+    Component.onDestruction: ZxEmulator.processInputEvents = true
+
+    GamepadKeyNavigation {
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
+        buttonAKey: Qt.Key_Return
+        buttonBKey: Qt.Key_Escape
+    }
+
+    Flickable {
+        id: flick
+        anchors.fill: parent
+        contentHeight: groupsColumn.implicitHeight + Theme.sp(6)
+        clip: true
+        focus: true
+        boundsBehavior: Flickable.StopAtBounds
+        ScrollIndicator.vertical: ScrollIndicator {}
+
+        function ensureVisible(item) {
+            const y = item.mapToItem(groupsColumn, 0, 0).y + groupsColumn.y;
+            if (y < contentY)
+                contentY = Math.max(0, y - Theme.sp(8));
+            else if (y + item.height > contentY + height)
+                contentY = Math.min(contentHeight - height, y + item.height - height + Theme.sp(4));
+        }
+
+        Keys.onLeftPressed: page.moveFocus(-1, 0)
+        Keys.onRightPressed: page.moveFocus(1, 0)
+        Keys.onUpPressed: page.moveFocus(0, -1)
+        Keys.onDownPressed: page.moveFocus(0, 1)
+        Keys.onReturnPressed: page.choose(page.focusIndex)
+        Keys.onEnterPressed: page.choose(page.focusIndex)
+        Keys.onSpacePressed: page.choose(page.focusIndex)
+
+        Column {
+            id: groupsColumn
+            x: Theme.sp(6)
+            y: Theme.sp(2)
+            width: flick.width - 2 * Theme.sp(6)
+            spacing: Theme.sp(1)
+
+            Repeater {
+                model: page.groups
+                delegate: Column {
+                    id: group
+                    required property string modelData
+                    required property int index
+                    width: groupsColumn.width
+                    spacing: Theme.sp(2)
+
+                    function chips() {
+                        const result = [];
+                        for (const child of flow.children) {
+                            if (child.machineIndex !== undefined && child.visible)
+                                result.push(child);
+                        }
+                        return result;
+                    }
+
+                    SectionTitle {
+                        leftPadding: 0
+                        text: group.modelData
+                    }
+
+                    Flow {
+                        id: flow
+                        width: parent.width
+                        spacing: Theme.sp(2)
+
+                        Repeater {
+                            model: ZxEmulator.settings.machinesModel
+                            delegate: Rectangle {
+                                id: chip
+                                required property string modelData
+                                required property int index
+                                readonly property int machineIndex: index
+                                readonly property bool current: index === ZxEmulator.settings.currentMachineIndex
+                                readonly property bool focused: index === page.focusIndex
+
+                                visible: page.groupOf(modelData) === group.index
+                                width: visible ? label.implicitWidth + Theme.sp(6) : 0
+                                height: visible ? Theme.sp(10) : 0
+                                radius: Theme.radiusSmall
+                                color: focused ? Theme.accentFill : "transparent"
+                                border.width: focused ? Theme.focusLine : Theme.line
+                                border.color: focused ? Theme.accent : current ? Theme.textMuted : Theme.outline
+
+                                Text {
+                                    id: label
+                                    anchors.centerIn: parent
+                                    text: (chip.current ? "✓ " : "") + page.shortName(chip.modelData)
+                                    font.pixelSize: Theme.body
+                                    color: Theme.text
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: page.choose(chip.machineIndex)
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

@@ -20,21 +20,16 @@
 import QtQuick
 import Spectacol
 
-Item {
-    anchors.fill: parent
+DrivesList {
+    title: qsTr("Eject a disk")
     Component.onCompleted: {
         if (ZxEmulator.disks.count === 1) {
             ZxEmulator.disks.ejectDisk(0);
             Qt.callLater(() => pageLoader.source = "");
         }
     }
-
-    DrivesList {
-        focus: true
-        title: qsTr("Eject disk from")
-        onDriveSelected: (drive) => {
-            ZxEmulator.disks.ejectDisk(drive);
-            pageLoader.source = "";
-        }
+    onDriveSelected: (drive) => {
+        ZxEmulator.disks.ejectDisk(drive);
+        pageLoader.source = "";
     }
 }

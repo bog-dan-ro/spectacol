@@ -20,6 +20,7 @@
 #include "breakpointsmodel.h"
 #include "disassamblemodel.h"
 #include "disks.h"
+#include "sdcardfiles.h"
 #include "zxtape.h"
 #include "pokefindermodel.h"
 #include "zxgamesmodel.h"
@@ -68,6 +69,7 @@ class ZxEmulator : public QObject
     Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
     Q_PROPERTY(const ZxTape *tape MEMBER m_tape CONSTANT)
     Q_PROPERTY(Disks *disks MEMBER m_disks CONSTANT)
+    Q_PROPERTY(SdCardFiles *sdCard MEMBER m_sdCard CONSTANT)
     Q_PROPERTY(const ZxRecording *recording MEMBER m_recording CONSTANT)
     Q_PROPERTY(ZxSettings *settings READ settings CONSTANT)
     Q_PROPERTY(const BreakpointsModel *breakpointsModel READ breakpointsModel CONSTANT)
@@ -324,26 +326,33 @@ signals:
     void showDebugger();
     void hideDebugger();
     void showMenu();
-    void hideMenu();
     void processInputEventsChanged();
     void mouseGrabbedChanged(bool mouseGrabbed);
     void gamepadIdChanged();
     void toggleOnScreenControls(ZxEmulator::ControlType type);
     void error(ZxEmulator::ErrorLevel level, const QString &message);
     void uiIconUpdate(ZxEmulator::UiItemType item, ZxEmulator::UiState state);
+    /// The tape moved to another block (it plays, or a block was loaded)
+    void tapeBlockChanged(int block);
     void configureJoystick();
     void showControlsIconsChanged(bool showControlsIcons);
 
 private:
     explicit ZxEmulator(QObject *parent = 0);
     void stopEngine();
+    void updateMediaActivity(const zxkit::MediaActivity &activity);
     friend class ZxImage;
 
 private:
     bool m_touchscreen = false;
     QString m_loadedFileName;
     int m_selectedFilterIndex = 0;
-    int m_selectedJoystickIndex = 1;
+    // The joysticks the gamepad can be: the order of joysticksModel()
+    enum JoystickKind { NoJoystick = 0, CursorKeys, KempstonJoystick, Sinclair1, Sinclair2, FullerJoystick };
+    void setJoystickButtons(uint8_t buttons);
+    void attachJoystick(int kind);
+    int m_selectedJoystickIndex = CursorKeys;
+    uint8_t m_joystickButtons = 0; // zxkit::JoystickButtons
     BreakpointsModel m_breakpointsModel;
     DisassambleModel m_disassambleModel;
     PokeFinderModel m_pokeFinderModel;
@@ -353,6 +362,8 @@ private:
     zxkit::CallbackHandle<zxkit::PauseCallback> m_pauseCallback;
     zxkit::CallbackHandle<zxkit::ResumeCallback> m_resumeCallback;
     zxkit::CallbackHandle<zxkit::LogCallback> m_logCallback;
+    zxkit::CallbackHandle<zxkit::MediaActivityCallback> m_mediaActivityCallback;
+    zxkit::MediaActivity m_mediaActivity; // the last one the GUI saw
     std::unique_ptr<zxkit::Engine> m_engine;
     std::unique_ptr<QAudioSink> m_audioOutput;
     QIODevice *m_audioOutputDevice = nullptr;
@@ -368,6 +379,7 @@ private:
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
     ZxTape *m_tape = nullptr;
     Disks *m_disks = nullptr;
+    SdCardFiles *m_sdCard = nullptr;
     ZxRecording* m_recording = nullptr;
     bool m_showControlsIcons = true;
     bool m_paused = false; // togglePaused()

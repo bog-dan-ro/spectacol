@@ -34,6 +34,43 @@ ApplicationWindow {
     title: qsTr("Spectacol")
 
     property bool portrait: width < height
+    // The menu, for the overlay's drawer and the desktop layout's menu bar
+    property ZxMenu zxMenu: ZxMenu {}
+    // A page docked next to the screen (desktop layout): the screen makes room for it
+    readonly property real dockWidth: Theme.desktopMode && pageLoader.status === Loader.Ready && pageLoader.item.panelWidth !== undefined
+                                      && pageLoader.item.panelWidth < mainRectangle.width * 0.7 ? pageLoader.item.panelWidth : 0
+
+    menuBar: DesktopMenuBar {
+        visible: Theme.desktopMode
+        rootMenu: mainScreen.zxMenu
+    }
+
+    footer: Rectangle {
+        visible: Theme.desktopMode
+        height: statusRow.implicitHeight + Theme.sp(3)
+        color: Theme.raised
+        Rectangle {
+            width: parent.width
+            height: Theme.line
+            color: Theme.outline
+        }
+        Row {
+            id: statusRow
+            anchors.left: parent.left
+            anchors.leftMargin: Theme.sp(4)
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: Theme.sp(6)
+            component Status: Text {
+                font.pixelSize: Theme.caption
+                color: Theme.textMuted
+            }
+            Status { text: ZxEmulator.settings.currentMachine }
+            Status { visible: hud.tapeActive; text: qsTr("Tape playing"); color: Theme.success }
+            Status { visible: hud.diskActive; text: qsTr("Disk"); color: Theme.success }
+            Status { visible: hud.speed !== 100; text: qsTr("Speed %1%").arg(hud.speed) }
+            Status { visible: hud.paused; text: qsTr("Paused"); color: Theme.warning }
+        }
+    }
 
     MessageDialog {
         id: quitDialog
@@ -48,15 +85,30 @@ ApplicationWindow {
         focus: false
         dragMargin: ZxEmulator.settings.swipe4menu ? Qt.styleHints.startDragDistance : 0
 
-        width: 17 * (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20)
+        width: Math.min(mainScreen.width * 0.85, Theme.sp(95))
         height: mainScreen.height
+        background: Rectangle {
+            color: Theme.surface
+            Rectangle {
+                anchors.right: parent.right
+                width: Theme.line
+                height: parent.height
+                color: Theme.outline
+            }
+        }
+        Overlay.modal: Rectangle {
+            color: Theme.scrim
+        }
+        enter: Transition {
+            NumberAnimation { property: "position"; to: 1.0; duration: Theme.enterDuration; easing.type: Easing.OutCubic }
+        }
+        exit: Transition {
+            NumberAnimation { property: "position"; to: 0.0; duration: Theme.exitDuration; easing.type: Easing.InCubic }
+        }
         MenuView {
             id: menuView
             anchors.fill: parent
-            rootMenu: ZxMenu {}
-            transform: Translate {
-                x: (menuBar.position - 1.0) * menuView.width
-            }
+            rootMenu: mainScreen.zxMenu
         }
         property bool paused: false
         onPausedChanged: ZxEmulator.paused = paused
@@ -202,6 +254,7 @@ ApplicationWindow {
         Item {
             anchors.fill: parent
             anchors.leftMargin: (ZxEmulator.settings.leftMargin && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
+            anchors.rightMargin: mainScreen.dockWidth
 
             ZxScreen {
                 id: zxScreen
@@ -209,48 +262,20 @@ ApplicationWindow {
                 mouseGrabSuspended: pageLoader.status !== Loader.Null || menuBar.position > 0 || !ZxEmulator.processInputEvents
 
                 onFullScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
-
-                Row {
-                    anchors.margins: Screen.pixelDensity * 2
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                    spacing: Screen.pixelDensity * 5
-
-                    Image {
-                        id: cassetteIcon
-                        visible: false
-                        height: Screen.pixelDensity * 10
-                        width: Screen.pixelDensity * 13
-                        sourceSize: Qt.size(width, height)
-                        NumberAnimation on opacity {
-                            id: cassetteIconHideAnimation
-                            running: false
-                            to: 0
-                            duration: 2000
-                            onStopped: {cassetteIcon.visible = false; cassetteIcon.opacity = 1}
-                        }
-
-                        source: "qrc:/images/cassette-tape.svg"
-                    }
-
-                    Image {
-                        id: diskIcon
-                        visible: false
-                        height: Screen.pixelDensity * 13
-                        width: Screen.pixelDensity * 13
-                        sourceSize: Qt.size(width, height)
-                        NumberAnimation on opacity {
-                            id: diskIconHideAnimation
-                            running: false
-                            to: 0
-                            duration: 2000
-                            onStopped: {diskIcon.visible = false; diskIcon.opacity = 1}
-                        }
-
-                        source: "qrc:/images/floppy.svg"
-                    }
-                }
             }
+        }
+
+        Hud {
+            id: hud
+            z: 15
+            // the desktop layout has its status bar
+            visible: !Theme.desktopMode
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.margins: Theme.sp(4)
+            // paused by the user, not by an open page or the menu
+            paused: ZxEmulator.paused && pageLoader.status === Loader.Null && menuBar.position === 0
+            speed: ZxEmulator.settings.emulationSpeed
         }
 
         MouseArea {
@@ -383,6 +408,8 @@ ApplicationWindow {
         MessagePage {
             id: messagePage
             z: 100
+            reservedRight: pageLoader.status === Loader.Ready && pageLoader.item.panelWidth !== undefined ? pageLoader.item.panelWidth : 0
+            reservedBottom: pageLoader.status === Loader.Ready && pageLoader.item.hintBarHeight !== undefined ? pageLoader.item.hintBarHeight : 0
         }
     }
 
@@ -428,7 +455,6 @@ ApplicationWindow {
         function onConfigureJoystick() { pageLoader.source = "Joysticks.qml"; }
 
         function onShowMenu() { menuBar.open(); }
-        function onHideMenu() { menuBar.close(); }
         function onToggleOnScreenControls(type) { toggleOnScreenControls(type, true); }
         function onShowWelcome() {
             ZxEmulator.settings.swipe4menu = !TextSizes.smallScreen;
@@ -439,33 +465,14 @@ ApplicationWindow {
         function onUiIconUpdate(item, state) {
             switch (item) {
             case ZxEmulator.Disk:
-                if (cassetteIcon.visible)
-                    cassetteIconHideAnimation.start();
-                if (state === ZxEmulator.Active) {
-                    diskIconHideAnimation.stop();
-                    diskIcon.visible = true
-                } else if (diskIcon.visible) {
-                    diskIconHideAnimation.start();
-                }
+                hud.diskActive = state === ZxEmulator.Active;
                 break;
             case ZxEmulator.Microdrive:
             case ZxEmulator.Tape:
-                if (diskIcon.visible)
-                    diskIconHideAnimation.start();
-                if (state === ZxEmulator.Active) {
-                    cassetteIconHideAnimation.stop();
-                    cassetteIcon.visible = true
-                } else if (cassetteIcon.visible) {
-                    cassetteIconHideAnimation.start();
-                }
-                break;
-            case ZxEmulator.Mouse:
-                break;
-            case ZxEmulator.Paused:
+                hud.tapeActive = state === ZxEmulator.Active;
                 break;
             }
         }
-
     }
 
     Component.onCompleted: {
@@ -486,8 +493,9 @@ ApplicationWindow {
                     pageLoader.source = "CalibrateGamepad.qml";
                 }
             } else {
-                if (!ZxEmulator.touchscreen)
-                    messagePage.showMessage(ZxEmulator.Info, qsTr("No gamepad was found, please connect a gamepad"));
+                // the desktop layout is for the keyboard and the mouse anyway
+                if (!ZxEmulator.touchscreen && !Theme.desktopMode)
+                    messagePage.showMessage(ZxEmulator.Info, qsTr("No gamepad found. Connect one to play with it."));
             }
         }
     }

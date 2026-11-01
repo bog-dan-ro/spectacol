@@ -30,6 +30,7 @@ class ZxTape : public QObject
     QML_UNCREATABLE("use ZxEmulator.tape instead")
     Q_PROPERTY(bool hasTape MEMBER m_hasTape NOTIFY hasTapeChanged)
     Q_PROPERTY(QString programName MEMBER m_programName NOTIFY programNameChanged)
+    Q_PROPERTY(bool playing READ playing NOTIFY playingChanged)
 
 public:
     explicit ZxTape(ZxEmulator *parent = 0);
@@ -37,6 +38,8 @@ public:
     QString programName() const { return m_programName; }
     void setProgramName(const QString &programName);
     void refreshData();
+    bool playing() const { return m_playing; }
+    void setPlaying(bool playing);
 
 public slots:
     void open(QString filePath);
@@ -48,11 +51,13 @@ public slots:
 signals:
     void hasTapeChanged(bool hasTape);
     void programNameChanged();
+    void playingChanged();
 
 private:
     void setHasTape(bool hasTape);
 
     bool m_hasTape = false;
+    bool m_playing = false;
     QByteArray m_tapeData;
     QString m_programName;
     ZxEmulator *m_zxEmulator = nullptr;

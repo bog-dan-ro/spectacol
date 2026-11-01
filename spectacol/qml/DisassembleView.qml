@@ -79,12 +79,15 @@ ListView {
                 return true;
             }
 
-            readonly property color paper: view.currentIndex !== row.index ? row.background : row.selectedBackground
-            readonly property color ink: view.currentIndex !== row.index ? row.foreground : row.selectedForeground
+            readonly property color paper: row.background
+            readonly property color ink: row.foreground
 
             width: view.width
-            height: asmEdit.contentHeight + asmEdit.topPadding + asmEdit.bottomPadding + Screen.pixelDensity
+            height: asmEdit.contentHeight + asmEdit.topPadding + asmEdit.bottomPadding + Theme.sp(1)
             color: paper
+            radius: Theme.radiusSmall
+            border.width: view.currentIndex === row.index ? Theme.focusLine : 0
+            border.color: Theme.accent
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
@@ -97,6 +100,7 @@ ListView {
             RowLayout {
                 anchors.fill: parent
                 FancyText {
+                    mono: true
                     Layout.fillHeight: true
                     Layout.fillWidth: false
                     horizontalAlignment: Text.AlignRight
@@ -110,6 +114,7 @@ ListView {
                 Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyText {
+                    mono: true
                     Layout.fillHeight: true
                     Layout.fillWidth: false
                     Layout.preferredWidth: 4 * TextSizes.scale12
@@ -124,6 +129,7 @@ ListView {
                 Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyTextField {
+                    mono: true
                     id: asmEdit
                     Layout.fillHeight: true
                     Layout.fillWidth: true

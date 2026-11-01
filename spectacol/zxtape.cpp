@@ -45,6 +45,14 @@ void ZxTape::updateBrowseData()
     setHasTape(!m_zxEmulator->emulator().readLock()->tapeDeck().blocks().empty());
 }
 
+void ZxTape::setPlaying(bool playing)
+{
+    if (m_playing == playing)
+        return;
+    m_playing = playing;
+    emit playingChanged();
+}
+
 void ZxTape::setProgramName(const QString &programName)
 {
     if (m_programName == programName)

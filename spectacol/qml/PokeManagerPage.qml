@@ -177,7 +177,7 @@ Item {
                 text: model.label
                 // only the user's clicks: checked also changes when the model updates
                 onToggled: pokeModel.setActive(model.index, checked)
-                background: Rectangle {color: Qt.rgba(0, 0, 0, 0.75)}
+                background: Rectangle {color: Theme.surface}
             }
         }
         header: FancyText {
@@ -185,7 +185,7 @@ Item {
             text: qsTr("Poke manager")
             font.pixelSize: TextSizes.scale20
             horizontalAlignment: Text.AlignHCenter
-            background: Rectangle {color: Qt.rgba(0, 0, 0, 0.75)}
+            background: Rectangle {color: Theme.surface}
         }
 
         footer: RowLayout {

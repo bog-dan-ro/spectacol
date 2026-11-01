@@ -39,8 +39,8 @@ Item {
         id: visualModel
         model: ZxEmulator.breakpointsModel
         delegate: Rectangle {
-            property color paper: view.currentIndex !== index ? Qt.rgba(0, 0, 0, 0.9) : "white"
-            property color ink: view.currentIndex !== index ? "white": Qt.rgba(0, 0, 0, 0.9)
+            property color paper: view.currentIndex !== index ? "transparent" : Theme.accentFill
+            property color ink: Theme.text
 
             width: view.width
             height: 7 * Screen.pixelDensity
@@ -48,6 +48,7 @@ Item {
             RowLayout {
                 anchors.fill: parent
                 FancyText {
+                    mono: true
                     Layout.fillHeight: true
                     Layout.fillWidth: false
                     Layout.preferredWidth: 2 * TextSizes.scale12
@@ -61,6 +62,7 @@ Item {
                 Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyText {
+                    mono: true
                     Layout.fillHeight: true
                     Layout.fillWidth: false
                     Layout.preferredWidth: 3 * TextSizes.scale12
@@ -74,6 +76,7 @@ Item {
                 Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyText {
+                    mono: true
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft

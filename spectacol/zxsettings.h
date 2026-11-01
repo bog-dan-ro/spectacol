@@ -45,6 +45,10 @@ class ZxSettings : public QObject
     Q_PROPERTY(bool detectLoaders READ detectLoaders WRITE setDetectLoaders NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool restrictToSpectacol READ restrictToSpectacol WRITE setRestrictToSpectacol NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool swipe4menu READ swipe4menu WRITE setSwipe4menu NOTIFY swipe4menuChanged)
+    // The UI: larger for a TV, without animations, and the overlay (gamepad, touch) or desktop layout
+    Q_PROPERTY(bool largeUi READ largeUi WRITE setLargeUi NOTIFY uiChanged)
+    Q_PROPERTY(bool reduceMotion READ reduceMotion WRITE setReduceMotion NOTIFY uiChanged)
+    Q_PROPERTY(UiMode uiMode READ uiMode WRITE setUiMode NOTIFY uiChanged)
     Q_PROPERTY(bool autoSaveOnExit READ autoSaveOnExit WRITE setAutoSaveOnExit NOTIFY autoSaveOnExitChanged)
     Q_PROPERTY(int loaderAcceleration READ loaderAcceleration WRITE setLoaderAcceleration NOTIFY settingsCurrentChanged)
     Q_PROPERTY(int messageLevel READ messageLevel WRITE setMessageLevel NOTIFY messageLevelChanged)
@@ -74,6 +78,13 @@ class ZxSettings : public QObject
     Q_PROPERTY(qreal deadZone READ deadZone WRITE setDeadZone NOTIFY deadZoneChanged)
 
 public:
+    enum UiMode {
+        AutoUi,    // the desktop layout without a gamepad or a touch screen, else the overlay
+        OverlayUi,
+        DesktopUi
+    };
+    Q_ENUM(UiMode)
+
     enum FillMode {
         PreserveAspectFit = 0,
         PreserveAspect,
@@ -162,6 +173,13 @@ public:
     bool swipe4menu() const;
     void setSwipe4menu(bool swipe4menu);
 
+    bool largeUi() const;
+    void setLargeUi(bool large);
+    bool reduceMotion() const;
+    void setReduceMotion(bool reduce);
+    UiMode uiMode() const;
+    void setUiMode(UiMode mode);
+
     bool autoSaveOnExit() const;
     void setAutoSaveOnExit(bool autoSave);
 
@@ -197,6 +215,7 @@ public slots:
 private:
     /// `persist`: remember the machine for the next start (the user picked it)
     void applyMachine(int idx, bool persist);
+    void applyTapeOptions();
 
     enum ScreenOrientation {
         Sensors = 0,
@@ -212,6 +231,7 @@ signals:
     void fillModeChanged(ZxSettings::FillMode fillMode);
     void smoothScalingChanged(bool smoothScaling);
     void swipe4menuChanged(bool swipe4menu);
+    void uiChanged();
     void autoSaveOnExitChanged(bool autoSaveOnExit);
     void leftMarginChanged(bool leftMargin);
     void deadZoneChanged(qreal deadZone);

@@ -77,10 +77,15 @@ QString NextSdCard::imagePath() const
 
 void NextSdCard::setImagePath(const QString &path)
 {
-    if (path == imagePath())
+    if ((path.isEmpty() ? defaultImagePath() : path) == imagePath())
         return;
     QSettings{}.setValue(kSettingsKey, path == defaultImagePath() ? QString{} : path);
     emit imagePathChanged();
+}
+
+bool NextSdCard::isCustomImage() const
+{
+    return !QSettings{}.value(kSettingsKey).toString().isEmpty();
 }
 
 bool NextSdCard::available() const

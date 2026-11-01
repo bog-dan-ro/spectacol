@@ -59,7 +59,10 @@ public:
 
     /// The SD card image used by the Next: a user chosen one, or the downloaded one.
     QString imagePath() const;
+    /// An empty path: the downloaded image
     void setImagePath(const QString &path);
+    /// The user picked the image (it isn't the downloaded one)
+    bool isCustomImage() const;
     bool available() const;
 
     State state() const { return m_state; }

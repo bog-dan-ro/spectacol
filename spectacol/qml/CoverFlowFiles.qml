@@ -21,7 +21,6 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import Spectacol
-import "private"
 
 // @scope main.qml
 
@@ -29,6 +28,9 @@ Item
 {
     id : fileList
     signal fileSelected(string filePath);
+    // full screen, with a hint bar: the messages go above it
+    readonly property real panelWidth: width
+    readonly property real hintBarHeight: hintBar.height
     property alias rootFolder: filesModel.rootFolder
     property alias folder: filesModel.folder
     property alias filterClass: filesModel.filterClass
@@ -48,6 +50,13 @@ Item
         origin.y : height * 0.5
     }
 
+
+    // The covers need a calm background, not the game
+    Rectangle {
+        anchors.fill: parent
+        z: -10
+        color: "#0d0f13"
+    }
 
     MessageDialog {
         id: copyDialog
@@ -167,19 +176,25 @@ Item
 
                 Rectangle {
                     width : parent.width
-                    height: TextSizes.scale14 * 3
+                    height: coverLabel.implicitHeight + Theme.sp(3)
                     anchors {
                         bottom : parent.bottom
                         horizontalCenter : parent.horizontalCenter
                     }
-                    color: Qt.rgba(0, 0, 0, 0.75)
-                    border.color: "gray"
-                    FancyText {
-                        anchors.fill: parent
-                        font.pixelSize: TextSizes.scale14
-                        font.bold: true
+                    radius: Theme.radiusSmall
+                    color: Theme.surface
+                    border.width: isCurrentItem ? Theme.focusLine : Theme.line
+                    border.color: isCurrentItem ? Theme.accent : Theme.outline
+                    Text {
+                        id: coverLabel
+                        anchors.centerIn: parent
+                        width: parent.width - Theme.sp(4)
+                        font.pixelSize: Theme.body
+                        font.weight: Font.DemiBold
+                        color: Theme.text
                         text : name
                         elide: Text.ElideRight
+                        maximumLineCount: 2
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         horizontalAlignment: Text.AlignHCenter
                     }
@@ -200,60 +215,60 @@ Item
                 }
             }
         }
-        RowLayout {
+        HintBar {
+            id: hintBar
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            Button {
-                Layout.fillWidth: true
-                text: qsTr("Remove (X)")
-                onClicked: removeDialog.remove()
-            }
-            Button {
-                Layout.fillWidth: true
-                text: qsTr("Copy (L1)")
-                onClicked: filesView.copyPath = filesModel.path(filesView.currentIndex)
-            }
-            Button {
-                Layout.fillWidth: true
-                enabled: filesView.canCopy
-                text: qsTr("Paste (R1)")
-                onClicked: copyDialog.copy()
-            }
-            Button {
-                Layout.fillWidth: true
-                text: qsTr("Go to <b>Spectrum</b> folder (Y)")
-                onClicked: fileList.folder = ZxEmulator.dataPath
-            }
-            Button {
-                Layout.fillWidth: true
-                text: qsTr("Close (B)")
-                onClicked: fileSelected("")
-            }
+            hints: [
+                { pad: "A", key: "Enter", text: qsTr("Open"), action: () => filesView.returnPressed() },
+                { pad: "B", key: "Esc", text: qsTr("Close"), action: () => fileList.fileSelected("") },
+                { pad: "X", key: "Del", text: qsTr("Remove"), action: () => removeDialog.remove() },
+                { pad: "L1", key: "C", text: qsTr("Copy"), action: () => filesView.copyPath = filesModel.path(filesView.currentIndex) },
+                { pad: "R1", key: "P", text: filesView.canCopy ? qsTr("Paste") : qsTr("Paste (copy first)"), action: () => copyDialog.copy() },
+                { pad: "Y", key: "Y", text: qsTr("Spectacol folder"), action: () => fileList.folder = ZxEmulator.dataPath }
+            ]
         }
     }
-    FancyText {
+    // Where we are; a click (or Up) goes to the parent folder, or closes at the top
+    Rectangle {
         id : artist_text_label
-        anchors
-        {
-            horizontalCenter : parent.horizontalCenter
-            top : parent.top
-            topMargin : TextSizes.scale20 / 2
-        }
-        background: Rectangle {
-            color: "gray"
-            opacity: 0.85
-        }
         property bool root: filesModel.rootFolder === filesModel.folder
-        padding: TextSizes.scale20 / 2
-        font.pixelSize: TextSizes.scale20
-        text : filesModel.folder + (root ? " X" : "  \u2191")
-        font.bold: true
-        elide: Text.ElideRight
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        width : parent.width
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        height: headerColumn.implicitHeight + Theme.sp(8)
+        color: Theme.surface
+
+        Column {
+            id: headerColumn
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: Theme.sp(6)
+            anchors.rightMargin: Theme.sp(6)
+            spacing: Theme.sp(1)
+            Text {
+                text: (artist_text_label.root ? qsTr("Open a file") : qsTr("‹ Up a folder")).toUpperCase()
+                font.pixelSize: Theme.caption
+                font.letterSpacing: Theme.uiScale
+                color: Theme.textMuted
+            }
+            Text {
+                width: parent.width
+                text: filesModel.folder
+                elide: Text.ElideMiddle
+                font.pixelSize: Theme.title
+                font.weight: Font.DemiBold
+                color: Theme.text
+            }
+        }
+        Rectangle {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: Theme.line
+            color: Theme.outline
+        }
         MouseArea {
             anchors.fill: parent
             onClicked: {

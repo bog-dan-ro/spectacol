@@ -25,7 +25,7 @@ import "private"
 StandardGamepad {
     id: confGamepad
 
-    backgroundColor: Qt.rgba(0, 0, 0, 0.75);
+    backgroundColor: Theme.surface
 
     property alias deviceId: gamepad.deviceId
     signal configureDone()

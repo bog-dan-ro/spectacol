@@ -28,7 +28,7 @@ import "private"
 
 Rectangle {
     id: pokeFinderPage
-    color: Qt.rgba(0, 0, 0, 0.75);
+    color: Theme.surface
 
     Component.onCompleted: {
         ZxEmulator.processInputEvents = false;
@@ -121,6 +121,7 @@ Rectangle {
             }
 
             FancyTextField {
+                mono: true
                 id: value
                 KeyNavigation.up: view
                 KeyNavigation.down: view
@@ -201,8 +202,8 @@ Rectangle {
                     id: visualModel
                     model: ZxEmulator.pokeFinderModel
                     delegate: Rectangle {
-                        property color paper: view.currentIndex !== index ? Qt.rgba(0, 0, 0, 0.9) : "white"
-                        property color ink: view.currentIndex !== index ? "white": Qt.rgba(0, 0, 0, 0.9)
+                        property color paper: view.currentIndex !== index ? "transparent" : Theme.accentFill
+                        property color ink: Theme.text
 
                         width: view.width
                         height: TextSizes.scale12 * 2
@@ -269,7 +270,7 @@ Rectangle {
                     Layout.fillHeight: true
                     radius: Screen.pixelDensity
                     border.width: (view.focus ? 1 : 0.5) * Screen.pixelDensity
-                    border.color: "white"
+                    border.color: Theme.accent
                     color: "transparent"
                     ListView {
                         id: view

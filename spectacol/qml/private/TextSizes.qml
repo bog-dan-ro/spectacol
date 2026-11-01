@@ -17,17 +17,18 @@
 
 pragma Singleton
 
+import QtQuick
 import QtQuick.Window
-import QtQuick.Controls
+import Spectacol
 
-Label {
-    id: _label
-    property bool smallScreen: Math.min(Screen.height, Screen.width) / Screen.pixelDensity < 80
-    property double scale12: smallScreen ? _label.font.pixelSize / (80 / (Math.min(Screen.height, Screen.width) / Screen.pixelDensity)) : _label.font.pixelSize
-    property double scale14: scale12 * 14 / 12
-    property double scale16: scale12 * 16 / 12
-    property double scale20: scale12 * 20 / 12
-    property double scale24: scale12 * 2 // 24 / 12
-    property double scale34: scale12 * 34 / 12
-    property double scaleImage: smallScreen ? Screen.devicePixelRatio : 1
+// The old size names, mapped onto Theme's type scale (pages move to Theme as they are restyled)
+QtObject {
+    readonly property bool smallScreen: Theme.smallScreen
+    readonly property double scale12: Theme.caption
+    readonly property double scale14: Theme.body
+    readonly property double scale16: Theme.body
+    readonly property double scale20: Theme.title
+    readonly property double scale24: Theme.pageTitle
+    readonly property double scale34: Theme.display
+    readonly property double scaleImage: smallScreen ? Screen.devicePixelRatio : 1
 }

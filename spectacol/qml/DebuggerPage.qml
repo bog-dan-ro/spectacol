@@ -46,7 +46,7 @@ Item {
         buttonR1Key: Qt.Key_C
     }
 
-    readonly property color backgroudColor : Qt.rgba(0, 0, 0, 0.85);
+    readonly property color backgroudColor : Theme.surface
     ColumnLayout {
         spacing: TextSizes.smallScreen ? 0 : 2.5 * Screen.pixelDensity
         anchors.fill: parent
@@ -57,9 +57,9 @@ Item {
             Rectangle {
                 id: disassambleRect
                 color: backgroudColor
-                radius: Screen.pixelDensity
-                border.width: (disassembleView.focus ? 1 : 0.5) * Screen.pixelDensity
-                border.color: "white"
+                radius: Theme.radiusSmall
+                border.width: disassembleView.focus ? Theme.focusLine : Theme.line
+                border.color: disassembleView.focus ? Theme.accent : Theme.outline
 
                 Layout.preferredWidth: 18 * TextSizes.scale14
                 Layout.fillHeight: true
@@ -80,10 +80,10 @@ Item {
                     id: infoRect
                     visible: false
                     anchors.fill: parent
-                    radius: Screen.pixelDensity
+                    radius: Theme.radiusSmall
                     color: backgroudColor
-                    border.width: (focus ? 1 : 0.5) * Screen.pixelDensity
-                    border.color: "white"
+                    border.width: focus ? Theme.focusLine : Theme.line
+                    border.color: focus ? Theme.accent : Theme.outline
 
                     FancyText {
                         anchors.centerIn: parent
@@ -99,9 +99,9 @@ Item {
                 Rectangle {
                     id: registersRect
                     color: backgroudColor
-                    radius: Screen.pixelDensity
-                    border.width: (focus ? 1 : 0.5) * Screen.pixelDensity
-                    border.color: "white"
+                    radius: Theme.radiusSmall
+                    border.width: focus ? Theme.focusLine : Theme.line
+                    border.color: focus ? Theme.accent : Theme.outline
                     Layout.preferredHeight: 14 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
                     Layout.fillWidth: true
                     RegistersView {
@@ -111,9 +111,9 @@ Item {
                 Rectangle {
                     id: breakPointsRect
                     color: backgroudColor
-                    radius: Screen.pixelDensity
-                    border.width: (breakpointsView.activeFocus ? 1 : 0.5) * Screen.pixelDensity
-                    border.color: "white"
+                    radius: Theme.radiusSmall
+                    border.width: breakpointsView.activeFocus ? Theme.focusLine : Theme.line
+                    border.color: breakpointsView.activeFocus ? Theme.accent : Theme.outline
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     FocusScope {
@@ -139,13 +139,14 @@ Item {
             Layout.preferredHeight: commandsLine.contentHeight + commandsLine.topPadding + commandsLine.bottomPadding + Screen.pixelDensity
             Layout.fillWidth: true
             color: backgroudColor
-            radius: Screen.pixelDensity
-            border.width: (focus ? 1 : 0.5) * Screen.pixelDensity
-            border.color: "white"
+            radius: Theme.radiusSmall
+            border.width: focus ? Theme.focusLine : Theme.line
+            border.color: focus ? Theme.accent : Theme.outline
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: parent.border.width
                 FancyTextField {
+                    mono: true
                     id: commandsLine
                     KeyNavigation.up: disassembleView
                     KeyNavigation.down: breakpointsView

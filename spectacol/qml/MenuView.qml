@@ -15,16 +15,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Window
 import QtGamepadLegacy
 import Spectacol
-import "Utils.js" as Utils
-import "private"
 
+// @scope main.qml
+
+// The menu: a list of ZxMenuItems; an item with children opens them in place
 ColumnLayout {
+    id: root
+
     property ZxMenuItem rootMenu: null
     property ZxMenuItem currentMenu: rootMenu
     property var menus: []
@@ -54,6 +57,12 @@ ColumnLayout {
             openMenu(menuModel.get(menuView.currentIndex).modelData, menuView.currentIndex);
     }
 
+    // "&Quick Open .." -> "Quick Open"
+    function plainText(text: string): string
+    {
+        return text.replace("&", "").replace(/ *\.\.+ *$/, "").trim();
+    }
+
     ListModel {
         id: menuModel
     }
@@ -73,58 +82,101 @@ ColumnLayout {
         }
     }
 
-
     function reset()
     {
         currentMenu = null;
         currentMenu = rootMenu;
         menus = [];
-        showParentMenu();
     }
 
     function pushMenu(menu, index)
     {
-        menus.push({"menu": currentMenu, "index": index});
+        menus = menus.concat([{"menu": currentMenu, "index": index}]);
         currentMenu = menu;
-        showParentMenu();
     }
 
     function popMenu()
     {
         if (menus.length) {
-            var menu = menus.pop();
+            const menu = menus[menus.length - 1];
+            menus = menus.slice(0, -1);
             currentMenu = menu.menu;
             menuView.currentIndex = menu.index;
-            showParentMenu();
         } else {
             reset();
             menuBar.close();
         }
     }
 
-    function showParentMenu()
-    {
-        title.text = (menus.length > 1 ? "&lt;/../" : "&lt;/") + Utils.shortcutText(currentMenu.text);
-    }
+    spacing: 0
 
-    spacing: 0.5 * Screen.pixelDensity
-
-    Rectangle {
+    // The header: Spectacol and the machine at the top level, a way back in a sub menu
+    Item {
         Layout.fillWidth: true
-        Layout.preferredHeight: (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20) * 2
-        border.width: 0.25 * Screen.pixelDensity
-        border.color: "black"
-        color: Qt.rgba(0.25, 0.25, 0.25, 0.75);
+        Layout.preferredHeight: headerColumn.implicitHeight + Theme.sp(10)
 
-        FancyText {
-            id: title
-            font.pixelSize: TextSizes.scale16
+        ColumnLayout {
+            id: headerColumn
             anchors.fill: parent
+            anchors.leftMargin: Theme.sp(6)
+            anchors.rightMargin: Theme.sp(6)
+            anchors.topMargin: Theme.sp(6)
+            anchors.bottomMargin: Theme.sp(4)
+            spacing: Theme.sp(1)
+
+            RowLayout {
+                spacing: Theme.sp(3)
+                // the 128K's rainbow stripe
+                Row {
+                    visible: root.menus.length === 0
+                    Repeater {
+                        model: Theme.stripe
+                        delegate: Rectangle {
+                            required property color modelData
+                            width: Theme.sp(2.5)
+                            height: Theme.sp(2.5)
+                            color: modelData
+                            transform: Shear { xFactor: -0.5 }
+                        }
+                    }
+                }
+                Text {
+                    visible: root.menus.length > 0
+                    text: "‹"
+                    font.pixelSize: Theme.pageTitle
+                    color: Theme.textMuted
+                }
+                Text {
+                    Layout.fillWidth: true
+                    text: root.menus.length === 0 || !root.currentMenu ? "Spectacol" : root.plainText(root.currentMenu.text)
+                    elide: Text.ElideRight
+                    font.pixelSize: Theme.pageTitle
+                    font.weight: Font.DemiBold
+                    color: Theme.text
+                }
+            }
+            Text {
+                Layout.fillWidth: true
+                text: (root.menus.length === 0 ? ZxEmulator.settings.currentMachine
+                                               : root.menus.map(m => m.menu === root.rootMenu ? "Spectacol" : root.plainText(m.menu.text)).join(" › ")).toUpperCase()
+                elide: Text.ElideRight
+                font.pixelSize: Theme.caption
+                font.letterSpacing: Theme.uiScale
+                color: Theme.textMuted
+            }
         }
 
         MouseArea {
             anchors.fill: parent
-            onClicked: popMenu()
+            enabled: root.menus.length > 0
+            onClicked: root.popMenu()
+        }
+
+        Rectangle {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: Theme.line
+            color: Theme.outline
         }
     }
 
@@ -133,52 +185,76 @@ ColumnLayout {
         clip: true
         Layout.fillWidth: true
         Layout.fillHeight: true
-
-        snapMode: ListView.SnapToItem
+        Layout.margins: Theme.sp(2)
+        spacing: Theme.sp(0.5)
+        boundsBehavior: Flickable.StopAtBounds
         highlightFollowsCurrentItem: true
+        highlightMoveDuration: Theme.reduceMotion ? 0 : 100
+        keyNavigationWraps: true
 
         model: menuModel
-        delegate: Rectangle {
-            id: menuItemRect
-            visible: modelData.visible
+
+        highlight: Rectangle {
+            radius: Theme.radiusSmall
+            color: Theme.accentFill
+            Rectangle {
+                width: Theme.sp(0.75)
+                height: parent.height
+                radius: width / 2
+                color: Theme.accent
+            }
+        }
+
+        delegate: Item {
+            id: menuItem
+            required property var modelData
+            required property int index
             width: menuView.width
-            height: visible ? TextSizes.scale20 * 2 : 0
-            border.width: 0.25 * Screen.pixelDensity
-            border.color: (index !== menuView.currentIndex) ? "black" : "lightgreen"
-            color: (index !== menuView.currentIndex) ? Qt.rgba(0.25, 0.25, 0.25, 0.75) : Qt.rgba(0.0, 0.85, 0.0, 0.75)
+            height: Theme.rowHeight
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: TextSizes.scale16 / 4
-                anchors.rightMargin: TextSizes.scale16 / 4
-                FancyText {
+                anchors.leftMargin: Theme.sp(4)
+                anchors.rightMargin: Theme.sp(4)
+                spacing: Theme.sp(2)
+                Text {
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    font.pixelSize: TextSizes.scale16
-                    text: Utils.shortcutText(modelData.text)
+                    text: root.plainText(menuItem.modelData.text)
+                    elide: Text.ElideRight
+                    font.pixelSize: Theme.body
+                    color: Theme.text
                 }
-                FancyText {
-                    Layout.fillHeight: true
-                    visible: modelData.children.length > 0
-                    font.pixelSize: TextSizes.scale20
-                    font.bold: true
-                    text: modelData.children.length > 0 ? ">" : ""
+                Text {
+                    visible: menuItem.modelData.children.length > 0
+                    text: "›"
+                    font.pixelSize: Theme.title
+                    color: menuItem.index === menuView.currentIndex ? Theme.text : Theme.textMuted
                 }
             }
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: openMenu(modelData, index)
+                hoverEnabled: true
+                onEntered: menuView.currentIndex = menuItem.index
+                onClicked: root.openMenu(menuItem.modelData, menuItem.index)
             }
         }
     }
 
+    HintBar {
+        Layout.fillWidth: true
+        hints: [
+            { pad: "A", key: "Enter", text: qsTr("Select"), action: () => root.openSelectedMenu() },
+            { pad: "B", key: "Esc", text: root.menus.length ? qsTr("Back") : qsTr("Close"), action: () => root.popMenu() },
+            { pad: "Menu", key: "F1", text: qsTr("Close"), action: () => menuBar.close() }
+        ]
+    }
 
     GamepadKeyNavigation {
         id: gamepadKeyNavigation
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         active: false
-        onActiveChanged: ZxEmulator.processInputEvents = !active
+        onActiveChanged: ZxEmulator.processInputEvents = !gamepadKeyNavigation.active
         upKey: Qt.Key_Up
         downKey: Qt.Key_Down
         buttonAKey: Qt.Key_Return

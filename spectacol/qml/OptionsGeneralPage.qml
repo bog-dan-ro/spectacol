@@ -16,162 +16,99 @@
 */
 
 import QtQuick
-import QtQuick.Window
 import QtGamepadLegacy
-import QtQuick.Controls
 import Spectacol
 
 // @scope main.qml
 
-Flickable {
-    contentHeight: pane.height
+Sheet {
+    crumb: qsTr("Options")
+    title: qsTr("General")
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Change") },
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+    ]
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        buttonAKey: Qt.Key_Space
+        buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
-        buttonYKey: Qt.Key_Tab
-        buttonXKey: Qt.Key_Backtab
     }
 
-    FancyPane {
-        id: pane
-        Column {
-            spacing: 2.5 * Screen.pixelDensity
-            anchors.horizontalCenter: parent.horizontalCenter
-            Label {
-                text: qsTr("General Options")
-            }
+    SettingsList {
+        SettingRow {
+            label: qsTr("Emulation speed")
+            kind: "stepper"
+            from: 10
+            to: 1000
+            stepSize: 10
+            value: ZxEmulator.settings.emulationSpeed
+            valueText: (v) => qsTr("%1%").arg(v)
+            onMoved: (v) => ZxEmulator.settings.emulationSpeed = v
+        }
+        SettingRow {
+            label: qsTr("Save a snapshot when quitting")
+            checked: ZxEmulator.settings.autoSaveOnExit
+            onToggled: (on) => ZxEmulator.settings.autoSaveOnExit = on
+        }
+        SettingRow {
+            label: qsTr("Browse only the Spectacol folder")
+            checked: ZxEmulator.settings.restrictToSpectacol
+            onToggled: (on) => ZxEmulator.settings.restrictToSpectacol = on
+        }
+        SettingRow {
+            visible: ZxEmulator.touchscreen
+            label: qsTr("Swipe to open the menu")
+            checked: ZxEmulator.settings.swipe4menu
+            onToggled: (on) => ZxEmulator.settings.swipe4menu = on
+        }
+        SettingRow {
+            label: qsTr("Start tapes when opened")
+            description: qsTr("Resets the machine and types LOAD \"\"")
+            checked: ZxEmulator.settings.autoLoad
+            onToggled: (on) => ZxEmulator.settings.autoLoad = on
+        }
+        SettingRow {
+            label: qsTr("Detect loaders")
+            description: qsTr("Plays and stops the tape when a game loads")
+            checked: ZxEmulator.settings.detectLoaders
+            onToggled: (on) => ZxEmulator.settings.detectLoaders = on
+        }
+        SettingRow {
+            label: qsTr("Loader acceleration")
+            description: qsTr("Turbo also runs flat out while the tape plays")
+            kind: "choice"
+            model: [qsTr("Off"), qsTr("Safe"), qsTr("Turbo")]
+            currentIndex: ZxEmulator.settings.loaderAcceleration
+            onActivated: (index) => ZxEmulator.settings.loaderAcceleration = index
+        }
+        SettingRow {
+            label: qsTr("Messages")
+            kind: "choice"
+            model: [qsTr("All"), qsTr("Warnings"), qsTr("Errors")]
+            currentIndex: ZxEmulator.settings.messageLevel
+            onActivated: (index) => ZxEmulator.settings.messageLevel = index
+        }
 
-            Row {
-                spacing: 2.5 * Screen.pixelDensity
-                Label {
-                    text: qsTr("Emulation Speed")
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                SpinBox {
-                    id: emulationSpeed
-                    focus: true
-                    Keys.onUpPressed: messageLevel.forceActiveFocus(Qt.TabFocusReason)
-                    Keys.onDownPressed: autoSave.forceActiveFocus(Qt.TabFocusReason)
-                    Keys.onLeftPressed: decrease()
-                    Keys.onRightPressed: increase()
-                    from: 10
-                    to: 10000
-                    value: ZxEmulator.settings.emulationSpeed
-                    onValueChanged: ZxEmulator.settings.emulationSpeed = value
-                }
-            }
-
-            CheckBox {
-                id: autoSave
-                KeyNavigation.up: emulationSpeed
-                KeyNavigation.down: restrictBrowse
-                text: qsTr("Auto save snapshot on exit")
-                checked: ZxEmulator.settings.autoSaveOnExit
-                onCheckedChanged: ZxEmulator.settings.autoSaveOnExit = checked
-            }
-
-            CheckBox {
-                id: restrictBrowse
-                KeyNavigation.up: autoSave
-                KeyNavigation.down: ZxEmulator.touchscreen ? swipeForMenu : autoLoad
-                text: qsTr("Restrict browsing to Spectacol folder")
-                checked: ZxEmulator.settings.restrictToSpectacol
-                onCheckedChanged: ZxEmulator.settings.restrictToSpectacol = checked
-            }
-
-            CheckBox {
-                id: swipeForMenu
-                visible: ZxEmulator.touchscreen
-                KeyNavigation.up: restrictBrowse
-                KeyNavigation.down: autoLoad
-                text: qsTr("Swipe to open the menu")
-                checked: ZxEmulator.settings.swipe4menu
-                onCheckedChanged: ZxEmulator.settings.swipe4menu = checked
-            }
-
-            CheckBox {
-                id: autoLoad
-                KeyNavigation.up: ZxEmulator.touchscreen ? swipeForMenu : restrictBrowse
-                KeyNavigation.down: detectLoaders
-                text: qsTr("Auto load media")
-                checked: ZxEmulator.settings.autoLoad
-                onCheckedChanged: ZxEmulator.settings.autoLoad = checked
-            }
-
-            CheckBox {
-                id: detectLoaders
-                KeyNavigation.up: autoLoad
-                KeyNavigation.down: loaderAcceleration
-                text: qsTr("Detect loaders")
-                checked: ZxEmulator.settings.detectLoaders
-                onCheckedChanged: ZxEmulator.settings.detectLoaders = checked
-            }
-
-            Row {
-                spacing: 2.5 * Screen.pixelDensity
-                Label {
-                    text: qsTr("Loader acceleration")
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                ComboBox {
-                    id: loaderAcceleration
-                    Keys.onUpPressed: {
-                        if (popup.visible)
-                            decrementCurrentIndex();
-                        else
-                            detectLoaders.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onDownPressed: {
-                        if (popup.visible)
-                            incrementCurrentIndex();
-                        else
-                            messageLevel.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onLeftPressed: if (!popup.visible)  decrementCurrentIndex()
-                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
-
-                    model: ["None", "Safe", "Turbo"]
-                    currentIndex: ZxEmulator.settings.loaderAcceleration
-                    onCurrentIndexChanged: ZxEmulator.settings.loaderAcceleration = currentIndex
-                }
-            }
-
-            Row {
-                spacing: 2.5 * Screen.pixelDensity
-                Label {
-                    text: qsTr("Message level")
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                ComboBox {
-                    id: messageLevel
-                    Keys.onUpPressed: {
-                        if (popup.visible)
-                            decrementCurrentIndex();
-                        else
-                            loaderAcceleration.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onDownPressed: {
-                        if (popup.visible)
-                            incrementCurrentIndex();
-                        else
-                            emulationSpeed.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onLeftPressed: if (!popup.visible)  decrementCurrentIndex()
-                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
-
-                    model: ["All (Infos, Warnings & Errors)", "Warnings & Errors", "Errors"]
-                    currentIndex: ZxEmulator.settings.messageLevel
-                    onCurrentIndexChanged: ZxEmulator.settings.messageLevel = currentIndex
-                }
-            }
-
-            Button {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Close (B)")
-                onClicked: pageLoader.source = ""
-            }
+        SectionTitle { text: qsTr("Interface") }
+        SettingRow {
+            label: qsTr("Layout")
+            description: qsTr("Desktop: a menu bar and docked panels. Overlay: for gamepads, touch and TVs")
+            kind: "choice"
+            model: [qsTr("Auto"), qsTr("Overlay"), qsTr("Desktop")]
+            currentIndex: ZxEmulator.settings.uiMode
+            onActivated: (index) => ZxEmulator.settings.uiMode = index
+        }
+        SettingRow {
+            label: qsTr("Large text")
+            description: qsTr("For a TV across the room")
+            checked: ZxEmulator.settings.largeUi
+            onToggled: (on) => ZxEmulator.settings.largeUi = on
+        }
+        SettingRow {
+            label: qsTr("Reduce motion")
+            checked: ZxEmulator.settings.reduceMotion
+            onToggled: (on) => ZxEmulator.settings.reduceMotion = on
         }
     }
 }

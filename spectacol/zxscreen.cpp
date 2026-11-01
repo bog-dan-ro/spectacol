@@ -22,6 +22,7 @@
 #include "zxemulator.h"
 
 #include <QQuickWindow>
+#include <QSGRendererInterface>
 #include <QSGSimpleTextureNode>
 
 #include <cmath>
@@ -155,12 +156,26 @@ QSGNode *ZxScreen::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         return nullptr;
     }
 
-    if (!node) {
-        node = new QSGSimpleTextureNode;
-        node->setOwnsTexture(true);
-        node->setTexture(new ZxTexture);
+    if (window()->rendererInterface()->graphicsApi() == QSGRendererInterface::Software) {
+        // The software renderer (no GPU, the offscreen platform) can't use ZxTexture's
+        // RHI uploads: give it a new texture when the image changed
+        if (!node)
+            node = new QSGSimpleTextureNode;
+        if (!node->texture() || !frame.dirty.isEmpty()) {
+            QSGTexture *old = node->texture();
+            node->setOwnsTexture(false);
+            node->setTexture(window()->createTextureFromImage(frame.image));
+            node->setOwnsTexture(true);
+            delete old;
+        }
+    } else {
+        if (!node) {
+            node = new QSGSimpleTextureNode;
+            node->setOwnsTexture(true);
+            node->setTexture(new ZxTexture);
+        }
+        static_cast<ZxTexture *>(node->texture())->setFrame(std::move(frame));
     }
-    static_cast<ZxTexture *>(node->texture())->setFrame(std::move(frame));
     node->setFiltering(m_smoothScaling ? QSGTexture::Linear : QSGTexture::Nearest);
     node->setRect(rect);
     // the texture object is the same, but its content changed

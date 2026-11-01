@@ -16,127 +16,48 @@
 */
 
 import QtQuick
-import QtQuick.Window
-import QtQuick.Controls
-import QtQuick.Layouts
 import QtGamepadLegacy
 import Spectacol
 
 // @scope main.qml
 
-Flickable {
-    contentHeight: pane.height
-
-    function getIndex(data, str) {
-        for (var i = 0; i < data.length; ++i)
-            if (data[i] === str)
-                return i;
-        return 0;
-    }
+Sheet {
+    id: page
+    crumb: qsTr("Options")
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Change") },
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+    ]
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
+        buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
-        buttonAKey: Qt.Key_Space
     }
+    title: qsTr("Sound")
 
-    FancyPane {
-        id: pane
-        ColumnLayout {
-            spacing: 2.5 * Screen.pixelDensity
-            anchors.horizontalCenter: parent.horizontalCenter
-            Label {
-                text: qsTr("Sound Options")
-            }
+    readonly property var stereoModes: ["None", "ACB", "ABC"]
 
-
-            CheckBox {
-                id: soundEnabled
-                KeyNavigation.up: speakerType
-                KeyNavigation.down: loadingSound
-                focus: true
-                text: qsTr("Sound enabled")
-                checked: ZxEmulator.settings.soundEnabled
-                onCheckedChanged: ZxEmulator.settings.soundEnabled = checked
-            }
-
-            CheckBox {
-                id: loadingSound
-                KeyNavigation.up: soundEnabled
-                KeyNavigation.down: ayStereoSeparation
-                text: qsTr("Loading sound")
-                checked: ZxEmulator.settings.loadingSound
-                onCheckedChanged: ZxEmulator.settings.loadingSound = checked
-            }
-
-            RowLayout {
-                spacing: 2.5 * Screen.pixelDensity
-                Layout.fillWidth: true
-                Label {
-                    text: qsTr("AY stereo separation")
-                    Layout.alignment: Qt.AlignVCenter
-                }
-
-                ComboBox {
-                    id: ayStereoSeparation
-                    Layout.fillWidth: true
-                    Keys.onUpPressed: {
-                        if (popup.visible)
-                            decrementCurrentIndex();
-                        else
-                            loadingSound.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onDownPressed: {
-                        if (popup.visible)
-                            incrementCurrentIndex();
-                        else
-                            speakerType.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
-                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
-                    model: ["None", "ACB", "ABC"]
-                    currentIndex: getIndex(model, ZxEmulator.settings.AYStereoSeparation)
-                    onCurrentTextChanged: ZxEmulator.settings.AYStereoSeparation = currentText
-                }
-            }
-
-            RowLayout {
-                spacing: 2.5 * Screen.pixelDensity
-                Layout.fillWidth: true
-                Label {
-                    text: qsTr("Speaker type")
-                    Layout.alignment: Qt.AlignVCenter
-                }
-
-                ComboBox {
-                    id: speakerType
-                    Layout.fillWidth: true
-                    Keys.onUpPressed: {
-                        if (popup.visible)
-                            decrementCurrentIndex();
-                        else
-                            ayStereoSeparation.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onDownPressed: {
-                        if (popup.visible)
-                            incrementCurrentIndex();
-                        else
-                            soundEnabled.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
-                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
-                    model: ["TV speaker", "Beeper", "Unfiltered"]
-                    currentIndex: getIndex(model, ZxEmulator.settings.speakerType)
-                    onCurrentTextChanged: ZxEmulator.settings.speakerType = currentText
-                }
-            }
-
-
-            Button {
-                Layout.alignment: Qt.AlignHCenter
-                text: qsTr("Close (B)")
-                onClicked: pageLoader.source = ""
-            }
+    SettingsList {
+        SettingRow {
+            label: qsTr("Sound")
+            checked: ZxEmulator.settings.soundEnabled
+            onToggled: (on) => ZxEmulator.settings.soundEnabled = on
         }
+        SettingRow {
+            label: qsTr("Loading sound")
+            description: qsTr("Hear the tape while it loads")
+            checked: ZxEmulator.settings.loadingSound
+            onToggled: (on) => ZxEmulator.settings.loadingSound = on
+        }
+        SettingRow {
+            label: qsTr("AY stereo")
+            description: qsTr("Where the AY's three channels go: left, centre, right")
+            kind: "choice"
+            model: [qsTr("Mono"), "ACB", "ABC"]
+            currentIndex: Math.max(0, page.stereoModes.indexOf(ZxEmulator.settings.AYStereoSeparation))
+            onActivated: (index) => ZxEmulator.settings.AYStereoSeparation = page.stereoModes[index]
+        }
+        // "Speaker type" waits for ZxKit's speaker models (see TODO.md)
     }
 }

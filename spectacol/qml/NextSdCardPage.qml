@@ -23,21 +23,22 @@ import Spectacol
 import "private"
 
 // @scope main.qml
-Pane {
-    anchors.fill: parent
-    background.opacity: 0.85
-    Component.onCompleted: {
-        downloadButton.forceActiveFocus();
-    }
+Sheet {
+    crumb: qsTr("ZX Spectrum Next")
+    title: qsTr("SD card image")
+    preferredWidth: Theme.sp(150)
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Download"), action: () => { if (!busy) NextSdCard.download(); } },
+        { pad: "B", key: "Esc", text: qsTr("Cancel"), action: () => pageLoader.source = "" }
+    ]
+
+    Component.onCompleted: downloadButton.forceActiveFocus()
+    // closing the page cancels the download
+    Component.onDestruction: if (busy) NextSdCard.cancel()
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
-    }
-
-    Keys.onEscapePressed: {
-        NextSdCard.cancel();
-        pageLoader.source = "";
     }
 
     Connections {
@@ -48,16 +49,18 @@ Pane {
     readonly property bool busy: NextSdCard.state === NextSdCard.Downloading || NextSdCard.state === NextSdCard.Extracting
 
     ColumnLayout {
-        anchors.centerIn: parent
-        width: parent.width * 0.8
-        spacing: TextSizes.scale14
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: Theme.sp(6)
+        spacing: Theme.sp(4)
 
         FancyText {
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignLeft
             textFormat: Text.RichText
-            text: qsTr("The <b>ZX Spectrum Next</b> boots NextZXOS from an SD card.<br/><br/>"
+            text: "<style>a { color: " + Theme.accent + "; }</style>" + qsTr("The <b>ZX Spectrum Next</b> boots NextZXOS from an SD card.<br/><br/>"
                        + "Spectacol can download the official SD card image from "
                        + "<a href=\"https://www.specnext.com\">specnext.com</a> "
                        + "(about 52 MB to download, 1 GB on disk).<br/>"
@@ -88,7 +91,7 @@ Pane {
 
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: TextSizes.scale14
+            spacing: Theme.sp(4)
             Button {
                 id: downloadButton
                 text: NextSdCard.state === NextSdCard.Failed ? qsTr("Retry") : qsTr("Download")

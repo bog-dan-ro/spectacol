@@ -18,34 +18,31 @@
 // @scope main.qml
 
 import QtQuick
-import QtQuick.Window
+import QtGamepadLegacy
 import Spectacol
-import "private"
 
-Item {
-    FancyList {
-        id: view
+Sheet {
+    crumb: qsTr("Joystick")
+    title: qsTr("Choose a joystick")
+    preferredWidth: Theme.sp(100)
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Choose"), action: () => list.chosen(list.currentIndex) },
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+    ]
 
+    GamepadKeyNavigation {
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
+        buttonAKey: Qt.Key_Return
+        buttonBKey: Qt.Key_Escape
+    }
+
+    OptionList {
+        id: list
         model: ZxEmulator.joysticksModel
-        currentIndex: ZxEmulator.selectedJoysticksIndex
-        onCurrentIndexChanged: ZxEmulator.selectedJoysticksIndex = currentIndex
-
-        width: 7 * (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20)
-        delegate: Rectangle {
-            width: view.width
-            height: (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20) * 2
-            color: Qt.rgba(0, 0, 0, 0.75);
-
-            FancyText {
-                anchors.fill: parent
-                anchors.leftMargin: (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20) / 2
-                font.pixelSize: (TextSizes.smallScreen ? TextSizes.scale16 : TextSizes.scale20)
-                text: modelData
-            }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: view.currentIndex = model.index
-            }
+        checkedIndex: ZxEmulator.selectedJoysticksIndex
+        onChosen: (index) => {
+            ZxEmulator.selectedJoysticksIndex = index;
+            pageLoader.source = "";
         }
     }
 }

@@ -28,6 +28,8 @@
 
 #include <QSettings>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 #ifdef Q_OS_ANDROID
@@ -118,9 +120,21 @@ int ZxSettings::currentMachineIndex() const
     return m_currentMachineIndex;
 }
 
+void ZxSettings::applyTapeOptions()
+{
+    zxkit::TapeOptions options;
+    options.autoPlay = m_detectLoaders;
+    // "None", "Safe" (the edge loops are fast-forwarded), "Turbo" (and the emulation runs flat out)
+    options.accelerateLoaders = m_loaderAcceleration > 0;
+    options.turboWhilePlaying = m_loaderAcceleration > 1;
+    options.loadingSound = m_loadingSound;
+    m_zxEmulator.emulator().writeLock()->tapeDeck().setOptions(options);
+}
+
 void ZxSettings::applyToEmulator()
 {
     m_zxEmulator.emulator().writeLock()->audioMixer().setStereoMode(ayStereoMode(m_ayStereo));
+    applyTapeOptions();
     m_zxEmulator.setSpeed(m_emulationSpeed);
     // One by one: a peripheral that can't start (e.g. a missing ROM) must not stop the others
     if (m_kempstonJoystick)
@@ -248,6 +262,7 @@ void ZxSettings::setDetectLoaders(bool detectLoaders)
     QSettings s;
     s.beginGroup(u"General"_s);
     s.setValue("detectLoaders", detectLoaders);
+    applyTapeOptions();
     emit settingsCurrentChanged();
 }
 
@@ -280,6 +295,7 @@ void ZxSettings::setLoadingSound(bool loadingSound)
     QSettings s;
     s.beginGroup(u"Sound"_s);
     s.setValue("loadingSound", loadingSound);
+    applyTapeOptions();
     emit settingsCurrentChanged();
 }
 
@@ -572,6 +588,45 @@ void ZxSettings::setSwipe4menu(bool swipe)
     emit swipe4menuChanged(swipe);
 }
 
+bool ZxSettings::largeUi() const
+{
+    return QSettings{}.value(u"Ui/large"_s, false).toBool();
+}
+
+void ZxSettings::setLargeUi(bool large)
+{
+    if (large == largeUi())
+        return;
+    QSettings{}.setValue(u"Ui/large"_s, large);
+    emit uiChanged();
+}
+
+bool ZxSettings::reduceMotion() const
+{
+    return QSettings{}.value(u"Ui/reduceMotion"_s, false).toBool();
+}
+
+void ZxSettings::setReduceMotion(bool reduce)
+{
+    if (reduce == reduceMotion())
+        return;
+    QSettings{}.setValue(u"Ui/reduceMotion"_s, reduce);
+    emit uiChanged();
+}
+
+ZxSettings::UiMode ZxSettings::uiMode() const
+{
+    return UiMode(std::clamp(QSettings{}.value(u"Ui/mode"_s, int(AutoUi)).toInt(), int(AutoUi), int(DesktopUi)));
+}
+
+void ZxSettings::setUiMode(UiMode mode)
+{
+    if (mode == uiMode())
+        return;
+    QSettings{}.setValue(u"Ui/mode"_s, int(mode));
+    emit uiChanged();
+}
+
 bool ZxSettings::autoSaveOnExit() const
 {
     QSettings s;
@@ -638,6 +693,7 @@ void ZxSettings::setLoaderAcceleration(int acceleration)
     QSettings s;
     s.beginGroup(u"General"_s);
     s.setValue("loaderAcceleration", acceleration);
+    applyTapeOptions();
     emit settingsCurrentChanged();
 }
 

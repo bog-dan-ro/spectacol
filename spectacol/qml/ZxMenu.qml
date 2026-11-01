@@ -147,6 +147,15 @@ ZxMenuItem {
         }
 
         ZxMenuItem {
+            visible: ZxEmulator.sdCard.inUse
+            text: qsTr("SD card")
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "SdCardPage.qml";
+            }
+        }
+
+        ZxMenuItem {
             text: qsTr("Recording")
             ZxMenuItem {
                 visible: ZxEmulator.recording.type === ZxRecording.Recording
@@ -211,7 +220,7 @@ ZxMenuItem {
     ZxMenuItem {
         text: qsTr("Machine")
         ZxMenuItem {
-            text: qsTr("Select ... ") + ZxEmulator.settings.currentMachine
+            text: qsTr("Choose machine ...")
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "MachineTypePage.qml";

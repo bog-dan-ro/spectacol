@@ -16,15 +16,15 @@
 */
 
 import QtQuick
-import QtQuick.Window
 import QtQuick.Controls
-import "private"
+import Spectacol
 
+// Text in the UI: the platform's font from Theme's type scale; `mono` for code, registers, hex
 Label {
-    font.pixelSize: TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14
-    font.family: Qt.platform.os === 'android' ? 'Droid Sans Mono' : 'Monospace'
-    style: Text.Outline
-    styleColor: "#66ff2200"
+    property bool mono: false
+    font.pixelSize: Theme.body
+    font.family: mono ? Theme.monoFamily : Qt.application.font.family
+    color: Theme.text
     horizontalAlignment: Text.AlignLeft
     verticalAlignment: Text.AlignVCenter
 }

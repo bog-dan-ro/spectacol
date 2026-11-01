@@ -23,7 +23,7 @@ import Spectacol
 
 Rectangle {
     id: saveFilePage
-    color: Qt.rgba(0, 0, 0, 0.75);
+    color: Theme.surface
 
 
     function writeTape()

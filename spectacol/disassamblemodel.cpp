@@ -170,19 +170,20 @@ QColor DisassambleModel::color(DisassambleModel::ColorType colorType, const std:
 {
     switch (colorType) {
     case Ink:
-        return Qt::white;
+        return QColor(0xec, 0xee, 0xf2);
 
+    // Dark tints, so the text stays readable: the PC in the accent's cyan, breakpoints in red
     case Paper:
         if (types.find(BreakpointsModel::BreakOnExecute) != types.end() && address == currentPc)
-            return Qt::darkMagenta;
+            return QColor(0x6b, 0x2a, 0x7a);
 
         if (types.find(BreakpointsModel::BreakOnExecute) != types.end())
-            return Qt::red;
+            return QColor(0x8a, 0x1c, 0x1c);
 
         if (address == currentPc)
-            return Qt::blue;
+            return QColor(0x00, 0x5f, 0x62);
 
-        return QColor(0, 0, 0, 200);
+        return Qt::transparent;
     }
     Q_ASSERT(false);
     return QColor();

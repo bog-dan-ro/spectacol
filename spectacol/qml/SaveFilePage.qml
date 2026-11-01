@@ -16,6 +16,7 @@
 */
 
 import QtQuick
+import Spectacol
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Window
@@ -23,7 +24,7 @@ import QtQuick.Controls
 
 Rectangle {
     id: saveFilePage
-    color: Qt.rgba(0, 0, 0, 0.75);
+    color: Theme.surface
 
     property alias title: title.text
     property alias fileName: fileNameEdit.text

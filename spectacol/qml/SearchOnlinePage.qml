@@ -27,7 +27,7 @@ import Spectacol
 import "private"
 
 Rectangle {
-    color: Qt.rgba(0, 0, 0, 0.75);
+    color: Theme.surface
     Timer {
         id: timer
         repeat: false
@@ -113,9 +113,10 @@ Rectangle {
             }
             model: ZxEmulator.onlineGamesModel
             highlight: Rectangle {
-                border.width: 0.25 * Screen.pixelDensity
-                color: Qt.rgba(0.0, 0.85, 0.0, 0.75)
-                border.color: "lightgreen"
+                radius: Theme.radiusSmall
+                color: Theme.accentFill
+                border.width: Theme.focusLine
+                border.color: Theme.accent
             }
             delegate: Item {
                 width: grid.cellWidth; height: grid.cellHeight

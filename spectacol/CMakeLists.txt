@@ -93,6 +93,8 @@ set_source_files_properties(
         QT_QML_SINGLETON_TYPE TRUE
 )
 
+set_source_files_properties(qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+
 qt_add_qml_module(spectacol
     URI Spectacol
     VERSION 1.0
@@ -142,6 +144,7 @@ qt_add_qml_module(spectacol
         qml/MenuView.qml
         qml/MessagePage.qml
         qml/NextSdCardPage.qml
+        qml/SdCardPage.qml
         qml/OnScreen48Keyboard.qml
         qml/OnScreenButton.qml
         qml/OnScreenCursorJoystick.qml
@@ -160,11 +163,21 @@ qt_add_qml_module(spectacol
         qml/SearchOnlinePage.qml
         qml/StandardGamepad.qml
         qml/TapesFileBrowserPage.qml
+        qml/Theme.qml
+        qml/HintBar.qml
+        qml/Hud.qml
+        qml/Sheet.qml
+        qml/SectionTitle.qml
+        qml/SettingRow.qml
+        qml/SettingsList.qml
+        qml/OptionList.qml
+        qml/DesktopMenuBar.qml
         qml/Utils.js
         qml/ZxMenuItem.qml
         qml/private/TextSizes.qml
         SOURCES disks.h disks.cpp
         SOURCES nextsdcard.h nextsdcard.cpp
+        SOURCES sdcardfiles.h sdcardfiles.cpp
 )
 
 target_link_libraries(spectacol PRIVATE ZX::Kit Qt::Quick Qt::Multimedia Qt::GamepadLegacy Qt::GuiPrivate Qt::ShaderTools)

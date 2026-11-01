@@ -6,7 +6,7 @@ Spectacol is a ZX Spectrum emulator: the emulation core is [ZxKit](https://githu
 
 ## Build
 
-The project uses CMake and needs Qt ≥ 6.11 (Quick, Multimedia, ShaderTools) and C++23. `BUILD.md`, `spectacol/qml.qrc` and `spectacol/deployment.pri` describe the old qmake/Qt 5 build and are stale. The CMake build does not use them.
+The project uses CMake and needs Qt ≥ 6.11 (Quick, Multimedia, ShaderTools) and C++23. `BUILD.md` describes the build; the Android build is not ported to CMake yet.
 
 ```sh
 git submodule update --init --recursive   # android_openssl (Android only)
@@ -14,6 +14,9 @@ cmake -S . -B build -G Ninja -DCMAKE_PREFIX_PATH=/path/to/Qt/6.x/gcc_64
 cmake --build build
 ./build/bin/spectacol [--machine ID] [--list-machines] [file.tzx|.tap|.z80|.nex|...]
 # headless check: QT_QPA_PLATFORM=offscreen ./build/bin/spectacol --machine next --quit-after 14 --screenshot next.png
+# the whole UI: --ui-screenshot ui.png [--window-size 1280x800] (the offscreen platform renders with Qt Quick's
+# software backend, ZxScreen has a path for it); --ui-keys F1,Down,Return presses keys to open a page first
+# (click:X:Y clicks), e.g. the desktop menu bar
 ```
 
 Configuring needs network access. The top-level `CMakeLists.txt` uses `FetchContent` for:
@@ -49,6 +52,14 @@ Spectacol has no tests of its own (ZxKit has them); check changes with the headl
 New C++/QML sources, shaders, images and ROMs must be listed explicitly in `spectacol/CMakeLists.txt` under `qt_add_qml_module`, `qt_add_shaders` or `qt_add_resources`. There is no globbing. Shaders are Vulkan-style GLSL, precompiled by `qt_add_shaders` for GLSL "100es,120,150,310es,450".
 
 `spectacol/shaders/slang_parser.py` is a standalone helper for converting libretro slang shaders. It is not part of the build.
+
+### UI
+- `Theme` (QML singleton) holds the design tokens: colour roles, the type scale (`caption`, `body`, `title`,
+  `pageTitle`), spacing (`sp(n)` = n × 4 px, scaled by "Large text"), motion (respects "Reduce motion"), and
+  `desktopMode` (menu bar and docked pages, else the overlay for gamepad, touch and TV). No hard-coded colours or sizes.
+- A page is a `Sheet` (crumb, title, `hints` for the `HintBar`, content); settings pages use `SettingsList` and
+  `SettingRow`; pick-one lists use `OptionList`. `TextSizes` only maps the old names onto `Theme`.
+- Leave the screen filter UI (`OptionsScreenPage.qml`, `FiltersPage.qml`, `filtersModel`, `selectedFilterIndex`) alone.
 
 ## Conventions
 - Each source file starts with the GPL-3.0 license header (`Copyright (c) 2015-2026, BogDan Vatra`).

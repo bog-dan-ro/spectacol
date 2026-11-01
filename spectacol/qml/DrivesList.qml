@@ -18,55 +18,31 @@
 // @scope main.qml
 
 import QtQuick
-import QtQuick.Controls
 import QtGamepadLegacy
 import Spectacol
-import "private"
 
-// Lets the user pick one of the machine's floppy drives (A:, B:, ...)
-FancyBaseList {
-    id: view
-    property string title: qsTr("Select drive")
+// Picks one of the machine's floppy drives (A:, B:, ...)
+Sheet {
+    id: page
     signal driveSelected(int drive)
 
-    animation: false
-    width: 13 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
-    model: ZxEmulator.disks.count
+    crumb: qsTr("Disks")
+    preferredWidth: Theme.sp(100)
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Choose"), action: () => list.chosen(list.currentIndex) },
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+    ]
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
+        buttonAKey: Qt.Key_Return
+        buttonBKey: Qt.Key_Escape
     }
 
-    Keys.onEscapePressed: pageLoader.source = ""
-    Keys.onReturnPressed: driveSelected(currentIndex)
-
-    header: FancyText {
-        width: view.width
-        font.pixelSize: (TextSizes.smallScreen ? TextSizes.scale14 : TextSizes.scale16)
-        horizontalAlignment: Text.AlignHCenter
-        text: view.title
-    }
-
-    delegate: Rectangle {
-        width: view.width
-        height: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) * 2
-        color: Qt.rgba(0, 0, 0, 0.75)
-
-        FancyText {
-            anchors.fill: parent
-            anchors.leftMargin: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14) / 2
-            font.pixelSize: (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
-            text: qsTr("Drive %1:").arg(String.fromCharCode(65 + model.index))
-        }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: view.driveSelected(model.index)
-        }
-    }
-
-    footer: Button {
-        width: view.width
-        text: qsTr("Close (B)")
-        onClicked: pageLoader.source = ""
+    OptionList {
+        id: list
+        model: ZxEmulator.disks.count
+        textOf: (index) => qsTr("Drive %1:").arg(String.fromCharCode(65 + index))
+        onChosen: (index) => page.driveSelected(index)
     }
 }

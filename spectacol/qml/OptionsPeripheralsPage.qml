@@ -16,115 +16,77 @@
 */
 
 import QtQuick
-import QtQuick.Window
 import QtGamepadLegacy
-import QtQuick.Controls
 import Spectacol
 
 // @scope main.qml
 
-Flickable {
-    contentHeight: pane.height
+Sheet {
+    crumb: qsTr("Options")
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Change") },
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+    ]
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
+        buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
-        buttonAKey: Qt.Key_Space
     }
+    title: qsTr("Peripherals")
 
-    FancyPane {
-        id: pane
-        Column {
-            spacing: 2.5 * Screen.pixelDensity
-            anchors.horizontalCenter: parent.horizontalCenter
-            Label {
-                text: qsTr("Peripherals Options")
-            }
+    SettingsList {
+        SettingRow {
+            label: qsTr("Kempston joystick")
+            checked: ZxEmulator.settings.kempstonJoystick
+            onToggled: (on) => ZxEmulator.settings.kempstonJoystick = on
+        }
+        SettingRow {
+            label: qsTr("Kempston mouse")
+            checked: ZxEmulator.settings.kempstonMouse
+            onToggled: (on) => ZxEmulator.settings.kempstonMouse = on
+        }
+        SettingRow {
+            label: qsTr("Interface 1")
+            description: qsTr("Microdrives and the RS232 port")
+            checked: ZxEmulator.settings.interface1
+            onToggled: (on) => ZxEmulator.settings.interface1 = on
+        }
+        SettingRow {
+            label: qsTr("Interface 2")
+            description: qsTr("Two Sinclair joysticks and a cartridge slot")
+            checked: ZxEmulator.settings.interface2
+            onToggled: (on) => ZxEmulator.settings.interface2 = on
+        }
 
-            CheckBox {
-                id: kempstonJoystick
-                KeyNavigation.up: deadZone
-                KeyNavigation.down: kempstonMouse
-                focus: true
-                text: qsTr("Kempston joystick")
-                checked: ZxEmulator.settings.kempstonJoystick
-                onCheckedChanged: ZxEmulator.settings.kempstonJoystick = checked
-            }
-
-            CheckBox {
-                id: kempstonMouse
-                KeyNavigation.up: kempstonJoystick
-                KeyNavigation.down: interface1
-                text: qsTr("Kempston mouse")
-                checked: ZxEmulator.settings.kempstonMouse
-                onCheckedChanged: ZxEmulator.settings.kempstonMouse = checked
-            }
-
-            CheckBox {
-                id: interface1
-                KeyNavigation.up: kempstonMouse
-                KeyNavigation.down: interface2
-                text: qsTr("Interface 1")
-                checked: ZxEmulator.settings.interface1
-                onCheckedChanged: ZxEmulator.settings.interface1 = checked
-            }
-
-            CheckBox {
-                id: interface2
-                KeyNavigation.up: interface1
-                KeyNavigation.down: full48kOSK
-                text: qsTr("Interface 2")
-                checked: ZxEmulator.settings.interface2
-                onCheckedChanged: ZxEmulator.settings.interface2 = checked
-            }
-
-            CheckBox {
-                id: full48kOSK
-                KeyNavigation.up: interface2
-                KeyNavigation.down: recreatedSpectrum
-                text: qsTr("Full On Screen 48k Keyboard")
-                checked: ZxEmulator.settings.full48kOSK
-                onCheckedChanged: ZxEmulator.settings.full48kOSK = checked
-            }
-
-            CheckBox {
-                id: recreatedSpectrum
-                KeyNavigation.up: full48kOSK
-                KeyNavigation.down: joystickPrompt
-                text: qsTr("Recreated spectrum keyboard")
-                checked: ZxEmulator.settings.recreatedSpectrum
-                onCheckedChanged: ZxEmulator.settings.recreatedSpectrum = checked
-            }
-
-            CheckBox {
-                id: joystickPrompt
-                KeyNavigation.up: recreatedSpectrum
-                KeyNavigation.down: deadZone
-                text: qsTr("Snapshot joystick prompt")
-                checked: ZxEmulator.settings.joystickPrompt
-                onCheckedChanged: ZxEmulator.settings.joystickPrompt = checked
-            }
-            Row {
-                Label {
-                    text: "Joystick deadzone"
-                }
-                Slider {
-                    id: deadZone
-                    KeyNavigation.up: joystickPrompt
-                    KeyNavigation.down: kempstonJoystick
-                    from: 0
-                    to: 0.5
-                    stepSize: 0.05
-                    value: ZxEmulator.settings.deadZone
-                    onValueChanged: ZxEmulator.settings.deadZone = value
-                }
-            }
-
-            Button {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Close (B)")
-                onClicked: pageLoader.source = ""
-            }
+        SectionTitle { text: qsTr("Keyboard and gamepad") }
+        SettingRow {
+            label: qsTr("Full on-screen keyboard")
+            description: qsTr("All 40 keys of the 48K, instead of the short one")
+            checked: ZxEmulator.settings.full48kOSK
+            onToggled: (on) => ZxEmulator.settings.full48kOSK = on
+        }
+        SettingRow {
+            label: qsTr("Recreated ZX Spectrum keyboard")
+            description: qsTr("Its game mode, where each key sends two codes")
+            checked: ZxEmulator.settings.recreatedSpectrum
+            onToggled: (on) => ZxEmulator.settings.recreatedSpectrum = on
+        }
+        SettingRow {
+            label: qsTr("Ask for the joystick")
+            description: qsTr("When a snapshot loads and a gamepad is connected")
+            checked: ZxEmulator.settings.joystickPrompt
+            onToggled: (on) => ZxEmulator.settings.joystickPrompt = on
+        }
+        SettingRow {
+            label: qsTr("Stick dead zone")
+            kind: "stepper"
+            from: 0
+            to: 0.5
+            stepSize: 0.05
+            value: ZxEmulator.settings.deadZone
+            valueText: (v) => qsTr("%1%").arg(Math.round(v * 100))
+            onMoved: (v) => ZxEmulator.settings.deadZone = v
         }
     }
 }
