@@ -246,7 +246,7 @@ ColumnLayout {
         hints: [
             { pad: "A", key: "Enter", text: qsTr("Select"), action: () => root.openSelectedMenu() },
             { pad: "B", key: "Esc", text: root.menus.length ? qsTr("Back") : qsTr("Close"), action: () => root.popMenu() },
-            { pad: "Menu", key: "F1", text: qsTr("Close"), action: () => menuBar.close() }
+            { pad: "Menu", key: "F5", text: qsTr("Close"), action: () => menuBar.close() }
         ]
     }
 
@@ -258,7 +258,7 @@ ColumnLayout {
         upKey: Qt.Key_Up
         downKey: Qt.Key_Down
         buttonAKey: Qt.Key_Return
-        buttonStartKey: Qt.Key_F1
+        buttonStartKey: Qt.Key_F5
         buttonBKey: Qt.Key_Escape
     }
 }

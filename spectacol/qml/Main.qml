@@ -146,7 +146,8 @@ ApplicationWindow {
 
         Keys.onPressed: (event)=> {
             switch (event.key) {
-            case Qt.Key_F1:
+            // F1-F4 belong to the emulated machine (the CoBra's keys): Spectacol's own keys are F5 on
+            case Qt.Key_F5:
             case Qt.Key_Search:
             case Qt.Key_Guide:
             case Qt.Key_Menu:
@@ -162,7 +163,7 @@ ApplicationWindow {
                 event.accepted = true;
                 break;
 
-            case Qt.Key_F4:
+            case Qt.Key_F6:
                 pageLoader.source = "FileBrowserPage.qml";
                 event.accepted = true;
                 break;
@@ -324,7 +325,7 @@ ApplicationWindow {
                 radius: 7
                 checkable: true
                 checked: false
-                text: "Sticky CS/SS"
+                text: onScreen48Keyboard.cobraMode ? "Sticky CS/SS/CTRL" : "Sticky CS/SS"
             }
 
             Image {

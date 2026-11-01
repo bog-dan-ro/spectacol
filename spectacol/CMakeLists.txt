@@ -42,10 +42,7 @@ qt_add_resources(spectacol "resources"
         roms/cobra1_sys-1.rom
         roms/cobra1_sys-2.rom
         roms/cobra1_sys-3.rom
-        roms/cobra2_TS_4_OS-0.rom
-        roms/cobra2_TS_4_OS-1.rom
-        roms/cobra2_TS_4_OS-2.rom
-        roms/cobra2_TS_4_OS-3.rom
+        roms/cobra2_ts_boot.rom
         roms/disciple.rom
         roms/gluck.rom
         roms/hc-if1.rom

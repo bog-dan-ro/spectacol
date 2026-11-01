@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <QGuiApplication>
 #include <QKeyEvent>
 #include <QKeySequence>
+#include <QMetaEnum>
 #include <QMouseEvent>
 #include <QQmlApplicationEngine>
 #include <QQuickWindow>
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
     parser.addOption(quitAfterOption);
     parser.addOption(screenshotOption);
     parser.addOption(uiScreenshotOption);
-    const QCommandLineOption uiKeysOption(u"ui-keys"_s, u"Press keys in the window, one every 300 ms from 1 s on, e.g. F1,Down,Return (to screenshot a page); click:X:Y clicks at a window position."_s, u"keys"_s);
+    const QCommandLineOption uiKeysOption(u"ui-keys"_s, u"Press keys in the window, one every 300 ms from 1 s on, e.g. F5,Down,Return (to screenshot a page); click:X:Y clicks at a window position, down:KEY and up:KEY only press or release a key (e.g. down:Control,0,up:Control), wait idles 300 ms."_s, u"keys"_s);
     parser.addOption(windowSizeOption);
     parser.addOption(uiKeysOption);
     parser.addPositionalArgument(u"file"_s, u"Snapshot, tape, disk or recording to load."_s, u"[file]"_s);
@@ -99,6 +100,9 @@ int main(int argc, char *argv[])
     if (parser.isSet(uiKeysOption)) {
         const QStringList keys = parser.value(uiKeysOption).split(u',', Qt::SkipEmptyParts);
         for (qsizetype i = 0; i < keys.size(); ++i) {
+            // wait: an idle 300 ms slot
+            if (keys[i].trimmed() == u"wait"_s)
+                continue;
             if (keys[i].startsWith(u"click:"_s)) {
                 const QStringList xy = keys[i].split(u':');
                 const QPointF pos(xy.value(1).toDouble(), xy.value(2).toDouble());
@@ -108,6 +112,25 @@ int main(int argc, char *argv[])
                         QCoreApplication::sendEvent(w, &press);
                         QMouseEvent release(QEvent::MouseButtonRelease, pos, w->mapToGlobal(pos), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
                         QCoreApplication::sendEvent(w, &release);
+                    }
+                });
+                continue;
+            }
+            if (keys[i].startsWith(u"down:"_s) || keys[i].startsWith(u"up:"_s)) {
+                // down:KEY / up:KEY: only press or release a key (a Qt::Key name without "Key_"), to
+                // hold a modifier around other keys, e.g. down:Control,0,up:Control
+                const bool down = keys[i].startsWith(u"down:"_s);
+                const QByteArray name = "Key_" + keys[i].section(u':', 1).trimmed().toLatin1();
+                bool ok = false;
+                const int key = QMetaEnum::fromType<Qt::Key>().keyToValue(name.constData(), &ok);
+                if (!ok) {
+                    qWarning().noquote() << "Unknown key" << keys[i];
+                    continue;
+                }
+                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), &app, [key, down, window] {
+                    if (auto *w = window()) {
+                        QKeyEvent event(down ? QEvent::KeyPress : QEvent::KeyRelease, key, Qt::NoModifier);
+                        QCoreApplication::sendEvent(w, &event);
                     }
                 });
                 continue;
@@ -124,8 +147,14 @@ int main(int argc, char *argv[])
                 if (auto *w = window()) {
                     QKeyEvent press(QEvent::KeyPress, key.key(), key.keyboardModifiers(), text);
                     QCoreApplication::sendEvent(w, &press);
-                    QKeyEvent release(QEvent::KeyRelease, key.key(), key.keyboardModifiers(), text);
-                    QCoreApplication::sendEvent(w, &release);
+                    // Keep it down across several emulated frames, so the ROM's keyboard scan
+                    // sees it too (an immediate release only reaches the QML UI).
+                    QTimer::singleShot(std::chrono::milliseconds(80), w, [key, text, window] {
+                        if (auto *target = window()) {
+                            QKeyEvent release(QEvent::KeyRelease, key.key(), key.keyboardModifiers(), text);
+                            QCoreApplication::sendEvent(target, &release);
+                        }
+                    });
                 }
             });
         }

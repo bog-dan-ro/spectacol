@@ -43,7 +43,7 @@ XDG_CONFIG_HOME=/tmp/spx/config XDG_DATA_HOME=/tmp/spx/data QT_QPA_PLATFORM=offs
 ```
 
 `--screenshot` saves the emulated screen, `--ui-screenshot ui.png` the whole window (`--window-size 1280x800`
-sets its size). `--ui-keys F1,Down,Return` presses keys in the window (one every 300 ms from the first second on),
+sets its size). `--ui-keys F5,Down,Return` presses keys in the window (one every 300 ms from the first second on),
 to reach a page before the screenshot; `click:X:Y` in the list clicks at a window position (the desktop menu bar). The first run with new settings shows the welcome page, which pauses the emulation. To skip it,
 and to keep the data (snapshots, downloads) out of your own folder, start with this
 `$XDG_CONFIG_HOME/Licentia/Spectacol.conf` (`[General]` holds the top level keys, `[%General]` the "General" group of
@@ -91,3 +91,13 @@ the Qt for Android kit, the Android SDK and NDK, and the OpenSSL libraries of th
 ```sh
 git submodule update --init --recursive
 ```
+
+The CoBra keyboard regression drives the compiled on-screen keyboard, selects sticky
+CTRL+0 and checks the ROM CP/M CPU state (no external disk required):
+
+```sh
+python3 tests/cobra_keyboard.py
+```
+
+Its screenshots, snapshot and log go to `build/cobra-keyboard`; it uses temporary
+settings and app data. `--binary` and `--output` override the defaults.

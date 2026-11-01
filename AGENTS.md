@@ -15,7 +15,7 @@ cmake --build build
 ./build/bin/spectacol [--machine ID] [--list-machines] [file.tzx|.tap|.z80|.nex|...]
 # headless check: QT_QPA_PLATFORM=offscreen ./build/bin/spectacol --machine next --quit-after 14 --screenshot next.png
 # the whole UI: --ui-screenshot ui.png [--window-size 1280x800] (the offscreen platform renders with Qt Quick's
-# software backend, ZxScreen has a path for it); --ui-keys F1,Down,Return presses keys to open a page first
+# software backend, ZxScreen has a path for it); --ui-keys F5,Down,Return presses keys to open a page first
 # (click:X:Y clicks), e.g. the desktop menu bar
 ```
 

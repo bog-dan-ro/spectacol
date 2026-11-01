@@ -301,6 +301,8 @@ public slots:
 
     void keyPress(int qtKey, int modifiers = 0, bool autoRepeat = false, bool virtualKeyboard = true);
     void keyRelease(int qtKey, int modifiers = 0, bool autoRepeat = false, bool virtualKeyboard = true);
+    // The on-screen CoBra column, independent of the Spectrum modifier mapping.
+    void setCobraKeyState(int qtKey, bool pressed);
     void gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value);
     void gamepadButtonPressEvent(QGamepadManager::GamepadButton button);
     void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button);

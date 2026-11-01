@@ -66,6 +66,34 @@ struct MappedZxKeys {
     std::optional<zxkit::ZxKey> modifier;
 };
 
+// The CoBra 1's keyboard has a sixth column: CTRL, NO SCROLL, LINE FEED, ESC and F1-F4. The
+// host's keys for them, on a physical keyboard (the on-screen keyboard's Control is Symbol Shift).
+// Spectacol's own keys start at F5.
+std::optional<zxkit::ZxKey> cobraKey(int qtKey, int modifiers)
+{
+    using zxkit::ZxKey;
+    switch (qtKey) {
+    case Qt::Key_Control:    return ZxKey::Ctrl;
+    case Qt::Key_Escape:     return ZxKey::Esc;
+    case Qt::Key_ScrollLock: return ZxKey::NoScroll;
+    case Qt::Key_Enter:
+        // the keypad's Enter
+        if (modifiers & Qt::KeypadModifier)
+            return ZxKey::LineFeed;
+        return std::nullopt;
+    case Qt::Key_F1:         return ZxKey::F1;
+    case Qt::Key_F2:         return ZxKey::F2;
+    case Qt::Key_F3:         return ZxKey::F3;
+    case Qt::Key_F4:         return ZxKey::F4;
+    default:                 return std::nullopt;
+    }
+}
+
+bool hasCobraKeyboard(const zxkit::Emulator &emulator)
+{
+    return emulator.machine().id().starts_with("cobra1");
+}
+
 MappedZxKeys mapQtKeyToZx(int qtKey, int modifiers)
 {
     using zxkit::ZxKey;
@@ -1196,6 +1224,17 @@ void ZxEmulator::pokeMemory(int address, int page, int value)
     }
 }
 
+void ZxEmulator::setCobraKeyState(int qtKey, bool pressed)
+{
+    if (pressed && m_paused)
+        return;
+    auto emulator = this->emulator().writeLock();
+    if (hasCobraKeyboard(*emulator)) {
+        if (const auto key = cobraKey(qtKey, Qt::KeypadModifier))
+            emulator->setKeyState(*key, pressed);
+    }
+}
+
 void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
 {
     if (m_paused || autoRepeat)
@@ -1207,11 +1246,15 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
         return;
     }
 
-    const auto mapped = mapQtKeyToZx(qtKey, modifiers);
-    if (!mapped.primary && !mapped.modifier)
-        return;
-
     auto emulator = this->emulator().writeLock();
+    if (!virtualKeyboard && hasCobraKeyboard(*emulator)) {
+        if (const auto key = cobraKey(qtKey, modifiers)) {
+            emulator->setKeyState(*key, true);
+            return;
+        }
+    }
+
+    const auto mapped = mapQtKeyToZx(qtKey, modifiers);
     if (mapped.modifier)
         emulator->setKeyState(*mapped.modifier, true);
     if (mapped.primary)
@@ -1220,17 +1263,22 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
 
 void ZxEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
 {
-    if (m_paused || autoRepeat)
+    // Closing a keyboard/page can release keys after emulation has already paused.
+    if (autoRepeat)
         return;
     // The Recreated keyboard tells its releases with characters too (see keyPress)
     if (!virtualKeyboard && m_settings->recreatedSpectrum())
         return;
 
-    const auto mapped = mapQtKeyToZx(qtKey, modifiers);
-    if (!mapped.primary && !mapped.modifier)
-        return;
-
     auto emulator = this->emulator().writeLock();
+    if (!virtualKeyboard && hasCobraKeyboard(*emulator)) {
+        if (const auto key = cobraKey(qtKey, modifiers)) {
+            emulator->setKeyState(*key, false);
+            return;
+        }
+    }
+
+    const auto mapped = mapQtKeyToZx(qtKey, modifiers);
     if (mapped.primary)
         emulator->setKeyState(*mapped.primary, false);
     if (mapped.modifier)

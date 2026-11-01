@@ -71,3 +71,45 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+cobra1_boot.rom
+cobra1_sys-0.rom
+cobra1_sys-1.rom
+cobra1_sys-2.rom
+cobra1_sys-3.rom
+
+The CoBra 1 (Computer Brasov, ITC Brasov, 1986) ROMs, the official images published by the
+CoBra Project (Cristian Savu, https://cobrasov.com/CoBra%20Project/boot.html) for the computer
+and its emulators:
+- cobra1_boot.rom is 16K_UNIFIED_BOOT_rev.01.bin, the Unified CoBra Boot (the Boot Manager
+  and the original 2K boots), 12K programmed, padded to 16K with 0xFF as an erased EPROM;
+- cobra1_sys-0..3.rom are SYSTEM_ROM.bin, the 64K system EPROM (OPUS, BASIC, DEVIL and the
+  ROM CP/M), padded with 0xFF and split in 16K pages.
+The BASIC page is the Sinclair 48K ROM and the others derive from it: the Amstrad
+statement above applies to that code.
+
+cobra2_ts_boot.rom
+
+The CoBra 2, the Turbo Spectrum, designed by Sorin Cismas: ts_boot.bin (v1.0, 2022), the
+official 16K EEPROM image from https://cobrasov.org/download/, copyright 2022 The Cismas
+Foundation under the MIT license (its source is ts_boot.asm on the same page). The compacted Sinclair ROM it carries is covered by the Amstrad statement above.
+
+Copyright 2022 The Cismas Foundation, under the terms of the MIT License.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
