@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,8 @@ ZxMenuItem {
 
     ZxMenuItem {
         visible: ZxEmulator.recording.type !== ZxRecording.None
-        text: qsTr("Stop ") + (ZxEmulator.recording.type === ZxRecording.Playback ? qsTr("Playback") : qsTr("Recording"))
+        text: ZxEmulator.recording.type === ZxRecording.Unsaved ? qsTr("Retry recording save")
+              : qsTr("Stop ") + (ZxEmulator.recording.type === ZxRecording.Playback ? qsTr("Playback") : qsTr("Recording"))
         onTriggered: {
             menuBar.close();
             ZxEmulator.recording.stop();
@@ -66,7 +67,6 @@ ZxMenuItem {
         text: qsTr("Media")
 
         ZxMenuItem {
-            visible: false
             text: qsTr("&Save snapshot as ...")
             onTriggered: {
                 menuBar.close();
@@ -76,6 +76,13 @@ ZxMenuItem {
 
         ZxMenuItem {
             text: qsTr("Tape")
+            ZxMenuItem {
+                text: qsTr("New blank tape")
+                onTriggered: {
+                    menuBar.close();
+                    pageLoader.source = "NewTapePage.qml";
+                }
+            }
             ZxMenuItem {
                 text: "Open"
                 onTriggered: {
@@ -105,14 +112,6 @@ ZxMenuItem {
                 onTriggered: {
                     menuBar.close();
                     ZxEmulator.tape.rewind();
-                }
-            }
-
-            ZxMenuItem {
-                text: qsTr("Clear")
-                onTriggered: {
-                    menuBar.close();
-                    ZxEmulator.tape.clear();
                 }
             }
 

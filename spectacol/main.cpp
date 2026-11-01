@@ -99,6 +99,8 @@ int main(int argc, char *argv[])
         ZxEmulator::instance().load(QFileInfo(parser.positionalArguments().first()).absoluteFilePath());
     if (parser.isSet(uiKeysOption)) {
         const QStringList keys = parser.value(uiKeysOption).split(u',', Qt::SkipEmptyParts);
+        // Coarse timers can merge adjacent slots in long scripts and reorder
+        // modifier transitions. Keep scripted input on the requested timeline.
         for (qsizetype i = 0; i < keys.size(); ++i) {
             // wait: an idle 300 ms slot
             if (keys[i].trimmed() == u"wait"_s)
@@ -106,7 +108,7 @@ int main(int argc, char *argv[])
             if (keys[i].startsWith(u"click:"_s)) {
                 const QStringList xy = keys[i].split(u':');
                 const QPointF pos(xy.value(1).toDouble(), xy.value(2).toDouble());
-                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), &app, [pos, window] {
+                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app, [pos, window] {
                     if (auto *w = window()) {
                         QMouseEvent press(QEvent::MouseButtonPress, pos, w->mapToGlobal(pos), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
                         QCoreApplication::sendEvent(w, &press);
@@ -127,7 +129,7 @@ int main(int argc, char *argv[])
                     qWarning().noquote() << "Unknown key" << keys[i];
                     continue;
                 }
-                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), &app, [key, down, window] {
+                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app, [key, down, window] {
                     if (auto *w = window()) {
                         QKeyEvent event(down ? QEvent::KeyPress : QEvent::KeyRelease, key, Qt::NoModifier);
                         QCoreApplication::sendEvent(w, &event);
@@ -143,13 +145,13 @@ int main(int argc, char *argv[])
             const QKeyCombination key = sequence[0];
             // A single character is also typed (text fields)
             const QString text = keys[i].size() == 1 ? keys[i] : QString{};
-            QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), &app, [key, text, window] {
+            QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app, [key, text, window] {
                 if (auto *w = window()) {
                     QKeyEvent press(QEvent::KeyPress, key.key(), key.keyboardModifiers(), text);
                     QCoreApplication::sendEvent(w, &press);
                     // Keep it down across several emulated frames, so the ROM's keyboard scan
                     // sees it too (an immediate release only reaches the QML UI).
-                    QTimer::singleShot(std::chrono::milliseconds(80), w, [key, text, window] {
+                    QTimer::singleShot(std::chrono::milliseconds(80), Qt::PreciseTimer, w, [key, text, window] {
                         if (auto *target = window()) {
                             QKeyEvent release(QEvent::KeyRelease, key.key(), key.keyboardModifiers(), text);
                             QCoreApplication::sendEvent(target, &release);

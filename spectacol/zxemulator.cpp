@@ -31,6 +31,7 @@
 #include <QAudioSink>
 #include <QBuffer>
 #include <QDateTime>
+#include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
@@ -41,6 +42,7 @@
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QSettings>
+#include <QSaveFile>
 #include <QStandardPaths>
 #include <QTimer>
 
@@ -61,6 +63,30 @@ using namespace Qt::StringLiterals;
 namespace {
 
 static constexpr std::chrono::microseconds kAudioBufferDuration{80'000};
+
+QString saveName(QString name, const QString &fallback)
+{
+    name = name.trimmed();
+    for (QChar &ch : name) {
+        if (ch.unicode() < 32 || ch.unicode() == 127 || u"<>:\"/\\|?*"_s.contains(ch))
+            ch = u'_';
+    }
+    while (name.endsWith(u'.') || name.endsWith(u' '))
+        name.chop(1);
+    if (name.isEmpty())
+        return fallback;
+    const QString stem = name.section(u'.', 0, 0).toUpper();
+    if (stem == u"CON"_s || stem == u"PRN"_s || stem == u"AUX"_s || stem == u"NUL"_s
+        || (stem.size() == 4 && (stem.startsWith(u"COM"_s) || stem.startsWith(u"LPT"_s))
+            && stem.back() >= u'1' && stem.back() <= u'9'))
+        name.prepend(u'_');
+    return name;
+}
+
+QString saveTimestamp()
+{
+    return QDateTime::currentDateTime().toString(u"yyyy-MM-dd_hh_mm_ss_zzz"_s);
+}
 
 struct MappedZxKeys {
     std::optional<zxkit::ZxKey> primary;
@@ -778,9 +804,23 @@ bool ZxEmulator::saveMediaFile(const QString &filePath)
     } else if (!withEmulator([&bytes, &suffix](zxkit::Emulator &emulator) { bytes = emulator.saveMedia(suffix.toStdString()); })) {
         return false;
     }
-    QFile f(filePath);
-    if (!f.open(QIODevice::WriteOnly) || f.write(QByteArrayView(bytes).data(), qint64(bytes.size())) != qint64(bytes.size())) {
-        showMessage(tr("Can't write '%1'").arg(filePath), Error);
+    return writeFileBytes(filePath, bytes);
+}
+
+bool ZxEmulator::writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes)
+{
+    const QDir folder = QFileInfo(filePath).absoluteDir();
+    if (!folder.mkpath(u"."_s)) {
+        const QString message = tr("Can't create folder '%1'").arg(folder.absolutePath());
+        showMessage(message, Error);
+        return false;
+    }
+    QSaveFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly)
+        || file.write(reinterpret_cast<const char *>(bytes.data()), qint64(bytes.size())) != qint64(bytes.size())
+        || !file.commit()) {
+        const QString message = tr("Can't save '%1': %2").arg(filePath, file.errorString());
+        showMessage(message, Error);
         return false;
     }
     return true;
@@ -884,29 +924,43 @@ void ZxEmulator::quit()
 
 QString ZxEmulator::snapshotsPath() const
 {
-    return dataPath() + u"Snapshots/"_s;
+    return QDir(dataPath()).filePath(u"Snapshots/"_s);
 }
 
 QString ZxEmulator::recordingsPath() const
 {
-    return dataPath() + u"Recordings/"_s;
+    return QDir(dataPath()).filePath(u"Recordings/"_s);
 }
 
 QString ZxEmulator::savesPath() const
 {
-    return dataPath() + u"Saves/"_s;
+    return QDir(dataPath()).filePath(u"Saves/"_s);
 }
 
 QString ZxEmulator::recordingFilePath() const
 {
-    return recordingsPath() + (m_loadedFileName.isEmpty() ? u"Generic"_s : m_loadedFileName) +
-           QDateTime::currentDateTime().toString(u".yyyy-MM-dd_hh:mm:ss"_s) + u".rzx"_s;
+    return QDir(recordingsPath()).filePath(saveName(m_loadedFileName, u"Generic"_s) + u'.' + saveTimestamp() + u".rzx"_s);
 }
 
-QString ZxEmulator::saveSnapshotsFilePath(const QString &filePath) const
+QString ZxEmulator::tapeFileName(const QString &programName) const
 {
-    return savesPath() + "Snapshots/" + (filePath.isEmpty() ? u"Unnamed"_s : filePath) +
-           QDateTime::currentDateTime().toString(u"_yyyy-MM-dd_hh:mm:ss"_s) + u".tzx"_s;
+    return saveName(programName, u"Unnamed"_s) + u'_' + saveTimestamp() + u".tap"_s;
+}
+
+QString ZxEmulator::tapeFilePath(const QString &fileName) const
+{
+    QString name = fileName.trimmed();
+    if (name.endsWith(u".tap"_s, Qt::CaseInsensitive))
+        name.chop(4);
+    return QDir(savesPath()).filePath(saveName(name, u"Unnamed"_s) + u".tap"_s);
+}
+
+QString ZxEmulator::snapshotFilePath(const QString &folder, const QString &fileName) const
+{
+    QString name = fileName.trimmed();
+    if (name.endsWith(u".szx"_s, Qt::CaseInsensitive))
+        name.chop(4);
+    return QDir(folder.trimmed().isEmpty() ? snapshotsPath() : folder).filePath(saveName(name, u"Snapshot"_s) + u".szx"_s);
 }
 
 void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
@@ -920,8 +974,10 @@ void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
     const bool storageBusy = activity.busyDisks != 0 || activity.sdCardBusy;
     if (storageBusy != (previous.busyDisks != 0 || previous.sdCardBusy))
         emit uiIconUpdate(Disk, storageBusy ? Active : Inactive);
-    if (activity.tapeBlock != previous.tapeBlock)
+    if (activity.tapeBlock != previous.tapeBlock) {
+        m_tape->refreshData();
         emit tapeBlockChanged(int(activity.tapeBlock));
+    }
 }
 
 void ZxEmulator::load(const QString &filePath, bool removeOnFail)
@@ -974,14 +1030,12 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
         emit configureJoystick();
 }
 
-void ZxEmulator::save(const QString &filePath)
+bool ZxEmulator::save(const QString &filePath)
 {
-    QDir d = QFileInfo(filePath).absoluteDir();
-    d.mkpath(d.absolutePath());
     if (!saveMediaFile(filePath))
-        QFile::remove(filePath);
-    else
-        showMessage(tr("File saved to '%1'").arg(filePath), Info);
+        return false;
+    showMessage(tr("File saved to '%1'").arg(filePath), Info);
+    return true;
 }
 
 void ZxEmulator::copyToFavourites(const QString &filePath)
@@ -1078,24 +1132,26 @@ void ZxEmulator::quickSaveSnapshot()
     if (m_loadedFileName.isEmpty())
         return;
 
-    const QString name = m_loadedFileName + u'/' + m_loadedFileName +
-                         QDateTime::currentDateTime().toString(u".yyyy-MM-dd_hh:mm:ss"_s) +
-                         u".szx"_s;
-    save(snapshotsPath() + name);
+    const QString base = saveName(m_loadedFileName, u"Snapshot"_s);
+    const QString name = base + u'/' + base + u'.' + saveTimestamp() + u".szx"_s;
+    save(QDir(snapshotsPath()).filePath(name));
 }
 
 void ZxEmulator::quickLoadSnapshot()
 {
-    QDir dir(snapshotsPath());
-    auto list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Time);
-    if (list.size())
-        list = QDir(list.first().absoluteFilePath()).entryInfoList(QDir::Files, QDir::Time);
-    else
-        list = dir.entryInfoList(QDir::Files, QDir::Time);
-
-    if (list.size()) {
-        load(list.first().filePath(), true);
-        showMessage(tr("Snapshot loaded from '%1'").arg(list.first().fileName()));
+    QFileInfo latest;
+    QDirIterator files(snapshotsPath(), {u"*.szx"_s, u"*.sna"_s}, QDir::Files, QDirIterator::Subdirectories);
+    while (files.hasNext()) {
+        files.next();
+        const auto candidate = files.fileInfo();
+        if (latest.filePath().isEmpty() || candidate.lastModified() > latest.lastModified())
+            latest = candidate;
+    }
+    if (!latest.filePath().isEmpty()) {
+        // User snapshots are never deleted when loading fails.
+        load(latest.absoluteFilePath());
+        if (!m_loadedFileName.isEmpty())
+            showMessage(tr("Snapshot loaded from '%1'").arg(latest.fileName()));
     }
 }
 

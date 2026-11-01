@@ -94,6 +94,19 @@ chains can reduce rendering performance; the emulator frame callback continues
 to publish native frames. Spectacol links the separate `ZX::VideoFilters` target;
 other ZxKit consumers can continue to link only `ZX::Kit`.
 
+## Saving regression
+
+The saving check uses the real BASIC ROM to load a generated program, saves it to a blank tape, exports TAP
+through the compiled UI and compares the program bytes after reload. It also checks snapshot Save As, portable
+quick-save names, failed-write recovery and retrying an RZX recording without recording it again:
+
+```sh
+python3 tests/saving.py
+```
+
+Logs, screenshots and round-trip media go to `build/saving`. The test uses temporary settings and data;
+`--binary` and `--output` override the defaults. Android storage access is a separate postponed task.
+
 ## Android
 
 The Android build has not been ported to CMake and Qt 6 yet (see the Android section of `TODO.md`). It will need

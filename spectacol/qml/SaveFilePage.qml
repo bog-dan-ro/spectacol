@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,71 +16,90 @@
 */
 
 import QtQuick
-import Spectacol
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import QtQuick.Window
 import QtQuick.Controls
+import QtGamepadLegacy
+import Spectacol
 
-Rectangle {
-    id: saveFilePage
-    color: Theme.surface
-
-    property alias title: title.text
+// @scope main.qml
+Sheet {
+    id: page
+    crumb: qsTr("Media")
     property alias fileName: fileNameEdit.text
     property alias folder: pathEdit.text
-
+    property string destinationPath
     signal accepted
     signal canceled
-
-    GridLayout {
-        columns: 2
-        anchors.centerIn: parent
-
-        FancyText {
-            id: title
-            Layout.alignment: Qt.AlignRight
+    onCloseRequested: canceled()
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Save"), action: () => page.accepted() },
+        { pad: "B", key: "Esc", text: qsTr("Cancel"), action: () => page.canceled() }
+    ]
+    GamepadKeyNavigation {
+        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
+        buttonAKey: Qt.Key_Return
+        buttonBKey: Qt.Key_Escape
+    }
+    FolderDialog {
+        id: browseFolder
+        currentFolder: "file://" + pathEdit.text
+        onAccepted: pathEdit.text = decodeURIComponent(selectedFolder.toString().replace(/^file:\/\//, ""))
+    }
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: Theme.sp(6)
+        spacing: Theme.sp(4)
+        Text {
+            text: qsTr("File name (.szx)")
+            font.pixelSize: Theme.body
+            color: Theme.text
         }
-
         FancyTextField {
             id: fileNameEdit
-            implicitWidth: saveFilePage.width / 2
             Layout.fillWidth: true
-            placeholderText: qsTr("Enter file name")
+            focus: true
+            selectByMouse: true
+            onAccepted: page.accepted()
         }
-
-        FancyText {
-            text: qsTr("Path:")
-            Layout.alignment: Qt.AlignRight
+        Text {
+            text: qsTr("Folder")
+            font.pixelSize: Theme.body
+            color: Theme.text
         }
-
         RowLayout {
             Layout.fillWidth: true
             FancyTextField {
                 id: pathEdit
                 Layout.fillWidth: true
-                placeholderText: qsTr("Enter file path")
+                selectByMouse: true
+                onAccepted: page.accepted()
             }
             Button {
-                FolderDialog {
-                    id: browseFolder
-                    // the folder is a local path (Linux, Android), the dialog uses urls
-                    currentFolder: "file://" + pathEdit.text
-                    onAccepted: pathEdit.text = decodeURIComponent(selectedFolder.toString().replace(/^file:\/\//, ""))
-                }
                 text: qsTr("Browse")
                 onClicked: browseFolder.open()
             }
         }
-
-        Button {
-            Layout.alignment: Qt.AlignRight
-            text: qsTr("Save")
-            onClicked: saveFilePage.accepted()
+        Text {
+            Layout.fillWidth: true
+            visible: text !== ""
+            text: page.destinationPath
+            wrapMode: Text.WrapAnywhere
+            font.pixelSize: Theme.caption
+            color: Theme.textMuted
         }
-        Button {
-            text: qsTr("Cancel")
-            onClicked: saveFilePage.canceled()
+        RowLayout {
+            Button {
+                text: qsTr("Save")
+                onClicked: page.accepted()
+                Keys.onReturnPressed: page.accepted()
+            }
+            Button {
+                text: qsTr("Cancel")
+                onClicked: page.canceled()
+                Keys.onReturnPressed: page.canceled()
+            }
         }
+        Item { Layout.fillHeight: true }
     }
 }

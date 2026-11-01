@@ -34,6 +34,27 @@ F1 to F4 belong to the emulated machine (the CoBra's function keys); Spectacol's
 On a CoBra 1, Ctrl is CTRL, Esc is ESC, Scroll Lock is NO SCROLL and the keypad's Enter is LINE FEED.
 Elsewhere Ctrl, Alt and Meta are Symbol Shift and Esc is BREAK.
 
+## Saving programs and snapshots
+
+To save a BASIC program to a tape:
+
+1. Choose **Media → Tape → New blank tape**, then **Create blank tape**. This replaces the inserted tape and
+   keeps your program in memory. Export the old tape first if you want to keep its blocks.
+2. In BASIC, enter `SAVE "name"`, press Enter, then press Enter again when the ROM asks you to start the tape.
+3. Choose **Media → Tape → Save**, check the destination and export the `.tap` file. It includes the original
+   Spectrum headers and data, ready to load in another emulator or transfer to a real Spectrum.
+
+Input recording (`.rzx`) records a play session. Stop input recording/playback before using BASIC `SAVE`;
+use tape export to share a program. Tape export currently supports `.tap`.
+
+**Media → Save snapshot as** saves the current state as `.szx`, even if you started with a blank machine.
+The file and folder can be edited. Generated tape, snapshot and RZX names use portable timestamps, and
+filename punctuation such as colons and slashes is replaced with underscores.
+Quick load finds the newest snapshot across Save As files and per-game quick-save folders.
+
+Save failures keep the editor open and leave existing files intact. A failed RZX save keeps the recording in
+memory; **Spectacol → Retry recording save** retries it after the destination is available. Retry before quitting.
+
 ## CoBra
 
 Pick CoBra 1 (64KB or 80KB) or CoBra 2 (TS) in the machine picker. CoBra 1 starts at its

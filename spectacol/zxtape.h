@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <QTimer>
 #include <QQmlEngine>
 
 #include <QObject>
@@ -31,22 +30,24 @@ class ZxTape : public QObject
     Q_PROPERTY(bool hasTape MEMBER m_hasTape NOTIFY hasTapeChanged)
     Q_PROPERTY(QString programName MEMBER m_programName NOTIFY programNameChanged)
     Q_PROPERTY(bool playing READ playing NOTIFY playingChanged)
+    Q_PROPERTY(QString suggestedFileName READ suggestedFileName NOTIFY programNameChanged)
 
 public:
     explicit ZxTape(ZxEmulator *parent = 0);
     void updateBrowseData();
     QString programName() const { return m_programName; }
     void setProgramName(const QString &programName);
-    void refreshData();
+    Q_INVOKABLE void refreshData();
     bool playing() const { return m_playing; }
     void setPlaying(bool playing);
+    QString suggestedFileName() const;
 
 public slots:
     void open(QString filePath);
     void togglePlay();
     void rewind();
     void clear();
-    void write(QString filePath);
+    bool write(QString filePath);
 
 signals:
     void hasTapeChanged(bool hasTape);
@@ -58,8 +59,6 @@ private:
 
     bool m_hasTape = false;
     bool m_playing = false;
-    QByteArray m_tapeData;
     QString m_programName;
     ZxEmulator *m_zxEmulator = nullptr;
-    QTimer m_saveSnapshotTimer;
 };

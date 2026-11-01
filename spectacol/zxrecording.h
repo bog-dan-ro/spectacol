@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 #include <QQmlEngine>
 
 #include <QObject>
+#include <vector>
+#include <cstdint>
 
 class ZxEmulator;
 class ZxRecording : public QObject
@@ -34,7 +36,8 @@ public:
     enum class Type {
         None,
         Playback,
-        Recording
+        Recording,
+        Unsaved
     };
     Q_ENUM(Type)
 
@@ -54,6 +57,9 @@ signals:
     void typeChanged(Type type);
 
 private:
+    bool savePendingRecording();
+    std::vector<uint8_t> m_pendingRecording;
+    QString m_pendingPath;
     ZxEmulator *m_emulator;
     Type m_type = Type::None;
 };

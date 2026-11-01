@@ -32,8 +32,10 @@ controls, netplay, Google Play sharing, new platform ports and the broad metadat
         built from the same menu, a status bar, pages docked beside the screen (the tape browser keeps the tape
         playing).
   - [ ] Options › Screen and the filters list keep the old look: they hold the screen filter UI (owner's work).
-  - [ ] Still the old structure, only recoloured: poke finder and manager, online search, the save pages, the
+  - [ ] Still the old structure, only recoloured: poke finder and manager, online search, the
         gamepad pages (customize, calibrate), the on-screen keyboard and joysticks.
+  - [x] Tape creation/export and snapshot Save As use themed sheets with keyboard/gamepad actions and
+        destination previews. Failed writes leave the editor open for retry.
   - [ ] One icon set (the cover flow's 3D folder and floppy art, SVG and PNG mixed).
   - [ ] Desktop menu shortcuts shown next to the items, and more shortcuts (reset, pause, screenshot).
 
@@ -107,13 +109,20 @@ controls, netplay, Google Play sharing, new platform ports and the broad metadat
 
 ## Files, saving and playback
 
-- [ ] **Portable save names** ([#153](https://github.com/bog-dan-ro/spectacol/issues/153),
-      [#155](https://github.com/bog-dan-ro/spectacol/issues/155)): replace `hh:mm:ss` in generated tape/RZX names
-      with `hh_mm_ss`, sanitize the program-name component, and check/report write failures.
-- [ ] **Save BASIC to a tape** ([#155](https://github.com/bog-dan-ro/spectacol/issues/155)): make a new blank tape,
-      collect ROM `SAVE` blocks and export a reusable `.tap`; distinguish this from RZX input recording. The
-      current SaveTape page asks for `.tzx`, but ZxKit only writes `.tap`: offer supported formats, then TZX when
-      ZxKit gains its writer. Explain the workflow and verify save/reload on an empty tape.
+- [x] **Portable save names** ([#153](https://github.com/bog-dan-ro/spectacol/issues/153),
+      [#155](https://github.com/bog-dan-ro/spectacol/issues/155)): tape exports, quick snapshots and RZX files use
+      `hh_mm_ss_zzz` timestamps and sanitized filename components. Shared `QSaveFile` writes check open, write and
+      commit errors and preserve existing files on failure. Failed RZX saves keep their bytes in memory and offer
+      "Retry recording save". Android storage access remains postponed below.
+- [x] **Save BASIC to a tape** ([#155](https://github.com/bog-dan-ro/spectacol/issues/155)): Media → Tape → New blank
+      tape keeps the program in RAM; ROM `SAVE` collects blocks, and Tape → Save exports `.tap` with a destination
+      preview. The page explains the difference from RZX and stays open on failure. Tape metadata follows new SAVE
+      blocks and clears on a new tape. `tests/saving.py` checks real-ROM SAVE, TAP checksums and exact program bytes
+      after reload. TZX export remains dependent on ZxKit's writer.
+- [x] **Snapshot Save As**: enable Media → Save snapshot as and wire its editor to the supported `.szx` writer,
+      with portable names, destination preview and retry on failure. Quick Load compares file times across root
+      Save As files and per-game folders, and never deletes an unreadable snapshot. The saving regression checks
+      a BASIC program after a snapshot round trip; broader per-machine snapshot coverage remains in ZxKit's TODO.
 - [ ] Tape browser: an explicit reset-and-auto-load-from-selected-block action
       ([#76](https://github.com/bog-dan-ro/spectacol/issues/76)); selecting a block currently only seeks the deck.
 - [ ] Custom ROM selection per machine ([#152](https://github.com/bog-dan-ro/spectacol/issues/152)): use the

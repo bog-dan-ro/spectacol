@@ -159,6 +159,7 @@ qt_add_qml_module(spectacol
         qml/SaveFilePage.qml
         qml/SaveSnapshotPage.qml
         qml/SaveTapePage.qml
+        qml/NewTapePage.qml
         qml/SearchOnlinePage.qml
         qml/StandardGamepad.qml
         qml/TapesFileBrowserPage.qml

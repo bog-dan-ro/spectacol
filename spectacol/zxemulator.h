@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -158,6 +158,8 @@ public:
     bool loadMediaFile(const QString &filePath);
     /// Saves a snapshot, the tape or a screenshot (the file is written after unlocking the emulator).
     bool saveMediaFile(const QString &filePath);
+    /// Atomically replaces a file, reporting directory, write and commit failures.
+    bool writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes);
     zxkit::Z80Registers registers() const;
 
     bool paused() const;
@@ -253,9 +255,11 @@ public slots:
     QString recordingsPath() const;
     QString savesPath() const;
     QString recordingFilePath() const;
-    QString saveSnapshotsFilePath(const QString &filePath) const;
+    QString tapeFileName(const QString &programName) const;
+    QString tapeFilePath(const QString &fileName) const;
+    QString snapshotFilePath(const QString &folder, const QString &fileName) const;
     void load(const QString &filePath, bool removeOnFail = false);
-    void save(const QString &filePath);
+    bool save(const QString &filePath);
     void copyToFavourites(const QString &filePath);
     void remove(const QString &path);
     bool isFolder(const QString &path);

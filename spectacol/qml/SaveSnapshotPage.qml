@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,10 +24,13 @@ import Spectacol
 SaveFilePage {
     id: saveSnapshotPage
 
-    title: qsTr("Snapshot name:")
+    title: qsTr("Save snapshot")
+    fileName: "Snapshot.szx"
     folder: ZxEmulator.dataPath + "/Snapshots/"
+    destinationPath: ZxEmulator.snapshotFilePath(folder, fileName)
     onAccepted: {
-        pageLoader.source = "";
+        if (ZxEmulator.save(ZxEmulator.snapshotFilePath(folder, fileName)))
+            pageLoader.source = "";
     }
 
     onCanceled: pageLoader.source = "";

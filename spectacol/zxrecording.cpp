@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@
 #include "zxrecording.h"
 #include "zxemulator.h"
 
-#include <QFile>
-
 ZxRecording::ZxRecording(ZxEmulator *parent)
     : QObject(parent)
     , m_emulator(parent)
@@ -33,7 +31,8 @@ void ZxRecording::setStopVisible(bool visible)
     {
         const auto emulator = m_emulator->emulator().readLock();
         const auto &rzx = emulator->rzx();
-        t = rzx.isRecording() ? Type::Recording : (rzx.isPlaying() ? Type::Playback : Type::None);
+        t = !m_pendingRecording.empty() ? Type::Unsaved
+            : rzx.isRecording() ? Type::Recording : (rzx.isPlaying() ? Type::Playback : Type::None);
     }
     if (m_type != t) {
         m_type = t;
@@ -43,6 +42,8 @@ void ZxRecording::setStopVisible(bool visible)
 
 void ZxRecording::start()
 {
+    if (!savePendingRecording())
+        return;
     const bool started = m_emulator->withEmulator([](zxkit::Emulator &emulator) {
         emulator.rzx().startRecording(emulator.saveSnapshot(".szx"), ".szx", emulator.ioBus());
     });
@@ -79,21 +80,30 @@ void ZxRecording::finalise()
 
 void ZxRecording::stop()
 {
-    std::vector<uint8_t> bytes;
-    m_emulator->withEmulator([&bytes](zxkit::Emulator &emulator) {
-        auto &rzx = emulator.rzx();
-        if (rzx.isRecording())
-            bytes = rzx.stopRecording(emulator.ioBus());
-        else
-            rzx.clear();
-    });
-    if (!bytes.empty()) {
-        const QString path = m_emulator->recordingFilePath();
-        QFile f(path);
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write(QByteArrayView(bytes).data(), qint64(bytes.size()));
-            m_emulator->showMessage(tr("Recording saved to %1").arg(path));
-        }
+    if (m_pendingRecording.empty()) {
+        if (!m_emulator->withEmulator([this](zxkit::Emulator &emulator) {
+                auto &rzx = emulator.rzx();
+                if (rzx.isRecording())
+                    m_pendingRecording = rzx.stopRecording(emulator.ioBus());
+                else
+                    rzx.clear();
+            }))
+            return;
+        if (!m_pendingRecording.empty())
+            m_pendingPath = m_emulator->recordingFilePath();
     }
+    savePendingRecording();
     setStopVisible(false);
+}
+
+bool ZxRecording::savePendingRecording()
+{
+    if (m_pendingRecording.empty())
+        return true;
+    if (!m_emulator->writeFileBytes(m_pendingPath, m_pendingRecording))
+        return false;
+    m_emulator->showMessage(tr("Recording saved to %1").arg(m_pendingPath));
+    m_pendingRecording.clear();
+    m_pendingPath.clear();
+    return true;
 }

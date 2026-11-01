@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@ ZxTape::ZxTape(ZxEmulator *emulator)
     : QObject(emulator)
     , m_zxEmulator(emulator)
 {
-    m_saveSnapshotTimer.setInterval(2000);
-    m_saveSnapshotTimer.setSingleShot(true);
-    connect(&m_saveSnapshotTimer, &QTimer::timeout, this, [this] {
-        write(m_zxEmulator->saveSnapshotsFilePath(m_programName));
-    });
+}
+
+QString ZxTape::suggestedFileName() const
+{
+    return m_zxEmulator->tapeFileName(m_programName);
 }
 
 void ZxTape::setHasTape(bool hasTape)
@@ -78,10 +78,8 @@ void ZxTape::refreshData()
         }
         hasTape = !blocks.empty();
     }
-    if (!progName.isEmpty())
-        setProgramName(progName);
+    setProgramName(progName);
     setHasTape(hasTape);
-    m_saveSnapshotTimer.stop();
 }
 
 void ZxTape::open(QString filePath)
@@ -111,10 +109,19 @@ void ZxTape::clear()
         emulator.tapeDeck().clear();
     });
     setHasTape(false);
+    setProgramName({});
+    setPlaying(false);
 }
 
-void ZxTape::write(QString filePath)
+bool ZxTape::write(QString filePath)
 {
-    if (m_zxEmulator->saveMediaFile(filePath))
-        m_zxEmulator->showMessage(tr("Saved %1").arg(filePath));
+    refreshData();
+    if (!m_hasTape) {
+        m_zxEmulator->showMessage(tr("The tape is empty. Enter SAVE in BASIC before exporting it."), ZxEmulator::Warning);
+        return false;
+    }
+    if (!m_zxEmulator->saveMediaFile(filePath))
+        return false;
+    m_zxEmulator->showMessage(tr("Saved %1").arg(filePath));
+    return true;
 }
