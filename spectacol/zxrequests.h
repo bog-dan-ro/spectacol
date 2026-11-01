@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,50 +17,55 @@
 
 #pragma once
 
-#include <QObject>
-#include <QPointer>
+#include <QJsonObject>
+#include <QList>
+#include <QString>
+#include <QUrl>
 
-class ZXGamesModel;
-class QNetworkReply;
-class ZXRequest : public QObject
-{
-    Q_OBJECT
-public:
-    explicit ZXRequest(ZXGamesModel *parent);
-    virtual ~ZXRequest();
-    void abort();
+namespace zxonline {
 
-protected:
-    QPointer<QNetworkReply> m_reply;
-    QByteArray m_data;
-    ZXGamesModel *m_model;
-    bool m_aborted = false;
+struct Endpoints {
+    Endpoints();
+    QUrl archive;
+    QUrl zxinfo;
+    QUrl zxinfoMedia;
+    QUrl spectrumComputing;
 };
 
-class ZXSearchRequest : public ZXRequest
-{
-    Q_OBJECT
-public:
-    explicit ZXSearchRequest(ZXGamesModel *parent);
+struct Game {
+    QString id;
+    QString title;
+    QString subtitle;
+    QUrl screenshot;
 };
 
-class ZXFetchRequest : public ZXRequest
-{
-public:
-    explicit ZXFetchRequest(ZXGamesModel *parent, size_t start, size_t count);
-
-private:
-    size_t m_start;
-    size_t m_count;
+struct Media {
+    QUrl url;
+    QString name;
+    QString label;
+    QByteArray md5;
+    qint64 size = 0;
 };
 
-class ZXUpdateRequest : public ZXRequest
-{
-public:
-    explicit ZXUpdateRequest(ZXGamesModel *parent, const QString &identifier, size_t row);
-
-private:
-    QString m_identifier;
-    size_t m_row;
-    QByteArray m_fileData;
+struct Details {
+    QString title;
+    QString subtitle;
+    QString description;
+    QUrl website;
+    QUrl screenshot;
+    QList<Media> files;
 };
+
+struct Page {
+    QList<Game> games;
+    int total = 0;
+};
+
+// Source 0 is Internet Archive, source 1 is ZXInfo.
+QUrl searchUrl(const Endpoints &endpoints, int source, const QString &text, int page);
+QUrl detailsUrl(const Endpoints &endpoints, int source, const QString &id);
+Page parsePage(const QJsonObject &object, int source, const Endpoints &endpoints = {});
+Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int source, const QString &id);
+QString downloadName(int source, const QString &id, const Media &file);
+
+} // namespace zxonline

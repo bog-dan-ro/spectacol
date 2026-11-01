@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,163 +15,505 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// @scope main.qml
-
 import QtQuick
-import QtQuick.Layouts
-import QtQuick.Window
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtCore
 import QtGamepadLegacy
 import Spectacol
-import "private"
 
-Rectangle {
-    color: Theme.surface
-    Timer {
-        id: timer
-        repeat: false
-        interval: 5000
-        running: false
-        onTriggered: {
-            noResults.visible = false;
-            ZxEmulator.onlineGamesModel.search(searchText.text);
+// @scope main.qml
+Sheet {
+    id: page
+    crumb: qsTr("Library")
+    title: qsTr("Search online")
+    preferredWidth: Theme.sp(260)
+    readonly property var catalogue: ZxEmulator.onlineGamesModel
+    readonly property bool narrow: width < Theme.sp(190)
+    property int pendingIndex: -1
+    hints: [
+        {
+            pad: "A",
+            key: "Enter",
+            text: qsTr("Details"),
+            action: () => page.openDetails(results.currentIndex)
+        },
+        {
+            pad: "X",
+            key: "F3",
+            text: qsTr("Search"),
+            action: () => query.forceActiveFocus()
+        },
+        {
+            pad: "Y",
+            key: "F4",
+            text: qsTr("Source"),
+            action: () => source.forceActiveFocus()
+        },
+        {
+            pad: "B",
+            key: "Esc",
+            text: qsTr("Close"),
+            action: () => pageLoader.source = ""
+        }
+    ]
+    Keys.onPressed: event => {
+        if (event.key === Qt.Key_F3 || event.key === Qt.Key_F4) {
+            (event.key === Qt.Key_F3 ? query : source).forceActiveFocus();
+            event.accepted = true;
         }
     }
-
-    Connections {
-        target: ZxEmulator.onlineGamesModel
-        function onNoResults () {
-            noResults.visible = true;
-            searchText.forceActiveFocus(Qt.TabFocusReason);
-        }
-    }
-
-    GamepadKeyNavigation {
-        id: gamepadKeyNavigation
-        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        buttonYKey: Qt.Key_Tab
-        buttonBKey: Qt.Key_Escape
-        buttonAKey: searchText.focus ? Qt.Key_unknown : Qt.Key_Return
-    }
-
     Settings {
+        id: preferences
         category: "OnlineSearch"
-        property alias searchString: searchText.text
+        property alias searchString: query.text
+        property int sourceIndex: 0
     }
-
-    function performSearch()
-    {
-        noResults.visible = false;
-        timer.stop();
-        if (searchText.text.length === 1)
-            ZxEmulator.onlineGamesModel.search("", searchText.text);
+    GamepadKeyNavigation {
+        gamepad: Gamepad {
+            deviceId: ZxEmulator.gamepadId
+        }
+        buttonAKey: Qt.Key_Return
+        buttonBKey: Qt.Key_Escape
+        buttonXKey: Qt.Key_F3
+        buttonYKey: Qt.Key_F4
+    }
+    Connections {
+        target: page.catalogue
+        function onDownloaded(path) {
+            if (ZxEmulator.copyToFavourites(path))
+                pageLoader.source = "";
+        }
+        function onPageLoaded(firstPage) {
+            if (firstPage)
+                results.currentIndex = results.count ? 0 : -1;
+            else if (page.pendingIndex >= 0) {
+                results.currentIndex = Math.min(page.pendingIndex, results.count - 1);
+                results.positionViewAtIndex(results.currentIndex, GridView.Contain);
+            }
+            page.pendingIndex = -1;
+        }
+        function onStateChanged() {
+            if (page.catalogue.errorString.length)
+                page.pendingIndex = -1;
+            if (detailDialog.awaitingFiles && detailDialog.opened && !page.catalogue.loadingDetails) {
+                detailDialog.awaitingFiles = false;
+                media.currentIndex = media.count ? 0 : -1;
+                (media.count ? media : closeDetails).forceActiveFocus();
+            }
+        }
+    }
+    function performSearch() {
+        pendingIndex = -1;
+        catalogue.search(query.text);
+        results.forceActiveFocus();
+    }
+    function openDetails(index) {
+        if (index < 0 || index >= results.count)
+            return;
+        pendingIndex = -1;
+        results.currentIndex = index;
+        results.forceActiveFocus();
+        detailDialog.selectedTitle = catalogue.data(catalogue.index(index, 0), Qt.DisplayRole);
+        detailDialog.awaitingFiles = true;
+        catalogue.select(index);
+        detailDialog.open();
+    }
+    function playSelection() {
+        if (media.currentIndex >= 0 && !catalogue.downloading && !catalogue.loadingDetails)
+            catalogue.download(media.currentIndex, ZxEmulator.dataPath + "/Downloaded/Online");
+    }
+    Component.onCompleted: {
+        ZxEmulator.processInputEvents = false;
+        catalogue.source = preferences.sourceIndex;
+        if (query.text.length)
+            performSearch();
         else
-            ZxEmulator.onlineGamesModel.search(searchText.text);
-        grid.forceActiveFocus(Qt.TabFocusReason);
+            query.forceActiveFocus();
+    }
+    Component.onDestruction: {
+        catalogue.cancel();
+        ZxEmulator.processInputEvents = true;
     }
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: TextSizes.scale24
-        // Layout.topMargin: TextSizes.scale24
-        FancyTextField {
-            id: searchText
-            focus: false
-            font.pixelSize: TextSizes.scale16
+        anchors.margins: Theme.sp(5)
+        spacing: Theme.sp(3)
+        GridLayout {
+            columns: page.narrow ? 2 : 3
             Layout.fillWidth: true
-            Layout.leftMargin: TextSizes.scale24 * 4
-            Layout.rightMargin: TextSizes.scale24 * 4
-            placeholderText: qsTr("Search title or one letter to browse the catalogue")
-            onTextChanged: timer.restart()
-            KeyNavigation.tab: grid
-            KeyNavigation.down: grid
-            onAccepted: performSearch()
+            ComboBox {
+                id: source
+                Layout.preferredWidth: Theme.sp(48)
+                model: page.catalogue.sources
+                currentIndex: preferences.sourceIndex
+                Accessible.name: qsTr("Search source")
+                onActivated: {
+                    preferences.sourceIndex = currentIndex;
+                    page.catalogue.source = currentIndex;
+                    page.performSearch();
+                }
+            }
+            FancyTextField {
+                id: query
+                Layout.fillWidth: true
+                placeholderText: qsTr("Title, or one letter to browse")
+                selectByMouse: true
+                maximumLength: 200
+                onAccepted: page.performSearch()
+                KeyNavigation.down: results
+            }
+            Button {
+                text: qsTr("Search")
+                Layout.columnSpan: page.narrow ? 2 : 1
+                Layout.fillWidth: page.narrow
+                onClicked: page.performSearch()
+            }
         }
-
+        Text {
+            Layout.fillWidth: true
+            text: page.catalogue.searching ? qsTr("Searching %1…").arg(source.currentText) : page.catalogue.searched ? qsTr("%1 of %2 titles · %3").arg(results.count).arg(page.catalogue.total).arg(source.currentText) : qsTr("Search by title, or leave the field empty to browse the catalogue.")
+            wrapMode: Text.Wrap
+            font.pixelSize: Theme.caption
+            color: Theme.textMuted
+        }
+        Text {
+            Layout.fillWidth: true
+            visible: text.length > 0 && !detailDialog.visible
+            text: page.catalogue.errorString
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            font.pixelSize: Theme.body
+            color: Theme.warning
+        }
         GridView {
-            id: grid
-            KeyNavigation.tab: searchText
-            KeyNavigation.up: searchText
-            Keys.onReturnPressed: {
-                ZxEmulator.copyToFavourites(model.getPath(currentIndex));
-                pageLoader.source = "";
-            }
-            clip: true
-            focus: true
-            currentIndex: 0
-            Layout.alignment: Qt.AlignHCenter
+            id: results
+            objectName: "onlineResults"
+            Layout.fillWidth: true
             Layout.fillHeight: true
-            // Cells are 320px wide, or a third of the column when that is narrower.
-            // The grid shows whole cells, centered. Everything derives from the column's
-            // width, not from the grid's own width which the layout sets from these.
-            cellWidth: Math.max(1, Math.floor(Math.min(320, parent.width / 3)))
-            cellHeight: cellWidth
-            Layout.preferredWidth: Math.max(1, Math.floor(parent.width / cellWidth)) * cellWidth
-            populate: Transition {
-                NumberAnimation { properties: "x,y"; duration: 200 }
-            }
-            model: ZxEmulator.onlineGamesModel
-            highlight: Rectangle {
-                radius: Theme.radiusSmall
-                color: Theme.accentFill
-                border.width: Theme.focusLine
-                border.color: Theme.accent
+            readonly property int columns: Math.max(1, Math.floor(width / Theme.sp(page.narrow ? 44 : 64)))
+            cellWidth: width / columns
+            cellHeight: Math.min(cellWidth * 0.625, Theme.sp(32)) + Theme.sp(24)
+            clip: true
+            model: page.catalogue
+            keyNavigationWraps: false
+            boundsBehavior: Flickable.StopAtBounds
+            highlightMoveDuration: Theme.reduceMotion ? 0 : 100
+            ScrollBar.vertical: ScrollBar {}
+            Keys.onReturnPressed: page.openDetails(currentIndex)
+            Keys.onEnterPressed: page.openDetails(currentIndex)
+            Keys.onPressed: event => {
+                const next = currentIndex + (event.key === Qt.Key_Down ? columns : 1);
+                if ((event.key === Qt.Key_Down || event.key === Qt.Key_Right) && currentIndex >= 0 && next >= count && page.catalogue.hasMore) {
+                    page.pendingIndex = next;
+                    page.catalogue.loadMore();
+                    event.accepted = true;
+                }
             }
             delegate: Item {
-                width: grid.cellWidth; height: grid.cellHeight
-                Image {
-                    anchors.margins: 2 * Screen.pixelDensity
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    fillMode: Image.PreserveAspectFit
-                    source: "image://spectrum/" + screenFile
-                }
-                FancyText {
-                    anchors.margins: 2 * Screen.pixelDensity
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    text: title
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                id: card
+                required property int index
+                required property string title
+                required property string subtitle
+                required property url screenshot
+                width: results.cellWidth
+                height: results.cellHeight
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: Theme.sp(1)
+                    radius: Theme.radiusSmall
+                    color: card.index === results.currentIndex ? Theme.accentFill : Theme.raised
+                    border.color: Theme.accent
+                    border.width: card.index === results.currentIndex ? Theme.focusLine : 0
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: Theme.sp(3)
+                        spacing: Theme.sp(1)
+                        Image {
+                            id: preview
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            source: card.screenshot
+                            asynchronous: true
+                            fillMode: Image.PreserveAspectFit
+                            Text {
+                                anchors.centerIn: parent
+                                visible: preview.status !== Image.Ready
+                                text: preview.status === Image.Loading ? qsTr("Loading…") : qsTr("No screenshot")
+                                font.pixelSize: Theme.caption
+                                color: Theme.textMuted
+                            }
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            text: card.title
+                            textFormat: Text.PlainText
+                            wrapMode: Text.Wrap
+                            maximumLineCount: 2
+                            elide: Text.ElideRight
+                            font.pixelSize: Theme.body
+                            color: Theme.text
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            visible: text.length > 0
+                            text: card.subtitle
+                            textFormat: Text.PlainText
+                            elide: Text.ElideRight
+                            font.pixelSize: Theme.caption
+                            color: Theme.textMuted
+                        }
+                    }
                 }
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {
-                        if (grid.currentIndex !== index)
-                            grid.currentIndex = index;
-                        else {
-                            ZxEmulator.copyToFavourites(path);
-                            pageLoader.source = "";
+                    onClicked: page.openDetails(card.index)
+                }
+            }
+            Text {
+                anchors.centerIn: parent
+                width: parent.width
+                visible: page.catalogue.searched && !page.catalogue.searching && results.count === 0
+                text: qsTr("No results. Try another title or source.")
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: Theme.body
+                color: Theme.textMuted
+            }
+        }
+        Button {
+            visible: page.catalogue.hasMore
+            enabled: !page.catalogue.searching
+            text: qsTr("Load more")
+            onClicked: page.catalogue.loadMore()
+            KeyNavigation.up: results
+        }
+    }
+
+    Dialog {
+        id: detailDialog
+        objectName: "onlineDetails"
+        property string selectedTitle
+        property bool awaitingFiles: false
+        parent: Overlay.overlay
+        x: Math.round((parent.width - width) / 2)
+        y: Math.round((parent.height - height) / 2)
+        width: Math.min(page.width - Theme.sp(8), Theme.sp(165))
+        height: Math.min(page.height - Theme.sp(8), Theme.sp(170))
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        padding: Theme.sp(5)
+        Overlay.modal: Rectangle {
+            color: Theme.scrim
+        }
+        onOpened: {
+            if (!page.catalogue.loadingDetails) {
+                awaitingFiles = false;
+                media.currentIndex = media.count ? 0 : -1;
+                (media.count ? media : closeDetails).forceActiveFocus();
+            } else {
+                closeDetails.forceActiveFocus();
+            }
+        }
+        onClosed: {
+            awaitingFiles = false;
+            page.catalogue.cancelSelection();
+            results.forceActiveFocus();
+        }
+        background: Rectangle {
+            color: Theme.raised
+            radius: Theme.radius
+            border.width: Theme.line
+            border.color: Theme.outline
+        }
+        header: Text {
+            padding: Theme.sp(5)
+            text: page.catalogue.details.title || detailDialog.selectedTitle
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            font.pixelSize: Theme.title
+            color: Theme.text
+        }
+        contentItem: ColumnLayout {
+            spacing: Theme.sp(3)
+            Keys.onPressed: event => {
+                if (event.key === Qt.Key_F3) {
+                    if (page.catalogue.details.website.toString().length)
+                        Qt.openUrlExternally(page.catalogue.details.website);
+                    event.accepted = true;
+                }
+            }
+            ScrollView {
+                id: detailScroll
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                contentWidth: availableWidth
+                clip: true
+                ColumnLayout {
+                    width: detailScroll.availableWidth
+                    spacing: Theme.sp(3)
+                    Text {
+                        Layout.fillWidth: true
+                        text: page.catalogue.loadingDetails ? qsTr("Loading title…") : page.catalogue.details.subtitle
+                        textFormat: Text.PlainText
+                        wrapMode: Text.Wrap
+                        font.pixelSize: Theme.caption
+                        color: Theme.textMuted
+                    }
+                    Image {
+                        id: fullPreview
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Math.min(width * 0.625, Math.max(Theme.sp(20), detailScroll.availableHeight - Theme.sp(16)))
+                        source: page.catalogue.details.screenshot
+                        visible: source.toString().length > 0
+                        asynchronous: true
+                        fillMode: Image.PreserveAspectFit
+                        Text {
+                            anchors.centerIn: parent
+                            visible: fullPreview.status === Image.Error
+                            text: qsTr("Screenshot unavailable")
+                            font.pixelSize: Theme.caption
+                            color: Theme.textMuted
+                        }
+                    }
+                    Text {
+                        Layout.fillWidth: true
+                        text: page.catalogue.details.description
+                        textFormat: Text.StyledText
+                        wrapMode: Text.Wrap
+                        font.pixelSize: Theme.body
+                        color: Theme.text
+                    }
+                }
+            }
+            Text {
+                Layout.fillWidth: true
+                visible: text.length > 0
+                text: page.catalogue.errorString
+                textFormat: Text.PlainText
+                wrapMode: Text.Wrap
+                font.pixelSize: Theme.body
+                color: Theme.warning
+            }
+            ListView {
+                id: media
+                objectName: "onlineMedia"
+                Layout.fillWidth: true
+                Layout.preferredHeight: Math.min(count, 3) * Theme.rowHeight
+                visible: count > 0
+                enabled: !page.catalogue.downloading
+                model: page.catalogue.details.files
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                ScrollBar.vertical: ScrollBar {}
+                keyNavigationWraps: false
+                Keys.onReturnPressed: page.playSelection()
+                Keys.onEnterPressed: page.playSelection()
+                delegate: Item {
+                    id: file
+                    required property int index
+                    required property var modelData
+                    width: media.width
+                    height: Theme.rowHeight
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: Theme.radiusSmall
+                        color: file.index === media.currentIndex ? Theme.accentFill : "transparent"
+                        border.width: file.index === media.currentIndex ? Theme.focusLine : 0
+                        border.color: Theme.accent
+                    }
+                    Text {
+                        anchors.fill: parent
+                        anchors.margins: Theme.sp(3)
+                        text: file.modelData.label
+                        textFormat: Text.PlainText
+                        elide: Text.ElideMiddle
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: Theme.body
+                        color: Theme.text
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            media.currentIndex = file.index;
+                            media.forceActiveFocus();
                         }
                     }
                 }
             }
+            Text {
+                Layout.fillWidth: true
+                visible: !page.catalogue.loadingDetails && !page.catalogue.details.files.length && !page.catalogue.errorString.length
+                text: qsTr("No supported media files are listed for this title. Check the source page for availability.")
+                wrapMode: Text.Wrap
+                font.pixelSize: Theme.body
+                color: Theme.textMuted
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Button {
+                    id: play
+                    Layout.fillWidth: true
+                    text: page.catalogue.downloading ? qsTr("Downloading…") : qsTr("Play")
+                    enabled: media.count > 0 && !page.catalogue.downloading
+                    onClicked: page.playSelection()
+                    Keys.onReturnPressed: page.playSelection()
+                    KeyNavigation.up: media
+                    KeyNavigation.right: sourcePage
+                    KeyNavigation.down: retryDetails
+                }
+                Button {
+                    id: sourcePage
+                    Layout.fillWidth: true
+                    text: qsTr("Source page")
+                    enabled: page.catalogue.details.website.toString().length > 0
+                    onClicked: Qt.openUrlExternally(page.catalogue.details.website)
+                    Keys.onReturnPressed: clicked()
+                    KeyNavigation.left: play
+                    KeyNavigation.right: closeDetails
+                    KeyNavigation.up: media
+                    KeyNavigation.down: retryDetails
+                }
+                Button {
+                    id: closeDetails
+                    Layout.fillWidth: true
+                    text: qsTr("Back")
+                    onClicked: detailDialog.close()
+                    Keys.onReturnPressed: detailDialog.close()
+                    KeyNavigation.left: sourcePage
+                    KeyNavigation.up: media
+                    KeyNavigation.down: retryDetails
+                }
+            }
+            Button {
+                id: retryDetails
+                visible: page.catalogue.errorString.length > 0 && !page.catalogue.loadingDetails
+                text: qsTr("Retry details")
+                onClicked: {
+                    detailDialog.awaitingFiles = true;
+                    page.catalogue.select(results.currentIndex);
+                }
+                Keys.onReturnPressed: clicked()
+                KeyNavigation.up: closeDetails
+            }
         }
-        Button {
-            Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Close (B)")
-            onClicked: pageLoader.source = ""
+        footer: HintBar {
+            hints: [
+                {
+                    pad: "A",
+                    key: "Enter",
+                    text: qsTr("Play selected file"),
+                    action: () => page.playSelection()
+                },
+                {
+                    pad: "B",
+                    key: "Esc",
+                    text: qsTr("Results"),
+                    action: () => detailDialog.close()
+                }
+            ]
         }
-    }
-
-    FancyText {
-        id: noResults
-        visible: false
-        anchors.centerIn: parent
-        font.pixelSize: TextSizes.scale16
-        text: qsTr("No results")
-    }
-
-    Component.onCompleted: {
-        noResults.visible = false;
-        ZxEmulator.processInputEvents = false;
-        if (searchText.text.length)
-            performSearch();
-    }
-    Component.onDestruction: {
-        ZxEmulator.processInputEvents = true;
     }
 }

@@ -51,4 +51,11 @@ endif()
 
 add_subdirectory(spectacol)
 
+option(SPECTACOL_BUILD_TESTS "Build Spectacol's offline network tests" OFF)
+if(SPECTACOL_BUILD_TESTS)
+    enable_testing()
+    find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Test)
+    add_subdirectory(tests)
+endif()
+
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

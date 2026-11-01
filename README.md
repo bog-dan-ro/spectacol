@@ -34,6 +34,20 @@ F1 to F4 belong to the emulated machine (the CoBra's function keys); Spectacol's
 On a CoBra 1, Ctrl is CTRL, Esc is ESC, Scroll Lock is NO SCROLL and the keypad's Enter is LINE FEED.
 Elsewhere Ctrl, Alt and Meta are Symbol Shift and Esc is BREAK.
 
+## Online search
+
+Choose **Spectacol → Search online**, then **Internet Archive** or **ZXInfo**. Enter a title, a single letter
+to browse by initial, or leave the field empty to browse the catalogue. The source and search text are remembered.
+
+Browse the grid with the D-pad or arrow keys. Press **A/Enter** (or click a card) to open its details dialog.
+Choose a media file with Up/Down, then press **A/Enter** to download and play it. The file is kept under
+`Downloaded/Online` and copied to Favourites for offline use. **B/Escape** closes the dialog and restores the
+same card and scroll position in the grid.
+Browsing results does not download game files. Unavailable titles keep a link to their source page; failed
+searches and downloads display an error and can be retried. **X/F3** focuses the search field and **Y/F4** the
+source selector. Inside the details dialog, **X/F3** opens the source page. ZIP tapes use the same auto-load
+setting as loose tapes.
+
 ## Saving programs and snapshots
 
 To save a BASIC program to a tape:

@@ -94,6 +94,24 @@ chains can reduce rendering performance; the emulator frame callback continues
 to publish native frames. Spectacol links the separate `ZX::VideoFilters` target;
 other ZxKit consumers can continue to link only `ZX::Kit`.
 
+## Offline catalogue tests
+
+The Qt Test suite exercises both Internet Archive and ZXInfo through a local HTTP server. It checks paging,
+URL encoding, metadata and download parsing, cancellation, unavailable results, malformed replies, checksum
+failures and atomic save/retry. It makes no requests to the public services.
+
+```sh
+cmake -S . -B build -DSPECTACOL_BUILD_TESTS=ON
+cmake --build build --parallel
+ctest --test-dir build --output-on-failure
+```
+
+ZXInfo uses the public [v5 API](https://github.com/zxinfo-api/zxinfo-api-v5/blob/main/docs/swagger.yml) at
+`https://api.zxinfo.dk/v5/`. Its `offset` is a zero-based page number. Catalogue file paths follow
+[ZXInfo's own link mapping](https://github.com/thomasheckmann/zxinfo-vue/blob/master/src/components/ZXInfo/linksInfo.vue)
+to the World of Spectrum Archive mirror or Spectrum Computing; screenshots use ZXInfo's media host.
+No API key is required. Use the headless UI check above to review layout and the live-service integration.
+
 ## Saving regression
 
 The saving check uses the real BASIC ROM to load a generated program, saves it to a blank tape, exports TAP

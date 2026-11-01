@@ -32,10 +32,13 @@ controls, netplay, Google Play sharing, new platform ports and the broad metadat
         built from the same menu, a status bar, pages docked beside the screen (the tape browser keeps the tape
         playing).
   - [ ] Options › Screen and the filters list keep the old look: they hold the screen filter UI (owner's work).
-  - [ ] Still the old structure, only recoloured: poke finder and manager, online search, the
+  - [ ] Still the old structure, only recoloured: poke finder and manager, the
         gamepad pages (customize, calibrate), the on-screen keyboard and joysticks.
   - [x] Tape creation/export and snapshot Save As use themed sheets with keyboard/gamepad actions and
         destination previews. Failed writes leave the editor open for retry.
+  - [x] Online search keeps a gamepad-friendly grid of thumbnail cards. A/Enter opens a modal title/details/media
+        dialog; Up/Down picks the media file and A plays it. B/Escape restores the same grid selection and scroll
+        position. Full details and media are requested only after confirmation; X/Y reach search/source directly.
   - [ ] One icon set (the cover flow's 3D folder and floppy art, SVG and PNG mixed).
   - [ ] Desktop menu shortcuts shown next to the items, and more shortcuts (reset, pause, screenshot).
 
@@ -131,11 +134,13 @@ controls, netplay, Google Play sharing, new platform ports and the broad metadat
 - [ ] A compact list/grid alternative to cover flow, with remembered folder/selection and local filename search
       ([#18](https://github.com/bog-dan-ro/spectacol/issues/18),
       [#32](https://github.com/bog-dan-ro/spectacol/issues/32)); usable with touch, keyboard and gamepad.
-- [ ] **ZXInfo online search**: add [zxinfo.dk](https://zxinfo.dk/) alongside the existing Internet Archive search,
-      using its public ZXDB REST API ([v5 OpenAPI specification](https://github.com/zxinfo-api/zxinfo-api-v5/blob/main/docs/swagger.yml),
-      [Swagger UI](https://zxinfo-api.github.io/zxinfo-api-v5/)). Integrate paginated results, title details,
-      screenshots and available media links with the current search/download flow; show the source and handle
-      unavailable results or network errors. Confirm the production API base URL/version when implementing.
+- [x] **ZXInfo online search**: choose [zxinfo.dk](https://zxinfo.dk/) or Internet Archive, with paginated title
+      search and browsing by initial. ZXInfo uses the public [v5 REST API](https://github.com/zxinfo-api/zxinfo-api-v5/blob/main/docs/swagger.yml)
+      at `https://api.zxinfo.dk/v5/` (zero-based page offsets). Select a title for details, screenshots and supported
+      media choices; download explicitly to Favourites for offline play. ZIP tapes auto-load using the unpacked
+      media type. Requests cancel on source/query changes and closing; errors stay visible for retry, and failed
+      downloads preserve existing files. `tests/test_online.cpp` checks both sources with an offline HTTP server;
+      `tests/saving.py` also checks that a zipped BASIC tape loads through the ROM.
 - [ ] Show RZX playback progress ([#47](https://github.com/bog-dan-ro/spectacol/issues/47)) once ZxKit exposes it.
       Recheck the compatibility reports in [#48](https://github.com/bog-dan-ro/spectacol/issues/48) after the core
       work in ZxKit's `TODO.md`; surface playback/desynchronization errors to the user.

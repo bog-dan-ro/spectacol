@@ -36,10 +36,12 @@ Q_MOC_INCLUDE("zxsettings.h")
 
 #include <zxkit/core/Engine.h>
 #include <zxkit/core/Events.h>
+#include <zxkit/media/MediaPreview.h>
 
 #include <atomic>
 #include <exception>
 #include <memory>
+#include <utility>
 
 class QAudioSink;
 class QIODevice;
@@ -75,7 +77,7 @@ class ZxEmulator : public QObject
     Q_PROPERTY(const BreakpointsModel *breakpointsModel READ breakpointsModel CONSTANT)
     Q_PROPERTY(const DisassambleModel* disassambleModel READ disassambleModel CONSTANT)
     Q_PROPERTY(const PokeFinderModel* pokeFinderModel READ pokeFinderModel CONSTANT)
-    Q_PROPERTY(const ZXGamesModel* onlineGamesModel READ onlineGamesModel CONSTANT)
+    Q_PROPERTY(ZXGamesModel* onlineGamesModel READ onlineGamesModel CONSTANT)
 
     Q_PROPERTY(bool showControlsIcons MEMBER m_showControlsIcons NOTIFY showControlsIconsChanged)
 
@@ -247,7 +249,7 @@ public:
     const DisassambleModel *disassambleModel() const;
 
     const PokeFinderModel *pokeFinderModel() const;
-    const ZXGamesModel* onlineGamesModel() const;
+    ZXGamesModel* onlineGamesModel();
 
 public slots:
     void quit();
@@ -260,7 +262,7 @@ public slots:
     QString snapshotFilePath(const QString &folder, const QString &fileName) const;
     void load(const QString &filePath, bool removeOnFail = false);
     bool save(const QString &filePath);
-    void copyToFavourites(const QString &filePath);
+    bool copyToFavourites(const QString &filePath);
     void remove(const QString &path);
     bool isFolder(const QString &path);
     QString fileName(const QString &path);
@@ -347,6 +349,7 @@ private:
     explicit ZxEmulator(QObject *parent = 0);
     void stopEngine();
     void updateMediaActivity(const zxkit::MediaActivity &activity);
+    std::pair<bool, zxkit::MediaClass> loadMediaWithType(const QString &filePath);
     friend class ZxImage;
 
 private:

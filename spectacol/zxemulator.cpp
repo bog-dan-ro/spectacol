@@ -771,20 +771,25 @@ int ZxEmulator::pokeFinderCount() const
 
 bool ZxEmulator::loadMediaFile(const QString &filePath)
 {
+    return loadMediaWithType(filePath).first;
+}
+
+std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &filePath)
+{
     zxkit::MediaFile file;
     try {
         // The slow part (reading, unzipping) runs before taking the lock
         file = zxkit::MediaFile::read(filePath.toStdString());
     } catch (const std::exception &e) {
         showMessage(QString::fromUtf8(e.what()), Error);
-        return false;
+        return {false, zxkit::MediaClass::Unknown};
     }
     const bool loaded = withEmulator([&file](zxkit::Emulator &emulator) {
         emulator.loadMedia(file);
     });
     if (loaded)
         m_engine->refreshFrame();
-    return loaded;
+    return {loaded, zxkit::classifyMediaFile(file.extension, file.data)};
 }
 
 bool ZxEmulator::saveMediaFile(const QString &filePath)
@@ -983,7 +988,8 @@ void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
 void ZxEmulator::load(const QString &filePath, bool removeOnFail)
 {
     m_loadedFileName = QFileInfo(filePath).baseName();
-    if (!loadMediaFile(filePath)) {
+    const auto [loaded, mediaClass] = loadMediaWithType(filePath);
+    if (!loaded) {
         m_loadedFileName.clear();
         if (removeOnFail) {
             QFile::remove(filePath);
@@ -994,7 +1000,6 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
     }
 
     // If a tape was loaded and autoLoad is enabled, type LOAD "" + Enter
-    const auto mediaClass = zxkit::classifyMediaFile(filePath.toStdString());
     if (mediaClass == zxkit::MediaClass::Tape && m_settings && m_settings->autoLoad()) {
         withEmulator([](zxkit::Emulator &emulator) {
             emulator.reset(zxkit::ResetKind::Soft);
@@ -1038,16 +1043,17 @@ bool ZxEmulator::save(const QString &filePath)
     return true;
 }
 
-void ZxEmulator::copyToFavourites(const QString &filePath)
+bool ZxEmulator::copyToFavourites(const QString &filePath)
 {
     QDir d(dataPath());
     d.mkpath(u"Favourites"_s);
-    const QString &dest = dataPath() + u"Favourites/"_s + QFileInfo(filePath).fileName();
+    const QString dest = d.filePath(u"Favourites/"_s + QFileInfo(filePath).fileName());
     if (!QFile::exists(dest) && !QFile::copy(filePath, dest)) {
         emit error(Error, tr("Can't copy \"%1\" to \"%2\"").arg(filePath).arg(dest));
-        return;
+        return false;
     }
-    load(dest, true);
+    load(dest);
+    return !m_loadedFileName.isEmpty();
 }
 
 void ZxEmulator::remove(const QString &path)
@@ -1570,7 +1576,7 @@ const PokeFinderModel *ZxEmulator::pokeFinderModel() const
     return &m_pokeFinderModel;
 }
 
-const ZXGamesModel *ZxEmulator::onlineGamesModel() const
+ZXGamesModel *ZxEmulator::onlineGamesModel()
 {
     return &m_onlineGamesModel;
 }

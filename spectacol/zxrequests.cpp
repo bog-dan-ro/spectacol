@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,177 +17,270 @@
 
 #include "zxrequests.h"
 
-#include "zxgamesmodel.h"
-#include "zxemulator.h"
-
 #include <QCryptographicHash>
-
+#include <QFileInfo>
 #include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonValue>
+#include <QUrlQuery>
 
-#include <QDir>
-#include <QFile>
-#include <QNetworkReply>
-#include <QNetworkRequest>
+#include <stdexcept>
 
 using namespace Qt::StringLiterals;
 
+namespace zxonline {
 namespace {
-    const QString zxSpectrumSearchTitle = u"&fl[]=identifier&fl[]=title&sort[]=titleSorter+asc&rows=%1&page=%2&output=json"_s;
-    const QString metadata = u"https://archive.org/metadata/"_s;
+QString segment(const QString &text)
+{
+    return QString::fromLatin1(QUrl::toPercentEncoding(text));
 }
 
-ZXRequest::ZXRequest(ZXGamesModel *parent)
-    : QObject(parent)
-    , m_model(parent)
+QUrl relativePath(const QString &path)
+{
+    QUrl url;
+    url.setPath(path);
+    return url;
+}
+
+bool supportedMedia(QString name)
+{
+    name = name.toLower();
+    if (name.endsWith(u".zip"_s))
+        name.chop(4);
+    static const QStringList formats{u"tap"_s, u"tzx"_s, u"sna"_s, u"szx"_s, u"z80"_s,
+        u"nex"_s, u"rzx"_s, u"dsk"_s, u"trd"_s, u"scl"_s, u"mgt"_s,
+        u"img"_s, u"opd"_s, u"td0"_s};
+    return formats.contains(QFileInfo(name).suffix());
+}
+
+QString textValue(const QJsonValue &value)
+{
+    if (value.isArray()) {
+        QStringList texts;
+        for (const auto &item : value.toArray())
+            if (item.isString())
+                texts.append(item.toString());
+        return texts.join(u", "_s);
+    }
+    return value.toVariant().toString();
+}
+
+QString summary(const QJsonObject &entry)
+{
+    QStringList parts;
+    const auto year = textValue(entry.value(u"originalYearOfRelease"_s));
+    if (!year.isEmpty())
+        parts.append(year);
+    QStringList publishers;
+    for (const auto &publisher : entry.value(u"publishers"_s).toArray()) {
+        const auto name = publisher.toObject().value(u"name"_s).toString();
+        if (!name.isEmpty() && !publishers.contains(name))
+            publishers.append(name);
+    }
+    if (!publishers.isEmpty())
+        parts.append(publishers.join(u", "_s));
+    const auto machine = entry.value(u"machineType"_s).toString();
+    if (!machine.isEmpty())
+        parts.append(machine);
+    return parts.join(u" · "_s);
+}
+
+QUrl screenshotUrl(const QJsonObject &entry, const Endpoints &endpoints)
+{
+    for (const auto &screen : entry.value(u"screens"_s).toArray()) {
+        const auto path = screen.toObject().value(u"url"_s).toString();
+        const QUrl url(path);
+        if (url.scheme() == u"https"_s || url.scheme() == u"http"_s)
+            return url;
+        if (path.startsWith(u'/') && !path.startsWith(u"//"_s))
+            return endpoints.zxinfoMedia.resolved(relativePath(path.mid(1)));
+    }
+    return {};
+}
+
+QUrl zxinfoFileUrl(const Endpoints &endpoints, const QString &path)
+{
+    const QUrl url(path);
+    if (url.scheme() == u"https"_s || url.scheme() == u"http"_s)
+        return url;
+    // Follow ZXInfo's own download-link mapping, rather than treating catalogue
+    // paths as API-relative URLs. Unknown relative paths are not downloads.
+    if (path.startsWith(u"/pub/sinclair/"_s)) {
+        const QString mirror = u"download/World_of_Spectrum_June_2017_Mirror/World of Spectrum June 2017 Mirror.zip/World of Spectrum June 2017 Mirror/sinclair/"_s;
+        return endpoints.archive.resolved(relativePath(mirror + path.mid(14)));
+    }
+    if (path.startsWith(u"/zxdb/"_s))
+        return endpoints.spectrumComputing.resolved(relativePath(path.mid(1)));
+    return {};
+}
+
+void addFile(Details &details, Media file)
+{
+    if (!supportedMedia(file.name) || (file.url.scheme() != u"https"_s && file.url.scheme() != u"http"_s))
+        return;
+    for (const auto &existing : details.files)
+        if (existing.url == file.url)
+            return;
+    details.files.append(std::move(file));
+}
+} // namespace
+
+Endpoints::Endpoints()
+    : archive(u"https://archive.org/"_s)
+    , zxinfo(u"https://api.zxinfo.dk/v5/"_s)
+    , zxinfoMedia(u"https://zxinfo.dk/media/"_s)
+    , spectrumComputing(u"https://spectrumcomputing.co.uk/"_s)
 {}
 
-ZXRequest::~ZXRequest()
-{}
-
-void ZXRequest::abort()
+QUrl searchUrl(const Endpoints &endpoints, int source, const QString &text, int page)
 {
-    m_aborted = true;
-    if (m_reply)
-        m_reply->abort();
+    QUrl url;
+    QUrlQuery query;
+    if (source == 1) {
+        QString path = u"search"_s;
+        if (text.size() == 1 && (text[0].isLetter() || text == u"#"_s))
+            path = u"entries/byletter/"_s + segment(text);
+        else if (!text.isEmpty())
+            path = u"search/titles/"_s + segment(text);
+        url = endpoints.zxinfo.resolved(QUrl(path));
+        query.addQueryItem(u"size"_s, u"25"_s);
+        query.addQueryItem(u"offset"_s, QString::number(page));
+        query.addQueryItem(u"mode"_s, u"tiny"_s);
+        query.addQueryItem(u"contenttype"_s, u"SOFTWARE"_s);
+        query.addQueryItem(u"machinetype"_s, u"ZXSPECTRUM"_s);
+    } else {
+        url = endpoints.archive.resolved(QUrl(u"advancedsearch.php"_s));
+        QString expression = u"collection:(zx_spectrum_library_games)"_s;
+        QString escaped = text;
+        escaped.replace(u"\\"_s, u"\\\\"_s).replace(u"\""_s, u"\\\""_s);
+        if (text.size() == 1 && text[0].isLetterOrNumber())
+            expression += u" AND firstTitle:"_s + text;
+        else if (!text.isEmpty())
+            expression += u" AND title:(\"%1\")"_s.arg(escaped);
+        query.addQueryItem(u"q"_s, expression);
+        query.addQueryItem(u"fl[]"_s, u"identifier"_s);
+        query.addQueryItem(u"fl[]"_s, u"title"_s);
+        query.addQueryItem(u"sort[]"_s, u"titleSorter asc"_s);
+        query.addQueryItem(u"rows"_s, u"25"_s);
+        query.addQueryItem(u"page"_s, QString::number(page + 1));
+        query.addQueryItem(u"output"_s, u"json"_s);
+    }
+    url.setQuery(query);
+    return url;
 }
 
-ZXSearchRequest::ZXSearchRequest(ZXGamesModel *parent)
-    : ZXRequest(parent)
+QUrl detailsUrl(const Endpoints &endpoints, int source, const QString &id)
 {
-    QNetworkRequest req(parent->searchString() + zxSpectrumSearchTitle.arg(50).arg(1));
-    req.setPriority(QNetworkRequest::HighPriority);
-    m_reply = parent->networkManager().get(req);
-    connect(m_reply.data(), &QNetworkReply::finished, this, [this] {
-        if (!m_aborted && !m_data.isEmpty()) {
-            QJsonDocument doc = QJsonDocument::fromJson(m_data);
-            auto response = doc.object().value(u"response"_s).toObject();
-            size_t numFound = response.value(u"numFound"_s).toInt();
-            auto docs = response.value(u"docs"_s).toArray();
-            std::vector<ZXGamesModel::ZXData> data;
-            for (const auto &doc : docs) {
-                auto obj = doc.toObject();
-                data.emplace_back(obj.value(u"title"_s).toString(), obj.value(u"identifier"_s).toString());
-            }
-            m_model->setSearchData(data, numFound);
+    QUrl url = (source == 1 ? endpoints.zxinfo : endpoints.archive)
+                   .resolved(QUrl((source == 1 ? u"entries/"_s : u"metadata/"_s) + segment(id)));
+    if (source == 1)
+        url.setQuery(u"mode=full"_s);
+    return url;
+}
+
+Page parsePage(const QJsonObject &object, int source, const Endpoints &endpoints)
+{
+    Page page;
+    if (source == 1) {
+        if (!object.value(u"hits"_s).isObject())
+            throw std::runtime_error("Unexpected ZXInfo search response");
+        const auto hits = object.value(u"hits"_s).toObject();
+        const auto total = hits.value(u"total"_s);
+        page.total = total.isObject() ? total.toObject().value(u"value"_s).toInt() : total.toInt();
+        if (!hits.value(u"hits"_s).isArray())
+            throw std::runtime_error("Missing ZXInfo results");
+        for (const auto &value : hits.value(u"hits"_s).toArray()) {
+            const auto hit = value.toObject();
+            const auto entry = hit.value(u"_source"_s).toObject();
+            const auto id = hit.value(u"_id"_s).toString();
+            const auto title = entry.value(u"title"_s).toString();
+            if (!id.isEmpty() && !title.isEmpty())
+                page.games.append({id, title, summary(entry), screenshotUrl(entry, endpoints)});
         }
-        m_reply->deleteLater();
-        m_model->requestFinished(this);
-        deleteLater();
-    });
-
-//    connect(m_reply.data(), &QNetworkReply::error, this, [this](QNetworkReply::NetworkError error){
-//        if (error == QNetworkReply::NoError)
-//            return;
-//        abort();
-//    });
-
-    connect(m_reply.data(), &QNetworkReply::readyRead, this, [this] {
-        m_data += m_reply->readAll();
-    });
-}
-
-ZXFetchRequest::ZXFetchRequest(ZXGamesModel *parent, size_t start, size_t count)
-    : ZXRequest(parent)
-    , m_start(start)
-    , m_count(count)
-{
-    QNetworkRequest req(parent->searchString() + zxSpectrumSearchTitle.arg(count).arg(start / 50 + 1));
-    req.setPriority(QNetworkRequest::NormalPriority);
-    m_reply = parent->networkManager().get(req);
-    connect(m_reply.data(), &QNetworkReply::finished, this, [this] {
-        if (!m_aborted && !m_data.isEmpty()) {
-            auto response = QJsonDocument::fromJson(m_data).object().value(u"response"_s).toObject();
-            auto docs = response.value(u"docs"_s).toArray();
-            std::vector<ZXGamesModel::ZXData> data;
-            for (const auto &doc : std::as_const(docs)) {
-                auto obj = doc.toObject();
-                data.emplace_back(obj.value(u"title"_s).toString(), obj.value(u"identifier"_s).toString());
-            }
-            m_model->setFetchedData(data);
+    } else {
+        const auto response = object.value(u"response"_s).toObject();
+        if (!response.value(u"docs"_s).isArray())
+            throw std::runtime_error("Unexpected Internet Archive search response");
+        page.total = response.value(u"numFound"_s).toInt();
+        for (const auto &value : response.value(u"docs"_s).toArray()) {
+            const auto entry = value.toObject();
+            const auto id = entry.value(u"identifier"_s).toString();
+            const auto title = textValue(entry.value(u"title"_s));
+            if (!id.isEmpty() && !title.isEmpty())
+                page.games.append({id, title, {}, endpoints.archive.resolved(QUrl(u"services/img/"_s + segment(id)))});
         }
-        m_reply->deleteLater();
-        m_model->requestFinished(this);
-        deleteLater();
-    });
-
-    connect(m_reply.data(), &QNetworkReply::readyRead, this, [this] {
-        m_data += m_reply->readAll();
-    });
+    }
+    return page;
 }
 
-ZXUpdateRequest::ZXUpdateRequest(ZXGamesModel *parent, const QString &identifier, size_t row)
-    : ZXRequest(parent)
-    , m_identifier(identifier)
-    , m_row(row)
+Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int source, const QString &id)
 {
-    QNetworkRequest req(metadata + identifier);
-    req.setPriority(QNetworkRequest::LowPriority);
-    m_reply = parent->networkManager().get(req);
-    connect(m_reply.data(), &QNetworkReply::finished, this, [this] {
-        if (!m_aborted && !m_data.isEmpty()) {
-            QJsonDocument doc = QJsonDocument::fromJson(m_data);
-            auto rootObject = doc.object();
-            auto files = rootObject.value(u"files"_s).toArray();
-            auto metadata = rootObject.value(u"metadata"_s).toObject();
-            QString emulator_ext = u'.' + metadata.value(u"emulator_ext"_s).toString();
-            for (const auto &file : std::as_const(files)) {
-                auto obj = file.toObject();
-                QString name = obj.value(u"name"_s).toString();
-                if (name.endsWith(emulator_ext)) {
-                    QString md5 = obj.value(u"md5"_s).toString().toLower();
-                    QString path = ZxEmulator::instance().saveFilePath(name);
-                    QFile f(path);
-                    if (!f.open(QIODevice::ReadOnly) ||
-                            QCryptographicHash::hash(f.readAll(), QCryptographicHash::Md5).toHex().toLower() != md5) {
-                        auto workable_servers = rootObject.value(u"workable_servers"_s).toArray();
-                        if (workable_servers.empty())
-                            return;
-
-                        auto download_url
-                            = u"https://"_s
-                              + workable_servers.at(rand() % workable_servers.size()).toString()
-                              + rootObject.value(u"dir"_s).toString() + u'/'
-                              + name;
-
-                        QNetworkRequest req(download_url);
-                        req.setPriority(QNetworkRequest::HighPriority);
-                        auto reply = m_model->networkManager().get(req);
-                        connect(reply, &QNetworkReply::readyRead, this, [reply, this]{
-                            m_fileData += reply->readAll();
-                        });
-
-                        connect(reply, &QNetworkReply::finished, this, [reply, md5, path, this] {
-                            if (QCryptographicHash::hash(m_fileData, QCryptographicHash::Md5).toHex().toLower() == md5) {
-                                QDir d(QFileInfo(path).absoluteDir());
-                                if (d.mkpath(d.absolutePath())) {
-                                    QFile f(path);
-                                    if (f.open(QIODevice::WriteOnly)) {
-                                        f.write(m_fileData);
-                                        f.close();
-                                        m_model->updateData(m_row, path);
-                                    }
-                                }
-                            }
-                            m_model->updateFinished(m_identifier);
-                            reply->deleteLater();
-                            deleteLater();
-                        });
-                    } else {
-                        m_model->updateData(m_row, path);
-                        m_model->updateFinished(m_identifier);
-                        deleteLater();
-                    }
-                    break;
-                }
-            }
+    Details details;
+    if (source == 1) {
+        const auto entry = object.value(u"_source"_s).toObject();
+        details.title = entry.value(u"title"_s).toString();
+        details.subtitle = summary(entry);
+        QStringList description;
+        for (const auto &key : {u"genre"_s, u"availability"_s, u"language"_s}) {
+            const auto text = textValue(entry.value(key));
+            if (!text.isEmpty())
+                description.append(text);
         }
-        m_reply->deleteLater();
-    });
-
-    connect(m_reply.data(), &QNetworkReply::readyRead, this, [this] {
-        m_data += m_reply->readAll();
-    });
+        details.description = description.join(u" · "_s);
+        details.website = QUrl(u"https://zxinfo.dk/details/"_s + segment(id));
+        details.screenshot = screenshotUrl(entry, endpoints);
+        QJsonArray files;
+        for (const auto &release : entry.value(u"releases"_s).toArray())
+            for (const auto &file : release.toObject().value(u"files"_s).toArray())
+                files.append(file);
+        for (const auto &file : entry.value(u"additionalDownloads"_s).toArray())
+            files.append(file);
+        for (const auto &value : files) {
+            const auto file = value.toObject();
+            const auto path = file.value(u"path"_s).toString();
+            const auto name = QFileInfo(path.startsWith(u'/') ? path : QUrl(path).path()).fileName();
+            QString label = file.value(u"format"_s).toString();
+            if (!label.isEmpty())
+                label += u" · "_s;
+            label += name;
+            addFile(details, {zxinfoFileUrl(endpoints, path), name, label, {}, file.value(u"size"_s).toInteger()});
+        }
+    } else {
+        const auto metadata = object.value(u"metadata"_s).toObject();
+        details.title = textValue(metadata.value(u"title"_s));
+        details.subtitle = textValue(metadata.value(u"year"_s));
+        const auto creator = textValue(metadata.value(u"creator"_s));
+        if (!creator.isEmpty())
+            details.subtitle += (details.subtitle.isEmpty() ? QString{} : u" · "_s) + creator;
+        details.description = textValue(metadata.value(u"description"_s));
+        details.website = endpoints.archive.resolved(QUrl(u"details/"_s + segment(id)));
+        details.screenshot = endpoints.archive.resolved(QUrl(u"services/img/"_s + segment(id)));
+        for (const auto &value : object.value(u"files"_s).toArray()) {
+            const auto file = value.toObject();
+            if (file.value(u"private"_s).toString() == u"true"_s || file.value(u"private"_s).toBool())
+                continue;
+            const auto name = file.value(u"name"_s).toString();
+            const QUrl url = endpoints.archive.resolved(QUrl(u"download/"_s + segment(id) + u'/' + segment(name)));
+            addFile(details, {url, QFileInfo(name).fileName(), name, file.value(u"md5"_s).toString().toLatin1().toLower(),
+                              textValue(file.value(u"size"_s)).toLongLong()});
+        }
+    }
+    if (details.title.isEmpty())
+        throw std::runtime_error("This title's details are unavailable");
+    return details;
 }
+
+QString downloadName(int source, const QString &id, const Media &file)
+{
+    const auto hash = QString::fromLatin1(QCryptographicHash::hash(file.url.toEncoded(), QCryptographicHash::Sha256).toHex().left(10));
+    QString name = (source == 1 ? u"zxinfo-"_s : u"archive-"_s) + id + u'-' + hash + u'-' + file.name;
+    for (QChar &ch : name)
+        if (ch.unicode() < 32 || ch.unicode() == 127 || u"<>:\"/\\|?*"_s.contains(ch))
+            ch = u'_';
+    // Keep the extension and the distinguishing source/hash if the catalogue's
+    // filename is longer than a host filesystem component allows.
+    if (name.size() > 200)
+        name = name.first(120) + u'-' + name.last(60);
+    while (name.endsWith(u'.') || name.endsWith(u' '))
+        name.chop(1);
+    return name;
+}
+} // namespace zxonline

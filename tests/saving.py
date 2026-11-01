@@ -14,6 +14,7 @@ import struct
 import subprocess
 import tempfile
 import threading
+import zipfile
 
 
 def basic_bytes(snapshot):
@@ -118,6 +119,14 @@ def main():
         run("basic", source=input_tape, snapshot=True)
         initial = output / "basic.sna"
         assert basic_bytes(initial) == expected
+
+        # Online catalogues commonly provide zipped tapes. Classification must
+        # use the unpacked media so that the same ROM auto-load runs for a ZIP.
+        zipped = output / "input.tap.zip"
+        with zipfile.ZipFile(zipped, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            archive.write(input_tape, "input.tap")
+        run("zip-tape", source=zipped, snapshot=True)
+        assert basic_bytes(output / "zip-tape.sna") == expected
 
         # SAVE a title with filesystem punctuation; export uses a portable filename
         # while the tape's original Spectrum header retains its six-character title.

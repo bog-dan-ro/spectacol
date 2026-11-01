@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,75 +17,89 @@
 
 #pragma once
 
+#include "zxrequests.h"
+
 #include <QAbstractListModel>
-#include <QHash>
 #include <QNetworkAccessManager>
-#include <QUrl>
+#include <QNetworkReply>
+#include <QPointer>
+#include <QVariantMap>
 
-#include <unordered_set>
-#include <vector>
-
-class ZXRequest;
 class ZXGamesModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(int source READ source WRITE setSource NOTIFY sourceChanged)
+    Q_PROPERTY(QStringList sources READ sources CONSTANT)
+    Q_PROPERTY(bool searching READ searching NOTIFY stateChanged)
+    Q_PROPERTY(bool loadingDetails READ loadingDetails NOTIFY stateChanged)
+    Q_PROPERTY(bool downloading READ downloading NOTIFY stateChanged)
+    Q_PROPERTY(bool hasMore READ hasMore NOTIFY stateChanged)
+    Q_PROPERTY(bool searched READ searched NOTIFY stateChanged)
+    Q_PROPERTY(int total READ total NOTIFY stateChanged)
+    Q_PROPERTY(QString errorString READ errorString NOTIFY stateChanged)
+    Q_PROPERTY(QVariantMap details READ details NOTIFY detailsChanged)
 
 public:
-    enum ZXRole {
-        Title = Qt::DisplayRole,
-        Path = Qt::UserRole,
-        ScreenFile
-    };
+    enum ZXRole { Title = Qt::DisplayRole, Subtitle = Qt::UserRole, Identifier, Screenshot };
     Q_ENUM(ZXRole)
 
-    struct ZXData {
-        ZXData(const QString &title, const QString &identifier)
-            : title(title)
-            , identifier(identifier)
-        {}
-        QString title;
-        QString identifier;
-        QString path;
-    };
+    explicit ZXGamesModel(QObject *parent = nullptr);
+    explicit ZXGamesModel(const zxonline::Endpoints &endpoints, QObject *parent = nullptr);
+    ~ZXGamesModel() override;
 
-public:
-    explicit ZXGamesModel(QObject *parent = 0);
-    ~ZXGamesModel();
+    int source() const { return m_source; }
+    void setSource(int source);
+    QStringList sources() const;
+    bool searching() const { return !m_searchReply.isNull(); }
+    bool loadingDetails() const { return !m_detailReply.isNull(); }
+    bool downloading() const { return !m_downloadReply.isNull(); }
+    bool hasMore() const { return m_hasMore; }
+    bool searched() const { return m_searched; }
+    int total() const { return m_total; }
+    QString errorString() const { return m_error; }
+    QVariantMap details() const;
 
-    const QString &searchString() const { return m_searchString; }
-    void setSearchData(const std::vector<ZXData> &data, size_t total);
-    void setFetchedData(const std::vector<ZXData> &data);
-    void updateData(size_t row, const QString &path);
-    QNetworkAccessManager &networkManager() { return m_netManager; }
-    void requestFinished(ZXRequest* req);
-    void updateFinished(const QString &identifier);
-
-    // QAbstractItemModel interface
-    int rowCount(const QModelIndex &parent) const override;
+    int rowCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role) const override;
     bool canFetchMore(const QModelIndex &parent) const override;
     void fetchMore(const QModelIndex &parent) override;
     QHash<int, QByteArray> roleNames() const override;
 
 public slots:
-    void search(const QString &title = QString(), const QString &firstTitle = QString());
-    QString getPath(int index);
+    void search(const QString &title = {});
+    void loadMore();
+    void select(int row);
+    void download(int fileIndex, const QString &folder);
+    void cancel();
+    void cancelSelection();
 
 signals:
-    void noResults();
+    void sourceChanged();
+    void stateChanged();
+    void detailsChanged();
+    void pageLoaded(bool firstPage);
+    void downloaded(const QString &path);
 
 private:
-    void abortAll();
+    void fetchPage();
+    void clearResults();
+    QNetworkReply *get(const QUrl &url);
+    void abort(QPointer<QNetworkReply> &reply);
+    void setError(const QString &error);
 
-private:
-    size_t m_totalFound = 0;
-    size_t m_fetchStart = 0;
-    QString m_searchString;
-
-    std::unordered_set<ZXRequest*> m_pendingRequests;
-    mutable QHash<QString, ZXRequest*> m_pendingUpdates;
-
-    std::vector<ZXData> m_data;
-
-    QNetworkAccessManager m_netManager;
+    zxonline::Endpoints m_endpoints;
+    QNetworkAccessManager m_network;
+    QPointer<QNetworkReply> m_searchReply;
+    QPointer<QNetworkReply> m_detailReply;
+    QPointer<QNetworkReply> m_downloadReply;
+    QList<zxonline::Game> m_games;
+    zxonline::Details m_details;
+    QString m_selectedId;
+    QString m_query;
+    QString m_error;
+    int m_source = 0;
+    int m_nextPage = 0;
+    int m_total = 0;
+    bool m_hasMore = false;
+    bool m_searched = false;
 };
