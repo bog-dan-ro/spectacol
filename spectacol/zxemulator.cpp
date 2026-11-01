@@ -29,6 +29,7 @@
 
 #include <QAudioDevice>
 #include <QAudioSink>
+#include <QBuffer>
 #include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
@@ -290,6 +291,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
     zxkit::EmulatorConfig cfg;
     cfg.machineId = "48k";
     cfg.audioSampleRate = 48'000;
+    cfg.fullBorder = true;
     cfg.romResolver = [](std::string_view romName, std::size_t /*expectedSize*/) -> std::vector<uint8_t> {
         QFile f(u":/roms/"_s + QString::fromUtf8(romName.data(), qsizetype(romName.size())));
         if (!f.open(QIODevice::ReadOnly))
@@ -763,8 +765,19 @@ bool ZxEmulator::saveMediaFile(const QString &filePath)
 {
     std::vector<uint8_t> bytes;
     const QString suffix = QFileInfo(filePath).suffix();
-    if (!withEmulator([&bytes, &suffix](zxkit::Emulator &emulator) { bytes = emulator.saveMedia(suffix.toStdString()); }))
+    if (suffix.compare(u"png"_s, Qt::CaseInsensitive) == 0) {
+        // Save the native cropped picture, before software filters or window scaling.
+        QByteArray encoded;
+        QBuffer buffer(&encoded);
+        buffer.open(QIODevice::WriteOnly);
+        if (!ZxImage::instance()->image().save(&buffer, "PNG")) {
+            showMessage(tr("Can't encode the screenshot"), Error);
+            return false;
+        }
+        bytes.assign(encoded.begin(), encoded.end());
+    } else if (!withEmulator([&bytes, &suffix](zxkit::Emulator &emulator) { bytes = emulator.saveMedia(suffix.toStdString()); })) {
         return false;
+    }
     QFile f(filePath);
     if (!f.open(QIODevice::WriteOnly) || f.write(QByteArrayView(bytes).data(), qint64(bytes.size())) != qint64(bytes.size())) {
         showMessage(tr("Can't write '%1'").arg(filePath), Error);

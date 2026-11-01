@@ -19,6 +19,7 @@
 
 #include <QImage>
 #include <QMutex>
+#include <QMargins>
 #include <QSGTexture>
 
 #include <zxkit/video/VideoFrame.h>
@@ -45,15 +46,22 @@ public:
     QSize imageSize() const;
     // Returns the last finished frame and the area changed since the previous call
     Frame takeFrame();
+    QImage image() const;
+    QMargins borderLimits() const;
+    void setBorderMargins(zxkit::BorderMargins margins);
 
     // Engine thread: copies the rows that changed since the previous frame
     void presentFrame(const zxkit::VideoFramePtr &frame);
 
 signals:
+    void sourceGeometryChanged();
     void needsUpdate();
     void geometryChanged(QSize size);
 
 private:
+    bool updateImage(const zxkit::VideoFrame &pixels);
+    zxkit::BorderMargins m_borderMargins;
+    zxkit::VideoFramePtr m_sourceFrame;
     // The renderer gets shallow copies of m_frameImage: presentFrame() detaches
     // from them, so they never change while QRhi uploads them.
     mutable QMutex m_syncVars;

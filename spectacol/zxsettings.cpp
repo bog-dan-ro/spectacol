@@ -18,6 +18,7 @@
 #include "zxsettings.h"
 #include "zxemulator.h"
 #include "nextsdcard.h"
+#include "zximage.h"
 
 #include <zxkit/core/Exception.h>
 #include <zxkit/input/Joystick.h>
@@ -65,6 +66,12 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
 
     {
         QSettings s;
+        s.beginGroup(u"Screen"_s);
+        m_borderMargins = {uint16_t(std::clamp(s.value(u"borderLeft"_s, 32).toInt(), 0, 128)),
+                           uint16_t(std::clamp(s.value(u"borderTop"_s, 32).toInt(), 0, 128)),
+                           uint16_t(std::clamp(s.value(u"borderRight"_s, 32).toInt(), 0, 128)),
+                           uint16_t(std::clamp(s.value(u"borderBottom"_s, 32).toInt(), 0, 128))};
+        s.endGroup();
         s.beginGroup(u"General"_s);
         m_hasStartButton = s.value("hasStartButton", false).toBool();
         m_emulationSpeed = s.value("emulationSpeed", 100).toInt();
@@ -96,6 +103,7 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
             m_gamepadActions[it.key().toInt()] = it.value().toInt();
     }
     setScreenOrientation(screenOrientation());
+    connect(ZxImage::instance(), &ZxImage::sourceGeometryChanged, this, &ZxSettings::borderLimitsChanged, Qt::QueuedConnection);
 
     connect(&NextSdCard::instance(), &NextSdCard::ready, this, [this] {
         if (m_pendingMachineIndex >= 0)
@@ -133,6 +141,7 @@ void ZxSettings::applyTapeOptions()
 
 void ZxSettings::applyToEmulator()
 {
+    ZxImage::instance()->setBorderMargins(m_borderMargins);
     m_zxEmulator.emulator().writeLock()->audioMixer().setStereoMode(ayStereoMode(m_ayStereo));
     applyTapeOptions();
     m_zxEmulator.setSpeed(m_emulationSpeed);
@@ -152,6 +161,30 @@ void ZxSettings::applyToEmulator()
     if (it == m_machineIds.end() || (*it == "next" && !NextSdCard::instance().available()))
         return;
     applyMachine(int(it - m_machineIds.begin()), false);
+}
+
+QVariantMap ZxSettings::borderLimits() const
+{
+    const auto limits = ZxImage::instance()->borderLimits();
+    return {{u"left"_s, limits.left()}, {u"top"_s, limits.top()},
+            {u"right"_s, limits.right()}, {u"bottom"_s, limits.bottom()}};
+}
+
+void ZxSettings::setBorderMargins(int left, int top, int right, int bottom)
+{
+    const zxkit::BorderMargins margins{uint16_t(std::clamp(left, 0, 128)), uint16_t(std::clamp(top, 0, 128)),
+                                       uint16_t(std::clamp(right, 0, 128)), uint16_t(std::clamp(bottom, 0, 128))};
+    if (margins == m_borderMargins)
+        return;
+    m_borderMargins = margins;
+    QSettings s;
+    s.beginGroup(u"Screen"_s);
+    s.setValue(u"borderLeft"_s, margins.left);
+    s.setValue(u"borderTop"_s, margins.top);
+    s.setValue(u"borderRight"_s, margins.right);
+    s.setValue(u"borderBottom"_s, margins.bottom);
+    ZxImage::instance()->setBorderMargins(margins);
+    emit borderMarginsChanged();
 }
 
 void ZxSettings::setCurrentMachineIndex(int idx)

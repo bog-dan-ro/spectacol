@@ -296,6 +296,14 @@ ZxMenuItem {
         }
 
         ZxMenuItem {
+            text: qsTr("Borders")
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "OptionsBordersPage.qml";
+            }
+        }
+
+        ZxMenuItem {
             text: qsTr("Sound")
             onTriggered: {
                 menuBar.close();

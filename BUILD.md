@@ -57,6 +57,17 @@ dataPath=/tmp/spx/data/Spectacol/
 
 ## Software screen filters
 
+Under **Options → Borders**, choose the top, left, bottom and right margins independently. Values are standard
+Spectrum pixels/lines (scaled for Timex hi-res and the Next). Changes are immediate, including while paused,
+and persist between runs. **Wide** keeps the full side borders with zero top/bottom margins; **Full borders**,
+**No borders** and **Default borders** are also available. Each machine's available border limits the crop.
+Spectacol crops ZxKit's full native frame; cropping never resets the machine or alters its timing. Native PNG
+screenshots use the selected crop, before filtering or window scaling. Check the compiled UI with:
+
+```sh
+python3 tests/borders.py
+```
+
 Choose a filter under **Options → Screen → Screen filter**. Normal is the default.
 The selector includes ZxKit's HQ, xBRZ, Scale/AdvMAME, SaI/Eagle, TV, dot matrix,
 bilinear, nearest, scanlines and RGB masks, plus chained presets such as

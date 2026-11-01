@@ -151,6 +151,7 @@ qt_add_qml_module(spectacol
         qml/OptionsGeneralPage.qml
         qml/OptionsPeripheralsPage.qml
         qml/OptionsScreenPage.qml
+        qml/OptionsBordersPage.qml
         qml/OptionsSoundPage.qml
         qml/PokeFinderPage.qml
         qml/PokeManagerPage.qml

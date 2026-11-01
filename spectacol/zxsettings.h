@@ -21,6 +21,8 @@
 
 #include <QGamepadManager>
 #include <QQmlEngine>
+#include <QVariantMap>
+#include <zxkit/video/VideoFrame.h>
 
 #include <mutex>
 #include <string>
@@ -59,6 +61,11 @@ class ZxSettings : public QObject
     Q_PROPERTY(FillMode fillMode READ fillMode WRITE setFillMode NOTIFY fillModeChanged)
     Q_PROPERTY(bool smoothScaling READ smoothScaling WRITE setSmoothScaling NOTIFY smoothScalingChanged)
     Q_PROPERTY(bool leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
+    Q_PROPERTY(int borderLeft READ borderLeft NOTIFY borderMarginsChanged)
+    Q_PROPERTY(int borderTop READ borderTop NOTIFY borderMarginsChanged)
+    Q_PROPERTY(int borderRight READ borderRight NOTIFY borderMarginsChanged)
+    Q_PROPERTY(int borderBottom READ borderBottom NOTIFY borderMarginsChanged)
+    Q_PROPERTY(QVariantMap borderLimits READ borderLimits NOTIFY borderLimitsChanged)
 
     // Sound Options
     Q_PROPERTY(bool soundEnabled READ soundEnabled WRITE setSoundEnabled NOTIFY settingsCurrentChanged)
@@ -78,6 +85,12 @@ class ZxSettings : public QObject
     Q_PROPERTY(qreal deadZone READ deadZone WRITE setDeadZone NOTIFY deadZoneChanged)
 
 public:
+    int borderLeft() const { return m_borderMargins.left; }
+    int borderTop() const { return m_borderMargins.top; }
+    int borderRight() const { return m_borderMargins.right; }
+    int borderBottom() const { return m_borderMargins.bottom; }
+    QVariantMap borderLimits() const;
+    Q_INVOKABLE void setBorderMargins(int left, int top, int right, int bottom);
     enum UiMode {
         AutoUi,    // the desktop layout without a gamepad or a touch screen, else the overlay
         OverlayUi,
@@ -224,6 +237,8 @@ private:
     };
 
 signals:
+    void borderLimitsChanged();
+    void borderMarginsChanged();
     void currentMachineChanged();
     void settingsCurrentChanged();
     void hasStartButtonChanged(bool hasStartButton);
@@ -240,6 +255,7 @@ signals:
 
 private:
     ZxEmulator &m_zxEmulator;
+    zxkit::BorderMargins m_borderMargins;
     bool m_hasStartButton = false;
     int m_currentMachineIndex = 1; // Default to 48k
     std::string m_savedMachineId = "48k";
