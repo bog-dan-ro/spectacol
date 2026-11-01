@@ -105,6 +105,7 @@ qt_add_qml_module(spectacol
         zxemulator.cpp zxemulator.h
         zxrecording.cpp zxrecording.h
         zxscreen.cpp zxscreen.h
+        screenfilters.h
         zxsettings.cpp zxsettings.h
         zxtape.cpp zxtape.h
         zxtapedata.cpp zxtapedata.h
@@ -180,4 +181,4 @@ qt_add_qml_module(spectacol
         SOURCES sdcardfiles.h sdcardfiles.cpp
 )
 
-target_link_libraries(spectacol PRIVATE ZX::Kit Qt::Quick Qt::Multimedia Qt::GamepadLegacy Qt::GuiPrivate Qt::ShaderTools)
+target_link_libraries(spectacol PRIVATE ZX::VideoFilters Qt::Quick Qt::Multimedia Qt::GamepadLegacy Qt::GuiPrivate Qt::ShaderTools)

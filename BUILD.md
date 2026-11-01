@@ -55,6 +55,34 @@ first_start=false
 dataPath=/tmp/spx/data/Spectacol/
 ```
 
+## Software screen filters
+
+Choose a filter under **Options → Screen → Screen filter**. Normal is the default.
+The selector includes ZxKit's HQ, xBRZ, Scale/AdvMAME, SaI/Eagle, TV, dot matrix,
+bilinear, nearest, scanlines and RGB masks, plus chained presets such as
+HQ4x + Scanlines and xBRZ4x + RGB mask. HQ4x + TV4x enlarges each dimension
+16 times; the same-resolution scanline presets retain the scaler's dimensions.
+
+The choice is restored on startup using the stable preset ID in
+`Screen/softwareFilter`, independent of menu ordering. For example, an isolated
+headless configuration can append:
+
+```ini
+[Screen]
+softwareFilter=hq:4+scanlines:1
+```
+
+Filtering runs during rendering and updates immediately even while emulation
+is paused. Native screen dimensions still determine aspect ratio, integer
+scaling and mouse input. Normal bypasses the CPU filters. Unsupported texture
+sizes or processing failures restore Normal and show the error.
+
+Use `--ui-screenshot` to capture the displayed filter. Saved emulator screenshots,
+screen files and snapshot previews retain native pixels. Large software filter
+chains can reduce rendering performance; the emulator frame callback continues
+to publish native frames. Spectacol links the separate `ZX::VideoFilters` target;
+other ZxKit consumers can continue to link only `ZX::Kit`.
+
 ## Android
 
 The Android build has not been ported to CMake and Qt 6 yet (see the Android section of `TODO.md`). It will need

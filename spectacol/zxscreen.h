@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,9 @@
 
 #include <QQmlEngine>
 #include <QQuickItem>
+#include <QImage>
+
+#include <zxkit/video/VideoFilters.h>
 
 #include <optional>
 
@@ -61,6 +64,7 @@ private:
     void updateImplicitSize();
     void updateMouseGrab(bool grabbed);
     void sendMouseMotion(QPointF position);
+    void applySoftwareFilter(QImage& image, QRect& dirty);
 
 private:
     QSize m_imageSize;
@@ -70,4 +74,11 @@ private:
     bool m_mouseGrabSuspended = false;
     std::optional<QPointF> m_lastMousePosition = std::nullopt;
     QPointF m_mouseMotionRemainder;
+    int m_filterIndex = 0;
+    bool m_filterChanged = true;
+    // Used only during rendering, with the GUI thread blocked. ZxImage keeps
+    // native frames; the emulation callback never runs software filters.
+    zxkit::VideoFilterPipeline m_filterPipeline;
+    zxkit::VideoFrame m_filterSource{0, 0};
+    QImage m_filteredImage;
 };

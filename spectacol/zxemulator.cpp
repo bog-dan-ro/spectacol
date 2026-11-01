@@ -20,6 +20,7 @@
 #include "zxsettings.h"
 #include "qmlui.h"
 #include "zximage.h"
+#include "screenfilters.h"
 
 #include <zxkit/input/Joystick.h>
 #include <zxkit/input/Mouse.h>
@@ -281,6 +282,18 @@ ZxEmulator::ZxEmulator(QObject *parent)
     m_engine = std::make_unique<zxkit::Engine>(std::move(cfg), std::move(engineConfig));
     emulator().writeLock()->setRewindEnabled(true, 300);
     m_settings->applyToEmulator();
+    {
+        QSettings settings;
+        settings.beginGroup(u"Screen"_s);
+        const auto savedFilter = settings.value(u"softwareFilter"_s, u"normal"_s).toString();
+        const auto presets = screenFilterPresets();
+        for (std::size_t index = 0; index < presets.size(); ++index) {
+            if (presets[index].id == savedFilter) {
+                m_selectedFilterIndex = int(index);
+                break;
+            }
+        }
+    }
     m_selectedJoystickIndex = std::clamp(QSettings().value("joystick", int(CursorKeys)).toInt(), int(NoJoystick), int(FullerJoystick));
     attachJoystick(m_selectedJoystickIndex);
 
@@ -513,12 +526,10 @@ bool ZxEmulator::saveSnapshotEnabled() const
 
 QStringList ZxEmulator::filtersModel() const
 {
-    return {
-        u"Normal"_s,
-        u"CRT Scanlines"_s,
-        u"2xSaI"_s,
-        u"HQ2x"_s
-    };
+    QStringList names;
+    for (const auto& preset : screenFilterPresets())
+        names.push_back(preset.name);
+    return names;
 }
 
 int ZxEmulator::selectedFilterIndex() const
@@ -528,9 +539,16 @@ int ZxEmulator::selectedFilterIndex() const
 
 void ZxEmulator::setSelectedFilterIndex(int selectedFilterIndex)
 {
-    if (m_selectedFilterIndex == selectedFilterIndex)
+    const auto presets = screenFilterPresets();
+    if (selectedFilterIndex < 0 || std::size_t(selectedFilterIndex) >= presets.size()
+        || m_selectedFilterIndex == selectedFilterIndex)
         return;
     m_selectedFilterIndex = selectedFilterIndex;
+    {
+        QSettings settings;
+        settings.beginGroup(u"Screen"_s);
+        settings.setValue(u"softwareFilter"_s, presets[std::size_t(selectedFilterIndex)].id);
+    }
     emit selectedFilterIndexChanged();
 }
 

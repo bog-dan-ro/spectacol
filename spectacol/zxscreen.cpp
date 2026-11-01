@@ -1,6 +1,6 @@
 /* zxscreen.cpp: QML Item representing the ZX Spectrum screen
 
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,12 +20,18 @@
 
 #include "zximage.h"
 #include "zxemulator.h"
+#include "screenfilters.h"
 
+#include <zxkit/core/Exception.h>
+#include <rhi/qrhi.h>
 #include <QQuickWindow>
 #include <QSGRendererInterface>
 #include <QSGSimpleTextureNode>
 
 #include <cmath>
+#include <algorithm>
+#include <new>
+#include <stdexcept>
 #include <utility>
 
 static double fitFactor(double i, double s)
@@ -77,6 +83,12 @@ ZxScreen::ZxScreen(QQuickItem *parent)
     setAcceptedMouseButtons(Qt::LeftButton | Qt::MiddleButton | Qt::RightButton);
 
     auto settings = ZxEmulator::instance().settings();
+    m_filterIndex = ZxEmulator::instance().selectedFilterIndex();
+    connect(&ZxEmulator::instance(), &ZxEmulator::selectedFilterIndexChanged, this, [this] {
+        m_filterIndex = ZxEmulator::instance().selectedFilterIndex();
+        m_filterChanged = true;
+        update(); // Also re-filter a paused frame, without waiting for the Engine.
+    });
     m_fillMode = settings->fillMode();
     m_smoothScaling = settings->smoothScaling();
     connect(settings, &ZxSettings::fillModeChanged, this, [this](ZxSettings::FillMode fillMode) {
@@ -156,6 +168,10 @@ QSGNode *ZxScreen::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         return nullptr;
     }
 
+    // Layout and integer scaling use the native screen dimensions. Enlarging a
+    // texture must not change the screen's geometry or the mouse coordinates.
+    applySoftwareFilter(frame.image, frame.dirty);
+
     if (window()->rendererInterface()->graphicsApi() == QSGRendererInterface::Software) {
         // The software renderer (no GPU, the offscreen platform) can't use ZxTexture's
         // RHI uploads: give it a new texture when the image changed
@@ -181,6 +197,74 @@ QSGNode *ZxScreen::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     // the texture object is the same, but its content changed
     node->markDirty(QSGNode::DirtyMaterial);
     return node;
+}
+
+void ZxScreen::applySoftwareFilter(QImage& image, QRect& dirty)
+{
+    const bool changed = std::exchange(m_filterChanged, false);
+    try {
+        if (changed) {
+            m_filterPipeline.setStages(screenFilterPresets()[std::size_t(m_filterIndex)].stages);
+            m_filterPipeline.releaseBuffers();
+            m_filterSource = zxkit::VideoFrame(0, 0);
+            m_filteredImage = {};
+        }
+        if (m_filterPipeline.stages().empty()) {
+            if (changed)
+                dirty = image.rect();
+            return;
+        }
+        if (changed || !dirty.isEmpty() || m_filteredImage.isNull()) {
+            const auto size = m_filterPipeline.outputSize({uint32_t(image.width()), uint32_t(image.height())});
+            const auto rhi = static_cast<QRhi*>(window()->rendererInterface()->getResource(window(), QSGRendererInterface::RhiResource));
+            if (rhi) {
+                const auto maxSize = uint32_t(rhi->resourceLimit(QRhi::TextureSizeMax));
+                if (size.width > maxSize || size.height > maxSize)
+                    throw std::runtime_error("The selected filter exceeds the maximum screen texture size.");
+            }
+            if (m_filterSource.width() != uint32_t(image.width()) || m_filterSource.height() != uint32_t(image.height()))
+                m_filterSource = zxkit::VideoFrame(uint32_t(image.width()), uint32_t(image.height()));
+            for (int y = 0; y < image.height(); ++y) {
+                const auto source = std::span(reinterpret_cast<const uint32_t*>(image.constScanLine(y)), std::size_t(image.width()));
+                std::ranges::copy(source, m_filterSource.scanline(uint32_t(y)).begin());
+            }
+            const auto& output = m_filterPipeline.apply(m_filterSource);
+            // Own the QImage pixels: queued texture uploads may retain them past
+            // the next pipeline.apply(), which reuses its buffers.
+            m_filteredImage = QImage(reinterpret_cast<const uchar*>(output.pixels().data()),
+                                     int(output.width()), int(output.height()),
+                                     qsizetype(output.width()) * sizeof(uint32_t), QImage::Format_RGBA8888).copy();
+            if (m_filteredImage.isNull())
+                throw std::bad_alloc();
+            dirty = m_filteredImage.rect(); // Neighborhood filters also change adjacent rows.
+        }
+        image = m_filteredImage;
+    } catch (const std::exception& error) {
+        const auto failedIndex = m_filterIndex;
+        m_filterIndex = 0;
+        m_filterPipeline.setStages({});
+        m_filterPipeline.releaseBuffers();
+        m_filterSource = zxkit::VideoFrame(0, 0);
+        m_filteredImage = {};
+        dirty = image.rect();
+        QString reason;
+        if (const auto* filterError = dynamic_cast<const zxkit::Exception*>(&error)) {
+            const auto text = filterError->rawMessage();
+            reason = QString::fromUtf8(text.data(), qsizetype(text.size()));
+        } else if (dynamic_cast<const std::bad_alloc*>(&error)) {
+            reason = tr("There is not enough memory for this screen filter.");
+        } else {
+            reason = QString::fromUtf8(error.what());
+        }
+        const auto message = tr("Unable to apply the screen filter: %1").arg(reason);
+        QMetaObject::invokeMethod(&ZxEmulator::instance(), [failedIndex, message] {
+            auto& emulator = ZxEmulator::instance();
+            if (emulator.selectedFilterIndex() == failedIndex) {
+                emulator.setSelectedFilterIndex(0);
+                emulator.showMessage(message, ZxEmulator::Warning);
+            }
+        }, Qt::QueuedConnection);
+    }
 }
 
 void ZxScreen::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
