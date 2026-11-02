@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check chip-model selection and persistence through the compiled Sound page.
+"""Check chip and speaker selection through the compiled Sound page.
 
 Copyright (c) 2015-2026, BogDan Vatra. GPL-3.0-or-later.
 """
@@ -49,7 +49,19 @@ def main():
         ini.write_text(ini.read_text().replace("ayModel=AY8912", "ayModel=unknown"))
         run("recovered", open_sound + ",Down,Down,Down,Right")
         assert "ayModel=YM2149" in ini.read_text(), ini.read_text()
-    print("Sound chip navigation, persistence and invalid-setting recovery passed")
+        speaker_keys = open_sound + ",Down,Down,Down,Down"
+        run("speaker-beeper", speaker_keys + ",Right")
+        assert "speakerType=Beeper" in ini.read_text(), ini.read_text()
+        run("speaker-unfiltered", speaker_keys + ",Right")
+        assert "speakerType=Unfiltered" in ini.read_text(), ini.read_text()
+        run("speaker-restored", speaker_keys + ",Left")
+        assert "speakerType=Beeper" in ini.read_text(), ini.read_text()
+        run("speaker-tv", speaker_keys + ",Left")
+        assert "speakerType=TV speaker" in ini.read_text(), ini.read_text()
+        ini.write_text(ini.read_text().replace("speakerType=TV speaker", "speakerType=unknown"))
+        run("speaker-recovered", speaker_keys + ",Right")
+        assert "speakerType=Beeper" in ini.read_text(), ini.read_text()
+    print("Chip/speaker navigation, persistence and invalid-setting recovery passed")
 
 
 if __name__ == "__main__":

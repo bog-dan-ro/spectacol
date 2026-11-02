@@ -48,6 +48,20 @@ zxkit::AyStereoMode ayStereoMode(const QString &separation)
     return zxkit::AyStereoMode::Mono;
 }
 
+zxkit::SpeakerModel speakerModel(const QString &type)
+{
+    if (type == u"Beeper"_s)
+        return zxkit::SpeakerModel::Beeper;
+    if (type == u"Unfiltered"_s)
+        return zxkit::SpeakerModel::Unfiltered;
+    return zxkit::SpeakerModel::TV;
+}
+
+bool validSpeakerType(const QString &type)
+{
+    return type == u"TV speaker"_s || type == u"Beeper"_s || type == u"Unfiltered"_s;
+}
+
 } // namespace
 
 ZxSettings::ZxSettings(ZxEmulator &emulator)
@@ -89,6 +103,8 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
         if (m_ayModel != u"YM2149"_s)
             m_ayModel = u"AY8912"_s;
         m_speakerType = s.value("speakerType", u"TV speaker"_s).toString();
+        if (!validSpeakerType(m_speakerType))
+            m_speakerType = u"TV speaker"_s;
         s.endGroup();
 
         s.beginGroup(u"Peripherals"_s);
@@ -153,6 +169,7 @@ void ZxSettings::applyToEmulator()
     m_zxEmulator.emulator().writeLock()->audioMixer().setStereoMode(ayStereoMode(m_ayStereo));
     m_zxEmulator.emulator().writeLock()->audioMixer().setAyModel(
         m_ayModel == u"YM2149"_s ? zxkit::AyModel::YM2149 : zxkit::AyModel::AY8912);
+    m_zxEmulator.emulator().writeLock()->audioMixer().setSpeakerModel(speakerModel(m_speakerType));
     applyTapeOptions();
     m_zxEmulator.setSpeed(m_emulationSpeed);
     // One by one: a peripheral that can't start (e.g. a missing ROM) must not stop the others
@@ -381,12 +398,13 @@ void ZxSettings::setAyModel(const QString &model)
 
 void ZxSettings::setSpeakerType(const QString &speakerType)
 {
-    if (m_speakerType == speakerType)
+    if (!validSpeakerType(speakerType) || m_speakerType == speakerType)
         return;
     m_speakerType = speakerType;
     QSettings s;
     s.beginGroup(u"Sound"_s);
     s.setValue("speakerType", speakerType);
+    m_zxEmulator.emulator().writeLock()->audioMixer().setSpeakerModel(speakerModel(speakerType));
     emit settingsCurrentChanged();
 }
 

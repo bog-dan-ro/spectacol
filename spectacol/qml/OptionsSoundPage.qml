@@ -37,6 +37,7 @@ Sheet {
     title: qsTr("Sound")
 
     readonly property var stereoModes: ["None", "ACB", "ABC"]
+    readonly property var speakerTypes: ["TV speaker", "Beeper", "Unfiltered"]
     readonly property var chipModels: ["AY8912", "YM2149"]
 
     SettingsList {
@@ -67,6 +68,13 @@ Sheet {
             currentIndex: Math.max(0, page.chipModels.indexOf(ZxEmulator.settings.ayModel))
             onActivated: (index) => ZxEmulator.settings.ayModel = page.chipModels[index]
         }
-        // "Speaker type" waits for ZxKit's speaker models (see TODO.md)
+        SettingRow {
+            label: qsTr("Speaker")
+            description: qsTr("TV shapes ULA and AY audio; Beeper shapes ULA audio; Unfiltered keeps the original response")
+            kind: "choice"
+            model: [qsTr("TV speaker"), qsTr("Beeper"), qsTr("Unfiltered")]
+            currentIndex: Math.max(0, page.speakerTypes.indexOf(ZxEmulator.settings.speakerType))
+            onActivated: (index) => ZxEmulator.settings.speakerType = page.speakerTypes[index]
+        }
     }
 }

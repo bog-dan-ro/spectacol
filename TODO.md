@@ -15,7 +15,8 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 - [x] AY quality: use ZxKit's band-limited synthesis and measured AY/YM volume curves, with an AY-3-8912 /
       YM2149 choice in Sound settings. Core regressions check alias rejection, envelope shapes and rewind;
       physical-device listening with real game music and effects remains below.
-- [ ] Speaker models: connect `speakerType` to ZxKit's TV speaker, beeper and unfiltered models once available.
+- [x] Speaker models: Sound settings select ZxKit's TV speaker, Beeper and Unfiltered responses, with persistent
+      choices, safe fallback for older settings and smooth runtime transitions.
 - [x] Audio output pacing: adaptive resampling corrects device-clock drift without changing emulation speed.
       Deterministic regressions cover 44.1/48/96 kHz, 50/100/200% speed and ten virtual minutes of clock mismatch.
       Packet timing keeps latency/phase continuous across speed changes; turbo estimates exclude paused time.
