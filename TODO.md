@@ -49,11 +49,15 @@ controls, netplay, Google Play sharing, new platform ports and the broad metadat
 - [x] **SD card page** (Media → SD card, on the Next): the image (path, free space), its folders and files, copy a
       host file onto the card, make a folder, remove a file or an empty folder (the Next restarts after a change),
       pick another image or go back to the downloaded one.
-  - [ ] Re-download or update the distro (a newer NextZXOS) from the page.
-  - [ ] The DivMMC on the other machines: ZxKit's `DivMmcPeripheral` (esxDOS) isn't offered in the peripherals
-        page yet; it would use the same card (and this page).
-  - [ ] Adding a file goes through the platform's file dialog: a gamepad can't drive it (the in-app cover flow
-        browser could pick the file instead).
+  - [x] Re-download/update the distro from the page, preserving the previous default image as a backup.
+        Failed/cancelled updates keep the current card; offline HTTP tests cover replacement and recovery.
+  - [ ] DivMMC/esxDOS on the other machines: **postponed**. It must remain an optional peripheral.
+  - [x] Add host files and select SD images through the in-app browser using a gamepad.
+- [x] ESP/Pi UART modules: QJSEngine lives on the ZxKit Engine thread; direct byte hooks, host TCP/UDP,
+      timers, bounded queues and a script watchdog. Local/HTTPS scripts can be selected and reloaded without
+      rebuilding; see `UART.md`. Pi bridges to a host service; it does not emulate Linux or I2S.
+- [x] Next extended keys on the physical/on-screen keyboards and separate Multiface/drive NMI actions.
+- [x] Supply host local RTC time and persist its battery RAM.
 
 ## Features and fixes
 

@@ -35,7 +35,7 @@ Sheet {
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Open folder"), action: () => page.openCurrent() },
         { pad: "B", key: "Esc", text: qsTr("Close"), action: () => pageLoader.source = "" },
-        { pad: "X", key: "Ins", text: qsTr("Add file"), action: () => { if (page.writable) addDialog.open(); } },
+        { pad: "X", key: "Ins", text: qsTr("Add file"), action: () => { if (page.writable) pageLoader.setSource("FilePickerPage.qml",{purpose:"sdCopy"}); } },
         { pad: "Y", key: "Del", text: qsTr("Remove"), action: () => page.removeCurrent() }
     ]
 
@@ -80,22 +80,29 @@ Sheet {
     }
 
 
-    FileDialog {
-        id: addDialog
-        title: qsTr("Copy a file onto the SD card")
-        popupType: Popup.Item // when there's no native dialog: in the (full screen) window
-        onAccepted: page.card.addFile(selectedFile)
-    }
-
-    FileDialog {
-        id: imageDialog
-        title: qsTr("Choose an SD card image")
-        popupType: Popup.Item
-        nameFilters: [qsTr("SD card images (*.img *.mmc *.hdf)"), qsTr("All files (*)")]
-        onAccepted: page.card.useImage(selectedFile)
-    }
-
     // In the window, and Return (the gamepad's A) confirms
+    Dialog {
+        id: updateDialog
+        title: qsTr("Update downloaded image")
+        anchors.centerIn: parent
+        width: Math.min(page.width-Theme.sp(12),Theme.sp(140))
+        modal: true
+        focus: true
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        onAccepted: {
+            NextSdCard.updateDistro();
+            pageLoader.setSource("NextSdCardPage.qml",{returnToCard:true});
+        }
+        onClosed: filesView.forceActiveFocus()
+        Label {
+            width: parent.width
+            wrapMode: Text.WordWrap
+            text: qsTr("Download the latest official emulator image? The previous downloaded image will be kept as a backup. A custom image is kept unchanged.")
+            font.pixelSize: Theme.body
+            color: Theme.text
+        }
+    }
+
     Dialog {
         id: removeDialog
         property string name
@@ -162,7 +169,7 @@ Sheet {
                 if (page.card.readOnly)
                     text += qsTr(", read only");
                 if (page.card.inUse)
-                    text += qsTr(". Changes restart the Next.");
+                    text += qsTr(". Changes restart the machine.");
                 return text;
             }
         }
@@ -224,7 +231,7 @@ Sheet {
             Keys.onReturnPressed: page.openCurrent()
             Keys.onPressed: (event) => {
                 if (event.key === Qt.Key_Insert && page.writable) {
-                    addDialog.open();
+                    pageLoader.setSource("FilePickerPage.qml",{purpose:"sdCopy"});
                     event.accepted = true;
                 } else if (event.key === Qt.Key_Delete) {
                     page.removeCurrent();
@@ -245,7 +252,12 @@ Sheet {
             Button {
                 text: qsTr("Other image")
                 flat: true
-                onClicked: imageDialog.open()
+                onClicked: pageLoader.setSource("FilePickerPage.qml",{purpose:"sdImage"})
+            }
+            Button {
+                text: qsTr("Update downloaded image")
+                flat: true
+                onClicked: updateDialog.open()
             }
             Button {
                 text: qsTr("Downloaded image")

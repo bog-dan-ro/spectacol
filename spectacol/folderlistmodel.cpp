@@ -186,6 +186,8 @@ QHash<int, QByteArray> FolderListModel::roleNames() const
 
 bool FolderListModel::canOpen(const QString &path)
 {
+    if (m_filterClass == HostFiles)
+        return true;
     BlockErrors silenter;
     QFile f(path);
     if (!f.open(QIODevice::ReadOnly))

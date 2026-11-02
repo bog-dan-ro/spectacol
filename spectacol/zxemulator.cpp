@@ -199,6 +199,50 @@ MappedZxKeys mapQtKeyToZx(int qtKey, int modifiers)
     }
 }
 
+std::optional<zxkit::NextKey> nextExtendedKey(int key)
+{
+    using K = zxkit::NextKey;
+    switch (key) {
+    case Qt::Key_Right:
+        return K::Right;
+    case Qt::Key_Left:
+        return K::Left;
+    case Qt::Key_Down:
+        return K::Down;
+    case Qt::Key_Up:
+        return K::Up;
+    case Qt::Key_Period:
+        return K::Period;
+    case Qt::Key_Comma:
+        return K::Comma;
+    case Qt::Key_QuoteDbl:
+        return K::Quote;
+    case Qt::Key_Semicolon:
+        return K::Semicolon;
+    case Qt::Key_Tab:
+        return K::Extend;
+    case Qt::Key_CapsLock:
+    case Qt::Key_F2:
+        return K::CapsLock;
+    case Qt::Key_Home:
+        return K::Graph;
+    case Qt::Key_F3:
+        return K::TrueVideo;
+    case Qt::Key_F4:
+        return K::InvVideo;
+    case Qt::Key_Escape:
+        return K::Break;
+    case Qt::Key_Insert:
+    case Qt::Key_F1:
+        return K::Edit;
+    case Qt::Key_Backspace:
+    case Qt::Key_Delete:
+        return K::Delete;
+    default:
+        return std::nullopt;
+    }
+}
+
 // The Recreated ZX Spectrum keyboard (Elite Systems), in its game mode, types a character when a
 // key goes down and another when it goes up (FUSE's input.c). The characters, as US keys
 // (upper case and the shifted symbols: typed with Shift):
@@ -337,7 +381,10 @@ ZxEmulator::ZxEmulator(QObject *parent)
         return std::vector<uint8_t>(bytes.begin(), bytes.end());
     };
 
+    m_uartHooks = std::make_unique<NextUartHooks>();
+    QQmlEngine::setObjectOwnership(m_uartHooks.get(), QQmlEngine::CppOwnership);
     zxkit::EngineConfig engineConfig;
+    engineConfig.threadHooks = m_uartHooks->threadHooks();
     engineConfig.callbacks = {
         .videoFrame = m_videoFrameCallback.weak(),
         .audio = m_audioCallback.weak(),
@@ -1121,6 +1168,13 @@ void ZxEmulator::hardReset()
     m_engine->refreshFrame();
 }
 
+void ZxEmulator::nextNmi(bool multiface)
+{
+    if (!emulator().writeLock()->triggerNextNmi(multiface))
+        showMessage(tr("This Next NMI button is disabled or another device is handling NMI."));
+    m_engine->refreshFrame();
+}
+
 void ZxEmulator::nmi()
 {
     resetLoadedFile();
@@ -1298,8 +1352,12 @@ void ZxEmulator::applyKeyChanges(const HeldKeyState::Changes &changes)
     if (changes.isEmpty() || !m_engine)
         return;
     auto emulator = this->emulator().writeLock();
-    for (const auto &[key, pressed] : changes)
-        emulator->setKeyState(static_cast<zxkit::ZxKey>(key), pressed);
+    for (const auto &[key, pressed] : changes) {
+        if (key >= 0x100 && key < 0x110)
+            emulator->setNextKeyState(static_cast<zxkit::NextKey>(key - 0x100), pressed);
+        else
+            emulator->setKeyState(static_cast<zxkit::ZxKey>(key), pressed);
+    }
 }
 
 void ZxEmulator::setInputKeys(quint64 source, const QSet<int> &keys)
@@ -1340,6 +1398,13 @@ void ZxEmulator::applyControllerState()
     }
 }
 
+void ZxEmulator::setNextKeyState(int key, bool pressed)
+{
+    if (key < 0 || key >= 16 || (pressed && m_paused))
+        return;
+    setInputKeys((quint64(7) << 32) | unsigned(key), pressed ? QSet<int>{0x100 + key} : QSet<int>{});
+}
+
 void ZxEmulator::setCobraKeyState(int qtKey, bool pressed)
 {
     if (pressed) {
@@ -1367,11 +1432,16 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
     }
     QSet<int> keys;
     bool cobra = false;
+    std::optional<zxkit::NextKey> nextKey;
     if (!virtualKeyboard) {
         const auto emulator = this->emulator().readLock();
         cobra = hasCobraKeyboard(*emulator);
+        if (emulator->machine().id() == "next")
+            nextKey = nextExtendedKey(qtKey);
     }
-    if (const auto key = cobra ? cobraKey(qtKey, modifiers) : std::nullopt) {
+    if (nextKey) {
+        keys.insert(0x100 + int(*nextKey));
+    } else if (const auto key = cobra ? cobraKey(qtKey, modifiers) : std::nullopt) {
         keys.insert(int(*key));
     } else {
         const auto mapped = mapQtKeyToZx(qtKey, modifiers);

@@ -105,6 +105,7 @@ qt_add_qml_module(spectacol
         screenfilters.h
         zxsettings.cpp zxsettings.h
         controllerinput.cpp controllerinput.h
+        nextuarthooks.cpp nextuarthooks.h
         zxtape.cpp zxtape.h
         zxtapedata.cpp zxtapedata.h
         zximage.cpp zximage.h
@@ -143,6 +144,8 @@ qt_add_qml_module(spectacol
         qml/MenuView.qml
         qml/MessagePage.qml
         qml/NextSdCardPage.qml
+        qml/NextUartPage.qml
+        qml/FilePickerPage.qml
         qml/SdCardPage.qml
         qml/KeyboardInput.qml
         qml/OnScreen48Keyboard.qml
@@ -183,3 +186,9 @@ qt_add_qml_module(spectacol
 )
 
 target_link_libraries(spectacol PRIVATE ZX::VideoFilters Qt::Quick Qt::Multimedia Qt::GamepadLegacy Qt::GuiPrivate Qt::ShaderTools)
+
+qt_add_resources(spectacol "uart_scripts"
+    PREFIX "/uart"
+    BASE "uart"
+    FILES uart/esp.js uart/pi.js
+)

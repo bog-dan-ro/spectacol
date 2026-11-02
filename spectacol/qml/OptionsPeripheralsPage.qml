@@ -59,6 +59,13 @@ Sheet {
             onToggled: (on) => ZxEmulator.settings.interface2 = on
         }
 
+        SettingRow {
+            visible: ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
+            label: qsTr("Next UART devices")
+            description: qsTr("Wi-Fi, Pi service and external scripts")
+            kind: "action"
+            onClicked: pageLoader.source="NextUartPage.qml"
+        }
         SectionTitle { text: qsTr("Keyboard and gamepad") }
         SettingRow {
             label: qsTr("Full on-screen keyboard")

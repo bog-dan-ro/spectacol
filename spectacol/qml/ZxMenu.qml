@@ -267,11 +267,22 @@ ZxMenuItem {
         }
 
         ZxMenuItem {
+            visible: ZxEmulator.settings.currentMachine !== "ZX Spectrum Next"
             text: qsTr("NMI")
             onTriggered: {
                 menuBar.close();
                 ZxEmulator.nmi();
             }
+        }
+        ZxMenuItem {
+            visible: ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
+            text: qsTr("Multiface button")
+            onTriggered: { menuBar.close(); ZxEmulator.nextNmi(true); }
+        }
+        ZxMenuItem {
+            visible: ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
+            text: qsTr("DivMMC drive button")
+            onTriggered: { menuBar.close(); ZxEmulator.nextNmi(false); }
         }
     }
 

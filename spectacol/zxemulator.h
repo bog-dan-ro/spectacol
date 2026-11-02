@@ -16,6 +16,7 @@
 */
 
 #pragma once
+#include "nextuarthooks.h"
 
 #include "breakpointsmodel.h"
 #include "disassamblemodel.h"
@@ -58,6 +59,7 @@ class ZxEmulator : public QObject
     QML_ELEMENT
     QML_SINGLETON
 
+    Q_PROPERTY(NextUartHooks *uartHooks READ uartHooks CONSTANT)
     Q_PROPERTY(bool touchscreen MEMBER m_touchscreen CONSTANT)
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
     Q_PROPERTY(bool processInputEvents READ processInputEvents WRITE setProcessInputEvents NOTIFY processInputEventsChanged)
@@ -138,6 +140,7 @@ public:
     static ZxEmulator &instance();
     ~ZxEmulator();
 
+    NextUartHooks *uartHooks() const { return m_uartHooks.get(); }
     zxkit::Engine &engine() { return *m_engine; }
     const zxkit::Engine &engine() const { return *m_engine; }
     /// The emulated machine, shared with the Engine thread: lock it to use it.
@@ -275,6 +278,8 @@ public slots:
     void reset();
     void hardReset();
     void nmi();
+    void nextNmi(bool multiface);
+    Q_INVOKABLE void setNextKeyState(int key, bool pressed);
     void quickSaveSnapshot();
     void quickLoadSnapshot();
 
@@ -383,6 +388,7 @@ private:
     zxkit::CallbackHandle<zxkit::LogCallback> m_logCallback;
     zxkit::CallbackHandle<zxkit::MediaActivityCallback> m_mediaActivityCallback;
     zxkit::MediaActivity m_mediaActivity; // the last one the GUI saw
+    std::unique_ptr<NextUartHooks> m_uartHooks;
     std::unique_ptr<zxkit::Engine> m_engine;
     std::unique_ptr<QAudioSink> m_audioOutput;
     QIODevice *m_audioOutputDevice = nullptr;

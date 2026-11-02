@@ -52,6 +52,10 @@ SdCardFiles::SdCardFiles(ZxEmulator *parent)
         m_folder = u"/"_s;
         refresh();
     });
+    connect(&NextSdCard::instance(), &NextSdCard::ready, this, [this] {
+        useImage({});
+        refresh();
+    });
     // ZxEmulator creates the engine after its members
     QMetaObject::invokeMethod(this, &SdCardFiles::updateInUse, Qt::QueuedConnection);
 }

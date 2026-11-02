@@ -17,11 +17,15 @@
 
 #include "nextsdcard.h"
 
+#include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
 #include <QNetworkReply>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
+#include <zxkit/peripherals/storage/FatVolume.h>
+#include <zxkit/peripherals/storage/SdCard.h>
 
 #include <zxkit/core/Exception.h>
 #include <zxkit/media/Compression.h>
@@ -66,7 +70,7 @@ QString NextSdCard::defaultImagePath() const
 
 QString NextSdCard::zipPath() const
 {
-    return QFileInfo(defaultImagePath()).absolutePath() + u"/"_s + QFileInfo(QString::fromLatin1(kDistroUrl)).fileName();
+    return QFileInfo(defaultImagePath()).absolutePath() + u"/"_s + QFileInfo(downloadUrl()).fileName();
 }
 
 QString NextSdCard::imagePath() const
@@ -95,7 +99,7 @@ bool NextSdCard::available() const
 
 QString NextSdCard::downloadUrl() const
 {
-    return QString::fromLatin1(kDistroUrl);
+    return QSettings{}.value(u"Next/distroUrl"_s, QString::fromUtf8(kDistroUrl)).toString();
 }
 
 void NextSdCard::requestDownload()
@@ -120,18 +124,67 @@ void NextSdCard::setProgress(double progress)
     emit progressChanged();
 }
 
+void NextSdCard::updateDistro()
+{
+    if (m_state == Checking || m_state == Downloading || m_state == Extracting)
+        return;
+    m_forceDownload = true;
+    m_cancel = false;
+    setState(Checking);
+    const auto source = QSettings{}.value(u"Next/distroPage"_s, u"https://www.specnext.com/latestdistro/"_s).toUrl();
+    QNetworkRequest request(source);
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+    m_reply = m_network.get(request);
+    auto bytes = std::make_shared<QByteArray>();
+    connect(m_reply, &QNetworkReply::readyRead, this, [this, bytes] {
+        *bytes += m_reply->readAll();
+        if (bytes->size() > 2 * 1024 * 1024)
+            m_reply->abort();
+    });
+    connect(m_reply, &QNetworkReply::finished, this, [this, bytes] {
+        auto reply = m_reply;
+        *bytes += reply->readAll();
+        reply->deleteLater();
+        m_reply = nullptr;
+        if (reply->error() != QNetworkReply::NoError || m_cancel) {
+            setState(m_cancel ? Idle : Failed, m_cancel ? QString{} : reply->errorString());
+            return;
+        }
+        const auto html = QString::fromUtf8(*bytes);
+        const QRegularExpression link(u"href\\s*=\\s*[\"']([^\"']*sn-emulator-[^\"']*\\.zip)[\"']"_s,
+                                      QRegularExpression::CaseInsensitiveOption);
+        const auto match = link.match(html);
+        if (!match.hasMatch()) {
+            setState(Failed, tr("The official page contains no emulator image download."));
+            return;
+        }
+        const auto url = reply->url().resolved(QUrl(match.captured(1)));
+        if (url.scheme() != u"https"_s && !(url.scheme() == u"http"_s && url.host() == u"127.0.0.1"_s)) {
+            setState(Failed, tr("The image download URL is not secure."));
+            return;
+        }
+        QSettings{}.setValue(u"Next/distroUrl"_s, url.toString());
+        setState(Idle);
+        download();
+    });
+}
+
 void NextSdCard::download()
 {
     if (m_state == Downloading || m_state == Extracting)
         return;
 
-    // The download goes next to the default image location, even when the
-    // user picked another image: downloading means "use the official one"
-    setImagePath(defaultImagePath());
+    // Prepare the replacement alongside the downloaded image. Keep the active
+    // image and any custom selection intact until extraction and validation pass.
     QDir().mkpath(QFileInfo(zipPath()).absolutePath());
     m_cancel = false;
     setProgress(0);
 
+    if (m_forceDownload) {
+        QFile::remove(zipPath());
+        QFile::remove(zipPath() + u".part"_s);
+        m_forceDownload = false;
+    }
     if (QFileInfo::exists(zipPath())) {
         m_freshZip = false;
         startExtraction();
@@ -215,7 +268,28 @@ void NextSdCard::startExtraction()
                 QMetaObject::invokeMethod(this, [this, p = double(done) / double(total)] { setProgress(p); }, Qt::QueuedConnection);
                 return !m_cancel.load();
             });
-            std::filesystem::rename(part, image);
+            if (m_cancel)
+                throw zxkit::IoException("SD card extraction cancelled");
+            zxkit::SdCard check;
+            check.insert(part, true);
+            zxkit::FatVolume volume(
+                [&check](uint64_t lba, std::span<uint8_t, 512> block) { return check.readBlock(lba, block); });
+            check.eject();
+            std::filesystem::path backup;
+            if (std::filesystem::exists(image)) {
+                backup = image;
+                backup += ".backup-" + QDateTime::currentDateTimeUtc().toString(u"yyyyMMdd-HHmmss-zzz"_s).toStdString();
+                std::filesystem::rename(image, backup);
+            }
+            try {
+                std::filesystem::rename(part, image);
+            } catch (...) {
+                if (!backup.empty())
+                    std::filesystem::rename(backup, image);
+                throw;
+            }
+            const auto backupName = QString::fromStdString(backup.string());
+            QMetaObject::invokeMethod(this, [this, backupName] { m_backupPath = backupName; }, Qt::QueuedConnection);
         } catch (const zxkit::FormatException &e) {
             error = QString::fromUtf8(e.rawMessage());
             corruptZip = true;
@@ -242,6 +316,7 @@ void NextSdCard::startExtraction()
             }
             std::error_code ec;
             std::filesystem::remove(zip, ec); // the image is all we need
+            setImagePath(defaultImagePath());
             emit imagePathChanged();
             setState(Ready);
             emit ready();

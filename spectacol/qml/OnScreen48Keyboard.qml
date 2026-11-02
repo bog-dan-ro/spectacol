@@ -30,13 +30,16 @@ Item {
     readonly property bool cobraMode: ZxEmulator.settings.currentMachine.startsWith("CoBra 1")
     readonly property int cobraFlag: 0x20000000
     readonly property int cobraControlKey: Qt.Key_Control | cobraFlag
-    readonly property int columns: cobraMode ? 12 : 10
+    readonly property bool nextMode: ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
+    readonly property int nextFlag: 0x10000000
+    readonly property int columns: cobraMode ? 12 : nextMode ? 14 : 10
     readonly property bool cobraCtrlPressed: input.heldKeys.indexOf(cobraControlKey) >= 0
     readonly property bool capsPressed: input.heldKeys.indexOf(Qt.Key_Control) >= 0
     readonly property bool symbolPressed: input.heldKeys.indexOf(Qt.Key_Shift) >= 0
     property bool gamepadMode: false
     property bool stickyCSSS: gamepadMode || stickyCSSSButton.checked
     onCobraModeChanged: releasePressedKeys()
+    onNextModeChanged: releasePressedKeys()
     onGamepadModeChanged: releasePressedKeys()
     Component.onDestruction: releasePressedKeys()
 
@@ -45,7 +48,9 @@ Item {
         sticky: onScreenKeyboard.stickyCSSS
         extraModifier: onScreenKeyboard.cobraControlKey
         onKeyChanged: (key, pressed) => {
-            if (key & cobraFlag)
+            if (key & nextFlag)
+                ZxEmulator.setNextKeyState(key & ~nextFlag, pressed);
+            else if (key & cobraFlag)
                 ZxEmulator.setCobraKeyState(key & ~cobraFlag, pressed);
             else if (pressed)
                 ZxEmulator.keyPress(key);
@@ -83,7 +88,7 @@ Item {
     onVisibleChanged: {
         ZxEmulator.processInputEvents = !visible;
         if (visible) {
-            grid.currentIndex = cobraMode ? 24 : 20;
+            grid.currentIndex = columns * 2;
             grid.forceActiveFocus(Qt.OtherFocusReason);
         } else {
             releasePressedKeys();
@@ -192,18 +197,31 @@ Item {
     }
 
     ListModel { id: cobraKeyboard }
+    ListModel { id: nextKeyboard }
 
     Component.onCompleted: {
         const extraCodes = [Qt.Key_F1, Qt.Key_F2, Qt.Key_F3, Qt.Key_F4,
                             Qt.Key_Escape, Qt.Key_Enter, Qt.Key_Control, Qt.Key_ScrollLock];
         const extraLabels = ["F1", "F2", "F3", "F4", "ESC", "LINE FEED", "CTRL", "NO SCROLL"];
+        const nextCodes = [14,9,11,12, 3,1,2,0, 10,8,13,15, 7,6,5,4];
+        const nextLabels = ["EDIT","CAPS LOCK","TRUE VIDEO","INV VIDEO", "UP","LEFT","DOWN","RIGHT",
+                            "GRAPH","EXTEND","BREAK","DELETE", ";", "\"", ",", "."];
         for (let row = 0; row < 4; ++row) {
             for (let column = 0; column < 10; ++column) {
                 const original = zx48Keyboard.get(row * 10 + column);
+                nextKeyboard.append({code: original.code, letter: original.letter,
+                    keyword: original.keyword || "", redsymbol: original.redsymbol || "",
+                    extgreen: original.extgreen || "", extred: original.extred || "",
+                    buttonColor: original.buttonColor || ""});
                 cobraKeyboard.append({code: original.code, letter: original.letter,
                     keyword: original.keyword || "", redsymbol: original.redsymbol || "",
                     extgreen: original.extgreen || "", extred: original.extred || "",
                     buttonColor: original.buttonColor || ""});
+            }
+            for (let column = 0; column < 4; ++column) {
+                const extra = row * 4 + column;
+                nextKeyboard.append({code: nextCodes[extra] | nextFlag, letter: nextLabels[extra],
+                    keyword: "", redsymbol: "", extgreen: "", extred: "", buttonColor: ""});
             }
             for (let column = 0; column < 2; ++column) {
                 const extra = row * 2 + column;
@@ -242,11 +260,11 @@ Item {
             horizontalCenter: parent.horizontalCenter
             bottom: parent.bottom
         }
-        cellWidth: (mainScreen.portrait || gamepadMode) ? parent.width / columns : Math.min(parent.width / columns, Screen.pixelDensity * 9)
+        cellWidth: (mainScreen.portrait || gamepadMode) ? Math.max(1, Math.floor(parent.width / columns)) : Math.min(parent.width / columns, Screen.pixelDensity * 9)
         cellHeight: mainScreen.portrait ? Screen.pixelDensity * 9 : cellWidth
         width: Math.min(cellWidth * columns + ((mainScreen.portrait || gamepadMode) ? 0 : 8 * Screen.pixelDensity), parent.width)
         height: cellHeight * 4 + ((mainScreen.portrait || gamepadMode) ? 0 : 2 * Screen.pixelDensity)
-        model: cobraMode ? cobraKeyboard : zx48Keyboard
+        model: cobraMode ? cobraKeyboard : nextMode ? nextKeyboard : zx48Keyboard
         currentIndex: 24
         onCurrentIndexChanged: input.release("navigation", false)
         onActiveFocusChanged: if (!activeFocus) input.release("navigation", true)

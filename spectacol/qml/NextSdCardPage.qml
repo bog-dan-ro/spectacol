@@ -24,6 +24,7 @@ import "private"
 
 // @scope main.qml
 Sheet {
+    property bool returnToCard: false
     crumb: qsTr("ZX Spectrum Next")
     title: qsTr("SD card image")
     preferredWidth: Theme.sp(150)
@@ -43,10 +44,10 @@ Sheet {
 
     Connections {
         target: NextSdCard
-        function onReady() { pageLoader.source = ""; }
+        function onReady() { pageLoader.source = returnToCard ? "SdCardPage.qml" : ""; }
     }
 
-    readonly property bool busy: NextSdCard.state === NextSdCard.Downloading || NextSdCard.state === NextSdCard.Extracting
+    readonly property bool busy: NextSdCard.state === NextSdCard.Checking || NextSdCard.state === NextSdCard.Downloading || NextSdCard.state === NextSdCard.Extracting
 
     ColumnLayout {
         anchors.left: parent.left
@@ -74,6 +75,7 @@ Sheet {
             wrapMode: Text.WordWrap
             text: {
                 switch (NextSdCard.state) {
+                case NextSdCard.Checking: return qsTr("Checking the latest official distribution…");
                 case NextSdCard.Downloading: return qsTr("Downloading...");
                 case NextSdCard.Extracting: return qsTr("Extracting the SD card image...");
                 case NextSdCard.Ready: return qsTr("The SD card image is ready.");

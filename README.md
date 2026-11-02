@@ -81,6 +81,24 @@ Quick load finds the newest snapshot across Save As files and per-game quick-sav
 Save failures keep the editor open and leave existing files intact. A failed RZX save keeps the recording in
 memory; **Spectacol → Retry recording save** retries it after the destination is available. Retry before quitting.
 
+## ZX Spectrum Next
+
+**Media → SD card** browses the card, copies host files through the gamepad browser,
+and selects another image. Updating the distro preserves the previous default
+image as a backup; failed or cancelled updates keep the current image.
+
+**Options → Peripherals → Next UART devices** configures the ESP AT module and
+Pi TCP bridge. Choose local scripts or HTTPS URLs, edit and reload without
+rebuilding. The JavaScript engines run on the emulation thread. See [UART.md](UART.md)
+for the module API and supported commands.
+
+The physical and on-screen keyboards provide the Next's extended keys. Arrows,
+punctuation, Tab (Extend), Caps Lock/F2, Home (Graph), F1/Insert (Edit), F3/F4
+(True/Inverse Video), Escape (Break) and Backspace/Delete reach NextREG B0/B1.
+The menu provides separate Multiface and drive NMI buttons, subject to the
+guest's device/button enables. The RTC follows host local time and retains its
+battery RAM in settings. Optional DivMMC support on classic machines is postponed.
+
 ## CoBra
 
 Pick CoBra 1 (64KB or 80KB) or CoBra 2 (TS) in the machine picker. CoBra 1 starts at its
