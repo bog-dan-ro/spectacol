@@ -39,7 +39,10 @@ ZxKit has its own complete unit suite, which must also pass.
 
 ### Threading model (important)
 - GUI thread code talks to the emulator synchronously: `ZxEmulator::instance().emulator().writeLock()->...`, or `withEmulator(fn)` which also shows a ZxKit error to the user. Keep the locked parts short: read files before taking the lock (`loadMediaFile()`), write them after releasing it (`saveMediaFile()`). The lock is not recursive: don't call something that locks again while holding it.
-- The Engine callbacks hop to the GUI thread with `QMetaObject::invokeMethod(this, ..., Qt::QueuedConnection)`.
+- GUI notifications hop from Engine callbacks with `QMetaObject::invokeMethod(this, ..., Qt::QueuedConnection)`.
+  Audio is an exception: `AudioOutput::write` feeds `AudioBuffer` directly on the Engine thread; Qt's audio-thread
+  callback consumes it without allocation, locks or GUI event processing. Only device lifecycle belongs to the
+  owner thread. Pause/resume and mute use shared atomic generation controls; never read GUI settings in the producer.
 - Pausing nests: every `ZxEmulator::setPaused(true)` must be balanced by a `setPaused(false)`. The page `Loader` in `Main.qml` pauses while any page is open (a page can opt out with `readonly property bool pausesEmulation: false`, like the debugger, which pauses through `activateDebugger()` / `deactivateDebugger()`).
 - Rendering: the video callback hands each frame to `ZxImage`, which copies the rows that changed into a mutex-guarded image and emits `needsUpdate`. `ZxScreen` (a plain `QQuickItem`, the QML element) draws it through a `QSGSimpleTextureNode` placed at the fill-mode rect. `ZxTexture` (a `QSGTexture`) uploads only the dirty rect in `commitTextureOperations()`.
 - The Engine is stopped on `QCoreApplication::aboutToQuit` (`ZxEmulator::stopEngine()`).

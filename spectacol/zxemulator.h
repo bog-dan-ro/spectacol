@@ -30,7 +30,6 @@
 Q_MOC_INCLUDE("zxrecording.h")
 Q_MOC_INCLUDE("zxsettings.h")
 
-#include <QAudioFormat>
 #include <QGamepadManager>
 #include <QPointer>
 #include <QQmlEngine>
@@ -45,7 +44,7 @@ Q_MOC_INCLUDE("zxsettings.h")
 #include <memory>
 #include <utility>
 
-class QAudioSink;
+class AudioOutput;
 class QIODevice;
 class QKeyEvent;
 class QMouseEvent;
@@ -393,9 +392,7 @@ private:
     zxkit::MediaActivity m_mediaActivity; // the last one the GUI saw
     std::unique_ptr<NextUartHooks> m_uartHooks;
     std::unique_ptr<zxkit::Engine> m_engine;
-    std::unique_ptr<QAudioSink> m_audioOutput;
-    QIODevice *m_audioOutputDevice = nullptr;
-    QAudioFormat m_audioFormat;
+    std::unique_ptr<AudioOutput> m_audioOutput;
     std::atomic_bool m_debuggerActivated{false};
     bool m_resetPokeFinder = true;
     std::atomic_bool m_processInputEvents{true};
@@ -412,6 +409,4 @@ private:
     bool m_showControlsIcons = true;
     bool m_paused = false; // togglePaused()
     int m_pauseCount = 0;  // setPaused() nests
-    // The audio plays only in real time (100%, no fast forward): read on the Engine thread
-    std::atomic_bool m_realTimeAudio{true};
 };

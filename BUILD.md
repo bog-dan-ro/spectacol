@@ -139,6 +139,38 @@ chords. Outputs go to `build/keyboard`; `--binary` and `--output` override the d
 accepts `point:ID:down:X:Y`, `point:ID:move:X:Y`, `point:ID:up:X:Y` (window coordinates) and `point:cancel`.
 Tests use temporary settings and require no touch hardware.
 
+## Audio continuity regression
+
+The Engine feeds a bounded PCM queue directly. Qt 6.12's `QAudioSink` callback consumes it on the audio
+thread; GUI event processing and frame presentation do not feed the device. The callback allocates no
+memory and takes no locks. Device creation/destruction stays on the owning thread; a short producer-side
+mutex only publishes/takes a queue reference and is never held during backend calls or sample processing.
+
+Playback primes about 60 ms of audio, corrects device-clock drift through adaptive resampling, and fades
+on deliberate pause/mute and resume. Fixed-speed playback changes pitch with speed. Unbounded turbo
+estimates the incoming rate; it no longer mutes sound. ZxKit preserves fractional sample timing and writes
+across video boundaries, avoiding gradual buffer starvation. The standalone Engine keeps wall-clock pacing.
+
+The `audio_output` group in the full CTest suite needs no sound hardware. It checks rate conversion,
+50/100/200% speeds, ten virtual minutes of device-clock mismatch, rate-boundary phase/latency,
+turbo jitter and resume timing, stale audio after pause/mute, bounded
+storage and actual producer/consumer threads. Root ZxKit tests also verify audio timing and callback order.
+
+An optional live test uses an explicitly selected disposable device and repeatedly stalls its GUI/event
+thread for 500 ms while its producer keeps feeding Qt's real audio backend. It cycles through 100%, 200%,
+50% and measured turbo speed, then reports underruns, overflows and rendered frames:
+
+```sh
+./build/bin/test_audio_output --live-device "DEVICE NAME OR ID"
+```
+
+On Linux a private null sink can be created with `pactl load-module module-null-sink
+sink_name=spectacol_audio_test sink_properties=device.description=SpectacolAudioTest`; pass
+`SpectacolAudioTest` to the test. Record its monitor with `parec -d spectacol_audio_test.monitor` to check
+for gaps, and unload only that module afterwards using the returned module ID. This leaves the system's
+default device unchanged. Physical-device listening, Bluetooth/device switching and Android latency still
+need checks; the test establishes output continuity under the exercised scheduling and speed changes.
+
 ## Saving regression
 
 The saving check uses the real BASIC ROM to load a generated program, saves it to a blank tape, exports TAP

@@ -110,6 +110,8 @@ qt_add_qml_module(spectacol
     URI Spectacol
     VERSION 1.0
     SOURCES
+        audiooutput.cpp audiooutput.h
+        audiobuffer.cpp audiobuffer.h
         breakpointsmodel.cpp breakpointsmodel.h
         disassamblemodel.cpp disassamblemodel.h
         folderlistmodel.cpp folderlistmodel.h

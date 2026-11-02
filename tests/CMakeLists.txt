@@ -38,3 +38,12 @@ qt_add_executable(test_next_sdcard test_next_sdcard.cpp ../spectacol/nextsdcard.
 target_include_directories(test_next_sdcard PRIVATE ../spectacol)
 target_link_libraries(test_next_sdcard PRIVATE Qt6::Test Qt6::Qml Qt6::Network ZX::Kit)
 add_test(NAME next_sdcard_update COMMAND test_next_sdcard)
+
+qt_add_executable(test_audio_output
+    test_audio_output.cpp
+    ../spectacol/audiobuffer.cpp ../spectacol/audiobuffer.h
+    ../spectacol/audiooutput.cpp ../spectacol/audiooutput.h
+)
+target_include_directories(test_audio_output PRIVATE ../spectacol)
+target_link_libraries(test_audio_output PRIVATE Qt6::Test Qt6::Multimedia)
+add_test(NAME audio_output COMMAND test_audio_output)

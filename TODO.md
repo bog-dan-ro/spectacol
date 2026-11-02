@@ -8,14 +8,20 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 
 ## Audio
 
-- [ ] **Crackle-free sound first.** Measure underruns and audible gaps during long play sessions, UI work,
-      video frame drops, pause/resume and speed changes. Keep audio continuous even if a video frame is dropped.
+- [x] **GUI-independent audio delivery.** Engine samples enter a bounded queue directly; Qt's audio-thread
+      callback consumes it without GUI event delivery, locks or allocation. Pause/mute generations discard stale
+      samples with short fades. A live capture with repeated 500 ms GUI stalls and 100%/200%/50%/turbo playback
+      has zero underruns/overflows and no silent 10 ms windows. Keep physical-device listening checks below.
 - [ ] AY quality: use ZxKit's band-limited synthesis and AY/YM volume tables when available, and check
       real game music and sound effects for aliasing and distortion.
 - [ ] Speaker models: connect `speakerType` to ZxKit's TV speaker, beeper and unfiltered models once available.
-- [ ] Audio pacing: coordinate the output buffer and ZxKit Engine clock/resampling so neither drift nor
-      host scheduling introduces clicks; cover desktop and Android devices.
-- [ ] Sound at speeds other than 100% (muted today, like FUSE).
+- [x] Audio output pacing: adaptive resampling corrects device-clock drift without changing emulation speed.
+      Deterministic regressions cover 44.1/48/96 kHz, 50/100/200% speed and ten virtual minutes of clock mismatch.
+      Packet timing keeps latency/phase continuous across speed changes; turbo estimates exclude paused time.
+- [x] Sound at other speeds: resample fixed speeds and estimate the input rate during unbounded/manual/tape
+      turbo, instead of muting. Pitch follows emulation speed; this is not pitch-preserving time stretching.
+- [ ] Listening/latency checks on physical desktop and Android devices, including the actual games, Bluetooth
+      outputs and device changes. Android x86_64/ARM64 packages compile with the new Qt 6.12 callback path.
 
 ## RZX compatibility and progress
 

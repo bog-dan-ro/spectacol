@@ -27,8 +27,7 @@
 #include <zxkit/media/MediaPreview.h>
 #include <zxkit/peripherals/expansion/ExpansionPeripherals.h>
 
-#include <QAudioDevice>
-#include <QAudioSink>
+#include "audiooutput.h"
 #include <QBuffer>
 #include <QDateTime>
 #include <QDebug>
@@ -38,7 +37,6 @@
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QKeyEvent>
-#include <QMediaDevices>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QSettings>
@@ -64,7 +62,6 @@ using namespace Qt::StringLiterals;
 
 namespace {
 
-static constexpr std::chrono::microseconds kAudioBufferDuration{80'000};
 constexpr quint64 kPhysicalKeys = quint64(1) << 32;
 constexpr quint64 kVirtualKeys = quint64(2) << 32;
 constexpr quint64 kControllerKeys = quint64(3) << 32;
@@ -345,6 +342,15 @@ ZxEmulator::ZxEmulator(QObject *parent)
     QQmlEngine::setObjectOwnership(m_tape, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_recording, QQmlEngine::CppOwnership);
 
+    m_audioOutput = std::make_unique<AudioOutput>();
+    connect(m_audioOutput.get(), &AudioOutput::errorOccurred, this,
+            [this](const QString &message) { showMessage(message, Warning); });
+    connect(m_settings.get(), &ZxSettings::settingsCurrentChanged, this, [this] {
+        m_audioOutput->setMuted(!m_settings->soundEnabled());
+    });
+    m_audioOutput->setMuted(!m_settings->soundEnabled());
+    m_audioOutput->start();
+
     // The Engine calls these on its thread, it holds only Weak references to them
     m_videoFrameCallback = zxkit::CallbackHandle<zxkit::VideoFrameCallback>([](const zxkit::VideoFramePtr &frame) {
         ZxImage::instance()->presentFrame(frame);
@@ -353,6 +359,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
         writeAudioSamples(samples, sampleRate, channels);
     });
     m_pauseCallback = zxkit::CallbackHandle<zxkit::PauseCallback>([this](const zxkit::PauseEvent &event) {
+        m_audioOutput->setPaused(true);
         QMetaObject::invokeMethod(this, [this, event] {
             emit pausedChanged();
             if (m_debuggerActivated)
@@ -362,6 +369,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
         }, Qt::QueuedConnection);
     });
     m_resumeCallback = zxkit::CallbackHandle<zxkit::ResumeCallback>([this] {
+        m_audioOutput->setPaused(false);
         QMetaObject::invokeMethod(this, &ZxEmulator::pausedChanged, Qt::QueuedConnection);
     });
     m_logCallback = zxkit::CallbackHandle<zxkit::LogCallback>([this](zxkit::LogLevel level, std::string_view msg) {
@@ -392,6 +400,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
     m_uartHooks = std::make_unique<NextUartHooks>();
     QQmlEngine::setObjectOwnership(m_uartHooks.get(), QQmlEngine::CppOwnership);
     zxkit::EngineConfig engineConfig;
+    engineConfig.startPaused = true;
     engineConfig.threadHooks = m_uartHooks->threadHooks();
     engineConfig.callbacks = {
         .videoFrame = m_videoFrameCallback.weak(),
@@ -505,6 +514,11 @@ ZxEmulator::ZxEmulator(QObject *parent)
     connect(m_settings.get(), &ZxSettings::controllerMappingChanged, this, &ZxEmulator::configureController);
     connect(m_settings.get(), &ZxSettings::deadZoneChanged, this, [this] { configureController(); });
 
+    // Engine::run may start after this constructor clears its initial pause;
+    // do not depend on observing a Resume event to enable the first packet.
+    m_audioOutput->setPaused(m_pauseCount > 0);
+    m_engine->setPaused(m_pauseCount > 0);
+
     // If a file was passed on the command line, load it automatically
     const auto args = QCoreApplication::arguments();
     if (args.size() > 1 && QFile::exists(args[1])) {
@@ -521,37 +535,8 @@ ZxEmulator::~ZxEmulator()
 
 void ZxEmulator::writeAudioSamples(std::span<const int16_t> samples, uint32_t sampleRate, uint8_t channels)
 {
-    // Faster or slower than real time the samples would come faster or slower than
-    // the audio device plays them: like FUSE, play the sound only at 100%
-    if (!m_realTimeAudio.load(std::memory_order_relaxed) || !m_settings || !m_settings->soundEnabled() || samples.empty())
-        return;
-
-    // Engine thread: copy the samples and play them on the GUI thread
-    QByteArray pcmBytes(QByteArrayView(std::as_bytes(samples)));
-    QMetaObject::invokeMethod(this, [this, pcmBytes = std::move(pcmBytes), sampleRate, channels] {
-        if (!m_audioOutput || m_audioFormat.sampleRate() != int(sampleRate) || m_audioFormat.channelCount() != int(channels)) {
-            m_audioOutputDevice = nullptr;
-            m_audioOutput.reset();
-
-            const auto device = QMediaDevices::defaultAudioOutput();
-            if (device.isNull())
-                return;
-
-            QAudioFormat fmt;
-            fmt.setSampleFormat(QAudioFormat::Int16);
-            fmt.setSampleRate(int(sampleRate));
-            fmt.setChannelCount(int(channels));
-            if (!device.isFormatSupported(fmt))
-                return;
-
-            m_audioFormat = fmt;
-            m_audioOutput = std::make_unique<QAudioSink>(device, fmt);
-            m_audioOutput->setBufferSize(fmt.bytesForDuration(kAudioBufferDuration.count()));
-            m_audioOutputDevice = m_audioOutput->start();
-        }
-        if (m_audioOutputDevice)
-            m_audioOutputDevice->write(pcmBytes);
-    }, Qt::QueuedConnection);
+    // Engine thread -> bounded queue -> Qt audio thread. No GUI event delivery.
+    m_audioOutput->write(samples, sampleRate, channels, m_engine->isTurbo() ? 0 : m_engine->speed());
 }
 
 bool ZxEmulator::paused() const
@@ -1621,19 +1606,16 @@ void ZxEmulator::showMessage(QString message, ZxEmulator::ErrorLevel level)
 void ZxEmulator::setSpeed(int percent)
 {
     m_engine->setSpeed(uint32_t(std::max(percent, 1)));
-    m_realTimeAudio = m_engine->isRealTime();
 }
 
 void ZxEmulator::speedup()
 {
     m_engine->setTurbo(true);
-    m_realTimeAudio = false;
 }
 
 void ZxEmulator::slowdown()
 {
     m_engine->setTurbo(false);
-    m_realTimeAudio = m_engine->isRealTime();
 }
 
 void ZxEmulator::togglePaused()
@@ -1719,6 +1701,8 @@ void ZxEmulator::stopEngine()
 {
     if (m_engine)
         m_engine->stop();
+    if (m_audioOutput)
+        m_audioOutput->stop();
 }
 
 const DisassambleModel *ZxEmulator::disassambleModel() const
