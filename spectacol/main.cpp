@@ -105,6 +105,40 @@ int main(int argc, char *argv[])
             // wait: an idle 300 ms slot
             if (keys[i].trimmed() == u"wait"_s)
                 continue;
+            if (keys[i].startsWith(u"pad:"_s) || keys[i].startsWith(u"touch:"_s)) {
+                // Exercise controller input without requiring a hardware gamepad.
+                const auto parts = keys[i].split(u':');
+                const bool touch = parts[0] == u"touch"_s;
+                const auto name = parts.value(1).toLatin1();
+                if (name == "clear") {
+                    QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app, [touch] {
+                        if (touch) ZxEmulator::instance().releaseTouchJoystick();
+                        else ZxEmulator::instance().releaseInputs();
+                    });
+                    continue;
+                }
+                bool axisOk = false, buttonOk = false, numberOk = false;
+                const auto &meta = QGamepadManager::staticMetaObject;
+                const int axis = meta.enumerator(meta.indexOfEnumerator("GamepadAxis")).keyToValue(name.constData(), &axisOk);
+                const int button = meta.enumerator(meta.indexOfEnumerator("GamepadButton")).keyToValue(name.constData(), &buttonOk);
+                const double value = parts.value(2).toDouble(&numberOk);
+                const auto operation = parts.value(2);
+                if ((axisOk && numberOk) || (buttonOk && (operation == u"down"_s || operation == u"up"_s || operation == u"cancel"_s))) {
+                    QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app,
+                                       [axisOk, axis, button, value, operation, touch] {
+                        auto &emulator = ZxEmulator::instance();
+                        if (axisOk)
+                            emulator.gamepadAxisEvent(static_cast<QGamepadManager::GamepadAxis>(axis), value, touch);
+                        else if (operation == u"down"_s)
+                            emulator.gamepadButtonPressEvent(static_cast<QGamepadManager::GamepadButton>(button), touch);
+                        else
+                            emulator.gamepadButtonReleaseEvent(static_cast<QGamepadManager::GamepadButton>(button), touch, operation == u"cancel"_s);
+                    });
+                } else {
+                    qWarning().noquote() << "Unknown controller event" << keys[i];
+                }
+                continue;
+            }
             if (keys[i].startsWith(u"click:"_s)) {
                 const QStringList xy = keys[i].split(u':');
                 const QPointF pos(xy.value(1).toDouble(), xy.value(2).toDouble());

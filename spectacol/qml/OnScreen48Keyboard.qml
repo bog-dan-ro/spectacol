@@ -33,6 +33,13 @@ Item {
     readonly property int columns: cobraMode ? 12 : 10
     property bool cobraCtrlPressed: false
     property var heldKeys: []
+    Connections {
+        target: ZxEmulator
+        function onPausedChanged() {
+            if (ZxEmulator.paused)
+                onScreenKeyboard.releasePressedKeys();
+        }
+    }
     onCobraModeChanged: releasePressedKeys()
 
     property bool gamepadMode: false

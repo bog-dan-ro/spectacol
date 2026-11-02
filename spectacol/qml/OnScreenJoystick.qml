@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,6 +22,25 @@ import Spectacol
 import "private"
 
 Item {
+    id: touchJoystick
+    enabled: visible
+    function releaseDirections() {
+        returnAnimation.stop();
+        thumb.anchors.horizontalCenterOffset = 0;
+        thumb.anchors.verticalCenterOffset = 0;
+        ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftX, 0, true);
+        ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftY, 0, true);
+    }
+    function releaseInputs() {
+        releaseDirections();
+        ZxEmulator.releaseTouchJoystick();
+    }
+    onVisibleChanged: if (!visible) releaseInputs()
+    Component.onDestruction: ZxEmulator.releaseTouchJoystick()
+    Connections {
+        target: ZxEmulator
+        function onPausedChanged() { if (ZxEmulator.paused) touchJoystick.releaseInputs(); }
+    }
     anchors.fill: parent
     anchors.margins: (TextSizes.smallScreen ? 2.5 :  5) * Screen.pixelDensity
     // Directions
@@ -43,6 +62,7 @@ Item {
         }
 
         MultiPointTouchArea {
+            onCanceled: touchJoystick.releaseDirections()
             id: touch
             anchors.fill: parent
             touchPoints: TouchPoint {
@@ -74,8 +94,8 @@ Item {
             radius: width / 2
             anchors {
                 centerIn: parent
-                onHorizontalCenterOffsetChanged: ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftX, anchors.horizontalCenterOffset / parent.radius)
-                onVerticalCenterOffsetChanged: ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftY, anchors.verticalCenterOffset / parent.radius)
+                onHorizontalCenterOffsetChanged: ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftX, anchors.horizontalCenterOffset / parent.radius, true)
+                onVerticalCenterOffsetChanged: ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftY, anchors.verticalCenterOffset / parent.radius, true)
             }
         }
     }
@@ -88,9 +108,10 @@ Item {
         text: "Y"
         MultiPointTouchArea {
             anchors.fill: parent
-            touchPoints: TouchPoint {
-                onPressedChanged: pressed ? ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonY) : ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY)
-            }
+            maximumTouchPoints: 1
+            onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonY, true)
+            onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY, true)
+            onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY, true, true)
         }
     }
 
@@ -102,9 +123,10 @@ Item {
         text: "X"
         MultiPointTouchArea {
             anchors.fill: parent
-            touchPoints: TouchPoint {
-                onPressedChanged: pressed ? ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonX) : ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX)
-            }
+            maximumTouchPoints: 1
+            onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonX, true)
+            onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX, true)
+            onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX, true, true)
         }
     }
 
@@ -116,9 +138,10 @@ Item {
         text: "B"
         MultiPointTouchArea {
             anchors.fill: parent
-            touchPoints: TouchPoint {
-                onPressedChanged: pressed ? ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonB) : ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB)
-            }
+            maximumTouchPoints: 1
+            onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonB, true)
+            onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB, true)
+            onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB, true, true)
         }
     }
 
@@ -130,9 +153,10 @@ Item {
         text: "A"
         MultiPointTouchArea {
             anchors.fill: parent
-            touchPoints: TouchPoint {
-                onPressedChanged: pressed ? ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonA) : ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA)
-            }
+            maximumTouchPoints: 1
+            onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonA, true)
+            onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA, true)
+            onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA, true, true)
         }
     }
 }

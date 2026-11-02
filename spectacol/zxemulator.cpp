@@ -63,6 +63,17 @@ using namespace Qt::StringLiterals;
 namespace {
 
 static constexpr std::chrono::microseconds kAudioBufferDuration{80'000};
+constexpr quint64 kPhysicalKeys = quint64(1) << 32;
+constexpr quint64 kVirtualKeys = quint64(2) << 32;
+constexpr quint64 kControllerKeys = quint64(3) << 32;
+constexpr quint64 kJoystickKeys = quint64(4) << 32;
+constexpr quint64 kCobraKeys = quint64(5) << 32;
+constexpr quint64 kRecreatedKeys = quint64(6) << 32;
+static_assert(ControllerInput::LeftBit == zxkit::JoystickButtons::Left
+              && ControllerInput::RightBit == zxkit::JoystickButtons::Right
+              && ControllerInput::UpBit == zxkit::JoystickButtons::Up
+              && ControllerInput::DownBit == zxkit::JoystickButtons::Down
+              && ControllerInput::FireBit == zxkit::JoystickButtons::Fire1);
 
 QString saveName(QString name, const QString &fallback)
 {
@@ -393,7 +404,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
     });
 
     connect(gm, &QGamepadManager::gamepadButtonPressEvent, this, [this](int deviceId, QGamepadManager::GamepadButton button, double value) {
-        if (!m_processInputEvents.load() || value != 1)
+        if (!m_processInputEvents.load() || value < 0.5)
             return;
 
         switch (button) {
@@ -418,31 +429,6 @@ ZxEmulator::ZxEmulator(QObject *parent)
         if (deviceId != m_gamepadId || button == QGamepadManager::ButtonInvalid || button == QGamepadManager::ButtonStart)
             return;
 
-        auto action = m_settings->gamepadAction(button);
-        switch (action) {
-        case ZxSettings::ToggleKeyboard:
-            if (m_paused) {
-                showMessage(tr("Spectacol is paused"));
-                return;
-            }
-            if (m_showControlsIcons)
-                emit showControlsIconsChanged(m_showControlsIcons = false);
-            QTimer::singleShot(0, this, [this] { emit toggleOnScreenControls(Keyboard48K); });
-            return;
-        case ZxSettings::ToggleCursorJoystick:
-            if (m_paused) {
-                showMessage(tr("Spectacol is paused"));
-                return;
-            }
-            if (m_showControlsIcons)
-                emit showControlsIconsChanged(m_showControlsIcons = false);
-            QTimer::singleShot(0, this, [this] { emit toggleOnScreenControls(CursorJoystick); });
-            return;
-        }
-
-        if (!m_processInputEvents.load())
-            return;
-
         gamepadButtonReleaseEvent(button);
     });
 
@@ -455,10 +441,9 @@ ZxEmulator::ZxEmulator(QObject *parent)
 
     connect(gm, &QGamepadManager::gamepadDisconnected, this, [this](int deviceId) {
         if (m_gamepadId == deviceId) {
-            if (QGamepadManager::instance()->connectedGamepads().size())
-                setGamepadId(QGamepadManager::instance()->connectedGamepads().first());
-            else
-                setGamepadId(-1);
+            auto devices = QGamepadManager::instance()->connectedGamepads();
+            devices.removeAll(deviceId);
+            setGamepadId(devices.isEmpty() ? -1 : devices.first());
 
             if (m_touchscreen && !m_showControlsIcons)
                 emit showControlsIconsChanged(m_showControlsIcons = true);
@@ -472,10 +457,9 @@ ZxEmulator::ZxEmulator(QObject *parent)
     setDataPath(dataPath());
     m_debuggerActivated.store(false);
     m_processInputEvents.store(true);
-    m_deadZone = m_settings->deadZone();
-    connect(m_settings.get(), &ZxSettings::deadZoneChanged, this, [this](qreal deadZone) {
-        m_deadZone = deadZone;
-    });
+    configureController();
+    connect(m_settings.get(), &ZxSettings::controllerMappingChanged, this, &ZxEmulator::configureController);
+    connect(m_settings.get(), &ZxSettings::deadZoneChanged, this, [this] { configureController(); });
 
     // If a file was passed on the command line, load it automatically
     const auto args = QCoreApplication::arguments();
@@ -536,6 +520,8 @@ bool ZxEmulator::paused() const
 // E.g. the debugger keeps it paused while the menu that opened it closes.
 void ZxEmulator::setPaused(bool paused)
 {
+    if (paused && m_pauseCount == 0)
+        releaseInputs();
     if (paused)
         ++m_pauseCount;
     else if (m_pauseCount > 0)
@@ -631,6 +617,8 @@ void ZxEmulator::setSelectedJoysticksIndex(int selectedJoysticksIndex)
     if (selectedJoysticksIndex < NoJoystick || selectedJoysticksIndex > FullerJoystick
         || selectedJoysticksIndex == m_selectedJoystickIndex)
         return;
+    m_controller.clear();
+    applyControllerState();
     setJoystickButtons(0); // release everything on the old one
     m_selectedJoystickIndex = selectedJoysticksIndex;
     attachJoystick(selectedJoysticksIndex);
@@ -667,23 +655,22 @@ void ZxEmulator::setJoystickButtons(uint8_t buttons)
     static constexpr std::array<K, 5> kSinclair1Keys{K::Num6, K::Num7, K::Num9, K::Num8, K::Num0};
     static constexpr std::array<K, 5> kSinclair2Keys{K::Num1, K::Num2, K::Num4, K::Num3, K::Num5};
 
-    auto emulator = this->emulator().writeLock();
-    const auto pressKeys = [&](const std::array<K, 5> &keys) {
-        for (std::size_t i = 0; i < kBits.size(); ++i) {
-            if (changed & kBits[i])
-                emulator->setKeyState(keys[i], (buttons & kBits[i]) != 0);
-        }
-    };
+    std::span<const K> keys;
     switch (m_selectedJoystickIndex) {
-    case CursorKeys:
-        pressKeys(kCursorKeys);
-        break;
-    case Sinclair1:
-        pressKeys(kSinclair1Keys);
-        break;
-    case Sinclair2:
-        pressKeys(kSinclair2Keys);
-        break;
+    case CursorKeys: keys = kCursorKeys; break;
+    case Sinclair1: keys = kSinclair1Keys; break;
+    case Sinclair2: keys = kSinclair2Keys; break;
+    }
+    if (!keys.empty()) {
+        QSet<int> held;
+        for (std::size_t i = 0; i < kBits.size(); ++i)
+            if (buttons & kBits[i])
+                held.insert(int(keys[i]));
+        setInputKeys(kJoystickKeys, held);
+        return;
+    }
+    auto emulator = this->emulator().writeLock();
+    switch (m_selectedJoystickIndex) {
     case KempstonJoystick:
         withPeripheral<zxkit::KempstonJoystickPeripheral>(*emulator, "kempston", [buttons](auto &kempston) {
             kempston.setButtons(buttons);
@@ -784,6 +771,7 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
         showMessage(QString::fromUtf8(e.what()), Error);
         return {false, zxkit::MediaClass::Unknown};
     }
+    releaseInputs();
     const bool loaded = withEmulator([&file](zxkit::Emulator &emulator) {
         emulator.loadMedia(file);
     });
@@ -839,6 +827,8 @@ void ZxEmulator::setProcessInputEvents(bool processEvents)
     } else if (m_inputEventsBlockers++) {
         return;
     }
+    if (!processEvents)
+        releaseInputs();
     m_processInputEvents.store(processEvents);
     emit processInputEventsChanged();
 }
@@ -852,6 +842,8 @@ void ZxEmulator::setGamepadId(int gamepadId)
         s.setValue("gamepadId", gamepadId);
     }
 
+    m_controller.clearPhysical();
+    applyControllerState();
     m_gamepadId = gamepadId;
     if (m_gamepadId != -1)
         emit error(Info, tr("A new default gamepad was selected"));
@@ -1116,6 +1108,7 @@ bool ZxEmulator::copy(const QString &from, const QString &to, bool override)
 void ZxEmulator::reset()
 {
     resetLoadedFile();
+    releaseInputs();
     emulator().writeLock()->reset(zxkit::ResetKind::Soft);
     m_engine->refreshFrame();
 }
@@ -1123,6 +1116,7 @@ void ZxEmulator::reset()
 void ZxEmulator::hardReset()
 {
     resetLoadedFile();
+    releaseInputs();
     emulator().writeLock()->reset(zxkit::ResetKind::Hard);
     m_engine->refreshFrame();
 }
@@ -1299,158 +1293,165 @@ void ZxEmulator::pokeMemory(int address, int page, int value)
     }
 }
 
-void ZxEmulator::setCobraKeyState(int qtKey, bool pressed)
+void ZxEmulator::applyKeyChanges(const HeldKeyState::Changes &changes)
 {
-    if (pressed && m_paused)
+    if (changes.isEmpty() || !m_engine)
         return;
     auto emulator = this->emulator().writeLock();
-    if (hasCobraKeyboard(*emulator)) {
-        if (const auto key = cobraKey(qtKey, Qt::KeypadModifier))
-            emulator->setKeyState(*key, pressed);
+    for (const auto &[key, pressed] : changes)
+        emulator->setKeyState(static_cast<zxkit::ZxKey>(key), pressed);
+}
+
+void ZxEmulator::setInputKeys(quint64 source, const QSet<int> &keys)
+{
+    applyKeyChanges(m_heldKeys.setSource(source, keys));
+}
+
+void ZxEmulator::releaseInputs()
+{
+    m_controller.clear();
+    applyControllerState();
+    applyKeyChanges(m_heldKeys.clear());
+}
+
+void ZxEmulator::configureController()
+{
+    m_controller.configure(m_settings->directionMapping(), m_settings->directionKeys(), m_settings->deadZone());
+    applyControllerState();
+}
+
+void ZxEmulator::applyControllerState()
+{
+    const auto state = m_controller.state();
+    QSet<int> keys;
+    for (const int key : state.keys) {
+        const auto mapped = mapQtKeyToZx(key, 0);
+        if (mapped.primary)
+            keys.insert(int(*mapped.primary));
+        if (mapped.modifier)
+            keys.insert(int(*mapped.modifier));
     }
+    setInputKeys(kControllerKeys, keys);
+    setJoystickButtons(state.joystick);
+    const bool turbo = state.actions.contains(ZxSettings::ToggleEmulationSpeed);
+    if (m_controllerTurbo != turbo) {
+        m_controllerTurbo = turbo;
+        turbo ? speedup() : slowdown();
+    }
+}
+
+void ZxEmulator::setCobraKeyState(int qtKey, bool pressed)
+{
+    if (pressed) {
+        if (m_paused)
+            return;
+        const auto emulator = this->emulator().readLock();
+        if (!hasCobraKeyboard(*emulator))
+            return;
+    }
+    QSet<int> keys;
+    if (pressed)
+        if (const auto key = cobraKey(qtKey, Qt::KeypadModifier))
+            keys.insert(int(*key));
+    setInputKeys(kCobraKeys | quint32(qtKey), keys);
 }
 
 void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
 {
     if (m_paused || autoRepeat)
         return;
-
     if (!virtualKeyboard && m_settings->recreatedSpectrum()) {
         if (const auto key = recreatedKey(qtKey, modifiers))
-            emulator().writeLock()->setKeyState(key->first, key->second);
+            setInputKeys(kRecreatedKeys | int(key->first), key->second ? QSet<int>{int(key->first)} : QSet<int>{});
         return;
     }
-
-    auto emulator = this->emulator().writeLock();
-    if (!virtualKeyboard && hasCobraKeyboard(*emulator)) {
-        if (const auto key = cobraKey(qtKey, modifiers)) {
-            emulator->setKeyState(*key, true);
-            return;
-        }
+    QSet<int> keys;
+    bool cobra = false;
+    if (!virtualKeyboard) {
+        const auto emulator = this->emulator().readLock();
+        cobra = hasCobraKeyboard(*emulator);
     }
-
-    const auto mapped = mapQtKeyToZx(qtKey, modifiers);
-    if (mapped.modifier)
-        emulator->setKeyState(*mapped.modifier, true);
-    if (mapped.primary)
-        emulator->setKeyState(*mapped.primary, true);
+    if (const auto key = cobra ? cobraKey(qtKey, modifiers) : std::nullopt) {
+        keys.insert(int(*key));
+    } else {
+        const auto mapped = mapQtKeyToZx(qtKey, modifiers);
+        if (mapped.modifier)
+            keys.insert(int(*mapped.modifier));
+        if (mapped.primary)
+            keys.insert(int(*mapped.primary));
+    }
+    setInputKeys((virtualKeyboard ? kVirtualKeys : kPhysicalKeys) | quint32(qtKey), keys);
 }
 
 void ZxEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
 {
-    // Closing a keyboard/page can release keys after emulation has already paused.
-    if (autoRepeat)
+    Q_UNUSED(modifiers)
+    // Releases remain valid after pausing or opening a page. The stored press
+    // owns its modifiers, even if the host release reports different ones.
+    if (autoRepeat || (!virtualKeyboard && m_settings->recreatedSpectrum()))
         return;
-    // The Recreated keyboard tells its releases with characters too (see keyPress)
-    if (!virtualKeyboard && m_settings->recreatedSpectrum())
-        return;
-
-    auto emulator = this->emulator().writeLock();
-    if (!virtualKeyboard && hasCobraKeyboard(*emulator)) {
-        if (const auto key = cobraKey(qtKey, modifiers)) {
-            emulator->setKeyState(*key, false);
-            return;
-        }
-    }
-
-    const auto mapped = mapQtKeyToZx(qtKey, modifiers);
-    if (mapped.primary)
-        emulator->setKeyState(*mapped.primary, false);
-    if (mapped.modifier)
-        emulator->setKeyState(*mapped.modifier, false);
+    setInputKeys((virtualKeyboard ? kVirtualKeys : kPhysicalKeys) | quint32(qtKey), {});
 }
 
-void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value)
+void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value, bool touch)
 {
-    uint8_t negBit = 0;
-    uint8_t posBit = 0;
+    if (m_pauseCount || m_paused || !m_processInputEvents)
+        return;
+    ControllerInput::Axis target;
     switch (axis) {
-    case QGamepadManager::AxisLeftX:
-    case QGamepadManager::AxisRightX:
-        negBit = zxkit::JoystickButtons::Left;
-        posBit = zxkit::JoystickButtons::Right;
-        break;
-    case QGamepadManager::AxisLeftY:
-    case QGamepadManager::AxisRightY:
-        negBit = zxkit::JoystickButtons::Up;
-        posBit = zxkit::JoystickButtons::Down;
-        break;
-    default:
+    case QGamepadManager::AxisLeftX: target = touch ? ControllerInput::TouchX : ControllerInput::LeftX; break;
+    case QGamepadManager::AxisLeftY: target = touch ? ControllerInput::TouchY : ControllerInput::LeftY; break;
+    case QGamepadManager::AxisRightX: if (touch) return; target = ControllerInput::RightX; break;
+    case QGamepadManager::AxisRightY: if (touch) return; target = ControllerInput::RightY; break;
+    default: return;
+    }
+    m_controller.axis(target, value);
+    applyControllerState();
+}
+
+void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button, bool touch)
+{
+    if (button == QGamepadManager::ButtonInvalid || button == QGamepadManager::ButtonStart
+        || !m_processInputEvents)
         return;
-    }
-
-    uint8_t buttons = m_joystickButtons & static_cast<uint8_t>(~(negBit | posBit));
-    if (value <= -m_deadZone)
-        buttons |= negBit;
-    else if (value >= m_deadZone)
-        buttons |= posBit;
-    setJoystickButtons(buttons);
+    const int action = m_settings->gamepadAction(button);
+    if ((m_pauseCount || m_paused)
+        && (action != ZxSettings::TogglePause || !m_paused || m_pauseCount != 1))
+        return;
+    const quint8 direction = button == QGamepadManager::ButtonUp || button == QGamepadManager::ButtonDown
+        || button == QGamepadManager::ButtonLeft || button == QGamepadManager::ButtonRight
+        ? toJoystickMask(button) : 0;
+    m_controller.press(int(button) + (touch ? ControllerInput::TouchButtonOffset : 0), action, direction);
+    applyControllerState();
 }
 
-void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button)
+void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button, bool touch, bool cancelled)
 {
-    auto action = m_settings->gamepadAction(button);
-    switch (action) {
-    case ZxSettings::JoystickFire:
-        setJoystickButtons(m_joystickButtons | toJoystickMask(button));
-        break;
-    case ZxSettings::ToggleEmulationSpeed:
-        speedup();
-        break;
+    const auto action = m_controller.release(int(button) + (touch ? ControllerInput::TouchButtonOffset : 0));
+    applyControllerState();
+    if (!action || cancelled)
+        return; // A page, mapping change or disconnect may have cleared the press.
+    switch (*action) {
     case ZxSettings::ToggleKeyboard:
     case ZxSettings::ToggleCursorJoystick:
-    case ZxSettings::TogglePause:
-    case ZxSettings::QuickSaveSnapshot:
-    case ZxSettings::QuickLoadSnapshot:
+        if (m_paused)
+            return;
+        if (m_showControlsIcons)
+            emit showControlsIconsChanged(m_showControlsIcons = false);
+        QTimer::singleShot(0, this, [this, action] {
+            emit toggleOnScreenControls(*action == ZxSettings::ToggleKeyboard ? Keyboard48K : CursorJoystick);
+        });
         break;
-    default:
-        keyPress(action);
-        break;
+    case ZxSettings::TogglePause: togglePaused(); break;
+    case ZxSettings::QuickSaveSnapshot: if (!m_paused) quickSaveSnapshot(); break;
+    case ZxSettings::QuickLoadSnapshot: if (!m_paused) quickLoadSnapshot(); break;
     }
 }
 
-void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button)
+void ZxEmulator::releaseTouchJoystick()
 {
-    auto action = m_settings->gamepadAction(button);
-    switch (action) {
-    case ZxSettings::JoystickFire:
-        if (m_paused) {
-            showMessage(tr("Spectacol is paused"));
-            return;
-        }
-        setJoystickButtons(m_joystickButtons & static_cast<uint8_t>(~toJoystickMask(button)));
-        break;
-    case ZxSettings::ToggleEmulationSpeed:
-        slowdown();
-        break;
-    case ZxSettings::ToggleKeyboard:
-    case ZxSettings::ToggleCursorJoystick:
-        break;
-    case ZxSettings::TogglePause:
-        togglePaused();
-        break;
-    case ZxSettings::QuickSaveSnapshot:
-        if (m_paused) {
-            showMessage(tr("Spectacol is paused"));
-            return;
-        }
-        quickSaveSnapshot();
-        break;
-    case ZxSettings::QuickLoadSnapshot:
-        if (m_paused) {
-            showMessage(tr("Spectacol is paused"));
-            return;
-        }
-        quickLoadSnapshot();
-        break;
-    default:
-        if (m_paused) {
-            showMessage(tr("Spectacol is paused"));
-            return;
-        }
-        keyRelease(action);
-        break;
-    }
+    m_controller.clearTouch();
+    applyControllerState();
 }
 
 void ZxEmulator::showMessage(QString message, ZxEmulator::ErrorLevel level)

@@ -94,11 +94,13 @@ chains can reduce rendering performance; the emulator frame callback continues
 to publish native frames. Spectacol links the separate `ZX::VideoFilters` target;
 other ZxKit consumers can continue to link only `ZX::Kit`.
 
-## Offline catalogue tests
+## Offline catalogue and controller tests
 
 The Qt Test suite exercises both Internet Archive and ZXInfo through a local HTTP server. It checks paging,
 URL encoding, metadata and download parsing, cancellation, unavailable results, malformed replies, checksum
 failures and atomic save/retry. It makes no requests to the public services.
+The controller tests cover dead zones, both sticks, D-pad/touch overlap, shared fire/key ownership,
+mapping changes, cancelled presses and disconnect cleanup.
 
 ```sh
 cmake -S . -B build -DSPECTACOL_BUILD_TESTS=ON
@@ -111,6 +113,18 @@ ZXInfo uses the public [v5 API](https://github.com/zxinfo-api/zxinfo-api-v5/blob
 [ZXInfo's own link mapping](https://github.com/thomasheckmann/zxinfo-vue/blob/master/src/components/ZXInfo/linksInfo.vue)
 to the World of Spectrum Archive mirror or Spectrum Computing; screenshots use ZXInfo's media host.
 No API key is required. Use the headless UI check above to review layout and the live-service integration.
+
+The controller integration check runs a generated Z80 diagnostic that samples the real keyboard rows and
+Kempston port into RAM, then checks the values from saved snapshots. It uses temporary settings and no hardware:
+
+```sh
+python3 tests/controller.py
+```
+
+Outputs go to `build/controller`; `--binary` and `--output` override the defaults. Scripted `--ui-keys` also accepts
+`pad:AxisLeftX:-1`, `pad:ButtonA:down` / `up` and corresponding `touch:` events (`cancel` tests cancelled touches).
+`pad:clear` releases all input;
+`touch:clear` releases only the touch joystick.
 
 ## Saving regression
 

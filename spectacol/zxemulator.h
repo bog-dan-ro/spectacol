@@ -24,6 +24,7 @@
 #include "zxtape.h"
 #include "pokefindermodel.h"
 #include "zxgamesmodel.h"
+#include "controllerinput.h"
 
 Q_MOC_INCLUDE("zxrecording.h")
 Q_MOC_INCLUDE("zxsettings.h")
@@ -162,6 +163,7 @@ public:
     bool saveMediaFile(const QString &filePath);
     /// Atomically replaces a file, reporting directory, write and commit failures.
     bool writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes);
+    void releaseInputs();
     zxkit::Z80Registers registers() const;
 
     bool paused() const;
@@ -309,9 +311,10 @@ public slots:
     void keyRelease(int qtKey, int modifiers = 0, bool autoRepeat = false, bool virtualKeyboard = true);
     // The on-screen CoBra column, independent of the Spectrum modifier mapping.
     void setCobraKeyState(int qtKey, bool pressed);
-    void gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value);
-    void gamepadButtonPressEvent(QGamepadManager::GamepadButton button);
-    void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button);
+    void gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value, bool touch = false);
+    void gamepadButtonPressEvent(QGamepadManager::GamepadButton button, bool touch = false);
+    void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button, bool touch = false, bool cancelled = false);
+    void releaseTouchJoystick();
 
 
     void showMessage(QString message, ZxEmulator::ErrorLevel level = Info);
@@ -349,6 +352,10 @@ private:
     explicit ZxEmulator(QObject *parent = 0);
     void stopEngine();
     void updateMediaActivity(const zxkit::MediaActivity &activity);
+    void configureController();
+    void applyControllerState();
+    void setInputKeys(quint64 source, const QSet<int> &keys);
+    void applyKeyChanges(const HeldKeyState::Changes &changes);
     std::pair<bool, zxkit::MediaClass> loadMediaWithType(const QString &filePath);
     friend class ZxImage;
 
@@ -362,6 +369,9 @@ private:
     void attachJoystick(int kind);
     int m_selectedJoystickIndex = CursorKeys;
     uint8_t m_joystickButtons = 0; // zxkit::JoystickButtons
+    ControllerInput m_controller;
+    HeldKeyState m_heldKeys;
+    bool m_controllerTurbo = false;
     BreakpointsModel m_breakpointsModel;
     DisassambleModel m_disassambleModel;
     PokeFinderModel m_pokeFinderModel;
@@ -395,5 +405,4 @@ private:
     int m_pauseCount = 0;  // setPaused() nests
     // The audio plays only in real time (100%, no fast forward): read on the Engine thread
     std::atomic_bool m_realTimeAudio{true};
-    double m_deadZone = 0.4;
 };

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,185 +16,287 @@
 */
 
 import QtQuick
-import QtQuick.Window
+import QtQuick.Controls
 import QtQuick.Layouts
 import QtGamepadLegacy
-import QtQuick.Controls
 import Spectacol
 
 // @scope main.qml
-
-Flickable {
-    contentHeight: pane.height
-
+Sheet {
+    id: page
+    crumb: qsTr("Options / Gamepad")
+    title: qsTr("Controller mapping")
+    property int revision: 0
+    property int direction: -1
+    property int buttonCode: -1
+    property var returnFocus: null
+    Component.onCompleted: ZxEmulator.processInputEvents = false
+    Component.onDestruction: ZxEmulator.processInputEvents = true
+    readonly property var directionLabels: [qsTr("Up"), qsTr("Down"), qsTr("Left"), qsTr("Right"), qsTr("Fire")]
+    readonly property var keyChoices: {
+        let keys = [
+            {
+                code: Qt.Key_Space,
+                name: qsTr("Space")
+            },
+            {
+                code: Qt.Key_Return,
+                name: qsTr("Enter")
+            },
+            {
+                code: Qt.Key_Shift,
+                name: qsTr("Caps Shift")
+            },
+            {
+                code: Qt.Key_Control,
+                name: qsTr("Symbol Shift")
+            }
+        ];
+        for (let code = Qt.Key_0; code <= Qt.Key_9; ++code)
+            keys.push({
+                code: code,
+                name: String.fromCharCode(code)
+            });
+        for (let code = Qt.Key_A; code <= Qt.Key_Z; ++code)
+            keys.push({
+                code: code,
+                name: String.fromCharCode(code)
+            });
+        return keys;
+    }
+    readonly property var actionChoices: [
+        {
+            code: ZxSettings.JoystickFire,
+            name: qsTr("Joystick / mapped fire")
+        },
+        {
+            code: ZxSettings.ToggleKeyboard,
+            name: qsTr("Show keyboard")
+        },
+        {
+            code: ZxSettings.ToggleCursorJoystick,
+            name: qsTr("Show numeric keypad")
+        },
+        {
+            code: ZxSettings.TogglePause,
+            name: qsTr("Pause / resume")
+        },
+        {
+            code: ZxSettings.ToggleEmulationSpeed,
+            name: qsTr("Hold to fast-forward")
+        },
+        {
+            code: ZxSettings.QuickSaveSnapshot,
+            name: qsTr("Quick save")
+        },
+        {
+            code: ZxSettings.QuickLoadSnapshot,
+            name: qsTr("Quick load")
+        }
+    ].concat(keyChoices)
+    readonly property var controllerButtons: [
+        {
+            code: GamepadManager.ButtonA,
+            name: "A"
+        },
+        {
+            code: GamepadManager.ButtonB,
+            name: "B"
+        },
+        {
+            code: GamepadManager.ButtonX,
+            name: "X"
+        },
+        {
+            code: GamepadManager.ButtonY,
+            name: "Y"
+        },
+        {
+            code: GamepadManager.ButtonL1,
+            name: "L1"
+        },
+        {
+            code: GamepadManager.ButtonR1,
+            name: "R1"
+        },
+        {
+            code: GamepadManager.ButtonL2,
+            name: "L2"
+        },
+        {
+            code: GamepadManager.ButtonR2,
+            name: "R2"
+        },
+        {
+            code: GamepadManager.ButtonSelect,
+            name: qsTr("Select")
+        },
+        {
+            code: GamepadManager.ButtonL3,
+            name: qsTr("Left stick click")
+        },
+        {
+            code: GamepadManager.ButtonR3,
+            name: qsTr("Right stick click")
+        }
+    ]
+    hints: [
+        {
+            pad: "A",
+            key: "Enter",
+            text: qsTr("Change")
+        },
+        {
+            pad: "B",
+            key: "Esc",
+            text: qsTr("Back"),
+            action: () => pageLoader.source = ""
+        }
+    ]
     GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        buttonAKey: Qt.Key_Space
+        gamepad: Gamepad {
+            deviceId: ZxEmulator.gamepadId
+        }
+        buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
-        buttonYKey: Qt.Key_Tab
-        buttonXKey: Qt.Key_Backtab
     }
-
-    ListModel {
-        id: buttonsModel
-        ListElement { code: GamepadManager.ButtonA; name: "A" }
-        ListElement { code: GamepadManager.ButtonB; name: "B" }
-        ListElement { code: GamepadManager.ButtonX; name: "X" }
-        ListElement { code: GamepadManager.ButtonY; name: "Y" }
-        ListElement { code: GamepadManager.ButtonL1; name: "L1" }
-        ListElement { code: GamepadManager.ButtonR1; name: "R1" }
-        ListElement { code: GamepadManager.ButtonL2; name: "L2" }
-        ListElement { code: GamepadManager.ButtonR2; name: "R2" }
-    }
-
-    ListModel {
-        id: actionsModel
-        ListElement { code: ZxSettings.JoystickFire; name: "Joystick fire" }
-
-        // Actions shortcuts
-        ListElement { code: ZxSettings.ToggleKeyboard; name: "Toggle Keyboard"; section: "Actions" }
-        ListElement { code: ZxSettings.ToggleCursorJoystick; name: "Toggle Joystick"; section: "Actions" }
-        ListElement { code: ZxSettings.TogglePause; name: "Toggle Pause"; section: "Actions" }
-        ListElement { code: ZxSettings.ToggleEmulationSpeed; name: "Toggle Emulation Speed"; section: "Actions" }
-        ListElement { code: ZxSettings.QuickSaveSnapshot; name : "Save Snapshot"; section: "Actions" }
-        ListElement { code: ZxSettings.QuickLoadSnapshot; name: "Load Snapshot"; section: "Actions" }
-
-        // Keys shortcuts
-        ListElement { code: Qt.Key_Enter; name:"Enter"; section: "Keys" }
-        ListElement { code: Qt.Key_Shift; name:"Caps Shift"; section: "Keys" }
-        ListElement { code: Qt.Key_Control; name:"Symbol Shift"; buttonColor:"red"; section: "Keys" }
-        ListElement { code: Qt.Key_Space; name:"Break Space"; section: "Keys" }
-
-        ListElement { code: Qt.Key_0; name: "0"; section: "Keys" }
-        ListElement { code: Qt.Key_1; name: "1"; section: "Keys" }
-        ListElement { code: Qt.Key_2; name: "2"; section: "Keys" }
-        ListElement { code: Qt.Key_3; name: "3"; section: "Keys" }
-        ListElement { code: Qt.Key_4; name: "4"; section: "Keys" }
-        ListElement { code: Qt.Key_5; name: "5"; section: "Keys" }
-        ListElement { code: Qt.Key_6; name: "6"; section: "Keys" }
-        ListElement { code: Qt.Key_7; name: "7"; section: "Keys" }
-        ListElement { code: Qt.Key_8; name: "8"; section: "Keys" }
-        ListElement { code: Qt.Key_9; name: "9"; section: "Keys" }
-
-        ListElement { code: Qt.Key_A; name: "A"; section: "Keys" }
-        ListElement { code: Qt.Key_B; name: "B"; section: "Keys" }
-        ListElement { code: Qt.Key_C; name: "C"; section: "Keys" }
-        ListElement { code: Qt.Key_D; name: "D"; section: "Keys" }
-        ListElement { code: Qt.Key_E; name: "E"; section: "Keys" }
-        ListElement { code: Qt.Key_F; name: "F"; section: "Keys" }
-        ListElement { code: Qt.Key_G; name: "G"; section: "Keys" }
-        ListElement { code: Qt.Key_H; name: "H"; section: "Keys" }
-        ListElement { code: Qt.Key_I; name: "I"; section: "Keys" }
-        ListElement { code: Qt.Key_J; name: "J"; section: "Keys" }
-        ListElement { code: Qt.Key_K; name: "K"; section: "Keys" }
-        ListElement { code: Qt.Key_L; name: "L"; section: "Keys" }
-        ListElement { code: Qt.Key_M; name: "M"; section: "Keys" }
-        ListElement { code: Qt.Key_N; name: "N"; section: "Keys" }
-        ListElement { code: Qt.Key_O; name: "O"; section: "Keys" }
-        ListElement { code: Qt.Key_P; name: "P"; section: "Keys" }
-        ListElement { code: Qt.Key_Q; name: "Q"; section: "Keys" }
-        ListElement { code: Qt.Key_R; name: "R"; section: "Keys" }
-        ListElement { code: Qt.Key_S; name: "S"; section: "Keys" }
-        ListElement { code: Qt.Key_T; name: "T"; section: "Keys" }
-        ListElement { code: Qt.Key_U; name: "U"; section: "Keys" }
-        ListElement { code: Qt.Key_V; name: "V"; section: "Keys" }
-        ListElement { code: Qt.Key_W; name: "W"; section: "Keys" }
-        ListElement { code: Qt.Key_X; name: "X"; section: "Keys" }
-        ListElement { code: Qt.Key_Y; name: "Y"; section: "Keys" }
-        ListElement { code: Qt.Key_Z; name: "Z"; section: "Keys" }
-    }
-
-    function actionIndex(action)
-    {
-        for (var i = 0; i < actionsModel.count; ++i) {
-            if (actionsModel.get(i).code === action)
-                return i;
-        }
-        return -1;
-    }
-
-    Component {
-        id: sectionHeading
-        FancyText {
-            horizontalAlignment: Text.AlignHCenter
-            text: section
+    Connections {
+        target: ZxEmulator.settings
+        function onControllerMappingChanged() {
+            ++page.revision;
         }
     }
-
-    FancyPane {
-        id: pane
-        ColumnLayout {
-            GridLayout {
-                columns: 2
-                FancyText {
-                    Layout.alignment:Qt.AlignRight
-                    text: qsTr("Gampad button")
+    function actionName(button) {
+        const changed = revision;
+        let code = ZxEmulator.settings.gamepadAction(button);
+        if (code === Qt.Key_Enter)
+            code = Qt.Key_Return;
+        return actionChoices.find(item => item.code === code)?.name || qsTr("Unknown mapping");
+    }
+    function choose(direction, button, row) {
+        page.direction = direction;
+        page.buttonCode = button;
+        returnFocus = row;
+        chooser.open();
+    }
+    SettingsList {
+        id: settings
+        SettingRow {
+            label: qsTr("Directions")
+            description: ZxEmulator.settings.directionMapping === ZxSettings.QaopDirections ? qsTr("Q up · A down · O left · P right · Space fire") : qsTr("Both sticks, D-pad and the touch joystick")
+            kind: "choice"
+            model: [qsTr("Selected joystick"), qsTr("QAOP + Space"), qsTr("Custom keys")]
+            currentIndex: ZxEmulator.settings.directionMapping
+            onActivated: index => ZxEmulator.settings.directionMapping = index
+        }
+        Repeater {
+            model: page.directionLabels
+            delegate: SettingRow {
+                id: directionRow
+                required property int index
+                required property string modelData
+                visible: ZxEmulator.settings.directionMapping === ZxSettings.CustomDirections
+                label: modelData
+                kind: "action"
+                actionText: ZxEmulator.settings.directionKeyNames[index]
+                onClicked: page.choose(index, -1, directionRow)
+            }
+        }
+        Text {
+            width: parent.width
+            padding: Theme.sp(3)
+            text: qsTr("Buttons")
+            font.pixelSize: Theme.title
+            color: Theme.text
+        }
+        Repeater {
+            model: page.controllerButtons
+            delegate: SettingRow {
+                id: buttonRow
+                required property var modelData
+                label: modelData.name
+                kind: "action"
+                actionText: page.actionName(modelData.code)
+                onClicked: page.choose(-1, modelData.code, buttonRow)
+            }
+        }
+        Text {
+            width: parent.width
+            padding: Theme.sp(3)
+            text: qsTr("Start opens the menu. QAOP uses Q/A for up/down, O/P for left/right, and Space for fire. Mappings are remembered.")
+            wrapMode: Text.Wrap
+            font.pixelSize: Theme.caption
+            color: Theme.textMuted
+        }
+    }
+    Dialog {
+        id: chooser
+        parent: Overlay.overlay
+        x: Math.round((parent.width - width) / 2)
+        y: Math.round((parent.height - height) / 2)
+        width: Math.min(page.width - Theme.sp(8), Theme.sp(120))
+        height: Math.min(page.height - Theme.sp(8), Theme.sp(140))
+        modal: true
+        focus: true
+        title: page.direction >= 0 ? page.directionLabels[page.direction] : qsTr("Button action")
+        Overlay.modal: Rectangle {
+            color: Theme.scrim
+        }
+        background: Rectangle {
+            color: Theme.raised
+            radius: Theme.radius
+            border.width: Theme.line
+            border.color: Theme.outline
+        }
+        onOpened: {
+            options.currentIndex = Math.max(0, options.checkedIndex);
+            options.positionViewAtIndex(options.currentIndex, ListView.Contain);
+            options.forceActiveFocus();
+        }
+        onClosed: {
+            if (page.returnFocus) {
+                page.returnFocus.forceActiveFocus();
+                settings.ensureVisible(page.returnFocus);
+            }
+        }
+        contentItem: Item {
+            OptionList {
+                id: options
+                model: page.direction >= 0 ? page.keyChoices : page.actionChoices
+                textOf: item => item.name
+                checkedIndex: {
+                    const changed = page.revision;
+                    let code = page.direction >= 0 ? ZxEmulator.settings.directionKey(page.direction) : ZxEmulator.settings.gamepadAction(page.buttonCode);
+                    if (code === Qt.Key_Enter)
+                        code = Qt.Key_Return;
+                    return model.findIndex(item => item.code === code);
                 }
-                ComboBox {
-                    id: gamepadButton
-                    Layout.fillWidth: true
-                    focus: true
-                    model: buttonsModel
-                    textRole: "name"
-                    Keys.onUpPressed: {
-                        if (popup.visible)
-                             decrementCurrentIndex();
-                        else
-                            shortcut.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onDownPressed: {
-                        if (popup.visible)
-                            incrementCurrentIndex();
-                        else
-                            shortcut.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex()
-                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
-
-                }
-
-                FancyText {
-                    Layout.alignment:Qt.AlignRight
-                    text: qsTr("Shortcut")
-                }
-                ComboBox {
-                    id: shortcut
-                    Layout.fillWidth: true
-                    model: actionsModel
-                    currentIndex: actionIndex(ZxEmulator.settings.gamepadAction(buttonsModel.get(gamepadButton.currentIndex).code))
-                    onCurrentIndexChanged: ZxEmulator.settings.setGamepadAction(buttonsModel.get(gamepadButton.currentIndex).code, actionsModel.get(currentIndex).code)
-                    textRole: "name"
-                    Keys.onUpPressed: {
-                        if (shortcut.popup.visible)
-                             decrementCurrentIndex();
-                        else
-                            gamepadButton.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onDownPressed: {
-                        if (shortcut.popup.visible)
-                            shortcut.incrementCurrentIndex();
-                        else
-                            gamepadButton.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex()
-                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
-
-                    Connections {
-                        target: shortcut.popup
-                        function onOpened() {
-                            shortcut.popup.contentItem.section.property = "section";
-                            shortcut.popup.contentItem.section.delegate = sectionHeading;
-                            shortcut.popup.contentItem.section.criteria = ViewSection.FullString;
-                        }
-                    }
+                onChosen: index => {
+                    if (index < 0 || index >= model.length)
+                        return;
+                    if (page.direction >= 0)
+                        ZxEmulator.settings.setDirectionKey(page.direction, model[index].code);
+                    else
+                        ZxEmulator.settings.setGamepadAction(page.buttonCode, model[index].code);
+                    chooser.close();
                 }
             }
-
-            Button {
-                Layout.alignment: Qt.AlignHCenter
-                text: qsTr("Close (B)")
-                onClicked: pageLoader.source = ""
-            }
+        }
+        footer: HintBar {
+            hints: [
+                {
+                    pad: "A",
+                    key: "Enter",
+                    text: qsTr("Choose"),
+                    action: () => options.chosen(options.currentIndex)
+                },
+                {
+                    pad: "B",
+                    key: "Esc",
+                    text: qsTr("Back"),
+                    action: () => chooser.close()
+                }
+            ]
         }
     }
 }

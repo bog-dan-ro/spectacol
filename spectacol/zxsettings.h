@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include <QObject>
 
 #include <QGamepadManager>
+#include "controllerinput.h"
 #include <QQmlEngine>
 #include <QVariantMap>
 #include <zxkit/video/VideoFrame.h>
@@ -83,8 +84,19 @@ class ZxSettings : public QObject
     Q_PROPERTY(bool joystickPrompt READ joystickPrompt WRITE setJoystickPrompt NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool recreatedSpectrum READ recreatedSpectrum WRITE setRecreatedSpectrum NOTIFY settingsCurrentChanged)
     Q_PROPERTY(qreal deadZone READ deadZone WRITE setDeadZone NOTIFY deadZoneChanged)
+    Q_PROPERTY(int directionMapping READ directionMapping WRITE setDirectionMapping NOTIFY controllerMappingChanged)
+    Q_PROPERTY(QStringList directionKeyNames READ directionKeyNames NOTIFY controllerMappingChanged)
 
 public:
+    enum DirectionMapping { JoystickDirections = ControllerInput::Joystick, QaopDirections = ControllerInput::Qaop,
+                            CustomDirections = ControllerInput::Custom };
+    Q_ENUM(DirectionMapping)
+    int directionMapping() const { return m_directionMapping; }
+    void setDirectionMapping(int mode);
+    QStringList directionKeyNames() const;
+    const std::array<int, ControllerInput::DirectionCount> &directionKeys() const { return m_directionKeys; }
+    Q_INVOKABLE int directionKey(int index) const;
+    Q_INVOKABLE void setDirectionKey(int index, int key);
     int borderLeft() const { return m_borderMargins.left; }
     int borderTop() const { return m_borderMargins.top; }
     int borderRight() const { return m_borderMargins.right; }
@@ -226,6 +238,8 @@ public slots:
     void setGamepadAction(int gamepadButton, int action);
 
 private:
+    int m_directionMapping = JoystickDirections;
+    std::array<int, ControllerInput::DirectionCount> m_directionKeys = ControllerInput::qaopKeys;
     /// `persist`: remember the machine for the next start (the user picked it)
     void applyMachine(int idx, bool persist);
     void applyTapeOptions();
@@ -250,6 +264,7 @@ signals:
     void autoSaveOnExitChanged(bool autoSaveOnExit);
     void leftMarginChanged(bool leftMargin);
     void deadZoneChanged(qreal deadZone);
+    void controllerMappingChanged();
 
     void messageLevelChanged(int messageLevel);
 

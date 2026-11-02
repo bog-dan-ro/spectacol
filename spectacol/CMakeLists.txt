@@ -104,6 +104,7 @@ qt_add_qml_module(spectacol
         zxscreen.cpp zxscreen.h
         screenfilters.h
         zxsettings.cpp zxsettings.h
+        controllerinput.cpp controllerinput.h
         zxtape.cpp zxtape.h
         zxtapedata.cpp zxtapedata.h
         zximage.cpp zximage.h

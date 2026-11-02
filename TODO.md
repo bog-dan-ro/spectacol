@@ -33,7 +33,9 @@ controls, netplay, Google Play sharing, new platform ports and the broad metadat
         playing).
   - [ ] Options › Screen and the filters list keep the old look: they hold the screen filter UI (owner's work).
   - [ ] Still the old structure, only recoloured: poke finder and manager, the
-        gamepad pages (customize, calibrate), the on-screen keyboard and joysticks.
+        gamepad calibration, the on-screen keyboard and joysticks.
+  - [x] Controller mapping uses themed settings rows and a key/action dialog with D-pad navigation and focus
+        restoration on close, including direction presets and custom keys.
   - [x] Tape creation/export and snapshot Save As use themed sheets with keyboard/gamepad actions and
         destination previews. Failed writes leave the editor open for retry.
   - [x] Online search keeps a gamepad-friendly grid of thumbnail cards. A/Enter opens a modal title/details/media
@@ -91,16 +93,19 @@ controls, netplay, Google Play sharing, new platform ports and the broad metadat
 
 ## Controls
 
-- [ ] **Map directions to Spectrum keys**, for touch and physical gamepads: a QAOP+fire preset and custom keys
+- [x] **Map directions to Spectrum keys**, for touch and physical gamepads: a QAOP+Space preset and custom keys
       ([#129](https://github.com/bog-dan-ro/spectacol/issues/129),
       [#131](https://github.com/bog-dan-ro/spectacol/issues/131),
-      [#3](https://github.com/bog-dan-ro/spectacol/issues/3)). Buttons already map to keys, but the sticks always
-      drive the selected joystick. Map axis directions with a dead zone and release keys on neutral/disconnect.
+      [#3](https://github.com/bog-dan-ro/spectacol/issues/3)). Options → (Virtual) Gamepad → Controller mapping
+      chooses joystick, QAOP or custom Up/Down/Left/Right/Fire keys. Both sticks, the D-pad and touch have separate
+      ownership and respect the dead zone. Neutral/disconnect, hidden/cancelled touch, menus/pause, reset and
+      mapping changes release held input. Shared keys/modifiers/fire stay held until every owner releases them.
+      Native controller tests and `tests/controller.py` verify state and actual emulated keyboard/Kempston ports.
 - [ ] Save/load named gamepad mapping profiles, with per-game selection and import/export
       ([#116](https://github.com/bog-dan-ro/spectacol/issues/116), duplicate
       [#121](https://github.com/bog-dan-ro/spectacol/issues/121)). Keep profiles independent of a new game container.
-- [ ] Expose Select and stick-click buttons in the mapping UI; decide how Start can be mapped while keeping a
-      reliable way to open the menu ([#117](https://github.com/bog-dan-ro/spectacol/issues/117)).
+- [x] Expose Select and stick-click buttons in the mapping UI; Start remains reserved for the menu
+      ([#117](https://github.com/bog-dan-ro/spectacol/issues/117)).
 - [ ] Fix stuck keys on the touch keyboard with overlapping touches, cancellation and hiding the keyboard
       ([#100](https://github.com/bog-dan-ro/spectacol/issues/100)); track each held key, including shared modifiers.
 - [ ] Configurable opacity for the on-screen keyboard, joysticks and action buttons

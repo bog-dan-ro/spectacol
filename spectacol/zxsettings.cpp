@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,6 +98,11 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
         s.endGroup();
 
         s.beginGroup(u"Gamepad"_s);
+        m_directionMapping = std::clamp(s.value(u"directionMapping"_s, int(JoystickDirections)).toInt(), 0, 2);
+        const auto directions = s.value(u"directionKeys"_s).toList();
+        for (int i = 0; i < std::min(int(directions.size()), int(ControllerInput::DirectionCount)); ++i)
+            if (ControllerInput::isSpectrumKey(directions[i].toInt()))
+                m_directionKeys[i] = directions[i].toInt();
         QVariantMap map = s.value(u"actionsMap"_s).toMap();
         for (auto it = map.begin(); it != map.end(); ++it)
             m_gamepadActions[it.key().toInt()] = it.value().toInt();
@@ -214,6 +219,7 @@ void ZxSettings::applyMachine(int idx, bool persist)
 
     try {
         // On failure the emulator keeps the previous machine
+        m_zxEmulator.releaseInputs();
         m_zxEmulator.emulator().writeLock()->selectMachine(machineId);
         m_currentMachineIndex = idx;
         if (persist) {
@@ -785,7 +791,13 @@ void ZxSettings::setRecreatedSpectrum(bool recreatedSpectrum)
 
 void ZxSettings::setGamepadAction(int gamepadButton, int action)
 {
+    if (action != JoystickFire && !ControllerInput::isSpectrumKey(action)
+        && (action < ToggleKeyboard || action > ToggleEmulationSpeed))
+        return;
     std::unique_lock<std::mutex> lock(m_gamepadActionsMutex);
+    const auto previous = m_gamepadActions.find(gamepadButton);
+    if ((previous == m_gamepadActions.end() ? int(JoystickFire) : previous->second) == action)
+        return;
     m_gamepadActions[gamepadButton] = action;
     QSettings s;
     s.beginGroup(u"Gamepad"_s);
@@ -793,4 +805,53 @@ void ZxSettings::setGamepadAction(int gamepadButton, int action)
     for (const auto &it : m_gamepadActions)
         map[QString::number(it.first)] = it.second;
     s.setValue(u"actionsMap"_s, map);
+    lock.unlock();
+    emit controllerMappingChanged();
+}
+
+void ZxSettings::setDirectionMapping(int mode)
+{
+    if (mode < JoystickDirections || mode > CustomDirections || mode == m_directionMapping)
+        return;
+    m_directionMapping = mode;
+    QSettings settings;
+    settings.beginGroup(u"Gamepad"_s);
+    settings.setValue(u"directionMapping"_s, mode);
+    emit controllerMappingChanged();
+}
+
+int ZxSettings::directionKey(int index) const
+{
+    return index >= 0 && index < ControllerInput::DirectionCount ? m_directionKeys[index] : 0;
+}
+
+QStringList ZxSettings::directionKeyNames() const
+{
+    QStringList result;
+    for (const int key : m_directionKeys) {
+        switch (key) {
+        case Qt::Key_Shift: result.append(tr("Caps Shift")); break;
+        case Qt::Key_Control: result.append(tr("Symbol Shift")); break;
+        case Qt::Key_Enter:
+        case Qt::Key_Return: result.append(tr("Enter")); break;
+        case Qt::Key_Space: result.append(tr("Space")); break;
+        default: result.append(QString(QChar(key))); break;
+        }
+    }
+    return result;
+}
+
+void ZxSettings::setDirectionKey(int index, int key)
+{
+    if (index < 0 || index >= ControllerInput::DirectionCount || !ControllerInput::isSpectrumKey(key)
+        || m_directionKeys[index] == key)
+        return;
+    m_directionKeys[index] = key;
+    QVariantList values;
+    for (const int code : m_directionKeys)
+        values.append(code);
+    QSettings settings;
+    settings.beginGroup(u"Gamepad"_s);
+    settings.setValue(u"directionKeys"_s, values);
+    emit controllerMappingChanged();
 }

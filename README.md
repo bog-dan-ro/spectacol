@@ -34,6 +34,18 @@ F1 to F4 belong to the emulated machine (the CoBra's function keys); Spectacol's
 On a CoBra 1, Ctrl is CTRL, Esc is ESC, Scroll Lock is NO SCROLL and the keypad's Enter is LINE FEED.
 Elsewhere Ctrl, Alt and Meta are Symbol Shift and Esc is BREAK.
 
+## Controller mapping
+
+Choose **Options → (Virtual) Gamepad → Controller mapping**. Directions can drive the selected joystick,
+use **QAOP + Space**, or use five custom Spectrum keys. The mapping applies to both sticks, the D-pad and the
+touch joystick. Buttons can use the mapped fire key, another key or an action such as pause or quick save.
+Select and both stick-click buttons are available; Start keeps opening the menu. Settings are remembered.
+
+Use Up/Down to move between settings and Left/Right to change the direction mode. A/Enter opens a key/action
+picker; A confirms and B/Escape returns to the same row. Shared keys and fire buttons remain held until all
+their input sources release them. Menus, pause, reset and mapping changes clear held input; disconnecting a
+gamepad or hiding the touch joystick releases that input source.
+
 ## Online search
 
 Choose **Spectacol → Search online**, then **Internet Archive** or **ZXInfo**. Enter a title, a single letter

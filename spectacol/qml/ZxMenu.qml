@@ -329,7 +329,7 @@ ZxMenuItem {
         ZxMenuItem {
             text: qsTr("(Virtual) Gamepad")
             ZxMenuItem {
-                text: qsTr("Customize Gamepad Buttons")
+                text: qsTr("Controller mapping")
                 onTriggered: {
                     menuBar.close();
                     pageLoader.source = "CustomizeGamepadPage.qml";
