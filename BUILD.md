@@ -94,13 +94,14 @@ chains can reduce rendering performance; the emulator frame callback continues
 to publish native frames. Spectacol links the separate `ZX::VideoFilters` target;
 other ZxKit consumers can continue to link only `ZX::Kit`.
 
-## Offline catalogue and controller tests
+## Offline catalogue and input tests
 
 The Qt Test suite exercises both Internet Archive and ZXInfo through a local HTTP server. It checks paging,
 URL encoding, metadata and download parsing, cancellation, unavailable results, malformed replies, checksum
 failures and atomic save/retry. It makes no requests to the public services.
 The controller tests cover dead zones, both sticks, D-pad/touch overlap, shared fire/key ownership,
-mapping changes, cancelled presses and disconnect cleanup.
+mapping changes, cancelled presses and disconnect cleanup. Keyboard tests load the same QML input state
+used by the UI and cover overlapping fingers/navigation, sticky chords, cancellation and late releases.
 
 ```sh
 cmake -S . -B build -DSPECTACOL_BUILD_TESTS=ON
@@ -125,6 +126,18 @@ Outputs go to `build/controller`; `--binary` and `--output` override the default
 `pad:AxisLeftX:-1`, `pad:ButtonA:down` / `up` and corresponding `touch:` events (`cancel` tests cancelled touches).
 `pad:clear` releases all input;
 `touch:clear` releases only the touch joystick.
+
+The on-screen keyboard check sends window touch events and navigation presses through the compiled UI,
+then checks the real keyboard rows with the same diagnostic:
+
+```sh
+python3 tests/keyboard.py
+```
+
+It covers overlapping and shared keys, sliding off a key, cancelled touches, hiding/pause and sticky modifier
+chords. Outputs go to `build/keyboard`; `--binary` and `--output` override the defaults. Scripted `--ui-keys`
+accepts `point:ID:down:X:Y`, `point:ID:move:X:Y`, `point:ID:up:X:Y` (window coordinates) and `point:cancel`.
+Tests use temporary settings and require no touch hardware.
 
 ## Saving regression
 

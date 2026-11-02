@@ -31,8 +31,29 @@ Item {
     readonly property int cobraFlag: 0x20000000
     readonly property int cobraControlKey: Qt.Key_Control | cobraFlag
     readonly property int columns: cobraMode ? 12 : 10
-    property bool cobraCtrlPressed: false
-    property var heldKeys: []
+    readonly property bool cobraCtrlPressed: input.heldKeys.indexOf(cobraControlKey) >= 0
+    readonly property bool capsPressed: input.heldKeys.indexOf(Qt.Key_Control) >= 0
+    readonly property bool symbolPressed: input.heldKeys.indexOf(Qt.Key_Shift) >= 0
+    property bool gamepadMode: false
+    property bool stickyCSSS: gamepadMode || stickyCSSSButton.checked
+    onCobraModeChanged: releasePressedKeys()
+    onGamepadModeChanged: releasePressedKeys()
+    Component.onDestruction: releasePressedKeys()
+
+    KeyboardInput {
+        id: input
+        sticky: onScreenKeyboard.stickyCSSS
+        extraModifier: onScreenKeyboard.cobraControlKey
+        onKeyChanged: (key, pressed) => {
+            if (key & cobraFlag)
+                ZxEmulator.setCobraKeyState(key & ~cobraFlag, pressed);
+            else if (pressed)
+                ZxEmulator.keyPress(key);
+            else
+                ZxEmulator.keyRelease(key);
+        }
+    }
+
     Connections {
         target: ZxEmulator
         function onPausedChanged() {
@@ -40,11 +61,14 @@ Item {
                 onScreenKeyboard.releasePressedKeys();
         }
     }
-    onCobraModeChanged: releasePressedKeys()
-
-    property bool gamepadMode: false
-    property bool stickyCSSS: gamepadMode || stickyCSSSButton.checked
-    onStickyCSSSChanged: if (!stickyCSSS) releasePressedKeys()
+    Connections {
+        target: onScreenKeyboard.Window.window
+        function onActiveChanged() {
+            const window = onScreenKeyboard.Window.window;
+            if (!window || !window.active)
+                onScreenKeyboard.releasePressedKeys();
+        }
+    }
 
     anchors {
         bottomMargin: Screen.pixelDensity * (mainScreen.portrait ? 10 : 4)
@@ -52,30 +76,8 @@ Item {
         rightMargin: mainScreen.portrait ? 0 : Screen.pixelDensity * 2
     }
 
-    // Separate the CoBra column from the Spectrum keys, so CTRL and SYMBOL SHIFT
-    // remain independent even though both use Qt.Key_Control in their host mapping.
-    function sendKey(pressed: bool, key: int): void {
-        if (!key)
-            return;
-        if (key & cobraFlag)
-            ZxEmulator.setCobraKeyState(key & ~cobraFlag, pressed);
-        else if (pressed)
-            ZxEmulator.keyPress(key);
-        else
-            ZxEmulator.keyRelease(key);
-        const index = heldKeys.indexOf(key);
-        if (pressed && index < 0)
-            heldKeys.push(key);
-        else if (!pressed && index >= 0)
-            heldKeys.splice(index, 1);
-    }
-
-    function releasePressedKeys()
-    {
-        for (const key of heldKeys.slice())
-            sendKey(false, key);
-        _pressedKey = 0;
-        capsPressed = symbolPressed = cobraCtrlPressed = false;
+    function releasePressedKeys(): void {
+        input.clear();
     }
 
     onVisibleChanged: {
@@ -84,7 +86,7 @@ Item {
             grid.currentIndex = cobraMode ? 24 : 20;
             grid.forceActiveFocus(Qt.OtherFocusReason);
         } else {
-            releasePressedKeys()
+            releasePressedKeys();
         }
     }
     Keys.onPressed: (event) => {
@@ -92,108 +94,30 @@ Item {
             event.accepted = true;
         } else if (event.key === Qt.Key_Return) {
             event.accepted = true;
-            pressKey(grid.model.get(grid.currentIndex).code);
+            if (!event.isAutoRepeat && !ZxEmulator.paused)
+                input.press("navigation", grid.model.get(grid.currentIndex).code);
         }
     }
-
     Keys.onReleased: (event) => {
         if (event.key === Qt.Key_Escape) {
             event.accepted = true;
             onScreenKeyboard.visible = false;
         } else if (event.key === Qt.Key_Return) {
             event.accepted = true;
-            releaseKey(grid.model.get(grid.currentIndex).code);
+            if (!event.isAutoRepeat)
+                input.release("navigation", false);
         }
     }
 
-    property bool capsPressed: false
-    property bool symbolPressed: false
-    property int _pressedKey: 0
     Timer {
-        running: capsPressed && symbolPressed
+        // A short CS+SS chord switches the ROM into extended mode. Other
+        // owners of a modifier keep it held when these latches expire.
+        running: input.latchedKeys.indexOf(Qt.Key_Control) >= 0 &&
+                 input.latchedKeys.indexOf(Qt.Key_Shift) >= 0
         interval: 200
-        repeat: false
         onTriggered: {
-            sendKey(false, Qt.Key_Control);
-            sendKey(false, Qt.Key_Shift);
-            capsPressed = symbolPressed = false;
-        }
-    }
-
-    function pressKey(key: int): void
-    {
-        _pressedKey = 0;
-        if (key === cobraControlKey) {
-            if (stickyCSSS) {
-                cobraCtrlPressed = !cobraCtrlPressed;
-                sendKey(cobraCtrlPressed, key);
-            } else {
-                sendKey(true, key);
-            }
-            return;
-        }
-        switch(key)
-        {
-        case Qt.Key_Control:
-            if (stickyCSSS) {
-                capsPressed = !capsPressed;
-                if (capsPressed)
-                    sendKey(true, Qt.Key_Control);
-                else
-                    sendKey(false, Qt.Key_Control);
-            } else {
-                sendKey(true, Qt.Key_Control);
-            }
-            break;
-        case Qt.Key_Shift:
-            if (stickyCSSS) {
-                symbolPressed = !symbolPressed;
-                if (symbolPressed)
-                    sendKey(true, Qt.Key_Shift);
-                else
-                    sendKey(false, Qt.Key_Shift);
-            } else {
-                sendKey(true, Qt.Key_Shift);
-            }
-            break;
-        default:
-            sendKey(true, key);
-            if (gamepadMode)
-                _pressedKey = key;
-            break;
-        }
-    }
-
-    function releaseKey(key: int): void
-    {
-        if (key === cobraControlKey) {
-            if (!stickyCSSS)
-                sendKey(false, key);
-            return;
-        }
-        switch(key)
-        {
-        case Qt.Key_Control:
-        case Qt.Key_Shift:
-            if (!stickyCSSS) {
-                sendKey(false, key);
-                _pressedKey = 0;
-            }
-            break;
-        default:
-            if (gamepadMode) {
-                sendKey(false, _pressedKey);
-            } else {
-                sendKey(false, key);
-            }
-            if (stickyCSSS) {
-                if (capsPressed) sendKey(false, Qt.Key_Control);
-                if (symbolPressed) sendKey(false, Qt.Key_Shift);
-                if (cobraCtrlPressed) sendKey(false, cobraControlKey);
-                capsPressed = symbolPressed = cobraCtrlPressed = false;
-            }
-            _pressedKey = 0;
-            break;
+            input.releaseLatch(Qt.Key_Control);
+            input.releaseLatch(Qt.Key_Shift);
         }
     }
 
@@ -324,14 +248,39 @@ Item {
         height: cellHeight * 4 + ((mainScreen.portrait || gamepadMode) ? 0 : 2 * Screen.pixelDensity)
         model: cobraMode ? cobraKeyboard : zx48Keyboard
         currentIndex: 24
-        onCurrentIndexChanged: {
-            if (_pressedKey) {
-                sendKey(false, _pressedKey);
-                _pressedKey = 0;
+        onCurrentIndexChanged: input.release("navigation", false)
+        onActiveFocusChanged: if (!activeFocus) input.release("navigation", true)
+        interactive: false
+        keyNavigationEnabled: gamepadMode
+
+        // One area owns the whole keyboard, so every point has a stable ID.
+        // Sliding off a key keeps its original hold until release/cancellation.
+        MultiPointTouchArea {
+            anchors.fill: parent
+            minimumTouchPoints: 1
+            maximumTouchPoints: 10
+            z: 2
+            onPressed: (points) => {
+                if (ZxEmulator.paused)
+                    return;
+                for (const point of points) {
+                    // indexAt takes content coordinates; the view's origin can
+                    // shift when the layout changes size or machine.
+                    const index = grid.indexAt(point.x + grid.contentX, point.y + grid.contentY);
+                    const item = grid.itemAtIndex(index);
+                    if (item && item.contains(item.mapFromItem(grid, point.x, point.y)))
+                        input.press("touch:" + point.pointId, grid.model.get(index).code);
+                }
+            }
+            onReleased: (points) => {
+                for (const point of points)
+                    input.release("touch:" + point.pointId, false);
+            }
+            onCanceled: (points) => {
+                for (const point of points)
+                    input.release("touch:" + point.pointId, true);
             }
         }
-
-        interactive: gamepadMode
 
         delegate: Rectangle {
             id: rec
@@ -418,13 +367,6 @@ Item {
                 text: extred ? extred : ""
             }
 
-            MultiPointTouchArea {
-                anchors.fill: parent
-                onCanceled: releasePressedKeys()
-                touchPoints: TouchPoint {
-                    onPressedChanged: pressed ? pressKey(code) : releaseKey(code)
-                }
-            }
         }
     }
 }

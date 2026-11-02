@@ -106,8 +106,11 @@ controls, netplay, Google Play sharing, new platform ports and the broad metadat
       [#121](https://github.com/bog-dan-ro/spectacol/issues/121)). Keep profiles independent of a new game container.
 - [x] Expose Select and stick-click buttons in the mapping UI; Start remains reserved for the menu
       ([#117](https://github.com/bog-dan-ro/spectacol/issues/117)).
-- [ ] Fix stuck keys on the touch keyboard with overlapping touches, cancellation and hiding the keyboard
-      ([#100](https://github.com/bog-dan-ro/spectacol/issues/100)); track each held key, including shared modifiers.
+- [x] Fix stuck keys on the touch keyboard with overlapping touches, cancellation and hiding the keyboard
+      ([#100](https://github.com/bog-dan-ro/spectacol/issues/100)). Each finger/navigation press owns its original
+      key and sticky chord modifiers; shared keys remain down until their last owner releases. Cancellation is
+      local to its points; hiding, pause, deactivation and mode changes clear all holds. Native keyboard-state
+      tests and `tests/keyboard.py` cover the compiled UI and real emulated keyboard ports.
 - [ ] Configurable opacity for the on-screen keyboard, joysticks and action buttons
       ([#102](https://github.com/bog-dan-ro/spectacol/issues/102)).
 - [ ] Choose hold-to-fast-forward or press-to-toggle for touch/gamepad controls

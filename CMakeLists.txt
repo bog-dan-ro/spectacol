@@ -51,7 +51,7 @@ endif()
 
 add_subdirectory(spectacol)
 
-option(SPECTACOL_BUILD_TESTS "Build Spectacol's offline catalogue and controller tests" OFF)
+option(SPECTACOL_BUILD_TESTS "Build Spectacol's offline catalogue and input tests" OFF)
 if(SPECTACOL_BUILD_TESTS)
     enable_testing()
     find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Test)

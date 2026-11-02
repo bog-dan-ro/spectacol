@@ -94,7 +94,9 @@ starts Spectrum BASIC. The machines' official ROMs are bundled with their notice
 
 On CoBra 1, the on-screen keyboard adds F1–F4, ESC, LINE FEED, CTRL and NO SCROLL.
 CTRL is separate from SYMBOL SHIFT; the sticky modifier option supports chords on a
-single touch screen or gamepad. Keys are released when the keyboard closes or touch is canceled.
+single touch screen or gamepad. Each finger keeps its original key while sliding; overlapping keys and
+sticky chords remain held until their last owner releases. Cancelled touches release their own holds;
+closing the keyboard, pausing or leaving the app clears all keyboard holds.
 
 The original 64KB boot's SYS.COM disk loader is verified with diagnostic disks in both
 FM and MFM formats. A complete historical 64KB CP/M system remains unverified because

@@ -144,6 +144,7 @@ qt_add_qml_module(spectacol
         qml/MessagePage.qml
         qml/NextSdCardPage.qml
         qml/SdCardPage.qml
+        qml/KeyboardInput.qml
         qml/OnScreen48Keyboard.qml
         qml/OnScreenButton.qml
         qml/OnScreenCursorJoystick.qml

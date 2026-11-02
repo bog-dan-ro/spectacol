@@ -28,6 +28,13 @@
 #include <QKeySequence>
 #include <QMetaEnum>
 #include <QMouseEvent>
+#include <QPointingDevice>
+#include <QTouchEvent>
+#include <qpa/qwindowsysteminterface.h>
+#include <private/qhighdpiscaling_p.h>
+#include <QMap>
+#include <memory>
+#include <algorithm>
 #include <QQmlApplicationEngine>
 #include <QQuickWindow>
 #include <QStandardPaths>
@@ -97,14 +104,65 @@ int main(int argc, char *argv[])
         ZxEmulator::instance().settings()->selectMachine(parser.value(machineOption));
     if (!parser.positionalArguments().isEmpty())
         ZxEmulator::instance().load(QFileInfo(parser.positionalArguments().first()).absoluteFilePath());
+    // Keep the scripted device alive until the window and pending touches close.
+    QPointingDevice touchDevice(u"Scripted touchscreen"_s, 0x53504543, QInputDevice::DeviceType::TouchScreen,
+                                QPointingDevice::PointerType::Finger, QInputDevice::Capability::Position, 10, 0);
     if (parser.isSet(uiKeysOption)) {
         const QStringList keys = parser.value(uiKeysOption).split(u',', Qt::SkipEmptyParts);
+        if (std::any_of(keys.cbegin(), keys.cend(), [](const QString &key) { return key.startsWith(u"point:"_s); }))
+            QWindowSystemInterface::registerInputDevice(&touchDevice);
+        const auto touchPoints = std::make_shared<QMap<int, QPointF>>();
         // Coarse timers can merge adjacent slots in long scripts and reorder
         // modifier transitions. Keep scripted input on the requested timeline.
         for (qsizetype i = 0; i < keys.size(); ++i) {
             // wait: an idle 300 ms slot
             if (keys[i].trimmed() == u"wait"_s)
                 continue;
+            if (keys[i].startsWith(u"point:"_s)) {
+                // Real window touch events: point:ID:down/move/up:X:Y or point:cancel.
+                const auto parts = keys[i].split(u':');
+                bool idOk = false, xOk = false, yOk = false;
+                const int id = parts.value(1).toInt(&idOk);
+                const auto operation = parts.value(2);
+                const QPointF pos(parts.value(3).toDouble(&xOk), parts.value(4).toDouble(&yOk));
+                const bool cancel = parts.value(1) == u"cancel"_s;
+                if (!cancel && (!idOk || !xOk || !yOk ||
+                    (operation != u"down"_s && operation != u"move"_s && operation != u"up"_s))) {
+                    qWarning().noquote() << "Unknown touch event" << keys[i];
+                    continue;
+                }
+                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app,
+                                   [id, operation, pos, cancel, window, &touchDevice, touchPoints] {
+                    auto *w = window();
+                    if (!w)
+                        return;
+                    if (cancel) {
+                        QWindowSystemInterface::handleTouchCancelEvent<QWindowSystemInterface::SynchronousDelivery>(w, &touchDevice);
+                        touchPoints->clear();
+                        return;
+                    }
+                    const bool down = operation == u"down"_s;
+                    const bool up = operation == u"up"_s;
+                    if ((!down && !touchPoints->contains(id)) || (down && touchPoints->contains(id)))
+                        return;
+                    touchPoints->insert(id, pos);
+                    QList<QWindowSystemInterface::TouchPoint> points;
+                    for (auto it = touchPoints->cbegin(); it != touchPoints->cend(); ++it) {
+                        const auto state = it.key() != id ? QEventPoint::Stationary :
+                                           down ? QEventPoint::Pressed : up ? QEventPoint::Released : QEventPoint::Updated;
+                        QWindowSystemInterface::TouchPoint point;
+                        point.id = it.key();
+                        point.state = state;
+                        point.area = QRectF(QHighDpi::toNativePixels(w->mapToGlobal(it.value()), w), QSizeF(1, 1));
+                        point.pressure = state == QEventPoint::Released ? 0 : 1;
+                        points.append(point);
+                    }
+                    if (up)
+                        touchPoints->remove(id);
+                    QWindowSystemInterface::handleTouchEvent<QWindowSystemInterface::SynchronousDelivery>(w, &touchDevice, points);
+                });
+                continue;
+            }
             if (keys[i].startsWith(u"pad:"_s) || keys[i].startsWith(u"touch:"_s)) {
                 // Exercise controller input without requiring a hardware gamepad.
                 const auto parts = keys[i].split(u':');

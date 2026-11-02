@@ -25,7 +25,7 @@ Configuring needs network access. The top-level `CMakeLists.txt` uses `FetchCont
 
 The ROMs are Qt resources under `spectacol/roms/`, ZxKit gets them through the `romResolver` set in `ZxEmulator`. The ZX Spectrum Next boots from an SD card image that `NextSdCard` downloads (like jnext does) into the app data dir.
 
-Spectacol's catalogue tests use a local HTTP server and its controller tests use simulated input: configure with
+Spectacol's catalogue tests use a local HTTP server and its input tests use simulated controllers and touch: configure with
 `-DSPECTACOL_BUILD_TESTS=ON`, build, then `ctest --test-dir build --output-on-failure`.
 Check UI changes with the headless run above; `tests/*.py` contains compiled UI regressions.
 ZxKit has its own complete unit suite, which must also pass.

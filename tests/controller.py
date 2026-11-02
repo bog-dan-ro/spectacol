@@ -12,14 +12,7 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor
 
 
-def main():
-    repo = Path(__file__).resolve().parents[1]
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--binary", type=Path, default=repo / "build/bin/spectacol")
-    parser.add_argument("--output", type=Path, default=repo / "build/controller")
-    args = parser.parse_args()
-    output = args.output.resolve()
-    output.mkdir(parents=True, exist_ok=True)
+def make_diagnostic(source):
     # A tiny DI loop samples the machine's real I/O into RAM, rather than
     # relying on facade properties to establish that keys reach the computer.
     ram = bytearray(49152)
@@ -33,8 +26,19 @@ def main():
     header = bytearray(27)
     struct.pack_into("<H", header, 23, 0xFFFC)
     header[25:27] = b"\x01\x07"
-    source = output / "ports.sna"
     source.write_bytes(header + ram)
+
+
+def main():
+    repo = Path(__file__).resolve().parents[1]
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--binary", type=Path, default=repo / "build/bin/spectacol")
+    parser.add_argument("--output", type=Path, default=repo / "build/controller")
+    args = parser.parse_args()
+    output = args.output.resolve()
+    output.mkdir(parents=True, exist_ok=True)
+    source = output / "ports.sna"
+    make_diagnostic(source)
     cases = [
         ("qaop-diagonal", 1, 2, "pad:AxisLeftX:-1,pad:AxisLeftY:-1,pad:ButtonA:down", [0x20, 0x51, 0x70], 0),
         ("two-sticks", 1, 2, "pad:AxisLeftX:-1,pad:AxisRightX:-1,pad:AxisLeftX:0", [0x51], 0),
