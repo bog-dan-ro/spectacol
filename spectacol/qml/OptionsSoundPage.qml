@@ -37,6 +37,7 @@ Sheet {
     title: qsTr("Sound")
 
     readonly property var stereoModes: ["None", "ACB", "ABC"]
+    readonly property var chipModels: ["AY8912", "YM2149"]
 
     SettingsList {
         SettingRow {
@@ -57,6 +58,14 @@ Sheet {
             model: [qsTr("Mono"), "ACB", "ABC"]
             currentIndex: Math.max(0, page.stereoModes.indexOf(ZxEmulator.settings.AYStereoSeparation))
             onActivated: (index) => ZxEmulator.settings.AYStereoSeparation = page.stereoModes[index]
+        }
+        SettingRow {
+            label: qsTr("Sound chip")
+            description: qsTr("AY and YM chips have different volume curves and envelope steps")
+            kind: "choice"
+            model: ["AY-3-8912", "YM2149"]
+            currentIndex: Math.max(0, page.chipModels.indexOf(ZxEmulator.settings.ayModel))
+            onActivated: (index) => ZxEmulator.settings.ayModel = page.chipModels[index]
         }
         // "Speaker type" waits for ZxKit's speaker models (see TODO.md)
     }

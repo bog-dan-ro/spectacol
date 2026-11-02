@@ -85,6 +85,9 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
         m_soundEnabled = s.value("soundEnabled", true).toBool();
         m_loadingSound = s.value("loadingSound", true).toBool();
         m_ayStereo = s.value("ayStereo", u"ACB"_s).toString();
+        m_ayModel = s.value(u"ayModel"_s, u"AY8912"_s).toString();
+        if (m_ayModel != u"YM2149"_s)
+            m_ayModel = u"AY8912"_s;
         m_speakerType = s.value("speakerType", u"TV speaker"_s).toString();
         s.endGroup();
 
@@ -148,6 +151,8 @@ void ZxSettings::applyToEmulator()
 {
     ZxImage::instance()->setBorderMargins(m_borderMargins);
     m_zxEmulator.emulator().writeLock()->audioMixer().setStereoMode(ayStereoMode(m_ayStereo));
+    m_zxEmulator.emulator().writeLock()->audioMixer().setAyModel(
+        m_ayModel == u"YM2149"_s ? zxkit::AyModel::YM2149 : zxkit::AyModel::AY8912);
     applyTapeOptions();
     m_zxEmulator.setSpeed(m_emulationSpeed);
     // One by one: a peripheral that can't start (e.g. a missing ROM) must not stop the others
@@ -359,6 +364,19 @@ void ZxSettings::setAYStereoSeparation(const QString &AYStereoSeparation)
 QString ZxSettings::speakerType() const
 {
     return m_speakerType;
+}
+
+void ZxSettings::setAyModel(const QString &model)
+{
+    if ((model != u"AY8912"_s && model != u"YM2149"_s) || m_ayModel == model)
+        return;
+    m_ayModel = model;
+    QSettings s;
+    s.beginGroup(u"Sound"_s);
+    s.setValue(u"ayModel"_s, model);
+    m_zxEmulator.emulator().writeLock()->audioMixer().setAyModel(
+        model == u"YM2149"_s ? zxkit::AyModel::YM2149 : zxkit::AyModel::AY8912);
+    emit settingsCurrentChanged();
 }
 
 void ZxSettings::setSpeakerType(const QString &speakerType)

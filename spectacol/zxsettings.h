@@ -72,6 +72,7 @@ class ZxSettings : public QObject
     Q_PROPERTY(bool soundEnabled READ soundEnabled WRITE setSoundEnabled NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool loadingSound READ loadingSound WRITE setLoadingSound NOTIFY settingsCurrentChanged)
     Q_PROPERTY(QString AYStereoSeparation READ AYStereoSeparation WRITE setAYStereoSeparation NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(QString ayModel READ ayModel WRITE setAyModel NOTIFY settingsCurrentChanged)
     Q_PROPERTY(QString speakerType READ speakerType WRITE setSpeakerType NOTIFY settingsCurrentChanged)
 
 
@@ -159,6 +160,9 @@ public:
 
     QString AYStereoSeparation() const;
     void setAYStereoSeparation(const QString &AYStereoSeparation);
+
+    QString ayModel() const { return m_ayModel; }
+    void setAyModel(const QString &model);
 
     QString speakerType() const;
     void setSpeakerType(const QString &speakerType);
@@ -282,6 +286,7 @@ private:
     bool m_soundEnabled = true;
     bool m_loadingSound = true;
     QString m_ayStereo;
+    QString m_ayModel;
     QString m_speakerType;
     bool m_kempstonJoystick = true;
     bool m_kempstonMouse = false;

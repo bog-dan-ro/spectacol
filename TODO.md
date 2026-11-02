@@ -12,8 +12,9 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
       callback consumes it without GUI event delivery, locks or allocation. Pause/mute generations discard stale
       samples with short fades. A live capture with repeated 500 ms GUI stalls and 100%/200%/50%/turbo playback
       has zero underruns/overflows and no silent 10 ms windows. Keep physical-device listening checks below.
-- [ ] AY quality: use ZxKit's band-limited synthesis and AY/YM volume tables when available, and check
-      real game music and sound effects for aliasing and distortion.
+- [x] AY quality: use ZxKit's band-limited synthesis and measured AY/YM volume curves, with an AY-3-8912 /
+      YM2149 choice in Sound settings. Core regressions check alias rejection, envelope shapes and rewind;
+      physical-device listening with real game music and effects remains below.
 - [ ] Speaker models: connect `speakerType` to ZxKit's TV speaker, beeper and unfiltered models once available.
 - [x] Audio output pacing: adaptive resampling corrects device-clock drift without changing emulation speed.
       Deterministic regressions cover 44.1/48/96 kHz, 50/100/200% speed and ten virtual minutes of clock mismatch.
