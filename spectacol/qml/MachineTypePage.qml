@@ -27,18 +27,18 @@ import Spectacol
 Sheet {
     id: page
 
-    readonly property var groups: [qsTr("Sinclair"), qsTr("Timex"), qsTr("Clones"), qsTr("Romanian"), qsTr("Next")]
+    readonly property var groups: [qsTr("Sinclair"), qsTr("Next"), qsTr("Romanian"), qsTr("Clones"), qsTr("Timex")]
     property int focusIndex: ZxEmulator.settings.currentMachineIndex
 
     function groupOf(name: string): int {
         if (name.startsWith("Timex"))
-            return 1;
-        if (/Pentagon|Scorpion/.test(name))
-            return 2;
-        if (/HC-2000|CoBra/.test(name))
-            return 3;
-        if (/Next/.test(name))
             return 4;
+        if (/Pentagon|Scorpion/.test(name))
+            return 3;
+        if (/HC-2000|CoBra/.test(name))
+            return 2;
+        if (/Next/.test(name))
+            return 1;
         return 0;
     }
 
