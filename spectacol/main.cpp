@@ -39,6 +39,9 @@
 #include <QQuickWindow>
 #include <QStandardPaths>
 #include <QTimer>
+#ifdef Q_OS_ANDROID
+#include "androidintegration.h"
+#endif
 
 using namespace Qt::StringLiterals;
 int main(int argc, char *argv[])
@@ -266,6 +269,7 @@ int main(int argc, char *argv[])
         });
     }
 #ifdef Q_OS_ANDROID
+    AndroidIntegration::install(&app);
     QNativeInterface::QAndroidApplication::hideSplashScreen();
 #endif
     return app.exec();

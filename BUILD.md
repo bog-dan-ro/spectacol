@@ -1,13 +1,13 @@
 # Building Spectacol
 
-Spectacol builds with CMake and Qt 6. It is developed on Linux; the desktop build should also work on the other
-platforms Qt supports, but only Linux is tested.
+Spectacol builds with CMake and Qt 6. Linux and an Android emulator are tested; the desktop build
+should also work on the other platforms Qt supports.
 
 ## Requirements
 
 - CMake 3.25 or later and Ninja (or another generator).
 - A C++23 compiler: GCC 14 or later, or Clang 18 or later.
-- Qt 6.11 or later with the Quick, Multimedia and ShaderTools modules (the Qt online installer has them).
+- Qt 6.12 or later with the Quick, Multimedia and ShaderTools modules (the Qt online installer has them).
 - zlib.
 - Network access when configuring the first time: CMake's `FetchContent` downloads
   - [qtgamepadlegacy](https://github.com/bog-dan-ro/qtgamepadlegacy) (branch `dev`), the gamepad support;
@@ -150,16 +150,60 @@ python3 tests/saving.py
 ```
 
 Logs, screenshots and round-trip media go to `build/saving`. The test uses temporary settings and data;
-`--binary` and `--output` override the defaults. Android storage access is a separate postponed task.
+`--binary` and `--output` override the defaults. Android document-provider checks are described below.
 
 ## Android
 
-The Android build has not been ported to CMake and Qt 6 yet (see the Android section of `TODO.md`). It will need
-the Qt for Android kit, the Android SDK and NDK, and the OpenSSL libraries of the `android_openssl` submodule:
+Use Qt 6.12's Android and desktop host kits, Android SDK/platform/build tools, NDK r27c
+(`27.2.12479018`) and JDK 21. Both `android_x86_64` and `android_arm64_v8a` APKs build with
+this toolchain. Qt supplies the Gradle wrapper and matching Android Gradle plugin; do not copy
+the old Qt 5 Gradle files into the package directory. No Qt SDK modifications are required.
 
 ```sh
 git submodule update --init --recursive
+export ANDROID_SDK_ROOT="$HOME/android"
+export ANDROID_NDK_ROOT="$ANDROID_SDK_ROOT/ndk/27.2.12479018"
+qt_root="$HOME/Qt/6.12.0"
+cmake -S . -B build-android-x86_64 -G Ninja \
+    -DCMAKE_TOOLCHAIN_FILE="$qt_root/android_x86_64/lib/cmake/Qt6/qt.toolchain.cmake" \
+    -DQT_HOST_PATH="$qt_root/gcc_64" \
+    -DANDROID_SDK_ROOT="$ANDROID_SDK_ROOT" -DANDROID_NDK_ROOT="$ANDROID_NDK_ROOT" \
+    -DCMAKE_BUILD_TYPE=Release -DQT_ANDROID_DEPLOYMENT_TYPE=Debug
+cmake --build build-android-x86_64 --target apk --parallel
 ```
+
+For ARM64, use `android_arm64_v8a` and a separate build directory. The command builds optimized
+native code in a debug-signed APK, suitable for installing and `adb run-as` testing. The APK is under
+`spectacol/android-build/build/outputs/apk/debug/`. A distributable release needs your release signing
+configuration and a monotonically increasing `-DSPECTACOL_ANDROID_VERSION_CODE=...`; the default
+1641605 preserves the highest version code of the old per-ABI scheme. Debug signatures cannot upgrade
+a release signed with another key.
+
+The build fetches the Qt 6.12 GamepadLegacy fork, including its Java JAR, and packages the OpenSSL 3
+libraries from `android_openssl`. ZxKit probes NDK support for `std::jthread` and propagates
+`-fexperimental-library` only when needed. Native libraries use 16 KiB ELF alignment; check the packaged
+APK with the SDK's `zipalign -c -P 16 4` and `apksigner verify` as well.
+
+The Qt 6 manifest uses app storage and no obsolete shared-storage permissions. **Quick Open → Device
+files…** imports a file through Android's picker; **Save snapshot → Export…** and **Export tape → Export
+to device…** write to a selected document. Files opened from another app are copied into app storage
+before loading, including when Spectacol is already running. App data stays private. Old shared data
+is left in place; its saved location is retained as `Android/legacyDataPath` and files can be imported
+through the picker. Automatic migration and browsing a granted folder in the cover flow remain TODOs.
+
+Run device regressions on a disposable emulator with an English system UI:
+
+```sh
+python3 tests/android.py --adb "$ANDROID_SDK_ROOT/platform-tools/adb" --serial emulator-5554
+```
+
+The script requires an installed debug APK. It temporarily replaces the app's settings, restores them
+on exit, and checks cold/warm document intents and native snapshot export. Do not interact with the
+emulator while it runs. Physical gamepads, Android TV remotes and audio latency still need device checks.
+On the tested API 37 x86_64 emulator, `-gpu host` renders correctly; SwiftShader's OpenGL driver showed
+incomplete frames. Check that an AVD's system image is actually installed before diagnosing Qt.
+
+## CoBra keyboard regression
 
 The CoBra keyboard regression drives the compiled on-screen keyboard, selects sticky
 CTRL+0 and checks the ROM CP/M CPU state (no external disk required):

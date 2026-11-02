@@ -58,6 +58,8 @@ using namespace Qt::StringLiterals;
 
 #ifdef Q_OS_ANDROID
 # include <QCoreApplication>
+# include <QJniObject>
+# include "androidintegration.h"
 #endif
 
 namespace {
@@ -333,6 +335,12 @@ ZxEmulator::ZxEmulator(QObject *parent)
     , m_sdCard(new SdCardFiles(this))
     , m_recording(new ZxRecording(this))
 {
+#ifdef Q_OS_ANDROID
+    const auto manager = QJniObject(QNativeInterface::QAndroidApplication::context()).callObjectMethod(
+        "getPackageManager", "()Landroid/content/pm/PackageManager;");
+    const auto feature = QJniObject::fromString(u"android.hardware.touchscreen"_s);
+    m_touchscreen = manager.callMethod<jboolean>("hasSystemFeature", "(Ljava/lang/String;)Z", feature.object<jstring>());
+#endif
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_tape, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_recording, QQmlEngine::CppOwnership);
@@ -413,22 +421,11 @@ ZxEmulator::ZxEmulator(QObject *parent)
 
     connect(qGuiApp, &QCoreApplication::aboutToQuit, this, &ZxEmulator::stopEngine);
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state) {
-        switch (state) {
-        case Qt::ApplicationActive:
-            if (m_applicationState != Qt::ApplicationActive) {
-                m_applicationState = Qt::ApplicationActive;
-                setPaused(false);
-            }
-            break;
-        case Qt::ApplicationInactive:
-            if (m_applicationState != Qt::ApplicationInactive) {
-                m_applicationState = Qt::ApplicationInactive;
-                setPaused(true);
-            }
-            break;
-        default:
-            break;
-        }
+        const bool wasActive = m_applicationState == Qt::ApplicationActive;
+        const bool active = state == Qt::ApplicationActive;
+        m_applicationState = state;
+        if (wasActive != active)
+            setPaused(!active);
     });
 
     QGamepadManager *gm = QGamepadManager::instance();
@@ -587,7 +584,17 @@ QString ZxEmulator::dataPath() const
         return path;
 
     QSettings s;
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(Q_OS_ANDROID)
+    const auto appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    path = s.value("dataPath", appData).toString();
+    const auto relative = QDir(appData).relativeFilePath(path);
+    // Shared external paths saved by the Qt 5 app are no longer writable under
+    // scoped storage. Keep its files in place; imports go through the picker.
+    if (QDir::isAbsolutePath(relative) || relative == u".."_s || relative.startsWith(u"../"_s)) {
+        s.setValue(u"Android/legacyDataPath"_s, path);
+        path = appData;
+    }
+#elif defined(Q_OS_IOS)
     path = s.value("dataPath", QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation).last() + u"/Spectacol/"_s).toString();
 #else
     path = s.value("dataPath", QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + u"/Spectacol/"_s).toString();
@@ -808,12 +815,77 @@ bool ZxEmulator::loadMediaFile(const QString &filePath)
     return loadMediaWithType(filePath).first;
 }
 
+QString ZxEmulator::importFile(const QUrl &url)
+{
+    if (url.scheme() != u"content"_s)
+        return url.isLocalFile() ? url.toLocalFile() : url.toString();
+#ifdef Q_OS_ANDROID
+    const auto name = AndroidIntegration::displayName(url);
+#else
+    const auto name = QFileInfo(url.path()).fileName();
+#endif
+    QFile input(url.toString());
+    if (!input.open(QIODevice::ReadOnly)) {
+        showMessage(tr("Can't open '%1': %2").arg(name, input.errorString()), Error);
+        return {};
+    }
+    const QDir folder(QDir(dataPath()).filePath(u"Imported"_s));
+    if (!folder.mkpath(u"."_s)) {
+        showMessage(tr("Can't create the Imported folder."), Error);
+        return {};
+    }
+    const QFileInfo info(saveName(name, u"Imported"_s));
+    QString path = folder.filePath(info.fileName());
+    for (unsigned n = 1; QFileInfo::exists(path); ++n)
+        path = folder.filePath(info.completeBaseName() + u'_' + QString::number(n)
+                               + (info.suffix().isEmpty() ? QString{} : u'.' + info.suffix()));
+    QSaveFile output(path);
+    if (output.open(QIODevice::WriteOnly)) {
+        bool written = true;
+        for (;;) {
+            const auto bytes = input.read(64 * 1024);
+            if (input.error() != QFileDevice::NoError) {
+                showMessage(tr("Can't read '%1': %2").arg(name, input.errorString()), Error);
+                return {};
+            }
+            if (bytes.isEmpty())
+                break;
+            if (output.write(bytes) != bytes.size()) {
+                written = false;
+                break;
+            }
+        }
+        if (written && output.commit())
+            return path;
+    }
+    showMessage(tr("Can't import '%1': %2").arg(name, output.errorString()), Error);
+    return {};
+}
+
 std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &filePath)
 {
     zxkit::MediaFile file;
     try {
         // The slow part (reading, unzipping) runs before taking the lock
-        file = zxkit::MediaFile::read(filePath.toStdString());
+        const QUrl url(filePath);
+        QFile input(url.isLocalFile() ? url.toLocalFile() : filePath);
+        if (!input.open(QIODevice::ReadOnly)) {
+            showMessage(tr("Can't open '%1': %2").arg(filePath, input.errorString()), Error);
+            return {false, zxkit::MediaClass::Unknown};
+        }
+        const auto bytes = input.readAll();
+        if (input.error() != QFileDevice::NoError) {
+            showMessage(tr("Can't read '%1': %2").arg(filePath, input.errorString()), Error);
+            return {false, zxkit::MediaClass::Unknown};
+        }
+        // QFile supports Android's content providers; std::ifstream does not.
+#ifdef Q_OS_ANDROID
+        const auto name = AndroidIntegration::displayName(url);
+#else
+        const auto name = QFileInfo(input.fileName()).fileName();
+#endif
+        file = zxkit::MediaFile::fromBytes(std::vector<uint8_t>(bytes.begin(), bytes.end()),
+                                         QFileInfo(name).suffix().toStdString());
     } catch (const std::exception &e) {
         showMessage(QString::fromUtf8(e.what()), Error);
         return {false, zxkit::MediaClass::Unknown};
@@ -830,7 +902,13 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
 bool ZxEmulator::saveMediaFile(const QString &filePath)
 {
     std::vector<uint8_t> bytes;
-    const QString suffix = QFileInfo(filePath).suffix();
+#ifdef Q_OS_ANDROID
+    const auto name = AndroidIntegration::displayName(QUrl(filePath));
+#else
+    const auto url = QUrl(filePath);
+    const auto name = url.isLocalFile() ? url.toLocalFile() : filePath;
+#endif
+    const QString suffix = QFileInfo(name).suffix();
     if (suffix.compare(u"png"_s, Qt::CaseInsensitive) == 0) {
         // Save the native cropped picture, before software filters or window scaling.
         QByteArray encoded;
@@ -849,13 +927,19 @@ bool ZxEmulator::saveMediaFile(const QString &filePath)
 
 bool ZxEmulator::writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes)
 {
-    const QDir folder = QFileInfo(filePath).absoluteDir();
-    if (!folder.mkpath(u"."_s)) {
+    const QUrl url(filePath);
+    const auto path = url.isLocalFile() ? url.toLocalFile() : filePath;
+    const QDir folder = QFileInfo(path).absoluteDir();
+    const bool contentUri = filePath.startsWith(u"content://"_s);
+    if (!contentUri && !folder.mkpath(u"."_s)) {
         const QString message = tr("Can't create folder '%1'").arg(folder.absolutePath());
         showMessage(message, Error);
         return false;
     }
-    QSaveFile file(filePath);
+    QSaveFile file(path);
+    // A document provider cannot atomically rename a temporary file. Qt writes
+    // directly to the document explicitly selected by the user in that case.
+    file.setDirectWriteFallback(contentUri);
     if (!file.open(QIODevice::WriteOnly)
         || file.write(reinterpret_cast<const char *>(bytes.data()), qint64(bytes.size())) != qint64(bytes.size())
         || !file.commit()) {

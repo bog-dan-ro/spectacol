@@ -8,7 +8,7 @@ project(Spectacol
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 23)
 
-set(QT_REQUIRED_VERSION "6.11")
+set(QT_REQUIRED_VERSION "6.12")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -28,6 +28,12 @@ FetchContent_Declare(
 # (e.g. Threads::Threads) we already imported to global, and Qt6QmlConfig skips
 # loading Qt6QmlBuildInternals (qt_internal_add_qml_module).
 FetchContent_MakeAvailable(QtGamepad)
+
+if(ANDROID)
+    # The fetched Qt module's JAR/plugins live here, rather than in the Qt SDK.
+    # androiddeployqt searches these prefixes when resolving module metadata.
+    list(APPEND CMAKE_FIND_ROOT_PATH "${CMAKE_BINARY_DIR}")
+endif()
 
 find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Quick Multimedia ShaderTools GuiPrivate)
 

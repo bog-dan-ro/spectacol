@@ -27,9 +27,14 @@ SaveFilePage {
     title: qsTr("Save snapshot")
     fileName: "Snapshot.szx"
     folder: ZxEmulator.dataPath + "/Snapshots/"
-    destinationPath: ZxEmulator.snapshotFilePath(folder, fileName)
+    destinationPath: selectedPath || ZxEmulator.snapshotFilePath(folder, fileName)
+    Component.onCompleted: {
+        if (Qt.platform.os === "android" && folder !== ZxEmulator.dataPath
+                && !folder.startsWith(ZxEmulator.dataPath + "/"))
+            folder = ZxEmulator.snapshotsPath();
+    }
     onAccepted: {
-        if (ZxEmulator.save(ZxEmulator.snapshotFilePath(folder, fileName)))
+        if (ZxEmulator.save(destinationPath))
             pageLoader.source = "";
     }
 

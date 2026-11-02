@@ -34,6 +34,25 @@ ApplicationWindow {
     title: qsTr("Spectacol")
 
     property bool portrait: width < height
+    function goBack() {
+        if (Qt.inputMethod.visible)
+            Qt.inputMethod.hide();
+        else if (menuBar.position)
+            menuView.popMenu();
+        else if (pageLoader.status !== Loader.Null)
+            pageLoader.source = "";
+        else if (onScreen48Keyboard.visible)
+            onScreen48Keyboard.visible = false;
+        else if (ZxEmulator.settings.hasStartButton || ZxEmulator.touchscreen)
+            quitDialog.open();
+        else
+            menuBar.open();
+    }
+    Shortcut {
+        sequences: ["Back"]
+        enabled: Qt.platform.os === "android"
+        onActivated: mainScreen.goBack()
+    }
     // The menu, for the overlay's drawer and the desktop layout's menu bar
     property ZxMenu zxMenu: ZxMenu {}
     // A page docked next to the screen (desktop layout): the screen makes room for it
@@ -213,21 +232,8 @@ ApplicationWindow {
                 }
                 break;
             case Qt.Key_Back:
-                if (menuBar.position) {
-                    menuView.popMenu();
-                    event.accepted = true;
-                } else {
-                    if (pageLoader.status !== Loader.Null) {
-                        pageLoader.source = "";
-                        event.accepted = true;
-                    } else {
-                        if (ZxEmulator.settings.hasStartButton || ZxEmulator.touchscreen)
-                            quitDialog.open();
-                        else
-                            menuBar.open();
-                        event.accepted = true;
-                    }
-                }
+                mainScreen.goBack();
+                event.accepted = true;
                 break;
             }
             if (!event.accepted && ZxEmulator.processInputEvents) {

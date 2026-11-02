@@ -162,9 +162,12 @@ public:
     }
     /// Loads any media file (the file is read before locking the emulator).
     bool loadMediaFile(const QString &filePath);
+    /// Copy a document-provider file into app storage while its URI grant is valid.
+    Q_INVOKABLE QString importFile(const QUrl &url);
     /// Saves a snapshot, the tape or a screenshot (the file is written after unlocking the emulator).
     bool saveMediaFile(const QString &filePath);
-    /// Atomically replaces a file, reporting directory, write and commit failures.
+    /// Replaces local files atomically; selected Android documents use direct writes.
+    /// Reports directory, write and commit failures.
     bool writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes);
     void releaseInputs();
     zxkit::Z80Registers registers() const;

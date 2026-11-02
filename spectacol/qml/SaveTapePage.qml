@@ -18,6 +18,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
 import QtGamepadLegacy
 import Spectacol
 
@@ -32,9 +33,17 @@ Sheet {
     ]
     Component.onCompleted: ZxEmulator.tape.refreshData()
 
-    function writeTape() {
-        if (ZxEmulator.tape.write(ZxEmulator.tapeFilePath(fileName.text)))
+    function writeTape(path) {
+        if (ZxEmulator.tape.write(path || ZxEmulator.tapeFilePath(fileName.text)))
             pageLoader.source = "";
+    }
+    FileDialog {
+        id: deviceFile
+        title: qsTr("Export tape to device storage")
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "tap"
+        currentFile: "file://" + ZxEmulator.tapeFilePath(fileName.text)
+        onAccepted: page.writeTape(selectedFile.toString())
     }
 
     GamepadKeyNavigation {
@@ -77,6 +86,12 @@ Sheet {
             enabled: ZxEmulator.tape.hasTape
             onClicked: page.writeTape()
             Keys.onReturnPressed: page.writeTape()
+        }
+        Button {
+            visible: Qt.platform.os === "android"
+            text: qsTr("Export to device…")
+            enabled: ZxEmulator.tape.hasTape
+            onClicked: deviceFile.open()
         }
         Text {
             Layout.fillWidth: true

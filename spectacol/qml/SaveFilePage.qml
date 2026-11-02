@@ -29,6 +29,7 @@ Sheet {
     property alias fileName: fileNameEdit.text
     property alias folder: pathEdit.text
     property string destinationPath
+    property string selectedPath
     signal accepted
     signal canceled
     onCloseRequested: canceled()
@@ -45,6 +46,17 @@ Sheet {
         id: browseFolder
         currentFolder: "file://" + pathEdit.text
         onAccepted: pathEdit.text = decodeURIComponent(selectedFolder.toString().replace(/^file:\/\//, ""))
+    }
+    FileDialog {
+        id: deviceFile
+        title: qsTr("Save snapshot to device storage")
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "szx"
+        currentFile: "file://" + page.folder + "/" + page.fileName
+        onAccepted: {
+            page.selectedPath = selectedFile.toString();
+            page.accepted();
+        }
     }
     ColumnLayout {
         anchors.fill: parent
@@ -76,8 +88,8 @@ Sheet {
                 onAccepted: page.accepted()
             }
             Button {
-                text: qsTr("Browse")
-                onClicked: browseFolder.open()
+                text: Qt.platform.os === "android" ? qsTr("Export…") : qsTr("Browse")
+                onClicked: Qt.platform.os === "android" ? deviceFile.open() : browseFolder.open()
             }
         }
         Text {

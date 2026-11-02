@@ -35,6 +35,17 @@ Item
     property alias folder: filesModel.folder
     property alias filterClass: filesModel.filterClass
 
+    FileDialog {
+        id: deviceFile
+        title: qsTr("Open a file from device storage")
+        fileMode: FileDialog.OpenFile
+        nameFilters: [qsTr("All files (*)")]
+        onAccepted: {
+            const path = ZxEmulator.importFile(selectedFile);
+            if (path) fileList.fileSelected(path);
+        }
+    }
+
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonXKey: Qt.Key_X
@@ -278,6 +289,14 @@ Item
                 else
                     filesModel.cdUp();
             }
+        }
+        Button {
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: Theme.sp(3)
+            visible: Qt.platform.os === "android"
+            text: qsTr("Device files…")
+            onClicked: deviceFile.open()
         }
     }
 

@@ -1,4 +1,18 @@
 qt_add_executable(spectacol main.cpp)
+if(ANDROID)
+    target_sources(spectacol PRIVATE androidintegration.cpp androidintegration.h)
+    # Preserve the highest version code used by the old per-ABI release scheme.
+    set(SPECTACOL_ANDROID_VERSION_CODE 1641605 CACHE STRING "Android APK/AAB version code")
+    set_target_properties(spectacol PROPERTIES
+        QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
+        QT_ANDROID_MIN_SDK_VERSION 28
+        QT_ANDROID_VERSION_CODE "${SPECTACOL_ANDROID_VERSION_CODE}"
+        QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
+        QT_QML_IMPORT_PATH "${CMAKE_BINARY_DIR}/qml"
+    )
+    include(3rdparty/android_openssl/android_openssl.cmake)
+    add_android_openssl_libraries(spectacol)
+endif()
 qt_add_resources(spectacol "resources"
     PREFIX "/"
     FILES
@@ -185,7 +199,13 @@ qt_add_qml_module(spectacol
         SOURCES sdcardfiles.h sdcardfiles.cpp
 )
 
-target_link_libraries(spectacol PRIVATE ZX::VideoFilters Qt::Quick Qt::Multimedia Qt::GamepadLegacy Qt::GuiPrivate Qt::ShaderTools)
+target_link_libraries(spectacol PRIVATE
+    ZX::VideoFilters
+    Qt::Quick
+    Qt::Multimedia
+    Qt::GamepadLegacy
+    Qt::GuiPrivate
+    Qt::ShaderTools)
 
 qt_add_resources(spectacol "uart_scripts"
     PREFIX "/uart"
