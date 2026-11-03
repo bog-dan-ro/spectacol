@@ -178,6 +178,7 @@ qt_add_qml_module(spectacol
         qml/PokeManagerPage.qml
         qml/RegistersView.qml
         qml/SaveFilePage.qml
+        qml/RzxControlsPage.qml
         qml/SaveSnapshotPage.qml
         qml/SaveTapePage.qml
         qml/NewTapePage.qml

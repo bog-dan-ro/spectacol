@@ -27,9 +27,15 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 
 ## RZX compatibility and progress
 
-- [ ] Show RZX playback progress ([#47](https://github.com/bog-dan-ro/spectacol/issues/47)) once ZxKit exposes it.
-      Recheck the compatibility reports in [#48](https://github.com/bog-dan-ro/spectacol/issues/48) after the core
-      work in ZxKit's `TODO.md`; surface playback/desynchronization errors to the user.
+- [x] RZX playback progress ([#47](https://github.com/bog-dan-ro/spectacol/issues/47)): desktop status and overlay
+      show current/total frames and percentage, retaining completion/stop positions. Input desynchronization
+      errors pause playback and surface through the normal error message without opening the debugger.
+      ZxKit now plays all five recordings from [#48](https://github.com/bog-dan-ro/spectacol/issues/48) to completion.
+      Recording uses ZxKit's fetch-counted API; pending saves remain retryable.
+- [x] RZX recording/playback transport: start, pause, Stop/finalise at cursor, backward/forward seeking and
+      seek-to-end. Seeking waits for a fresh gameplay input; resuming a recording discards its later attempt.
+      Held controls, repeats, menu navigation and stick noise do not resume. F8/F9 and Media → Recording controls
+      use the same core timeline; seeks run in small batches with the Engine paused.
 
 ## Media formats and disk auto-boot
 

@@ -246,3 +246,16 @@ python3 tests/cobra_keyboard.py
 
 Its screenshots, snapshot and log go to `build/cobra-keyboard`; it uses temporary
 settings and app data. `--binary` and `--output` override the defaults.
+
+RZX progress, completion, stop, desynchronization, overlay, seek/pause/resume and recording-branch checks use authored
+recordings and the compiled application (requires Pillow and `tesseract` to read the rendered status):
+
+```sh
+python3 tests/rzx.py --binary build/bin/spectacol
+```
+
+During RZX recording or playback, F8 rewinds five seconds, F9 advances five seconds,
+and Shift+F9 seeks to the end. Media → Recording → Playback and recording controls
+also offers pause/resume and a seek-step choice. A seek stays paused until a fresh
+gameplay input; resuming a recording replaces the future from that cursor. Stop
+finalises at the cursor. Held controls, host modifiers and stick noise do not resume.

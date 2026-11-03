@@ -87,6 +87,19 @@ ApplicationWindow {
             Status { visible: hud.tapeActive; text: qsTr("Tape playing"); color: Theme.success }
             Status { visible: hud.diskActive; text: qsTr("Disk"); color: Theme.success }
             Status { visible: hud.speed !== 100; text: qsTr("Speed %1%").arg(hud.speed) }
+            Status {
+                objectName: "rzxProgress"
+                visible: ZxEmulator.recording.hasProgress
+                text: ZxEmulator.recording.statusText
+                color: ZxEmulator.recording.playbackError.length ? Theme.warning : Theme.textMuted
+            }
+            Status {
+                visible: ZxEmulator.recording.waitingForInput
+                text: ZxEmulator.recording.seeking ? qsTr("Seeking…")
+                      : ZxEmulator.recording.type === ZxRecording.None ? qsTr("End of playback; rewind to resume")
+                      : qsTr("Press a game key to resume")
+                color: Theme.warning
+            }
             Status { visible: hud.paused; text: qsTr("Paused"); color: Theme.warning }
         }
     }
@@ -182,6 +195,14 @@ ApplicationWindow {
                 event.accepted = true;
                 break;
 
+            case Qt.Key_F8:
+                ZxEmulator.recording.rewind(5000);
+                event.accepted = true;
+                break;
+            case Qt.Key_F9:
+                ZxEmulator.recording.fastForward(event.modifiers & Qt.ShiftModifier ? -1 : 5000);
+                event.accepted = true;
+                break;
             case Qt.Key_F6:
                 pageLoader.source = "FileBrowserPage.qml";
                 event.accepted = true;
@@ -397,6 +418,13 @@ ApplicationWindow {
             visible: status === Loader.Ready
             // Every page pauses the emulation while it is open, unless it says otherwise
             readonly property bool pausing: status === Loader.Ready && item !== null && item.pausesEmulation !== false
+            Connections {
+                target: pageLoader.status === Loader.Ready ? pageLoader.item : null
+                ignoreUnknownSignals: true
+                function onOpenPlaybackRequested() {
+                    pageLoader.setSource("FileBrowserPage.qml", {folder: ZxEmulator.recordingsPath()});
+                }
+            }
             onPausingChanged: ZxEmulator.paused = pausing
             focus: visible
             enabled: visible

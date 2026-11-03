@@ -73,5 +73,18 @@ Row {
     Chip { text: qsTr("Tape"); shown: hud.tapeActive }
     Chip { text: qsTr("Disk"); shown: hud.diskActive }
     Chip { text: qsTr("%1%").arg(hud.speed); dot: Theme.accent; shown: hud.speed !== 100 }
+    Chip {
+        objectName: "rzxProgressOverlay"
+        text: ZxEmulator.recording.statusText
+        shown: ZxEmulator.recording.hasProgress
+        dot: ZxEmulator.recording.playbackError.length ? Theme.warning : Theme.accent
+    }
+    Chip {
+        text: ZxEmulator.recording.seeking ? qsTr("Seeking…")
+                      : ZxEmulator.recording.type === ZxRecording.None ? qsTr("End of playback; rewind to resume")
+                      : qsTr("Press a game key to resume")
+        shown: ZxEmulator.recording.waitingForInput
+        dot: Theme.warning
+    }
     Chip { text: qsTr("Paused"); dot: Theme.warning; shown: hud.paused }
 }

@@ -260,6 +260,18 @@ void ZxSettings::applyMachine(int idx, bool persist)
     m_zxEmulator.resetLoadedFile();
 }
 
+void ZxSettings::syncCurrentMachine(std::string_view machineId)
+{
+    const auto it = std::ranges::find(m_machineIds, machineId);
+    if (it == m_machineIds.end())
+        return;
+    const int index = int(it - m_machineIds.begin());
+    if (index != m_currentMachineIndex) {
+        m_currentMachineIndex = index;
+        emit currentMachineChanged();
+    }
+}
+
 bool ZxSettings::selectMachine(const QString &machineId)
 {
     const auto it = std::ranges::find(m_machineIds, machineId.toStdString());

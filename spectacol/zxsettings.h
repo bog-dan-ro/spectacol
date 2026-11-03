@@ -142,6 +142,7 @@ public:
     /// Selects a machine by its ZxKit id (e.g. "next"); false if there is no such machine.
     bool selectMachine(const QString &machineId);
     QStringList machineIds() const;
+    void syncCurrentMachine(std::string_view machineId);
 
     int emulationSpeed() const;
     void setEmulationSpeed(int speed);

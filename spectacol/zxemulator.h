@@ -172,6 +172,8 @@ public:
     zxkit::Z80Registers registers() const;
 
     bool paused() const;
+    bool emulationQuiescent() const { return m_engineQuiescent; }
+    bool canResumeRzxInput() const { return m_pauseCount == 1 && !m_paused && m_processInputEvents.load(); }
     void setPaused(bool paused);
 
     QString dataPath() const;
@@ -408,5 +410,8 @@ private:
     ZxRecording* m_recording = nullptr;
     bool m_showControlsIcons = true;
     bool m_paused = false; // togglePaused()
+    bool m_engineQuiescent = true;
+    QSet<int> m_pressedRzxButtons;
+    std::array<bool, ControllerInput::AxisCount> m_rzxAxisActive{};
     int m_pauseCount = 0;  // setPaused() nests
 };

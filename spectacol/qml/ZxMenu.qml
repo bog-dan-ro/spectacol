@@ -166,44 +166,21 @@ ZxMenuItem {
             }
             ZxMenuItem {
                 visible: ZxEmulator.recording.type === ZxRecording.None
-                text: "Start recording"
+                text: qsTr("Start recording")
                 onTriggered: {
                     menuBar.close();
                     ZxEmulator.recording.start();
                 }
             }
             ZxMenuItem {
-                visible: ZxEmulator.recording.type === ZxRecording.None
-                text: "Continue recording"
+                text: qsTr("Playback and recording controls…")
                 onTriggered: {
                     menuBar.close();
-                    ZxEmulator.recording.continueRecording();
+                    pageLoader.source = "RzxControlsPage.qml";
                 }
             }
-            ZxMenuItem {
-                visible: ZxEmulator.recording.type === ZxRecording.Recording
-                text: "Rollback"
-                onTriggered: {
-                    menuBar.close();
-                    ZxEmulator.recording.rollback();
-                }
-            }
-            ZxMenuItem {
-                visible: ZxEmulator.recording.type === ZxRecording.Recording
-                text: "Rollback to ..."
-                onTriggered: {
-                    menuBar.close();
-                    ZxEmulator.recording.rollbackTo();
-                }
-            }
-            ZxMenuItem {
-                visible: ZxEmulator.recording.type === ZxRecording.None
-                text: "Finalise ..."
-                onTriggered: {
-                    menuBar.close();
-                    ZxEmulator.recording.finalise();
-                }
-            }
+
+
         }
     }
 

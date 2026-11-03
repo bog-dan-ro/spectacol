@@ -37,7 +37,7 @@ Flickable {
         const rows = [];
         for (let i = 0; i < column.children.length; ++i) {
             const child = column.children[i];
-            if (child.visible && child.isSettingRow === true)
+            if (child.visible && child.enabled && child.isSettingRow === true)
                 rows.push(child);
         }
         return rows;

@@ -361,16 +361,18 @@ ZxEmulator::ZxEmulator(QObject *parent)
     m_pauseCallback = zxkit::CallbackHandle<zxkit::PauseCallback>([this](const zxkit::PauseEvent &event) {
         m_audioOutput->setPaused(true);
         QMetaObject::invokeMethod(this, [this, event] {
+            m_engineQuiescent = true;
+            m_recording->refresh();
             emit pausedChanged();
             if (m_debuggerActivated)
                 updateDebugger(); // e.g. a step over reached its instruction
-            else if (event.reason != zxkit::PauseReason::UserRequest)
+            else if (m_recording->playbackError().isEmpty() && event.reason != zxkit::PauseReason::UserRequest)
                 activateDebugger(); // a breakpoint or a watchpoint
         }, Qt::QueuedConnection);
     });
     m_resumeCallback = zxkit::CallbackHandle<zxkit::ResumeCallback>([this] {
         m_audioOutput->setPaused(false);
-        QMetaObject::invokeMethod(this, &ZxEmulator::pausedChanged, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(this, [this] { m_engineQuiescent = false; emit pausedChanged(); }, Qt::QueuedConnection);
     });
     m_logCallback = zxkit::CallbackHandle<zxkit::LogCallback>([this](zxkit::LogLevel level, std::string_view msg) {
         ErrorLevel errLvl = Info;
@@ -451,17 +453,18 @@ ZxEmulator::ZxEmulator(QObject *parent)
         m_gamepadId = -1;
 
     connect(gm, &QGamepadManager::gamepadAxisEvent, this, [this](int deviceId, QGamepadManager::GamepadAxis axis, double value) {
-        if (!m_processInputEvents || deviceId != m_gamepadId || axis == QGamepadManager::AxisInvalid)
+        if (deviceId != m_gamepadId || axis == QGamepadManager::AxisInvalid)
             return;
         gamepadAxisEvent(axis, value);
     });
 
     connect(gm, &QGamepadManager::gamepadButtonPressEvent, this, [this](int deviceId, QGamepadManager::GamepadButton button, double value) {
-        if (!m_processInputEvents.load() || value < 0.5)
+        if (value < 0.5)
             return;
 
         switch (button) {
         case QGamepadManager::ButtonStart:
+            if (!m_processInputEvents) return;
             setGamepadId(deviceId);
             m_settings->setHasStartButton(true);
             if (m_showControlsIcons)
@@ -557,8 +560,10 @@ void ZxEmulator::setPaused(bool paused)
         --m_pauseCount;
     else
         return;
-    if (m_engine)
+    if (m_engine) {
+        if (!m_pauseCount) m_engineQuiescent = false;
         m_engine->setPaused(m_pauseCount > 0);
+    }
     emit pausedChanged();
 }
 
@@ -959,6 +964,8 @@ void ZxEmulator::setGamepadId(int gamepadId)
     }
 
     m_controller.clearPhysical();
+    m_pressedRzxButtons.clear();
+    m_rzxAxisActive.fill(false);
     applyControllerState();
     m_gamepadId = gamepadId;
     if (m_gamepadId != -1)
@@ -1025,6 +1032,7 @@ void ZxEmulator::resetLoadedFile()
 {
     m_loadedFileName = "";
     emit saveSnapshotEnabledChanged();
+    m_recording->refresh();
 }
 
 void ZxEmulator::quit()
@@ -1097,6 +1105,7 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
 {
     m_loadedFileName = QFileInfo(filePath).baseName();
     const auto [loaded, mediaClass] = loadMediaWithType(filePath);
+    m_recording->refresh();
     if (!loaded) {
         m_loadedFileName.clear();
         if (removeOnFail) {
@@ -1106,6 +1115,8 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
         emit saveSnapshotEnabledChanged();
         return;
     }
+
+    m_recording->mediaLoaded();
 
     // If a tape was loaded and autoLoad is enabled, type LOAD "" + Enter
     if (mediaClass == zxkit::MediaClass::Tape && m_settings && m_settings->autoLoad()) {
@@ -1225,7 +1236,8 @@ void ZxEmulator::reset()
 {
     resetLoadedFile();
     releaseInputs();
-    emulator().writeLock()->reset(zxkit::ResetKind::Soft);
+    withEmulator([](zxkit::Emulator &core) { core.reset(zxkit::ResetKind::Soft); });
+    m_recording->refresh();
     m_engine->refreshFrame();
 }
 
@@ -1233,7 +1245,8 @@ void ZxEmulator::hardReset()
 {
     resetLoadedFile();
     releaseInputs();
-    emulator().writeLock()->reset(zxkit::ResetKind::Hard);
+    withEmulator([](zxkit::Emulator &core) { core.reset(zxkit::ResetKind::Hard); });
+    m_recording->refresh();
     m_engine->refreshFrame();
 }
 
@@ -1519,6 +1532,9 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
         if (mapped.primary)
             keys.insert(int(*mapped.primary));
     }
+    const bool hostModifier = !virtualKeyboard && (qtKey == Qt::Key_Shift || qtKey == Qt::Key_Control
+        || qtKey == Qt::Key_Alt || qtKey == Qt::Key_Meta);
+    if (!keys.isEmpty() && !hostModifier) m_recording->resumeOnGameplayInput();
     setInputKeys((virtualKeyboard ? kVirtualKeys : kPhysicalKeys) | quint32(qtKey), keys);
 }
 
@@ -1534,8 +1550,6 @@ void ZxEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat, bool virt
 
 void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value, bool touch)
 {
-    if (m_pauseCount || m_paused || !m_processInputEvents)
-        return;
     ControllerInput::Axis target;
     switch (axis) {
     case QGamepadManager::AxisLeftX: target = touch ? ControllerInput::TouchX : ControllerInput::LeftX; break;
@@ -1544,18 +1558,32 @@ void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double valu
     case QGamepadManager::AxisRightY: if (touch) return; target = ControllerInput::RightY; break;
     default: return;
     }
+    const bool active = std::abs(value) > m_settings->deadZone();
+    const bool fresh = active && !m_rzxAxisActive[target];
+    m_rzxAxisActive[target] = active;
+    const bool resumed = fresh && m_recording->resumeOnGameplayInput();
+    if ((m_pauseCount || m_paused || !m_processInputEvents) && !resumed) {
+        // A release can arrive before the queued transport resume.
+        if (!active) { m_controller.axis(target, 0); applyControllerState(); }
+        return;
+    }
     m_controller.axis(target, value);
     applyControllerState();
 }
 
 void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button, bool touch)
 {
-    if (button == QGamepadManager::ButtonInvalid || button == QGamepadManager::ButtonStart
-        || !m_processInputEvents)
-        return;
+    if (button == QGamepadManager::ButtonInvalid || button == QGamepadManager::ButtonStart) return;
+    const int inputId = int(button) + (touch ? ControllerInput::TouchButtonOffset : 0);
+    const bool fresh = !m_pressedRzxButtons.contains(inputId);
+    m_pressedRzxButtons.insert(inputId);
+    if (!m_processInputEvents) return;
     const int action = m_settings->gamepadAction(button);
+    const bool resumed = fresh && (action == ZxSettings::JoystickFire || ControllerInput::isSpectrumKey(action))
+        && m_recording->resumeOnGameplayInput();
     if ((m_pauseCount || m_paused)
-        && (action != ZxSettings::TogglePause || !m_paused || m_pauseCount != 1))
+        && !resumed
+        && (action != ZxSettings::TogglePause || (!m_paused && !m_recording->waitingForInput()) || m_pauseCount != 1))
         return;
     const quint8 direction = button == QGamepadManager::ButtonUp || button == QGamepadManager::ButtonDown
         || button == QGamepadManager::ButtonLeft || button == QGamepadManager::ButtonRight
@@ -1566,6 +1594,7 @@ void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button, 
 
 void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button, bool touch, bool cancelled)
 {
+    m_pressedRzxButtons.remove(int(button) + (touch ? ControllerInput::TouchButtonOffset : 0));
     const auto action = m_controller.release(int(button) + (touch ? ControllerInput::TouchButtonOffset : 0));
     applyControllerState();
     if (!action || cancelled)
@@ -1589,6 +1618,7 @@ void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button
 
 void ZxEmulator::releaseTouchJoystick()
 {
+    m_rzxAxisActive[ControllerInput::TouchX] = m_rzxAxisActive[ControllerInput::TouchY] = false;
     m_controller.clearTouch();
     applyControllerState();
 }
@@ -1620,6 +1650,7 @@ void ZxEmulator::slowdown()
 
 void ZxEmulator::togglePaused()
 {
+    if (m_recording->waitingForInput()) { m_recording->resume(); return; }
     m_paused = !m_paused;
     if (!m_touchscreen || !m_showControlsIcons)
         showMessage(m_paused ? tr("Pause spectacol") : tr("Resume spectacol"));
