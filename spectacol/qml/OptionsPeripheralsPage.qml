@@ -81,7 +81,7 @@ Sheet {
         }
         SettingRow {
             label: qsTr("Ask for the joystick")
-            description: qsTr("When a snapshot loads and a gamepad is connected")
+            description: qsTr("When a snapshot has no single supported joystick type")
             checked: ZxEmulator.settings.joystickPrompt
             onToggled: (on) => ZxEmulator.settings.joystickPrompt = on
         }

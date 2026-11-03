@@ -42,7 +42,8 @@ Sheet {
         checkedIndex: ZxEmulator.selectedJoysticksIndex
         onChosen: (index) => {
             ZxEmulator.selectedJoysticksIndex = index;
-            pageLoader.source = "";
+            if (ZxEmulator.joystickAvailable(index))
+                pageLoader.source = "";
         }
     }
 }

@@ -97,6 +97,18 @@ void ZxTapeData::selectBlock(int block)
     setCurrentBlock(current);
 }
 
+bool ZxTapeData::resetAndLoadBlock(int block)
+{
+    if (block < 0 || std::size_t(block) >= m_tapeBlocks.size()) return false;
+    bool supported = false;
+    auto &host = ZxEmulator::instance();
+    if (!host.withEmulator([&](zxkit::Emulator &emulator) { supported = emulator.autoLoadTape(std::size_t(block)); }))
+        return false;
+    if (!supported) host.showMessage(tr("Automatic tape loading is unavailable for this machine."), ZxEmulator::Warning);
+    if (supported) setCurrentBlock(block);
+    return supported;
+}
+
 void ZxTapeData::setCurrentBlock(int block)
 {
     if (m_currentBlock == block)

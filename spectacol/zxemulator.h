@@ -34,6 +34,7 @@ Q_MOC_INCLUDE("zxsettings.h")
 #include <QPointer>
 #include <QQmlEngine>
 #include <QUrl>
+#include <QTimer>
 
 #include <zxkit/core/Engine.h>
 #include <zxkit/core/Events.h>
@@ -188,6 +189,7 @@ public:
     QStringList joysticksModel() const;
     int selectedJoysticksIndex() const;
     void setSelectedJoysticksIndex(int selectedJoysticksIndex);
+    Q_INVOKABLE bool joystickAvailable(int index) const;
 
     QString PC() const;
     void setPC(const QString &value);
@@ -268,6 +270,8 @@ public slots:
     QString recordingFilePath() const;
     QString tapeFileName(const QString &programName) const;
     QString tapeFilePath(const QString &fileName) const;
+    QStringList snapshotFormats() const;
+    QString snapshotFileName() const;
     QString snapshotFilePath(const QString &folder, const QString &fileName) const;
     void load(const QString &filePath, bool removeOnFail = false);
     bool save(const QString &filePath);
@@ -373,10 +377,11 @@ private:
     QString m_loadedFileName;
     int m_selectedFilterIndex = 0;
     // The joysticks the gamepad can be: the order of joysticksModel()
-    enum JoystickKind { NoJoystick = 0, CursorKeys, KempstonJoystick, Sinclair1, Sinclair2, FullerJoystick };
+    enum JoystickKind : int { NoJoystick = 0, CursorKeys, KempstonJoystick, Sinclair1, Sinclair2, FullerJoystick, Timex1, Timex2 };
     void setJoystickButtons(uint8_t buttons);
     void attachJoystick(int kind);
     int m_selectedJoystickIndex = CursorKeys;
+    QTimer m_joystickPromptTimer;
     uint8_t m_joystickButtons = 0; // zxkit::JoystickButtons
     ControllerInput m_controller;
     HeldKeyState m_heldKeys;

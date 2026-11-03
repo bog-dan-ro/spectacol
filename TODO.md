@@ -39,12 +39,13 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 
 ## Media formats and disk auto-boot
 
-- [ ] Expose additional tape formats and snapshot writers as ZxKit gains them: PZX/CSW reading, TZX
-      export, 128K SNA, Z80 and NEX writing. Keep the save choices aligned with supported writers.
-- [ ] Opening a disk loads it into drive A: only: boot it as FUSE does (reset into TR-DOS, the +3 Loader), once
-      ZxKit has a disk auto-load API.
-- [ ] Tape browser: an explicit reset-and-auto-load-from-selected-block action
-      ([#76](https://github.com/bog-dan-ro/spectacol/issues/76)); selecting a block currently only seeks the deck.
+- [x] PZX/CSW reading, TZX export, 128K SNA, Z80 and Next NEX writing. The export pages offer supported
+      formats; SZX remains the snapshot default and NEX is labelled as a program export. Custom tapes default
+      to TZX so no loading signals or control blocks are silently discarded.
+- [x] Opening drive A with automatic loading enabled resets into TR-DOS or selects the +3 Loader through
+      ZxKit's boot API. Inserting drive B does not reset the machine.
+- [x] Tape browser: explicit “Reset and load from here” action (Y / L) for the selected block
+      ([#76](https://github.com/bog-dan-ro/spectacol/issues/76)); ordinary selection still only seeks the deck.
 
 ## Controls, profiles and playback indicators
 
@@ -175,14 +176,18 @@ API 37 x86_64 emulator. Physical phone/TV validation remains open.
 - [x] Remove the stale qmake / Qt 5 files the CMake build doesn't use: `spectacol/qml.qrc` and
       `spectacol/deployment.pri`; rewrite `BUILD.md` for CMake and Qt 6.
 - [x] Signals QML listens to that nothing emitted (FUSE UI hooks): `hideDebugger` closes the debugger page when it
-      deactivates, `configureJoystick` opens the joystick list when a snapshot loads with a gamepad connected (the
-      "Snapshot joystick prompt" setting), `hideMenu` is gone, `uiIconUpdate` follows the media activity.
+      deactivates, `configureJoystick` opens the joystick list after the file browser closes when a snapshot
+      has no single supported joystick declaration and "Ask for the joystick" is enabled, `hideMenu` is gone, `uiIconUpdate` follows the media activity.
 - [ ] Singletons (`ZxEmulator::instance()`, `ZxImage::instance()`, `NextSdCard::instance()`) and raw pointers.
 
 ## Completed features
 
 - [x] Joysticks: the gamepad drives the joystick picked in the list (remembered): Cursor and Sinclair 1/2 press
-      their keys, Kempston and Fuller attach their interfaces. Picking one no longer attaches Interface 1/2.
+      their keys, Kempston and Fuller attach their interfaces. Timex 1/2 feed the TC/TS2068 AY ports.
+      Z80/SZX metadata selects a single supported type automatically and suppresses the chooser; absent,
+      ambiguous or unsupported declarations use the prompt setting, including without a physical gamepad.
+      SZX exports preserve every supported type; Z80 exports preserve the types its header can represent.
+      Picking one no longer attaches Interface 1/2.
 - [x] Disk UI for the +3 and TR-DOS drives: the Disks menu is generic (two drives on the +3, four on the Pentagon
       and the Scorpion; checked headless with `--ui-keys`).
 - [x] Status indicators: the tape and disk icons follow ZxKit's media activity (the SD card lights the disk icon),
@@ -258,8 +263,12 @@ Keep these at the very end. DivMMC/esxDOS on classic machines remains postponed.
 
 - [ ] Microdrives and IDE images, as ZxKit gains them. For the microdrive part of
       [#152](https://github.com/bog-dan-ro/spectacol/issues/152): insert, eject, save and save as `.mdr`.
-- [ ] "Timex 1/2" are gone from the list: ZxKit's TC2068/TS2068 have no AY, which reads their joysticks.
+- [x] Timex 1/2: restored alongside None, Cursor, Kempston, Sinclair 1/2 and Fuller; real AY joystick
+      input on TC2068/TS2068. Incompatible machine choices remain in the chooser with an explanation.
 - [ ] ULAplus on classic machines: expose it only after ZxKit implements it; keep this behind the priorities above.
 - [ ] Twister tape acceleration: follow up in Spectacol after ZxKit fixes its loader pattern; keep postponed.
 - [ ] DivMMC/esxDOS on the other machines: **postponed**. It must remain an optional peripheral.
 - [ ] Keep other unusual clones, peripherals and extensions after the main compatibility and usability work.
+
+- [ ] Revisit the experimental FlatBuffers [zx_format](https://github.com/bog-dan-ro/zx_format/tree/master)
+      container after the established formats and higher-priority compatibility work; no new dependency yet.

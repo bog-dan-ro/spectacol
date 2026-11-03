@@ -62,6 +62,14 @@ void ZxTape::setProgramName(const QString &programName)
     emit programNameChanged();
 }
 
+bool ZxTape::canSaveTap() const
+{
+    const auto emulator = m_zxEmulator->emulator().readLock();
+    return std::ranges::all_of(emulator->tapeDeck().blocks(), [](const auto &b) {
+        return b.isMetadata() || (b.isRomBlock() && b.data.size() <= 65535);
+    });
+}
+
 void ZxTape::refreshData()
 {
     QString progName;
@@ -71,8 +79,9 @@ void ZxTape::refreshData()
         const auto &blocks = emulator->tapeDeck().blocks();
         for (const auto &blk : blocks) {
             const QString desc = QString::fromStdString(blk.description);
-            if (desc.startsWith(u"Program: "_s)) {
-                progName = desc.mid(9).trimmed();
+            const int prefix = desc.startsWith(u"Program: "_s) ? 9 : desc.startsWith(u"PZX Program: "_s) ? 13 : 0;
+            if (prefix) {
+                progName = desc.mid(prefix).trimmed();
                 break;
             }
         }
@@ -84,8 +93,8 @@ void ZxTape::refreshData()
 
 void ZxTape::open(QString filePath)
 {
-    if (m_zxEmulator->loadMediaFile(filePath))
-        refreshData();
+    m_zxEmulator->load(filePath);
+    refreshData();
 }
 
 void ZxTape::togglePlay()

@@ -53,7 +53,7 @@ def main():
         def run(name, frames=500, broken=False, keys='', overlay=False, expected='', live=False, panel=False):
             (config / 'Spectacol.conf').write_text(
                 '[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=' + str(session / 'data')
-                + '\n[Ui]\nmode=' + ('1' if overlay else '2') + '\n')
+                + '\n[Peripherals]\njoystickPrompt=false\n[Ui]\nmode=' + ('1' if overlay else '2') + '\n')
             source = output / (name + '.rzx')
             raw = recording(frames, broken)
             if live:

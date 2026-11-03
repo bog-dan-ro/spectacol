@@ -29,6 +29,8 @@ Sheet {
     property alias fileName: fileNameEdit.text
     property alias folder: pathEdit.text
     property string destinationPath
+    property list<string> formats: ["szx"]
+    readonly property string selectedFormat: formatChoice.currentText
     property string selectedPath
     signal accepted
     signal canceled
@@ -51,7 +53,7 @@ Sheet {
         id: deviceFile
         title: qsTr("Save snapshot to device storage")
         fileMode: FileDialog.SaveFile
-        defaultSuffix: "szx"
+        defaultSuffix: page.selectedFormat
         currentFile: "file://" + page.folder + "/" + page.fileName
         onAccepted: {
             page.selectedPath = selectedFile.toString();
@@ -63,7 +65,7 @@ Sheet {
         anchors.margins: Theme.sp(6)
         spacing: Theme.sp(4)
         Text {
-            text: qsTr("File name (.szx)")
+            text: qsTr("File name (.%1)").arg(page.selectedFormat)
             font.pixelSize: Theme.body
             color: Theme.text
         }
@@ -97,6 +99,31 @@ Sheet {
             visible: text !== ""
             text: page.destinationPath
             wrapMode: Text.WrapAnywhere
+            font.pixelSize: Theme.caption
+            color: Theme.textMuted
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            Text {
+                text: qsTr("Format")
+                font.pixelSize: Theme.body
+                color: Theme.text
+            }
+            ComboBox {
+                id: formatChoice
+                objectName: "exportFormat"
+                model: page.formats
+                onActivated: {
+                    page.selectedPath = "";
+                    page.fileName = page.fileName.replace(/\.(szx|sna|z80|nex)$/i, "") + "." + currentText;
+                }
+            }
+        }
+        Text {
+            Layout.fillWidth: true
+            visible: page.selectedFormat === "nex"
+            text: qsTr("NEX exports a Next program and its RAM. It does not preserve all CPU registers or device state.")
+            wrapMode: Text.Wrap
             font.pixelSize: Theme.caption
             color: Theme.textMuted
         }

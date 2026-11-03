@@ -48,6 +48,7 @@ signals:
 
 public slots:
     void selectBlock(int block);
+    bool resetAndLoadBlock(int block);
     QByteArray base64CompressedBlockData(int index) const;
     int getBufferLength(int index);
 

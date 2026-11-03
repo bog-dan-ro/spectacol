@@ -67,7 +67,7 @@ def main():
             config.mkdir(parents=True)
             (config / "Spectacol.conf").write_text(
                 "[General]\nfirst_start=false\nautoSaveOnExit=false\njoystick=" + str(joystick)
-                + "\ndataPath=" + str(session / name / "data") + "\n[Gamepad]\ndirectionMapping=" + str(mode)
+                + "\ndataPath=" + str(session / name / "data") + "\n[Peripherals]\njoystickPrompt=false\n[Gamepad]\ndirectionMapping=" + str(mode)
                 + "\ndirectionKeys=87, 83, 65, 68, 16777249\n")
             env = os.environ | {"QT_QPA_PLATFORM": "offscreen", "XDG_CONFIG_HOME": str(config.parent),
                                 "XDG_DATA_HOME": str(session / name / "data")}

@@ -32,17 +32,20 @@ Sheet {
         { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
     ]
     Component.onCompleted: ZxEmulator.tape.refreshData()
+    readonly property bool tapSupported: ZxEmulator.tape.canSaveTap()
+    readonly property string suffix: formatChoice.currentText
+    function exportName() { return fileName.text.replace(/\.(tap|tzx)$/i, "") + "." + suffix; }
 
     function writeTape(path) {
-        if (ZxEmulator.tape.write(path || ZxEmulator.tapeFilePath(fileName.text)))
+        if (ZxEmulator.tape.write(path || ZxEmulator.tapeFilePath(page.exportName())))
             pageLoader.source = "";
     }
     FileDialog {
         id: deviceFile
         title: qsTr("Export tape to device storage")
         fileMode: FileDialog.SaveFile
-        defaultSuffix: "tap"
-        currentFile: "file://" + ZxEmulator.tapeFilePath(fileName.text)
+        defaultSuffix: page.suffix
+        currentFile: "file://" + ZxEmulator.tapeFilePath(page.exportName())
         onAccepted: page.writeTape(selectedFile.toString())
     }
 
@@ -59,7 +62,7 @@ Sheet {
             Layout.fillWidth: true
             wrapMode: Text.Wrap
             text: ZxEmulator.tape.hasTape
-                  ? qsTr("Exports the inserted tape, including blocks written by BASIC SAVE, as a .tap file.")
+                  ? qsTr("TZX preserves custom loading signals and tape controls. TAP exports standard ROM data, including BASIC SAVE programs.")
                   : qsTr("The tape is empty. Close this page, enter SAVE \"name\" in BASIC and press Enter at the tape prompt. Then return here to export it.")
             font.pixelSize: Theme.body
             color: Theme.text
@@ -76,13 +79,19 @@ Sheet {
         }
         Text {
             Layout.fillWidth: true
-            text: ZxEmulator.tapeFilePath(fileName.text)
+            text: ZxEmulator.tapeFilePath(page.exportName())
             wrapMode: Text.WrapAnywhere
             font.pixelSize: Theme.caption
             color: Theme.textMuted
         }
+        ComboBox {
+            id: formatChoice
+            objectName: "exportFormat"
+            model: page.tapSupported ? ["tap", "tzx"] : ["tzx"]
+            Accessible.name: qsTr("Tape export format")
+        }
         Button {
-            text: qsTr("Export .tap")
+            text: qsTr("Export .%1").arg(page.suffix)
             enabled: ZxEmulator.tape.hasTape
             onClicked: page.writeTape()
             Keys.onReturnPressed: page.writeTape()

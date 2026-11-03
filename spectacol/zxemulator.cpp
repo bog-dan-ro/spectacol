@@ -25,6 +25,8 @@
 #include <zxkit/input/Joystick.h>
 #include <zxkit/input/Mouse.h>
 #include <zxkit/media/MediaPreview.h>
+#include <zxkit/media/SnapshotFormats.h>
+#include <zxkit/machines/CloneMachines.h>
 #include <zxkit/peripherals/expansion/ExpansionPeripherals.h>
 
 #include "audiooutput.h"
@@ -427,8 +429,15 @@ ZxEmulator::ZxEmulator(QObject *parent)
             }
         }
     }
-    m_selectedJoystickIndex = std::clamp(QSettings().value("joystick", int(CursorKeys)).toInt(), int(NoJoystick), int(FullerJoystick));
+    m_selectedJoystickIndex = std::clamp(QSettings().value("joystick", int(CursorKeys)).toInt(), int(NoJoystick), int(Timex2));
     attachJoystick(m_selectedJoystickIndex);
+
+    m_joystickPromptTimer.setSingleShot(true);
+    m_joystickPromptTimer.setInterval(500);
+    connect(&m_joystickPromptTimer, &QTimer::timeout, this, [this] {
+        if (m_settings->joystickPrompt())
+            emit configureJoystick();
+    });
 
     connect(qGuiApp, &QCoreApplication::aboutToQuit, this, &ZxEmulator::stopEngine);
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state) {
@@ -647,7 +656,9 @@ QStringList ZxEmulator::joysticksModel() const
         u"Kempston"_s,
         u"Sinclair 1"_s,
         u"Sinclair 2"_s,
-        u"Fuller"_s
+        u"Fuller"_s,
+        u"Timex 1 (TC/TS2068)"_s,
+        u"Timex 2 (TC/TS2068)"_s
     };
 }
 
@@ -658,9 +669,17 @@ int ZxEmulator::selectedJoysticksIndex() const
 
 void ZxEmulator::setSelectedJoysticksIndex(int selectedJoysticksIndex)
 {
-    if (selectedJoysticksIndex < NoJoystick || selectedJoysticksIndex > FullerJoystick
-        || selectedJoysticksIndex == m_selectedJoystickIndex)
+    if (selectedJoysticksIndex < NoJoystick || selectedJoysticksIndex > Timex2)
         return;
+    if (!joystickAvailable(selectedJoysticksIndex)) {
+        showMessage(tr("Timex joysticks require a TC2068 or TS2068 machine"), Info);
+        return;
+    }
+    m_joystickPromptTimer.stop();
+    if (selectedJoysticksIndex == m_selectedJoystickIndex) {
+        attachJoystick(selectedJoysticksIndex);
+        return;
+    }
     m_controller.clear();
     applyControllerState();
     setJoystickButtons(0); // release everything on the old one
@@ -670,12 +689,23 @@ void ZxEmulator::setSelectedJoysticksIndex(int selectedJoysticksIndex)
     emit selectedJoysticksIndexChanged();
 }
 
+bool ZxEmulator::joystickAvailable(int index) const
+{
+    if (index < NoJoystick || index > Timex2) return false;
+    if (index != Timex1 && index != Timex2) return true;
+    const auto core = emulator().readLock();
+    const auto *timex = dynamic_cast<const zxkit::TimexMachine *>(&core->machine());
+    return timex && timex->hasTimexJoysticks();
+}
+
 void ZxEmulator::attachJoystick(int kind)
 {
     // The Sinclair (Interface 2) and Cursor joysticks are keys; the Kempston and Fuller ones are interfaces
     if (kind == KempstonJoystick)
         m_settings->setKempstonJoystick(true);
     withEmulator([kind](zxkit::Emulator &emulator) {
+        if (kind == KempstonJoystick && !emulator.findPeripheral("kempston"))
+            emulator.attachPeripheral(std::make_unique<zxkit::KempstonJoystickPeripheral>());
         const bool attached = emulator.findPeripheral("fuller").has_value();
         if (kind == FullerJoystick && !attached)
             emulator.attachPeripheral(std::make_unique<zxkit::FullerBoxPeripheral>());
@@ -724,6 +754,10 @@ void ZxEmulator::setJoystickButtons(uint8_t buttons)
         withPeripheral<zxkit::FullerBoxPeripheral>(*emulator, "fuller", [buttons](auto &fuller) {
             fuller.setButtons(buttons);
         });
+        break;
+    case Timex1: case Timex2:
+        if (auto *timex = dynamic_cast<zxkit::TimexMachine *>(&emulator->machine()))
+            timex->setJoystickButtons(m_selectedJoystickIndex == Timex1 ? 0 : 1, buttons);
         break;
     default:
         break;
@@ -854,7 +888,9 @@ QString ZxEmulator::importFile(const QUrl &url)
 
 std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &filePath)
 {
+    m_joystickPromptTimer.stop();
     zxkit::MediaFile file;
+    zxkit::SnapshotJoystickInfo joystick;
     try {
         // The slow part (reading, unzipping) runs before taking the lock
         const QUrl url(filePath);
@@ -876,6 +912,7 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
 #endif
         file = zxkit::MediaFile::fromBytes(std::vector<uint8_t>(bytes.begin(), bytes.end()),
                                          QFileInfo(name).suffix().toStdString());
+        joystick = zxkit::SnapshotFormats::joystickInfo(file.data, file.extension);
     } catch (const std::exception &e) {
         showMessage(QString::fromUtf8(e.what()), Error);
         return {false, zxkit::MediaClass::Unknown};
@@ -884,8 +921,35 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
     const bool loaded = withEmulator([&file](zxkit::Emulator &emulator) {
         emulator.loadMedia(file);
     });
-    if (loaded)
+    if (loaded) {
+        const auto id = std::string(emulator().readLock()->machine().id());
+        if (m_settings) m_settings->syncCurrentMachine(id);
         m_engine->refreshFrame();
+        if (zxkit::classifyMediaFile(file.extension, file.data) == zxkit::MediaClass::Snapshot) {
+            std::optional<int> selected = std::nullopt;
+            if (joystick.type) {
+                using J = zxkit::JoystickType;
+                switch (*joystick.type) {
+                case J::None: selected = NoJoystick; break;
+                case J::Cursor: selected = CursorKeys; break;
+                case J::Kempston: selected = KempstonJoystick; break;
+                case J::Sinclair1: selected = Sinclair1; break;
+                case J::Sinclair2: selected = Sinclair2; break;
+                case J::Fuller: selected = FullerJoystick; break;
+                case J::Timex1: selected = Timex1; break;
+                case J::Timex2: selected = Timex2; break;
+                default: break;
+                }
+            }
+            if (selected && joystickAvailable(*selected)) {
+                setSelectedJoysticksIndex(*selected);
+            } else if (m_settings && m_settings->joystickPrompt()) {
+                // File pickers clear their page after load() returns. Also allow
+                // time for the selecting touch/button to be released.
+                m_joystickPromptTimer.start();
+            }
+        }
+    }
     return {loaded, zxkit::classifyMediaFile(file.extension, file.data)};
 }
 
@@ -911,6 +975,14 @@ bool ZxEmulator::saveMediaFile(const QString &filePath)
         bytes.assign(encoded.begin(), encoded.end());
     } else if (!withEmulator([&bytes, &suffix](zxkit::Emulator &emulator) { bytes = emulator.saveMedia(suffix.toStdString()); })) {
         return false;
+    }
+    const auto extension = (u"."_s + suffix.toLower()).toStdString();
+    if (extension == ".szx" || extension == ".z80") {
+        static constexpr std::array types{
+            zxkit::JoystickType::None, zxkit::JoystickType::Cursor, zxkit::JoystickType::Kempston,
+            zxkit::JoystickType::Sinclair1, zxkit::JoystickType::Sinclair2, zxkit::JoystickType::Fuller,
+            zxkit::JoystickType::Timex1, zxkit::JoystickType::Timex2};
+        zxkit::SnapshotFormats::setJoystickInfo(bytes, extension, types[m_selectedJoystickIndex]);
     }
     return writeFileBytes(filePath, bytes);
 }
@@ -1030,6 +1102,7 @@ ZxSettings *ZxEmulator::settings() const
 
 void ZxEmulator::resetLoadedFile()
 {
+    m_joystickPromptTimer.stop();
     m_loadedFileName = "";
     emit saveSnapshotEnabledChanged();
     m_recording->refresh();
@@ -1071,17 +1144,39 @@ QString ZxEmulator::tapeFileName(const QString &programName) const
 QString ZxEmulator::tapeFilePath(const QString &fileName) const
 {
     QString name = fileName.trimmed();
-    if (name.endsWith(u".tap"_s, Qt::CaseInsensitive))
-        name.chop(4);
-    return QDir(savesPath()).filePath(saveName(name, u"Unnamed"_s) + u".tap"_s);
+    const QString suffix = name.endsWith(u".tzx"_s, Qt::CaseInsensitive) ? u".tzx"_s : u".tap"_s;
+    if (name.endsWith(suffix, Qt::CaseInsensitive)) name.chop(4);
+    return QDir(savesPath()).filePath(saveName(name, u"Unnamed"_s) + suffix);
+}
+
+QStringList ZxEmulator::snapshotFormats() const
+{
+    const auto id = emulator().readLock()->machine().id();
+    QStringList result = {u"szx"_s};
+    if (id == "next") result << u"nex"_s;
+    if (id == "48k" || id == "128k" || id == "plus2" || id == "plus2a" || id == "plus3"
+        || id == "plus3e" || id == "pentagon") result << u"z80"_s;
+    if (id == "48k" || id == "128k" || id == "plus2" || id == "pentagon") result << u"sna"_s;
+    return result;
+}
+
+QString ZxEmulator::snapshotFileName() const
+{
+    return saveName(m_loadedFileName, u"Snapshot"_s) + u".szx"_s;
 }
 
 QString ZxEmulator::snapshotFilePath(const QString &folder, const QString &fileName) const
 {
     QString name = fileName.trimmed();
-    if (name.endsWith(u".szx"_s, Qt::CaseInsensitive))
-        name.chop(4);
-    return QDir(folder.trimmed().isEmpty() ? snapshotsPath() : folder).filePath(saveName(name, u"Snapshot"_s) + u".szx"_s);
+    QString suffix = u".szx"_s;
+    for (const auto &extension : {u".szx"_s, u".z80"_s, u".sna"_s, u".nex"_s}) {
+        if (name.endsWith(extension, Qt::CaseInsensitive)) {
+            suffix = extension;
+            name.chop(extension.size());
+            break;
+        }
+    }
+    return QDir(folder.trimmed().isEmpty() ? snapshotsPath() : folder).filePath(saveName(name, u"Snapshot"_s) + suffix);
 }
 
 void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
@@ -1103,7 +1198,7 @@ void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
 
 void ZxEmulator::load(const QString &filePath, bool removeOnFail)
 {
-    m_loadedFileName = QFileInfo(filePath).baseName();
+    m_loadedFileName = QFileInfo(filePath).completeBaseName();
     const auto [loaded, mediaClass] = loadMediaWithType(filePath);
     m_recording->refresh();
     if (!loaded) {
@@ -1118,30 +1213,11 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
 
     m_recording->mediaLoaded();
 
-    // If a tape was loaded and autoLoad is enabled, type LOAD "" + Enter
-    if (mediaClass == zxkit::MediaClass::Tape && m_settings && m_settings->autoLoad()) {
-        withEmulator([](zxkit::Emulator &emulator) {
-            emulator.reset(zxkit::ResetKind::Soft);
-            emulator.runFrames(90); // the ROM initializes
-            const auto tapKey = [&emulator](std::optional<zxkit::ZxKey> k1, std::optional<zxkit::ZxKey> k2) {
-                for (const bool pressed : {true, false}) {
-                    if (k1)
-                        emulator.setKeyState(*k1, pressed);
-                    if (k2)
-                        emulator.setKeyState(*k2, pressed);
-                    emulator.runFrames(5); // the ROM debounces keys for a few frames
-                }
-            };
-            const auto id = emulator.machine().id();
-            if (id == "48k" || id == "16k" || id == "48k_ntsc") {
-                tapKey(zxkit::ZxKey::J, std::nullopt);              // LOAD
-                tapKey(zxkit::ZxKey::P, zxkit::ZxKey::SymbolShift); // "
-                tapKey(zxkit::ZxKey::P, zxkit::ZxKey::SymbolShift); // "
-                tapKey(zxkit::ZxKey::Enter, std::nullopt);          // ENTER
-            } else {
-                tapKey(zxkit::ZxKey::Enter, std::nullopt);          // 128K Tape Loader
-            }
-        });
+    if (m_settings && m_settings->autoLoad()) {
+        if (mediaClass == zxkit::MediaClass::Tape)
+            withEmulator([](zxkit::Emulator &emulator) { emulator.autoLoadTape(); });
+        else if (mediaClass == zxkit::MediaClass::Disk)
+            withEmulator([](zxkit::Emulator &emulator) { emulator.autoBootDisk(); });
         m_engine->refreshFrame();
     }
 
@@ -1149,9 +1225,6 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
     m_tape->refreshData();
     emit saveSnapshotEnabledChanged();
 
-    // A snapshot is a game ready to play: offer to pick the joystick the gamepad plays it with
-    if (mediaClass == zxkit::MediaClass::Snapshot && m_settings && m_settings->joystickPrompt() && m_gamepadId != -1)
-        emit configureJoystick();
 }
 
 bool ZxEmulator::save(const QString &filePath)
@@ -1276,7 +1349,7 @@ void ZxEmulator::quickSaveSnapshot()
 void ZxEmulator::quickLoadSnapshot()
 {
     QFileInfo latest;
-    QDirIterator files(snapshotsPath(), {u"*.szx"_s, u"*.sna"_s}, QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator files(snapshotsPath(), {u"*.szx"_s, u"*.sna"_s, u"*.z80"_s}, QDir::Files, QDirIterator::Subdirectories);
     while (files.hasNext()) {
         files.next();
         const auto candidate = files.fileInfo();
@@ -1730,6 +1803,7 @@ void ZxEmulator::debuggerCommand(const QString &command)
 
 void ZxEmulator::stopEngine()
 {
+    m_joystickPromptTimer.stop();
     if (m_engine)
         m_engine->stop();
     if (m_audioOutput)

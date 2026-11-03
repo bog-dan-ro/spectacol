@@ -31,6 +31,7 @@ Sheet {
     preferredWidth: Theme.sp(130)
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Play from here"), action: () => tapeData.selectBlock(view.currentIndex) },
+        { pad: "Y", key: "L", text: qsTr("Reset and load from here"), action: () => page.resetAndLoad() },
         { pad: "X", key: "V", text: qsTr("View data"), action: () => page.showBlock(view.currentIndex) },
         { pad: "B", key: "Esc", text: qsTr("Close"), action: () => pageLoader.source = "" }
     ]
@@ -41,6 +42,10 @@ Sheet {
     property string base64CompressedData: ""
     // docked (desktop layout): the tape plays on while the blocks are shown
     readonly property bool pausesEmulation: !Theme.desktopMode
+
+    function resetAndLoad() {
+        if (tapeData.resetAndLoadBlock(view.currentIndex)) pageLoader.source = "";
+    }
 
     function showBlock(index) {
         base64CompressedData = tapeData.base64CompressedBlockData(index);
@@ -141,6 +146,8 @@ Sheet {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
+        buttonXKey: Qt.Key_V
+        buttonYKey: Qt.Key_L
     }
 
     ZxTapeData {
@@ -164,7 +171,10 @@ Sheet {
         Keys.onReturnPressed: tapeData.selectBlock(currentIndex)
         Keys.onEnterPressed: tapeData.selectBlock(currentIndex)
         Keys.onPressed: (event) => {
-            if (event.key === Qt.Key_V || event.key === Qt.Key_X) {
+            if (event.key === Qt.Key_L || event.key === Qt.Key_Y) {
+                page.resetAndLoad();
+                event.accepted = true;
+            } else if (event.key === Qt.Key_V || event.key === Qt.Key_X) {
                 page.showBlock(currentIndex);
                 event.accepted = true;
             }

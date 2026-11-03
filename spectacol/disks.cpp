@@ -45,7 +45,12 @@ void Disks::insertDisk(int idx, const QString &path)
     const auto bytes = f.readAll() | std::ranges::to<std::vector<uint8_t>>();
     const QString name = QFileInfo{path}.fileName();
     try {
-        m_zxEmulator->emulator().writeLock()->insertDisk(std::size_t(idx), bytes, QFileInfo{path}.suffix().toStdString());
+        {
+            auto emulator = m_zxEmulator->emulator().writeLock();
+            emulator->insertDisk(std::size_t(idx), bytes, QFileInfo{path}.suffix().toStdString());
+            if (idx == 0 && m_zxEmulator->settings()->autoLoad())
+                emulator->autoBootDisk();
+        }
         m_zxEmulator->showMessage(tr("'%1' inserted into drive %2:").arg(name, QChar(u'A' + idx)));
     } catch (const std::exception &e) {
         m_zxEmulator->showMessage(tr("Can't insert '%1': %2").arg(name, QString::fromUtf8(e.what())), ZxEmulator::Error);

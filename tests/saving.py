@@ -66,7 +66,7 @@ def main():
         config.mkdir(parents=True)
         data = session / "data"
         (config / "Spectacol.conf").write_text(
-            "[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=" + str(data) + "\n")
+            "[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=" + str(data) + "\n[Peripherals]\njoystickPrompt=false\n")
         env = os.environ | {"QT_QPA_PLATFORM": "offscreen",
                             "XDG_CONFIG_HOME": str(config.parent), "XDG_DATA_HOME": str(data)}
 
@@ -161,7 +161,7 @@ def main():
         print("Snapshot Save As → SZX → reload: original program bytes match")
 
         # A failed destination must remain intact; the page stays open for retry.
-        blocked = data / "Snapshots/Snapshot.szx"
+        blocked = data / "Snapshots/basic.szx"
         blocked.mkdir()
         (blocked / "keep").write_bytes(b"existing data")
         run("snapshot-retry", snapshot_as + ["Return", "wait", "Ctrl+A", "F", "I", "X", "Return"], initial)
