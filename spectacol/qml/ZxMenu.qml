@@ -325,6 +325,15 @@ ZxMenuItem {
             }
 
             ZxMenuItem {
+                text: qsTr("Controller profiles")
+                onTriggered: { menuBar.close(); pageLoader.source = "ControllerProfilesPage.qml"; }
+            }
+            ZxMenuItem {
+                text: qsTr("On-screen controls and fast-forward")
+                onTriggered: { menuBar.close(); pageLoader.source = "OptionsControlsPage.qml"; }
+            }
+
+            ZxMenuItem {
                 visible: ZxEmulator.gamepadId !== -1
                 text: qsTr("Calibrate Gamepad")
                 onTriggered: {

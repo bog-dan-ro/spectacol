@@ -41,6 +41,7 @@ FocusScope {
 
     property var model: []
     property int currentIndex: 0
+    property real choiceMaximumWidth: 0
     signal activated(int index)
 
     property real value: 0
@@ -232,6 +233,8 @@ FocusScope {
             }
             Text {
                 Layout.minimumWidth: Theme.sp(14)
+                Layout.maximumWidth: row.choiceMaximumWidth > 0 ? row.choiceMaximumWidth : Number.POSITIVE_INFINITY
+                elide: row.choiceMaximumWidth > 0 ? Text.ElideRight : Text.ElideNone
                 horizontalAlignment: Text.AlignHCenter
                 text: row.kind === "stepper" ? row.valueText(row.value) : (row.model[row.currentIndex] ?? "")
                 font.pixelSize: Theme.body

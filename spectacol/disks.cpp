@@ -51,6 +51,7 @@ void Disks::insertDisk(int idx, const QString &path)
             if (idx == 0 && m_zxEmulator->settings()->autoLoad())
                 emulator->autoBootDisk();
         }
+        if (idx == 0) m_zxEmulator->setLoadedGame(path);
         m_zxEmulator->showMessage(tr("'%1' inserted into drive %2:").arg(name, QChar(u'A' + idx)));
     } catch (const std::exception &e) {
         m_zxEmulator->showMessage(tr("Can't insert '%1': %2").arg(name, QString::fromUtf8(e.what())), ZxEmulator::Error);

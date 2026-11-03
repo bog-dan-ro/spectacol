@@ -89,7 +89,7 @@ Sheet {
             label: qsTr("Stick dead zone")
             kind: "stepper"
             from: 0
-            to: 0.5
+            to: 0.95
             stepSize: 0.05
             value: ZxEmulator.settings.deadZone
             valueText: (v) => qsTr("%1%").arg(Math.round(v * 100))

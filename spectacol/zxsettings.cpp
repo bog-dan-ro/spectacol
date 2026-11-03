@@ -30,6 +30,7 @@
 #include <QSettings>
 
 #include <algorithm>
+#include <cmath>
 
 using namespace Qt::StringLiterals;
 
@@ -112,11 +113,14 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
         m_kempstonMouse = s.value("kempstonMouse", false).toBool();
         m_interface1 = s.value("interface1", false).toBool();
         m_interface2 = s.value("interface2", true).toBool();
+        const double deadZone = s.value(u"deadZone"_s, 0.4).toDouble();
+        m_deadZone = std::isfinite(deadZone) ? std::clamp(deadZone, 0.0, 0.95) : 0.4;
         m_joystickPrompt = s.value("joystickPrompt", true).toBool();
         m_recreatedSpectrum = s.value("recreatedSpectrum", false).toBool();
         s.endGroup();
 
         s.beginGroup(u"Gamepad"_s);
+        m_fastForwardToggle = s.value(u"fastForwardToggle"_s, false).toBool();
         m_directionMapping = std::clamp(s.value(u"directionMapping"_s, int(JoystickDirections)).toInt(), 0, 2);
         const auto directions = s.value(u"directionKeys"_s).toList();
         for (int i = 0; i < std::min(int(directions.size()), int(ControllerInput::DirectionCount)); ++i)
@@ -125,6 +129,15 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
         QVariantMap map = s.value(u"actionsMap"_s).toMap();
         for (auto it = map.begin(); it != map.end(); ++it)
             m_gamepadActions[it.key().toInt()] = it.value().toInt();
+        s.endGroup();
+        s.beginGroup(u"Controls"_s);
+        auto opacity = [&s](const QString &key) {
+            const double value = s.value(key, 1.0).toDouble();
+            return std::isfinite(value) ? std::clamp(value, 0.1, 1.0) : 1.0;
+        };
+        m_keyboardOpacity = opacity(u"keyboardOpacity"_s);
+        m_joystickOpacity = opacity(u"joystickOpacity"_s);
+        m_buttonsOpacity = opacity(u"buttonsOpacity"_s);
     }
     setScreenOrientation(screenOrientation());
     connect(ZxImage::instance(), &ZxImage::sourceGeometryChanged, this, &ZxSettings::borderLimitsChanged, Qt::QueuedConnection);
@@ -784,23 +797,16 @@ void ZxSettings::setLoaderAcceleration(int acceleration)
     emit settingsCurrentChanged();
 }
 
-qreal ZxSettings::deadZone() const
+qreal ZxSettings::deadZone() const { return m_deadZone; }
+
+void ZxSettings::setDeadZone(qreal value)
 {
-    QSettings s;
-    s.beginGroup(u"Peripherals"_s);
-    return s.value("deadZone", 0.4).toDouble();
-}
-
-void ZxSettings::setDeadZone(qreal dz)
-{
-    if (deadZone() == dz)
-        return;
-
-    QSettings s;
-    s.beginGroup(u"Peripherals"_s);
-    s.setValue("deadZone", dz);
-
-    emit deadZoneChanged(dz);
+    if (!std::isfinite(value)) return;
+    value = std::clamp(value, 0.0, 0.95);
+    if (m_deadZone == value) return;
+    m_deadZone = value;
+    persistControllerMapping();
+    emit deadZoneChanged(value);
 }
 
 int ZxSettings::messageLevel() const
@@ -847,13 +853,8 @@ void ZxSettings::setGamepadAction(int gamepadButton, int action)
     if ((previous == m_gamepadActions.end() ? int(JoystickFire) : previous->second) == action)
         return;
     m_gamepadActions[gamepadButton] = action;
-    QSettings s;
-    s.beginGroup(u"Gamepad"_s);
-    QVariantMap map;
-    for (const auto &it : m_gamepadActions)
-        map[QString::number(it.first)] = it.second;
-    s.setValue(u"actionsMap"_s, map);
     lock.unlock();
+    persistControllerMapping();
     emit controllerMappingChanged();
 }
 
@@ -862,9 +863,7 @@ void ZxSettings::setDirectionMapping(int mode)
     if (mode < JoystickDirections || mode > CustomDirections || mode == m_directionMapping)
         return;
     m_directionMapping = mode;
-    QSettings settings;
-    settings.beginGroup(u"Gamepad"_s);
-    settings.setValue(u"directionMapping"_s, mode);
+    persistControllerMapping();
     emit controllerMappingChanged();
 }
 
@@ -895,11 +894,71 @@ void ZxSettings::setDirectionKey(int index, int key)
         || m_directionKeys[index] == key)
         return;
     m_directionKeys[index] = key;
-    QVariantList values;
-    for (const int code : m_directionKeys)
-        values.append(code);
-    QSettings settings;
-    settings.beginGroup(u"Gamepad"_s);
-    settings.setValue(u"directionKeys"_s, values);
+    persistControllerMapping();
     emit controllerMappingChanged();
 }
+
+QVariantMap ZxSettings::controllerMapping()
+{
+    QVariantList keys;
+    for (const int key : m_directionKeys) keys.append(key);
+    QVariantMap actions;
+    std::unique_lock lock(m_gamepadActionsMutex);
+    for (const auto &[button, action] : m_gamepadActions) actions.insert(QString::number(button), action);
+    return {{u"directionMode"_s, m_directionMapping}, {u"directionKeys"_s, keys},
+            {u"deadZone"_s, m_deadZone}, {u"actions"_s, actions}, {u"fastForwardToggle"_s, m_fastForwardToggle}};
+}
+
+void ZxSettings::persistControllerMapping()
+{
+    if (m_controllerOverride) return;
+    const auto mapping = controllerMapping();
+    QSettings settings;
+    settings.setValue(u"Gamepad/directionMapping"_s, m_directionMapping);
+    settings.setValue(u"Gamepad/directionKeys"_s, mapping.value(u"directionKeys"_s));
+    settings.setValue(u"Gamepad/actionsMap"_s, mapping.value(u"actions"_s));
+    settings.setValue(u"Gamepad/fastForwardToggle"_s, m_fastForwardToggle);
+    settings.setValue(u"Peripherals/deadZone"_s, m_deadZone);
+}
+
+void ZxSettings::applyControllerMapping(const QVariantMap &mapping, bool temporary)
+{
+    // ControllerProfiles validates the entire mapping before any settings change.
+    m_controllerOverride = temporary;
+    m_directionMapping = mapping.value(u"directionMode"_s).toInt();
+    const auto keys = mapping.value(u"directionKeys"_s).toList();
+    for (int i = 0; i < ControllerInput::DirectionCount; ++i) m_directionKeys[i] = keys[i].toInt();
+    m_deadZone = mapping.value(u"deadZone"_s).toDouble();
+    m_fastForwardToggle = mapping.value(u"fastForwardToggle"_s).toBool();
+    {
+        std::unique_lock lock(m_gamepadActionsMutex);
+        m_gamepadActions.clear();
+        const auto actions = mapping.value(u"actions"_s).toMap();
+        for (auto it = actions.cbegin(); it != actions.cend(); ++it)
+            m_gamepadActions[it.key().toInt()] = it.value().toInt();
+    }
+    persistControllerMapping();
+    emit controllerMappingChanged();
+    emit deadZoneChanged(m_deadZone);
+}
+
+void ZxSettings::setFastForwardToggle(bool toggle)
+{
+    if (m_fastForwardToggle == toggle) return;
+    m_fastForwardToggle = toggle;
+    persistControllerMapping();
+    emit controllerMappingChanged();
+}
+
+void ZxSettings::setControlOpacity(qreal &member, qreal value, const QString &key)
+{
+    if (!std::isfinite(value)) return;
+    value = std::clamp(value, 0.1, 1.0);
+    if (member == value) return;
+    member = value;
+    QSettings().setValue(u"Controls/"_s + key, value);
+    emit controlsAppearanceChanged();
+}
+void ZxSettings::setKeyboardOpacity(qreal value) { setControlOpacity(m_keyboardOpacity, value, u"keyboardOpacity"_s); }
+void ZxSettings::setJoystickOpacity(qreal value) { setControlOpacity(m_joystickOpacity, value, u"joystickOpacity"_s); }
+void ZxSettings::setButtonsOpacity(qreal value) { setControlOpacity(m_buttonsOpacity, value, u"buttonsOpacity"_s); }

@@ -45,6 +45,7 @@ Item {
     anchors.margins: (TextSizes.smallScreen ? 2.5 :  5) * Screen.pixelDensity
     // Directions
     Rectangle {
+        opacity: ZxEmulator.settings.joystickOpacity
         anchors.bottom: parent.bottom
         anchors.left: parent.left
 

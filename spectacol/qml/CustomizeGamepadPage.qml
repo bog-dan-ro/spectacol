@@ -83,7 +83,7 @@ Sheet {
         },
         {
             code: ZxSettings.ToggleEmulationSpeed,
-            name: qsTr("Hold to fast-forward")
+            name: qsTr("Fast-forward")
         },
         {
             code: ZxSettings.QuickSaveSnapshot,
@@ -182,6 +182,14 @@ Sheet {
     SettingsList {
         id: settings
         SettingRow {
+            label: qsTr("Controller profiles")
+            description: ZxEmulator.controllerProfiles.gameProfile.length
+                ? qsTr("This game: %1. Save profile edits to keep them.").arg(ZxEmulator.controllerProfiles.gameProfile)
+                : qsTr("Save mappings and choose one for this game")
+            kind: "action"
+            onClicked: pageLoader.source = "ControllerProfilesPage.qml"
+        }
+        SettingRow {
             label: qsTr("Directions")
             description: ZxEmulator.settings.directionMapping === ZxSettings.QaopDirections ? qsTr("Q up · A down · O left · P right · Space fire") : qsTr("Both sticks, D-pad and the touch joystick")
             kind: "choice"
@@ -223,7 +231,10 @@ Sheet {
         Text {
             width: parent.width
             padding: Theme.sp(3)
-            text: qsTr("Start opens the menu. QAOP uses Q/A for up/down, O/P for left/right, and Space for fire. Mappings are remembered.")
+            text: qsTr("Start opens the menu. QAOP uses Q/A for up/down, O/P for left/right, and Space for fire.")
+                + (ZxEmulator.controllerProfiles.gameProfile.length
+                    ? qsTr(" Save your edits in Controller profiles to keep them for this game.")
+                    : qsTr(" Mappings are remembered as your defaults."))
             wrapMode: Text.Wrap
             font.pixelSize: Theme.caption
             color: Theme.textMuted

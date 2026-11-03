@@ -23,6 +23,7 @@ import Spectacol
 
 Item {
     id: onScreenJoystick
+    opacity: ZxEmulator.settings.joystickOpacity
     anchors.fill: parent
     anchors.topMargin: Screen.pixelDensity * 20
     property var buttonList: [button5, button56, button57, button6,

@@ -76,6 +76,11 @@ class ZxSettings : public QObject
     Q_PROPERTY(QString speakerType READ speakerType WRITE setSpeakerType NOTIFY settingsCurrentChanged)
 
 
+    Q_PROPERTY(bool fastForwardToggle READ fastForwardToggle WRITE setFastForwardToggle NOTIFY controllerMappingChanged FINAL)
+    Q_PROPERTY(qreal keyboardOpacity READ keyboardOpacity WRITE setKeyboardOpacity NOTIFY controlsAppearanceChanged FINAL)
+    Q_PROPERTY(qreal joystickOpacity READ joystickOpacity WRITE setJoystickOpacity NOTIFY controlsAppearanceChanged FINAL)
+    Q_PROPERTY(qreal buttonsOpacity READ buttonsOpacity WRITE setButtonsOpacity NOTIFY controlsAppearanceChanged FINAL)
+
     // Peripherals Options
     Q_PROPERTY(bool kempstonJoystick READ kempstonJoystick WRITE setKempstonJoystick NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool kempstonMouse READ kempstonMouse WRITE setKempstonMouse NOTIFY settingsCurrentChanged)
@@ -92,6 +97,17 @@ public:
     enum DirectionMapping { JoystickDirections = ControllerInput::Joystick, QaopDirections = ControllerInput::Qaop,
                             CustomDirections = ControllerInput::Custom };
     Q_ENUM(DirectionMapping)
+    bool fastForwardToggle() const { return m_fastForwardToggle; }
+    void setFastForwardToggle(bool toggle);
+    qreal keyboardOpacity() const { return m_keyboardOpacity; }
+    qreal joystickOpacity() const { return m_joystickOpacity; }
+    qreal buttonsOpacity() const { return m_buttonsOpacity; }
+    void setKeyboardOpacity(qreal value);
+    void setJoystickOpacity(qreal value);
+    void setButtonsOpacity(qreal value);
+    QVariantMap controllerMapping();
+    void applyControllerMapping(const QVariantMap &mapping, bool temporary);
+    bool controllerOverride() const { return m_controllerOverride; }
     int directionMapping() const { return m_directionMapping; }
     void setDirectionMapping(int mode);
     QStringList directionKeyNames() const;
@@ -119,8 +135,8 @@ public:
     Q_ENUM(FillMode)
 
     enum Actions {
-        JoystickFire = 0,
-        ToggleKeyboard = Qt::Key_unknown + 1,
+        JoystickFire = int(ControllerAction::Fire),
+        ToggleKeyboard = int(ControllerAction::Keyboard),
         ToggleCursorJoystick,
         TogglePause,
         QuickSaveSnapshot,
@@ -243,6 +259,14 @@ public slots:
     void setGamepadAction(int gamepadButton, int action);
 
 private:
+    void persistControllerMapping();
+    void setControlOpacity(qreal &member, qreal value, const QString &key);
+    bool m_fastForwardToggle = false;
+    bool m_controllerOverride = false;
+    qreal m_deadZone = 0.4;
+    qreal m_keyboardOpacity = 1;
+    qreal m_joystickOpacity = 1;
+    qreal m_buttonsOpacity = 1;
     int m_directionMapping = JoystickDirections;
     std::array<int, ControllerInput::DirectionCount> m_directionKeys = ControllerInput::qaopKeys;
     /// `persist`: remember the machine for the next start (the user picked it)
@@ -270,6 +294,7 @@ signals:
     void leftMarginChanged(bool leftMargin);
     void deadZoneChanged(qreal deadZone);
     void controllerMappingChanged();
+    void controlsAppearanceChanged();
 
     void messageLevelChanged(int messageLevel);
 

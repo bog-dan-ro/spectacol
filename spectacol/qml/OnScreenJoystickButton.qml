@@ -17,6 +17,7 @@
 
 import QtQuick
 import QtQuick.Window
+import Spectacol
 
 import "private"
 
@@ -25,7 +26,7 @@ Rectangle {
     anchors.bottomMargin: (TextSizes.smallScreen ? 3.5 : 7) * Screen.pixelDensity // 0.7, 1.5 cm
     anchors.right: parent.right
     color: Qt.lighter(border.color, 1.5)
-    opacity: 0.65
+    opacity: 0.65 * ZxEmulator.settings.buttonsOpacity
     width: (TextSizes.smallScreen ? 7 : 15) * Screen.pixelDensity // 0.7, 1.5 cm
     height: width
     radius: width / 2

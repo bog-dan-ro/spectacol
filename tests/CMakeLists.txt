@@ -47,3 +47,12 @@ qt_add_executable(test_audio_output
 target_include_directories(test_audio_output PRIVATE ../spectacol)
 target_link_libraries(test_audio_output PRIVATE Qt6::Test Qt6::Multimedia)
 add_test(NAME audio_output COMMAND test_audio_output)
+
+qt_add_executable(test_controller_profiles
+    test_controller_profiles.cpp
+    ../spectacol/controllerprofiles.cpp ../spectacol/controllerprofiles.h
+    ../spectacol/controllerinput.cpp ../spectacol/controllerinput.h
+)
+target_include_directories(test_controller_profiles PRIVATE ../spectacol)
+target_link_libraries(test_controller_profiles PRIVATE Qt6::Test Qt6::Qml Qt::GamepadLegacy)
+add_test(NAME controller_profiles COMMAND test_controller_profiles)

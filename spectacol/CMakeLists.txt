@@ -121,6 +121,7 @@ qt_add_qml_module(spectacol
         screenfilters.h
         zxsettings.cpp zxsettings.h
         controllerinput.cpp controllerinput.h
+        controllerprofiles.cpp controllerprofiles.h
         nextuarthooks.cpp nextuarthooks.h
         zxtape.cpp zxtape.h
         zxtapedata.cpp zxtapedata.h
@@ -141,6 +142,8 @@ qt_add_qml_module(spectacol
         qml/CoverFlow.qml
         qml/CoverFlowFiles.qml
         qml/CustomizeGamepadPage.qml
+        qml/ControllerProfilesPage.qml
+        qml/OptionsControlsPage.qml
         qml/DebuggerPage.qml
         qml/DisassembleView.qml
         qml/DisksEjectPage.qml

@@ -86,5 +86,6 @@ Row {
         shown: ZxEmulator.recording.waitingForInput
         dot: Theme.warning
     }
-    Chip { text: qsTr("Paused"); dot: Theme.warning; shown: hud.paused }
+    Chip { objectName: "fastForwardOverlay"; text: qsTr("Fast-forward"); dot: Theme.accent; shown: ZxEmulator.fastForward && !ZxEmulator.paused }
+    Chip { objectName: "pausedOverlay"; text: qsTr("Paused"); dot: Theme.warning; shown: hud.paused }
 }

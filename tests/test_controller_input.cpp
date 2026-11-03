@@ -23,6 +23,31 @@
 class ControllerTest : public QObject {
     Q_OBJECT
 private slots:
+    void fastForwardOwnership()
+    {
+        FastForwardControl control;
+        constexpr int touch = ControllerInput::TouchButtonOffset;
+        control.press(1); control.press(2); control.press(touch);
+        QVERIFY(control.active());
+        control.release(1); control.clearPhysical();
+        QVERIFY(control.active()); // the touch source still holds it
+        control.clearTouch(); QVERIFY(!control.active());
+        control.press(1); control.release(1, true); QVERIFY(!control.active());
+        control.setToggle(true);
+        control.press(1); control.press(1); QVERIFY(!control.active());
+        control.release(1); QVERIFY(control.active());
+        control.release(1); QVERIFY(control.active()); // duplicate release cannot toggle
+        control.press(2); control.release(2, true); QVERIFY(control.active());
+        control.clearPhysical(); QVERIFY(!control.active());
+        control.press(touch); control.release(touch); QVERIFY(control.active());
+        control.clearPhysical(); QVERIFY(control.active());
+        control.clearTouch(); QVERIFY(!control.active());
+        control.press(1); control.release(1); QVERIFY(control.active());
+        control.press(touch); control.release(touch); QVERIFY(!control.active());
+        control.press(2); control.release(2); QVERIFY(control.active());
+        control.setToggle(false); QVERIFY(!control.active());
+        control.press(1); control.clear(); QVERIFY(!control.active());
+    }
     void joystickSources()
     {
         ControllerInput input;

@@ -86,6 +86,7 @@ ApplicationWindow {
             Status { text: ZxEmulator.settings.currentMachine }
             Status { visible: hud.tapeActive; text: qsTr("Tape playing"); color: Theme.success }
             Status { visible: hud.diskActive; text: qsTr("Disk"); color: Theme.success }
+            Status { objectName: "fastForwardStatus"; visible: ZxEmulator.fastForward && !ZxEmulator.paused; text: qsTr("Fast-forward"); color: Theme.accent }
             Status { visible: hud.speed !== 100; text: qsTr("Speed %1%").arg(hud.speed) }
             Status {
                 objectName: "rzxProgress"
@@ -325,6 +326,7 @@ ApplicationWindow {
             columnSpacing: Screen.pixelDensity
             rowSpacing: Screen.pixelDensity
 
+            opacity: ZxEmulator.settings.buttonsOpacity
             property real buttonsOpacity: (onScreenCursorJoystick.visible || onScreen48Keyboard.visible) ? 0.25 : 1.0
             Button {
                 text: "="
@@ -376,7 +378,7 @@ ApplicationWindow {
                     anchors.fill: parent
                     onPressed: ZxEmulator.speedup()
                     onReleased: ZxEmulator.slowdown()
-                    onCanceled: ZxEmulator.slowdown()
+                    onCanceled: ZxEmulator.cancelFastForward()
                 }
             }
             Image {
@@ -404,6 +406,7 @@ ApplicationWindow {
 
         OnScreen48Keyboard {
             id: onScreen48Keyboard
+            opacity: ZxEmulator.settings.keyboardOpacity
             visible: false
             enabled: visible
             anchors.fill: parent

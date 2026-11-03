@@ -49,15 +49,22 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 
 ## Controls, profiles and playback indicators
 
-- [ ] Save/load named gamepad mapping profiles, with per-game selection and import/export
+- [x] Named gamepad profiles with load/save, per-game selection and portable JSON import/export
       ([#116](https://github.com/bog-dan-ro/spectacol/issues/116), duplicate
-      [#121](https://github.com/bog-dan-ro/spectacol/issues/121)). Keep profiles independent of a new game container.
-- [ ] Configurable opacity for the on-screen keyboard, joysticks and action buttons
-      ([#102](https://github.com/bog-dan-ro/spectacol/issues/102)).
-- [ ] Choose hold-to-fast-forward or press-to-toggle for touch/gamepad controls
-      ([#110](https://github.com/bog-dan-ro/spectacol/issues/110)); release the speed override safely on disconnect.
-- [ ] Pause and fast-forward indicators visible when using a physical gamepad; keep the paused state discoverable
-      ([#94](https://github.com/bog-dan-ro/spectacol/issues/94); `UiItemType::Paused` is never shown).
+      [#121](https://github.com/bog-dan-ro/spectacol/issues/121)). Per-game overrides preserve the default
+      mapping; filename matching spans folders, quick snapshots and explicitly named snapshot exports.
+      Profiles include directions, keys, button actions, joystick, dead zone and fast-forward mode.
+      Snapshot joystick declarations retain priority. Import validation, collisions, persistence and actual
+      keyboard/joystick routing have regressions; see `docs/controller-profiles.md`.
+- [x] Independent opacity settings for the on-screen keyboard, joystick and action buttons
+      ([#102](https://github.com/bog-dan-ro/spectacol/issues/102)); persist between sessions, without adding
+      rendering layers or per-frame updates.
+- [x] Hold or press-to-toggle fast-forward for touch/gamepad controls
+      ([#110](https://github.com/bog-dan-ro/spectacol/issues/110)). Independent input ownership releases
+      overrides on cancellation, disconnect, pause, mapping changes and backgrounding.
+- [x] Pause and fast-forward indicators remain visible with physical controllers, independently of touch
+      icon visibility ([#94](https://github.com/bog-dan-ro/spectacol/issues/94)). Desktop status and overlay
+      chips follow the actual pause/manual/tape-turbo state; compiled UI checks cover both layouts.
 
 ## Files: trainers, ROMs and compact browsing
 

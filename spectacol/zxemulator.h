@@ -26,6 +26,7 @@
 #include "pokefindermodel.h"
 #include "zxgamesmodel.h"
 #include "controllerinput.h"
+#include "controllerprofiles.h"
 
 Q_MOC_INCLUDE("zxrecording.h")
 Q_MOC_INCLUDE("zxsettings.h")
@@ -60,6 +61,8 @@ class ZxEmulator : public QObject
     QML_SINGLETON
 
     Q_PROPERTY(NextUartHooks *uartHooks READ uartHooks CONSTANT)
+    Q_PROPERTY(ControllerProfiles *controllerProfiles READ controllerProfiles CONSTANT FINAL)
+    Q_PROPERTY(bool fastForward READ fastForward NOTIFY fastForwardChanged FINAL)
     Q_PROPERTY(bool touchscreen MEMBER m_touchscreen CONSTANT)
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
     Q_PROPERTY(bool processInputEvents READ processInputEvents WRITE setProcessInputEvents NOTIFY processInputEventsChanged)
@@ -140,6 +143,8 @@ public:
     static ZxEmulator &instance();
     ~ZxEmulator();
 
+    ControllerProfiles *controllerProfiles() const { return m_controllerProfiles.get(); }
+    bool fastForward() const { return m_fastForwardIndicator; }
     NextUartHooks *uartHooks() const { return m_uartHooks.get(); }
     zxkit::Engine &engine() { return *m_engine; }
     const zxkit::Engine &engine() const { return *m_engine; }
@@ -170,6 +175,8 @@ public:
     /// Reports directory, write and commit failures.
     bool writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes);
     void releaseInputs();
+    /// A consumer drive-A insertion selects a game without reading the media twice.
+    void setLoadedGame(const QString &path);
     zxkit::Z80Registers registers() const;
 
     bool paused() const;
@@ -334,6 +341,9 @@ public slots:
 
     // Fast forward, while the button is held
     void speedup();
+    void cancelFastForward();
+    bool saveControllerProfile(const QString &name);
+    bool loadControllerProfile(const QString &name);
     void slowdown();
 
     void togglePaused();
@@ -360,6 +370,7 @@ signals:
     void tapeBlockChanged(int block);
     void configureJoystick();
     void showControlsIconsChanged(bool showControlsIcons);
+    void fastForwardChanged();
 
 private:
     explicit ZxEmulator(QObject *parent = 0);
@@ -367,6 +378,11 @@ private:
     void updateMediaActivity(const zxkit::MediaActivity &activity);
     void configureController();
     void applyControllerState();
+    void syncFastForward();
+    void updateFastForwardIndicator();
+    QVariantMap controllerMapping();
+    bool applyControllerMapping(const QVariantMap &mapping, bool temporary);
+    bool activateControllerGame(const QString &title);
     void setInputKeys(quint64 source, const QSet<int> &keys);
     void applyKeyChanges(const HeldKeyState::Changes &changes);
     std::pair<bool, zxkit::MediaClass> loadMediaWithType(const QString &filePath);
@@ -385,7 +401,11 @@ private:
     uint8_t m_joystickButtons = 0; // zxkit::JoystickButtons
     ControllerInput m_controller;
     HeldKeyState m_heldKeys;
-    bool m_controllerTurbo = false;
+    FastForwardControl m_fastForwardControl;
+    bool m_manualFastForward = false;
+    bool m_tapeFastForward = false;
+    bool m_fastForwardIndicator = false;
+    QVariantMap m_defaultControllerMapping;
     BreakpointsModel m_breakpointsModel;
     DisassambleModel m_disassambleModel;
     PokeFinderModel m_pokeFinderModel;
@@ -408,6 +428,7 @@ private:
     int m_gamepadId = -1;
     ZXGamesModel m_onlineGamesModel;
     std::unique_ptr<ZxSettings> m_settings;
+    std::unique_ptr<ControllerProfiles> m_controllerProfiles;
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
     ZxTape *m_tape = nullptr;
     Disks *m_disks = nullptr;

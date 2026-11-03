@@ -329,6 +329,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
     , m_pokeFinderModel(this)
     , m_resetPokeFinder(true)
     , m_settings(std::make_unique<ZxSettings>(*this))
+    , m_controllerProfiles(std::make_unique<ControllerProfiles>(this))
     , m_tape(new ZxTape(this))
     , m_disks(new Disks(this))
     , m_sdCard(new SdCardFiles(this))
@@ -437,6 +438,18 @@ ZxEmulator::ZxEmulator(QObject *parent)
     connect(&m_joystickPromptTimer, &QTimer::timeout, this, [this] {
         if (m_settings->joystickPrompt())
             emit configureJoystick();
+    });
+
+    connect(m_controllerProfiles.get(), &ControllerProfiles::failed, this, [this](const QString &message) {
+        showMessage(message, Error);
+    });
+    connect(m_controllerProfiles.get(), &ControllerProfiles::activationRequested, this, [this](const QString &name) {
+        if (!m_settings->controllerOverride()) m_defaultControllerMapping = controllerMapping();
+        applyControllerMapping(name.isEmpty() ? m_defaultControllerMapping : m_controllerProfiles->mapping(name), !name.isEmpty());
+    });
+    connect(m_settings.get(), &ZxSettings::settingsCurrentChanged, this, [this] {
+        m_tapeFastForward = m_mediaActivity.tapePlaying && m_settings->loaderAcceleration() > 1;
+        updateFastForwardIndicator();
     });
 
     connect(qGuiApp, &QCoreApplication::aboutToQuit, this, &ZxEmulator::stopEngine);
@@ -680,12 +693,11 @@ void ZxEmulator::setSelectedJoysticksIndex(int selectedJoysticksIndex)
         attachJoystick(selectedJoysticksIndex);
         return;
     }
-    m_controller.clear();
-    applyControllerState();
+    releaseInputs();
     setJoystickButtons(0); // release everything on the old one
     m_selectedJoystickIndex = selectedJoysticksIndex;
     attachJoystick(selectedJoysticksIndex);
-    QSettings().setValue("joystick", selectedJoysticksIndex);
+    if (!m_settings->controllerOverride()) QSettings().setValue("joystick", selectedJoysticksIndex);
     emit selectedJoysticksIndexChanged();
 }
 
@@ -925,6 +937,7 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
         const auto id = std::string(emulator().readLock()->machine().id());
         if (m_settings) m_settings->syncCurrentMachine(id);
         m_engine->refreshFrame();
+        const bool profileApplied = activateControllerGame(m_loadedFileName);
         if (zxkit::classifyMediaFile(file.extension, file.data) == zxkit::MediaClass::Snapshot) {
             std::optional<int> selected = std::nullopt;
             if (joystick.type) {
@@ -943,7 +956,7 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
             }
             if (selected && joystickAvailable(*selected)) {
                 setSelectedJoysticksIndex(*selected);
-            } else if (m_settings && m_settings->joystickPrompt()) {
+            } else if (!profileApplied && m_settings && m_settings->joystickPrompt()) {
                 // File pickers clear their page after load() returns. Also allow
                 // time for the selecting touch/button to be released.
                 m_joystickPromptTimer.start();
@@ -984,7 +997,11 @@ bool ZxEmulator::saveMediaFile(const QString &filePath)
             zxkit::JoystickType::Timex1, zxkit::JoystickType::Timex2};
         zxkit::SnapshotFormats::setJoystickInfo(bytes, extension, types[m_selectedJoystickIndex]);
     }
-    return writeFileBytes(filePath, bytes);
+    if (!writeFileBytes(filePath, bytes)) return false;
+    const auto profile = m_controllerProfiles->gameProfile();
+    if (!profile.isEmpty() && (extension == ".szx" || extension == ".z80" || extension == ".sna" || extension == ".nex"))
+        m_controllerProfiles->rememberGame(QFileInfo(name).completeBaseName(), profile);
+    return true;
 }
 
 bool ZxEmulator::writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes)
@@ -1035,6 +1052,8 @@ void ZxEmulator::setGamepadId(int gamepadId)
         s.setValue("gamepadId", gamepadId);
     }
 
+    m_fastForwardControl.clearPhysical();
+    syncFastForward();
     m_controller.clearPhysical();
     m_pressedRzxButtons.clear();
     m_rzxAxisActive.fill(false);
@@ -1103,6 +1122,7 @@ ZxSettings *ZxEmulator::settings() const
 void ZxEmulator::resetLoadedFile()
 {
     m_joystickPromptTimer.stop();
+    activateControllerGame(QString{});
     m_loadedFileName = "";
     emit saveSnapshotEnabledChanged();
     m_recording->refresh();
@@ -1182,6 +1202,8 @@ QString ZxEmulator::snapshotFilePath(const QString &folder, const QString &fileN
 void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
 {
     const zxkit::MediaActivity previous = std::exchange(m_mediaActivity, activity);
+    m_tapeFastForward = activity.tapePlaying && m_settings->loaderAcceleration() > 1;
+    updateFastForwardIndicator();
     if (activity.tapePlaying != previous.tapePlaying) {
         emit uiIconUpdate(Tape, activity.tapePlaying ? Active : Inactive);
         m_tape->setPlaying(activity.tapePlaying);
@@ -1198,11 +1220,12 @@ void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
 
 void ZxEmulator::load(const QString &filePath, bool removeOnFail)
 {
+    const auto previousName = m_loadedFileName;
     m_loadedFileName = QFileInfo(filePath).completeBaseName();
     const auto [loaded, mediaClass] = loadMediaWithType(filePath);
     m_recording->refresh();
     if (!loaded) {
-        m_loadedFileName.clear();
+        m_loadedFileName = previousName;
         if (removeOnFail) {
             QFile::remove(filePath);
             emit error(Info, tr("File \"%1\" was removed").arg(filePath));
@@ -1522,6 +1545,8 @@ void ZxEmulator::setInputKeys(quint64 source, const QSet<int> &keys)
 
 void ZxEmulator::releaseInputs()
 {
+    m_fastForwardControl.clear();
+    syncFastForward();
     m_controller.clear();
     applyControllerState();
     applyKeyChanges(m_heldKeys.clear());
@@ -1529,6 +1554,9 @@ void ZxEmulator::releaseInputs()
 
 void ZxEmulator::configureController()
 {
+    m_fastForwardControl.clear();
+    m_fastForwardControl.setToggle(m_settings->fastForwardToggle());
+    syncFastForward();
     m_controller.configure(m_settings->directionMapping(), m_settings->directionKeys(), m_settings->deadZone());
     applyControllerState();
 }
@@ -1546,11 +1574,7 @@ void ZxEmulator::applyControllerState()
     }
     setInputKeys(kControllerKeys, keys);
     setJoystickButtons(state.joystick);
-    const bool turbo = state.actions.contains(ZxSettings::ToggleEmulationSpeed);
-    if (m_controllerTurbo != turbo) {
-        m_controllerTurbo = turbo;
-        turbo ? speedup() : slowdown();
-    }
+
 }
 
 void ZxEmulator::setNextKeyState(int key, bool pressed)
@@ -1661,13 +1685,20 @@ void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button, 
     const quint8 direction = button == QGamepadManager::ButtonUp || button == QGamepadManager::ButtonDown
         || button == QGamepadManager::ButtonLeft || button == QGamepadManager::ButtonRight
         ? toJoystickMask(button) : 0;
-    m_controller.press(int(button) + (touch ? ControllerInput::TouchButtonOffset : 0), action, direction);
+    if (action == ZxSettings::ToggleEmulationSpeed && fresh) {
+        m_fastForwardControl.press(inputId);
+        syncFastForward();
+    }
+    m_controller.press(inputId, action, direction);
     applyControllerState();
 }
 
 void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button, bool touch, bool cancelled)
 {
-    m_pressedRzxButtons.remove(int(button) + (touch ? ControllerInput::TouchButtonOffset : 0));
+    const int source = int(button) + (touch ? ControllerInput::TouchButtonOffset : 0);
+    m_fastForwardControl.release(source, cancelled);
+    syncFastForward();
+    m_pressedRzxButtons.remove(source);
     const auto action = m_controller.release(int(button) + (touch ? ControllerInput::TouchButtonOffset : 0));
     applyControllerState();
     if (!action || cancelled)
@@ -1691,6 +1722,8 @@ void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button
 
 void ZxEmulator::releaseTouchJoystick()
 {
+    m_fastForwardControl.clearTouch();
+    syncFastForward();
     m_rzxAxisActive[ControllerInput::TouchX] = m_rzxAxisActive[ControllerInput::TouchY] = false;
     m_controller.clearTouch();
     applyControllerState();
@@ -1713,12 +1746,39 @@ void ZxEmulator::setSpeed(int percent)
 
 void ZxEmulator::speedup()
 {
-    m_engine->setTurbo(true);
+    if (m_pauseCount || m_paused || !m_processInputEvents) return;
+    m_fastForwardControl.press(ControllerInput::TouchButtonOffset + 256);
+    syncFastForward();
 }
 
 void ZxEmulator::slowdown()
 {
-    m_engine->setTurbo(false);
+    m_fastForwardControl.release(ControllerInput::TouchButtonOffset + 256);
+    syncFastForward();
+}
+
+void ZxEmulator::cancelFastForward()
+{
+    m_fastForwardControl.release(ControllerInput::TouchButtonOffset + 256, true);
+    syncFastForward();
+}
+
+void ZxEmulator::syncFastForward()
+{
+    const bool active = m_fastForwardControl.active();
+    if (m_manualFastForward != active) {
+        m_manualFastForward = active;
+        if (m_engine) m_engine->setTurbo(active);
+    }
+    updateFastForwardIndicator();
+}
+
+void ZxEmulator::updateFastForwardIndicator()
+{
+    const bool active = m_manualFastForward || m_tapeFastForward;
+    if (active == m_fastForwardIndicator) return;
+    m_fastForwardIndicator = active;
+    emit fastForwardChanged();
 }
 
 void ZxEmulator::togglePaused()
@@ -1823,4 +1883,51 @@ const PokeFinderModel *ZxEmulator::pokeFinderModel() const
 ZXGamesModel *ZxEmulator::onlineGamesModel()
 {
     return &m_onlineGamesModel;
+}
+
+QVariantMap ZxEmulator::controllerMapping()
+{
+    auto result = m_settings->controllerMapping();
+    result.insert(u"joystick"_s, m_selectedJoystickIndex);
+    return result;
+}
+
+bool ZxEmulator::applyControllerMapping(const QVariantMap &mapping, bool temporary)
+{
+    if (!ControllerProfiles::validMapping(mapping)) return false;
+    releaseInputs();
+    m_settings->applyControllerMapping(mapping, temporary);
+    const int joystick = mapping.value(u"joystick"_s).toInt();
+    const bool available = joystickAvailable(joystick);
+    setSelectedJoysticksIndex(available ? joystick : NoJoystick);
+    if (!available) showMessage(tr("This profile's Timex joystick needs a TC2068 or TS2068"), Info);
+    return available;
+}
+
+bool ZxEmulator::saveControllerProfile(const QString &name)
+{
+    return m_controllerProfiles->save(name.trimmed(), controllerMapping());
+}
+
+bool ZxEmulator::loadControllerProfile(const QString &name)
+{
+    const auto mapping = m_controllerProfiles->mapping(name);
+    if (mapping.isEmpty()) { showMessage(tr("Controller profile does not exist"), Error); return false; }
+    return applyControllerMapping(mapping, m_settings->controllerOverride());
+}
+
+bool ZxEmulator::activateControllerGame(const QString &name)
+{
+    if (m_settings->controllerOverride()) applyControllerMapping(m_defaultControllerMapping, false);
+    else m_defaultControllerMapping = controllerMapping();
+    m_controllerProfiles->setGame(name);
+    const auto profile = m_controllerProfiles->gameProfile();
+    return !profile.isEmpty() && applyControllerMapping(m_controllerProfiles->mapping(profile), true);
+}
+
+void ZxEmulator::setLoadedGame(const QString &path)
+{
+    m_loadedFileName = QFileInfo(path).completeBaseName();
+    activateControllerGame(m_loadedFileName);
+    emit saveSnapshotEnabledChanged();
 }
