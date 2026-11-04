@@ -92,18 +92,22 @@ See [Debugger controls and limits](docs/debugger.md).
 
 ## Performance and resource usage profiling
 
-- [ ] **Investigate the CPU/resource regression before further CI and UI polish.** User-reported CPU usage on
+- [x] **Investigate the CPU/resource regression before further CI and UI polish.** User-reported CPU usage on
       this machine was about 0.2% just after the ZxKit port, before filtering; it is now about 0.6% without filters
       and 0.9–1.5% with some filters enabled. Reproduce these measurements with a consistent CPU percentage
       convention, optimized build, machine/media, speed and display workload; prioritize battery-powered devices.
-- [ ] Use `perf` for native C++ hotspots and the
+- [x] Use `perf` for native C++ hotspots and the
       [Qt QML Profiler workflow](https://www.qt.io/blog/introducing-the-qml-profiler-skill-for-agentic-development)
       for QML logic, bindings/signals, rendering and memory traces. Compare the initial post-port/pre-filter
       version, the current unfiltered path and individual filters. Separate profiling overhead from production
       CPU measurements and distinguish emulation/audio, UI, frame copies/uploads and filter costs.
-- [ ] Record CPU time, memory/allocations and wakeups during gameplay, paused/menu states and backgrounding.
+- [x] Record CPU time, memory/allocations and wakeups during gameplay, paused/menu states and backgrounding.
       Save reproducible traces and before/after results under the build directory. Fix measured bottlenecks
       without sacrificing audio continuity or changing the owner's screen/filter UI.
+
+See [CPU and resource investigation](docs/profiling.md) for the historical pair,
+htop conventions, idle/Dizzy results, all 36 presets, QML/native captures, fixes and
+measurement limits. Generated evidence remains under the build directories.
 
 ## CI, tests, installation and remaining UI polish
 

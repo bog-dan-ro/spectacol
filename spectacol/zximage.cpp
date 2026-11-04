@@ -46,6 +46,7 @@ void ZxImage::presentFrame(const zxkit::VideoFramePtr &frame)
     const auto pixels = frame.readLock();
     bool resized = false;
     bool sourceChanged = false;
+    bool changed = false;
     {
         QMutexLocker lock(&m_syncVars);
         if (m_sourceFrame) {
@@ -56,16 +57,17 @@ void ZxImage::presentFrame(const zxkit::VideoFramePtr &frame)
             sourceChanged = true;
         }
         m_sourceFrame = frame;
-        resized = updateImage(*pixels);
+        resized = updateImage(*pixels, changed);
     }
     if (sourceChanged)
         emit sourceGeometryChanged();
     if (resized)
         emit geometryChanged(imageSize());
-    emit needsUpdate();
+    if (changed)
+        emit needsUpdate();
 }
 
-bool ZxImage::updateImage(const zxkit::VideoFrame &pixels)
+bool ZxImage::updateImage(const zxkit::VideoFrame &pixels, bool &changed)
 {
     const auto paper = pixels.paperRect();
     const uint32_t sx = std::max(1u, paper.width / 256);
@@ -93,7 +95,8 @@ bool ZxImage::updateImage(const zxkit::VideoFrame &pixels)
         top = std::min(top, y);
         bottom = y;
     }
-    if (bottom >= 0)
+    changed = bottom >= 0;
+    if (changed)
         m_frameDirty |= QRect(0, top, size.width(), bottom - top + 1);
     return resized;
 }
@@ -101,17 +104,19 @@ bool ZxImage::updateImage(const zxkit::VideoFrame &pixels)
 void ZxImage::setBorderMargins(zxkit::BorderMargins margins)
 {
     bool resized = false;
+    bool changed = false;
     {
         QMutexLocker lock(&m_syncVars);
         if (m_borderMargins == margins)
             return;
         m_borderMargins = margins;
         if (m_sourceFrame)
-            resized = updateImage(*m_sourceFrame.readLock());
+            resized = updateImage(*m_sourceFrame.readLock(), changed);
     }
     if (resized)
         emit geometryChanged(imageSize());
-    emit needsUpdate();
+    if (changed)
+        emit needsUpdate();
 }
 
 QMargins ZxImage::borderLimits() const

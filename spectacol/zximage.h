@@ -59,7 +59,7 @@ signals:
     void geometryChanged(QSize size);
 
 private:
-    bool updateImage(const zxkit::VideoFrame &pixels);
+    bool updateImage(const zxkit::VideoFrame &pixels, bool &changed);
     zxkit::BorderMargins m_borderMargins;
     zxkit::VideoFramePtr m_sourceFrame;
     // The renderer gets shallow copies of m_frameImage: presentFrame() detaches

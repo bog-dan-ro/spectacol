@@ -64,3 +64,8 @@ qt_add_executable(test_debugger_models
 target_include_directories(test_debugger_models PRIVATE ../spectacol)
 target_link_libraries(test_debugger_models PRIVATE Qt6::Test Qt6::Qml ZX::Kit)
 add_test(NAME debugger_models COMMAND test_debugger_models)
+
+qt_add_executable(test_zximage test_zximage.cpp ../spectacol/zximage.cpp ../spectacol/zximage.h)
+target_include_directories(test_zximage PRIVATE ../spectacol)
+target_link_libraries(test_zximage PRIVATE Qt6::Test Qt6::Quick Qt6::GuiPrivate ZX::Kit)
+add_test(NAME image_updates COMMAND test_zximage)
