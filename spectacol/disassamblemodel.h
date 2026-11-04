@@ -38,7 +38,8 @@ class DisassambleModel : public QAbstractListModel
         AddressText,
         Bytes,
         BytesText,
-        Disassable
+        Disassable,
+        Annotation
     };
 
     enum ColorType {
@@ -56,6 +57,7 @@ class DisassambleModel : public QAbstractListModel
         uint16_t address = 0;
         QByteArray bytes;
         QString disassamble;
+        QString annotation;
     };
 
 public:

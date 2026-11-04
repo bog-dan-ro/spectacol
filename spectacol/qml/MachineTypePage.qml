@@ -20,7 +20,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls
-import QtGamepadLegacy
 import Spectacol
 
 // The machines, grouped by family. The arrows move, Return (the gamepad's A) or a click switches
@@ -46,6 +45,10 @@ Sheet {
         return name.startsWith("ZX Spectrum ") && !/Next/.test(name) ? name.substring(12) : name;
     }
 
+    function openRoms() {
+        pageLoader.setSource("RomsPage.qml", {machineIndex: focusIndex});
+    }
+    Keys.onPressed: event => { if (event.key === Qt.Key_F2) { openRoms(); event.accepted = true; } }
     function choose(index: int) {
         if (index !== ZxEmulator.settings.currentMachineIndex)
             ZxEmulator.settings.currentMachineIndex = index;
@@ -90,17 +93,15 @@ Sheet {
     title: qsTr("Choose a machine")
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Switch"), action: () => page.choose(page.focusIndex) },
+        { pad: "X", key: "F2", text: qsTr("ROMs"), action: () => page.openRoms() },
         { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
     ]
 
     Component.onCompleted: ZxEmulator.processInputEvents = false
     Component.onDestruction: ZxEmulator.processInputEvents = true
 
-    GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        buttonAKey: Qt.Key_Return
-        buttonBKey: Qt.Key_Escape
-    }
+    DebuggerGamepad { transportKeys: false }
+
 
     Flickable {
         id: flick

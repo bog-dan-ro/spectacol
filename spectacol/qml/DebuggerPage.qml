@@ -77,7 +77,10 @@ FocusScope {
             loaded.forceActiveFocus();
     }
     function focusAddress() {
-        if (views.currentIndex === 2) {
+        if (views.currentIndex === 6) {
+            const symbols = content.item as DebugSymbolsView;
+            if (symbols) symbols.focusAddress();
+        } else if (views.currentIndex === 2) {
             const memory = content.item as DebuggerMemoryView;
             if (memory)
                 memory.focusAddress();
@@ -196,16 +199,15 @@ FocusScope {
                 displayText: currentIndex >= 0 ? textAt(currentIndex) : ""
                 enabled: ZxEmulator.debuggerReady
                 Layout.fillWidth: true
-                model: [qsTr("Disassembly"), qsTr("CPU registers"), qsTr("Memory"), qsTr("Breakpoints / watchpoints"), qsTr("Next registers"), qsTr("MMU mappings")]
+                model: [qsTr("Disassembly"), qsTr("CPU registers"), qsTr("Memory"), qsTr("Breakpoints / watchpoints"), qsTr("Next registers"), qsTr("MMU mappings"), qsTr("Labels / source mappings")]
             }
             TextField {
                 id: goAddress
                 objectName: "debuggerAddress"
-                visible: views.currentIndex === 0 || views.currentIndex >= 4
+                visible: views.currentIndex === 0 || views.currentIndex === 4 || views.currentIndex === 5
                 Layout.preferredWidth: Theme.sp(25)
-                placeholderText: qsTr("Hex address")
+                placeholderText: views.currentIndex === 0 ? qsTr("Hex / label") : qsTr("Hex address")
                 inputMethodHints: Qt.ImhPreferUppercase | Qt.ImhNoPredictiveText
-                validator: RegularExpressionValidator { regularExpression: /(?:\$|0[xX])?[0-9a-fA-F]{1,4}/ }
                 onAccepted: goButton.click()
             }
             Button {
@@ -214,7 +216,7 @@ FocusScope {
                 visible: goAddress.visible
                 enabled: ZxEmulator.debuggerReady
                 onClicked: {
-                    const parsed = parseInt(goAddress.text.replace(/^(\$|0x)/i, ""), 16);
+                    const parsed = ZxEmulator.resolveDebuggerAddress(goAddress.text);
                     if (isFinite(parsed) && parsed >= 0 && parsed <= (views.currentIndex === 4 ? 255 : 65535)) {
                         const inspector = content.item as DebuggerStateView;
                         if (inspector)
@@ -231,7 +233,7 @@ FocusScope {
             Layout.fillWidth: true
             Layout.fillHeight: true
             enabled: ZxEmulator.debuggerReady
-            sourceComponent: [disassembly, registers, memory, breakpoints, nextRegisters, mmu][views.currentIndex]
+            sourceComponent: [disassembly, registers, memory, breakpoints, nextRegisters, mmu, symbols][views.currentIndex]
         }
         Label {
             Layout.fillWidth: true
@@ -239,6 +241,16 @@ FocusScope {
             color: Theme.textMuted
             font.pixelSize: Theme.caption
             wrapMode: Text.Wrap
+        }
+    }
+    Component {
+        id: symbols
+        DebugSymbolsView {
+            onGoTo: address => {
+                views.currentIndex = 0;
+                ZxEmulator.disassamble(address, 0);
+                page.focusContent();
+            }
         }
     }
     Component {

@@ -68,13 +68,15 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 
 ## Files: trainers, ROMs and compact browsing
 
-- [ ] `.pok` trainers: ZxKit parses them, but the poke manager only has custom pokes. Load the `.pok` file that
-      comes with a game; also search a user-selected POKES folder by game name
+- [x] `.pok` trainers: automatically find a game’s adjacent `.pok`, then search the user-selected
+      POKES folder by game name. Import explicitly, apply grouped/banked patches and requested values,
+      and restore captured bytes on toggle-off
       ([#142](https://github.com/bog-dan-ro/spectacol/issues/142)).
-- [ ] Custom ROM selection per machine ([#152](https://github.com/bog-dan-ro/spectacol/issues/152)): use the
-      existing ZxKit `romResolver`, validate the required ROM sizes, persist overrides and allow restoring bundled ROMs.
+- [x] Custom ROM selection per machine ([#152](https://github.com/bog-dan-ro/spectacol/issues/152)):
+      machine-scoped overrides through ZxKit's ROM resolver, exact size checks, persistent private copies,
+      and restoration of bundled/Next SD defaults at the next hard reset or machine switch.
       Snapshot saving already exists; its Android failures belong to the save-name and storage tasks.
-- [ ] A compact list/grid alternative to cover flow, with remembered folder/selection and local filename search
+- [x] A compact list/grid alternative to cover flow, with remembered folder/selection and local filename search
       ([#18](https://github.com/bog-dan-ro/spectacol/issues/18),
       [#32](https://github.com/bog-dan-ro/spectacol/issues/32)); usable with touch, keyboard and gamepad.
 
@@ -84,11 +86,12 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 - [x] Side-effect-free Next register latches and effective MMU read/write mappings.
 - [x] D-pad/stick navigation, contextual gamepad shortcuts and Back support in the debugger and poke editor,
       with standard OS-keyboard text fields and physical writable-bank pokes beyond 64 KiB.
-- [ ] Load SLD/symbol files.
+- [x] Load sjasmplus SLD v1 / symbol assignments, navigate labels and annotate disassembly with
+      source file/line mappings for the currently mapped RAM page.
 - [x] Step out and bank-aware run to cursor ([#27](https://github.com/bog-dan-ro/spectacol/issues/27)),
       with nested-call/interrupt handling in ZxKit and pause/continue controls.
 
-See [Debugger controls and limits](docs/debugger.md).
+See [Debugger controls and limits](docs/debugger.md) and [Files and symbols](docs/files-and-symbols.md).
 
 ## Performance and resource usage profiling
 
@@ -114,9 +117,15 @@ measurement limits. Generated evidence remains under the build directories.
 - [ ] CI: build and run the native suite and compiled UI regressions; include Android packaging checks.
       Coordinate sanitizer coverage with ZxKit.
 - [ ] Broader snapshot and boot coverage through the UI, alongside ZxKit's standalone per-machine tests.
-- [ ] Investigate the intermittent Qt 6.12 shutdown crash in `QQmlData::disconnectNotifiers` during
-      `QQmlApplicationEngine` cleanup. It was captured in the earlier Profile build before the debugger work;
-      RZX UI automation can also reproduce it. Keep failed runs and stack evidence rather than hiding it with retries.
+- [ ] Classify the intermittent QML-cleanup SIGSEGV (`QQmlData::disconnectNotifiers`); its cause is
+      unconfirmed. The older Qt Creator Profile build was `RelWithDebInfo` with `QT_ENABLE_QML_DEBUG=ON`.
+      A historical offscreen RZX CLI failure also exists, but its original executable was overwritten.
+      The owner cannot reproduce it in normal RelWithDebInfo use. Clean current RZX checks on 2026-11-04
+      passed three times each with QML debugging disabled/enabled; a separate failure overlapped a build
+      refresh and is confounded. Compare matching optimized binaries with debugging off/on and debugger
+      attachment before blaming Qt or the application. Preserve matching binaries, flags and cores, and
+      keep failed runs instead of hiding them with retries. Local evidence: `build/shutdown-review/` in ZxKit.
+
 
 ### UI review
 

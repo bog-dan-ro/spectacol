@@ -135,6 +135,8 @@ QVariant DisassambleModel::data(const QModelIndex &index, int role) const
 
     case Disassable:
         return dd.disassamble;
+    case Annotation:
+        return dd.annotation;
     default:
         break;
     }
@@ -165,6 +167,7 @@ QHash<int, QByteArray> DisassambleModel::roleNames() const
     ret[Bytes] = "bytes";
     ret[BytesText] = "bytesText";
     ret[Disassable] = "disassable";
+    ret[Annotation] = "annotation";
     return ret;
 }
 
@@ -224,6 +227,7 @@ DisassambleModel::DisassambleDataVector DisassambleModel::disassambleTemp(uint16
         else
             disassambledData.emplace_back(address, currentPc, bytes, mnemonic);
 
+        disassambledData.back().annotation = ZxEmulator::instance().symbols()->annotation(*emulator, address);
         address += inst.length;
         ++delta;
         m_length += inst.length;

@@ -401,12 +401,9 @@ ZxEmulator::ZxEmulator(QObject *parent)
     cfg.machineId = "48k";
     cfg.audioSampleRate = 48'000;
     cfg.fullBorder = true;
-    cfg.romResolver = [](std::string_view romName, std::size_t /*expectedSize*/) -> std::vector<uint8_t> {
-        QFile f(u":/roms/"_s + QString::fromUtf8(romName.data(), qsizetype(romName.size())));
-        if (!f.open(QIODevice::ReadOnly))
-            return {};
-        const QByteArray bytes = f.readAll();
-        return std::vector<uint8_t>(bytes.begin(), bytes.end());
+    m_roms = std::make_unique<RomOverrides>();
+    cfg.machineRomResolver = [this](std::string_view machine, std::string_view name, std::size_t size) {
+        return m_roms->resolve(machine, name, size);
     };
 
     m_uartHooks = std::make_unique<NextUartHooks>();
@@ -423,6 +420,13 @@ ZxEmulator::ZxEmulator(QObject *parent)
         .mediaActivity = m_mediaActivityCallback.weak(),
     };
     m_engine = std::make_unique<zxkit::Engine>(std::move(cfg), std::move(engineConfig));
+    m_pokes = std::make_unique<PokeModel>(emulator());
+    QQmlEngine::setObjectOwnership(m_pokes.get(), QQmlEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(m_roms.get(), QQmlEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(&m_symbols, QQmlEngine::CppOwnership);
+    connect(m_pokes.get(), &PokeModel::failed, this, [this](const QString &message) { showMessage(message, Error); });
+    connect(m_pokes.get(), &PokeModel::memoryChanged, this, &ZxEmulator::debuggerRefresh);
+    connect(&m_symbols, &DebugSymbols::changed, this, [this] { if (debuggerReady()) m_disassambleModel.update(); });
     emulator().writeLock()->setRewindEnabled(true, 300);
     m_settings->applyToEmulator();
     {
@@ -988,6 +992,8 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
         emulator.loadMedia(file);
     });
     if (loaded) {
+        m_pokes->gameLoaded(filePath);
+        m_symbols.clear();
         const auto id = std::string(emulator().readLock()->machine().id());
         if (m_settings) m_settings->syncCurrentMachine(id);
         m_engine->refreshFrame();
@@ -1178,6 +1184,8 @@ void ZxEmulator::resetLoadedFile()
     m_joystickPromptTimer.stop();
     activateControllerGame(QString{});
     m_loadedFileName = "";
+    if (m_pokes) m_pokes->gameLoaded({});
+    m_symbols.clear();
     emit saveSnapshotEnabledChanged();
     m_recording->refresh();
 }
@@ -2007,6 +2015,31 @@ void ZxEmulator::addBreakpointPage(int address, int page, int type)
     emulator().writeLock()->addBreakpoint(std::move(bp));
     m_breakpointsModel.breakpointsUpdated();
     m_pokeFinderModel.update();
+}
+
+int ZxEmulator::resolveDebuggerAddress(const QString &text)
+{
+    const auto label = text.trimmed();
+    int address;
+    {
+        const auto core = emulator().readLock();
+        address = m_symbols.resolve(*core, label);
+    }
+    if (address >= 0) return address;
+    if (address == -2) {
+        showMessage(tr("Ambiguous or unmapped symbol: %1").arg(label), Error);
+        return -1;
+    }
+    quint32 value = 0;
+    if (DebuggerMemoryModel::parseHex(label, 65535, value)) return int(value);
+    showMessage(tr("Unknown, ambiguous or unmapped symbol/address: %1").arg(label), Error);
+    return -1;
+}
+int ZxEmulator::symbolAddress(int row)
+{
+    const auto address = m_symbols.rowAddress(*emulator().readLock(), row);
+    if (address < 0) showMessage(tr("This label's RAM page is not currently mapped; select it in the emulated program first"), Error);
+    return address;
 }
 
 void ZxEmulator::debuggerCommand(const QString &command)

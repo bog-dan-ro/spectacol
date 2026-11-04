@@ -59,8 +59,8 @@ def main():
         at8010=[pad('Y'),'input:8010','Return','F8']
         cases=[
             ('asm-cancel',[pad('A'),'input:NOP',pad('B')],'disassembly','1280x800'),
-            ('watch-form',[pad('X')]+[pad('Down')]*3+[pad('A'),pad('Down'),pad('A'),pad('A'),pad('Down'),pad('Down'),pad('A'),pad('Down'),'input:9000']+[pad('Down')]*3+[pad('A'),pad('R1')],'watchpoint','1280x800'),
-            ('watch-control',memory+address+[pad('Y')]+[pad('Down')]*4+[pad('A'),pad('R1')],'watchpoint','1280x800'),
+            ('watch-form',[pad('X')]+[pad('Down')]*3+[pad('A'),pad('Down'),pad('A'),pad('A'),pad('Down'),pad('Down'),pad('A'),pad('Down'),'input:9000']+[pad('Down')]*3+[pad('A'),'wait',pad('R1')],'watchpoint','1280x800'),
+            ('watch-control',memory+address+[pad('Y')]+[pad('Down')]*4+[pad('A'),'wait',pad('R1')],'watchpoint','1280x800'),
             ('views-memory',memory,'cpu address space','1280x800'),
             ('poke-zero',memory+address+editor+['input:00','Return'],'memory','1280x800'),
             ('poke-zero-phone',memory+address+editor+['input:00','Return'],'cpu address space','480x640'),
@@ -70,7 +70,7 @@ def main():
             ('back-button',memory+address+editor+[pad('Select')],'cpu address space','1280x800'),
             ('restore-focus',memory+address+editor+[pad('B'),pad('A')],'edit byte at $9000','1280x800'),
             ('step-over-out',at8010+[pad('L1'),pad('R2'),pad('L2')],'step complete','1280x800'),
-            ('stick-views', [pad('X'),'nav:AxisLeftY:1','wait','wait','wait','nav:AxisLeftY:0',pad('A')],'read-only','1280x800'),
+            ('stick-views', [pad('X'),'nav:AxisLeftY:1','wait','wait','wait','nav:AxisLeftY:0',pad('A')],'labels / source mappings','1280x800'),
         ]
         with ThreadPoolExecutor(max_workers=3) as executor: list(executor.map(run,[case for case in cases if not args.case or case[0] in args.case]))
 

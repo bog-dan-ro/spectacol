@@ -24,6 +24,7 @@ import Spectacol
 
 FocusScope {
     id: page
+    readonly property PokeModel pokes: ZxEmulator.pokes
     Component.onCompleted: {
         ZxEmulator.processInputEvents = false;
         pokes.refreshBanks();
@@ -35,6 +36,8 @@ FocusScope {
         editor.open();
     }
     function closeDialog(): bool {
+        if (trainerFile.closeNested() || trainerFolder.closeNested()) return true;
+        if (valuesDialog.visible) { valuesDialog.reject(); return true; }
         if (bank.popup.visible) {
             bank.popup.close();
             return true;
@@ -46,8 +49,14 @@ FocusScope {
     }
     function toggleCurrent() {
         const row = view.currentItem;
-        if (row)
-            pokes.setActive(row.index, !row.active);
+        if (!row) return;
+        const requested = pokes.requestedValues(row.index);
+        if (!row.active && requested.length) {
+            valuesDialog.row = row.index;
+            valuesDialog.requests = requested;
+            valuesDialog.returnFocus = view;
+            valuesDialog.open();
+        } else pokes.setActive(row.index, !row.active);
     }
     Keys.onPressed: event => {
         if (editor.visible)
@@ -74,13 +83,51 @@ FocusScope {
     DebuggerGamepad {
         transportKeys: false
     }
-    PokeModel {
-        id: pokes
-    }
     Rectangle {
         anchors.fill: parent
         color: Theme.raised
         z: -1
+    }
+    HostPathDialog {
+        id: trainerFile
+        title: qsTr("Load POK trainers")
+        nameFilters: [qsTr("POK trainers (*.pok *.POK)")]
+        submit: path => pokes.loadPok(path)
+    }
+    HostPathDialog {
+        id: trainerFolder
+        title: qsTr("Choose POKES folder")
+        directory: true
+        path: pokes.pokesFolder
+        submit: path => pokes.choosePokesFolder(path)
+    }
+    FormDialog {
+        id: valuesDialog
+        property int row: -1
+        property var requests: []
+        title: qsTr("Trainer values")
+        commit: () => {
+            const values = [];
+            for (let i = 0; i < valueFields.count; ++i) {
+                const field = valueFields.itemAt(i);
+                if (!field.acceptableInput) return false;
+                values.push(Number.fromLocaleString(Qt.locale(field.validator.locale), field.text));
+            }
+            return pokes.setActive(row, true, values);
+        }
+        onOpened: if (valueFields.count) valueFields.itemAt(0).forceActiveFocus()
+        Repeater {
+            id: valueFields
+            model: valuesDialog.requests
+            delegate: TextField {
+                required property string modelData
+                Layout.fillWidth: true
+                placeholderText: modelData
+                inputMethodHints: Qt.ImhDigitsOnly
+                validator: IntValidator { bottom: 0; top: 255 }
+                onAccepted: valuesDialog.save()
+            }
+        }
     }
     FormDialog {
         id: editor
@@ -140,7 +187,10 @@ FocusScope {
             wrapMode: Text.Wrap
             color: Theme.textMuted
         }
-        RowLayout {
+        Flow {
+            Layout.fillWidth: true
+            Layout.preferredHeight: childrenRect.height
+            spacing: Theme.sp(2)
             Button {
                 id: addButton
                 objectName: "pokeAdd"
@@ -155,6 +205,27 @@ FocusScope {
                 text: qsTr("Close (B)")
                 onClicked: pageLoader.source = ""
             }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            Button {
+                id: loadTrainer
+                objectName: "loadTrainers"
+                text: qsTr("Load .pok…")
+                onClicked: { trainerFile.returnFocus = loadTrainer; trainerFile.open(); }
+            }
+            Button {
+                id: chooseFolder
+                objectName: "pokesFolder"
+                text: qsTr("POKES folder…")
+                onClicked: { trainerFolder.returnFocus = chooseFolder; trainerFolder.open(); }
+            }
+        }
+        Label {
+            Layout.fillWidth: true
+            text: pokes.sourcePath || qsTr("No associated trainers found. Load a .pok file or choose a POKES folder.")
+            elide: Text.ElideMiddle
+            color: Theme.textMuted
         }
         ListView {
             id: view
@@ -178,6 +249,7 @@ FocusScope {
                     ZxEmulator.sendNavigationKey(Qt.Key_Tab);
             }
             Keys.onReturnPressed: page.toggleCurrent()
+            Keys.onSelectPressed: page.toggleCurrent()
             Keys.onSpacePressed: page.toggleCurrent()
             delegate: ItemDelegate {
                 id: row
@@ -185,13 +257,14 @@ FocusScope {
                 required property string label
                 required property bool active
                 required property bool disabled
+                objectName: "trainerRow" + index
                 width: view.width
                 enabled: !disabled
                 highlighted: view.currentIndex === index
                 text: (active ? "☑ " : "☐ ") + label
                 onClicked: {
                     view.currentIndex = index;
-                    pokes.setActive(index, !active);
+                    page.toggleCurrent();
                     view.forceActiveFocus();
                 }
             }
@@ -199,7 +272,7 @@ FocusScope {
         }
         Label {
             Layout.fillWidth: true
-            text: qsTr("A: toggle poke · B: back · X: clear list · Y: add\nTurning a poke off restores its original byte. Clearing the list keeps the current memory values.")
+            text: qsTr("A: toggle poke · B: back · X: clear list · Y: add\nTurning a trainer off restores its original bytes. Clearing the list keeps the current memory values.")
             color: Theme.textMuted
             font.pixelSize: Theme.caption
             wrapMode: Text.Wrap

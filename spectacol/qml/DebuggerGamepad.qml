@@ -19,17 +19,24 @@ import QtQuick
 import QtGamepadLegacy
 import Spectacol
 
-// Instantiated only by the debugger and poke editor. GUI keys let modal dialogs
+// Shared page navigation. GUI keys let modal dialogs
 // receive input before the page; gameplay input remains blocked by the page.
 QtObject {
     id: root
     property bool transportKeys: true
+    property int buttonXKey: Qt.Key_F2
+    property int buttonYKey: Qt.Key_F3
+    property int buttonStartKey: Qt.Key_Menu
+    property int leftShoulderKey: Qt.Key_F11
+    property int rightShoulderKey: Qt.Key_F5
+    property int leftTriggerKey: Qt.Key_F12
+    property int rightTriggerKey: Qt.Key_F10
     property bool ready: false
     Component.onCompleted: ready = true
     property int direction: 0
     property bool repeating: false
     function tap(key: int) {
-        if (ready && Qt.application.state === Qt.ApplicationActive)
+        if (key !== Qt.Key_unknown && ready && Qt.application.state === Qt.ApplicationActive)
             ZxEmulator.sendNavigationKey(key);
     }
     function updateDirection() {
@@ -69,21 +76,21 @@ QtObject {
         onButtonBChanged: if (buttonB)
             root.tap(Qt.Key_Escape)
         onButtonXChanged: if (buttonX)
-            root.tap(Qt.Key_F2)
+            root.tap(root.buttonXKey)
         onButtonYChanged: if (buttonY)
-            root.tap(Qt.Key_F3)
+            root.tap(root.buttonYKey)
         onButtonStartChanged: if (buttonStart)
-            root.tap(Qt.Key_Menu)
+            root.tap(root.buttonStartKey)
         onButtonSelectChanged: if (buttonSelect)
             root.tap(Qt.Key_Escape)
         onButtonL1Changed: if (buttonL1 && root.transportKeys)
-            root.tap(Qt.Key_F11)
+            root.tap(root.leftShoulderKey)
         onButtonR1Changed: if (buttonR1 && root.transportKeys)
-            root.tap(Qt.Key_F5)
+            root.tap(root.rightShoulderKey)
         onLeftTriggerChanged: if (leftTrigger && root.transportKeys)
-            root.tap(Qt.Key_F12)
+            root.tap(root.leftTriggerKey)
         onRightTriggerChanged: if (rightTrigger && root.transportKeys)
-            root.tap(Qt.Key_F10)
+            root.tap(root.rightTriggerKey)
         onButtonL3Changed: if (buttonL3)
             root.tap(Qt.Key_PageUp)
         onButtonR3Changed: if (buttonR3)

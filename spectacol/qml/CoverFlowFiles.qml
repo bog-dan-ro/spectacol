@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtGamepadLegacy
+import QtCore
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -30,10 +30,54 @@ Item
     signal fileSelected(string filePath);
     // full screen, with a hint bar: the messages go above it
     readonly property real panelWidth: width
-    readonly property real hintBarHeight: hintBar.height
+    readonly property real hintBarHeight: viewMode === 0 ? hintBar.height : compactHints.height
     property alias rootFolder: filesModel.rootFolder
     property alias folder: filesModel.folder
     property alias filterClass: filesModel.filterClass
+    property alias viewMode: browserPrefs.mode
+    Settings {
+        id: browserPrefs
+        category: "LocalFilesView"
+        property int mode: 0
+    }
+    function focusFiles() {
+        if (viewMode === 0) filesView.forceActiveFocus();
+        else compactView.forceActiveFocus();
+    }
+    function openRow(row: int) {
+        if (!filesModel.path(row)) return;
+        filesModel.currentIndex = row;
+        filesModel.rememberSelection(row);
+        if (filesModel.isDir(row)) filesModel.folder = filesModel.path(row);
+        else fileSelected(filesModel.path(row));
+    }
+    function closeDialog(): bool {
+        if (modePicker.popup.visible) { modePicker.popup.close(); return true; }
+        if (deviceFile.visible) { deviceFile.close(); focusFiles(); return true; }
+        if (copyDialog.visible) { copyDialog.close(); focusFiles(); return true; }
+        if (removeDialog.visible) { removeDialog.close(); focusFiles(); return true; }
+        return false;
+    }
+    Component.onCompleted: {
+        ZxEmulator.processInputEvents = false;
+        Qt.callLater(focusFiles);
+    }
+    Component.onDestruction: ZxEmulator.processInputEvents = true
+    onViewModeChanged: Qt.callLater(focusFiles)
+    Keys.onPressed: event => {
+        if (event.key === Qt.Key_F2) viewMode = (viewMode + 1) % 3;
+        else if (event.key === Qt.Key_F3) search.forceActiveFocus();
+        else if (event.key === Qt.Key_Backspace) filesModel.cdUp();
+        else if (event.key === Qt.Key_Home) folder = ZxEmulator.dataPath;
+        else if (event.key === Qt.Key_Escape) {
+            if (!closeDialog()) fileSelected("");
+        } else if ([Qt.Key_Delete, Qt.Key_X].includes(event.key) && viewMode !== 0) removeDialog.remove();
+        else if (event.key === Qt.Key_C && viewMode !== 0) filesView.copyPressed();
+        else if (event.key === Qt.Key_P && viewMode !== 0) copyDialog.copy();
+        else if (event.key === Qt.Key_Y && viewMode !== 0) folder = ZxEmulator.dataPath;
+        else return;
+        event.accepted = true;
+    }
 
     FileDialog {
         id: deviceFile
@@ -46,13 +90,16 @@ Item
         }
     }
 
-    GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        buttonXKey: Qt.Key_X
-        buttonYKey: Qt.Key_Y
-        buttonL1Key: Qt.Key_C
-        buttonR1Key: Qt.Key_P
+    DebuggerGamepad {
+        buttonXKey: Qt.Key_Delete
+        buttonYKey: Qt.Key_F3
+        buttonStartKey: Qt.Key_F2
+        leftShoulderKey: Qt.Key_C
+        rightShoulderKey: Qt.Key_P
+        leftTriggerKey: Qt.Key_Home
+        rightTriggerKey: Qt.Key_unknown
     }
+
 
     transform: Rotation {
         angle : 0
@@ -66,7 +113,7 @@ Item
     Rectangle {
         anchors.fill: parent
         z: -10
-        color: "#0d0f13"
+        color: Theme.raised
     }
 
     MessageDialog {
@@ -122,13 +169,18 @@ Item
         id : filesView
 
         anchors.fill: parent
-        model : filesModel
+        visible: fileList.viewMode === 0
+        model: visible ? filesModel : null
+        onCurrentIndexChanged: if (visible && activeFocus) filesModel.currentIndex = currentIndex
         // Follow the model's remembered index for each folder. This is not a binding
         // because tapping a cover, copy and remove assign currentIndex directly.
         Component.onCompleted: currentIndex = filesModel.currentIndex
         Connections {
             target: filesModel
-            function onCurrentIndexChanged() { filesView.currentIndex = filesModel.currentIndex; }
+            function onCurrentIndexChanged() {
+                filesView.currentIndex = filesModel.currentIndex;
+                compactView.currentIndex = filesModel.currentIndex;
+            }
         }
         property string copyPath: ""
         onCopyPathChanged: {
@@ -144,13 +196,7 @@ Item
             return fileList.folder !== srcPath;
         }
 
-        onReturnPressed: {
-            filesModel.currentIndex = currentIndex;
-            if (model.isDir(currentIndex))
-                filesModel.folder = model.path(currentIndex);
-            else
-                fileSelected(model.path(currentIndex));
-        }
+        onReturnPressed: fileList.openRow(currentIndex)
         onEscapePressed: fileSelected("")
 
         onUpPressed: {
@@ -214,11 +260,7 @@ Item
                     anchors.fill: parent
                     onClicked: {
                         if (isCurrentItem) {
-                            filesModel.currentIndex = index;
-                            if (isDir)
-                                filesModel.folder = path
-                            else
-                                fileSelected(path);
+                            fileList.openRow(index);
                         } else {
                             filesView.currentIndex = index;
                         }
@@ -237,9 +279,35 @@ Item
                 { pad: "X", key: "Del", text: qsTr("Remove"), action: () => removeDialog.remove() },
                 { pad: "L1", key: "C", text: qsTr("Copy"), action: () => filesView.copyPath = filesModel.path(filesView.currentIndex) },
                 { pad: "R1", key: "P", text: filesView.canCopy ? qsTr("Paste") : qsTr("Paste (copy first)"), action: () => copyDialog.copy() },
-                { pad: "Y", key: "Y", text: qsTr("Spectacol folder"), action: () => fileList.folder = ZxEmulator.dataPath }
+                { pad: "Y", key: "F3", text: qsTr("Search"), action: () => search.forceActiveFocus() },
+                { pad: "Start", key: "F2", text: qsTr("View"), action: () => fileList.viewMode = (fileList.viewMode + 1) % 3 },
+                { pad: "L2", key: "Home", text: qsTr("Spectacol folder"), action: () => fileList.folder = ZxEmulator.dataPath }
             ]
         }
+    }
+    CompactFilesView {
+        id: compactView
+        objectName: "compactFiles"
+        visible: fileList.viewMode !== 0
+        grid: fileList.viewMode === 2
+        anchors { left: parent.left; right: parent.right; top: artist_text_label.bottom; bottom: compactHints.top; margins: Theme.sp(2) }
+        model: filesModel
+        onCurrentIndexChanged: if (visible && activeFocus) filesModel.currentIndex = currentIndex
+        onOpenRequested: row => fileList.openRow(row)
+    }
+    HintBar {
+        id: compactHints
+        visible: fileList.viewMode !== 0
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+        hints: [
+            { pad: "A", key: "Enter", text: qsTr("Open"), action: () => fileList.openRow(compactView.currentIndex) },
+            { pad: "B", key: "Esc", text: qsTr("Close"), action: () => fileList.fileSelected("") },
+            { pad: "Start", key: "F2", text: qsTr("View"), action: () => fileList.viewMode = (fileList.viewMode + 1) % 3 },
+            { pad: "Y", key: "F3", text: qsTr("Search"), action: () => search.forceActiveFocus() },
+            { pad: "X", key: "Del", text: qsTr("Remove"), action: () => removeDialog.remove() },
+            { pad: "L1", key: "C", text: qsTr("Copy"), action: () => filesView.copyPath = filesModel.path(compactView.currentIndex) },
+            { pad: "R1", key: "P", text: qsTr("Paste"), action: () => copyDialog.copy() }
+        ]
     }
     // Where we are; a click (or Up) goes to the parent folder, or closes at the top
     Rectangle {
@@ -259,6 +327,36 @@ Item
             anchors.leftMargin: Theme.sp(6)
             anchors.rightMargin: Theme.sp(6)
             spacing: Theme.sp(1)
+            RowLayout {
+                width: parent.width
+                Button {
+                    objectName: "filesUp"
+                    text: qsTr("Up")
+                    enabled: !artist_text_label.root
+                    onClicked: filesModel.cdUp()
+                }
+                NavigationComboBox {
+                    id: modePicker
+                    objectName: "filesViewMode"
+                    model: [qsTr("Covers"), qsTr("List"), qsTr("Grid")]
+                    currentIndex: fileList.viewMode
+                    onActivated: fileList.viewMode = currentIndex
+                }
+                TextField {
+                    id: search
+                    objectName: "filesSearch"
+                    Layout.fillWidth: true
+                    placeholderText: qsTr("Search filenames (F3)")
+                    text: filesModel.search
+                    onTextEdited: filesModel.search = text
+                    onAccepted: fileList.focusFiles()
+                    Keys.onDownPressed: fileList.focusFiles()
+                    Keys.onEscapePressed: {
+                        if (text.length) { clear(); filesModel.search = ""; }
+                        else fileList.focusFiles();
+                    }
+                }
+            }
             Text {
                 text: (artist_text_label.root ? qsTr("Open a file") : qsTr("‹ Up a folder")).toUpperCase()
                 font.pixelSize: Theme.caption
@@ -280,16 +378,6 @@ Item
             height: Theme.line
             color: Theme.outline
         }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                filesModel.currentIndex = filesView.currentIndex;
-                if (artist_text_label.root)
-                    fileSelected("");
-                else
-                    filesModel.cdUp();
-            }
-        }
         Button {
             anchors.right: parent.right
             anchors.top: parent.top
@@ -301,10 +389,11 @@ Item
     }
 
     ShaderEffect {
+        visible: fileList.viewMode === 0
         smooth: true
         property variant source : ShaderEffectSource {
             sourceItem: filesView
-            live : true
+            live: fileList.viewMode === 0
             width : fileList.width
             height : fileList.height
         }

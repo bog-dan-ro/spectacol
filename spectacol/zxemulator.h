@@ -20,6 +20,9 @@
 
 #include "breakpointsmodel.h"
 #include "debuggermodels.h"
+#include "debugsymbols.h"
+#include "romoverrides.h"
+#include "pokemodel.h"
 #include "disassamblemodel.h"
 #include "disks.h"
 #include "sdcardfiles.h"
@@ -80,6 +83,9 @@ class ZxEmulator : public QObject
     Q_PROPERTY(Disks *disks MEMBER m_disks CONSTANT)
     Q_PROPERTY(SdCardFiles *sdCard MEMBER m_sdCard CONSTANT)
     Q_PROPERTY(const ZxRecording *recording MEMBER m_recording CONSTANT)
+    Q_PROPERTY(RomOverrides *roms READ roms CONSTANT FINAL)
+    Q_PROPERTY(PokeModel *pokes READ pokes CONSTANT FINAL)
+    Q_PROPERTY(DebugSymbols *symbols READ symbols CONSTANT FINAL)
     Q_PROPERTY(ZxSettings *settings READ settings CONSTANT)
     Q_PROPERTY(DebuggerMemoryModel *debugMemory READ debugMemory CONSTANT FINAL)
     Q_PROPERTY(DebuggerStateModel *debugNextRegisters READ debugNextRegisters CONSTANT FINAL)
@@ -249,6 +255,11 @@ public:
     DebuggerStateModel *debugMmu();
     bool debuggerReady() const { return paused() && m_engineQuiescent; }
     QString debuggerStatus() const;
+    RomOverrides *roms() const { return m_roms.get(); }
+    PokeModel *pokes() const { return m_pokes.get(); }
+    DebugSymbols *symbols() { return &m_symbols; }
+    Q_INVOKABLE int resolveDebuggerAddress(const QString &text);
+    Q_INVOKABLE int symbolAddress(int row);
 
 
     int pokeFinderCount() const;
@@ -444,7 +455,10 @@ private:
     zxkit::CallbackHandle<zxkit::MediaActivityCallback> m_mediaActivityCallback;
     zxkit::MediaActivity m_mediaActivity; // the last one the GUI saw
     std::unique_ptr<NextUartHooks> m_uartHooks;
+    std::unique_ptr<RomOverrides> m_roms;
     std::unique_ptr<zxkit::Engine> m_engine;
+    std::unique_ptr<PokeModel> m_pokes;
+    DebugSymbols m_symbols;
     std::unique_ptr<AudioOutput> m_audioOutput;
     std::atomic_bool m_debuggerActivated{false};
     bool m_resetPokeFinder = true;

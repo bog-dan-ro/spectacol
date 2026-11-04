@@ -45,7 +45,8 @@ class KeyboardInputTest : public QObject {
     void sticky() { input->setProperty("sticky", true); }
 private slots:
     void init() {
-        QQmlComponent component(&engine, QUrl(u"qrc:/KeyboardInput.qml"_s));
+        QQmlComponent component(&engine);
+        component.loadFromModule(u"KeyboardInputTest"_s, u"KeyboardInput"_s);
         QVERIFY2(component.isReady(), qPrintable(component.errorString()));
         input.reset(component.create());
         QVERIFY(input);

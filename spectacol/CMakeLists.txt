@@ -114,6 +114,8 @@ qt_add_qml_module(spectacol
         audiobuffer.cpp audiobuffer.h
         breakpointsmodel.cpp breakpointsmodel.h
         debuggermodels.cpp debuggermodels.h
+        debugsymbols.cpp debugsymbols.h
+        romoverrides.cpp romoverrides.h
         disassamblemodel.cpp disassamblemodel.h
         folderlistmodel.cpp folderlistmodel.h
         zxemulator.cpp zxemulator.h
@@ -148,6 +150,10 @@ qt_add_qml_module(spectacol
         qml/DebuggerPage.qml
         qml/DebuggerGamepad.qml
         qml/FormDialog.qml
+        qml/HostPathDialog.qml
+        qml/RomsPage.qml
+        qml/DebugSymbolsView.qml
+        qml/CompactFilesView.qml
         qml/NavigationComboBox.qml
         qml/DebuggerMemoryView.qml
         qml/DebuggerStateView.qml

@@ -37,7 +37,7 @@ def main():
     args=parser.parse_args();out=args.output.resolve();out.mkdir(parents=True,exist_ok=True)
     cpu=[pad('Y'),pad('Down'),'input:36864',pad('Down'),'input:255',pad('Down'),pad('A')]
     physical=[pad('Y'),pad('A'),pad('Down'),pad('A'),pad('Down'),'input:65536',pad('Down'),'input:255',pad('Down'),pad('A')]
-    toggle=[pad('Down'),pad('Down'),pad('Down'),pad('A')]
+    toggle=[pad('Down')]*5+[pad('A')]
     with tempfile.TemporaryDirectory(prefix='session-',dir=out) as temporary:
         def run(case):
             name,keys,machine=case;home=Path(temporary)/name;config=home/'config/Licentia';config.mkdir(parents=True)

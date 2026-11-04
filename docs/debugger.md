@@ -44,7 +44,12 @@ normal run-to/step-out use the engine's regular execution path.
 Step-out follows CALL/RST/RET, conditional returns and RETN/RETI, including nested
 interrupt handlers and ignored DD/FD prefixes. Manually constructed call frames,
 stack pivots and self-modified instruction fetches can defeat this unwinder; use
-an execution breakpoint or Pause when needed. Symbol/SLD import remains deferred.
+an execution breakpoint or Pause when needed.
+
+The Labels / source mappings view imports sjasmplus SLD v1 and text symbol assignments.
+Labels and source file/line annotations follow the currently mapped RAM page, and the
+address field accepts label names. See [Files and symbols](files-and-symbols.md) for
+formats, controls and import limits.
 
 ## Controllers and virtual keyboards
 

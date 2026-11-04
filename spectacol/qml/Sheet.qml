@@ -38,8 +38,12 @@ FocusScope {
     readonly property real panelWidth: panel.width
     readonly property real hintBarHeight: hintBar.visible ? hintBar.height : 0
 
+    property var closeAction: null
     signal closeRequested
-    onCloseRequested: pageLoader.source = ""
+    onCloseRequested: {
+        if (closeAction) closeAction();
+        else pageLoader.source = "";
+    }
 
     anchors.fill: parent
     Keys.onEscapePressed: closeRequested()

@@ -66,6 +66,7 @@ ListView {
             required property string addressText
             required property var bytes
             required property string bytesText
+            required property string annotation
             required property string disassable
             required property color background
             required property color foreground
@@ -100,7 +101,7 @@ ListView {
             readonly property color ink: row.foreground
 
             width: view.width
-            height: asmEdit.contentHeight + asmEdit.topPadding + asmEdit.bottomPadding + Theme.sp(1)
+            height: asmEdit.contentHeight + asmEdit.topPadding + asmEdit.bottomPadding + Theme.sp(1) + (annotationLabel.visible ? annotationLabel.implicitHeight + Theme.sp(1) : 0)
             color: paper
             radius: Theme.radiusSmall
             border.width: view.currentIndex === row.index ? Theme.focusLine : 0
@@ -114,8 +115,18 @@ ListView {
                 onDoubleClicked: ZxEmulator.toggleBreakpoint(row.address)
                 onPressAndHold: ZxEmulator.toggleBreakpoint(row.address)
             }
+            Text {
+                id: annotationLabel
+                anchors { left: parent.left; right: parent.right; bottom: parent.bottom; margins: Theme.sp(1) }
+                visible: row.annotation.length > 0
+                text: row.annotation
+                color: Theme.textMuted
+                font.pixelSize: Theme.caption
+                elide: Text.ElideMiddle
+            }
             RowLayout {
                 anchors.fill: parent
+                anchors.bottomMargin: annotationLabel.visible ? annotationLabel.implicitHeight + Theme.sp(1) : 0
                 FancyText {
                     mono: true
                     Layout.fillHeight: true

@@ -16,10 +16,11 @@ target_link_libraries(test_controller_input PRIVATE Qt6::Test)
 add_test(NAME controller_input COMMAND test_controller_input)
 
 qt_add_executable(test_keyboard_input test_keyboard_input.cpp)
-qt_add_resources(test_keyboard_input "keyboard_input"
-    PREFIX "/"
-    BASE "../spectacol/qml"
-    FILES ../spectacol/qml/KeyboardInput.qml
+set_source_files_properties(../spectacol/qml/KeyboardInput.qml PROPERTIES QT_RESOURCE_ALIAS KeyboardInput.qml)
+qt_add_qml_module(test_keyboard_input
+    URI KeyboardInputTest
+    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/KeyboardInputTest
+    QML_FILES ../spectacol/qml/KeyboardInput.qml
 )
 target_link_libraries(test_keyboard_input PRIVATE Qt6::Test Qt6::Qml)
 add_test(NAME keyboard_input COMMAND test_keyboard_input)
@@ -69,3 +70,19 @@ qt_add_executable(test_zximage test_zximage.cpp ../spectacol/zximage.cpp ../spec
 target_include_directories(test_zximage PRIVATE ../spectacol)
 target_link_libraries(test_zximage PRIVATE Qt6::Test Qt6::Quick Qt6::GuiPrivate ZX::Kit)
 add_test(NAME image_updates COMMAND test_zximage)
+
+qt_add_executable(test_files_features
+    test_files_features.cpp
+    ../spectacol/pokemodel.cpp ../spectacol/pokemodel.h
+    ../spectacol/romoverrides.cpp ../spectacol/romoverrides.h
+    ../spectacol/debugsymbols.cpp ../spectacol/debugsymbols.h
+    ../spectacol/folderlistmodel.cpp ../spectacol/folderlistmodel.h
+)
+target_include_directories(test_files_features PRIVATE ../spectacol)
+target_link_libraries(test_files_features PRIVATE Qt6::Test Qt6::Qml ZX::Kit)
+qt_add_resources(test_files_features "feature_roms"
+    PREFIX "/roms"
+    BASE "../spectacol/roms"
+    FILES ../spectacol/roms/48.rom ../spectacol/roms/128-0.rom ../spectacol/roms/128-1.rom
+)
+add_test(NAME files_features COMMAND test_files_features)

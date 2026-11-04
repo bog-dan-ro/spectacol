@@ -28,6 +28,7 @@ class FolderListModel : public QAbstractListModel
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_PROPERTY(QString search READ search WRITE setSearch NOTIFY searchChanged FINAL)
     Q_PROPERTY(QString folder READ folder WRITE setFolder NOTIFY folderChanged)
     Q_PROPERTY(QString rootFolder READ rootFolder WRITE setRootFolder NOTIFY rootFolderChanged)
     Q_PROPERTY(FileSortCriteria sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged)
@@ -56,6 +57,8 @@ public:
     FolderListModel(QObject *parent = nullptr);
     ~FolderListModel();
 
+    QString search() const { return m_search; }
+    void setSearch(const QString &search);
     QString folder() const { return m_folder; }
     void setFolder(QString folder);
 
@@ -78,9 +81,11 @@ public slots:
     bool isDir(int index);
     QString path(int index);
     void cdUp();
+    void rememberSelection(int index);
     void refresh();
 
 signals:
+    void searchChanged();
     void folderChanged(QString folder);
     void rootFolderChanged(QString rootFolder);
     void sortCriteriaChanged(FolderListModel::FileSortCriteria sortCriteria);
@@ -88,16 +93,21 @@ signals:
     void currentIndexChanged(int currentIndex);
     void filterClassChanged(FolderListModel::FilterType filterClass);
 
-protected:
+public:
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const override;
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
+private:
     bool canOpen(const QString &path);
 
 private:
-    std::vector<QFileInfo> m_files;
+    std::vector<QFileInfo> m_files, m_allFiles;
+    void refilter();
     QString m_folder;
+    QString m_search;
+    bool m_refreshing = false;
+    QString selectionKey() const;
     QString m_rootFolder;
     FileSortCriteria m_sortCriteria = ByName;
     bool m_showDirsFirst = true;
