@@ -15,175 +15,264 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// @scope main.qml
+pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Layouts
-import QtQuick.Window
 import QtQuick.Controls
-import QtGamepadLegacy
+import QtQuick.Layouts
 import Spectacol
-import "private"
 
-Item {
-    // The debugger pauses and runs the emulation itself (Continue runs it with the page open)
+FocusScope {
+    id: page
     readonly property bool pausesEmulation: false
-
-    Component.onCompleted: ZxEmulator.processInputEvents = false
-
+    readonly property bool compact: width < Theme.sp(150)
+    Rectangle {
+        anchors.fill: parent
+        z: -1
+        color: Theme.raised
+    }
+    Component.onCompleted: {
+        ZxEmulator.processInputEvents = false;
+        forceActiveFocus();
+        Qt.callLater(() => {
+            const loaded = content.item as Item;
+            if (loaded)
+                loaded.forceActiveFocus();
+        });
+    }
     Component.onDestruction: {
         ZxEmulator.processInputEvents = true;
         ZxEmulator.debuggerRun();
     }
-
-    GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        buttonAKey: Qt.Key_Return
-        buttonBKey: Qt.Key_Escape
-        buttonXKey: Qt.Key_X
-        buttonYKey: Qt.Key_Y
-        buttonL1Key: Qt.Key_S
-        buttonR1Key: Qt.Key_C
+    function runToCursor() {
+        const disassembly = content.item as DisassembleView;
+        if (views.currentIndex === 0 && disassembly)
+            ZxEmulator.debuggerRunTo(disassembly.selectedAddress);
     }
-
-    readonly property color backgroudColor : Theme.surface
+    function toggleRun() {
+        if (ZxEmulator.paused)
+            ZxEmulator.debuggerContinue();
+        else
+            ZxEmulator.debuggerTrap();
+    }
+    DebuggerGamepad {}
+    readonly property bool dialogOpen: views.popup.visible || (content.item && content.item.dialogOpen === true)
+    function closeDialog(): bool {
+        if (views.popup.visible) {
+            views.popup.close();
+            return true;
+        }
+        return content.item && typeof content.item.closeDialog === "function" && content.item.closeDialog();
+    }
+    Connections {
+        target: ZxEmulator
+        function onPausedChanged() {
+            if (ZxEmulator.debuggerReady && !page.dialogOpen)
+                page.focusContent();
+        }
+    }
+    function focusContent() {
+        const loaded = content.item as Item;
+        if (loaded && ZxEmulator.debuggerReady)
+            loaded.forceActiveFocus();
+    }
+    function focusAddress() {
+        if (views.currentIndex === 2) {
+            const memory = content.item as DebuggerMemoryView;
+            if (memory)
+                memory.focusAddress();
+        } else if (goAddress.visible)
+            goAddress.forceActiveFocus(Qt.TabFocusReason);
+    }
+    // Handle these before Main's gameplay shortcuts, including during an async run.
+    function keyPress(key: int, modifiers: int): bool {
+        if (dialogOpen)
+            return [Qt.Key_F2, Qt.Key_F3, Qt.Key_F5, Qt.Key_F8, Qt.Key_F10, Qt.Key_F11, Qt.Key_F12, Qt.Key_Menu].includes(key);
+        switch (key) {
+        case Qt.Key_F2:
+            views.forceActiveFocus();
+            views.popup.open();
+            return true;
+        case Qt.Key_F3:
+            focusAddress();
+            return true;
+        case Qt.Key_F11:
+            if (ZxEmulator.debuggerReady) {
+                if (modifiers & Qt.ShiftModifier)
+                    ZxEmulator.debuggerOut();
+                else
+                    ZxEmulator.debuggerStep();
+            }
+            return true;
+        case Qt.Key_F10:
+            if (ZxEmulator.debuggerReady) {
+                if (modifiers & Qt.ControlModifier)
+                    runToCursor();
+                else
+                    ZxEmulator.debuggerNext();
+            }
+            return true;
+        case Qt.Key_F12:
+            if (ZxEmulator.debuggerReady)
+                ZxEmulator.debuggerOut();
+            return true;
+        case Qt.Key_F8:
+            if (ZxEmulator.debuggerReady)
+                runToCursor();
+            return true;
+        case Qt.Key_F5:
+            toggleRun();
+            return true;
+        }
+        return false;
+    }
+    Keys.onPressed: event => {
+        if (keyPress(event.key, event.modifiers))
+            event.accepted = true;
+        else if ([Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right].includes(event.key)) {
+            ZxEmulator.sendNavigationKey(event.key === Qt.Key_Up || event.key === Qt.Key_Left ? Qt.Key_Backtab : Qt.Key_Tab);
+            event.accepted = true;
+        }
+    }
+    Keys.onEscapePressed: ZxEmulator.debuggerRun()
     ColumnLayout {
-        spacing: TextSizes.smallScreen ? 0 : 2.5 * Screen.pixelDensity
         anchors.fill: parent
-        RowLayout {
-            spacing: 2.5 * Screen.pixelDensity
+        anchors.margins: Theme.sp(3)
+        spacing: Theme.sp(2)
+        Label {
+            text: qsTr("Debugger")
+            font.pixelSize: Theme.sp(5.5)
+            color: Theme.text
+        }
+        Label {
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            Rectangle {
-                id: disassambleRect
-                color: backgroudColor
-                radius: Theme.radiusSmall
-                border.width: disassembleView.focus ? Theme.focusLine : Theme.line
-                border.color: disassembleView.focus ? Theme.accent : Theme.outline
-
-                Layout.preferredWidth: 18 * TextSizes.scale14
-                Layout.fillHeight: true
-
-                DisassembleView {
-                    id: disassembleView
-                    anchors.fill: parent
-                    anchors.margins: 2 * Screen.pixelDensity
-                    focus: true
-                    KeyNavigation.left: breakpointsView
-                    KeyNavigation.right: breakpointsView
-                }
+            text: ZxEmulator.debuggerStatus
+            color: Theme.textMuted
+            wrapMode: Text.Wrap
+        }
+        Flow {
+            Layout.fillWidth: true
+            Layout.preferredHeight: childrenRect.height
+            spacing: Theme.sp(1)
+            Button {
+                text: page.compact ? qsTr("Step") : qsTr("Step (F11)")
+                enabled: ZxEmulator.debuggerReady
+                onClicked: ZxEmulator.debuggerStep()
             }
-            Item {
+            Button {
+                text: page.compact ? qsTr("Next") : qsTr("Next (F10)")
+                enabled: ZxEmulator.debuggerReady
+                onClicked: ZxEmulator.debuggerNext()
+            }
+            Button {
+                text: page.compact ? qsTr("Out") : qsTr("Out (F12)")
+                enabled: ZxEmulator.debuggerReady
+                onClicked: ZxEmulator.debuggerOut()
+            }
+            Button {
+                text: page.compact ? qsTr("Run to cursor") : qsTr("Run to cursor (F8)")
+                enabled: ZxEmulator.debuggerReady && views.currentIndex === 0
+                onClicked: page.runToCursor()
+            }
+            Button {
+                text: ZxEmulator.paused ? (page.compact ? qsTr("Continue") : qsTr("Continue (F5)")) : (page.compact ? qsTr("Pause") : qsTr("Pause (F5)"))
+                onClicked: page.toggleRun()
+            }
+            Button {
+                text: qsTr("Refresh")
+                enabled: ZxEmulator.debuggerReady
+                onClicked: ZxEmulator.debuggerRefresh()
+            }
+            Button {
+                text: qsTr("Close")
+                onClicked: ZxEmulator.debuggerRun()
+            }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            NavigationComboBox {
+                id: views
+                objectName: "debuggerViews"
+                displayText: currentIndex >= 0 ? textAt(currentIndex) : ""
+                enabled: ZxEmulator.debuggerReady
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-                Rectangle {
-                    id: infoRect
-                    visible: false
-                    anchors.fill: parent
-                    radius: Theme.radiusSmall
-                    color: backgroudColor
-                    border.width: focus ? Theme.focusLine : Theme.line
-                    border.color: focus ? Theme.accent : Theme.outline
-
-                    FancyText {
-                        anchors.centerIn: parent
-                        text: "info"
-                    }
-                }
+                model: [qsTr("Disassembly"), qsTr("CPU registers"), qsTr("Memory"), qsTr("Breakpoints / watchpoints"), qsTr("Next registers"), qsTr("MMU mappings")]
             }
-            ColumnLayout {
-                spacing: TextSizes.smallScreen ? 0 : 2.5 * Screen.pixelDensity
-                Layout.preferredWidth: 18 * TextSizes.scale14
-                Layout.fillWidth: false
-                Layout.fillHeight: true
-                Rectangle {
-                    id: registersRect
-                    color: backgroudColor
-                    radius: Theme.radiusSmall
-                    border.width: focus ? Theme.focusLine : Theme.line
-                    border.color: focus ? Theme.accent : Theme.outline
-                    Layout.preferredHeight: 14 * (TextSizes.smallScreen ? TextSizes.scale12 : TextSizes.scale14)
-                    Layout.fillWidth: true
-                    RegistersView {
-                        anchors.fill: parent
-                    }
-                }
-                Rectangle {
-                    id: breakPointsRect
-                    color: backgroudColor
-                    radius: Theme.radiusSmall
-                    border.width: breakpointsView.activeFocus ? Theme.focusLine : Theme.line
-                    border.color: breakpointsView.activeFocus ? Theme.accent : Theme.outline
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    FocusScope {
-                        id: breakpointsView
-                        anchors.fill: parent
-                        anchors.margins: 2 * Screen.pixelDensity
-                        KeyNavigation.left: disassembleView
-                        KeyNavigation.right: disassembleView
-                        KeyNavigation.tab: commandsLine
-                        KeyNavigation.down: commandsLine
-                        KeyNavigation.backtab: disassembleView
-                        BreakpointsView {
-                            anchors.fill: parent
-                            onBreakpointSelected: ZxEmulator.disassamble(item.absoluteAddress);
-                        }
+            TextField {
+                id: goAddress
+                objectName: "debuggerAddress"
+                visible: views.currentIndex === 0 || views.currentIndex >= 4
+                Layout.preferredWidth: Theme.sp(25)
+                placeholderText: qsTr("Hex address")
+                inputMethodHints: Qt.ImhPreferUppercase | Qt.ImhNoPredictiveText
+                validator: RegularExpressionValidator { regularExpression: /(?:\$|0[xX])?[0-9a-fA-F]{1,4}/ }
+                onAccepted: goButton.click()
+            }
+            Button {
+                id: goButton
+                text: qsTr("Go")
+                visible: goAddress.visible
+                enabled: ZxEmulator.debuggerReady
+                onClicked: {
+                    const parsed = parseInt(goAddress.text.replace(/^(\$|0x)/i, ""), 16);
+                    if (isFinite(parsed) && parsed >= 0 && parsed <= (views.currentIndex === 4 ? 255 : 65535)) {
+                        const inspector = content.item as DebuggerStateView;
+                        if (inspector)
+                            inspector.goTo(parsed);
+                        else
+                            ZxEmulator.disassamble(parsed, 0);
+                        page.focusContent();
                     }
                 }
             }
         }
-
-        Rectangle {
-            id: toolBarRect
-            Layout.preferredHeight: commandsLine.contentHeight + commandsLine.topPadding + commandsLine.bottomPadding + Screen.pixelDensity
+        Loader {
+            id: content
             Layout.fillWidth: true
-            color: backgroudColor
-            radius: Theme.radiusSmall
-            border.width: focus ? Theme.focusLine : Theme.line
-            border.color: focus ? Theme.accent : Theme.outline
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: parent.border.width
-                FancyTextField {
-                    mono: true
-                    id: commandsLine
-                    KeyNavigation.up: disassembleView
-                    KeyNavigation.down: breakpointsView
-                    KeyNavigation.tab: disassembleView
-                    KeyNavigation.backtab: breakpointsView
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.leftMargin: toolBarRect.border.width
-                    onAccepted: {
-                        ZxEmulator.debuggerCommand(text);
-                        selectAll();
-                    }
-                    placeholderText: qsTr("Type a command here")
-                }
-                Button {
-                    Layout.fillHeight: true
-                    text: qsTr("Step (L1)")
-                    onClicked: ZxEmulator.debuggerStep()
-                }
-                Button {
-                    Layout.fillHeight: true
-                    text: qsTr("Next")
-                    onClicked: ZxEmulator.debuggerNext()
-                }
-                Button {
-                    Layout.fillHeight: true
-                    Layout.rightMargin: toolBarRect.border.width
-                    text: qsTr("Continue (R1)")
-                    onClicked: ZxEmulator.debuggerRun()
-                }
-                Button {
-                    Layout.fillHeight: true
-                    Layout.rightMargin: toolBarRect.border.width
-                    text: qsTr("Close (B)")
-                    onClicked: pageLoader.source = ""
-                }
-            }
+            Layout.fillHeight: true
+            enabled: ZxEmulator.debuggerReady
+            sourceComponent: [disassembly, registers, memory, breakpoints, nextRegisters, mmu][views.currentIndex]
+        }
+        Label {
+            Layout.fillWidth: true
+            text: page.compact ? qsTr("A: select · B: back · X: views · Y: address") : qsTr("D-pad / stick: navigate · A: select · B: back · X: views · Y: address\nLB: step · RB: continue/pause · LT: out · RT: next")
+            color: Theme.textMuted
+            font.pixelSize: Theme.caption
+            wrapMode: Text.Wrap
+        }
+    }
+    Component {
+        id: disassembly
+        DisassembleView {
+            enabled: ZxEmulator.debuggerReady
+        }
+    }
+    Component {
+        id: registers
+        RegistersView {
+            enabled: ZxEmulator.debuggerReady
+        }
+    }
+    Component {
+        id: memory
+        DebuggerMemoryView {}
+    }
+    Component {
+        id: breakpoints
+        BreakpointsView {}
+    }
+    Component {
+        id: nextRegisters
+        DebuggerStateView {
+            stateModel: ZxEmulator.debugNextRegisters
+            unavailableText: qsTr("Next registers are available on ZX Spectrum Next machines.")
+        }
+    }
+    Component {
+        id: mmu
+        DebuggerStateView {
+            addressStep: 1024
+            stateModel: ZxEmulator.debugMmu
         }
     }
 }

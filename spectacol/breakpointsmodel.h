@@ -40,7 +40,9 @@ class BreakpointsModel : public QAbstractListModel
         Life,
         Condition,
         Commands,
-        AbsoluteAddress
+        AbsoluteAddress,
+        Enabled,
+        Hits
     };
 
 public:
@@ -50,8 +52,9 @@ public:
         BreakOnWrite = int(zxkit::BreakpointType::MemoryWrite),
         BreakOnPortRead = int(zxkit::BreakpointType::PortRead),
         BreakOnPortWrite = int(zxkit::BreakpointType::PortWrite),
+        BreakOnNextReg = int(zxkit::BreakpointType::NextRegWrite),
         BreakOnTime = int(zxkit::BreakpointType::RasterLine),
-        BreakOnEvent
+        BreakOnEvent = int(zxkit::BreakpointType::Event)
     };
     Q_ENUM(BreakpointType)
 
@@ -68,6 +71,9 @@ private:
         uint16_t address = 0;
         uint16_t mask = 0xFFFF;
         int page = -1;
+        QString bankName;
+        bool enabled = true;
+        quint64 hits = 0;
         size_t ignore = 0;
         BreakpointLife life = Permanent;
         QByteArray condition;

@@ -56,3 +56,11 @@ qt_add_executable(test_controller_profiles
 target_include_directories(test_controller_profiles PRIVATE ../spectacol)
 target_link_libraries(test_controller_profiles PRIVATE Qt6::Test Qt6::Qml Qt::GamepadLegacy)
 add_test(NAME controller_profiles COMMAND test_controller_profiles)
+
+qt_add_executable(test_debugger_models
+    test_debugger_models.cpp
+    ../spectacol/debuggermodels.cpp ../spectacol/debuggermodels.h
+)
+target_include_directories(test_debugger_models PRIVATE ../spectacol)
+target_link_libraries(test_debugger_models PRIVATE Qt6::Test Qt6::Qml ZX::Kit)
+add_test(NAME debugger_models COMMAND test_debugger_models)

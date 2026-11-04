@@ -16,6 +16,11 @@
 */
 
 #include "zxemulator.h"
+#include <QPointer>
+#include <QWindow>
+#include <QQuickWindow>
+#include <QQuickItem>
+#include <QInputMethod>
 #include "zxrecording.h"
 #include "zxsettings.h"
 #include "qmlui.h"
@@ -365,6 +370,8 @@ ZxEmulator::ZxEmulator(QObject *parent)
         m_audioOutput->setPaused(true);
         QMetaObject::invokeMethod(this, [this, event] {
             m_engineQuiescent = true;
+            m_debugPause = event;
+            emit debuggerStatusChanged();
             m_recording->refresh();
             emit pausedChanged();
             if (m_debuggerActivated)
@@ -375,7 +382,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
     });
     m_resumeCallback = zxkit::CallbackHandle<zxkit::ResumeCallback>([this] {
         m_audioOutput->setPaused(false);
-        QMetaObject::invokeMethod(this, [this] { m_engineQuiescent = false; emit pausedChanged(); }, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(this, [this] { m_engineQuiescent = false; if(m_debugMemory) m_debugMemory->setEditable(false); emit debuggerStatusChanged(); emit pausedChanged(); }, Qt::QueuedConnection);
     });
     m_logCallback = zxkit::CallbackHandle<zxkit::LogCallback>([this](zxkit::LogLevel level, std::string_view msg) {
         ErrorLevel errLvl = Info;
@@ -584,7 +591,8 @@ void ZxEmulator::setPaused(bool paused)
         return;
     if (m_engine) {
         if (!m_pauseCount) m_engineQuiescent = false;
-        m_engine->setPaused(m_pauseCount > 0);
+        if((m_pauseCount > 0) != m_engine->isPaused() || !m_engineQuiescent)
+            m_engine->setPaused(m_pauseCount > 0);
     }
     emit pausedChanged();
 }
@@ -835,10 +843,56 @@ zxkit::Z80Registers ZxEmulator::registers() const
     return emulator().readLock()->registers();
 }
 
+DebuggerMemoryModel *ZxEmulator::debugMemory()
+{
+    if(!m_debugMemory) {
+        m_debugMemory=std::make_unique<DebuggerMemoryModel>(emulator());
+        connect(m_debugMemory.get(), &DebuggerMemoryModel::errorChanged, this, [this] {
+            if(m_debugMemory->error().isEmpty()) m_engine->refreshFrame();
+        });
+    }
+    m_debugMemory->setEditable(debuggerReady());
+    return m_debugMemory.get();
+}
+DebuggerStateModel *ZxEmulator::debugNextRegisters()
+{
+    if(!m_debugNextRegisters) m_debugNextRegisters=std::make_unique<DebuggerStateModel>(emulator(),DebuggerStateModel::Kind::NextRegisters);
+    return m_debugNextRegisters.get();
+}
+DebuggerStateModel *ZxEmulator::debugMmu()
+{
+    if(!m_debugMmu) m_debugMmu=std::make_unique<DebuggerStateModel>(emulator(),DebuggerStateModel::Kind::Mmu);
+    return m_debugMmu.get();
+}
+QString ZxEmulator::debuggerStatus() const
+{
+    if(!debuggerReady()) return paused()?tr("Waiting for emulation to pause…"):tr("Running — views show the last paused state");
+    QString reason;
+    switch(m_debugPause.reason) {
+    case zxkit::PauseReason::ExecutionBreakpoint: reason=tr("Execution breakpoint");break;
+    case zxkit::PauseReason::MemoryWatchpoint: reason=tr("Memory watchpoint at %1").arg(formatNumber(m_debugPause.address));break;
+    case zxkit::PauseReason::PortWatchpoint: reason=tr("Port watchpoint at %1").arg(formatNumber(m_debugPause.address));break;
+    case zxkit::PauseReason::NextRegWatchpoint: reason=tr("Next register write at %1").arg(formatNumber(m_debugPause.address));break;
+    case zxkit::PauseReason::RasterBreakpoint: reason=tr("Raster line %1").arg(m_debugPause.address);break;
+    case zxkit::PauseReason::EventTrap: reason=m_debugPause.address?tr("NMI accepted"):tr("Interrupt accepted");break;
+    case zxkit::PauseReason::StepComplete: reason=tr("Step complete");break;
+    default: reason=tr("Paused");break;
+    }
+    return reason+tr(" · PC %1").arg(PC());
+}
 void ZxEmulator::updateDebugger()
 {
+    m_breakpointsModel.breakpointsUpdated();
     m_disassambleModel.disassamble(registers().PC);
+    if(m_debugMemory) { m_debugMemory->setEditable(debuggerReady()); m_debugMemory->refresh(); }
+    if(m_debugNextRegisters) m_debugNextRegisters->refresh();
+    if(m_debugMmu) m_debugMmu->refresh();
     emit registersChanged();
+    emit debuggerStatusChanged();
+}
+void ZxEmulator::debuggerRefresh()
+{
+    if(debuggerReady()) { updateDebugger(); m_engine->refreshFrame(); }
 }
 
 int ZxEmulator::pokeFinderCount() const
@@ -1404,22 +1458,20 @@ void ZxEmulator::disassamble(int address, int delta, uint16_t length)
 
 void ZxEmulator::activateDebugger()
 {
-    bool expected = false;
-    if (!m_debuggerActivated.compare_exchange_strong(expected, true))
-        return;
-
-    setPaused(true);
-    updateDebugger();
-    emit showDebugger();
+    const bool wasActive=m_debuggerActivated.exchange(true);
+    if(!m_debuggerOwnsPause) {
+        m_debuggerOwnsPause=true;
+        setPaused(true);
+    } else if(!debuggerReady()) m_engine->setPaused(true);
+    if(debuggerReady()) updateDebugger();
+    emit debuggerStatusChanged();
+    if(!wasActive) emit showDebugger();
 }
 
 void ZxEmulator::deactivateDebugger(bool /*interruptable*/)
 {
-    bool expected = true;
-    if (!m_debuggerActivated.compare_exchange_strong(expected, false))
-        return;
-
-    setPaused(false);
+    if(!m_debuggerActivated.exchange(false)) return;
+    debuggerContinue();
     emit hideDebugger();
 }
 
@@ -1790,6 +1842,45 @@ void ZxEmulator::togglePaused()
     setPaused(m_paused);
 }
 
+void ZxEmulator::sendNavigationKey(int key)
+{
+    if (m_processInputEvents) return;
+    QPointer<QQuickWindow> window = qobject_cast<QQuickWindow *>(QGuiApplication::focusWindow());
+    if (!window) return;
+    const auto showKeyboard = [&window] {
+        const auto *item = window ? window->activeFocusItem() : nullptr;
+        if (item && item->flags().testFlag(QQuickItem::ItemAcceptsInputMethod)
+            && !item->property("readOnly").toBool()) {
+            QGuiApplication::inputMethod()->show();
+            return true;
+        }
+        return false;
+    };
+    if (key == Qt::Key_Select) {
+        if (showKeyboard()) return;
+        auto *item = window->activeFocusItem();
+        if (item && item->isEnabled()) {
+            if (auto *popup = item->property("popup").value<QObject *>(); popup && !popup->property("visible").toBool()) {
+                QMetaObject::invokeMethod(popup, "open");
+                return;
+            }
+            if (item->metaObject()->indexOfMethod("click()") >= 0) {
+                QMetaObject::invokeMethod(item, "click");
+                return;
+            }
+        }
+        key = Qt::Key_Return;
+    }
+    const auto modifiers = key == Qt::Key_Backtab ? Qt::ShiftModifier : Qt::NoModifier;
+    QKeyEvent press(QEvent::KeyPress, key, modifiers);
+    QCoreApplication::sendEvent(window, &press);
+    if (window) {
+        QKeyEvent release(QEvent::KeyRelease, key, modifiers);
+        QCoreApplication::sendEvent(window, &release);
+        if (key == Qt::Key_Return) showKeyboard();
+    }
+}
+
 void ZxEmulator::debuggerTrap()
 {
     activateDebugger();
@@ -1797,29 +1888,110 @@ void ZxEmulator::debuggerTrap()
 
 void ZxEmulator::debuggerStep()
 {
-    emulator().writeLock()->stepInstruction();
-    m_engine->refreshFrame();
-    updateDebugger();
+    if(!debuggerReady()) return;
+    try {
+        {
+            auto core=emulator().writeLock();
+            core->stepInstruction();
+            if(auto event=core->takePauseEvent()) m_debugPause=*event;
+        }
+        m_engine->refreshFrame(); updateDebugger();
+    } catch(const std::exception &e) { showMessage(QString::fromUtf8(e.what()), Warning); }
 }
-
 void ZxEmulator::debuggerNext()
 {
-    // A call or a block instruction runs until the next one: the pause callback updates the debugger
-    m_engine->stepOver();
-    updateDebugger();
+    if(!debuggerReady()) return;
+    try {
+        m_engine->stepOver();
+        if(!paused()) m_engineQuiescent=false;
+        else { auto core=emulator().writeLock(); if(auto event=core->takePauseEvent()) m_debugPause=*event; }
+        emit pausedChanged();
+        if(debuggerReady()) updateDebugger();
+        else { if(m_debugMemory) m_debugMemory->setEditable(false); emit debuggerStatusChanged(); }
+    } catch(const std::exception &e) { showMessage(QString::fromUtf8(e.what()), Warning); }
 }
-
-void ZxEmulator::debuggerRun()
+void ZxEmulator::debuggerOut()
 {
-    deactivateDebugger(true);
+    if(!debuggerReady()) return;
+    m_engine->stepOut(); m_engineQuiescent=false;
+    if(m_debugMemory) m_debugMemory->setEditable(false);
+    emit pausedChanged(); emit debuggerStatusChanged();
 }
-
-void ZxEmulator::addBreakpoint(int address, int type)
+void ZxEmulator::debuggerRunTo(int address)
 {
-    zxkit::Breakpoint bp;
-    bp.type = zxkit::BreakpointType(type);
-    bp.address = uint16_t(address);
+    if(!debuggerReady() || address<0 || address>65535) return;
+    m_engine->runTo(uint16_t(address));
+    if(!paused()) m_engineQuiescent=false;
+    if(m_debugMemory) m_debugMemory->setEditable(debuggerReady());
+    emit pausedChanged(); emit debuggerStatusChanged();
+}
+void ZxEmulator::debuggerContinue()
+{
+    emulator().writeLock()->cancelRunControl();
+    if(m_debugMemory) m_debugMemory->setEditable(false);
+    if(m_paused) { m_paused=false; setPaused(false); }
+    if(m_debuggerOwnsPause) { m_debuggerOwnsPause=false; setPaused(false); }
+    else if(!m_pauseCount) { m_engineQuiescent=false; m_engine->setPaused(false); emit pausedChanged(); }
+    emit debuggerStatusChanged();
+}
+void ZxEmulator::debuggerRun() { deactivateDebugger(true); }
+
+bool ZxEmulator::createBreakpoint(int type, const QString &text, const QString &maskText, bool temporary)
+{
+    quint32 address=0, mask=0;
+    bool valid=type>=0 && type<=int(zxkit::BreakpointType::Event);
+    if(type==int(zxkit::BreakpointType::RasterLine) || type==int(zxkit::BreakpointType::Event)) {
+        bool ok=false; address=text.toUInt(&ok,10); valid &= ok;
+        const auto core=emulator().readLock();
+        valid &= type==int(zxkit::BreakpointType::Event)?address<=1:address<core->clock().timings().linesPerFrame;
+    } else valid &= DebuggerMemoryModel::parseHex(text,65535,address);
+    valid &= DebuggerMemoryModel::parseHex(maskText,65535,mask);
+    if(type==int(zxkit::BreakpointType::NextRegWrite))
+        valid &= address<=255 && emulator().readLock()->machine().id()=="next";
+    if(!valid) { showMessage(tr("Invalid breakpoint: use hexadecimal addresses/masks, decimal raster lines, or event 0 (IRQ) / 1 (NMI)."),Warning); return false; }
+    zxkit::Breakpoint bp; bp.type=zxkit::BreakpointType(type); bp.address=uint16_t(address); bp.mask=uint16_t(mask); bp.temporary=temporary;
     emulator().writeLock()->addBreakpoint(std::move(bp));
+    m_breakpointsModel.breakpointsUpdated(); return true;
+}
+void ZxEmulator::watchMemory(int type)
+{
+    if(!debuggerReady() || (type!=1&&type!=2)) return;
+    auto *memory=debugMemory();
+    zxkit::Breakpoint bp; bp.type=zxkit::BreakpointType(type);
+    bp.address=uint16_t(memory->address());
+    if(memory->bankId()>0) {
+        bp.bankId=zxkit::BankId(memory->bankId()); bp.page1k=uint16_t(memory->address()/1024);
+        bp.address&=1023; bp.mask=1023;
+    }
+    emulator().writeLock()->addBreakpoint(std::move(bp)); m_breakpointsModel.breakpointsUpdated();
+}
+void ZxEmulator::enableBreakpoint(int id, bool enabled)
+{
+    emulator().writeLock()->setBreakpointEnabled(uint32_t(id),enabled); m_breakpointsModel.breakpointsUpdated();
+}
+
+void ZxEmulator::toggleBreakpoint(int address)
+{
+    if (!debuggerReady() || address < 0 || address > 0xFFFF)
+        return;
+    {
+        auto core = emulator().writeLock();
+        std::vector<uint32_t> matches;
+        for (const auto &bp : core->debugger().breakpoints().breakpoints()) {
+            if (bp.type == zxkit::BreakpointType::Execute && bp.address == address
+                && bp.mask == 0xFFFF && !bp.bankId && !bp.page1k && !bp.condition)
+                matches.push_back(bp.id);
+        }
+        if (matches.empty()) {
+            zxkit::Breakpoint bp;
+            bp.address = uint16_t(address);
+            core->addBreakpoint(std::move(bp));
+        } else {
+            // Remove any duplicates left by the previous add-only shortcut too.
+            for (const auto id : matches)
+                core->removeBreakpoint(id);
+        }
+    }
     m_breakpointsModel.breakpointsUpdated();
     m_pokeFinderModel.update();
 }
@@ -1830,6 +2002,8 @@ void ZxEmulator::addBreakpointPage(int address, int page, int type)
     bp.type = zxkit::BreakpointType(type);
     bp.address = uint16_t(address);
     bp.page1k = uint16_t(page * 16 + ((address & 0x3FFF) >> 10));
+    bp.bankId = emulator().readLock()->machine().ramBankId();
+    bp.address &= 1023; bp.mask = 1023;
     emulator().writeLock()->addBreakpoint(std::move(bp));
     m_breakpointsModel.breakpointsUpdated();
     m_pokeFinderModel.update();

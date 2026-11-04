@@ -27,7 +27,16 @@ import "private"
 
 ListView {
     id: view
+    readonly property int selectedAddress: currentItem ? currentItem.address : -1
+    readonly property bool dialogOpen: currentItem && currentItem.editing
+    function closeDialog(): bool {
+        if (!dialogOpen)
+            return false;
+        currentItem.cancelEdit();
+        return true;
+    }
     clip: true
+    activeFocusOnTab: true
 
     snapMode: ListView.SnapToItem
     highlightFollowsCurrentItem: true
@@ -63,6 +72,14 @@ ListView {
             required property color selectedBackground
             required property color selectedForeground
 
+            readonly property bool editing: !asmEdit.readOnly
+            function cancelEdit() {
+                asmEdit.text = row.disassable;
+                asmEdit.validator = null;
+                asmEdit.readOnly = true;
+                Qt.inputMethod.hide();
+                view.forceActiveFocus();
+            }
             function toggleEdit()
             {
                 asmEdit.readOnly = !asmEdit.readOnly;
@@ -94,8 +111,8 @@ ListView {
                     view.forceActiveFocus(Qt.TabFocusReason);
                     view.currentIndex = row.index;
                 }
-                onDoubleClicked: ZxEmulator.addBreakpoint(row.address)
-                onPressAndHold: ZxEmulator.addBreakpoint(row.address)
+                onDoubleClicked: ZxEmulator.toggleBreakpoint(row.address)
+                onPressAndHold: ZxEmulator.toggleBreakpoint(row.address)
             }
             RowLayout {
                 anchors.fill: parent
@@ -148,6 +165,9 @@ ListView {
                         validator = null;
                         if (!readOnly)
                             row.toggleEdit();
+                    }
+                    Keys.onEscapePressed: event => {
+                        event.accepted = view.closeDialog();
                     }
                     Keys.onReturnPressed: row.toggleEdit()
                     Keys.onEnterPressed: row.toggleEdit()
@@ -217,7 +237,7 @@ ListView {
             break;
 
         case Qt.Key_C:
-            ZxEmulator.debuggerRun();
+            ZxEmulator.debuggerContinue();
             event.accepted = true;
             break;
 
@@ -234,7 +254,7 @@ ListView {
         case Qt.Key_X: {
             const address = ZxEmulator.disassambleModel.address(view.currentIndex);
             if (address !== -1)
-                ZxEmulator.addBreakpoint(address);
+                ZxEmulator.toggleBreakpoint(address);
             event.accepted = true;
             break;
         }

@@ -23,6 +23,10 @@ import Spectacol
 import "private"
 
 Flickable {
+    id: view
+    activeFocusOnTab: true
+    Keys.onUpPressed: contentY = Math.max(0, contentY - Theme.rowHeight)
+    Keys.onDownPressed: contentY = Math.min(Math.max(0, contentHeight - height), contentY + Theme.rowHeight)
     anchors.margins: Screen.pixelDensity * 3
     contentHeight: grid.height
     contentWidth: grid.width

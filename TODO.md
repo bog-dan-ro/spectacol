@@ -80,11 +80,15 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 
 ## Debugger
 
-- [ ] Memory view and a watchpoints UI.
-- [ ] Next registers and MMU views.
+- [x] Memory view/editor with physical RAM/ROM banks and a masked, one-shot watchpoints UI.
+- [x] Side-effect-free Next register latches and effective MMU read/write mappings.
+- [x] D-pad/stick navigation, contextual gamepad shortcuts and Back support in the debugger and poke editor,
+      with standard OS-keyboard text fields and physical writable-bank pokes beyond 64 KiB.
 - [ ] Load SLD/symbol files.
-- [ ] Step out and run to cursor ([#27](https://github.com/bog-dan-ro/spectacol/issues/27));
-      step out needs ZxKit support.
+- [x] Step out and bank-aware run to cursor ([#27](https://github.com/bog-dan-ro/spectacol/issues/27)),
+      with nested-call/interrupt handling in ZxKit and pause/continue controls.
+
+See [Debugger controls and limits](docs/debugger.md).
 
 ## Performance and resource usage profiling
 
@@ -106,6 +110,9 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 - [ ] CI: build and run the native suite and compiled UI regressions; include Android packaging checks.
       Coordinate sanitizer coverage with ZxKit.
 - [ ] Broader snapshot and boot coverage through the UI, alongside ZxKit's standalone per-machine tests.
+- [ ] Investigate the intermittent Qt 6.12 shutdown crash in `QQmlData::disconnectNotifiers` during
+      `QQmlApplicationEngine` cleanup. It was captured in the earlier Profile build before the debugger work;
+      RZX UI automation can also reproduce it. Keep failed runs and stack evidence rather than hiding it with retries.
 
 ### UI review
 
@@ -133,7 +140,7 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
         built from the same menu, a status bar, pages docked beside the screen (the tape browser keeps the tape
         playing).
   - [ ] Options › Screen and the filters list keep the old look: they hold the screen filter UI (owner's work).
-  - [ ] Still the old structure, only recoloured: poke finder and manager, the
+  - [ ] Still the old structure, only recoloured: poke finder, the
         gamepad calibration, the on-screen keyboard and joysticks.
   - [x] Controller mapping uses themed settings rows and a key/action dialog with D-pad navigation and focus
         restoration on close, including direction presets and custom keys.

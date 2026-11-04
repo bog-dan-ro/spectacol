@@ -37,6 +37,8 @@ ApplicationWindow {
     function goBack() {
         if (Qt.inputMethod.visible)
             Qt.inputMethod.hide();
+        else if (pageLoader.item && typeof pageLoader.item.closeDialog === "function" && pageLoader.item.closeDialog())
+            return;
         else if (menuBar.position)
             menuView.popMenu();
         else if (pageLoader.status !== Loader.Null)
@@ -178,6 +180,11 @@ ApplicationWindow {
         focus: true
 
         Keys.onPressed: (event)=> {
+            const debuggerPage = pageLoader.item as DebuggerPage;
+            if (debuggerPage && debuggerPage.keyPress(event.key, event.modifiers)) {
+                event.accepted = true;
+                return;
+            }
             switch (event.key) {
             // F1-F4 belong to the emulated machine (the CoBra's keys): Spectacol's own keys are F5 on
             case Qt.Key_F5:

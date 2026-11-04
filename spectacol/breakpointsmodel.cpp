@@ -39,7 +39,13 @@ void BreakpointsModel::breakpointsUpdated()
             dbp.type = BreakpointType(bp.type);
             dbp.address = bp.address;
             dbp.mask = bp.mask;
-            dbp.page = bp.page1k.has_value() ? int(*bp.page1k / 16) : -1;
+            dbp.page = bp.page1k.has_value() ? int(*bp.page1k) : -1;
+            dbp.enabled = bp.enabled;
+            dbp.hits = bp.hitCount;
+            if(bp.bankId && *bp.bankId<=emulator->mmu().banks().size()) {
+                const auto name=emulator->mmu().bank(*bp.bankId).name();
+                dbp.bankName=QString::fromUtf8(name.data(),qsizetype(name.size()));
+            }
             dbp.life = bp.temporary ? Oneshot : Permanent;
             breakpoints.push_back(dbp);
 
@@ -47,7 +53,8 @@ void BreakpointsModel::breakpointsUpdated()
             case BreakOnExecute:
             case BreakOnRead:
             case BreakOnWrite:
-                addresses[bp.address].insert(int(dbp.type));
+                if(bp.enabled && bp.mask==0xFFFF && !bp.page1k && !bp.bankId)
+                    addresses[bp.address].insert(int(dbp.type));
                 break;
             default:
                 break;
@@ -63,8 +70,7 @@ void BreakpointsModel::breakpointsUpdated()
 
 int BreakpointsModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent)
-    return int(m_breakPoints.size());
+    return parent.isValid()?0:int(m_breakPoints.size());
 }
 
 QVariant breakpointType(BreakpointsModel::BreakpointType type)
@@ -80,6 +86,7 @@ QVariant breakpointType(BreakpointsModel::BreakpointType type)
         return u"PR"_s;
     case BreakpointsModel::BreakOnPortWrite:
         return u"PW"_s;
+    case BreakpointsModel::BreakOnNextReg: return u"NR"_s;
     case BreakpointsModel::BreakOnTime:
         return u"T"_s;
     case BreakpointsModel::BreakOnEvent:
@@ -90,7 +97,7 @@ QVariant breakpointType(BreakpointsModel::BreakpointType type)
 
 QVariant BreakpointsModel::data(const QModelIndex &index, int role) const
 {
-    if (size_t(index.row()) >= m_breakPoints.size())
+    if (!index.isValid() || index.column()!=0 || index.row()<0 || size_t(index.row()) >= m_breakPoints.size())
         return {};
 
     const auto &value = m_breakPoints[index.row()];
@@ -110,6 +117,8 @@ QVariant BreakpointsModel::data(const QModelIndex &index, int role) const
         return value.condition;
     case Commands:
         return value.commands;
+    case Enabled: return value.enabled;
+    case Hits: return QVariant::fromValue(value.hits);
     case AbsoluteAddress:
         return int(value.address);
     }
@@ -119,7 +128,7 @@ QVariant BreakpointsModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> BreakpointsModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[Id] = "id";
+    roles[Id] = "breakpointId";
     roles[Type] = "type";
     roles[Value] = "value";
     roles[Ignore] = "ignore";
@@ -127,6 +136,8 @@ QHash<int, QByteArray> BreakpointsModel::roleNames() const
     roles[Condition] = "condition";
     roles[Commands] = "commands";
     roles[AbsoluteAddress] = "absoluteAddress";
+    roles[Enabled] = "active";
+    roles[Hits] = "hits";
     return roles;
 }
 
@@ -137,19 +148,17 @@ QVariant BreakpointsModel::breakPointValue(const BreakpointsModel::DebuggerBreak
     case BreakOnRead:
     case BreakOnWrite:
         if (bp.page < 0)
-            return formatNumber(bp.address);
-        return u"RAM:"_s +
-               formatNumber(uint8_t(bp.page)) + u':' +
-               formatNumber(uint16_t(bp.address & 0x3FFF));
+            return formatNumber(bp.address) + (bp.mask==0xFFFF?QString{}:tr(" / mask %1").arg(formatNumber(bp.mask)));
+        return bp.bankName+u':' + QString::number(bp.page*1024+(bp.address&1023),16).rightJustified(6,u'0').toUpper();
 
     case BreakOnPortRead:
     case BreakOnPortWrite:
         return formatNumber(bp.mask) + u':' +
                formatNumber(bp.address) + u':';
 
-    case BreakOnTime:
-    case BreakOnEvent:
-        return QString::number(bp.address);
+    case BreakOnNextReg: return formatNumber(bp.address);
+    case BreakOnTime: return tr("Line %1").arg(bp.address);
+    case BreakOnEvent: return bp.address?tr("NMI"):tr("IRQ");
     }
     return {};
 }

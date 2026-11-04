@@ -113,6 +113,7 @@ qt_add_qml_module(spectacol
         audiooutput.cpp audiooutput.h
         audiobuffer.cpp audiobuffer.h
         breakpointsmodel.cpp breakpointsmodel.h
+        debuggermodels.cpp debuggermodels.h
         disassamblemodel.cpp disassamblemodel.h
         folderlistmodel.cpp folderlistmodel.h
         zxemulator.cpp zxemulator.h
@@ -145,6 +146,11 @@ qt_add_qml_module(spectacol
         qml/ControllerProfilesPage.qml
         qml/OptionsControlsPage.qml
         qml/DebuggerPage.qml
+        qml/DebuggerGamepad.qml
+        qml/FormDialog.qml
+        qml/NavigationComboBox.qml
+        qml/DebuggerMemoryView.qml
+        qml/DebuggerStateView.qml
         qml/DisassembleView.qml
         qml/DisksEjectPage.qml
         qml/DisksInsertPage.qml

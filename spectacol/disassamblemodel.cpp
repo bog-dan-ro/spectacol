@@ -86,9 +86,13 @@ void DisassambleModel::update()
     if (m_disassambleData.empty())
         return;
 
-    m_disassambleData = disassambleTemp(m_disassambleData[0].address, 0, uint16_t(m_disassambleData.size()));
+    auto data = disassambleTemp(m_disassambleData[0].address, 0, uint16_t(m_disassambleData.size()));
+    const bool reset=data.size()!=m_disassambleData.size();
+    if(reset) beginResetModel();
+    m_disassambleData=std::move(data);
+    if(reset) endResetModel();
     m_canFetchMore = m_address + m_length < 0xffff;
-    emit dataChanged(index(0), index(int(m_disassambleData.size()) - 1));
+    if(!reset && !m_disassambleData.empty()) emit dataChanged(index(0), index(int(m_disassambleData.size()) - 1));
 }
 
 int DisassambleModel::address(int index)
@@ -100,13 +104,12 @@ int DisassambleModel::address(int index)
 
 int DisassambleModel::rowCount(const QModelIndex &parent) const
 {
-    Q_ASSERT(!parent.isValid());
-    return int(m_disassambleData.size());
+    return parent.isValid()?0:int(m_disassambleData.size());
 }
 
 QVariant DisassambleModel::data(const QModelIndex &index, int role) const
 {
-    if (size_t(index.row()) >= m_disassambleData.size())
+    if (!index.isValid() || index.column()!=0 || index.row()<0 || size_t(index.row()) >= m_disassambleData.size())
         return {};
     const DisassambleData &dd = m_disassambleData[index.row()];
     switch (role) {
@@ -140,13 +143,12 @@ QVariant DisassambleModel::data(const QModelIndex &index, int role) const
 
 bool DisassambleModel::canFetchMore(const QModelIndex &parent) const
 {
-    Q_ASSERT(!parent.isValid());
-    return m_canFetchMore;
+    return !parent.isValid() && m_canFetchMore;
 }
 
 void DisassambleModel::fetchMore(const QModelIndex &parent)
 {
-    Q_ASSERT(!parent.isValid());
+    if(parent.isValid()) return;
     m_canFetchMore = false;
     disassambleMore(End, 50);
 }

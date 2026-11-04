@@ -19,6 +19,7 @@
 #include "nextuarthooks.h"
 
 #include "breakpointsmodel.h"
+#include "debuggermodels.h"
 #include "disassamblemodel.h"
 #include "disks.h"
 #include "sdcardfiles.h"
@@ -80,6 +81,11 @@ class ZxEmulator : public QObject
     Q_PROPERTY(SdCardFiles *sdCard MEMBER m_sdCard CONSTANT)
     Q_PROPERTY(const ZxRecording *recording MEMBER m_recording CONSTANT)
     Q_PROPERTY(ZxSettings *settings READ settings CONSTANT)
+    Q_PROPERTY(DebuggerMemoryModel *debugMemory READ debugMemory CONSTANT FINAL)
+    Q_PROPERTY(DebuggerStateModel *debugNextRegisters READ debugNextRegisters CONSTANT FINAL)
+    Q_PROPERTY(DebuggerStateModel *debugMmu READ debugMmu CONSTANT FINAL)
+    Q_PROPERTY(bool debuggerReady READ debuggerReady NOTIFY pausedChanged FINAL)
+    Q_PROPERTY(QString debuggerStatus READ debuggerStatus NOTIFY debuggerStatusChanged FINAL)
     Q_PROPERTY(const BreakpointsModel *breakpointsModel READ breakpointsModel CONSTANT)
     Q_PROPERTY(const DisassambleModel* disassambleModel READ disassambleModel CONSTANT)
     Q_PROPERTY(const PokeFinderModel* pokeFinderModel READ pokeFinderModel CONSTANT)
@@ -238,6 +244,12 @@ public:
 
     BreakpointsModel *breakpointsModel() { return &m_breakpointsModel; }
     void updateDebugger();
+    DebuggerMemoryModel *debugMemory();
+    DebuggerStateModel *debugNextRegisters();
+    DebuggerStateModel *debugMmu();
+    bool debuggerReady() const { return paused() && m_engineQuiescent; }
+    QString debuggerStatus() const;
+
 
     int pokeFinderCount() const;
 
@@ -300,11 +312,20 @@ public slots:
 
     // debug methods
     void debuggerTrap();
+    void sendNavigationKey(int key);
     void debuggerStep();
     void debuggerNext();
     void debuggerRun();
+    void debuggerContinue();
+    void debuggerOut();
+    void debuggerRunTo(int address);
+    void debuggerRefresh();
+    bool createBreakpoint(int type, const QString &address, const QString &mask, bool temporary);
+    void watchMemory(int type);
+    void enableBreakpoint(int id, bool enabled);
 
-    void addBreakpoint(int address, int type = BreakpointsModel::BreakOnExecute);
+
+    void toggleBreakpoint(int address);
     void addBreakpointPage(int address, int page, int type = BreakpointsModel::BreakOnWrite);
     void debuggerCommand(const QString &command);
 
@@ -357,6 +378,7 @@ signals:
     void pokeFinderCountChanged();
     void registersChanged();
     void showWelcome();
+    void debuggerStatusChanged();
     void showDebugger();
     void hideDebugger();
     void showMenu();
@@ -406,6 +428,10 @@ private:
     bool m_tapeFastForward = false;
     bool m_fastForwardIndicator = false;
     QVariantMap m_defaultControllerMapping;
+    std::unique_ptr<DebuggerMemoryModel> m_debugMemory;
+    std::unique_ptr<DebuggerStateModel> m_debugNextRegisters, m_debugMmu;
+    zxkit::PauseEvent m_debugPause;
+    bool m_debuggerOwnsPause = false;
     BreakpointsModel m_breakpointsModel;
     DisassambleModel m_disassambleModel;
     PokeFinderModel m_pokeFinderModel;

@@ -25,6 +25,7 @@
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QKeyEvent>
+#include <QInputMethodEvent>
 #include <QKeySequence>
 #include <QMetaEnum>
 #include <QMouseEvent>
@@ -37,6 +38,7 @@
 #include <algorithm>
 #include <QQmlApplicationEngine>
 #include <QQuickWindow>
+#include <QQuickItem>
 #include <QStandardPaths>
 #include <QTimer>
 #ifdef Q_OS_ANDROID
@@ -66,7 +68,7 @@ int main(int argc, char *argv[])
     parser.addOption(quitAfterOption);
     parser.addOption(screenshotOption);
     parser.addOption(uiScreenshotOption);
-    const QCommandLineOption uiKeysOption(u"ui-keys"_s, u"Press keys in the window, one every 300 ms from 1 s on, e.g. F5,Down,Return (to screenshot a page); click:X:Y clicks at a window position, down:KEY and up:KEY only press or release a key (e.g. down:Control,0,up:Control), wait idles 300 ms."_s, u"keys"_s);
+    const QCommandLineOption uiKeysOption(u"ui-keys"_s, u"Press keys in the window, one every 300 ms from 1 s on, e.g. F5,Down,Return (to screenshot a page); click:X:Y clicks at a window position, click:NAME clicks a named UI item, nav:ButtonA sends a gamepad navigation tap, input:TEXT commits text through the input method, down:KEY and up:KEY only press or release a key (e.g. down:Control,0,up:Control), wait idles 300 ms."_s, u"keys"_s);
     parser.addOption(windowSizeOption);
     parser.addOption(uiKeysOption);
     parser.addPositionalArgument(u"file"_s, u"Snapshot, tape, disk or recording to load."_s, u"[file]"_s);
@@ -166,6 +168,36 @@ int main(int argc, char *argv[])
                 });
                 continue;
             }
+            if (keys[i].startsWith(u"input:"_s)) {
+                const auto text = keys[i].mid(6);
+                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app, [text, window] {
+                    if (auto *w = window()) {
+                        QInputMethodEvent event;
+                        event.setCommitString(text);
+                        QCoreApplication::sendEvent(w, &event);
+                    }
+                });
+                continue;
+            }
+            if (keys[i].startsWith(u"nav:"_s)) {
+                const auto parts = keys[i].split(u':');
+                const auto name = parts.value(1).toLatin1();
+                const auto &meta = QGamepadManager::staticMetaObject;
+                bool axisOk = false, buttonOk = false, valueOk = false;
+                const int axis = meta.enumerator(meta.indexOfEnumerator("GamepadAxis")).keyToValue(name.constData(), &axisOk);
+                const int button = meta.enumerator(meta.indexOfEnumerator("GamepadButton")).keyToValue(name.constData(), &buttonOk);
+                const double value = parts.value(2).toDouble(&valueOk);
+                if (!buttonOk && !(axisOk && valueOk)) { qWarning() << "Unknown navigation event" << keys[i]; continue; }
+                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app, [buttonOk, button, axis, value] {
+                    auto *manager = QGamepadManager::instance();
+                    const int device = ZxEmulator::instance().gamepadId();
+                    if (buttonOk) {
+                        manager->gamepadButtonPressEvent(device, static_cast<QGamepadManager::GamepadButton>(button), 1);
+                        QTimer::singleShot(80, manager, [manager, device, button] { manager->gamepadButtonReleaseEvent(device, static_cast<QGamepadManager::GamepadButton>(button)); });
+                    } else manager->gamepadAxisEvent(device, static_cast<QGamepadManager::GamepadAxis>(axis), value);
+                });
+                continue;
+            }
             if (keys[i].startsWith(u"pad:"_s) || keys[i].startsWith(u"touch:"_s)) {
                 // Exercise controller input without requiring a hardware gamepad.
                 const auto parts = keys[i].split(u':');
@@ -202,9 +234,19 @@ int main(int argc, char *argv[])
             }
             if (keys[i].startsWith(u"click:"_s)) {
                 const QStringList xy = keys[i].split(u':');
-                const QPointF pos(xy.value(1).toDouble(), xy.value(2).toDouble());
-                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app, [pos, window] {
+                const QPointF position(xy.value(1).toDouble(), xy.value(2).toDouble());
+                const QString itemName = xy.size() == 2 ? xy[1] : QString{};
+                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app, [position, itemName, window] {
                     if (auto *w = window()) {
+                        QPointF pos = position;
+                        if (!itemName.isEmpty()) {
+                            const auto *item = w->findChild<QQuickItem *>(itemName);
+                            if (!item || !item->isVisible() || !item->isEnabled()) {
+                                qWarning() << "Unavailable UI item" << itemName;
+                                return;
+                            }
+                            pos = item->mapToScene(QPointF(item->width()/2, item->height()/2));
+                        }
                         QMouseEvent press(QEvent::MouseButtonPress, pos, w->mapToGlobal(pos), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
                         QCoreApplication::sendEvent(w, &press);
                         QMouseEvent release(QEvent::MouseButtonRelease, pos, w->mapToGlobal(pos), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);

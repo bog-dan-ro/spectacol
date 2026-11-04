@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,199 +15,194 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// @scope main.qml
+pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtGamepadLegacy
 import Spectacol
-import "private"
 
-Item {
-    anchors.fill: parent
+FocusScope {
+    id: page
     Component.onCompleted: {
         ZxEmulator.processInputEvents = false;
+        pokes.refreshBanks();
+        view.forceActiveFocus();
     }
-    Component.onDestruction: {
-        ZxEmulator.processInputEvents = true;
+    Component.onDestruction: ZxEmulator.processInputEvents = true
+    function addPoke() {
+        editor.returnFocus = addButton;
+        editor.open();
     }
-
-    GamepadKeyNavigation {
-        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        buttonAKey: Qt.Key_Space
-        buttonBKey: Qt.Key_Escape
-        buttonYKey: Qt.Key_Y
-        buttonXKey: Qt.Key_X
+    function closeDialog(): bool {
+        if (bank.popup.visible) {
+            bank.popup.close();
+            return true;
+        }
+        if (!editor.visible)
+            return false;
+        editor.reject();
+        return true;
     }
-
+    function toggleCurrent() {
+        const row = view.currentItem;
+        if (row)
+            pokes.setActive(row.index, !row.active);
+    }
+    Keys.onPressed: event => {
+        if (editor.visible)
+            return;
+        switch (event.key) {
+        case Qt.Key_F3:
+        case Qt.Key_Menu:
+            addPoke();
+            break;
+        case Qt.Key_F2:
+            pokes.clear();
+            break;
+        case Qt.Key_Escape:
+            pageLoader.source = "";
+            break;
+        default:
+            if (![Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right].includes(event.key))
+                return;
+            ZxEmulator.sendNavigationKey(event.key === Qt.Key_Up || event.key === Qt.Key_Left ? Qt.Key_Backtab : Qt.Key_Tab);
+            break;
+        }
+        event.accepted = true;
+    }
+    DebuggerGamepad {
+        transportKeys: false
+    }
     PokeModel {
-        id: pokeModel
-        onModelReset: view.currentIndex = 0
+        id: pokes
     }
-
-    Popup {
-        id: addPoke
-        modal: true
-        focus: true
-        x: (parent.width - width) / 2
-        height: TextSizes.scale34 * 7
-        width: TextSizes.scale20 * 10
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnReleaseOutsideParent
-        onOpened: address.forceActiveFocus(Qt.TabFocusReason);
-        IntValidator {
-            id: addressValidator
-            bottom: bank.currentIndex === 8 ? 0x4000 : 0
-            top: bank.currentIndex === 8 ? 0xffff : 0x3fff
+    Rectangle {
+        anchors.fill: parent
+        color: Theme.raised
+        z: -1
+    }
+    FormDialog {
+        id: editor
+        title: qsTr("Add poke")
+        initialFocus: bank
+        acceptable: address.acceptableInput && value.acceptableInput
+        commit: () => {
+            if (!pokes.addPoke(pokes.selectedBank, Number.fromLocaleString(Qt.locale(address.validator.locale), address.text), Number.fromLocaleString(Qt.locale(value.validator.locale), value.text)))
+                return false;
+            view.currentIndex = view.count - 1;
+            return true;
         }
-        GridLayout {
-            columns: 2
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.right: parent.right
-            Label {
-                Layout.alignment: Qt.AlignRight
-                text: qsTr("Bank:")
-            }
-            ComboBox {
-                id: bank
-                model: 64
-                currentIndex: 8
-                Keys.onUpPressed: {
-                    if (popup.visible)
-                        decrementCurrentIndex();
-                    else
-                        ok.forceActiveFocus(Qt.TabFocusReason);
-                }
-                Keys.onDownPressed: {
-                    if (popup.visible)
-                        incrementCurrentIndex();
-                    else
-                        address.forceActiveFocus(Qt.TabFocusReason);
-                }
-                Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex()
-                Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
-            }
-
-            Label {
-                Layout.alignment: Qt.AlignRight
-                text: qsTr("Address:")
-            }
-            TextField {
-                id: address
-                placeholderText: addressValidator.bottom + " ... " + addressValidator.top
-                validator: addressValidator
-                inputMethodHints: Qt.ImhDigitsOnly
-                KeyNavigation.up: bank
-                KeyNavigation.down: value
-            }
-
-            Label {
-                Layout.alignment: Qt.AlignRight
-                text: qsTr("Value:")
-            }
-            TextField {
-                id: value
-                placeholderText: "0 ... 255"
-                validator: IntValidator {
-                    bottom: 0
-                    top: 255
-                }
-                inputMethodHints: Qt.ImhDigitsOnly
-                KeyNavigation.up: address
-                KeyNavigation.down: ok
-            }
-
-            Button {
-                id: ok
-                text: qsTr("Ok")
-                onClicked: {
-                    pokeModel.addPoke(bank.currentIndex, address.text, value.text);
-                    addPoke.close();
-                }
-                KeyNavigation.up: value
-                KeyNavigation.down: bank
-                KeyNavigation.right: cancel
-            }
-            Button {
-                id: cancel
-                Layout.alignment: Qt.AlignRight
-                text: qsTr("Cancel")
-                onClicked: addPoke.close();
-                KeyNavigation.left: ok
-                KeyNavigation.up: value
-                KeyNavigation.down: bank
-            }
+        Label { text: qsTr("Writable memory bank"); color: Theme.text }
+        NavigationComboBox {
+            id: bank
+            objectName: "pokeBank"
+            Layout.fillWidth: true
+            model: pokes.bankNames
+            currentIndex: pokes.selectedBank
+            onActivated: pokes.selectedBank = currentIndex
+        }
+        Label {
+            text: qsTr("Address / bank offset (decimal, 0–%1)").arg(pokes.addressLimit)
+            color: Theme.text
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
+        }
+        TextField {
+            id: address
+            objectName: "pokeAddress"
+            Layout.fillWidth: true
+            inputMethodHints: Qt.ImhDigitsOnly
+            validator: IntValidator { bottom: 0; top: pokes.addressLimit }
+            onAccepted: value.forceActiveFocus(Qt.TabFocusReason)
+        }
+        Label { text: qsTr("Value (decimal, 0–255)"); color: Theme.text }
+        TextField {
+            id: value
+            objectName: "pokeValue"
+            Layout.fillWidth: true
+            inputMethodHints: Qt.ImhDigitsOnly
+            validator: IntValidator { bottom: 0; top: 255 }
+            onAccepted: editor.save()
         }
     }
-
-    FancyBaseList {
-        id: view
-        width: (TextSizes.smallScreen && parent.width < parent.height) ? parent.width - Screen.pixelDensity * 10 : parent.width / 2
-        focus: true
-
-        model: pokeModel
-
-        Keys.onPressed: (event) => {
-            switch (event.key) {
-            case Qt.Key_Left:
-                decrementCurrentIndex();
-                break;
-            case Qt.Key_Right:
-                incrementCurrentIndex();
-                break;
-            case Qt.Key_Escape:
-                pageLoader.source = "";
-                break;
-            case Qt.Key_Y:
-                addPoke.open();
-                break;
-            case Qt.Key_X:
-                pokeModel.clear();
-                break;
-            }
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: Theme.sp(3)
+        Label {
+            text: qsTr("Poke memory")
+            color: Theme.text
+            font.pixelSize: Theme.pageTitle
         }
-
-        delegate: Component {
-            CheckBox {
-                width: view.width
-                checked: model.active
-                enabled: !model.disabled
-                text: model.label
-                // only the user's clicks: checked also changes when the model updates
-                onToggled: pokeModel.setActive(model.index, checked)
-                background: Rectangle {color: Theme.surface}
-            }
+        Label {
+            Layout.fillWidth: true
+            text: qsTr("CPU write addresses or offsets in a writable physical bank. Addresses and values are decimal.")
+            wrapMode: Text.Wrap
+            color: Theme.textMuted
         }
-        header: FancyText {
-            width: view.width
-            text: qsTr("Poke manager")
-            font.pixelSize: TextSizes.scale20
-            horizontalAlignment: Text.AlignHCenter
-            background: Rectangle {color: Theme.surface}
-        }
-
-        footer: RowLayout {
-            width: view.width
-            spacing: Screen.pixelDensity
+        RowLayout {
             Button {
-                text: qsTr("Add (Y)")
-                onClicked: addPoke.open();
+                id: addButton
+                objectName: "pokeAdd"
+                text: qsTr("Add poke (Y)")
+                onClicked: page.addPoke()
             }
             Button {
-                text: qsTr("Clear (X)")
-                onClicked: pokeModel.clear();
+                text: qsTr("Clear list (X)")
+                onClicked: pokes.clear()
             }
-
-            Item {
-                Layout.fillWidth: true
-            }
-
             Button {
                 text: qsTr("Close (B)")
                 onClicked: pageLoader.source = ""
             }
+        }
+        ListView {
+            id: view
+            objectName: "manualPokes"
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            model: pokes
+            clip: true
+            focus: true
+            activeFocusOnTab: true
+            Keys.onUpPressed: event => {
+                if (currentIndex > 0)
+                    decrementCurrentIndex();
+                else
+                    ZxEmulator.sendNavigationKey(Qt.Key_Backtab);
+            }
+            Keys.onDownPressed: event => {
+                if (currentIndex < count - 1)
+                    incrementCurrentIndex();
+                else
+                    ZxEmulator.sendNavigationKey(Qt.Key_Tab);
+            }
+            Keys.onReturnPressed: page.toggleCurrent()
+            Keys.onSpacePressed: page.toggleCurrent()
+            delegate: ItemDelegate {
+                id: row
+                required property int index
+                required property string label
+                required property bool active
+                required property bool disabled
+                width: view.width
+                enabled: !disabled
+                highlighted: view.currentIndex === index
+                text: (active ? "☑ " : "☐ ") + label
+                onClicked: {
+                    view.currentIndex = index;
+                    pokes.setActive(index, !active);
+                    view.forceActiveFocus();
+                }
+            }
+            ScrollBar.vertical: ScrollBar {}
+        }
+        Label {
+            Layout.fillWidth: true
+            text: qsTr("A: toggle poke · B: back · X: clear list · Y: add\nTurning a poke off restores its original byte. Clearing the list keeps the current memory values.")
+            color: Theme.textMuted
+            font.pixelSize: Theme.caption
+            wrapMode: Text.Wrap
         }
     }
 }

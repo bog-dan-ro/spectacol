@@ -67,6 +67,18 @@ New C++/QML sources, shaders, images and ROMs must be listed explicitly in `spec
   `SettingRow`; pick-one lists use `OptionList`. `TextSizes` only maps the old names onto `Theme`.
 - Leave the screen filter UI (`OptionsScreenPage.qml`, `FiltersPage.qml`, `filtersModel`, `selectedFilterIndex`) alone.
 
+#### Input and navigation
+
+- All UI pages, windows, dialogs and interactive controls must be navigable with a D-pad, gamepad or
+  joystick, with visible focus and predictable movement between controls.
+- Every page, window and dialog must support the gamepad Back action. It closes the current dialog/window
+  or returns one level, restoring focus to the control that opened it. Keep Back/B mappings consistent.
+- Add contextual gamepad shortcuts (A, B, X, Y, L1, R1, etc.) where useful, with clear on-screen hints.
+- Devices may have no **physical** keyboard attached, but text and number entry can use the OS-provided
+  virtual keyboard. Use standard Qt text fields and appropriate input-method hints for numeric/text input.
+- Keep navigation straightforward. Do not replace ordinary text fields with custom D-pad digit pickers,
+  controller keyboards or extra input wizards when the OS virtual keyboard covers the task.
+
 ## Conventions
 - Each source file starts with the GPL-3.0 license header (`Copyright (c) 2015-2026, BogDan Vatra`).
 - Uses `#pragma once` and `using namespace Qt::StringLiterals`: `u"..."_s` and `u'c'`, never `QLatin1String`, `QLatin1Char`, `QStringLiteral` or `_()` helpers.
