@@ -216,7 +216,7 @@ libraries from `android_openssl`. ZxKit probes NDK support for `std::jthread` an
 `-fexperimental-library` only when needed. Native libraries use 16 KiB ELF alignment; check the packaged
 APK with the SDK's `zipalign -c -P 16 4` and `apksigner verify` as well.
 
-The Qt 6 manifest uses app storage and no obsolete shared-storage permissions. **Quick Open → Device
+The Qt 6 manifest uses app storage and no obsolete shared-storage permissions. **Quick Open → ⋮ → Device
 files…** imports a file through Android's picker; **Save snapshot → Export…** and **Export tape → Export
 to device…** write to a selected document. Files opened from another app are copied into app storage
 before loading, including when Spectacol is already running. App data stays private. Old shared data
@@ -234,6 +234,39 @@ on exit, and checks cold/warm document intents and native snapshot export. Do no
 emulator while it runs. Physical gamepads, Android TV remotes and audio latency still need device checks.
 On the tested API 37 x86_64 emulator, `-gpu host` renders correctly; SwiftShader's OpenGL driver showed
 incomplete frames. Check that an AVD's system image is actually installed before diagnosing Qt.
+
+Phone sheets and the drawer use a single 48 dp header (72 with Large text), with 48 dp minimum
+navigation targets. Touch-only pages put secondary actions under **⋮**, rather than displaying desktop
+shortcuts. Connected gamepads retain button hints; a TV without touch or a gamepad uses OK/Back hints.
+Narrow hint rows scroll horizontally instead of taking multiple rows from the content. About and its
+controller help scroll within the page. Quick Open keeps view/search controls visible, and omits the
+cover reflection on mobile. Android starts fullscreen to hide system bars (swipe to reveal them);
+its landscape control rail aligns to the window's left edge, independently of viewport and safe-area padding.
+The emulated image stays at the top right on Android, using the selected scaling mode.
+
+```sh
+python3 tests/android_ui.py --adb "$ANDROID_SDK_ROOT/platform-tools/adb" --serial emulator-5554
+```
+
+This UI regression needs Pillow and tesseract. It uses an authored snapshot and a 360 × 800 dp
+phone profile (800 × 360 in landscape). Each page starts in a fresh process; scripted navigation
+opens it, then real Android touch tests the header, scrolling, actions, native picker and ROM settings.
+`--case large-landscape` also checks Large text. `--native-input` adds Android Menu/D-pad/OK/Back;
+`--native-only` runs just that input probe. `--display-only` checks right alignment in all three
+scaling modes and taps the menu button at the window edge. Settings, display overrides and the emulator's
+ignore-orientation policy are restored. Screenshots, accessibility trees and logcat go under
+`build/android-ui`. This does not replace physical phone, controller or TV checks.
+
+`--case portrait` and `--case large-portrait` also check that the Qt surface matches the native display.
+Android defaults to Any (sensor orientation); existing Landscape/Portrait choices remain saved. The
+saved choice is applied after creating the Qt window, allowing its surface to resize at startup.
+`--rotation-only` checks a fresh default, both saved choices and live changes through Options › Screen:
+
+```sh
+python3 tests/android_ui.py --adb "$ANDROID_SDK_ROOT/platform-tools/adb" --serial emulator-5554 --rotation-only
+```
+
+These checks pass on the Qt 6.12/API 37 phone emulator; repeat sensor rotation on physical phones.
 
 ## CoBra keyboard regression
 

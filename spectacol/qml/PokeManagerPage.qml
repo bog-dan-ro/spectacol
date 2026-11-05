@@ -194,15 +194,15 @@ FocusScope {
             Button {
                 id: addButton
                 objectName: "pokeAdd"
-                text: qsTr("Add poke (Y)")
+                text: Theme.gamepadHints ? qsTr("Add poke (Y)") : qsTr("Add poke")
                 onClicked: page.addPoke()
             }
             Button {
-                text: qsTr("Clear list (X)")
+                text: Theme.gamepadHints ? qsTr("Clear list (X)") : qsTr("Clear list")
                 onClicked: pokes.clear()
             }
             Button {
-                text: qsTr("Close (B)")
+                text: Theme.gamepadHints ? qsTr("Close (B)") : qsTr("Close")
                 onClicked: pageLoader.source = ""
             }
         }
@@ -272,7 +272,8 @@ FocusScope {
         }
         Label {
             Layout.fillWidth: true
-            text: qsTr("A: toggle poke · B: back · X: clear list · Y: add\nTurning a trainer off restores its original bytes. Clearing the list keeps the current memory values.")
+            text: (Theme.gamepadHints ? qsTr("A: toggle poke · B: back · X: clear list · Y: add") + "\n" : "")
+                  + qsTr("Turning a trainer off restores its original bytes. Clearing the list keeps the current memory values.")
             color: Theme.textMuted
             font.pixelSize: Theme.caption
             wrapMode: Text.Wrap

@@ -158,27 +158,27 @@ FocusScope {
             Layout.preferredHeight: childrenRect.height
             spacing: Theme.sp(1)
             Button {
-                text: page.compact ? qsTr("Step") : qsTr("Step (F11)")
+                text: !Theme.keyboardHints || page.compact ? qsTr("Step") : qsTr("Step (F11)")
                 enabled: ZxEmulator.debuggerReady
                 onClicked: ZxEmulator.debuggerStep()
             }
             Button {
-                text: page.compact ? qsTr("Next") : qsTr("Next (F10)")
+                text: !Theme.keyboardHints || page.compact ? qsTr("Next") : qsTr("Next (F10)")
                 enabled: ZxEmulator.debuggerReady
                 onClicked: ZxEmulator.debuggerNext()
             }
             Button {
-                text: page.compact ? qsTr("Out") : qsTr("Out (F12)")
+                text: !Theme.keyboardHints || page.compact ? qsTr("Out") : qsTr("Out (F12)")
                 enabled: ZxEmulator.debuggerReady
                 onClicked: ZxEmulator.debuggerOut()
             }
             Button {
-                text: page.compact ? qsTr("Run to cursor") : qsTr("Run to cursor (F8)")
+                text: !Theme.keyboardHints || page.compact ? qsTr("Run to cursor") : qsTr("Run to cursor (F8)")
                 enabled: ZxEmulator.debuggerReady && views.currentIndex === 0
                 onClicked: page.runToCursor()
             }
             Button {
-                text: ZxEmulator.paused ? (page.compact ? qsTr("Continue") : qsTr("Continue (F5)")) : (page.compact ? qsTr("Pause") : qsTr("Pause (F5)"))
+                text: ZxEmulator.paused ? (!Theme.keyboardHints || page.compact ? qsTr("Continue") : qsTr("Continue (F5)")) : (!Theme.keyboardHints || page.compact ? qsTr("Pause") : qsTr("Pause (F5)"))
                 onClicked: page.toggleRun()
             }
             Button {
@@ -237,6 +237,7 @@ FocusScope {
         }
         Label {
             Layout.fillWidth: true
+            visible: Theme.gamepadHints
             text: page.compact ? qsTr("A: select · B: back · X: views · Y: address") : qsTr("D-pad / stick: navigate · A: select · B: back · X: views · Y: address\nLB: step · RB: continue/pause · LT: out · RT: next")
             color: Theme.textMuted
             font.pixelSize: Theme.caption

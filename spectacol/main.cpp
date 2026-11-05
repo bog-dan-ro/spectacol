@@ -103,6 +103,14 @@ int main(int argc, char *argv[])
         if (auto *w = window(); w && size.size() == 2)
             w->resize(size[0].toInt(), size[1].toInt());
     }
+#ifdef Q_OS_ANDROID
+    // Apply the saved orientation after the Qt window exists, so its surface
+    // receives the same resize as the Android activity at startup.
+    if (window()) {
+        auto *settings = ZxEmulator::instance().settings();
+        settings->setScreenOrientation(settings->screenOrientation());
+    }
+#endif
 
     // After the UI is up, so it can ask for e.g. the ZX Next SD card image
     if (parser.isSet(machineOption))

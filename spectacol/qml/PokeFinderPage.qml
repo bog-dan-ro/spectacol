@@ -147,13 +147,13 @@ Rectangle {
                 Button {
                     id: buttonInc
                     Layout.fillWidth: true
-                    text: qsTr("Incremented <b>(Y)</b>")
+                    text: Theme.gamepadHints ? qsTr("Incremented <b>(Y)</b>") : qsTr("Incremented")
                     onClicked: ZxEmulator.pokeFinderInced()
                 }
                 Button {
                     id: buttonDec
                     Layout.fillWidth: true
-                    text: qsTr("Decremented <b>(X)</b>")
+                    text: Theme.gamepadHints ? qsTr("Decremented <b>(X)</b>") : qsTr("Decremented")
                     onClicked: ZxEmulator.pokeFinderDeced()
                 }
                 Button {
@@ -185,7 +185,7 @@ Rectangle {
                 Button {
                     id: buttonClose
                     Layout.fillWidth: true
-                    text: qsTr("Close <b>(B)</b>")
+                    text: Theme.gamepadHints ? qsTr("Close <b>(B)</b>") : qsTr("Close")
                     onClicked: pageLoader.source = "";
                 }
             }

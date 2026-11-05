@@ -16,6 +16,7 @@
 */
 
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import Spectacol
 
@@ -46,7 +47,17 @@ FocusScope {
     }
 
     anchors.fill: parent
-    Keys.onEscapePressed: closeRequested()
+    function back() {
+        const hint = hints.find(h => h.pad === "B" && typeof h.action === "function");
+        if (hint) hint.action();
+        else closeRequested();
+    }
+    function closeDialog(): bool {
+        if (!closePageActions()) back();
+        return true;
+    }
+    function closePageActions(): bool { return pageActions.close(); }
+    Keys.onEscapePressed: closeDialog()
 
     // Docked next to the screen in the desktop layout: the game stays bright
     readonly property bool docked: Theme.desktopMode && panel.width < width * 0.7
@@ -90,32 +101,67 @@ FocusScope {
             anchors.fill: parent
             spacing: 0
 
-            ColumnLayout {
+            Item {
                 id: header
+                objectName: "sheetHeader"
                 visible: sheet.title !== "" || sheet.crumb !== ""
                 Layout.fillWidth: true
-                Layout.leftMargin: Theme.sp(6)
-                Layout.rightMargin: Theme.sp(6)
-                Layout.topMargin: Theme.sp(6)
-                Layout.bottomMargin: Theme.sp(4)
-                spacing: Theme.sp(1)
+                Layout.preferredHeight: Theme.mobileUi ? Theme.headerHeight : desktopHeader.implicitHeight + Theme.sp(10)
 
-                Text {
-                    visible: text !== ""
-                    Layout.fillWidth: true
-                    text: sheet.crumb.toUpperCase()
-                    elide: Text.ElideRight
-                    font.pixelSize: Theme.caption
-                    font.letterSpacing: Theme.uiScale
-                    color: Theme.textMuted
+                ColumnLayout {
+                    id: desktopHeader
+                    visible: !Theme.mobileUi
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.sp(6)
+                    anchors.rightMargin: Theme.sp(6)
+                    anchors.topMargin: Theme.sp(6)
+                    anchors.bottomMargin: Theme.sp(4)
+                    spacing: Theme.sp(1)
+                    Text {
+                        visible: text !== ""
+                        Layout.fillWidth: true
+                        text: sheet.crumb.toUpperCase()
+                        elide: Text.ElideRight
+                        font.pixelSize: Theme.caption
+                        font.letterSpacing: Theme.uiScale
+                        color: Theme.textMuted
+                    }
+                    Text {
+                        Layout.fillWidth: true
+                        text: sheet.title
+                        elide: Text.ElideRight
+                        font.pixelSize: Theme.pageTitle
+                        font.weight: Font.DemiBold
+                        color: Theme.text
+                    }
                 }
-                Text {
-                    Layout.fillWidth: true
-                    text: sheet.title
-                    elide: Text.ElideRight
-                    font.pixelSize: Theme.pageTitle
-                    font.weight: Font.DemiBold
-                    color: Theme.text
+                RowLayout {
+                    visible: Theme.mobileUi
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.sp(1)
+                    anchors.rightMargin: Theme.sp(1)
+                    spacing: Theme.sp(2)
+                    ToolButton {
+                        objectName: "sheetBack"
+                        text: "‹"
+                        font.pixelSize: Theme.pageTitle
+                        implicitWidth: Theme.rowHeight
+                        implicitHeight: Theme.rowHeight
+                        Accessible.name: qsTr("Back")
+                        onClicked: sheet.back()
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        text: sheet.title || sheet.crumb
+                        elide: Text.ElideRight
+                        font.pixelSize: Theme.body
+                        font.weight: Font.DemiBold
+                        color: Theme.text
+                    }
+                    PageActions {
+                        id: pageActions
+                        actions: sheet.hints
+                    }
                 }
             }
 
@@ -128,13 +174,15 @@ FocusScope {
 
             Item {
                 id: body
+                objectName: "sheetBody"
+                clip: true
                 Layout.fillWidth: true
                 Layout.fillHeight: true
             }
 
             HintBar {
                 id: hintBar
-                visible: hints.length > 0
+                visible: Theme.showHintBar && hints.length > 0
                 Layout.fillWidth: true
             }
         }

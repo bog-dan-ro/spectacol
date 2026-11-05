@@ -96,7 +96,7 @@ Dialog {
         }
         Button {
             objectName: "formCancel"
-            text: qsTr("Cancel (B)")
+            text: Theme.gamepadHints ? qsTr("Cancel (B)") : qsTr("Cancel")
             onClicked: dialog.reject()
         }
         Keys.onPressed: event => {

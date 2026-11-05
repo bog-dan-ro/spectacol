@@ -202,6 +202,7 @@ qt_add_qml_module(spectacol
         qml/TapesFileBrowserPage.qml
         qml/Theme.qml
         qml/HintBar.qml
+        qml/PageActions.qml
         qml/Hud.qml
         qml/Sheet.qml
         qml/SectionTitle.qml

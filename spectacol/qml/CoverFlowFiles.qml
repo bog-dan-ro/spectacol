@@ -30,7 +30,7 @@ Item
     signal fileSelected(string filePath);
     // full screen, with a hint bar: the messages go above it
     readonly property real panelWidth: width
-    readonly property real hintBarHeight: viewMode === 0 ? hintBar.height : compactHints.height
+    readonly property real hintBarHeight: hintBar.visible ? hintBar.height : 0
     property alias rootFolder: filesModel.rootFolder
     property alias folder: filesModel.folder
     property alias filterClass: filesModel.filterClass
@@ -52,6 +52,7 @@ Item
         else fileSelected(filesModel.path(row));
     }
     function closeDialog(): bool {
+        if (fileActions.close()) return true;
         if (modePicker.popup.visible) { modePicker.popup.close(); return true; }
         if (deviceFile.visible) { deviceFile.close(); focusFiles(); return true; }
         if (copyDialog.visible) { copyDialog.close(); focusFiles(); return true; }
@@ -168,7 +169,9 @@ Item
     CoverFlow {
         id : filesView
 
-        anchors.fill: parent
+        anchors.fill: undefined
+        anchors { left: parent.left; right: parent.right; top: artist_text_label.bottom; bottom: hintBar.top }
+        clip: true
         visible: fileList.viewMode === 0
         model: visible ? filesModel : null
         onCurrentIndexChanged: if (visible && activeFocus) filesModel.currentIndex = currentIndex
@@ -185,7 +188,7 @@ Item
         property string copyPath: ""
         onCopyPathChanged: {
             if (copyPath.length)
-                messagePage.showMessage(ZxEmulator.Info, "\"" + copyPath + qsTr("\" copied to clipboard. Use <b>Paste (R1)</b> button to paste it to another folder."))
+                messagePage.showMessage(ZxEmulator.Info, "\"" + copyPath + qsTr("\" copied to clipboard. Use <b>Paste</b> to paste it to another folder."))
         }
         property bool canCopy: {
             if (!copyPath.length)
@@ -268,46 +271,35 @@ Item
                 }
             }
         }
-        HintBar {
-            id: hintBar
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            hints: [
-                { pad: "A", key: "Enter", text: qsTr("Open"), action: () => filesView.returnPressed() },
-                { pad: "B", key: "Esc", text: qsTr("Close"), action: () => fileList.fileSelected("") },
-                { pad: "X", key: "Del", text: qsTr("Remove"), action: () => removeDialog.remove() },
-                { pad: "L1", key: "C", text: qsTr("Copy"), action: () => filesView.copyPath = filesModel.path(filesView.currentIndex) },
-                { pad: "R1", key: "P", text: filesView.canCopy ? qsTr("Paste") : qsTr("Paste (copy first)"), action: () => copyDialog.copy() },
-                { pad: "Y", key: "F3", text: qsTr("Search"), action: () => search.forceActiveFocus() },
-                { pad: "Start", key: "F2", text: qsTr("View"), action: () => fileList.viewMode = (fileList.viewMode + 1) % 3 },
-                { pad: "L2", key: "Home", text: qsTr("Spectacol folder"), action: () => fileList.folder = ZxEmulator.dataPath }
-            ]
-        }
     }
+    HintBar {
+        id: hintBar
+        visible: Theme.showHintBar
+        height: visible ? implicitHeight : 0
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        hints: [
+            { pad: "A", key: "Enter", text: qsTr("Open"), action: () => fileList.openRow(filesModel.currentIndex) },
+            { pad: "B", key: "Esc", text: qsTr("Close"), action: () => fileList.fileSelected("") },
+            { pad: "X", key: "Del", text: qsTr("Remove"), action: () => removeDialog.remove() },
+            { pad: "L1", key: "C", text: qsTr("Copy"), action: () => filesView.copyPath = filesModel.path(filesModel.currentIndex) },
+            { pad: "R1", key: "P", text: filesView.canCopy ? qsTr("Paste") : qsTr("Paste (copy first)"), action: () => copyDialog.copy() },
+            { pad: "Y", key: "F3", text: qsTr("Search"), action: () => search.forceActiveFocus() },
+            { pad: "Start", key: "F2", text: qsTr("View"), action: () => fileList.viewMode = (fileList.viewMode + 1) % 3 },
+            { pad: "L2", key: "Home", text: qsTr("Spectacol folder"), action: () => fileList.folder = ZxEmulator.dataPath }
+        ]
+    }
+
     CompactFilesView {
         id: compactView
         objectName: "compactFiles"
         visible: fileList.viewMode !== 0
         grid: fileList.viewMode === 2
-        anchors { left: parent.left; right: parent.right; top: artist_text_label.bottom; bottom: compactHints.top; margins: Theme.sp(2) }
+        anchors { left: parent.left; right: parent.right; top: artist_text_label.bottom; bottom: hintBar.top; margins: Theme.sp(2) }
         model: filesModel
         onCurrentIndexChanged: if (visible && activeFocus) filesModel.currentIndex = currentIndex
         onOpenRequested: row => fileList.openRow(row)
-    }
-    HintBar {
-        id: compactHints
-        visible: fileList.viewMode !== 0
-        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-        hints: [
-            { pad: "A", key: "Enter", text: qsTr("Open"), action: () => fileList.openRow(compactView.currentIndex) },
-            { pad: "B", key: "Esc", text: qsTr("Close"), action: () => fileList.fileSelected("") },
-            { pad: "Start", key: "F2", text: qsTr("View"), action: () => fileList.viewMode = (fileList.viewMode + 1) % 3 },
-            { pad: "Y", key: "F3", text: qsTr("Search"), action: () => search.forceActiveFocus() },
-            { pad: "X", key: "Del", text: qsTr("Remove"), action: () => removeDialog.remove() },
-            { pad: "L1", key: "C", text: qsTr("Copy"), action: () => filesView.copyPath = filesModel.path(compactView.currentIndex) },
-            { pad: "R1", key: "P", text: qsTr("Paste"), action: () => copyDialog.copy() }
-        ]
     }
     // Where we are; a click (or Up) goes to the parent folder, or closes at the top
     Rectangle {
@@ -316,7 +308,7 @@ Item
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: headerColumn.implicitHeight + Theme.sp(8)
+        height: headerColumn.implicitHeight + Theme.sp(Theme.mobileUi ? 2 : 8)
         color: Theme.surface
 
         Column {
@@ -324,14 +316,45 @@ Item
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: Theme.sp(6)
-            anchors.rightMargin: Theme.sp(6)
+            anchors.leftMargin: Theme.sp(Theme.mobileUi ? 1 : 6)
+            anchors.rightMargin: Theme.sp(Theme.mobileUi ? 1 : 6)
             spacing: Theme.sp(1)
+            RowLayout {
+                visible: Theme.mobileUi
+                width: parent.width
+                spacing: Theme.sp(2)
+                ToolButton {
+                    objectName: "filesClose"
+                    implicitWidth: Theme.rowHeight
+                    implicitHeight: Theme.rowHeight
+                    text: "‹"
+                    font.pixelSize: Theme.pageTitle
+                    Accessible.name: qsTr("Close files")
+                    onClicked: fileList.fileSelected("")
+                }
+                Label {
+                    Layout.fillWidth: true
+                    text: artist_text_label.root ? qsTr("Open a file") : ZxEmulator.fileName(filesModel.folder)
+                    elide: Text.ElideMiddle
+                    font.pixelSize: Theme.title
+                    color: Theme.text
+                }
+                PageActions {
+                    id: fileActions
+                    actions: hintBar.hints.concat(Qt.platform.os === "android" ? [
+                        { text: qsTr("Device files…"), action: () => deviceFile.open() }
+                    ] : [])
+                    onDismissed: fileList.focusFiles()
+                }
+            }
             RowLayout {
                 width: parent.width
                 Button {
                     objectName: "filesUp"
-                    text: qsTr("Up")
+                    text: Theme.mobileUi ? "↑" : qsTr("Up")
+                    Accessible.name: qsTr("Up a folder")
+                    Layout.minimumWidth: Theme.rowHeight
+                    Layout.minimumHeight: Theme.rowHeight
                     enabled: !artist_text_label.root
                     onClicked: filesModel.cdUp()
                 }
@@ -346,7 +369,8 @@ Item
                     id: search
                     objectName: "filesSearch"
                     Layout.fillWidth: true
-                    placeholderText: qsTr("Search filenames (F3)")
+                    placeholderText: Theme.keyboardHints ? qsTr("Search filenames (F3)") : qsTr("Search filenames")
+                    Layout.minimumWidth: 0
                     text: filesModel.search
                     onTextEdited: filesModel.search = text
                     onAccepted: fileList.focusFiles()
@@ -358,12 +382,14 @@ Item
                 }
             }
             Text {
+                visible: !Theme.mobileUi
                 text: (artist_text_label.root ? qsTr("Open a file") : qsTr("‹ Up a folder")).toUpperCase()
                 font.pixelSize: Theme.caption
                 font.letterSpacing: Theme.uiScale
                 color: Theme.textMuted
             }
             Text {
+                visible: !Theme.mobileUi
                 width: parent.width
                 text: filesModel.folder
                 elide: Text.ElideMiddle
@@ -378,22 +404,15 @@ Item
             height: Theme.line
             color: Theme.outline
         }
-        Button {
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.margins: Theme.sp(3)
-            visible: Qt.platform.os === "android"
-            text: qsTr("Device files…")
-            onClicked: deviceFile.open()
-        }
+
     }
 
     ShaderEffect {
-        visible: fileList.viewMode === 0
+        visible: fileList.viewMode === 0 && !Theme.mobileUi
         smooth: true
         property variant source : ShaderEffectSource {
             sourceItem: filesView
-            live: fileList.viewMode === 0
+            live: fileList.viewMode === 0 && !Theme.mobileUi
             width : fileList.width
             height : fileList.height
         }

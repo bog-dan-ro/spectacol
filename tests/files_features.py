@@ -183,6 +183,13 @@ def main():
         elif name == 'browser-phone':
             _, text, *_ = run(name, BROWSER + ['F2', 'F3', 'input:feature', 'Return'], size='480x640', extra='large=true\n')
             assert 'feature game' in text, text
+        elif name == 'browser-phone-hints-scroll':
+            # Cross the drag threshold, then move again after Flickable takes the grab.
+            drag = ['point:1:down:450:580', 'point:1:move:350:580',
+                    'point:1:move:250:580', 'point:1:move:50:580', 'point:1:up:50:580']
+            _, text, *_ = run(name, BROWSER + ['F2', 'F3', 'input:feature', 'Return'] + drag * 4 + ['wait'] * 8,
+                              size='480x640', extra='large=true\n')
+            assert 'feature game' in text and 'spectacol folder' in text, text
         elif name == 'symbols-phone':
             _, text, *_ = run(name, SYMBOLS + ['click:importSymbols'], size='480x640')
             assert 'import assembler' in text, text
@@ -193,7 +200,7 @@ def main():
     cases = ['trainer-toggle', 'trainer-restore', 'trainer-value', 'trainer-value-cancel', 'trainer-folder',
              'rom-invalid-size', 'rom-persistence', 'rom-back', 'browser-list-search', 'browser-grid-pad',
              'browser-persistence', 'symbols-import-jump', 'symbols-invalid', 'symbols-back',
-             'browser-phone', 'symbols-phone', 'browser-open-pad', 'browser-open-touch', 'browser-stick-open', 'rom-stick', 'machine-stick', 'rom-picker-back', 'folder-picker-back']
+             'browser-phone', 'browser-phone-hints-scroll', 'symbols-phone', 'browser-open-pad', 'browser-open-touch', 'browser-stick-open', 'rom-stick', 'machine-stick', 'rom-picker-back', 'folder-picker-back']
     def checked(name):
         try:
             scenario(name)

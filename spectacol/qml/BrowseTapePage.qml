@@ -136,7 +136,7 @@ Sheet {
 
             Button {
                 Layout.fillWidth: true
-                text: qsTr("Close <b>(B)</b>")
+                text: Theme.gamepadHints ? qsTr("Close <b>(B)</b>") : qsTr("Close")
                 onClicked: showData.close()
             }
         }

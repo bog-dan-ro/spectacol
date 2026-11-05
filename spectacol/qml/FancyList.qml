@@ -35,7 +35,7 @@ FancyBaseList {
 
     footer: Button {
         width: view.width
-        text: qsTr("Close (B)")
+        text: Theme.gamepadHints ? qsTr("Close (B)") : qsTr("Close")
         onClicked: pageLoader.source = ""
     }
 }

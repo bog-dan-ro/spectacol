@@ -29,7 +29,7 @@ Sheet {
     title: qsTr("Search online")
     preferredWidth: Theme.sp(260)
     readonly property var catalogue: ZxEmulator.onlineGamesModel
-    readonly property bool narrow: width < Theme.sp(190)
+    readonly property bool narrow: panelWidth < Theme.sp(120)
     property int pendingIndex: -1
     hints: [
         {
@@ -138,14 +138,16 @@ Sheet {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Theme.sp(5)
-        spacing: Theme.sp(3)
+        anchors.margins: Theme.sp(Theme.mobileUi ? 2 : 5)
+        spacing: Theme.sp(Theme.mobileUi ? 1 : 3)
         GridLayout {
             columns: page.narrow ? 2 : 3
             Layout.fillWidth: true
             ComboBox {
                 id: source
                 Layout.preferredWidth: Theme.sp(48)
+                Layout.columnSpan: page.narrow ? 2 : 1
+                Layout.fillWidth: page.narrow
                 model: page.catalogue.sources
                 currentIndex: preferences.sourceIndex
                 Accessible.name: qsTr("Search source")
@@ -158,6 +160,7 @@ Sheet {
             FancyTextField {
                 id: query
                 Layout.fillWidth: true
+                Layout.minimumWidth: 0
                 placeholderText: qsTr("Title, or one letter to browse")
                 selectByMouse: true
                 maximumLength: 200
@@ -166,8 +169,6 @@ Sheet {
             }
             Button {
                 text: qsTr("Search")
-                Layout.columnSpan: page.narrow ? 2 : 1
-                Layout.fillWidth: page.narrow
                 onClicked: page.performSearch()
             }
         }

@@ -152,6 +152,11 @@ measurement limits. Generated evidence remains under the build directories.
   - [x] Desktop layout (Options › General › Layout: Auto picks it without a gamepad or a touch screen): a menu bar
         built from the same menu, a status bar, pages docked beside the screen (the tape browser keeps the tape
         playing).
+  - [x] Compact Android page chrome: a 48 dp header (72 with Large text) with Back and an actions menu; retain
+        48 dp touch targets. Hide keyboard shortcut footers on touch-only devices; keep connected-gamepad
+        hints and OK/Back hints for non-touch Android devices. Narrow hint rows scroll rather than wrap.
+        About/controller help scroll independently of the header, with compact phone tabs. Quick Open
+        keeps view/search controls, moves file actions/device import to ⋮, and avoids reflecting its footer.
   - [ ] Options › Screen and the filters list keep the old look: they hold the screen filter UI (owner's work).
   - [ ] Still the old structure, only recoloured: poke finder, the
         gamepad calibration, the on-screen keyboard and joysticks.
@@ -182,6 +187,18 @@ API 37 x86_64 emulator. Physical phone/TV validation remains open.
       target SDK, 16 KiB native library alignment. Build both x86_64 and ARM64 packages.
 - [x] Detect touch hardware, show on-screen controls, balance pause/resume across application states and
       handle Android Back (dismiss input keyboard before closing the page).
+- [x] Compact shared page/drawer chrome, with touch actions instead of keyboard-only footer hints.
+      Hide Android system bars in fullscreen, remove the flat drawer's rounded-corner spacer, and align
+      the landscape controls to the window's left edge independently of the ZX viewport; keep the
+      Android ZX display aligned to the top right.
+      Actions menus consume outside taps without closing the underlying page. The drawer focuses its
+      list, handles D-pad/OK there and restores the newly opened page's focus.
+      `tests/android_ui.py` covers landscape touch, Large text, native picker/ROM access and an explicit
+      Android Menu/D-pad/OK/Back probe. The desktop file regression also drags a narrow hint row.
+- [x] Default Android orientation to Any, preserving saved Landscape/Portrait choices. Apply the saved
+      orientation after creating the Qt window so startup rotation also resizes its surface. On the
+      Qt 6.12/API 37 phone emulator, `tests/android_ui.py --rotation-only` covers fresh defaults, both
+      saved choices and live changes through Options › Screen; physical phone rotation remains to verify.
 - [ ] Offer migration of old shared data when readable. The old directory is preserved and its location
       is remembered as `Android/legacyDataPath`; individual files can already be imported through the picker.
 - [ ] Browse a granted games folder (`content://`) in the in-app cover flow, retaining its URI permission.

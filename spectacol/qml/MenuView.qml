@@ -18,6 +18,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import QtGamepadLegacy
 import Spectacol
@@ -32,6 +33,8 @@ ColumnLayout {
     property ZxMenuItem currentMenu: rootMenu
     property var menus: []
     property alias useGamepad: gamepadKeyNavigation.active
+
+    function focusMenu() { menuView.forceActiveFocus(Qt.PopupFocusReason); }
 
     function decrementCurrentIndex()
     {
@@ -102,6 +105,7 @@ ColumnLayout {
             menus = menus.slice(0, -1);
             currentMenu = menu.menu;
             menuView.currentIndex = menu.index;
+            focusMenu();
         } else {
             reset();
             menuBar.close();
@@ -112,23 +116,34 @@ ColumnLayout {
 
     // The header: Spectacol and the machine at the top level, a way back in a sub menu
     Item {
+        objectName: "menuHeader"
         Layout.fillWidth: true
-        Layout.preferredHeight: headerColumn.implicitHeight + Theme.sp(10)
+        Layout.preferredHeight: Theme.mobileUi ? Theme.headerHeight : headerColumn.implicitHeight + Theme.sp(10)
 
         ColumnLayout {
             id: headerColumn
             anchors.fill: parent
-            anchors.leftMargin: Theme.sp(6)
-            anchors.rightMargin: Theme.sp(6)
-            anchors.topMargin: Theme.sp(6)
-            anchors.bottomMargin: Theme.sp(4)
+            anchors.leftMargin: Theme.sp(Theme.mobileUi ? 1 : 6)
+            anchors.rightMargin: Theme.sp(Theme.mobileUi ? 1 : 6)
+            anchors.topMargin: Theme.mobileUi ? 0 : Theme.sp(6)
+            anchors.bottomMargin: Theme.mobileUi ? 0 : Theme.sp(4)
             spacing: Theme.sp(1)
 
             RowLayout {
                 spacing: Theme.sp(3)
+                ToolButton {
+                    visible: Theme.mobileUi
+                    objectName: "menuBack"
+                    text: root.menus.length ? "‹" : "×"
+                    font.pixelSize: Theme.title
+                    implicitWidth: Theme.rowHeight
+                    implicitHeight: Theme.rowHeight
+                    Accessible.name: root.menus.length ? qsTr("Back") : qsTr("Close menu")
+                    onClicked: root.popMenu()
+                }
                 // the 128K's rainbow stripe
                 Row {
-                    visible: root.menus.length === 0
+                    visible: !Theme.mobileUi && root.menus.length === 0
                     Repeater {
                         model: Theme.stripe
                         delegate: Rectangle {
@@ -141,21 +156,24 @@ ColumnLayout {
                     }
                 }
                 Text {
-                    visible: root.menus.length > 0
+                    visible: !Theme.mobileUi && root.menus.length > 0
                     text: "‹"
-                    font.pixelSize: Theme.pageTitle
+                    font.pixelSize: Theme.mobileUi ? Theme.body : Theme.pageTitle
                     color: Theme.textMuted
                 }
                 Text {
                     Layout.fillWidth: true
                     text: root.menus.length === 0 || !root.currentMenu ? "Spectacol" : root.plainText(root.currentMenu.text)
+                    Accessible.role: Accessible.StaticText
+                    Accessible.name: text
                     elide: Text.ElideRight
-                    font.pixelSize: Theme.pageTitle
+                    font.pixelSize: Theme.mobileUi ? Theme.body : Theme.pageTitle
                     font.weight: Font.DemiBold
                     color: Theme.text
                 }
             }
             Text {
+                visible: !Theme.mobileUi
                 Layout.fillWidth: true
                 text: (root.menus.length === 0 ? ZxEmulator.settings.currentMachine
                                                : root.menus.map(m => m.menu === root.rootMenu ? "Spectacol" : root.plainText(m.menu.text)).join(" › ")).toUpperCase()
@@ -168,7 +186,7 @@ ColumnLayout {
 
         MouseArea {
             anchors.fill: parent
-            enabled: root.menus.length > 0
+            enabled: !Theme.mobileUi && root.menus.length > 0
             onClicked: root.popMenu()
         }
 
@@ -182,6 +200,7 @@ ColumnLayout {
 
     ListView {
         id: menuView
+        focus: true
         clip: true
         Layout.fillWidth: true
         Layout.fillHeight: true
@@ -191,6 +210,31 @@ ColumnLayout {
         highlightFollowsCurrentItem: true
         highlightMoveDuration: Theme.reduceMotion ? 0 : 100
         keyNavigationWraps: true
+        Keys.onReturnPressed: event => { event.accepted = true; }
+        Keys.onEnterPressed: event => { event.accepted = true; }
+        Keys.onEscapePressed: root.popMenu()
+        // Activate on release, as the main window does. Opening a page on
+        // press lets its closing drawer route the release to that page again.
+        Keys.onReleased: event => {
+            if ([Qt.Key_Select, Qt.Key_Return, Qt.Key_Enter].includes(event.key)) {
+                event.accepted = true;
+                root.openSelectedMenu();
+            }
+        }
+        Keys.onPressed: event => {
+            if (event.key === Qt.Key_Down) root.incrementCurrentIndex();
+            else if (event.key === Qt.Key_Up) root.decrementCurrentIndex();
+            else if (event.key === Qt.Key_Select) event.accepted = true;
+            else if (event.key === Qt.Key_Left || event.key === Qt.Key_Back) root.popMenu();
+            else if (event.key === Qt.Key_Right) {
+                if (menuView.currentIndex >= 0 && menuView.currentIndex < menuModel.count
+                        && menuModel.get(menuView.currentIndex).modelData.children.length)
+                    root.openSelectedMenu();
+            }
+            else if (event.key === Qt.Key_F5 || event.key === Qt.Key_Menu) menuBar.close();
+            else { event.accepted = false; return; }
+            event.accepted = true;
+        }
 
         model: menuModel
 
@@ -209,8 +253,13 @@ ColumnLayout {
             id: menuItem
             required property var modelData
             required property int index
+            objectName: "menuItem" + index
             width: menuView.width
             height: Theme.rowHeight
+            Accessible.role: Accessible.MenuItem
+            Accessible.name: root.plainText(modelData.text)
+            Accessible.selected: index === menuView.currentIndex
+            Accessible.onPressAction: root.openMenu(modelData, index)
 
             RowLayout {
                 anchors.fill: parent
@@ -234,7 +283,7 @@ ColumnLayout {
 
             MouseArea {
                 anchors.fill: parent
-                hoverEnabled: true
+                hoverEnabled: !Theme.mobileUi
                 onEntered: menuView.currentIndex = menuItem.index
                 onClicked: root.openMenu(menuItem.modelData, menuItem.index)
             }
@@ -242,6 +291,7 @@ ColumnLayout {
     }
 
     HintBar {
+        visible: Theme.showHintBar
         Layout.fillWidth: true
         hints: [
             { pad: "A", key: "Enter", text: qsTr("Select"), action: () => root.openSelectedMenu() },

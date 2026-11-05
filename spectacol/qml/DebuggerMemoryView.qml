@@ -210,7 +210,8 @@ FocusScope {
         Label {
             Layout.fillWidth: true
             visible: pane.height >= Theme.sp(80)
-            text: qsTr("Arrows select bytes · Enter edits · Values are hexadecimal · ROM editing needs explicit confirmation")
+            text: Theme.keyboardHints ? qsTr("Arrows select bytes · Enter edits · Values are hexadecimal · ROM editing needs explicit confirmation")
+                                      : qsTr("Values are hexadecimal · ROM editing needs explicit confirmation")
             wrapMode: Text.Wrap
             color: Theme.textMuted
         }

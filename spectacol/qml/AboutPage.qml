@@ -39,6 +39,12 @@ Sheet {
         { pad: "B", key: "Esc", text: qsTr("Close"), action: () => pageLoader.source = "" }
     ]
 
+    function scrollHelp(direction: int) {
+        const view = helpPages.children[tab];
+        view.contentY = Math.max(0, Math.min(view.contentHeight - view.height, view.contentY + direction * Theme.rowHeight));
+    }
+    Keys.onUpPressed: scrollHelp(-1)
+    Keys.onDownPressed: scrollHelp(1)
     Keys.onLeftPressed: tab = Math.max(0, tab - 1)
     Keys.onRightPressed: tab = Math.min(tabs.length - 1, tab + 1)
 
@@ -86,41 +92,28 @@ Sheet {
         anchors.fill: parent
         spacing: 0
 
-        Row {
-            Layout.leftMargin: Theme.sp(6)
-            Layout.topMargin: Theme.sp(3)
-            Layout.bottomMargin: Theme.sp(2)
-            spacing: Theme.sp(1)
+        TabBar {
+            objectName: "aboutTabs"
+            Layout.fillWidth: true
+            currentIndex: page.tab
+            onCurrentIndexChanged: page.tab = currentIndex
             Repeater {
-                model: page.tabs
-                delegate: Rectangle {
-                    id: tabButton
+                model: Theme.mobileUi ? [qsTr("About"), qsTr("Menus"), qsTr("Games")] : page.tabs
+                delegate: TabButton {
                     required property string modelData
                     required property int index
-                    readonly property bool selected: index === page.tab
-                    width: tabLabel.implicitWidth + Theme.sp(6)
-                    height: Theme.sp(9)
-                    radius: Theme.radiusSmall
-                    color: selected ? Theme.accentFill : "transparent"
-                    border.width: selected ? Theme.line : 0
-                    border.color: Theme.accent
-                    Text {
-                        id: tabLabel
-                        anchors.centerIn: parent
-                        text: tabButton.modelData
-                        font.pixelSize: Theme.body
-                        font.weight: tabButton.selected ? Font.DemiBold : Font.Normal
-                        color: tabButton.selected ? Theme.text : Theme.textMuted
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: page.tab = tabButton.index
-                    }
+                    Accessible.name: page.tabs[index]
+                    text: modelData
+                    font.pixelSize: Theme.body
+                    implicitHeight: Theme.rowHeight
                 }
             }
         }
 
         StackLayout {
+            id: helpPages
+            Layout.minimumHeight: 0
+            Layout.minimumWidth: 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             currentIndex: page.tab
@@ -156,51 +149,69 @@ Sheet {
                 }
             }
 
-            ColumnLayout {
-                spacing: Theme.sp(2)
-                Image {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.margins: Theme.sp(4)
-                    fillMode: Image.PreserveAspectFit
-                    source: "qrc:///images/gamepad.png"
-                }
+            Flickable {
+                clip: true
+                contentHeight: mappings0.implicitHeight
+                boundsBehavior: Flickable.StopAtBounds
+                ScrollIndicator.vertical: ScrollIndicator {}
                 ColumnLayout {
-                    Layout.leftMargin: Theme.sp(6)
-                    Layout.rightMargin: Theme.sp(6)
-                    Layout.bottomMargin: Theme.sp(4)
+                    id: mappings0
+                    width: parent.width
                     spacing: Theme.sp(2)
-                    Mapping { button: qsTr("Start"); action: qsTr("Opens and closes the menu") }
-                    Mapping { button: qsTr("Back"); action: qsTr("Closes the menu or the page; quits from the game") }
-                    Mapping { button: qsTr("D-pad, left stick"); action: qsTr("Move through menus and settings") }
-                    Mapping { button: "A"; action: qsTr("Select, change") }
-                    Mapping { button: "B"; action: qsTr("Close the page or the menu") }
-                    Mapping { button: "X"; action: qsTr("On-screen number keys") }
-                    Mapping { button: "Y"; action: qsTr("On-screen 48K keyboard") }
+                    Image {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Theme.sp(40)
+                        Layout.margins: Theme.sp(4)
+                        fillMode: Image.PreserveAspectFit
+                        source: "qrc:///images/gamepad.png"
+                        sourceSize.width: Theme.sp(100)
+                    }
+                    ColumnLayout {
+                        Layout.leftMargin: Theme.sp(6)
+                        Layout.rightMargin: Theme.sp(6)
+                        Layout.bottomMargin: Theme.sp(4)
+                        spacing: Theme.sp(2)
+                        Mapping { button: qsTr("Start"); action: qsTr("Opens and closes the menu") }
+                        Mapping { button: qsTr("Back"); action: qsTr("Closes the menu or the page; quits from the game") }
+                        Mapping { button: qsTr("D-pad, left stick"); action: qsTr("Move through menus and settings") }
+                        Mapping { button: "A"; action: qsTr("Select, change") }
+                        Mapping { button: "B"; action: qsTr("Close the page or the menu") }
+                        Mapping { button: "X"; action: qsTr("On-screen number keys") }
+                        Mapping { button: "Y"; action: qsTr("On-screen 48K keyboard") }
+                    }
                 }
             }
 
-            ColumnLayout {
-                spacing: Theme.sp(2)
-                Image {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.margins: Theme.sp(4)
-                    fillMode: Image.PreserveAspectFit
-                    source: "qrc:///images/gamepad.png"
-                }
+            Flickable {
+                clip: true
+                contentHeight: mappings1.implicitHeight
+                boundsBehavior: Flickable.StopAtBounds
+                ScrollIndicator.vertical: ScrollIndicator {}
                 ColumnLayout {
-                    Layout.leftMargin: Theme.sp(6)
-                    Layout.rightMargin: Theme.sp(6)
-                    Layout.bottomMargin: Theme.sp(4)
+                    id: mappings1
+                    width: parent.width
                     spacing: Theme.sp(2)
-                    Mapping { button: qsTr("D-pad, both sticks"); action: qsTr("Joystick directions") }
-                    Mapping { button: "A, B, L1, R1"; action: qsTr("Fire") }
-                    Mapping { button: qsTr("Start"); action: qsTr("Opens the menu") }
-                    Mapping { button: "X"; action: qsTr("On-screen number keys") }
-                    Mapping { button: "Y"; action: qsTr("On-screen 48K keyboard") }
-                    Mapping { button: "L2"; action: qsTr("Quick save snapshot") }
-                    Mapping { button: "R2"; action: qsTr("Quick load snapshot") }
+                    Image {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Theme.sp(40)
+                        Layout.margins: Theme.sp(4)
+                        fillMode: Image.PreserveAspectFit
+                        source: "qrc:///images/gamepad.png"
+                        sourceSize.width: Theme.sp(100)
+                    }
+                    ColumnLayout {
+                        Layout.leftMargin: Theme.sp(6)
+                        Layout.rightMargin: Theme.sp(6)
+                        Layout.bottomMargin: Theme.sp(4)
+                        spacing: Theme.sp(2)
+                        Mapping { button: qsTr("D-pad, both sticks"); action: qsTr("Joystick directions") }
+                        Mapping { button: "A, B, L1, R1"; action: qsTr("Fire") }
+                        Mapping { button: qsTr("Start"); action: qsTr("Opens the menu") }
+                        Mapping { button: "X"; action: qsTr("On-screen number keys") }
+                        Mapping { button: "Y"; action: qsTr("On-screen 48K keyboard") }
+                        Mapping { button: "L2"; action: qsTr("Quick save snapshot") }
+                        Mapping { button: "R2"; action: qsTr("Quick load snapshot") }
+                    }
                 }
             }
         }

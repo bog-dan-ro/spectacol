@@ -27,6 +27,7 @@ import "private"
 ApplicationWindow {
     id: mainScreen
     visible: true
+    visibility: Qt.platform.os === "android" ? Window.FullScreen : Window.AutomaticVisibility
 
     width: 320 * 3
     height: 256 * 3
@@ -35,8 +36,11 @@ ApplicationWindow {
 
     property bool portrait: width < height
     function goBack() {
+        const sheet = pageLoader.item as Sheet;
         if (Qt.inputMethod.visible)
             Qt.inputMethod.hide();
+        else if (sheet && sheet.closePageActions())
+            return;
         else if (pageLoader.item && typeof pageLoader.item.closeDialog === "function" && pageLoader.item.closeDialog())
             return;
         else if (menuBar.position)
@@ -117,7 +121,21 @@ ApplicationWindow {
 
     Drawer {
         id: menuBar
-        focus: false
+        // Our flat drawer has no rounded-corner spacer above its header.
+        topPadding: SafeArea.margins.top
+        bottomPadding: SafeArea.margins.bottom
+        focus: true
+        onOpened: menuView.focusMenu()
+        onClosed: Qt.callLater(() => {
+            // A page may open while the drawer is leaving. Popup focus
+            // restoration must finish before the new page takes focus.
+            if (pageLoader.status === Loader.Ready) {
+                if (typeof pageLoader.item.focusFiles === "function") pageLoader.item.focusFiles();
+                else pageLoader.item.forceActiveFocus(Qt.PopupFocusReason);
+            } else {
+                mainRectangle.forceActiveFocus(Qt.PopupFocusReason);
+            }
+        })
         dragMargin: ZxEmulator.settings.swipe4menu ? Qt.styleHints.startDragDistance : 0
 
         width: Math.min(mainScreen.width * 0.85, Theme.sp(95))
@@ -244,6 +262,7 @@ ApplicationWindow {
                 }
                 break;
 
+            case Qt.Key_Select:
             case Qt.Key_Return:
             case Qt.Key_Enter:
                 if (menuBar.position)
@@ -273,6 +292,7 @@ ApplicationWindow {
 
         Keys.onReleased: (event)=> {
             switch (event.key) {
+            case Qt.Key_Select:
             case Qt.Key_Return:
             case Qt.Key_Enter:
                 if (menuBar.position) {
@@ -294,6 +314,7 @@ ApplicationWindow {
 
             ZxScreen {
                 id: zxScreen
+                fullScreen: Qt.platform.os === "android"
                 anchors.fill: parent
                 mouseGrabSuspended: pageLoader.status !== Loader.Null || menuBar.position > 0 || !ZxEmulator.processInputEvents
 
@@ -323,10 +344,14 @@ ApplicationWindow {
 
         Grid {
             id: screenButtonsGrid
+            objectName: "screenControls"
             anchors.fill: parent
+            // The landscape control rail belongs to the window edge, outside
+            // the safe-area padding used by pages and the ZX viewport.
+            anchors.leftMargin: mainScreen.portrait ? 0 : -mainScreen.leftPadding
             anchors.topMargin: mainScreen.portrait ? zxScreen.implicitHeight : 0;
             visible: ZxEmulator.touchscreen && ZxEmulator.showControlsIcons
-            horizontalItemAlignment: Grid.AlignHCenter
+            horizontalItemAlignment: mainScreen.portrait ? Grid.AlignHCenter : Grid.AlignLeft
             verticalItemAlignment: Grid.AlignVCenter
             columns: mainScreen.portrait ? 6 : 1
             rows: mainScreen.portrait ? 1 : 6

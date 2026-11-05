@@ -139,7 +139,6 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
         m_joystickOpacity = opacity(u"joystickOpacity"_s);
         m_buttonsOpacity = opacity(u"buttonsOpacity"_s);
     }
-    setScreenOrientation(screenOrientation());
     connect(ZxImage::instance(), &ZxImage::sourceGeometryChanged, this, &ZxSettings::borderLimitsChanged, Qt::QueuedConnection);
 
     connect(&NextSdCard::instance(), &NextSdCard::ready, this, [this] {
@@ -595,7 +594,7 @@ int ZxSettings::screenOrientation() const
 #else
     QSettings s;
     s.beginGroup(u"Screen"_s);
-    return s.value("orientation", Landscape).toInt();
+    return s.value("orientation", Sensors).toInt();
 #endif
 }
 
