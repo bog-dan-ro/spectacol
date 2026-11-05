@@ -130,6 +130,50 @@ class NextUartTest : public QObject {
         send(0, "AT+RST\r\n");
         QTRY_VERIFY(received().contains("ready"));
     }
+    void wifiSetup()
+    {
+        // Both Wi-Fi wizards shipped with NextZXOS query station IP and DNS.
+        for (const QByteArray &command : {QByteArray("ATE0"), QByteArray("AT+CWMODE=1"), QByteArray("AT+GMR"),
+                                         QByteArray("AT+CWJAP?"), QByteArray("AT+CIPSTA?"),
+                                         QByteArray("AT+CIPDNS_CUR?"), QByteArray("AT+CIPDNS?")}) {
+            send(0, command + "\r\n");
+            QTRY_VERIFY(received().endsWith("\r\nOK\r\n"));
+            QVERIFY(!received().contains("ERROR"));
+        }
+        QVERIFY(received().count("+CIPDNS:") == 2);
+        send(0, "AT+CIPSTA?\r\n");
+        QTRY_VERIFY(received().endsWith("\r\nOK\r\n"));
+        QVERIFY(received().contains("+CIPSTA:ip:\"127.0.0.1\""));
+        QVERIFY(received().contains("+CIPSTA:gateway:"));
+        QVERIFY(received().contains("+CIPSTA:netmask:"));
+
+        for (const QByteArray &command : {QByteArray("AT+CWDHCP=0,1"), QByteArray("AT+CIPSTA=\"192.168.1.42\""),
+                                         QByteArray("AT+CIPDNS_DEF=1,1.1.1.1,9.9.9.9")}) {
+            send(0, command + "\r\n");
+            QTRY_VERIFY(received().endsWith("\r\nOK\r\n"));
+        }
+        send(0, "AT+CIPSTA?\r\n");
+        QTRY_VERIFY(received().contains("+CIPSTA:ip:\"192.168.1.42\""));
+        send(0, "AT+CIPDNS_CUR?\r\n");
+        QTRY_VERIFY(received().endsWith("\r\nOK\r\n"));
+        QVERIFY(received().contains("+CIPDNS_CUR:1.1.1.1"));
+        QVERIFY(received().contains("+CIPDNS_CUR:9.9.9.9"));
+        send(0, "AT+CIPSTA=\"999.1.1.1\"\r\n");
+        QTRY_VERIFY(received().contains("ERROR"));
+        send(0, "AT+CIPSTA?\r\n");
+        QTRY_VERIFY(received().contains("192.168.1.42"));
+        for (const QByteArray &command : {QByteArray("AT+CWDHCP=1,1"), QByteArray("AT+CIPDNS_DEF=0")}) {
+            send(0, command + "\r\n");
+            QTRY_VERIFY(received().endsWith("\r\nOK\r\n"));
+        }
+        send(0, "AT+CIPSTA?\r\n");
+        QTRY_VERIFY(received().contains("+CIPSTA:ip:\"127.0.0.1\""));
+        send(0, "AT+CWQAP\r\n");
+        QTRY_VERIFY(received().contains("OK"));
+        send(0, "AT+CIPSTA?\r\n");
+        QTRY_VERIFY(received().contains("+CIPSTA:ip:\"0.0.0.0\""));
+        QVERIFY(host->errorString().isEmpty());
+    }
     void tcpBinary()
     {
         QTcpServer server;

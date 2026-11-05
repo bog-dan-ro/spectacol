@@ -20,6 +20,11 @@
 let line = "", echo = true, mux = 0, mode = 1, joined = true;
 let pending = null, sockets = {}, connecting = {}, closing = {};
 let receiveQueue=[], receiveBytes=0;
+// These describe the virtual station; sockets still use the host network.
+let station = ["127.0.0.1", "127.0.0.1", "255.0.0.0"], dns = ["8.8.8.8", "8.8.4.4"], dhcp = 1;
+function ipv4(value) {
+    return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value) && value.split(".").every(n => Number(n)<=255);
+}
 function deliver(data) {
     if(receiveBytes+data.length>1024*1024) {
         host.log("ESP UART receive backlog exceeded 1 MiB"); host.network("close",-1); sockets={}; receiveQueue=[]; receiveBytes=0; return;
@@ -63,7 +68,34 @@ function command(cmd) {
     if(/^AT\+CWJAP(?:_CUR|_DEF)?\?$/.test(cmd)) { reply(joined?'\r\n+CWJAP:"Spectacol","00:00:00:00:00:00",1,-40\r\n':"\r\nNo AP\r\n"); return ok(); }
     if(cmd==="AT+CWQAP") { joined=false; host.network("close",-1); sockets={}; return ok(); }
     if(cmd==="AT+CWLAP") { reply('\r\n+CWLAP:(0,"Spectacol",-40,"00:00:00:00:00:00",1)\r\n'); return ok(); }
-    if(cmd==="AT+CIFSR") { reply('\r\n+CIFSR:STAIP,"127.0.0.1"\r\n+CIFSR:STAMAC,"00:00:00:00:00:00"\r\n'); return ok(); }
+    const config = /^AT\+(CIPSTA|CIPDNS|CWDHCP)(_CUR|_DEF)?([?=])(.*)$/.exec(cmd);
+    if(config) {
+        const name=config[1], prefix="+"+name+(config[2] || ""), query=config[3]==="?", a=args(config[4]);
+        if(query && config[4]!=="") return error();
+        if(name==="CIPSTA") {
+            if(query) {
+                ["ip","gateway","netmask"].forEach((key,i) => reply("\r\n"+prefix+":"+key+':"'+(joined ? station[i] : "0.0.0.0")+'"\r\n'));
+            } else {
+                if(a.length<1 || a.length>3 || !a.every(ipv4)) return error();
+                station=a.concat(station.slice(a.length)); dhcp=0;
+            }
+        } else if(name==="CIPDNS") {
+            if(query) dns.forEach(address => reply("\r\n"+prefix+":"+address+"\r\n"));
+            else {
+                if(!["0","1"].includes(a[0]) || a.length>3 || (a[0]==="1" && a.length<2) || !a.slice(1).every(ipv4)) return error();
+                dns=a[0]==="0" ? ["8.8.8.8","8.8.4.4"] : a.slice(1).concat(dns.slice(a.length-1));
+            }
+        } else {
+            if(query) reply("\r\n"+prefix+":"+dhcp+"\r\n");
+            else {
+                if(a.length!==2 || !["0","1"].includes(a[0]) || !["1","2","3"].includes(a[1])) return error();
+                dhcp=Number(a[0]);
+                if(dhcp) station=["127.0.0.1","127.0.0.1","255.0.0.0"];
+            }
+        }
+        return ok();
+    }
+    if(cmd==="AT+CIFSR") { reply('\r\n+CIFSR:STAIP,"'+(joined ? station[0] : "0.0.0.0")+'"\r\n+CIFSR:STAMAC,"00:00:00:00:00:00"\r\n'); return ok(); }
     if(cmd==="AT+CIPSTATUS") {
         reply("\r\nSTATUS:"+(Object.keys(sockets).length ? 3 : joined ? 2 : 5)+"\r\n");
         for(const id of Object.keys(sockets)) { const s=sockets[id]; reply('+CIPSTATUS:'+id+',"'+s.type+'","'+s.host+'",'+s.port+',0,0\r\n'); }
