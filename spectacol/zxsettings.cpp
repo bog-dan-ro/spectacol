@@ -31,8 +31,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string_view>
 
 using namespace Qt::StringLiterals;
+using namespace std::literals;
 
 #ifdef Q_OS_ANDROID
 #  include <QCoreApplication>
@@ -75,7 +77,7 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
     for (std::size_t i = 0; i < m_machineIds.size(); ++i) {
         auto prof = machines.create(m_machineIds[i]);
         m_machineNames << QString::fromUtf8(prof->name().data(), qsizetype(prof->name().size()));
-        if (m_machineIds[i] == "48k")
+        if (m_machineIds[i] == "48k"sv)
             m_currentMachineIndex = int(i);
     }
 
@@ -197,7 +199,7 @@ void ZxSettings::applyToEmulator()
     // The machine picked last time. The Next needs its SD card image: without it
     // stay on the 48K, picking the Next again offers to download it.
     const auto it = std::ranges::find(m_machineIds, m_savedMachineId);
-    if (it == m_machineIds.end() || (*it == "next" && !NextSdCard::instance().available()))
+    if (it == m_machineIds.end() || (*it == "next"sv && !NextSdCard::instance().available()))
         return;
     applyMachine(int(it - m_machineIds.begin()), false);
 }
@@ -237,7 +239,7 @@ void ZxSettings::applyMachine(int idx, bool persist)
         return;
 
     const std::string &machineId = m_machineIds[size_t(idx)];
-    if (machineId == "next") {
+    if (machineId == "next"sv) {
         // The Next boots NextZXOS (and loads its ROMs) from an SD card image
         auto &sdCard = NextSdCard::instance();
         if (!sdCard.available()) {
@@ -449,7 +451,7 @@ void ZxSettings::setKempstonJoystick(bool kempstonJoystick)
         if (kempstonJoystick)
             emulator.attachPeripheral(std::make_unique<zxkit::KempstonJoystickPeripheral>());
         else
-            emulator.detachPeripheral("kempston");
+            emulator.detachPeripheral("kempston"sv);
     });
     emit settingsCurrentChanged();
 }
@@ -471,7 +473,7 @@ void ZxSettings::setKempstonMouse(bool kempstonMouse)
         if (kempstonMouse)
             emulator.attachPeripheral(std::make_unique<zxkit::KempstonMousePeripheral>());
         else
-            emulator.detachPeripheral("kempston_mouse");
+            emulator.detachPeripheral("kempston_mouse"sv);
     });
     emit settingsCurrentChanged();
 }
@@ -493,7 +495,7 @@ void ZxSettings::setInterface1(bool interface1)
         if (interface1)
             emulator.attachPeripheral(std::make_unique<zxkit::Interface1Peripheral>());
         else
-            emulator.detachPeripheral("interface1");
+            emulator.detachPeripheral("interface1"sv);
     });
     emit settingsCurrentChanged();
 }
@@ -515,7 +517,7 @@ void ZxSettings::setInterface2(bool interface2)
         if (interface2)
             emulator.attachPeripheral(std::make_unique<zxkit::Interface2Peripheral>());
         else
-            emulator.detachPeripheral("interface2");
+            emulator.detachPeripheral("interface2"sv);
     });
     emit settingsCurrentChanged();
 }

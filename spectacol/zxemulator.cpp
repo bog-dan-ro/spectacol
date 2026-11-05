@@ -55,11 +55,13 @@
 #include <array>
 #include <cctype>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
 using namespace Qt::StringLiterals;
+using namespace std::literals;
 
 #ifdef Q_OS_ANDROID
 # include <QCoreApplication>
@@ -135,7 +137,7 @@ std::optional<zxkit::ZxKey> cobraKey(int qtKey, int modifiers)
 
 bool hasCobraKeyboard(const zxkit::Emulator &emulator)
 {
-    return emulator.machine().id().starts_with("cobra1");
+    return emulator.machine().id().starts_with("cobra1"sv);
 }
 
 MappedZxKeys mapQtKeyToZx(int qtKey, int modifiers)
@@ -258,8 +260,8 @@ std::optional<zxkit::NextKey> nextExtendedKey(int key)
 std::optional<std::pair<zxkit::ZxKey, bool>> recreatedKey(int qtKey, int modifiers)
 {
     using zxkit::ZxKey;
-    static constexpr std::string_view kDown = "acegikmoqsuwyACEGIKMOQSUWY02468<-[;,/{!%";
-    static constexpr std::string_view kUp = "bdfhjlnprtvxzBDFHJLNPRTVXZ13579>=]:.?}$^";
+    static constexpr auto kDown = "acegikmoqsuwyACEGIKMOQSUWY02468<-[;,/{!%"sv;
+    static constexpr auto kUp = "bdfhjlnprtvxzBDFHJLNPRTVXZ13579>=]:.?}$^"sv;
     static constexpr std::array<ZxKey, 40> kKeys{
         ZxKey::Num1, ZxKey::Num2, ZxKey::Num3, ZxKey::Num4, ZxKey::Num5, ZxKey::Num6, ZxKey::Num7, ZxKey::Num8,
         ZxKey::Num9, ZxKey::Num0, ZxKey::Q, ZxKey::W, ZxKey::E, ZxKey::R, ZxKey::T, ZxKey::Y, ZxKey::U, ZxKey::I,
@@ -398,7 +400,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
     });
 
     zxkit::EmulatorConfig cfg;
-    cfg.machineId = "48k";
+    cfg.machineId = "48k"s;
     cfg.audioSampleRate = 48'000;
     cfg.fullBorder = true;
     m_roms = std::make_unique<RomOverrides>();
@@ -728,13 +730,13 @@ void ZxEmulator::attachJoystick(int kind)
     if (kind == KempstonJoystick)
         m_settings->setKempstonJoystick(true);
     withEmulator([kind](zxkit::Emulator &emulator) {
-        if (kind == KempstonJoystick && !emulator.findPeripheral("kempston"))
+        if (kind == KempstonJoystick && !emulator.findPeripheral("kempston"sv))
             emulator.attachPeripheral(std::make_unique<zxkit::KempstonJoystickPeripheral>());
-        const bool attached = emulator.findPeripheral("fuller").has_value();
+        const bool attached = emulator.findPeripheral("fuller"sv).has_value();
         if (kind == FullerJoystick && !attached)
             emulator.attachPeripheral(std::make_unique<zxkit::FullerBoxPeripheral>());
         else if (kind != FullerJoystick && attached)
-            emulator.detachPeripheral("fuller");
+            emulator.detachPeripheral("fuller"sv);
     });
 }
 
@@ -770,12 +772,12 @@ void ZxEmulator::setJoystickButtons(uint8_t buttons)
     auto emulator = this->emulator().writeLock();
     switch (m_selectedJoystickIndex) {
     case KempstonJoystick:
-        withPeripheral<zxkit::KempstonJoystickPeripheral>(*emulator, "kempston", [buttons](auto &kempston) {
+        withPeripheral<zxkit::KempstonJoystickPeripheral>(*emulator, "kempston"sv, [buttons](auto &kempston) {
             kempston.setButtons(buttons);
         });
         break;
     case FullerJoystick:
-        withPeripheral<zxkit::FullerBoxPeripheral>(*emulator, "fuller", [buttons](auto &fuller) {
+        withPeripheral<zxkit::FullerBoxPeripheral>(*emulator, "fuller"sv, [buttons](auto &fuller) {
             fuller.setButtons(buttons);
         });
         break;
@@ -1050,7 +1052,7 @@ bool ZxEmulator::saveMediaFile(const QString &filePath)
         return false;
     }
     const auto extension = (u"."_s + suffix.toLower()).toStdString();
-    if (extension == ".szx" || extension == ".z80") {
+    if (extension == ".szx"sv || extension == ".z80"sv) {
         static constexpr std::array types{
             zxkit::JoystickType::None, zxkit::JoystickType::Cursor, zxkit::JoystickType::Kempston,
             zxkit::JoystickType::Sinclair1, zxkit::JoystickType::Sinclair2, zxkit::JoystickType::Fuller,
@@ -1059,7 +1061,7 @@ bool ZxEmulator::saveMediaFile(const QString &filePath)
     }
     if (!writeFileBytes(filePath, bytes)) return false;
     const auto profile = m_controllerProfiles->gameProfile();
-    if (!profile.isEmpty() && (extension == ".szx" || extension == ".z80" || extension == ".sna" || extension == ".nex"))
+    if (!profile.isEmpty() && (extension == ".szx"sv || extension == ".z80"sv || extension == ".sna"sv || extension == ".nex"sv))
         m_controllerProfiles->rememberGame(QFileInfo(name).completeBaseName(), profile);
     return true;
 }
@@ -1146,7 +1148,7 @@ void ZxEmulator::mouseButton(Qt::MouseButton button, bool pressed)
     default: return;
     }
 
-    withPeripheral<zxkit::KempstonMousePeripheral>(*emulator().writeLock(), "kempston_mouse", [bit, pressed](auto &mouse) {
+    withPeripheral<zxkit::KempstonMousePeripheral>(*emulator().writeLock(), "kempston_mouse"sv, [bit, pressed](auto &mouse) {
         mouse.setButton(bit, pressed);
     });
 }
@@ -1156,7 +1158,7 @@ void ZxEmulator::mouseMotion(int dx, int dy)
     if (!m_processInputEvents)
         return;
 
-    withPeripheral<zxkit::KempstonMousePeripheral>(*emulator().writeLock(), "kempston_mouse", [dx, dy](auto &mouse) {
+    withPeripheral<zxkit::KempstonMousePeripheral>(*emulator().writeLock(), "kempston_mouse"sv, [dx, dy](auto &mouse) {
         mouse.move(dx, dy);
     });
 }
@@ -1235,10 +1237,10 @@ QStringList ZxEmulator::snapshotFormats() const
 {
     const auto id = emulator().readLock()->machine().id();
     QStringList result = {u"szx"_s};
-    if (id == "next") result << u"nex"_s;
-    if (id == "48k" || id == "128k" || id == "plus2" || id == "plus2a" || id == "plus3"
-        || id == "plus3e" || id == "pentagon") result << u"z80"_s;
-    if (id == "48k" || id == "128k" || id == "plus2" || id == "pentagon") result << u"sna"_s;
+    if (id == "next"sv) result << u"nex"_s;
+    if (id == "48k"sv || id == "128k"sv || id == "plus2"sv || id == "plus2a"sv || id == "plus3"sv
+        || id == "plus3e"sv || id == "pentagon"sv) result << u"z80"_s;
+    if (id == "48k"sv || id == "128k"sv || id == "plus2"sv || id == "pentagon"sv) result << u"sna"_s;
     return result;
 }
 
@@ -1675,7 +1677,7 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
     if (!virtualKeyboard) {
         const auto emulator = this->emulator().readLock();
         cobra = hasCobraKeyboard(*emulator);
-        if (emulator->machine().id() == "next")
+        if (emulator->machine().id() == "next"sv)
             nextKey = nextExtendedKey(qtKey);
     }
     if (nextKey) {
@@ -1955,7 +1957,7 @@ bool ZxEmulator::createBreakpoint(int type, const QString &text, const QString &
     } else valid &= DebuggerMemoryModel::parseHex(text,65535,address);
     valid &= DebuggerMemoryModel::parseHex(maskText,65535,mask);
     if(type==int(zxkit::BreakpointType::NextRegWrite))
-        valid &= address<=255 && emulator().readLock()->machine().id()=="next";
+        valid &= address<=255 && emulator().readLock()->machine().id()=="next"sv;
     if(!valid) { showMessage(tr("Invalid breakpoint: use hexadecimal addresses/masks, decimal raster lines, or event 0 (IRQ) / 1 (NMI)."),Warning); return false; }
     zxkit::Breakpoint bp; bp.type=zxkit::BreakpointType(type); bp.address=uint16_t(address); bp.mask=uint16_t(mask); bp.temporary=temporary;
     emulator().writeLock()->addBreakpoint(std::move(bp));

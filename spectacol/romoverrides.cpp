@@ -26,7 +26,10 @@
 #include <QStandardPaths>
 #include <QUrl>
 
+#include <string_view>
+
 using namespace Qt::StringLiterals;
+using namespace std::literals;
 
 RomOverrides::RomOverrides(QObject *parent) : QObject(parent)
 {
@@ -36,7 +39,7 @@ RomOverrides::RomOverrides(QObject *parent) : QObject(parent)
         const auto qid = QString::fromStdString(id);
         m_ids.append(qid);
         m_names.append(QString::fromUtf8(machine->name()));
-        if (id == "48k") m_index = int(m_ids.size() - 1);
+        if (id == "48k"sv) m_index = int(m_ids.size() - 1);
         // Ask the core itself for names/sizes; never duplicate its ROM catalogue.
         zxkit::EmulatorConfig config;
         config.machineId = id;

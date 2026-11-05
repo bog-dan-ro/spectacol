@@ -82,5 +82,6 @@ New C++/QML sources, shaders, images and ROMs must be listed explicitly in `spec
 ## Conventions
 - Each source file starts with the GPL-3.0 license header (`Copyright (c) 2015-2026, BogDan Vatra`).
 - Uses `#pragma once` and `using namespace Qt::StringLiterals`: `u"..."_s` and `u'c'`, never `QLatin1String`, `QLatin1Char`, `QStringLiteral` or `_()` helpers.
+- For standard strings, prefer `"..."s` (`std::string`) and `"..."sv` (`std::string_view`) with `using namespace std::literals;` in implementation files or function bodies alongside Qt's literals. Include `<string>` or `<string_view>` directly as needed; keep namespace-wide using directives out of public headers. Keep C string literals for APIs requiring null-terminated character pointers, including Qt translation and meta-object APIs.
 - No raw owning pointers and no singletons in ZxKit; ZxKit lookups return `OptionalRef` (a reference that may be missing).
 - The existing spelling `Disassamble` is used in class and file names. Keep it consistent.
