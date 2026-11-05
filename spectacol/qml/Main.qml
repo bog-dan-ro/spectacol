@@ -374,6 +374,7 @@ ApplicationWindow {
                 height: Screen.pixelDensity * 5
                 width: Screen.pixelDensity * 7
                 sourceSize: Qt.size(width, height)
+                fillMode: Image.PreserveAspectFit
                 source: "qrc:/images/keyboard-icon.svg"
                 MouseArea {
                     anchors.fill: parent
@@ -394,6 +395,7 @@ ApplicationWindow {
                 height: Screen.pixelDensity * 5
                 width: Screen.pixelDensity * 7
                 sourceSize: Qt.size(width, height)
+                fillMode: Image.PreserveAspectFit
                 source: "qrc:/images/controller-icon.svg"
                 MouseArea {
                     anchors.fill: parent
@@ -405,6 +407,7 @@ ApplicationWindow {
                 height: Screen.pixelDensity * 7
                 width: Screen.pixelDensity * 7
                 sourceSize: Qt.size(width, height)
+                fillMode: Image.PreserveAspectFit
                 source: "qrc:/images/fastforward.svg"
                 MouseArea {
                     anchors.fill: parent
@@ -418,6 +421,7 @@ ApplicationWindow {
                 height: Screen.pixelDensity * 7
                 width: Screen.pixelDensity * 7
                 sourceSize: Qt.size(width, height)
+                fillMode: Image.PreserveAspectFit
                 source: ZxEmulator.paused ? "qrc:/images/play.svg" : "qrc:/images/pause.svg"
                 MouseArea {
                     anchors.fill: parent

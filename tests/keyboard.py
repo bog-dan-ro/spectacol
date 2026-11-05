@@ -50,7 +50,7 @@ def main():
             config.mkdir(parents=True)
             (config / "Spectacol.conf").write_text(
                 "[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath="
-                + str(session / name / "data") + "\n")
+                + str(session / name / "data") + "\n[Peripherals]\njoystickPrompt=false\n")
             env = os.environ | {"QT_QPA_PLATFORM": "offscreen", "XDG_CONFIG_HOME": str(config.parent),
                                 "XDG_DATA_HOME": str(session / name / "data"), "QT_SCALE_FACTOR": "1"}
             target = output / (name + ".sna")

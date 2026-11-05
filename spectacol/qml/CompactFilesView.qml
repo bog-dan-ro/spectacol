@@ -25,6 +25,7 @@ import Spectacol
 GridView {
     id: view
     property bool grid: false
+    readonly property real pixelRatio: Window.window ? Window.window.devicePixelRatio : 1
     signal openRequested(int row)
     clip: true
     activeFocusOnTab: true
@@ -64,7 +65,7 @@ GridView {
                 Layout.fillHeight: true
                 visible: view.grid
                 source: visible ? (row.isDir ? "qrc:/images/folder.svg" : "image://spectrum/" + row.path) : ""
-                sourceSize: Qt.size(320, 256)
+                sourceSize: Qt.size(Math.ceil(view.cellWidth * view.pixelRatio), Math.ceil(view.cellHeight * view.pixelRatio))
                 fillMode: Image.PreserveAspectFit
                 smooth: false
                 asynchronous: true

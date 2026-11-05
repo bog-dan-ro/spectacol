@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
+     SPDX-License-Identifier: GPL-3.0-or-later
+     Original Spectacol artwork. Palette roles are defined in qml/Theme.qml. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="416" height="192" viewBox="-4 0 104 48">
+  <title>Gamepad controls</title>
+  <g fill="none" stroke="#eceef2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M25 10V8h10v2m26 0V8h10v2"/>
+    <path d="M30 10h36a12 12 0 0 1 12 9l5 18a5 5 0 0 1-8 5l-9-8H30l-9 8a5 5 0 0 1-8-5l5-18a12 12 0 0 1 12-9Z" fill="#20242c"/>
+    <path d="M28 17v10m-5-5h10"/>
+    <circle cx="41" cy="29" r="4"/>
+    <circle cx="53" cy="29" r="4"/>
+    <path d="M40 19h3m9 0h3"/>
+    <path d="M9 15h29v4h3m46-4H57v4h-3" stroke="#a4aab6" stroke-width="1"/>
+    <circle cx="66" cy="18" r="3" stroke="#f2cc60" fill="#f2cc60"/>
+    <circle cx="60" cy="24" r="3" stroke="#79b8ff" fill="#79b8ff"/>
+    <circle cx="72" cy="24" r="3" stroke="#ff7b72" fill="#ff7b72"/>
+    <circle cx="66" cy="30" r="3" stroke="#6fdc8c" fill="#6fdc8c"/>
+  </g>
+</svg>

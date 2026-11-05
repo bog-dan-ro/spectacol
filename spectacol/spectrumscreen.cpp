@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,9 +22,11 @@
 
 #include <QFile>
 #include <QFileInfo>
-#include <QIcon>
+#include <QImageReader>
 
 #include <cstring>
+
+using namespace Qt::StringLiterals;
 
 namespace {
 
@@ -38,17 +40,27 @@ QImage videoFrameToQImage(const zxkit::VideoFrame &vf)
     return img;
 }
 
-} // namespace
+// Only placeholders are rasterized at the requested size. Spectrum previews
+// retain their native pixels for the browser's nearest-neighbour rendering.
+QImage iconImage(const QString &name, QSize requestedSize = {})
+{
+    if (requestedSize.width() <= 0)
+        requestedSize.setWidth(requestedSize.height() > 0 ? requestedSize.height() : 256);
+    if (requestedSize.height() <= 0)
+        requestedSize.setHeight(requestedSize.width());
+    QImageReader reader(u":/images/"_s + name + u".svg"_s);
+    reader.setScaledSize(QSize(256, 256).scaled(requestedSize, Qt::KeepAspectRatio));
+    return reader.read();
+}
 
-QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString &fileName)
+QImage mediaImage(std::span<const uint8_t> span, const QString &fileName, const QSize &requestedSize = {})
 {
     BlockErrors silenter;
-    const std::span<const uint8_t> span(buffer, bufferSize);
     const std::string fname = fileName.toStdString();
     const auto mediaClass = zxkit::classifyMediaFile(fname, span);
 
     if (mediaClass == zxkit::MediaClass::Disk) {
-        return QImage(":/images/floppy.svg");
+        return iconImage(u"floppy"_s, requestedSize);
     }
 
     try {
@@ -56,6 +68,13 @@ QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString 
     } catch (...) {
         return QImage();
     }
+}
+
+} // namespace
+
+QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString &fileName)
+{
+    return mediaImage(std::span<const uint8_t>(buffer, bufferSize), fileName);
 }
 
 QImage buff2Image(const QByteArray &buffer, const QString &fileName)
@@ -80,11 +99,10 @@ QImage scr2Image(const char *buffer, size_t bufferSize)
     }
 }
 
-QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
-{
-    Q_UNUSED(size)
-    Q_UNUSED(requestedSize)
+namespace {
 
+QImage previewImage(const QString &id, const QSize &requestedSize)
+{
     if (id.startsWith("compressed64:")) {
         auto pos = id.indexOf(u':', 13);
         if (pos != -1) {
@@ -98,22 +116,34 @@ QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size,
                         return img;
                 }
             }
-            return QIcon(":/images/binary.svg").pixmap(QSize(256, 192)).toImage();
+            return iconImage(u"binary"_s, requestedSize);
         }
     }
 
     QFileInfo inf(id);
     if (inf.isDir())
-        return QIcon(":/images/folder.svg").pixmap(QSize(256, 192)).toImage();
+        return iconImage(u"folder"_s, requestedSize);
     if (!inf.isFile())
-        return QIcon(":/images/cassette-wait.svg").pixmap(QSize(256, 192)).toImage();
+        return iconImage(u"cassette-wait"_s, requestedSize);
 
     QFile file(id);
     if (!file.open(QIODevice::ReadOnly))
-        return QImage(":/images/cassette-broken.svg");
+        return iconImage(u"cassette-broken"_s, requestedSize);
 
-    QImage ret = buff2Image(file.readAll(), inf.fileName());
+    const auto buffer = file.readAll();
+    QImage ret = mediaImage(std::span<const uint8_t>(reinterpret_cast<const uint8_t *>(buffer.constData()), size_t(buffer.size())),
+                            inf.fileName(), requestedSize);
     if (ret.isNull())
-        return QImage(":/images/cassette-unknown.svg");
+        return iconImage(u"cassette-unknown"_s, requestedSize);
     return ret;
+}
+
+} // namespace
+
+QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+{
+    const auto image = previewImage(id, requestedSize);
+    if (size)
+        *size = image.size();
+    return image;
 }

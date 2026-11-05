@@ -86,3 +86,24 @@ qt_add_resources(test_files_features "feature_roms"
     FILES ../spectacol/roms/48.rom ../spectacol/roms/128-0.rom ../spectacol/roms/128-1.rom
 )
 add_test(NAME files_features COMMAND test_files_features)
+
+qt_add_executable(test_media_icons
+    test_media_icons.cpp
+    ../spectacol/spectrumscreen.cpp ../spectacol/spectrumscreen.h
+    ../spectacol/qmlui.cpp ../spectacol/qmlui.h
+)
+target_include_directories(test_media_icons PRIVATE ../spectacol)
+target_link_libraries(test_media_icons PRIVATE Qt6::Test Qt6::Quick ZX::Kit)
+qt_add_resources(test_media_icons "preview_icons"
+    PREFIX "/"
+    BASE "../spectacol"
+    FILES
+        ../spectacol/images/binary.svg
+        ../spectacol/images/cassette-broken.svg
+        ../spectacol/images/cassette-unknown.svg
+        ../spectacol/images/cassette-wait.svg
+        ../spectacol/images/floppy.svg
+        ../spectacol/images/folder.svg
+)
+add_test(NAME media_icons COMMAND test_media_icons)
+set_tests_properties(media_icons PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

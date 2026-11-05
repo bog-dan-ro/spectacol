@@ -167,7 +167,10 @@ measurement limits. Generated evidence remains under the build directories.
   - [x] Online search keeps a gamepad-friendly grid of thumbnail cards. A/Enter opens a modal title/details/media
         dialog; Up/Down picks the media file and A plays it. B/Escape restores the same grid selection and scroll
         position. Full details and media are requested only after confirmation; X/Y reach search/source directly.
-  - [ ] One icon set (the cover flow's 3D folder and floppy art, SVG and PNG mixed).
+  - [x] One original SVG icon family using Theme's palette and rounded strokes, including the cover flow's
+        folder/floppy placeholders, cassette states, touch controls and joystick directions. Controller help
+        uses the same artwork with localizable QML labels and a spoken description. Game covers and launcher
+        branding remain separate. See `spectacol/images/README.md` for the inventory and design rules.
   - [ ] Desktop menu shortcuts shown next to the items, and more shortcuts (reset, pause, screenshot).
 
 ### Android

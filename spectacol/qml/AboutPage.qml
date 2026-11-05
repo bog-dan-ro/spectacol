@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ Sheet {
         Layout.fillWidth: true
         spacing: Theme.sp(4)
         Rectangle {
-            Layout.preferredWidth: Theme.sp(40)
+            Layout.preferredWidth: Math.min(Theme.sp(40), page.width * 0.32)
             Layout.preferredHeight: buttonLabel.implicitHeight + Theme.sp(2)
             radius: Theme.radiusSmall
             color: Theme.raised
@@ -72,7 +72,7 @@ Sheet {
                 anchors.centerIn: parent
                 width: parent.width - Theme.sp(2)
                 horizontalAlignment: Text.AlignHCenter
-                elide: Text.ElideRight
+                wrapMode: Text.Wrap
                 text: mapping.button
                 font.pixelSize: Theme.caption
                 font.weight: Font.DemiBold
@@ -158,13 +158,10 @@ Sheet {
                     id: mappings0
                     width: parent.width
                     spacing: Theme.sp(2)
-                    Image {
+                    GamepadDiagram {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Theme.sp(40)
                         Layout.margins: Theme.sp(4)
-                        fillMode: Image.PreserveAspectFit
-                        source: "qrc:///images/gamepad.png"
-                        sourceSize.width: Theme.sp(100)
                     }
                     ColumnLayout {
                         Layout.leftMargin: Theme.sp(6)
@@ -191,13 +188,10 @@ Sheet {
                     id: mappings1
                     width: parent.width
                     spacing: Theme.sp(2)
-                    Image {
+                    GamepadDiagram {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Theme.sp(40)
                         Layout.margins: Theme.sp(4)
-                        fillMode: Image.PreserveAspectFit
-                        source: "qrc:///images/gamepad.png"
-                        sourceSize.width: Theme.sp(100)
                     }
                     ColumnLayout {
                         Layout.leftMargin: Theme.sp(6)

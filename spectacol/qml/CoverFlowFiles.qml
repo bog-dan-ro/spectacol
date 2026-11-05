@@ -29,6 +29,8 @@ Item
     id : fileList
     signal fileSelected(string filePath);
     // full screen, with a hint bar: the messages go above it
+    readonly property real coverSize: mainScreen.portrait ? filesView.width * 0.8 : filesView.height * 0.65
+    readonly property int coverPixels: Math.max(1, Math.ceil(coverSize * mainScreen.devicePixelRatio))
     readonly property real panelWidth: width
     readonly property real hintBarHeight: hintBar.visible ? hintBar.height : 0
     property alias rootFolder: filesModel.rootFolder
@@ -220,7 +222,7 @@ Item
                 property real delScale : PathView.onPath ? PathView.delScale : 0.5
                 property bool isCurrentItem : index === filesView.currentIndex;
 
-                width : mainScreen.portrait ? filesView.width * 0.8 : filesView.height * 0.65
+                width : fileList.coverSize
                 height : width
                 fillMode: Image.PreserveAspectFit
                 scale : delScale
@@ -228,6 +230,7 @@ Item
                 Behavior on rotAngle {SpringAnimation {spring : 5; damping: 0.7; epsilon: 0.025}}
                 Behavior on delScale {SpringAnimation {spring : 5; damping: 1; epsilon: 0.005}}
                 onStatusChanged: if (status === Image.Ready) scale_anim.start();
+                sourceSize: Qt.size(fileList.coverPixels, fileList.coverPixels)
                 source : "image://spectrum/" + path
                 smooth : false
 

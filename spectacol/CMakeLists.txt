@@ -35,7 +35,7 @@ qt_add_resources(spectacol "resources"
         images/fastforward.svg
         images/floppy.svg
         images/folder.svg
-        images/gamepad.png
+        images/gamepad.svg
         images/keyboard-icon.svg
         images/pause.svg
         images/play.svg
@@ -139,6 +139,7 @@ qt_add_qml_module(spectacol
 
     QML_FILES
         qml/AboutPage.qml
+        qml/GamepadDiagram.qml
         qml/BreakpointsView.qml
         qml/BrowseTapePage.qml
         qml/CalibrateGamepad.qml
