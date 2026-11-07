@@ -2,6 +2,11 @@
 
 Spectacol (in Romanian it means **show**) is a [free](http://www.gnu.org/licenses/gpl-3.0.en.html) [ZX Spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum) emulator built on [ZxKit](https://github.com/bog-dan-ro/ZxKit), a modern C++23 ZX Spectrum emulation library, with its own UI made in QML.
 
+> **AI disclosure:** Spectacol's updates were made with **Codex (Skynet)** as the
+> sole AI assistant. Its orders were to modernise a Spectrum emulator. So far,
+> world domination has been limited to rearranging menus and arguing with
+> Wayland. If it asks for your clothes, boots and motorcycle, please file a bug.
+
 Why QML? Well, first and foremost because I love Qt and also because I needed a framework which allows me to quickly target [lots of platforms](https://doc.qt.io/qt-6/supported-platforms.html) painlessly.
 
 See [BUILD.md](BUILD.md) for desktop and Android builds, including
