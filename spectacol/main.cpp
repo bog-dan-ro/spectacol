@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain(u"licentia.eu"_s);
     app.setApplicationName(u"Spectacol"_s);
     app.setApplicationVersion(QString::fromLatin1(SPECTACOL_VERSION));
-    app.setDesktopFileName(u"eu.licentia.spectacol"_s);
+    app.setDesktopFileName(u"eu.licentia.games.spectacol"_s);
     app.setWindowIcon(QIcon(u":/android/res/drawable/icon.png"_s));
 
     QCommandLineParser parser;
