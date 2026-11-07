@@ -4,6 +4,9 @@ Spectacol (in Romanian it means **show**) is a [free](http://www.gnu.org/license
 
 Why QML? Well, first and foremost because I love Qt and also because I needed a framework which allows me to quickly target [lots of platforms](https://doc.qt.io/qt-6/supported-platforms.html) painlessly.
 
+See [BUILD.md](BUILD.md) for desktop and Android builds, including
+[Flatpak and AppImage packages](BUILD.md#linux-packages) for Linux.
+
 **Spectacol**, currently, enables the following features:
  - Loads all ZX Spectrum files: tapes, snapshots, disks and RZX recordings
  - Accurate 16K, 48K, 128K, +2, +2A, +3, Pentagon, Scorpion and Timex emulation, the Romanian HC-2000 (with CP/M) and CoBra, and the **ZX Spectrum Next** (NextZXOS boots from its SD card image, which Spectacol downloads for you)

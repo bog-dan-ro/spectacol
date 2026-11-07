@@ -7,11 +7,11 @@ should also work on the other platforms Qt supports.
 
 - CMake 3.25 or later and Ninja (or another generator).
 - A C++23 compiler: GCC 14 or later, or Clang 18 or later.
-- Qt 6.12 or later with the Quick, Multimedia and ShaderTools modules (the Qt online installer has them).
+- Qt 6.11 or later with the Quick, Multimedia and ShaderTools modules (the Qt online installer has them).
 - zlib.
 - Network access when configuring the first time: CMake's `FetchContent` downloads
-  - [qtgamepadlegacy](https://github.com/bog-dan-ro/qtgamepadlegacy) (branch `dev`), the gamepad support;
-  - [ZxKit](https://github.com/bog-dan-ro/ZxKit), the emulation library, unless Spectacol lives in ZxKit's
+  - [qtgamepadlegacy](https://github.com/bog-dan-ro/qtgamepadlegacy) (a pinned revision), the gamepad support;
+  - [ZxKit](https://github.com/bog-dan-ro/ZxKit) (a pinned revision), the emulation library, unless Spectacol lives in ZxKit's
     `tests/spectacol` (then the parent directory is used);
   - [SafeCpp](https://github.com/bog-dan-ro/safecpp), which ZxKit needs.
 
@@ -54,6 +54,96 @@ the settings page):
 first_start=false
 dataPath=/tmp/spx/data/Spectacol/
 ```
+
+## Linux packages
+
+Both package formats install the desktop launcher, the existing Spectacol icon,
+AppStream metadata, ROM notices and third-party licenses. They include the
+QtGamepadLegacy libraries, QML module and controller backends. Generated files
+stay under `build/`.
+
+### Flatpak
+
+Install Flatpak 1.15.6 or later and `flatpak-builder` from your distribution, then add Flathub
+and its KDE 6.11 SDK/runtime:
+
+```sh
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak install --user flathub org.kde.Sdk//6.11 org.kde.Platform//6.11
+flatpak-builder --user --force-clean --jobs=4 \
+    --state-dir=build/flatpak-state --repo=build/flatpak-repo \
+    build/flatpak packaging/flatpak/io.github.bog_dan_ro.spectacol.json
+mkdir -p build/packages
+flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
+    build/flatpak-repo build/packages/Spectacol.flatpak io.github.bog_dan_ro.spectacol
+flatpak install --user build/packages/Spectacol.flatpak
+flatpak run io.github.bog_dan_ro.spectacol
+```
+
+The manifest builds the current Spectacol working tree. Dependencies are pinned
+and downloaded by Flatpak Builder before the network-isolated build;
+`FetchContent` uses those local sources. Update the dependency revisions in both
+`CMakeLists.txt` and the manifest together. The pinned QtGamepadLegacy revision
+supports Qt 6.11 and retains the Android build fixes.
+
+The sandbox grants graphics, audio, network and controller access. Home and
+removable-media access support Spectacol's built-in file browser, writable disks
+and SD images. Settings use Flatpak's private configuration directory; game data
+defaults to `~/Spectacol` or the folder selected in the app. Host
+serial ports for physical UART adapters need a separate user override; the
+default package supports the JavaScript UART hooks and network adapters.
+This is a local bundle recipe; publishing to Flathub also requires a release
+source and Flathub submission.
+
+### AppImage
+
+Use a complete Qt 6.11+ desktop SDK with Quick, Multimedia, ShaderTools, SVG and
+Wayland support, a C++23 compiler, Ninja, Python 3, and
+[linuxdeploy](https://github.com/linuxdeploy/linuxdeploy/releases) with its
+[Qt plugin](https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases).
+Download tools for the build machine's architecture, put both executables in the
+same directory and make them executable. The script does not download tools.
+
+```sh
+python3 tools/build_appimage.py --qt-prefix /path/to/Qt/6.11.1/gcc_64 \
+    --linuxdeploy /path/to/linuxdeploy-x86_64.AppImage
+chmod +x build/packages/Spectacol-*.AppImage
+./build/packages/Spectacol-1.6.0.5-x86_64.AppImage
+```
+
+The helper configures a Release build and installs only the `Runtime` component
+into a fresh AppDir. linuxdeploy bundles Qt, QML imports, SVG/Wayland support and
+shared-library dependencies, then writes `build/packages/Spectacol-VERSION-ARCH.AppImage`.
+`--build-dir`, `--output-dir`, `--jobs` and extra CMake arguments after `--` are
+supported. Staging directories remain inside the build directory for inspection.
+Build release AppImages on the oldest distribution you support: the build host's
+glibc and C++ runtime set the minimum host requirements. Build each architecture on a matching
+machine/toolchain.
+
+To run without FUSE, set `APPIMAGE_EXTRACT_AND_RUN=1`. A headless package check
+can use isolated settings and data, as for the desktop build. Create
+`build/package-check/config/Licentia/Spectacol.conf` first:
+
+```ini
+[General]
+first_start=false
+dataPath=/absolute/path/to/spectacol/build/package-check/data/
+```
+
+Then run:
+
+```sh
+APPIMAGE_EXTRACT_AND_RUN=1 QT_QPA_PLATFORM=offscreen \
+    XDG_CONFIG_HOME="$PWD/build/package-check/config" \
+    XDG_DATA_HOME="$PWD/build/package-check/data" \
+    ./build/packages/Spectacol-1.6.0.5-x86_64.AppImage \
+    --machine 48k --quit-after 3 --ui-screenshot "$PWD/build/package-check/ui.png"
+```
+
+Also launch the package with `QT_QPA_PLATFORM=wayland` in a Wayland session and
+`QT_QPA_PLATFORM=xcb` with an X server. These exercise the real graphics paths;
+the offscreen check does not load Wayland's EGL integration. The helper stages
+the Wayland graphics, shell and decoration plugins before dependency deployment.
 
 ## Software screen filters
 

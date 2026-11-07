@@ -6,7 +6,7 @@ Spectacol is a ZX Spectrum emulator: the emulation core is [ZxKit](https://githu
 
 ## Build
 
-The project uses CMake and needs Qt ≥ 6.12 (Quick, Multimedia, ShaderTools) and C++23. `BUILD.md` describes the build; the Android CMake build uses Qt’s Android toolchain, NDK r27c and JDK 21.
+The project uses CMake and needs Qt ≥ 6.11 (Quick, Multimedia, ShaderTools) and C++23. `BUILD.md` describes the build and Linux Flatpak/AppImage packaging; the Android CMake build uses Qt’s Android toolchain, NDK r27c and JDK 21.
 
 ```sh
 git submodule update --init --recursive   # android_openssl (Android only)
@@ -20,7 +20,7 @@ cmake --build build
 ```
 
 Configuring needs network access. The top-level `CMakeLists.txt` uses `FetchContent` for:
-- `qtgamepadlegacy` (bog-dan-ro fork, branch `dev`), which provides `Qt::GamepadLegacy`.
+- `qtgamepadlegacy` (a pinned revision of the bog-dan-ro fork), which provides `Qt::GamepadLegacy`.
 - ZxKit: the parent directory when Spectacol lives in ZxKit's `tests/spectacol`, otherwise from GitHub. ZxKit itself fetches SafeCpp (`v1.0`).
 
 The ROMs are Qt resources under `spectacol/roms/`, ZxKit gets them through the `romResolver` set in `ZxEmulator`. The ZX Spectrum Next boots from an SD card image that `NextSdCard` downloads (like jnext does) into the app data dir.

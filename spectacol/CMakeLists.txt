@@ -1,4 +1,5 @@
 qt_add_executable(spectacol main.cpp)
+target_compile_definitions(spectacol PRIVATE SPECTACOL_VERSION="${PROJECT_VERSION}")
 if(ANDROID)
     target_sources(spectacol PRIVATE androidintegration.cpp androidintegration.h)
     # Preserve the highest version code used by the old per-ABI release scheme.
@@ -16,6 +17,7 @@ endif()
 qt_add_resources(spectacol "resources"
     PREFIX "/"
     FILES
+        android/res/drawable/icon.png
         images/arrow-down-left.svg
         images/arrow-down-right.svg
         images/arrow-down.svg
@@ -232,3 +234,69 @@ qt_add_resources(spectacol "uart_scripts"
     BASE "uart"
     FILES uart/esp.js uart/pi.js
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(spectacolAppId "io.github.bog_dan_ro.spectacol")
+    set_target_properties(spectacol PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+    install(TARGETS spectacol
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
+    )
+
+    # FetchContent's Qt module also has SDK install rules. The Runtime component
+    # selects only the libraries, QML module and controller backends we ship.
+    install(TARGETS GamepadLegacy GamepadLegacyQuickPrivate zxkit zxkit_video_filters
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+    )
+    install(TARGETS GamepadLegacyQuickPrivateplugin
+        LIBRARY DESTINATION qml/QtGamepadLegacy COMPONENT Runtime
+    )
+    get_target_property(gamepadQmlDir GamepadLegacyQuickPrivate QT_QML_MODULE_OUTPUT_DIRECTORY)
+    install(FILES "${gamepadQmlDir}/qmldir"
+        DESTINATION qml/QtGamepadLegacy COMPONENT Runtime
+    )
+    foreach(backend IN ITEMS QEvdevGamepadBackendPlugin QSdl2GamepadBackendPlugin)
+        if(TARGET ${backend})
+            install(TARGETS ${backend}
+                LIBRARY DESTINATION plugins/legacygamepads COMPONENT Runtime
+            )
+        endif()
+    endforeach()
+
+    install(FILES "${PROJECT_SOURCE_DIR}/packaging/linux/${spectacolAppId}.desktop"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications COMPONENT Runtime
+    )
+    install(FILES "${PROJECT_SOURCE_DIR}/packaging/linux/${spectacolAppId}.metainfo.xml"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo COMPONENT Runtime
+    )
+    install(FILES android/res/drawable/icon.png
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/192x192/apps
+        RENAME "${spectacolAppId}.png" COMPONENT Runtime
+    )
+    install(FILES "${PROJECT_SOURCE_DIR}/packaging/linux/${spectacolAppId}.png"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/128x128/apps COMPONENT Runtime
+    )
+    install(FILES roms/README.copyright
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
+        RENAME ROMs.txt COMPONENT Runtime
+    )
+    get_target_property(zxkitSourceDir ZX::Kit SOURCE_DIR)
+    install(FILES "${zxkitSourceDir}/LICENSE"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
+        RENAME COPYING COMPONENT Runtime
+    )
+    install(FILES "${qtgamepad_SOURCE_DIR}/LICENSE.LGPLv3"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
+        RENAME QtGamepadLegacy.LGPLv3 COMPONENT Runtime
+    )
+    install(FILES "${zxkitSourceDir}/src/video/filters/README.md"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
+        RENAME VideoFilters.md COMPONENT Runtime
+    )
+    install(FILES "${zxkitSourceDir}/src/video/filters/xbrz/License.txt"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
+        RENAME xBRZ.txt COMPONENT Runtime
+    )
+    install(FILES "${zxkitSourceDir}/LICENSES/ayumi.txt"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol COMPONENT Runtime
+    )
+endif()

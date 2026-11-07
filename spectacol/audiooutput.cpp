@@ -70,7 +70,9 @@ void AudioOutput::start()
             std::make_shared<AudioBuffer>(format.sampleRate(), format.channelCount(), m_control);
     m_sink = std::make_unique<QAudioSink>(device, format);
     m_activeDevice = device.id();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 12, 0)
     m_sink->setNativePeriodFrameCount(512);
+#endif
     connect(m_sink.get(), &QAudioSink::stateChanged, this, [this](QtAudio::State state) {
         if (state == QtAudio::StoppedState && m_sink && m_sink->error() != QtAudio::NoError)
             emit errorOccurred(tr("Audio playback failed (error %1).").arg(int(m_sink->error())));

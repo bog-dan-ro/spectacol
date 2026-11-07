@@ -1,0 +1,69 @@
+{
+    "app-id": "eu.licentia.spectacol",
+    "runtime": "org.kde.Platform",
+    "runtime-version": "6.11",
+    "sdk": "org.kde.Sdk",
+    "command": "spectacol",
+    "finish-args": [
+        "--require-version=1.15.6",
+        "--share=ipc",
+        "--share=network",
+        "--socket=wayland",
+        "--socket=fallback-x11",
+        "--socket=pulseaudio",
+        "--device=dri",
+        "--device=input",
+        "--filesystem=home",
+        "--filesystem=/run/media",
+        "--filesystem=/media"
+    ],
+    "modules": [
+        {
+            "name": "spectacol",
+            "buildsystem": "cmake-ninja",
+            "builddir": true,
+            "config-opts": [
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-DCMAKE_INSTALL_LIBDIR=lib",
+                "-DSPECTACOL_BUILD_TESTS=OFF",
+                "-DZXKIT_BUILD_TESTS=OFF",
+                "-DZXKIT_BUILD_TOOLS=OFF",
+                "-DZXKIT_INSTALL=OFF",
+                "-DFETCHCONTENT_FULLY_DISCONNECTED=ON",
+                "-DFETCHCONTENT_SOURCE_DIR_QTGAMEPAD=/run/build/spectacol/dependencies/qtgamepad",
+                "-DFETCHCONTENT_SOURCE_DIR_SAFECPP=/run/build/spectacol/dependencies/safecpp",
+                "-DFETCHCONTENT_SOURCE_DIR_ZXKIT=/run/build/spectacol/dependencies/zxkit"
+            ],
+            "no-make-install": true,
+            "post-install": ["cmake --install . --component Runtime"],
+            "sources": [
+                {
+                    "type": "dir",
+                    "path": "../..",
+                    "skip": [".git", "build", ".flatpak-builder"]
+                },
+                {
+                    "type": "git",
+                    "url": "https://github.com/bog-dan-ro/qtgamepadlegacy.git",
+                    "commit": "e89b1e0dd903fc638857a344be0ebef0a04495ed",
+                    "dest": "dependencies/qtgamepad",
+                    "disable-submodules": true
+                },
+                {
+                    "type": "git",
+                    "url": "https://github.com/bog-dan-ro/safecpp.git",
+                    "commit": "1793cde676bc173ba3a896f79016beefb34cd87c",
+                    "dest": "dependencies/safecpp",
+                    "disable-submodules": true
+                },
+                {
+                    "type": "git",
+                    "url": "https://github.com/bog-dan-ro/ZxKit.git",
+                    "commit": "c22493baa0d78211ba48b078493fad04c6aebaa5",
+                    "dest": "dependencies/zxkit",
+                    "disable-submodules": true
+                }
+            ]
+        }
+    ]
+}

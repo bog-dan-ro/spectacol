@@ -8,14 +8,14 @@ project(Spectacol
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 23)
 
-set(QT_REQUIRED_VERSION "6.12")
+set(QT_REQUIRED_VERSION "6.11")
 
 include(FetchContent)
 
 FetchContent_Declare(
     QtGamepad
     GIT_REPOSITORY https://github.com/bog-dan-ro/qtgamepadlegacy.git
-    GIT_TAG dev
+    GIT_TAG e89b1e0dd903fc638857a344be0ebef0a04495ed
 )
 
 # QtGamepadLegacy is built with Qt's internal build system, so it must find Qt
@@ -35,7 +35,7 @@ find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Quick Multimedia Sha
 qt_standard_project_setup(REQUIRES ${QT_REQUIRED_VERSION})
 
 if(NOT TARGET ZX::Kit)
-    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../CMakeLists.txt")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../include/zxkit/zxkit.h")
         FetchContent_Declare(
             ZxKit
             SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.."
@@ -44,7 +44,7 @@ if(NOT TARGET ZX::Kit)
         FetchContent_Declare(
             ZxKit
             GIT_REPOSITORY https://github.com/bog-dan-ro/ZxKit.git
-            GIT_TAG main
+            GIT_TAG c22493baa0d78211ba48b078493fad04c6aebaa5
         )
     endif()
     FetchContent_MakeAvailable(ZxKit)

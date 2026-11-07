@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org> -->
+<component type="desktop-application">
+  <id>io.github.bog_dan_ro.spectacol</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Spectacol</name>
+  <summary>Play and debug ZX Spectrum software</summary>
+  <description>
+    <p>Spectacol emulates the ZX Spectrum family, including the ZX Spectrum Next,
+    Timex and Romanian computers. Its interface supports keyboards, touch screens
+    and game controllers.</p>
+    <p>Load tapes, disks, snapshots and recordings, browse online software
+    catalogues, and explore programs with the built-in debugger and assembler.</p>
+  </description>
+  <launchable type="desktop-id">io.github.bog_dan_ro.spectacol.desktop</launchable>
+  <url type="homepage">https://github.com/bog-dan-ro/spectacol</url>
+  <url type="bugtracker">https://github.com/bog-dan-ro/spectacol/issues</url>
+  <developer id="io.github.bog-dan-ro">
+    <name>BogDan Vatra</name>
+  </developer>
+  <provides>
+    <binary>spectacol</binary>
+  </provides>
+  <categories>
+    <category>Game</category>
+    <category>Emulator</category>
+  </categories>
+  <content_rating type="oars-1.1"/>
+</component>

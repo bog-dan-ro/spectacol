@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QGuiApplication>
+#include <QIcon>
 #include <QKeyEvent>
 #include <QInputMethodEvent>
 #include <QKeySequence>
@@ -53,10 +54,14 @@ int main(int argc, char *argv[])
     app.setOrganizationName(u"Licentia"_s);
     app.setOrganizationDomain(u"licentia.eu"_s);
     app.setApplicationName(u"Spectacol"_s);
+    app.setApplicationVersion(QString::fromLatin1(SPECTACOL_VERSION));
+    app.setDesktopFileName(u"eu.licentia.spectacol"_s);
+    app.setWindowIcon(QIcon(u":/android/res/drawable/icon.png"_s));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(u"Spectacol, a ZX Spectrum emulator"_s);
     parser.addHelpOption();
+    parser.addVersionOption();
     const QCommandLineOption machineOption(
             u"machine"_s, u"Start with machine <id> (see --list-machines)."_s, u"id"_s);
     const QCommandLineOption listMachinesOption(u"list-machines"_s,
