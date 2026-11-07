@@ -41,7 +41,8 @@ namespace {
 uint64_t uartTime(const zxkit::Emulator &em)
 {
     const auto &clock = em.clock();
-    return clock.frameCount() * uint64_t(clock.timings().tstatesPerFrame()) + clock.frameBaseTstates();
+    return clock.frameCount() * uint64_t(clock.timings().tstatesPerFrame())
+            + clock.frameBaseTstates();
 }
 QByteArray byteArray(const QVariantList &bytes)
 {
@@ -61,18 +62,23 @@ QVariantList byteList(const QByteArray &bytes)
 }
 quint64 steadyNanos()
 {
-    return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch())
-        .count();
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+                   std::chrono::steady_clock::now().time_since_epoch())
+            .count();
 }
 } // namespace
 
-class NextUartRuntime {
-  public:
+class NextUartRuntime
+{
+public:
     NextUartHooks &host;
     QJSEngine engine; // Constructed by Engine::ThreadHooks, never by the UI.
     std::array<std::unique_ptr<UartScriptApi>, 2> api;
     std::array<QJSValue, 2> modules;
-    struct Methods { QJSValue reset, onByte, onNetwork, onTimer; };
+    struct Methods
+    {
+        QJSValue reset, onByte, onNetwork, onTimer;
+    };
     std::array<Methods, 2> methods;
     NextUartHooks::Configuration configuration;
     zxkit::Emulator *emulator = nullptr;
@@ -84,7 +90,7 @@ class NextUartRuntime {
     QList<QPair<unsigned, uint8_t>> deferred;
     std::array<QHash<int, quint64>, 2> timers;
     QMutex evaluationMutex;
-    std::atomic<quint64> deadline{0};
+    std::atomic<quint64> deadline{ 0 };
     std::jthread watchdog; // Destroyed before engine.
 
     explicit NextUartRuntime(NextUartHooks &h)
@@ -110,7 +116,8 @@ class NextUartRuntime {
         watchdog.request_stop();
         watchdog.join();
     }
-    QJSValue call(unsigned ch, const QJSValue &function, const QJSValueList &args = {}, bool method = true)
+    QJSValue call(unsigned ch, const QJSValue &function, const QJSValueList &args = {},
+                  bool method = true)
     {
         if (!function.isCallable())
             return {};
@@ -127,7 +134,8 @@ class NextUartRuntime {
         if (result.isError()) {
             modules[ch] = {};
             methods[ch] = {};
-            host.reportError(QString(u"%1 UART hook: %2"_s).arg(ch ? u"Pi"_s : u"ESP"_s, result.toString()));
+            host.reportError(
+                    QString(u"%1 UART hook: %2"_s).arg(ch ? u"Pi"_s : u"ESP"_s, result.toString()));
         }
         return result;
     }
@@ -166,9 +174,9 @@ class NextUartRuntime {
                 engine.setInterrupted(false);
                 deadline.store(steadyNanos() + 100'000'000, std::memory_order_release);
             }
-            const auto factory =
-                engine.evaluate(u"(function(host){'use strict';\n"_s + configuration.source[ch] + u"\n})"_s,
-                                ch ? u"pi-uart.js"_s : u"esp-uart.js"_s);
+            const auto factory = engine.evaluate(u"(function(host){'use strict';\n"_s
+                                                         + configuration.source[ch] + u"\n})"_s,
+                                                 ch ? u"pi-uart.js"_s : u"esp-uart.js"_s);
             {
                 QMutexLocker lock(&evaluationMutex);
                 deadline.store(0, std::memory_order_release);
@@ -177,7 +185,7 @@ class NextUartRuntime {
                 host.reportError(factory.toString());
                 continue;
             }
-            auto module = call(ch, factory, {engine.newQObject(api[ch].get())}, false);
+            auto module = call(ch, factory, { engine.newQObject(api[ch].get()) }, false);
             bool valid = false;
             {
                 QMutexLocker lock(&evaluationMutex);
@@ -185,14 +193,19 @@ class NextUartRuntime {
                 deadline.store(steadyNanos() + 100'000'000, std::memory_order_release);
             }
             if (module.isObject() && module.property(u"apiVersion"_s).toInt() == 1) {
-                methods[ch] = {module.property(u"reset"_s), module.property(u"onByte"_s),
-                               module.property(u"onNetwork"_s), module.property(u"onTimer"_s)};
+                methods[ch] = { module.property(u"reset"_s), module.property(u"onByte"_s),
+                                module.property(u"onNetwork"_s), module.property(u"onTimer"_s) };
                 valid = !engine.hasError();
             }
-            { QMutexLocker lock(&evaluationMutex); deadline.store(0, std::memory_order_release); }
-            if (valid) modules[ch] = module;
+            {
+                QMutexLocker lock(&evaluationMutex);
+                deadline.store(0, std::memory_order_release);
+            }
+            if (valid)
+                modules[ch] = module;
             else {
-                if (engine.hasError()) engine.catchError();
+                if (engine.hasError())
+                    engine.catchError();
                 methods[ch] = {};
                 host.reportError(u"UART script must return an object with apiVersion: 1"_s);
             }
@@ -207,7 +220,7 @@ class NextUartRuntime {
         if (std::this_thread::get_id() != owner) {
             QMutexLocker lock(&deferredMutex);
             if (deferred.size() < 65536)
-                deferred.append({ch, byte});
+                deferred.append({ ch, byte });
             return;
         }
         emulator = &em;
@@ -216,7 +229,7 @@ class NextUartRuntime {
             generation = device.generation();
             reset();
         }
-        call(ch, methods[ch].onByte, {int(byte)});
+        call(ch, methods[ch].onByte, { int(byte) });
     }
     void poll(zxkit::Emulator &em)
     {
@@ -230,8 +243,9 @@ class NextUartRuntime {
         uart = &next.uart();
         if (!uart->hasTransmitHandler()) {
             generation = ~uint64_t(0);
-            uart->setTransmitHandler(
-                [this, &em, device = uart](unsigned ch, uint8_t byte) { transmit(em, *device, ch, byte); });
+            uart->setTransmitHandler([this, &em, device = uart](unsigned ch, uint8_t byte) {
+                transmit(em, *device, ch, byte);
+            });
             next.rtc().setTimeSource([] {
                 const auto now = QDateTime::currentDateTime();
                 return now.toSecsSinceEpoch() + now.offsetFromUtc();
@@ -242,8 +256,8 @@ class NextUartRuntime {
                 data = host.m_savedNvram;
             }
             if (data.size() == 56)
-                next.rtc().setNvram(
-                    std::span<const uint8_t, 56>(reinterpret_cast<const uint8_t *>(data.constData()), 56));
+                next.rtc().setNvram(std::span<const uint8_t, 56>(
+                        reinterpret_cast<const uint8_t *>(data.constData()), 56));
         }
         const bool reloaded = revision != host.m_revision.load(std::memory_order_acquire);
         if (reloaded)
@@ -266,7 +280,7 @@ class NextUartRuntime {
                 if (ch >= 2 || id < 0 || id > 4 || token != socketEpoch[ch][id])
                     continue;
                 if (ch < 2)
-                    call(ch, methods[ch].onNetwork, {engine.toScriptValue(event)});
+                    call(ch, methods[ch].onNetwork, { engine.toScriptValue(event) });
             }
         }
         QList<QPair<unsigned, uint8_t>> bytes;
@@ -283,7 +297,7 @@ class NextUartRuntime {
                 for (int id : ids)
                     if (timers[ch].contains(id) && timers[ch].value(id) <= now) {
                         timers[ch].remove(id);
-                        call(ch, methods[ch].onTimer, {id});
+                        call(ch, methods[ch].onTimer, { id });
                     }
             }
         }
@@ -293,15 +307,15 @@ class NextUartRuntime {
         if (value != nvram) {
             nvram = value;
             QMetaObject::invokeMethod(
-                &host,
-                [h = &host, value] {
-                    {
-                        QMutexLocker lock(&h->m_mutex);
-                        h->m_savedNvram = value;
-                    }
-                    QSettings{}.setValue(u"Next/rtcNvram"_s, value);
-                },
-                Qt::QueuedConnection);
+                    &host,
+                    [h = &host, value] {
+                        {
+                            QMutexLocker lock(&h->m_mutex);
+                            h->m_savedNvram = value;
+                        }
+                        QSettings{}.setValue(u"Next/rtcNvram"_s, value);
+                    },
+                    Qt::QueuedConnection);
         }
     }
     QByteArray nvram;
@@ -313,8 +327,9 @@ int UartScriptApi::receive(const QVariantList &bytes)
         return 0;
     const auto data = byteArray(bytes);
     return int(m_runtime.uart->receive(
-        m_channel, std::span(reinterpret_cast<const uint8_t *>(data.constData()), size_t(data.size())),
-        uartTime(*m_runtime.emulator)));
+            m_channel,
+            std::span(reinterpret_cast<const uint8_t *>(data.constData()), size_t(data.size())),
+            uartTime(*m_runtime.emulator)));
 }
 void UartScriptApi::network(const QString &operation, int id, const QString &address, int port,
                             const QVariantList &bytes, bool udp)
@@ -329,69 +344,85 @@ void UartScriptApi::network(const QString &operation, int id, const QString &add
             m_runtime.socketEpoch[m_channel][id] = ++m_runtime.epoch;
     }
     const auto token = id < 0 ? m_runtime.epoch : m_runtime.socketEpoch[m_channel][id];
-    m_runtime.host.command({{u"operation"_s, operation},
-                            {u"id"_s, id},
-                            {u"host"_s, address},
-                            {u"port"_s, port},
-                            {u"bytes"_s, byteArray(bytes)},
-                            {u"udp"_s, udp},
-                            {u"channel"_s, m_channel},
-                            {u"epoch"_s, qulonglong(token)}});
+    m_runtime.host.command({ { u"operation"_s, operation },
+                             { u"id"_s, id },
+                             { u"host"_s, address },
+                             { u"port"_s, port },
+                             { u"bytes"_s, byteArray(bytes) },
+                             { u"udp"_s, udp },
+                             { u"channel"_s, m_channel },
+                             { u"epoch"_s, qulonglong(token) } });
 }
 void UartScriptApi::setTimer(int id, int milliseconds)
 {
-    if (id < 0 || id > 1023 || milliseconds < 0 || milliseconds > 60000 || m_runtime.timers[m_channel].size() >= 64)
+    if (id < 0 || id > 1023 || milliseconds < 0 || milliseconds > 60000
+        || m_runtime.timers[m_channel].size() >= 64)
         return;
     m_runtime.timers[m_channel].insert(id, steadyNanos() + quint64(milliseconds) * 1'000'000);
 }
-void UartScriptApi::log(const QString &message) { m_runtime.host.reportError(message.left(4096)); }
-void UartScriptApi::cancelTimer(int id) { m_runtime.timers[m_channel].remove(id); }
+void UartScriptApi::log(const QString &message)
+{
+    m_runtime.host.reportError(message.left(4096));
+}
+void UartScriptApi::cancelTimer(int id)
+{
+    m_runtime.timers[m_channel].remove(id);
+}
 QVariantMap UartScriptApi::configuration() const
 {
-    return {{u"host"_s, m_runtime.configuration.piHost}, {u"port"_s, m_runtime.configuration.piPort}};
+    return { { u"host"_s, m_runtime.configuration.piHost },
+             { u"port"_s, m_runtime.configuration.piPort } };
 }
 
 NextUartHooks::NextUartHooks(QObject *parent) : QObject(parent)
 {
     QSettings settings;
     m_savedNvram = settings.value(u"Next/rtcNvram"_s).toByteArray();
-    m_paths = {settings.value(u"Next/espScript"_s).toString(), settings.value(u"Next/piScript"_s).toString()};
+    m_paths = { settings.value(u"Next/espScript"_s).toString(),
+                settings.value(u"Next/piScript"_s).toString() };
     m_piHost = settings.value(u"Next/piHost"_s, u"127.0.0.1"_s).toString();
     m_piPort = settings.value(u"Next/piPort"_s, 0).toInt();
     configure();
 }
-NextUartHooks::~NextUartHooks() { Q_ASSERT(!m_runtime); }
+NextUartHooks::~NextUartHooks()
+{
+    Q_ASSERT(!m_runtime);
+}
 zxkit::EngineConfig::ThreadHooks NextUartHooks::threadHooks()
 {
-    return {
-        .started =
-            [this](zxkit::Emulator &) { m_threadId = quint64(reinterpret_cast<quintptr>(QThread::currentThreadId())); },
-        .poll =
-            [this](zxkit::Emulator &em) {
-                if (em.machine().id() != "next" && !m_runtime)
-                    return;
-                if (!m_runtime)
-                    m_runtime = std::make_unique<NextUartRuntime>(*this);
-                m_runtime->poll(em);
-            },
-        .stopped =
-            [this](zxkit::Emulator &em) {
-                if (em.machine().id() == "next")
-                    static_cast<zxkit::ZxNextMachine &>(em.machine()).uart().setTransmitHandler({});
-                if (m_runtime)
-                    m_runtime->closeAll();
-                m_runtime.reset();
-            }};
+    return { .started =
+                     [this](zxkit::Emulator &) {
+                         m_threadId =
+                                 quint64(reinterpret_cast<quintptr>(QThread::currentThreadId()));
+                     },
+             .poll =
+                     [this](zxkit::Emulator &em) {
+                         if (em.machine().id() != "next" && !m_runtime)
+                             return;
+                         if (!m_runtime)
+                             m_runtime = std::make_unique<NextUartRuntime>(*this);
+                         m_runtime->poll(em);
+                     },
+             .stopped =
+                     [this](zxkit::Emulator &em) {
+                         if (em.machine().id() == "next")
+                             static_cast<zxkit::ZxNextMachine &>(em.machine())
+                                     .uart()
+                                     .setTransmitHandler({});
+                         if (m_runtime)
+                             m_runtime->closeAll();
+                         m_runtime.reset();
+                     } };
 }
 void NextUartHooks::reportError(const QString &error)
 {
     QMetaObject::invokeMethod(
-        this,
-        [this, error] {
-            m_error = error;
-            emit statusChanged();
-        },
-        Qt::QueuedConnection);
+            this,
+            [this, error] {
+                m_error = error;
+                emit statusChanged();
+            },
+            Qt::QueuedConnection);
 }
 void NextUartHooks::configure()
 {
@@ -399,7 +430,8 @@ void NextUartHooks::configure()
     configuration.piHost = m_piHost;
     configuration.piPort = m_piPort;
     for (unsigned ch = 0; ch < 2; ++ch) {
-        QFile file(m_paths[ch].isEmpty() ? (ch ? u":/uart/pi.js"_s : u":/uart/esp.js"_s) : m_paths[ch]);
+        QFile file(m_paths[ch].isEmpty() ? (ch ? u":/uart/pi.js"_s : u":/uart/esp.js"_s)
+                                         : m_paths[ch]);
         if (!file.open(QIODevice::ReadOnly) || file.size() > 1024 * 1024) {
             reportError(tr("Cannot read UART script: %1").arg(file.fileName()));
             continue;
@@ -452,8 +484,9 @@ void NextUartHooks::useBundled(int ch)
 }
 void NextUartHooks::downloadScript(int ch, const QUrl &url)
 {
-    if (ch < 0 || ch > 1 || m_downloading ||
-        (url.scheme() != u"https"_s && !(url.scheme() == u"http"_s && url.host() == u"127.0.0.1"_s)))
+    if (ch < 0 || ch > 1 || m_downloading
+        || (url.scheme() != u"https"_s
+            && !(url.scheme() == u"http"_s && url.host() == u"127.0.0.1"_s)))
         return;
     m_downloading = true;
     m_error.clear();
@@ -474,13 +507,17 @@ void NextUartHooks::downloadScript(int ch, const QUrl &url)
             reportError(tr("UART script download failed: %1").arg(reply->errorString()));
             return;
         }
-        const auto folder = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/uart"_s;
+        const auto folder =
+                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/uart"_s;
         QDir().mkpath(folder);
-        const auto path = folder + (ch ? u"/pi-"_s : u"/esp-"_s) +
-                          QString::fromLatin1(QCryptographicHash::hash(*bytes, QCryptographicHash::Sha256).toHex()) +
-                          u".js"_s;
+        const auto path =
+                folder + (ch ? u"/pi-"_s : u"/esp-"_s)
+                + QString::fromLatin1(
+                        QCryptographicHash::hash(*bytes, QCryptographicHash::Sha256).toHex())
+                + u".js"_s;
         QSaveFile file(path);
-        if (!file.open(QIODevice::WriteOnly) || file.write(*bytes) != bytes->size() || !file.commit()) {
+        if (!file.open(QIODevice::WriteOnly) || file.write(*bytes) != bytes->size()
+            || !file.commit()) {
             reportError(tr("Cannot save UART script"));
             return;
         }
@@ -538,43 +575,50 @@ void NextUartHooks::processCommands()
                     }
                 }
         } else if (op == u"resolve"_s) {
-            QHostInfo::lookupHost(cmd.value(u"host"_s).toString(), this, [event](const QHostInfo &info) {
-                event(u"resolved"_s,
-                      {{u"address"_s, info.addresses().isEmpty() ? QString{} : info.addresses().first().toString()}});
-            });
+            QHostInfo::lookupHost(cmd.value(u"host"_s).toString(), this,
+                                  [event](const QHostInfo &info) {
+                                      event(u"resolved"_s,
+                                            { { u"address"_s,
+                                                info.addresses().isEmpty()
+                                                        ? QString{}
+                                                        : info.addresses().first().toString() } });
+                                  });
         } else if (op == u"open"_s && id >= 0) {
             if (auto old = m_sockets.take(key)) {
                 old->abort();
                 old->deleteLater();
             }
             QAbstractSocket *socket = cmd.value(u"udp"_s).toBool()
-                                          ? static_cast<QAbstractSocket *>(new QUdpSocket(this))
-                                          : new QTcpSocket(this);
+                    ? static_cast<QAbstractSocket *>(new QUdpSocket(this))
+                    : new QTcpSocket(this);
             socket->setReadBufferSize(256 * 1024);
             m_sockets.insert(key, socket);
             connect(socket, &QAbstractSocket::connected, this, [event] { event(u"connected"_s); });
             connect(socket, &QAbstractSocket::disconnected, this, [event] { event(u"closed"_s); });
-            connect(socket, &QAbstractSocket::errorOccurred, this, [event, socket](QAbstractSocket::SocketError) {
-                event(u"error"_s, {{u"message"_s, socket->errorString()}});
-            });
+            connect(socket, &QAbstractSocket::errorOccurred, this,
+                    [event, socket](QAbstractSocket::SocketError) {
+                        event(u"error"_s, { { u"message"_s, socket->errorString() } });
+                    });
             connect(socket, &QIODevice::readyRead, this, [event, socket] {
                 if (auto *udp = qobject_cast<QUdpSocket *>(socket)) {
                     while (udp->hasPendingDatagrams()) {
-                        QByteArray data(std::min<qint64>(udp->pendingDatagramSize(), 65536), Qt::Uninitialized);
+                        QByteArray data(std::min<qint64>(udp->pendingDatagramSize(), 65536),
+                                        Qt::Uninitialized);
                         udp->readDatagram(data.data(), data.size());
-                        event(u"data"_s, {{u"bytes"_s, byteList(data)}});
+                        event(u"data"_s, { { u"bytes"_s, byteList(data) } });
                     }
                 } else {
                     while (socket->bytesAvailable())
-                        event(u"data"_s, {{u"bytes"_s, byteList(socket->read(65536))}});
+                        event(u"data"_s, { { u"bytes"_s, byteList(socket->read(65536)) } });
                 }
             });
-            socket->connectToHost(cmd.value(u"host"_s).toString(), quint16(cmd.value(u"port"_s).toUInt()));
+            socket->connectToHost(cmd.value(u"host"_s).toString(),
+                                  quint16(cmd.value(u"port"_s).toUInt()));
         } else if (op == u"write"_s && id >= 0) {
             auto socket = m_sockets.value(key);
             const auto bytes = cmd.value(u"bytes"_s).toByteArray();
-            if (!socket || socket->state() != QAbstractSocket::ConnectedState || socket->bytesToWrite() > 1024 * 1024 ||
-                socket->write(bytes) != bytes.size())
+            if (!socket || socket->state() != QAbstractSocket::ConnectedState
+                || socket->bytesToWrite() > 1024 * 1024 || socket->write(bytes) != bytes.size())
                 event(u"error"_s);
             else
                 event(u"sent"_s);

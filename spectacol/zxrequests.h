@@ -24,7 +24,8 @@
 
 namespace zxonline {
 
-struct Endpoints {
+struct Endpoints
+{
     Endpoints();
     QUrl archive;
     QUrl zxinfo;
@@ -32,14 +33,16 @@ struct Endpoints {
     QUrl spectrumComputing;
 };
 
-struct Game {
+struct Game
+{
     QString id;
     QString title;
     QString subtitle;
     QUrl screenshot;
 };
 
-struct Media {
+struct Media
+{
     QUrl url;
     QString name;
     QString label;
@@ -47,7 +50,8 @@ struct Media {
     qint64 size = 0;
 };
 
-struct Details {
+struct Details
+{
     QString title;
     QString subtitle;
     QString description;
@@ -56,7 +60,8 @@ struct Details {
     QList<Media> files;
 };
 
-struct Page {
+struct Page
+{
     QList<Game> games;
     int total = 0;
 };
@@ -65,7 +70,8 @@ struct Page {
 QUrl searchUrl(const Endpoints &endpoints, int source, const QString &text, int page);
 QUrl detailsUrl(const Endpoints &endpoints, int source, const QString &id);
 Page parsePage(const QJsonObject &object, int source, const Endpoints &endpoints = {});
-Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int source, const QString &id);
+Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int source,
+                     const QString &id);
 QString downloadName(int source, const QString &id, const Media &file);
 
 } // namespace zxonline

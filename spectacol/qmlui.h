@@ -22,8 +22,7 @@
 int debuggerOutputBase();
 void setDebuggerOutputBase(int base);
 
-template <typename T>
-inline QString formatNumber(T nr)
+template <typename T> inline QString formatNumber(T nr)
 {
     using namespace Qt::StringLiterals;
     if (debuggerOutputBase() == 10)
@@ -34,7 +33,14 @@ inline QString formatNumber(T nr)
 void showErrors();
 void hideErrors();
 
-struct BlockErrors {
-    BlockErrors() { hideErrors(); }
-    ~BlockErrors() { showErrors(); }
+struct BlockErrors
+{
+    BlockErrors()
+    {
+        hideErrors();
+    }
+    ~BlockErrors()
+    {
+        showErrors();
+    }
 };

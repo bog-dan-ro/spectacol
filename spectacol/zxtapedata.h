@@ -26,13 +26,8 @@ class ZxTapeData : public QAbstractListModel
     Q_OBJECT
     QML_ELEMENT
     Q_PROPERTY(int currentBlock READ currentBlock NOTIFY currentBlockChanged)
-    enum {
-        Label = Qt::DisplayRole,
-        Detail = Qt::UserRole + 1,
-        Image,
-        Data,
-        Current
-    };
+    enum { Label = Qt::DisplayRole, Detail = Qt::UserRole + 1, Image, Data, Current };
+
 public:
     ZxTapeData();
 
@@ -41,7 +36,10 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    int currentBlock() const { return m_currentBlock; }
+    int currentBlock() const
+    {
+        return m_currentBlock;
+    }
 
 signals:
     void currentBlockChanged();
@@ -53,7 +51,8 @@ public slots:
     int getBufferLength(int index);
 
 private:
-    struct TapeData {
+    struct TapeData
+    {
         QByteArray label;
         QByteArray detail;
         QByteArray data;

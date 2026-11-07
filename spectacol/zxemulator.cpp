@@ -64,9 +64,9 @@ using namespace Qt::StringLiterals;
 using namespace std::literals;
 
 #ifdef Q_OS_ANDROID
-# include <QCoreApplication>
-# include <QJniObject>
-# include "androidintegration.h"
+#include <QCoreApplication>
+#include <QJniObject>
+#include "androidintegration.h"
 #endif
 
 namespace {
@@ -107,7 +107,8 @@ QString saveTimestamp()
     return QDateTime::currentDateTime().toString(u"yyyy-MM-dd_hh_mm_ss_zzz"_s);
 }
 
-struct MappedZxKeys {
+struct MappedZxKeys
+{
     std::optional<zxkit::ZxKey> primary;
     std::optional<zxkit::ZxKey> modifier;
 };
@@ -119,19 +120,27 @@ std::optional<zxkit::ZxKey> cobraKey(int qtKey, int modifiers)
 {
     using zxkit::ZxKey;
     switch (qtKey) {
-    case Qt::Key_Control:    return ZxKey::Ctrl;
-    case Qt::Key_Escape:     return ZxKey::Esc;
-    case Qt::Key_ScrollLock: return ZxKey::NoScroll;
+    case Qt::Key_Control:
+        return ZxKey::Ctrl;
+    case Qt::Key_Escape:
+        return ZxKey::Esc;
+    case Qt::Key_ScrollLock:
+        return ZxKey::NoScroll;
     case Qt::Key_Enter:
         // the keypad's Enter
         if (modifiers & Qt::KeypadModifier)
             return ZxKey::LineFeed;
         return std::nullopt;
-    case Qt::Key_F1:         return ZxKey::F1;
-    case Qt::Key_F2:         return ZxKey::F2;
-    case Qt::Key_F3:         return ZxKey::F3;
-    case Qt::Key_F4:         return ZxKey::F4;
-    default:                 return std::nullopt;
+    case Qt::Key_F1:
+        return ZxKey::F1;
+    case Qt::Key_F2:
+        return ZxKey::F2;
+    case Qt::Key_F3:
+        return ZxKey::F3;
+    case Qt::Key_F4:
+        return ZxKey::F4;
+    default:
+        return std::nullopt;
     }
 }
 
@@ -145,65 +154,99 @@ MappedZxKeys mapQtKeyToZx(int qtKey, int modifiers)
     using zxkit::ZxKey;
 
     if (qtKey >= Qt::Key_A && qtKey <= Qt::Key_Z) {
-        static constexpr ZxKey kLetters[26] = {
-            ZxKey::A, ZxKey::B, ZxKey::C, ZxKey::D, ZxKey::E, ZxKey::F, ZxKey::G,
-            ZxKey::H, ZxKey::I, ZxKey::J, ZxKey::K, ZxKey::L, ZxKey::M, ZxKey::N,
-            ZxKey::O, ZxKey::P, ZxKey::Q, ZxKey::R, ZxKey::S, ZxKey::T, ZxKey::U,
-            ZxKey::V, ZxKey::W, ZxKey::X, ZxKey::Y, ZxKey::Z
-        };
+        static constexpr ZxKey kLetters[26] = { ZxKey::A, ZxKey::B, ZxKey::C, ZxKey::D, ZxKey::E,
+                                                ZxKey::F, ZxKey::G, ZxKey::H, ZxKey::I, ZxKey::J,
+                                                ZxKey::K, ZxKey::L, ZxKey::M, ZxKey::N, ZxKey::O,
+                                                ZxKey::P, ZxKey::Q, ZxKey::R, ZxKey::S, ZxKey::T,
+                                                ZxKey::U, ZxKey::V, ZxKey::W, ZxKey::X, ZxKey::Y,
+                                                ZxKey::Z };
         const auto key = kLetters[qtKey - Qt::Key_A];
         if (modifiers & Qt::ShiftModifier)
-            return {key, ZxKey::CapsShift};
-        return {key, std::nullopt};
+            return { key, ZxKey::CapsShift };
+        return { key, std::nullopt };
     }
 
     if (qtKey >= Qt::Key_0 && qtKey <= Qt::Key_9) {
-        static constexpr ZxKey kDigits[10] = {
-            ZxKey::Num0, ZxKey::Num1, ZxKey::Num2, ZxKey::Num3, ZxKey::Num4,
-            ZxKey::Num5, ZxKey::Num6, ZxKey::Num7, ZxKey::Num8, ZxKey::Num9
-        };
-        return {kDigits[qtKey - Qt::Key_0], std::nullopt};
+        static constexpr ZxKey kDigits[10] = { ZxKey::Num0, ZxKey::Num1, ZxKey::Num2, ZxKey::Num3,
+                                               ZxKey::Num4, ZxKey::Num5, ZxKey::Num6, ZxKey::Num7,
+                                               ZxKey::Num8, ZxKey::Num9 };
+        return { kDigits[qtKey - Qt::Key_0], std::nullopt };
     }
 
     switch (qtKey) {
     case Qt::Key_Return:
-    case Qt::Key_Enter:      return {ZxKey::Enter, std::nullopt};
-    case Qt::Key_Space:      return {ZxKey::Space, std::nullopt};
-    case Qt::Key_Shift:      return {ZxKey::CapsShift, std::nullopt};
+    case Qt::Key_Enter:
+        return { ZxKey::Enter, std::nullopt };
+    case Qt::Key_Space:
+        return { ZxKey::Space, std::nullopt };
+    case Qt::Key_Shift:
+        return { ZxKey::CapsShift, std::nullopt };
     case Qt::Key_Control:
     case Qt::Key_Alt:
-    case Qt::Key_Meta:       return {ZxKey::SymbolShift, std::nullopt};
-    case Qt::Key_Backspace:  return {ZxKey::Num0, ZxKey::CapsShift};
-    case Qt::Key_CapsLock:   return {ZxKey::Num2, ZxKey::CapsShift};
-    case Qt::Key_Escape:     return {ZxKey::Space, ZxKey::CapsShift};
-    case Qt::Key_Left:       return {ZxKey::Num5, ZxKey::CapsShift};
-    case Qt::Key_Down:       return {ZxKey::Num6, ZxKey::CapsShift};
-    case Qt::Key_Up:         return {ZxKey::Num7, ZxKey::CapsShift};
-    case Qt::Key_Right:      return {ZxKey::Num8, ZxKey::CapsShift};
-    case Qt::Key_Exclam:     return {ZxKey::Num1, ZxKey::SymbolShift};
-    case Qt::Key_At:         return {ZxKey::Num2, ZxKey::SymbolShift};
-    case Qt::Key_NumberSign: return {ZxKey::Num3, ZxKey::SymbolShift};
-    case Qt::Key_Dollar:     return {ZxKey::Num4, ZxKey::SymbolShift};
-    case Qt::Key_Percent:    return {ZxKey::Num5, ZxKey::SymbolShift};
-    case Qt::Key_Ampersand:  return {ZxKey::Num6, ZxKey::SymbolShift};
-    case Qt::Key_Apostrophe: return {ZxKey::Num7, ZxKey::SymbolShift};
-    case Qt::Key_ParenLeft:  return {ZxKey::Num8, ZxKey::SymbolShift};
-    case Qt::Key_ParenRight: return {ZxKey::Num9, ZxKey::SymbolShift};
-    case Qt::Key_Underscore: return {ZxKey::Num0, ZxKey::SymbolShift};
-    case Qt::Key_QuoteDbl:   return {ZxKey::P, ZxKey::SymbolShift};
-    case Qt::Key_Semicolon:  return {ZxKey::O, ZxKey::SymbolShift};
-    case Qt::Key_Comma:      return {ZxKey::N, ZxKey::SymbolShift};
-    case Qt::Key_Period:     return {ZxKey::M, ZxKey::SymbolShift};
-    case Qt::Key_Plus:       return {ZxKey::K, ZxKey::SymbolShift};
-    case Qt::Key_Minus:      return {ZxKey::J, ZxKey::SymbolShift};
-    case Qt::Key_Asterisk:   return {ZxKey::B, ZxKey::SymbolShift};
-    case Qt::Key_Slash:      return {ZxKey::V, ZxKey::SymbolShift};
-    case Qt::Key_Equal:      return {ZxKey::L, ZxKey::SymbolShift};
-    case Qt::Key_Colon:      return {ZxKey::Z, ZxKey::SymbolShift};
-    case Qt::Key_Less:       return {ZxKey::R, ZxKey::SymbolShift};
-    case Qt::Key_Greater:    return {ZxKey::T, ZxKey::SymbolShift};
-    case Qt::Key_Question:   return {ZxKey::C, ZxKey::SymbolShift};
-    default:                 return {std::nullopt, std::nullopt};
+    case Qt::Key_Meta:
+        return { ZxKey::SymbolShift, std::nullopt };
+    case Qt::Key_Backspace:
+        return { ZxKey::Num0, ZxKey::CapsShift };
+    case Qt::Key_CapsLock:
+        return { ZxKey::Num2, ZxKey::CapsShift };
+    case Qt::Key_Escape:
+        return { ZxKey::Space, ZxKey::CapsShift };
+    case Qt::Key_Left:
+        return { ZxKey::Num5, ZxKey::CapsShift };
+    case Qt::Key_Down:
+        return { ZxKey::Num6, ZxKey::CapsShift };
+    case Qt::Key_Up:
+        return { ZxKey::Num7, ZxKey::CapsShift };
+    case Qt::Key_Right:
+        return { ZxKey::Num8, ZxKey::CapsShift };
+    case Qt::Key_Exclam:
+        return { ZxKey::Num1, ZxKey::SymbolShift };
+    case Qt::Key_At:
+        return { ZxKey::Num2, ZxKey::SymbolShift };
+    case Qt::Key_NumberSign:
+        return { ZxKey::Num3, ZxKey::SymbolShift };
+    case Qt::Key_Dollar:
+        return { ZxKey::Num4, ZxKey::SymbolShift };
+    case Qt::Key_Percent:
+        return { ZxKey::Num5, ZxKey::SymbolShift };
+    case Qt::Key_Ampersand:
+        return { ZxKey::Num6, ZxKey::SymbolShift };
+    case Qt::Key_Apostrophe:
+        return { ZxKey::Num7, ZxKey::SymbolShift };
+    case Qt::Key_ParenLeft:
+        return { ZxKey::Num8, ZxKey::SymbolShift };
+    case Qt::Key_ParenRight:
+        return { ZxKey::Num9, ZxKey::SymbolShift };
+    case Qt::Key_Underscore:
+        return { ZxKey::Num0, ZxKey::SymbolShift };
+    case Qt::Key_QuoteDbl:
+        return { ZxKey::P, ZxKey::SymbolShift };
+    case Qt::Key_Semicolon:
+        return { ZxKey::O, ZxKey::SymbolShift };
+    case Qt::Key_Comma:
+        return { ZxKey::N, ZxKey::SymbolShift };
+    case Qt::Key_Period:
+        return { ZxKey::M, ZxKey::SymbolShift };
+    case Qt::Key_Plus:
+        return { ZxKey::K, ZxKey::SymbolShift };
+    case Qt::Key_Minus:
+        return { ZxKey::J, ZxKey::SymbolShift };
+    case Qt::Key_Asterisk:
+        return { ZxKey::B, ZxKey::SymbolShift };
+    case Qt::Key_Slash:
+        return { ZxKey::V, ZxKey::SymbolShift };
+    case Qt::Key_Equal:
+        return { ZxKey::L, ZxKey::SymbolShift };
+    case Qt::Key_Colon:
+        return { ZxKey::Z, ZxKey::SymbolShift };
+    case Qt::Key_Less:
+        return { ZxKey::R, ZxKey::SymbolShift };
+    case Qt::Key_Greater:
+        return { ZxKey::T, ZxKey::SymbolShift };
+    case Qt::Key_Question:
+        return { ZxKey::C, ZxKey::SymbolShift };
+    default:
+        return { std::nullopt, std::nullopt };
     }
 }
 
@@ -263,11 +306,14 @@ std::optional<std::pair<zxkit::ZxKey, bool>> recreatedKey(int qtKey, int modifie
     static constexpr auto kDown = "acegikmoqsuwyACEGIKMOQSUWY02468<-[;,/{!%"sv;
     static constexpr auto kUp = "bdfhjlnprtvxzBDFHJLNPRTVXZ13579>=]:.?}$^"sv;
     static constexpr std::array<ZxKey, 40> kKeys{
-        ZxKey::Num1, ZxKey::Num2, ZxKey::Num3, ZxKey::Num4, ZxKey::Num5, ZxKey::Num6, ZxKey::Num7, ZxKey::Num8,
-        ZxKey::Num9, ZxKey::Num0, ZxKey::Q, ZxKey::W, ZxKey::E, ZxKey::R, ZxKey::T, ZxKey::Y, ZxKey::U, ZxKey::I,
-        ZxKey::O, ZxKey::P, ZxKey::A, ZxKey::S, ZxKey::D, ZxKey::F, ZxKey::G, ZxKey::H, ZxKey::J, ZxKey::K,
-        ZxKey::L, ZxKey::Enter, ZxKey::CapsShift, ZxKey::Z, ZxKey::X, ZxKey::C, ZxKey::V, ZxKey::B, ZxKey::N,
-        ZxKey::M, ZxKey::SymbolShift, ZxKey::Space};
+        ZxKey::Num1,      ZxKey::Num2, ZxKey::Num3,        ZxKey::Num4, ZxKey::Num5, ZxKey::Num6,
+        ZxKey::Num7,      ZxKey::Num8, ZxKey::Num9,        ZxKey::Num0, ZxKey::Q,    ZxKey::W,
+        ZxKey::E,         ZxKey::R,    ZxKey::T,           ZxKey::Y,    ZxKey::U,    ZxKey::I,
+        ZxKey::O,         ZxKey::P,    ZxKey::A,           ZxKey::S,    ZxKey::D,    ZxKey::F,
+        ZxKey::G,         ZxKey::H,    ZxKey::J,           ZxKey::K,    ZxKey::L,    ZxKey::Enter,
+        ZxKey::CapsShift, ZxKey::Z,    ZxKey::X,           ZxKey::C,    ZxKey::V,    ZxKey::B,
+        ZxKey::N,         ZxKey::M,    ZxKey::SymbolShift, ZxKey::Space
+    };
 
     char c = 0;
     if (qtKey >= Qt::Key_A && qtKey <= Qt::Key_Z)
@@ -275,24 +321,30 @@ std::optional<std::pair<zxkit::ZxKey, bool>> recreatedKey(int qtKey, int modifie
     else if (qtKey >= Qt::Key_0 && qtKey <= Qt::Key_9)
         c = static_cast<char>('0' + (qtKey - Qt::Key_0));
     else if (qtKey >= 0x20 && qtKey < 0x7F)
-        c = static_cast<char>(qtKey); // Qt's key codes for the other printable keys are their ASCII codes
+        c = static_cast<char>(
+                qtKey); // Qt's key codes for the other printable keys are their ASCII codes
     if (c == 0)
         return std::nullopt;
     if (const auto down = kDown.find(c); down != std::string_view::npos)
-        return std::pair{kKeys[down], true};
+        return std::pair{ kKeys[down], true };
     if (const auto up = kUp.find(c); up != std::string_view::npos)
-        return std::pair{kKeys[up], false};
+        return std::pair{ kKeys[up], false };
     return std::nullopt;
 }
 
 uint8_t toJoystickMask(QGamepadManager::GamepadButton button)
 {
     switch (button) {
-    case QGamepadManager::ButtonUp:    return zxkit::JoystickButtons::Up;
-    case QGamepadManager::ButtonDown:  return zxkit::JoystickButtons::Down;
-    case QGamepadManager::ButtonRight: return zxkit::JoystickButtons::Right;
-    case QGamepadManager::ButtonLeft:  return zxkit::JoystickButtons::Left;
-    default:                           return zxkit::JoystickButtons::Fire1;
+    case QGamepadManager::ButtonUp:
+        return zxkit::JoystickButtons::Up;
+    case QGamepadManager::ButtonDown:
+        return zxkit::JoystickButtons::Down;
+    case QGamepadManager::ButtonRight:
+        return zxkit::JoystickButtons::Right;
+    case QGamepadManager::ButtonLeft:
+        return zxkit::JoystickButtons::Left;
+    default:
+        return zxkit::JoystickButtons::Fire1;
     }
 }
 
@@ -306,16 +358,16 @@ void withPeripheral(zxkit::Emulator &emulator, std::string_view id, F &&fn)
 
 } // namespace
 
-#define setRegisterValue(memberExpr) \
-    bool ok = false; \
-    int val = value.toInt(&ok); \
-    if (!ok) \
-        val = value.toInt(&ok, 16); \
-    if (!ok) { \
+#define setRegisterValue(memberExpr)                                        \
+    bool ok = false;                                                        \
+    int val = value.toInt(&ok);                                             \
+    if (!ok)                                                                \
+        val = value.toInt(&ok, 16);                                         \
+    if (!ok) {                                                              \
         emit error(Warning, tr("Value \"%1\" is not a number").arg(value)); \
-        return; \
-    } \
-    emulator().writeLock()->cpu().registers().memberExpr; \
+        return;                                                             \
+    }                                                                       \
+    emulator().writeLock()->cpu().registers().memberExpr;                   \
     emit registersChanged();
 
 ZxEmulator *ZxEmulator::create(QQmlEngine *, QJSEngine *)
@@ -330,23 +382,25 @@ ZxEmulator &ZxEmulator::instance()
 }
 
 ZxEmulator::ZxEmulator(QObject *parent)
-    : QObject(parent)
-    , m_breakpointsModel(this)
-    , m_disassambleModel(this)
-    , m_pokeFinderModel(this)
-    , m_resetPokeFinder(true)
-    , m_settings(std::make_unique<ZxSettings>(*this))
-    , m_controllerProfiles(std::make_unique<ControllerProfiles>(this))
-    , m_tape(new ZxTape(this))
-    , m_disks(new Disks(this))
-    , m_sdCard(new SdCardFiles(this))
-    , m_recording(new ZxRecording(this))
+    : QObject(parent),
+      m_breakpointsModel(this),
+      m_disassambleModel(this),
+      m_pokeFinderModel(this),
+      m_resetPokeFinder(true),
+      m_settings(std::make_unique<ZxSettings>(*this)),
+      m_controllerProfiles(std::make_unique<ControllerProfiles>(this)),
+      m_tape(new ZxTape(this)),
+      m_disks(new Disks(this)),
+      m_sdCard(new SdCardFiles(this)),
+      m_recording(new ZxRecording(this))
 {
 #ifdef Q_OS_ANDROID
-    const auto manager = QJniObject(QNativeInterface::QAndroidApplication::context()).callObjectMethod(
-        "getPackageManager", "()Landroid/content/pm/PackageManager;");
+    const auto manager =
+            QJniObject(QNativeInterface::QAndroidApplication::context())
+                    .callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;");
     const auto feature = QJniObject::fromString(u"android.hardware.touchscreen"_s);
-    m_touchscreen = manager.callMethod<jboolean>("hasSystemFeature", "(Ljava/lang/String;)Z", feature.object<jstring>());
+    m_touchscreen = manager.callMethod<jboolean>("hasSystemFeature", "(Ljava/lang/String;)Z",
+                                                 feature.object<jstring>());
 #endif
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_tape, QQmlEngine::CppOwnership);
@@ -355,56 +409,74 @@ ZxEmulator::ZxEmulator(QObject *parent)
     m_audioOutput = std::make_unique<AudioOutput>();
     connect(m_audioOutput.get(), &AudioOutput::errorOccurred, this,
             [this](const QString &message) { showMessage(message, Warning); });
-    connect(m_settings.get(), &ZxSettings::settingsCurrentChanged, this, [this] {
-        m_audioOutput->setMuted(!m_settings->soundEnabled());
-    });
+    connect(m_settings.get(), &ZxSettings::settingsCurrentChanged, this,
+            [this] { m_audioOutput->setMuted(!m_settings->soundEnabled()); });
     m_audioOutput->setMuted(!m_settings->soundEnabled());
     m_audioOutput->start();
 
     // The Engine calls these on its thread, it holds only Weak references to them
-    m_videoFrameCallback = zxkit::CallbackHandle<zxkit::VideoFrameCallback>([](const zxkit::VideoFramePtr &frame) {
-        ZxImage::instance()->presentFrame(frame);
-    });
-    m_audioCallback = zxkit::CallbackHandle<zxkit::AudioCallback>([this](std::span<const int16_t> samples, uint32_t sampleRate, uint8_t channels) {
-        writeAudioSamples(samples, sampleRate, channels);
-    });
-    m_pauseCallback = zxkit::CallbackHandle<zxkit::PauseCallback>([this](const zxkit::PauseEvent &event) {
-        m_audioOutput->setPaused(true);
-        QMetaObject::invokeMethod(this, [this, event] {
-            m_engineQuiescent = true;
-            m_debugPause = event;
-            emit debuggerStatusChanged();
-            m_recording->refresh();
-            emit pausedChanged();
-            if (m_debuggerActivated)
-                updateDebugger(); // e.g. a step over reached its instruction
-            else if (m_recording->playbackError().isEmpty() && event.reason != zxkit::PauseReason::UserRequest)
-                activateDebugger(); // a breakpoint or a watchpoint
-        }, Qt::QueuedConnection);
-    });
+    m_videoFrameCallback = zxkit::CallbackHandle<zxkit::VideoFrameCallback>(
+            [](const zxkit::VideoFramePtr &frame) { ZxImage::instance()->presentFrame(frame); });
+    m_audioCallback = zxkit::CallbackHandle<zxkit::AudioCallback>(
+            [this](std::span<const int16_t> samples, uint32_t sampleRate, uint8_t channels) {
+                writeAudioSamples(samples, sampleRate, channels);
+            });
+    m_pauseCallback =
+            zxkit::CallbackHandle<zxkit::PauseCallback>([this](const zxkit::PauseEvent &event) {
+                m_audioOutput->setPaused(true);
+                QMetaObject::invokeMethod(
+                        this,
+                        [this, event] {
+                            m_engineQuiescent = true;
+                            m_debugPause = event;
+                            emit debuggerStatusChanged();
+                            m_recording->refresh();
+                            emit pausedChanged();
+                            if (m_debuggerActivated)
+                                updateDebugger(); // e.g. a step over reached its instruction
+                            else if (m_recording->playbackError().isEmpty()
+                                     && event.reason != zxkit::PauseReason::UserRequest)
+                                activateDebugger(); // a breakpoint or a watchpoint
+                        },
+                        Qt::QueuedConnection);
+            });
     m_resumeCallback = zxkit::CallbackHandle<zxkit::ResumeCallback>([this] {
         m_audioOutput->setPaused(false);
-        QMetaObject::invokeMethod(this, [this] { m_engineQuiescent = false; if(m_debugMemory) m_debugMemory->setEditable(false); emit debuggerStatusChanged(); emit pausedChanged(); }, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(
+                this,
+                [this] {
+                    m_engineQuiescent = false;
+                    if (m_debugMemory)
+                        m_debugMemory->setEditable(false);
+                    emit debuggerStatusChanged();
+                    emit pausedChanged();
+                },
+                Qt::QueuedConnection);
     });
-    m_logCallback = zxkit::CallbackHandle<zxkit::LogCallback>([this](zxkit::LogLevel level, std::string_view msg) {
-        ErrorLevel errLvl = Info;
-        if (level == zxkit::LogLevel::Warning)
-            errLvl = Warning;
-        else if (level >= zxkit::LogLevel::Error)
-            errLvl = Error;
-        showMessage(QString::fromUtf8(msg.data(), qsizetype(msg.size())), errLvl);
-    });
+    m_logCallback = zxkit::CallbackHandle<zxkit::LogCallback>(
+            [this](zxkit::LogLevel level, std::string_view msg) {
+                ErrorLevel errLvl = Info;
+                if (level == zxkit::LogLevel::Warning)
+                    errLvl = Warning;
+                else if (level >= zxkit::LogLevel::Error)
+                    errLvl = Error;
+                showMessage(QString::fromUtf8(msg.data(), qsizetype(msg.size())), errLvl);
+            });
 
-    m_mediaActivityCallback = zxkit::CallbackHandle<zxkit::MediaActivityCallback>([this](const zxkit::MediaActivity &activity) {
-        QMetaObject::invokeMethod(this, [this, activity] { updateMediaActivity(activity); }, Qt::QueuedConnection);
-    });
+    m_mediaActivityCallback = zxkit::CallbackHandle<zxkit::MediaActivityCallback>(
+            [this](const zxkit::MediaActivity &activity) {
+                QMetaObject::invokeMethod(
+                        this, [this, activity] { updateMediaActivity(activity); },
+                        Qt::QueuedConnection);
+            });
 
     zxkit::EmulatorConfig cfg;
     cfg.machineId = "48k"s;
     cfg.audioSampleRate = 48'000;
     cfg.fullBorder = true;
     m_roms = std::make_unique<RomOverrides>();
-    cfg.machineRomResolver = [this](std::string_view machine, std::string_view name, std::size_t size) {
+    cfg.machineRomResolver = [this](std::string_view machine, std::string_view name,
+                                    std::size_t size) {
         return m_roms->resolve(machine, name, size);
     };
 
@@ -426,9 +498,13 @@ ZxEmulator::ZxEmulator(QObject *parent)
     QQmlEngine::setObjectOwnership(m_pokes.get(), QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_roms.get(), QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(&m_symbols, QQmlEngine::CppOwnership);
-    connect(m_pokes.get(), &PokeModel::failed, this, [this](const QString &message) { showMessage(message, Error); });
+    connect(m_pokes.get(), &PokeModel::failed, this,
+            [this](const QString &message) { showMessage(message, Error); });
     connect(m_pokes.get(), &PokeModel::memoryChanged, this, &ZxEmulator::debuggerRefresh);
-    connect(&m_symbols, &DebugSymbols::changed, this, [this] { if (debuggerReady()) m_disassambleModel.update(); });
+    connect(&m_symbols, &DebugSymbols::changed, this, [this] {
+        if (debuggerReady())
+            m_disassambleModel.update();
+    });
     emulator().writeLock()->setRewindEnabled(true, 300);
     m_settings->applyToEmulator();
     {
@@ -443,7 +519,8 @@ ZxEmulator::ZxEmulator(QObject *parent)
             }
         }
     }
-    m_selectedJoystickIndex = std::clamp(QSettings().value("joystick", int(CursorKeys)).toInt(), int(NoJoystick), int(Timex2));
+    m_selectedJoystickIndex = std::clamp(QSettings().value("joystick", int(CursorKeys)).toInt(),
+                                         int(NoJoystick), int(Timex2));
     attachJoystick(m_selectedJoystickIndex);
 
     m_joystickPromptTimer.setSingleShot(true);
@@ -453,26 +530,30 @@ ZxEmulator::ZxEmulator(QObject *parent)
             emit configureJoystick();
     });
 
-    connect(m_controllerProfiles.get(), &ControllerProfiles::failed, this, [this](const QString &message) {
-        showMessage(message, Error);
-    });
-    connect(m_controllerProfiles.get(), &ControllerProfiles::activationRequested, this, [this](const QString &name) {
-        if (!m_settings->controllerOverride()) m_defaultControllerMapping = controllerMapping();
-        applyControllerMapping(name.isEmpty() ? m_defaultControllerMapping : m_controllerProfiles->mapping(name), !name.isEmpty());
-    });
+    connect(m_controllerProfiles.get(), &ControllerProfiles::failed, this,
+            [this](const QString &message) { showMessage(message, Error); });
+    connect(m_controllerProfiles.get(), &ControllerProfiles::activationRequested, this,
+            [this](const QString &name) {
+                if (!m_settings->controllerOverride())
+                    m_defaultControllerMapping = controllerMapping();
+                applyControllerMapping(name.isEmpty() ? m_defaultControllerMapping
+                                                      : m_controllerProfiles->mapping(name),
+                                       !name.isEmpty());
+            });
     connect(m_settings.get(), &ZxSettings::settingsCurrentChanged, this, [this] {
         m_tapeFastForward = m_mediaActivity.tapePlaying && m_settings->loaderAcceleration() > 1;
         updateFastForwardIndicator();
     });
 
     connect(qGuiApp, &QCoreApplication::aboutToQuit, this, &ZxEmulator::stopEngine);
-    connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state) {
-        const bool wasActive = m_applicationState == Qt::ApplicationActive;
-        const bool active = state == Qt::ApplicationActive;
-        m_applicationState = state;
-        if (wasActive != active)
-            setPaused(!active);
-    });
+    connect(qGuiApp, &QGuiApplication::applicationStateChanged, this,
+            [this](Qt::ApplicationState state) {
+                const bool wasActive = m_applicationState == Qt::ApplicationActive;
+                const bool active = state == Qt::ApplicationActive;
+                m_applicationState = state;
+                if (wasActive != active)
+                    setPaused(!active);
+            });
 
     QGamepadManager *gm = QGamepadManager::instance();
     {
@@ -487,41 +568,46 @@ ZxEmulator::ZxEmulator(QObject *parent)
     if (!gm->connectedGamepads().contains(m_gamepadId))
         m_gamepadId = -1;
 
-    connect(gm, &QGamepadManager::gamepadAxisEvent, this, [this](int deviceId, QGamepadManager::GamepadAxis axis, double value) {
-        if (deviceId != m_gamepadId || axis == QGamepadManager::AxisInvalid)
-            return;
-        gamepadAxisEvent(axis, value);
-    });
+    connect(gm, &QGamepadManager::gamepadAxisEvent, this,
+            [this](int deviceId, QGamepadManager::GamepadAxis axis, double value) {
+                if (deviceId != m_gamepadId || axis == QGamepadManager::AxisInvalid)
+                    return;
+                gamepadAxisEvent(axis, value);
+            });
 
-    connect(gm, &QGamepadManager::gamepadButtonPressEvent, this, [this](int deviceId, QGamepadManager::GamepadButton button, double value) {
-        if (value < 0.5)
-            return;
+    connect(gm, &QGamepadManager::gamepadButtonPressEvent, this,
+            [this](int deviceId, QGamepadManager::GamepadButton button, double value) {
+                if (value < 0.5)
+                    return;
 
-        switch (button) {
-        case QGamepadManager::ButtonStart:
-            if (!m_processInputEvents) return;
-            setGamepadId(deviceId);
-            m_settings->setHasStartButton(true);
-            if (m_showControlsIcons)
-                emit showControlsIconsChanged(m_showControlsIcons = false);
-            emit showMenu();
-            return;
-        default:
-            break;
-        }
+                switch (button) {
+                case QGamepadManager::ButtonStart:
+                    if (!m_processInputEvents)
+                        return;
+                    setGamepadId(deviceId);
+                    m_settings->setHasStartButton(true);
+                    if (m_showControlsIcons)
+                        emit showControlsIconsChanged(m_showControlsIcons = false);
+                    emit showMenu();
+                    return;
+                default:
+                    break;
+                }
 
-        if (deviceId != m_gamepadId || button == QGamepadManager::ButtonInvalid)
-            return;
+                if (deviceId != m_gamepadId || button == QGamepadManager::ButtonInvalid)
+                    return;
 
-        gamepadButtonPressEvent(button);
-    });
+                gamepadButtonPressEvent(button);
+            });
 
-    connect(gm, &QGamepadManager::gamepadButtonReleaseEvent, this, [this](int deviceId, QGamepadManager::GamepadButton button) {
-        if (deviceId != m_gamepadId || button == QGamepadManager::ButtonInvalid || button == QGamepadManager::ButtonStart)
-            return;
+    connect(gm, &QGamepadManager::gamepadButtonReleaseEvent, this,
+            [this](int deviceId, QGamepadManager::GamepadButton button) {
+                if (deviceId != m_gamepadId || button == QGamepadManager::ButtonInvalid
+                    || button == QGamepadManager::ButtonStart)
+                    return;
 
-        gamepadButtonReleaseEvent(button);
-    });
+                gamepadButtonReleaseEvent(button);
+            });
 
     connect(gm, &QGamepadManager::gamepadConnected, this, [this](int deviceId) {
         if (m_gamepadId == -1) {
@@ -541,7 +627,8 @@ ZxEmulator::ZxEmulator(QObject *parent)
         }
     });
 
-    connect(&m_breakpointsModel, &BreakpointsModel::modelReset, &m_disassambleModel, &DisassambleModel::update);
+    connect(&m_breakpointsModel, &BreakpointsModel::modelReset, &m_disassambleModel,
+            &DisassambleModel::update);
 
     qRegisterMetaType<ErrorLevel>("ErrorLevel");
 
@@ -549,8 +636,10 @@ ZxEmulator::ZxEmulator(QObject *parent)
     m_debuggerActivated.store(false);
     m_processInputEvents.store(true);
     configureController();
-    connect(m_settings.get(), &ZxSettings::controllerMappingChanged, this, &ZxEmulator::configureController);
-    connect(m_settings.get(), &ZxSettings::deadZoneChanged, this, [this] { configureController(); });
+    connect(m_settings.get(), &ZxSettings::controllerMappingChanged, this,
+            &ZxEmulator::configureController);
+    connect(m_settings.get(), &ZxSettings::deadZoneChanged, this,
+            [this] { configureController(); });
 
     // Engine::run may start after this constructor clears its initial pause;
     // do not depend on observing a Resume event to enable the first packet.
@@ -571,10 +660,12 @@ ZxEmulator::~ZxEmulator()
     delete m_recording;
 }
 
-void ZxEmulator::writeAudioSamples(std::span<const int16_t> samples, uint32_t sampleRate, uint8_t channels)
+void ZxEmulator::writeAudioSamples(std::span<const int16_t> samples, uint32_t sampleRate,
+                                   uint8_t channels)
 {
     // Engine thread -> bounded queue -> Qt audio thread. No GUI event delivery.
-    m_audioOutput->write(samples, sampleRate, channels, m_engine->isTurbo() ? 0 : m_engine->speed());
+    m_audioOutput->write(samples, sampleRate, channels,
+                         m_engine->isTurbo() ? 0 : m_engine->speed());
 }
 
 bool ZxEmulator::paused() const
@@ -596,8 +687,9 @@ void ZxEmulator::setPaused(bool paused)
     else
         return;
     if (m_engine) {
-        if (!m_pauseCount) m_engineQuiescent = false;
-        if((m_pauseCount > 0) != m_engine->isPaused() || !m_engineQuiescent)
+        if (!m_pauseCount)
+            m_engineQuiescent = false;
+        if ((m_pauseCount > 0) != m_engine->isPaused() || !m_engineQuiescent)
             m_engine->setPaused(m_pauseCount > 0);
     }
     emit pausedChanged();
@@ -621,9 +713,15 @@ QString ZxEmulator::dataPath() const
         path = appData;
     }
 #elif defined(Q_OS_IOS)
-    path = s.value("dataPath", QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation).last() + u"/Spectacol/"_s).toString();
+    path = s.value("dataPath",
+                   QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation).last()
+                           + u"/Spectacol/"_s)
+                   .toString();
 #else
-    path = s.value("dataPath", QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + u"/Spectacol/"_s).toString();
+    path = s.value("dataPath",
+                   QStandardPaths::writableLocation(QStandardPaths::HomeLocation)
+                           + u"/Spectacol/"_s)
+                   .toString();
 #endif
     return path;
 }
@@ -649,7 +747,7 @@ bool ZxEmulator::saveSnapshotEnabled() const
 QStringList ZxEmulator::filtersModel() const
 {
     QStringList names;
-    for (const auto& preset : screenFilterPresets())
+    for (const auto &preset : screenFilterPresets())
         names.push_back(preset.name);
     return names;
 }
@@ -677,16 +775,14 @@ void ZxEmulator::setSelectedFilterIndex(int selectedFilterIndex)
 QStringList ZxEmulator::joysticksModel() const
 {
     // The order of JoystickKind
-    return {
-        u"None"_s,
-        u"Cursor"_s,
-        u"Kempston"_s,
-        u"Sinclair 1"_s,
-        u"Sinclair 2"_s,
-        u"Fuller"_s,
-        u"Timex 1 (TC/TS2068)"_s,
-        u"Timex 2 (TC/TS2068)"_s
-    };
+    return { u"None"_s,
+             u"Cursor"_s,
+             u"Kempston"_s,
+             u"Sinclair 1"_s,
+             u"Sinclair 2"_s,
+             u"Fuller"_s,
+             u"Timex 1 (TC/TS2068)"_s,
+             u"Timex 2 (TC/TS2068)"_s };
 }
 
 int ZxEmulator::selectedJoysticksIndex() const
@@ -711,14 +807,17 @@ void ZxEmulator::setSelectedJoysticksIndex(int selectedJoysticksIndex)
     setJoystickButtons(0); // release everything on the old one
     m_selectedJoystickIndex = selectedJoysticksIndex;
     attachJoystick(selectedJoysticksIndex);
-    if (!m_settings->controllerOverride()) QSettings().setValue("joystick", selectedJoysticksIndex);
+    if (!m_settings->controllerOverride())
+        QSettings().setValue("joystick", selectedJoysticksIndex);
     emit selectedJoysticksIndexChanged();
 }
 
 bool ZxEmulator::joystickAvailable(int index) const
 {
-    if (index < NoJoystick || index > Timex2) return false;
-    if (index != Timex1 && index != Timex2) return true;
+    if (index < NoJoystick || index > Timex2)
+        return false;
+    if (index != Timex1 && index != Timex2)
+        return true;
     const auto core = emulator().readLock();
     const auto *timex = dynamic_cast<const zxkit::TimexMachine *>(&core->machine());
     return timex && timex->hasTimexJoysticks();
@@ -750,16 +849,22 @@ void ZxEmulator::setJoystickButtons(uint8_t buttons)
         return;
 
     // Left, right, up, down, fire (FUSE's tables)
-    static constexpr std::array<uint8_t, 5> kBits{B::Left, B::Right, B::Up, B::Down, B::Fire1};
-    static constexpr std::array<K, 5> kCursorKeys{K::Num5, K::Num8, K::Num7, K::Num6, K::Num0};
-    static constexpr std::array<K, 5> kSinclair1Keys{K::Num6, K::Num7, K::Num9, K::Num8, K::Num0};
-    static constexpr std::array<K, 5> kSinclair2Keys{K::Num1, K::Num2, K::Num4, K::Num3, K::Num5};
+    static constexpr std::array<uint8_t, 5> kBits{ B::Left, B::Right, B::Up, B::Down, B::Fire1 };
+    static constexpr std::array<K, 5> kCursorKeys{ K::Num5, K::Num8, K::Num7, K::Num6, K::Num0 };
+    static constexpr std::array<K, 5> kSinclair1Keys{ K::Num6, K::Num7, K::Num9, K::Num8, K::Num0 };
+    static constexpr std::array<K, 5> kSinclair2Keys{ K::Num1, K::Num2, K::Num4, K::Num3, K::Num5 };
 
     std::span<const K> keys;
     switch (m_selectedJoystickIndex) {
-    case CursorKeys: keys = kCursorKeys; break;
-    case Sinclair1: keys = kSinclair1Keys; break;
-    case Sinclair2: keys = kSinclair2Keys; break;
+    case CursorKeys:
+        keys = kCursorKeys;
+        break;
+    case Sinclair1:
+        keys = kSinclair1Keys;
+        break;
+    case Sinclair2:
+        keys = kSinclair2Keys;
+        break;
     }
     if (!keys.empty()) {
         QSet<int> held;
@@ -772,16 +877,16 @@ void ZxEmulator::setJoystickButtons(uint8_t buttons)
     auto emulator = this->emulator().writeLock();
     switch (m_selectedJoystickIndex) {
     case KempstonJoystick:
-        withPeripheral<zxkit::KempstonJoystickPeripheral>(*emulator, "kempston"sv, [buttons](auto &kempston) {
-            kempston.setButtons(buttons);
-        });
+        withPeripheral<zxkit::KempstonJoystickPeripheral>(
+                *emulator, "kempston"sv,
+                [buttons](auto &kempston) { kempston.setButtons(buttons); });
         break;
     case FullerJoystick:
-        withPeripheral<zxkit::FullerBoxPeripheral>(*emulator, "fuller"sv, [buttons](auto &fuller) {
-            fuller.setButtons(buttons);
-        });
+        withPeripheral<zxkit::FullerBoxPeripheral>(
+                *emulator, "fuller"sv, [buttons](auto &fuller) { fuller.setButtons(buttons); });
         break;
-    case Timex1: case Timex2:
+    case Timex1:
+    case Timex2:
         if (auto *timex = dynamic_cast<zxkit::TimexMachine *>(&emulator->machine()))
             timex->setJoystickButtons(m_selectedJoystickIndex == Timex1 ? 0 : 1, buttons);
         break;
@@ -790,59 +895,167 @@ void ZxEmulator::setJoystickButtons(uint8_t buttons)
     }
 }
 
-QString ZxEmulator::PC() const { return formatNumber(registers().PC); }
-void ZxEmulator::setPC(const QString &value) { setRegisterValue(PC = uint16_t(val)); }
+QString ZxEmulator::PC() const
+{
+    return formatNumber(registers().PC);
+}
+void ZxEmulator::setPC(const QString &value)
+{
+    setRegisterValue(PC = uint16_t(val));
+}
 
-QString ZxEmulator::SP() const { return formatNumber(registers().SP); }
-void ZxEmulator::setSP(const QString &value) { setRegisterValue(SP = uint16_t(val)); }
+QString ZxEmulator::SP() const
+{
+    return formatNumber(registers().SP);
+}
+void ZxEmulator::setSP(const QString &value)
+{
+    setRegisterValue(SP = uint16_t(val));
+}
 
-QString ZxEmulator::IX() const { return formatNumber(registers().IX); }
-void ZxEmulator::setIX(const QString &value) { setRegisterValue(IX = uint16_t(val)); }
+QString ZxEmulator::IX() const
+{
+    return formatNumber(registers().IX);
+}
+void ZxEmulator::setIX(const QString &value)
+{
+    setRegisterValue(IX = uint16_t(val));
+}
 
-QString ZxEmulator::IY() const { return formatNumber(registers().IY); }
-void ZxEmulator::setIY(const QString &value) { setRegisterValue(IY = uint16_t(val)); }
+QString ZxEmulator::IY() const
+{
+    return formatNumber(registers().IY);
+}
+void ZxEmulator::setIY(const QString &value)
+{
+    setRegisterValue(IY = uint16_t(val));
+}
 
-QString ZxEmulator::R() const { return formatNumber(registers().R); }
-void ZxEmulator::setR(const QString &value) { setRegisterValue(R = uint8_t(val & 0x7F)); }
+QString ZxEmulator::R() const
+{
+    return formatNumber(registers().R);
+}
+void ZxEmulator::setR(const QString &value)
+{
+    setRegisterValue(R = uint8_t(val & 0x7F));
+}
 
-QString ZxEmulator::I() const { return formatNumber(registers().I); }
-void ZxEmulator::setI(const QString &value) { setRegisterValue(I = uint8_t(val)); }
+QString ZxEmulator::I() const
+{
+    return formatNumber(registers().I);
+}
+void ZxEmulator::setI(const QString &value)
+{
+    setRegisterValue(I = uint8_t(val));
+}
 
-QString ZxEmulator::R7() const { return formatNumber(registers().R7); }
-void ZxEmulator::setR7(const QString &value) { setRegisterValue(R7 = uint8_t(val & 0x80)); }
+QString ZxEmulator::R7() const
+{
+    return formatNumber(registers().R7);
+}
+void ZxEmulator::setR7(const QString &value)
+{
+    setRegisterValue(R7 = uint8_t(val & 0x80));
+}
 
-QString ZxEmulator::IFF1() const { return formatNumber(registers().IFF1); }
-void ZxEmulator::setIFF1(const QString &value) { setRegisterValue(IFF1 = uint8_t(val)); }
+QString ZxEmulator::IFF1() const
+{
+    return formatNumber(registers().IFF1);
+}
+void ZxEmulator::setIFF1(const QString &value)
+{
+    setRegisterValue(IFF1 = uint8_t(val));
+}
 
-QString ZxEmulator::IFF2() const { return formatNumber(registers().IFF2); }
-void ZxEmulator::setIFF2(const QString &value) { setRegisterValue(IFF2 = uint8_t(val)); }
+QString ZxEmulator::IFF2() const
+{
+    return formatNumber(registers().IFF2);
+}
+void ZxEmulator::setIFF2(const QString &value)
+{
+    setRegisterValue(IFF2 = uint8_t(val));
+}
 
-QString ZxEmulator::IM() const { return formatNumber(registers().IM); }
-void ZxEmulator::setIM(const QString &value) { setRegisterValue(IM = uint8_t(val & 0x03)); }
+QString ZxEmulator::IM() const
+{
+    return formatNumber(registers().IM);
+}
+void ZxEmulator::setIM(const QString &value)
+{
+    setRegisterValue(IM = uint8_t(val & 0x03));
+}
 
-QString ZxEmulator::AF() const { return formatNumber(registers().AF); }
-void ZxEmulator::setAF(const QString &value) { setRegisterValue(AF = uint16_t(val)); }
+QString ZxEmulator::AF() const
+{
+    return formatNumber(registers().AF);
+}
+void ZxEmulator::setAF(const QString &value)
+{
+    setRegisterValue(AF = uint16_t(val));
+}
 
-QString ZxEmulator::BC() const { return formatNumber(registers().BC); }
-void ZxEmulator::setBC(const QString &value) { setRegisterValue(BC = uint16_t(val)); }
+QString ZxEmulator::BC() const
+{
+    return formatNumber(registers().BC);
+}
+void ZxEmulator::setBC(const QString &value)
+{
+    setRegisterValue(BC = uint16_t(val));
+}
 
-QString ZxEmulator::DE() const { return formatNumber(registers().DE); }
-void ZxEmulator::setDE(const QString &value) { setRegisterValue(DE = uint16_t(val)); }
+QString ZxEmulator::DE() const
+{
+    return formatNumber(registers().DE);
+}
+void ZxEmulator::setDE(const QString &value)
+{
+    setRegisterValue(DE = uint16_t(val));
+}
 
-QString ZxEmulator::HL() const { return formatNumber(registers().HL); }
-void ZxEmulator::setHL(const QString &value) { setRegisterValue(HL = uint16_t(val)); }
+QString ZxEmulator::HL() const
+{
+    return formatNumber(registers().HL);
+}
+void ZxEmulator::setHL(const QString &value)
+{
+    setRegisterValue(HL = uint16_t(val));
+}
 
-QString ZxEmulator::AF_() const { return formatNumber(registers().AF_); }
-void ZxEmulator::setAF_(const QString &value) { setRegisterValue(AF_ = uint16_t(val)); }
+QString ZxEmulator::AF_() const
+{
+    return formatNumber(registers().AF_);
+}
+void ZxEmulator::setAF_(const QString &value)
+{
+    setRegisterValue(AF_ = uint16_t(val));
+}
 
-QString ZxEmulator::BC_() const { return formatNumber(registers().BC_); }
-void ZxEmulator::setBC_(const QString &value) { setRegisterValue(BC_ = uint16_t(val)); }
+QString ZxEmulator::BC_() const
+{
+    return formatNumber(registers().BC_);
+}
+void ZxEmulator::setBC_(const QString &value)
+{
+    setRegisterValue(BC_ = uint16_t(val));
+}
 
-QString ZxEmulator::DE_() const { return formatNumber(registers().DE_); }
-void ZxEmulator::setDE_(const QString &value) { setRegisterValue(DE_ = uint16_t(val)); }
+QString ZxEmulator::DE_() const
+{
+    return formatNumber(registers().DE_);
+}
+void ZxEmulator::setDE_(const QString &value)
+{
+    setRegisterValue(DE_ = uint16_t(val));
+}
 
-QString ZxEmulator::HL_() const { return formatNumber(registers().HL_); }
-void ZxEmulator::setHL_(const QString &value) { setRegisterValue(HL_ = uint16_t(val)); }
+QString ZxEmulator::HL_() const
+{
+    return formatNumber(registers().HL_);
+}
+void ZxEmulator::setHL_(const QString &value)
+{
+    setRegisterValue(HL_ = uint16_t(val));
+}
 
 zxkit::Z80Registers ZxEmulator::registers() const
 {
@@ -851,10 +1064,11 @@ zxkit::Z80Registers ZxEmulator::registers() const
 
 DebuggerMemoryModel *ZxEmulator::debugMemory()
 {
-    if(!m_debugMemory) {
-        m_debugMemory=std::make_unique<DebuggerMemoryModel>(emulator());
+    if (!m_debugMemory) {
+        m_debugMemory = std::make_unique<DebuggerMemoryModel>(emulator());
         connect(m_debugMemory.get(), &DebuggerMemoryModel::errorChanged, this, [this] {
-            if(m_debugMemory->error().isEmpty()) m_engine->refreshFrame();
+            if (m_debugMemory->error().isEmpty())
+                m_engine->refreshFrame();
         });
     }
     m_debugMemory->setEditable(debuggerReady());
@@ -862,43 +1076,73 @@ DebuggerMemoryModel *ZxEmulator::debugMemory()
 }
 DebuggerStateModel *ZxEmulator::debugNextRegisters()
 {
-    if(!m_debugNextRegisters) m_debugNextRegisters=std::make_unique<DebuggerStateModel>(emulator(),DebuggerStateModel::Kind::NextRegisters);
+    if (!m_debugNextRegisters)
+        m_debugNextRegisters = std::make_unique<DebuggerStateModel>(
+                emulator(), DebuggerStateModel::Kind::NextRegisters);
     return m_debugNextRegisters.get();
 }
 DebuggerStateModel *ZxEmulator::debugMmu()
 {
-    if(!m_debugMmu) m_debugMmu=std::make_unique<DebuggerStateModel>(emulator(),DebuggerStateModel::Kind::Mmu);
+    if (!m_debugMmu)
+        m_debugMmu =
+                std::make_unique<DebuggerStateModel>(emulator(), DebuggerStateModel::Kind::Mmu);
     return m_debugMmu.get();
 }
 QString ZxEmulator::debuggerStatus() const
 {
-    if(!debuggerReady()) return paused()?tr("Waiting for emulation to pause…"):tr("Running — views show the last paused state");
+    if (!debuggerReady())
+        return paused() ? tr("Waiting for emulation to pause…")
+                        : tr("Running — views show the last paused state");
     QString reason;
-    switch(m_debugPause.reason) {
-    case zxkit::PauseReason::ExecutionBreakpoint: reason=tr("Execution breakpoint");break;
-    case zxkit::PauseReason::MemoryWatchpoint: reason=tr("Memory watchpoint at %1").arg(formatNumber(m_debugPause.address));break;
-    case zxkit::PauseReason::PortWatchpoint: reason=tr("Port watchpoint at %1").arg(formatNumber(m_debugPause.address));break;
-    case zxkit::PauseReason::NextRegWatchpoint: reason=tr("Next register write at %1").arg(formatNumber(m_debugPause.address));break;
-    case zxkit::PauseReason::RasterBreakpoint: reason=tr("Raster line %1").arg(m_debugPause.address);break;
-    case zxkit::PauseReason::EventTrap: reason=m_debugPause.address?tr("NMI accepted"):tr("Interrupt accepted");break;
-    case zxkit::PauseReason::StepComplete: reason=tr("Step complete");break;
-    default: reason=tr("Paused");break;
+    switch (m_debugPause.reason) {
+    case zxkit::PauseReason::ExecutionBreakpoint:
+        reason = tr("Execution breakpoint");
+        break;
+    case zxkit::PauseReason::MemoryWatchpoint:
+        reason = tr("Memory watchpoint at %1").arg(formatNumber(m_debugPause.address));
+        break;
+    case zxkit::PauseReason::PortWatchpoint:
+        reason = tr("Port watchpoint at %1").arg(formatNumber(m_debugPause.address));
+        break;
+    case zxkit::PauseReason::NextRegWatchpoint:
+        reason = tr("Next register write at %1").arg(formatNumber(m_debugPause.address));
+        break;
+    case zxkit::PauseReason::RasterBreakpoint:
+        reason = tr("Raster line %1").arg(m_debugPause.address);
+        break;
+    case zxkit::PauseReason::EventTrap:
+        reason = m_debugPause.address ? tr("NMI accepted") : tr("Interrupt accepted");
+        break;
+    case zxkit::PauseReason::StepComplete:
+        reason = tr("Step complete");
+        break;
+    default:
+        reason = tr("Paused");
+        break;
     }
-    return reason+tr(" · PC %1").arg(PC());
+    return reason + tr(" · PC %1").arg(PC());
 }
 void ZxEmulator::updateDebugger()
 {
     m_breakpointsModel.breakpointsUpdated();
     m_disassambleModel.disassamble(registers().PC);
-    if(m_debugMemory) { m_debugMemory->setEditable(debuggerReady()); m_debugMemory->refresh(); }
-    if(m_debugNextRegisters) m_debugNextRegisters->refresh();
-    if(m_debugMmu) m_debugMmu->refresh();
+    if (m_debugMemory) {
+        m_debugMemory->setEditable(debuggerReady());
+        m_debugMemory->refresh();
+    }
+    if (m_debugNextRegisters)
+        m_debugNextRegisters->refresh();
+    if (m_debugMmu)
+        m_debugMmu->refresh();
     emit registersChanged();
     emit debuggerStatusChanged();
 }
 void ZxEmulator::debuggerRefresh()
 {
-    if(debuggerReady()) { updateDebugger(); m_engine->refreshFrame(); }
+    if (debuggerReady()) {
+        updateDebugger();
+        m_engine->refreshFrame();
+    }
 }
 
 int ZxEmulator::pokeFinderCount() const
@@ -969,12 +1213,12 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
         QFile input(url.isLocalFile() ? url.toLocalFile() : filePath);
         if (!input.open(QIODevice::ReadOnly)) {
             showMessage(tr("Can't open '%1': %2").arg(filePath, input.errorString()), Error);
-            return {false, zxkit::MediaClass::Unknown};
+            return { false, zxkit::MediaClass::Unknown };
         }
         const auto bytes = input.readAll();
         if (input.error() != QFileDevice::NoError) {
             showMessage(tr("Can't read '%1': %2").arg(filePath, input.errorString()), Error);
-            return {false, zxkit::MediaClass::Unknown};
+            return { false, zxkit::MediaClass::Unknown };
         }
         // QFile supports Android's content providers; std::ifstream does not.
 #ifdef Q_OS_ANDROID
@@ -983,21 +1227,21 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
         const auto name = QFileInfo(input.fileName()).fileName();
 #endif
         file = zxkit::MediaFile::fromBytes(std::vector<uint8_t>(bytes.begin(), bytes.end()),
-                                         QFileInfo(name).suffix().toStdString());
+                                           QFileInfo(name).suffix().toStdString());
         joystick = zxkit::SnapshotFormats::joystickInfo(file.data, file.extension);
     } catch (const std::exception &e) {
         showMessage(QString::fromUtf8(e.what()), Error);
-        return {false, zxkit::MediaClass::Unknown};
+        return { false, zxkit::MediaClass::Unknown };
     }
     releaseInputs();
-    const bool loaded = withEmulator([&file](zxkit::Emulator &emulator) {
-        emulator.loadMedia(file);
-    });
+    const bool loaded =
+            withEmulator([&file](zxkit::Emulator &emulator) { emulator.loadMedia(file); });
     if (loaded) {
         m_pokes->gameLoaded(filePath);
         m_symbols.clear();
         const auto id = std::string(emulator().readLock()->machine().id());
-        if (m_settings) m_settings->syncCurrentMachine(id);
+        if (m_settings)
+            m_settings->syncCurrentMachine(id);
         m_engine->refreshFrame();
         const bool profileApplied = activateControllerGame(m_loadedFileName);
         if (zxkit::classifyMediaFile(file.extension, file.data) == zxkit::MediaClass::Snapshot) {
@@ -1005,15 +1249,32 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
             if (joystick.type) {
                 using J = zxkit::JoystickType;
                 switch (*joystick.type) {
-                case J::None: selected = NoJoystick; break;
-                case J::Cursor: selected = CursorKeys; break;
-                case J::Kempston: selected = KempstonJoystick; break;
-                case J::Sinclair1: selected = Sinclair1; break;
-                case J::Sinclair2: selected = Sinclair2; break;
-                case J::Fuller: selected = FullerJoystick; break;
-                case J::Timex1: selected = Timex1; break;
-                case J::Timex2: selected = Timex2; break;
-                default: break;
+                case J::None:
+                    selected = NoJoystick;
+                    break;
+                case J::Cursor:
+                    selected = CursorKeys;
+                    break;
+                case J::Kempston:
+                    selected = KempstonJoystick;
+                    break;
+                case J::Sinclair1:
+                    selected = Sinclair1;
+                    break;
+                case J::Sinclair2:
+                    selected = Sinclair2;
+                    break;
+                case J::Fuller:
+                    selected = FullerJoystick;
+                    break;
+                case J::Timex1:
+                    selected = Timex1;
+                    break;
+                case J::Timex2:
+                    selected = Timex2;
+                    break;
+                default:
+                    break;
                 }
             }
             if (selected && joystickAvailable(*selected)) {
@@ -1025,7 +1286,7 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
             }
         }
     }
-    return {loaded, zxkit::classifyMediaFile(file.extension, file.data)};
+    return { loaded, zxkit::classifyMediaFile(file.extension, file.data) };
 }
 
 bool ZxEmulator::saveMediaFile(const QString &filePath)
@@ -1048,20 +1309,27 @@ bool ZxEmulator::saveMediaFile(const QString &filePath)
             return false;
         }
         bytes.assign(encoded.begin(), encoded.end());
-    } else if (!withEmulator([&bytes, &suffix](zxkit::Emulator &emulator) { bytes = emulator.saveMedia(suffix.toStdString()); })) {
+    } else if (!withEmulator([&bytes, &suffix](zxkit::Emulator &emulator) {
+                   bytes = emulator.saveMedia(suffix.toStdString());
+               })) {
         return false;
     }
     const auto extension = (u"."_s + suffix.toLower()).toStdString();
     if (extension == ".szx"sv || extension == ".z80"sv) {
         static constexpr std::array types{
-            zxkit::JoystickType::None, zxkit::JoystickType::Cursor, zxkit::JoystickType::Kempston,
-            zxkit::JoystickType::Sinclair1, zxkit::JoystickType::Sinclair2, zxkit::JoystickType::Fuller,
-            zxkit::JoystickType::Timex1, zxkit::JoystickType::Timex2};
+            zxkit::JoystickType::None,      zxkit::JoystickType::Cursor,
+            zxkit::JoystickType::Kempston,  zxkit::JoystickType::Sinclair1,
+            zxkit::JoystickType::Sinclair2, zxkit::JoystickType::Fuller,
+            zxkit::JoystickType::Timex1,    zxkit::JoystickType::Timex2
+        };
         zxkit::SnapshotFormats::setJoystickInfo(bytes, extension, types[m_selectedJoystickIndex]);
     }
-    if (!writeFileBytes(filePath, bytes)) return false;
+    if (!writeFileBytes(filePath, bytes))
+        return false;
     const auto profile = m_controllerProfiles->gameProfile();
-    if (!profile.isEmpty() && (extension == ".szx"sv || extension == ".z80"sv || extension == ".sna"sv || extension == ".nex"sv))
+    if (!profile.isEmpty()
+        && (extension == ".szx"sv || extension == ".z80"sv || extension == ".sna"sv
+            || extension == ".nex"sv))
         m_controllerProfiles->rememberGame(QFileInfo(name).completeBaseName(), profile);
     return true;
 }
@@ -1082,7 +1350,8 @@ bool ZxEmulator::writeFileBytes(const QString &filePath, std::span<const uint8_t
     // directly to the document explicitly selected by the user in that case.
     file.setDirectWriteFallback(contentUri);
     if (!file.open(QIODevice::WriteOnly)
-        || file.write(reinterpret_cast<const char *>(bytes.data()), qint64(bytes.size())) != qint64(bytes.size())
+        || file.write(reinterpret_cast<const char *>(bytes.data()), qint64(bytes.size()))
+                != qint64(bytes.size())
         || !file.commit()) {
         const QString message = tr("Can't save '%1': %2").arg(filePath, file.errorString());
         showMessage(message, Error);
@@ -1131,8 +1400,8 @@ void ZxEmulator::setGamepadId(int gamepadId)
 
 QString ZxEmulator::saveFilePath(const QString &fileName)
 {
-    return dataPath() + u"/Downloaded/"_s + fileName.left(1).toLower() +
-           u'/' + fileName.left(3).toLower() + u'/' + fileName;
+    return dataPath() + u"/Downloaded/"_s + fileName.left(1).toLower() + u'/'
+            + fileName.left(3).toLower() + u'/' + fileName;
 }
 
 void ZxEmulator::mouseButton(Qt::MouseButton button, bool pressed)
@@ -1142,15 +1411,22 @@ void ZxEmulator::mouseButton(Qt::MouseButton button, bool pressed)
 
     uint8_t bit = 0;
     switch (button) {
-    case Qt::RightButton:  bit = 0x01; break;
-    case Qt::LeftButton:   bit = 0x02; break;
-    case Qt::MiddleButton: bit = 0x04; break;
-    default: return;
+    case Qt::RightButton:
+        bit = 0x01;
+        break;
+    case Qt::LeftButton:
+        bit = 0x02;
+        break;
+    case Qt::MiddleButton:
+        bit = 0x04;
+        break;
+    default:
+        return;
     }
 
-    withPeripheral<zxkit::KempstonMousePeripheral>(*emulator().writeLock(), "kempston_mouse"sv, [bit, pressed](auto &mouse) {
-        mouse.setButton(bit, pressed);
-    });
+    withPeripheral<zxkit::KempstonMousePeripheral>(
+            *emulator().writeLock(), "kempston_mouse"sv,
+            [bit, pressed](auto &mouse) { mouse.setButton(bit, pressed); });
 }
 
 void ZxEmulator::mouseMotion(int dx, int dy)
@@ -1158,9 +1434,8 @@ void ZxEmulator::mouseMotion(int dx, int dy)
     if (!m_processInputEvents)
         return;
 
-    withPeripheral<zxkit::KempstonMousePeripheral>(*emulator().writeLock(), "kempston_mouse"sv, [dx, dy](auto &mouse) {
-        mouse.move(dx, dy);
-    });
+    withPeripheral<zxkit::KempstonMousePeripheral>(*emulator().writeLock(), "kempston_mouse"sv,
+                                                   [dx, dy](auto &mouse) { mouse.move(dx, dy); });
 }
 
 void ZxEmulator::setMouseGrabSuspended(bool suspended)
@@ -1186,7 +1461,8 @@ void ZxEmulator::resetLoadedFile()
     m_joystickPromptTimer.stop();
     activateControllerGame(QString{});
     m_loadedFileName = "";
-    if (m_pokes) m_pokes->gameLoaded({});
+    if (m_pokes)
+        m_pokes->gameLoaded({});
     m_symbols.clear();
     emit saveSnapshotEnabledChanged();
     m_recording->refresh();
@@ -1217,7 +1493,9 @@ QString ZxEmulator::savesPath() const
 
 QString ZxEmulator::recordingFilePath() const
 {
-    return QDir(recordingsPath()).filePath(saveName(m_loadedFileName, u"Generic"_s) + u'.' + saveTimestamp() + u".rzx"_s);
+    return QDir(recordingsPath())
+            .filePath(saveName(m_loadedFileName, u"Generic"_s) + u'.' + saveTimestamp()
+                      + u".rzx"_s);
 }
 
 QString ZxEmulator::tapeFileName(const QString &programName) const
@@ -1229,18 +1507,22 @@ QString ZxEmulator::tapeFilePath(const QString &fileName) const
 {
     QString name = fileName.trimmed();
     const QString suffix = name.endsWith(u".tzx"_s, Qt::CaseInsensitive) ? u".tzx"_s : u".tap"_s;
-    if (name.endsWith(suffix, Qt::CaseInsensitive)) name.chop(4);
+    if (name.endsWith(suffix, Qt::CaseInsensitive))
+        name.chop(4);
     return QDir(savesPath()).filePath(saveName(name, u"Unnamed"_s) + suffix);
 }
 
 QStringList ZxEmulator::snapshotFormats() const
 {
     const auto id = emulator().readLock()->machine().id();
-    QStringList result = {u"szx"_s};
-    if (id == "next"sv) result << u"nex"_s;
+    QStringList result = { u"szx"_s };
+    if (id == "next"sv)
+        result << u"nex"_s;
     if (id == "48k"sv || id == "128k"sv || id == "plus2"sv || id == "plus2a"sv || id == "plus3"sv
-        || id == "plus3e"sv || id == "pentagon"sv) result << u"z80"_s;
-    if (id == "48k"sv || id == "128k"sv || id == "plus2"sv || id == "pentagon"sv) result << u"sna"_s;
+        || id == "plus3e"sv || id == "pentagon"sv)
+        result << u"z80"_s;
+    if (id == "48k"sv || id == "128k"sv || id == "plus2"sv || id == "pentagon"sv)
+        result << u"sna"_s;
     return result;
 }
 
@@ -1253,14 +1535,15 @@ QString ZxEmulator::snapshotFilePath(const QString &folder, const QString &fileN
 {
     QString name = fileName.trimmed();
     QString suffix = u".szx"_s;
-    for (const auto &extension : {u".szx"_s, u".z80"_s, u".sna"_s, u".nex"_s}) {
+    for (const auto &extension : { u".szx"_s, u".z80"_s, u".sna"_s, u".nex"_s }) {
         if (name.endsWith(extension, Qt::CaseInsensitive)) {
             suffix = extension;
             name.chop(extension.size());
             break;
         }
     }
-    return QDir(folder.trimmed().isEmpty() ? snapshotsPath() : folder).filePath(saveName(name, u"Snapshot"_s) + suffix);
+    return QDir(folder.trimmed().isEmpty() ? snapshotsPath() : folder)
+            .filePath(saveName(name, u"Snapshot"_s) + suffix);
 }
 
 void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
@@ -1311,7 +1594,6 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
     m_resetPokeFinder = true;
     m_tape->refreshData();
     emit saveSnapshotEnabledChanged();
-
 }
 
 bool ZxEmulator::save(const QString &filePath)
@@ -1340,7 +1622,8 @@ void ZxEmulator::remove(const QString &path)
     QFileInfo inf(path);
     if (inf.isDir()) {
         QDir dir(path);
-        for (const QFileInfo &item : dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
+        for (const QFileInfo &item :
+             dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
             remove(item.absoluteFilePath());
         dir.rmdir(path);
     } else {
@@ -1350,33 +1633,34 @@ void ZxEmulator::remove(const QString &path)
 
 bool ZxEmulator::isFolder(const QString &path)
 {
-    return QFileInfo{path}.isDir();
+    return QFileInfo{ path }.isDir();
 }
 
 QString ZxEmulator::fileName(const QString &path)
 {
-    return QFileInfo{path}.fileName();
+    return QFileInfo{ path }.fileName();
 }
 
 QString ZxEmulator::folderName(const QString &path)
 {
-    return QFileInfo{path}.absolutePath();
+    return QFileInfo{ path }.absolutePath();
 }
 
 bool ZxEmulator::copy(const QString &from, const QString &to, bool override)
 {
-    QFileInfo inf{from};
+    QFileInfo inf{ from };
     if (inf.isDir()) {
-        QDir src{from};
-        QDir dst{to + QDir::separator() + src.dirName()};
+        QDir src{ from };
+        QDir dst{ to + QDir::separator() + src.dirName() };
         if (!override && dst.exists())
             return false;
 
-        QDirIterator it{src.absolutePath(), QDir::Files, QDirIterator::Subdirectories};
+        QDirIterator it{ src.absolutePath(), QDir::Files, QDirIterator::Subdirectories };
         while (it.hasNext()) {
             it.next();
             const auto item = it.fileInfo();
-            auto path = dst.absolutePath() + QDir::separator() + src.relativeFilePath(item.absolutePath());
+            auto path = dst.absolutePath() + QDir::separator()
+                    + src.relativeFilePath(item.absolutePath());
             dst.mkpath(path);
             auto destFile = path + QDir::separator() + item.fileName();
             QFile::remove(destFile);
@@ -1441,7 +1725,8 @@ void ZxEmulator::quickSaveSnapshot()
 void ZxEmulator::quickLoadSnapshot()
 {
     QFileInfo latest;
-    QDirIterator files(snapshotsPath(), {u"*.szx"_s, u"*.sna"_s, u"*.z80"_s}, QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator files(snapshotsPath(), { u"*.szx"_s, u"*.sna"_s, u"*.z80"_s }, QDir::Files,
+                       QDirIterator::Subdirectories);
     while (files.hasNext()) {
         files.next();
         const auto candidate = files.fileInfo();
@@ -1473,19 +1758,23 @@ void ZxEmulator::disassamble(int address, int delta, uint16_t length)
 
 void ZxEmulator::activateDebugger()
 {
-    const bool wasActive=m_debuggerActivated.exchange(true);
-    if(!m_debuggerOwnsPause) {
-        m_debuggerOwnsPause=true;
+    const bool wasActive = m_debuggerActivated.exchange(true);
+    if (!m_debuggerOwnsPause) {
+        m_debuggerOwnsPause = true;
         setPaused(true);
-    } else if(!debuggerReady()) m_engine->setPaused(true);
-    if(debuggerReady()) updateDebugger();
+    } else if (!debuggerReady())
+        m_engine->setPaused(true);
+    if (debuggerReady())
+        updateDebugger();
     emit debuggerStatusChanged();
-    if(!wasActive) emit showDebugger();
+    if (!wasActive)
+        emit showDebugger();
 }
 
 void ZxEmulator::deactivateDebugger(bool /*interruptable*/)
 {
-    if(!m_debuggerActivated.exchange(false)) return;
+    if (!m_debuggerActivated.exchange(false))
+        return;
     debuggerContinue();
     emit hideDebugger();
 }
@@ -1495,7 +1784,8 @@ QString ZxEmulator::dumpData(const QString &base64CompressedData, int offset, in
     if (base64CompressedData.isEmpty())
         return QString();
 
-    auto data = qUncompress(QByteArray::fromBase64(base64CompressedData.toLatin1(), QByteArray::Base64UrlEncoding));
+    auto data = qUncompress(
+            QByteArray::fromBase64(base64CompressedData.toLatin1(), QByteArray::Base64UrlEncoding));
 
     const int sz = data.size() - offset;
     if (sz <= 0)
@@ -1624,7 +1914,8 @@ void ZxEmulator::configureController()
     m_fastForwardControl.clear();
     m_fastForwardControl.setToggle(m_settings->fastForwardToggle());
     syncFastForward();
-    m_controller.configure(m_settings->directionMapping(), m_settings->directionKeys(), m_settings->deadZone());
+    m_controller.configure(m_settings->directionMapping(), m_settings->directionKeys(),
+                           m_settings->deadZone());
     applyControllerState();
 }
 
@@ -1641,14 +1932,14 @@ void ZxEmulator::applyControllerState()
     }
     setInputKeys(kControllerKeys, keys);
     setJoystickButtons(state.joystick);
-
 }
 
 void ZxEmulator::setNextKeyState(int key, bool pressed)
 {
     if (key < 0 || key >= 16 || (pressed && m_paused))
         return;
-    setInputKeys((quint64(7) << 32) | unsigned(key), pressed ? QSet<int>{0x100 + key} : QSet<int>{});
+    setInputKeys((quint64(7) << 32) | unsigned(key),
+                 pressed ? QSet<int>{ 0x100 + key } : QSet<int>{});
 }
 
 void ZxEmulator::setCobraKeyState(int qtKey, bool pressed)
@@ -1673,7 +1964,8 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
         return;
     if (!virtualKeyboard && m_settings->recreatedSpectrum()) {
         if (const auto key = recreatedKey(qtKey, modifiers))
-            setInputKeys(kRecreatedKeys | int(key->first), key->second ? QSet<int>{int(key->first)} : QSet<int>{});
+            setInputKeys(kRecreatedKeys | int(key->first),
+                         key->second ? QSet<int>{ int(key->first) } : QSet<int>{});
         return;
     }
     QSet<int> keys;
@@ -1696,9 +1988,11 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
         if (mapped.primary)
             keys.insert(int(*mapped.primary));
     }
-    const bool hostModifier = !virtualKeyboard && (qtKey == Qt::Key_Shift || qtKey == Qt::Key_Control
-        || qtKey == Qt::Key_Alt || qtKey == Qt::Key_Meta);
-    if (!keys.isEmpty() && !hostModifier) m_recording->resumeOnGameplayInput();
+    const bool hostModifier = !virtualKeyboard
+            && (qtKey == Qt::Key_Shift || qtKey == Qt::Key_Control || qtKey == Qt::Key_Alt
+                || qtKey == Qt::Key_Meta);
+    if (!keys.isEmpty() && !hostModifier)
+        m_recording->resumeOnGameplayInput();
     setInputKeys((virtualKeyboard ? kVirtualKeys : kPhysicalKeys) | quint32(qtKey), keys);
 }
 
@@ -1716,11 +2010,24 @@ void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double valu
 {
     ControllerInput::Axis target;
     switch (axis) {
-    case QGamepadManager::AxisLeftX: target = touch ? ControllerInput::TouchX : ControllerInput::LeftX; break;
-    case QGamepadManager::AxisLeftY: target = touch ? ControllerInput::TouchY : ControllerInput::LeftY; break;
-    case QGamepadManager::AxisRightX: if (touch) return; target = ControllerInput::RightX; break;
-    case QGamepadManager::AxisRightY: if (touch) return; target = ControllerInput::RightY; break;
-    default: return;
+    case QGamepadManager::AxisLeftX:
+        target = touch ? ControllerInput::TouchX : ControllerInput::LeftX;
+        break;
+    case QGamepadManager::AxisLeftY:
+        target = touch ? ControllerInput::TouchY : ControllerInput::LeftY;
+        break;
+    case QGamepadManager::AxisRightX:
+        if (touch)
+            return;
+        target = ControllerInput::RightX;
+        break;
+    case QGamepadManager::AxisRightY:
+        if (touch)
+            return;
+        target = ControllerInput::RightY;
+        break;
+    default:
+        return;
     }
     const bool active = std::abs(value) > m_settings->deadZone();
     const bool fresh = active && !m_rzxAxisActive[target];
@@ -1728,7 +2035,10 @@ void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double valu
     const bool resumed = fresh && m_recording->resumeOnGameplayInput();
     if ((m_pauseCount || m_paused || !m_processInputEvents) && !resumed) {
         // A release can arrive before the queued transport resume.
-        if (!active) { m_controller.axis(target, 0); applyControllerState(); }
+        if (!active) {
+            m_controller.axis(target, 0);
+            applyControllerState();
+        }
         return;
     }
     m_controller.axis(target, value);
@@ -1737,21 +2047,27 @@ void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double valu
 
 void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button, bool touch)
 {
-    if (button == QGamepadManager::ButtonInvalid || button == QGamepadManager::ButtonStart) return;
+    if (button == QGamepadManager::ButtonInvalid || button == QGamepadManager::ButtonStart)
+        return;
     const int inputId = int(button) + (touch ? ControllerInput::TouchButtonOffset : 0);
     const bool fresh = !m_pressedRzxButtons.contains(inputId);
     m_pressedRzxButtons.insert(inputId);
-    if (!m_processInputEvents) return;
-    const int action = m_settings->gamepadAction(button);
-    const bool resumed = fresh && (action == ZxSettings::JoystickFire || ControllerInput::isSpectrumKey(action))
-        && m_recording->resumeOnGameplayInput();
-    if ((m_pauseCount || m_paused)
-        && !resumed
-        && (action != ZxSettings::TogglePause || (!m_paused && !m_recording->waitingForInput()) || m_pauseCount != 1))
+    if (!m_processInputEvents)
         return;
-    const quint8 direction = button == QGamepadManager::ButtonUp || button == QGamepadManager::ButtonDown
-        || button == QGamepadManager::ButtonLeft || button == QGamepadManager::ButtonRight
-        ? toJoystickMask(button) : 0;
+    const int action = m_settings->gamepadAction(button);
+    const bool resumed = fresh
+            && (action == ZxSettings::JoystickFire || ControllerInput::isSpectrumKey(action))
+            && m_recording->resumeOnGameplayInput();
+    if ((m_pauseCount || m_paused) && !resumed
+        && (action != ZxSettings::TogglePause || (!m_paused && !m_recording->waitingForInput())
+            || m_pauseCount != 1))
+        return;
+    const quint8 direction = button == QGamepadManager::ButtonUp
+                    || button == QGamepadManager::ButtonDown
+                    || button == QGamepadManager::ButtonLeft
+                    || button == QGamepadManager::ButtonRight
+            ? toJoystickMask(button)
+            : 0;
     if (action == ZxSettings::ToggleEmulationSpeed && fresh) {
         m_fastForwardControl.press(inputId);
         syncFastForward();
@@ -1760,13 +2076,15 @@ void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button, 
     applyControllerState();
 }
 
-void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button, bool touch, bool cancelled)
+void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button, bool touch,
+                                           bool cancelled)
 {
     const int source = int(button) + (touch ? ControllerInput::TouchButtonOffset : 0);
     m_fastForwardControl.release(source, cancelled);
     syncFastForward();
     m_pressedRzxButtons.remove(source);
-    const auto action = m_controller.release(int(button) + (touch ? ControllerInput::TouchButtonOffset : 0));
+    const auto action =
+            m_controller.release(int(button) + (touch ? ControllerInput::TouchButtonOffset : 0));
     applyControllerState();
     if (!action || cancelled)
         return; // A page, mapping change or disconnect may have cleared the press.
@@ -1778,12 +2096,21 @@ void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button
         if (m_showControlsIcons)
             emit showControlsIconsChanged(m_showControlsIcons = false);
         QTimer::singleShot(0, this, [this, action] {
-            emit toggleOnScreenControls(*action == ZxSettings::ToggleKeyboard ? Keyboard48K : CursorJoystick);
+            emit toggleOnScreenControls(*action == ZxSettings::ToggleKeyboard ? Keyboard48K
+                                                                              : CursorJoystick);
         });
         break;
-    case ZxSettings::TogglePause: togglePaused(); break;
-    case ZxSettings::QuickSaveSnapshot: if (!m_paused) quickSaveSnapshot(); break;
-    case ZxSettings::QuickLoadSnapshot: if (!m_paused) quickLoadSnapshot(); break;
+    case ZxSettings::TogglePause:
+        togglePaused();
+        break;
+    case ZxSettings::QuickSaveSnapshot:
+        if (!m_paused)
+            quickSaveSnapshot();
+        break;
+    case ZxSettings::QuickLoadSnapshot:
+        if (!m_paused)
+            quickLoadSnapshot();
+        break;
     }
 }
 
@@ -1801,9 +2128,8 @@ void ZxEmulator::showMessage(QString message, ZxEmulator::ErrorLevel level)
     if (level != Info)
         qWarning().noquote() << message;
     // Any thread (e.g. the Engine's log callback)
-    QMetaObject::invokeMethod(this, [this, message, level] {
-        emit error(level, message);
-    }, Qt::QueuedConnection);
+    QMetaObject::invokeMethod(
+            this, [this, message, level] { emit error(level, message); }, Qt::QueuedConnection);
 }
 
 void ZxEmulator::setSpeed(int percent)
@@ -1813,7 +2139,8 @@ void ZxEmulator::setSpeed(int percent)
 
 void ZxEmulator::speedup()
 {
-    if (m_pauseCount || m_paused || !m_processInputEvents) return;
+    if (m_pauseCount || m_paused || !m_processInputEvents)
+        return;
     m_fastForwardControl.press(ControllerInput::TouchButtonOffset + 256);
     syncFastForward();
 }
@@ -1835,7 +2162,8 @@ void ZxEmulator::syncFastForward()
     const bool active = m_fastForwardControl.active();
     if (m_manualFastForward != active) {
         m_manualFastForward = active;
-        if (m_engine) m_engine->setTurbo(active);
+        if (m_engine)
+            m_engine->setTurbo(active);
     }
     updateFastForwardIndicator();
 }
@@ -1843,14 +2171,18 @@ void ZxEmulator::syncFastForward()
 void ZxEmulator::updateFastForwardIndicator()
 {
     const bool active = m_manualFastForward || m_tapeFastForward;
-    if (active == m_fastForwardIndicator) return;
+    if (active == m_fastForwardIndicator)
+        return;
     m_fastForwardIndicator = active;
     emit fastForwardChanged();
 }
 
 void ZxEmulator::togglePaused()
 {
-    if (m_recording->waitingForInput()) { m_recording->resume(); return; }
+    if (m_recording->waitingForInput()) {
+        m_recording->resume();
+        return;
+    }
     m_paused = !m_paused;
     if (!m_touchscreen || !m_showControlsIcons)
         showMessage(m_paused ? tr("Pause spectacol") : tr("Resume spectacol"));
@@ -1859,9 +2191,11 @@ void ZxEmulator::togglePaused()
 
 void ZxEmulator::sendNavigationKey(int key)
 {
-    if (m_processInputEvents) return;
+    if (m_processInputEvents)
+        return;
     QPointer<QQuickWindow> window = qobject_cast<QQuickWindow *>(QGuiApplication::focusWindow());
-    if (!window) return;
+    if (!window)
+        return;
     const auto showKeyboard = [&window] {
         const auto *item = window ? window->activeFocusItem() : nullptr;
         if (item && item->flags().testFlag(QQuickItem::ItemAcceptsInputMethod)
@@ -1872,10 +2206,12 @@ void ZxEmulator::sendNavigationKey(int key)
         return false;
     };
     if (key == Qt::Key_Select) {
-        if (showKeyboard()) return;
+        if (showKeyboard())
+            return;
         auto *item = window->activeFocusItem();
         if (item && item->isEnabled()) {
-            if (auto *popup = item->property("popup").value<QObject *>(); popup && !popup->property("visible").toBool()) {
+            if (auto *popup = item->property("popup").value<QObject *>();
+                popup && !popup->property("visible").toBool()) {
                 QMetaObject::invokeMethod(popup, "open");
                 return;
             }
@@ -1892,7 +2228,8 @@ void ZxEmulator::sendNavigationKey(int key)
     if (window) {
         QKeyEvent release(QEvent::KeyRelease, key, modifiers);
         QCoreApplication::sendEvent(window, &release);
-        if (key == Qt::Key_Return) showKeyboard();
+        if (key == Qt::Key_Return)
+            showKeyboard();
     }
 }
 
@@ -1903,86 +2240,148 @@ void ZxEmulator::debuggerTrap()
 
 void ZxEmulator::debuggerStep()
 {
-    if(!debuggerReady()) return;
+    if (!debuggerReady())
+        return;
     try {
         {
-            auto core=emulator().writeLock();
+            auto core = emulator().writeLock();
             core->stepInstruction();
-            if(auto event=core->takePauseEvent()) m_debugPause=*event;
+            if (auto event = core->takePauseEvent())
+                m_debugPause = *event;
         }
-        m_engine->refreshFrame(); updateDebugger();
-    } catch(const std::exception &e) { showMessage(QString::fromUtf8(e.what()), Warning); }
+        m_engine->refreshFrame();
+        updateDebugger();
+    } catch (const std::exception &e) {
+        showMessage(QString::fromUtf8(e.what()), Warning);
+    }
 }
 void ZxEmulator::debuggerNext()
 {
-    if(!debuggerReady()) return;
+    if (!debuggerReady())
+        return;
     try {
         m_engine->stepOver();
-        if(!paused()) m_engineQuiescent=false;
-        else { auto core=emulator().writeLock(); if(auto event=core->takePauseEvent()) m_debugPause=*event; }
+        if (!paused())
+            m_engineQuiescent = false;
+        else {
+            auto core = emulator().writeLock();
+            if (auto event = core->takePauseEvent())
+                m_debugPause = *event;
+        }
         emit pausedChanged();
-        if(debuggerReady()) updateDebugger();
-        else { if(m_debugMemory) m_debugMemory->setEditable(false); emit debuggerStatusChanged(); }
-    } catch(const std::exception &e) { showMessage(QString::fromUtf8(e.what()), Warning); }
+        if (debuggerReady())
+            updateDebugger();
+        else {
+            if (m_debugMemory)
+                m_debugMemory->setEditable(false);
+            emit debuggerStatusChanged();
+        }
+    } catch (const std::exception &e) {
+        showMessage(QString::fromUtf8(e.what()), Warning);
+    }
 }
 void ZxEmulator::debuggerOut()
 {
-    if(!debuggerReady()) return;
-    m_engine->stepOut(); m_engineQuiescent=false;
-    if(m_debugMemory) m_debugMemory->setEditable(false);
-    emit pausedChanged(); emit debuggerStatusChanged();
+    if (!debuggerReady())
+        return;
+    m_engine->stepOut();
+    m_engineQuiescent = false;
+    if (m_debugMemory)
+        m_debugMemory->setEditable(false);
+    emit pausedChanged();
+    emit debuggerStatusChanged();
 }
 void ZxEmulator::debuggerRunTo(int address)
 {
-    if(!debuggerReady() || address<0 || address>65535) return;
+    if (!debuggerReady() || address < 0 || address > 65535)
+        return;
     m_engine->runTo(uint16_t(address));
-    if(!paused()) m_engineQuiescent=false;
-    if(m_debugMemory) m_debugMemory->setEditable(debuggerReady());
-    emit pausedChanged(); emit debuggerStatusChanged();
+    if (!paused())
+        m_engineQuiescent = false;
+    if (m_debugMemory)
+        m_debugMemory->setEditable(debuggerReady());
+    emit pausedChanged();
+    emit debuggerStatusChanged();
 }
 void ZxEmulator::debuggerContinue()
 {
     emulator().writeLock()->cancelRunControl();
-    if(m_debugMemory) m_debugMemory->setEditable(false);
-    if(m_paused) { m_paused=false; setPaused(false); }
-    if(m_debuggerOwnsPause) { m_debuggerOwnsPause=false; setPaused(false); }
-    else if(!m_pauseCount) { m_engineQuiescent=false; m_engine->setPaused(false); emit pausedChanged(); }
+    if (m_debugMemory)
+        m_debugMemory->setEditable(false);
+    if (m_paused) {
+        m_paused = false;
+        setPaused(false);
+    }
+    if (m_debuggerOwnsPause) {
+        m_debuggerOwnsPause = false;
+        setPaused(false);
+    } else if (!m_pauseCount) {
+        m_engineQuiescent = false;
+        m_engine->setPaused(false);
+        emit pausedChanged();
+    }
     emit debuggerStatusChanged();
 }
-void ZxEmulator::debuggerRun() { deactivateDebugger(true); }
-
-bool ZxEmulator::createBreakpoint(int type, const QString &text, const QString &maskText, bool temporary)
+void ZxEmulator::debuggerRun()
 {
-    quint32 address=0, mask=0;
-    bool valid=type>=0 && type<=int(zxkit::BreakpointType::Event);
-    if(type==int(zxkit::BreakpointType::RasterLine) || type==int(zxkit::BreakpointType::Event)) {
-        bool ok=false; address=text.toUInt(&ok,10); valid &= ok;
-        const auto core=emulator().readLock();
-        valid &= type==int(zxkit::BreakpointType::Event)?address<=1:address<core->clock().timings().linesPerFrame;
-    } else valid &= DebuggerMemoryModel::parseHex(text,65535,address);
-    valid &= DebuggerMemoryModel::parseHex(maskText,65535,mask);
-    if(type==int(zxkit::BreakpointType::NextRegWrite))
-        valid &= address<=255 && emulator().readLock()->machine().id()=="next"sv;
-    if(!valid) { showMessage(tr("Invalid breakpoint: use hexadecimal addresses/masks, decimal raster lines, or event 0 (IRQ) / 1 (NMI)."),Warning); return false; }
-    zxkit::Breakpoint bp; bp.type=zxkit::BreakpointType(type); bp.address=uint16_t(address); bp.mask=uint16_t(mask); bp.temporary=temporary;
+    deactivateDebugger(true);
+}
+
+bool ZxEmulator::createBreakpoint(int type, const QString &text, const QString &maskText,
+                                  bool temporary)
+{
+    quint32 address = 0, mask = 0;
+    bool valid = type >= 0 && type <= int(zxkit::BreakpointType::Event);
+    if (type == int(zxkit::BreakpointType::RasterLine)
+        || type == int(zxkit::BreakpointType::Event)) {
+        bool ok = false;
+        address = text.toUInt(&ok, 10);
+        valid &= ok;
+        const auto core = emulator().readLock();
+        valid &= type == int(zxkit::BreakpointType::Event)
+                ? address <= 1
+                : address < core->clock().timings().linesPerFrame;
+    } else
+        valid &= DebuggerMemoryModel::parseHex(text, 65535, address);
+    valid &= DebuggerMemoryModel::parseHex(maskText, 65535, mask);
+    if (type == int(zxkit::BreakpointType::NextRegWrite))
+        valid &= address <= 255 && emulator().readLock()->machine().id() == "next"sv;
+    if (!valid) {
+        showMessage(tr("Invalid breakpoint: use hexadecimal addresses/masks, decimal raster lines, "
+                       "or event 0 (IRQ) / 1 (NMI)."),
+                    Warning);
+        return false;
+    }
+    zxkit::Breakpoint bp;
+    bp.type = zxkit::BreakpointType(type);
+    bp.address = uint16_t(address);
+    bp.mask = uint16_t(mask);
+    bp.temporary = temporary;
     emulator().writeLock()->addBreakpoint(std::move(bp));
-    m_breakpointsModel.breakpointsUpdated(); return true;
+    m_breakpointsModel.breakpointsUpdated();
+    return true;
 }
 void ZxEmulator::watchMemory(int type)
 {
-    if(!debuggerReady() || (type!=1&&type!=2)) return;
-    auto *memory=debugMemory();
-    zxkit::Breakpoint bp; bp.type=zxkit::BreakpointType(type);
-    bp.address=uint16_t(memory->address());
-    if(memory->bankId()>0) {
-        bp.bankId=zxkit::BankId(memory->bankId()); bp.page1k=uint16_t(memory->address()/1024);
-        bp.address&=1023; bp.mask=1023;
+    if (!debuggerReady() || (type != 1 && type != 2))
+        return;
+    auto *memory = debugMemory();
+    zxkit::Breakpoint bp;
+    bp.type = zxkit::BreakpointType(type);
+    bp.address = uint16_t(memory->address());
+    if (memory->bankId() > 0) {
+        bp.bankId = zxkit::BankId(memory->bankId());
+        bp.page1k = uint16_t(memory->address() / 1024);
+        bp.address &= 1023;
+        bp.mask = 1023;
     }
-    emulator().writeLock()->addBreakpoint(std::move(bp)); m_breakpointsModel.breakpointsUpdated();
+    emulator().writeLock()->addBreakpoint(std::move(bp));
+    m_breakpointsModel.breakpointsUpdated();
 }
 void ZxEmulator::enableBreakpoint(int id, bool enabled)
 {
-    emulator().writeLock()->setBreakpointEnabled(uint32_t(id),enabled); m_breakpointsModel.breakpointsUpdated();
+    emulator().writeLock()->setBreakpointEnabled(uint32_t(id), enabled);
+    m_breakpointsModel.breakpointsUpdated();
 }
 
 void ZxEmulator::toggleBreakpoint(int address)
@@ -2018,7 +2417,8 @@ void ZxEmulator::addBreakpointPage(int address, int page, int type)
     bp.address = uint16_t(address);
     bp.page1k = uint16_t(page * 16 + ((address & 0x3FFF) >> 10));
     bp.bankId = emulator().readLock()->machine().ramBankId();
-    bp.address &= 1023; bp.mask = 1023;
+    bp.address &= 1023;
+    bp.mask = 1023;
     emulator().writeLock()->addBreakpoint(std::move(bp));
     m_breakpointsModel.breakpointsUpdated();
     m_pokeFinderModel.update();
@@ -2032,28 +2432,33 @@ int ZxEmulator::resolveDebuggerAddress(const QString &text)
         const auto core = emulator().readLock();
         address = m_symbols.resolve(*core, label);
     }
-    if (address >= 0) return address;
+    if (address >= 0)
+        return address;
     if (address == -2) {
         showMessage(tr("Ambiguous or unmapped symbol: %1").arg(label), Error);
         return -1;
     }
     quint32 value = 0;
-    if (DebuggerMemoryModel::parseHex(label, 65535, value)) return int(value);
+    if (DebuggerMemoryModel::parseHex(label, 65535, value))
+        return int(value);
     showMessage(tr("Unknown, ambiguous or unmapped symbol/address: %1").arg(label), Error);
     return -1;
 }
 int ZxEmulator::symbolAddress(int row)
 {
     const auto address = m_symbols.rowAddress(*emulator().readLock(), row);
-    if (address < 0) showMessage(tr("This label's RAM page is not currently mapped; select it in the emulated program first"), Error);
+    if (address < 0)
+        showMessage(tr("This label's RAM page is not currently mapped; select it in the emulated "
+                       "program first"),
+                    Error);
     return address;
 }
 
 void ZxEmulator::debuggerCommand(const QString &command)
 {
     const QString trimmed = command.trimmed();
-    if (trimmed.startsWith(u"del"_s, Qt::CaseInsensitive) ||
-        trimmed.startsWith(u"clear"_s, Qt::CaseInsensitive)) {
+    if (trimmed.startsWith(u"del"_s, Qt::CaseInsensitive)
+        || trimmed.startsWith(u"clear"_s, Qt::CaseInsensitive)) {
         const auto parts = trimmed.split(u' ', Qt::SkipEmptyParts);
         if (parts.size() >= 2) {
             const uint32_t id = parts[1].toUInt();
@@ -2108,13 +2513,15 @@ QVariantMap ZxEmulator::controllerMapping()
 
 bool ZxEmulator::applyControllerMapping(const QVariantMap &mapping, bool temporary)
 {
-    if (!ControllerProfiles::validMapping(mapping)) return false;
+    if (!ControllerProfiles::validMapping(mapping))
+        return false;
     releaseInputs();
     m_settings->applyControllerMapping(mapping, temporary);
     const int joystick = mapping.value(u"joystick"_s).toInt();
     const bool available = joystickAvailable(joystick);
     setSelectedJoysticksIndex(available ? joystick : NoJoystick);
-    if (!available) showMessage(tr("This profile's Timex joystick needs a TC2068 or TS2068"), Info);
+    if (!available)
+        showMessage(tr("This profile's Timex joystick needs a TC2068 or TS2068"), Info);
     return available;
 }
 
@@ -2126,17 +2533,23 @@ bool ZxEmulator::saveControllerProfile(const QString &name)
 bool ZxEmulator::loadControllerProfile(const QString &name)
 {
     const auto mapping = m_controllerProfiles->mapping(name);
-    if (mapping.isEmpty()) { showMessage(tr("Controller profile does not exist"), Error); return false; }
+    if (mapping.isEmpty()) {
+        showMessage(tr("Controller profile does not exist"), Error);
+        return false;
+    }
     return applyControllerMapping(mapping, m_settings->controllerOverride());
 }
 
 bool ZxEmulator::activateControllerGame(const QString &name)
 {
-    if (m_settings->controllerOverride()) applyControllerMapping(m_defaultControllerMapping, false);
-    else m_defaultControllerMapping = controllerMapping();
+    if (m_settings->controllerOverride())
+        applyControllerMapping(m_defaultControllerMapping, false);
+    else
+        m_defaultControllerMapping = controllerMapping();
     m_controllerProfiles->setGame(name);
     const auto profile = m_controllerProfiles->gameProfile();
-    return !profile.isEmpty() && applyControllerMapping(m_controllerProfiles->mapping(profile), true);
+    return !profile.isEmpty()
+            && applyControllerMapping(m_controllerProfiles->mapping(profile), true);
 }
 
 void ZxEmulator::setLoadedGame(const QString &path)

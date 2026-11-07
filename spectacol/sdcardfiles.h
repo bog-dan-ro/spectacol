@@ -52,17 +52,38 @@ public:
     explicit SdCardFiles(ZxEmulator *parent);
 
     /// The current machine uses the card (the Next)
-    bool inUse() const { return m_inUse; }
+    bool inUse() const
+    {
+        return m_inUse;
+    }
     QString imagePath() const;
     bool customImage() const;
     /// The image has a FAT file system Spectacol can read
-    bool available() const { return m_available; }
-    bool readOnly() const { return m_readOnly; }
-    qint64 totalBytes() const { return m_totalBytes; }
-    qint64 freeBytes() const { return m_freeBytes; }
-    QString folder() const { return m_folder; }
+    bool available() const
+    {
+        return m_available;
+    }
+    bool readOnly() const
+    {
+        return m_readOnly;
+    }
+    qint64 totalBytes() const
+    {
+        return m_totalBytes;
+    }
+    qint64 freeBytes() const
+    {
+        return m_freeBytes;
+    }
+    QString folder() const
+    {
+        return m_folder;
+    }
     /// The current folder's entries ({name, size, isDir}), folders first; ".." outside the root
-    QVariantList entries() const { return m_entries; }
+    QVariantList entries() const
+    {
+        return m_entries;
+    }
 
 public slots:
     void refresh();

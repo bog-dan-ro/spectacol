@@ -37,14 +37,17 @@ ZxTapeData::ZxTapeData()
     }
     for (const auto &[description, data] : blocks) {
         TapeData td;
-        td.label = QByteArray::number(uint(m_tapeBlocks.size() + 1)) + " " + QByteArray::fromStdString(description);
+        td.label = QByteArray::number(uint(m_tapeBlocks.size() + 1)) + " "
+                + QByteArray::fromStdString(description);
         td.detail = QByteArray::fromStdString(description);
         td.length = int(data.size());
-        td.data = qCompress(data.data(), qsizetype(data.size()), 9).toBase64(QByteArray::Base64UrlEncoding);
+        td.data = qCompress(data.data(), qsizetype(data.size()), 9)
+                          .toBase64(QByteArray::Base64UrlEncoding);
         m_tapeBlocks.push_back(std::move(td));
     }
     m_currentBlock = current;
-    connect(&ZxEmulator::instance(), &ZxEmulator::tapeBlockChanged, this, &ZxTapeData::setCurrentBlock);
+    connect(&ZxEmulator::instance(), &ZxEmulator::tapeBlockChanged, this,
+            &ZxTapeData::setCurrentBlock);
 }
 
 int ZxTapeData::rowCount(const QModelIndex &parent) const
@@ -76,11 +79,9 @@ QVariant ZxTapeData::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> ZxTapeData::roleNames() const
 {
-    static QHash<int, QByteArray> res = {
-        {Label, "label"},
-        {Detail, "detail"},
-        {Current, "isCurrent"}
-    };
+    static QHash<int, QByteArray> res = { { Label, "label" },
+                                          { Detail, "detail" },
+                                          { Current, "isCurrent" } };
     return res;
 }
 
@@ -99,13 +100,19 @@ void ZxTapeData::selectBlock(int block)
 
 bool ZxTapeData::resetAndLoadBlock(int block)
 {
-    if (block < 0 || std::size_t(block) >= m_tapeBlocks.size()) return false;
+    if (block < 0 || std::size_t(block) >= m_tapeBlocks.size())
+        return false;
     bool supported = false;
     auto &host = ZxEmulator::instance();
-    if (!host.withEmulator([&](zxkit::Emulator &emulator) { supported = emulator.autoLoadTape(std::size_t(block)); }))
+    if (!host.withEmulator([&](zxkit::Emulator &emulator) {
+            supported = emulator.autoLoadTape(std::size_t(block));
+        }))
         return false;
-    if (!supported) host.showMessage(tr("Automatic tape loading is unavailable for this machine."), ZxEmulator::Warning);
-    if (supported) setCurrentBlock(block);
+    if (!supported)
+        host.showMessage(tr("Automatic tape loading is unavailable for this machine."),
+                         ZxEmulator::Warning);
+    if (supported)
+        setCurrentBlock(block);
     return supported;
 }
 
@@ -116,7 +123,7 @@ void ZxTapeData::setCurrentBlock(int block)
     m_currentBlock = block;
     emit currentBlockChanged();
     if (!m_tapeBlocks.empty())
-        emit dataChanged(index(0), index(int(m_tapeBlocks.size()) - 1), {Current});
+        emit dataChanged(index(0), index(int(m_tapeBlocks.size()) - 1), { Current });
 }
 
 QByteArray ZxTapeData::base64CompressedBlockData(int index) const

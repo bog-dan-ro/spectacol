@@ -53,7 +53,8 @@ QImage iconImage(const QString &name, QSize requestedSize = {})
     return reader.read();
 }
 
-QImage mediaImage(std::span<const uint8_t> span, const QString &fileName, const QSize &requestedSize = {})
+QImage mediaImage(std::span<const uint8_t> span, const QString &fileName,
+                  const QSize &requestedSize = {})
 {
     BlockErrors silenter;
     const std::string fname = fileName.toStdString();
@@ -79,7 +80,8 @@ QImage buff2Image(const unsigned char *buffer, size_t bufferSize, const QString 
 
 QImage buff2Image(const QByteArray &buffer, const QString &fileName)
 {
-    return buff2Image(reinterpret_cast<const unsigned char *>(buffer.constData()), size_t(buffer.size()), fileName);
+    return buff2Image(reinterpret_cast<const unsigned char *>(buffer.constData()),
+                      size_t(buffer.size()), fileName);
 }
 
 QImage scr2Image(const QByteArray &buffer)
@@ -108,8 +110,9 @@ QImage previewImage(const QString &id, const QSize &requestedSize)
         if (pos != -1) {
             bool ok;
             int delta = id.mid(13, pos - 13).toInt(&ok);
-            if (ok && delta >=0) {
-                auto buff = qUncompress(QByteArray::fromBase64(id.mid(pos + 1).toLatin1(), QByteArray::Base64UrlEncoding));
+            if (ok && delta >= 0) {
+                auto buff = qUncompress(QByteArray::fromBase64(id.mid(pos + 1).toLatin1(),
+                                                               QByteArray::Base64UrlEncoding));
                 if (buff.size() - delta >= 0) {
                     auto img = scr2Image(buff.constData() + delta, buff.size() - delta);
                     if (!img.isNull())
@@ -131,8 +134,10 @@ QImage previewImage(const QString &id, const QSize &requestedSize)
         return iconImage(u"cassette-broken"_s, requestedSize);
 
     const auto buffer = file.readAll();
-    QImage ret = mediaImage(std::span<const uint8_t>(reinterpret_cast<const uint8_t *>(buffer.constData()), size_t(buffer.size())),
-                            inf.fileName(), requestedSize);
+    QImage ret = mediaImage(
+            std::span<const uint8_t>(reinterpret_cast<const uint8_t *>(buffer.constData()),
+                                     size_t(buffer.size())),
+            inf.fileName(), requestedSize);
     if (ret.isNull())
         return iconImage(u"cassette-unknown"_s, requestedSize);
     return ret;
@@ -140,7 +145,8 @@ QImage previewImage(const QString &id, const QSize &requestedSize)
 
 } // namespace
 
-QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size,
+                                                 const QSize &requestedSize)
 {
     const auto image = previewImage(id, requestedSize);
     if (size)

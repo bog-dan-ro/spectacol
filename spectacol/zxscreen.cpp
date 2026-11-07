@@ -54,8 +54,7 @@ static QRect imageRect(QSize imageSize, QSize outputSize, ZxSettings::FillMode f
         auto wf = fitFactor(imageSize.width(), outputSize.width());
         auto hf = fitFactor(imageSize.height(), outputSize.height());
         size = (QSizeF(imageSize) * (std::min)(wf, hf)).toSize();
-    }
-    break;
+    } break;
 
     case ZxSettings::PreserveAspectFit:
         size = imageSize.scaled(outputSize, Qt::KeepAspectRatio);
@@ -73,11 +72,10 @@ static QRect imageRect(QSize imageSize, QSize outputSize, ZxSettings::FillMode f
     const int x = (outputSize.width() - size.width()) / 2;
     const int y = (outputSize.height() - size.height()) / 2;
 #endif
-    return {QPoint{x, y}, size};
+    return { QPoint{ x, y }, size };
 }
 
-ZxScreen::ZxScreen(QQuickItem *parent)
-    : QQuickItem(parent)
+ZxScreen::ZxScreen(QQuickItem *parent) : QQuickItem(parent)
 {
     setFlags(ItemHasContents | ItemIsFocusScope);
     setFocus(true);
@@ -101,14 +99,19 @@ ZxScreen::ZxScreen(QQuickItem *parent)
         m_smoothScaling = smoothScaling;
         update();
     });
-    connect(&ZxEmulator::instance(), &ZxEmulator::mouseGrabbedChanged, this, &ZxScreen::updateMouseGrab);
+    connect(&ZxEmulator::instance(), &ZxEmulator::mouseGrabbedChanged, this,
+            &ZxScreen::updateMouseGrab);
 
-    connect(ZxImage::instance(), &ZxImage::needsUpdate, this, &ZxScreen::update, Qt::QueuedConnection);
-    connect(ZxImage::instance(), &ZxImage::geometryChanged, this, [this](QSize size) {
-        m_imageSize = size;
-        updateImplicitSize();
-        update();
-    }, Qt::QueuedConnection);
+    connect(ZxImage::instance(), &ZxImage::needsUpdate, this, &ZxScreen::update,
+            Qt::QueuedConnection);
+    connect(
+            ZxImage::instance(), &ZxImage::geometryChanged, this,
+            [this](QSize size) {
+                m_imageSize = size;
+                updateImplicitSize();
+                update();
+            },
+            Qt::QueuedConnection);
 
     // The emulator might have published a frame before the above connection was made
     m_imageSize = ZxImage::instance()->imageSize();
@@ -149,7 +152,7 @@ QRectF ZxScreen::imageRect(QSize imageSize) const
     // compute it in device pixels, so the image is scaled by whole pixels
     const qreal dpr = window() ? window()->effectiveDevicePixelRatio() : 1.0;
     const QRect rect = ::imageRect(imageSize, (size() * dpr).toSize(), m_fillMode);
-    return {QPointF(rect.topLeft()) / dpr, QSizeF(rect.size()) / dpr};
+    return { QPointF(rect.topLeft()) / dpr, QSizeF(rect.size()) / dpr };
 }
 
 void ZxScreen::updateImplicitSize()
@@ -200,7 +203,7 @@ QSGNode *ZxScreen::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     return node;
 }
 
-void ZxScreen::applySoftwareFilter(QImage& image, QRect& dirty)
+void ZxScreen::applySoftwareFilter(QImage &image, QRect &dirty)
 {
     const bool changed = std::exchange(m_filterChanged, false);
     try {
@@ -216,31 +219,40 @@ void ZxScreen::applySoftwareFilter(QImage& image, QRect& dirty)
             return;
         }
         if (changed || !dirty.isEmpty() || m_filteredImage.isNull()) {
-            const auto size = m_filterPipeline.outputSize({uint32_t(image.width()), uint32_t(image.height())});
-            const auto rhi = static_cast<QRhi*>(window()->rendererInterface()->getResource(window(), QSGRendererInterface::RhiResource));
+            const auto size = m_filterPipeline.outputSize(
+                    { uint32_t(image.width()), uint32_t(image.height()) });
+            const auto rhi = static_cast<QRhi *>(window()->rendererInterface()->getResource(
+                    window(), QSGRendererInterface::RhiResource));
             if (rhi) {
                 const auto maxSize = uint32_t(rhi->resourceLimit(QRhi::TextureSizeMax));
                 if (size.width > maxSize || size.height > maxSize)
-                    throw std::runtime_error("The selected filter exceeds the maximum screen texture size.");
+                    throw std::runtime_error(
+                            "The selected filter exceeds the maximum screen texture size.");
             }
-            if (m_filterSource.width() != uint32_t(image.width()) || m_filterSource.height() != uint32_t(image.height()))
-                m_filterSource = zxkit::VideoFrame(uint32_t(image.width()), uint32_t(image.height()));
+            if (m_filterSource.width() != uint32_t(image.width())
+                || m_filterSource.height() != uint32_t(image.height()))
+                m_filterSource =
+                        zxkit::VideoFrame(uint32_t(image.width()), uint32_t(image.height()));
             for (int y = 0; y < image.height(); ++y) {
-                const auto source = std::span(reinterpret_cast<const uint32_t*>(image.constScanLine(y)), std::size_t(image.width()));
+                const auto source =
+                        std::span(reinterpret_cast<const uint32_t *>(image.constScanLine(y)),
+                                  std::size_t(image.width()));
                 std::ranges::copy(source, m_filterSource.scanline(uint32_t(y)).begin());
             }
-            const auto& output = m_filterPipeline.apply(m_filterSource);
+            const auto &output = m_filterPipeline.apply(m_filterSource);
             // Own the QImage pixels: queued texture uploads may retain them past
             // the next pipeline.apply(), which reuses its buffers.
-            m_filteredImage = QImage(reinterpret_cast<const uchar*>(output.pixels().data()),
-                                     int(output.width()), int(output.height()),
-                                     qsizetype(output.width()) * sizeof(uint32_t), QImage::Format_RGBA8888).copy();
+            m_filteredImage =
+                    QImage(reinterpret_cast<const uchar *>(output.pixels().data()),
+                           int(output.width()), int(output.height()),
+                           qsizetype(output.width()) * sizeof(uint32_t), QImage::Format_RGBA8888)
+                            .copy();
             if (m_filteredImage.isNull())
                 throw std::bad_alloc();
             dirty = m_filteredImage.rect(); // Neighborhood filters also change adjacent rows.
         }
         image = m_filteredImage;
-    } catch (const std::exception& error) {
+    } catch (const std::exception &error) {
         const auto failedIndex = m_filterIndex;
         m_filterIndex = 0;
         m_filterPipeline.setStages({});
@@ -249,22 +261,25 @@ void ZxScreen::applySoftwareFilter(QImage& image, QRect& dirty)
         m_filteredImage = {};
         dirty = image.rect();
         QString reason;
-        if (const auto* filterError = dynamic_cast<const zxkit::Exception*>(&error)) {
+        if (const auto *filterError = dynamic_cast<const zxkit::Exception *>(&error)) {
             const auto text = filterError->rawMessage();
             reason = QString::fromUtf8(text.data(), qsizetype(text.size()));
-        } else if (dynamic_cast<const std::bad_alloc*>(&error)) {
+        } else if (dynamic_cast<const std::bad_alloc *>(&error)) {
             reason = tr("There is not enough memory for this screen filter.");
         } else {
             reason = QString::fromUtf8(error.what());
         }
         const auto message = tr("Unable to apply the screen filter: %1").arg(reason);
-        QMetaObject::invokeMethod(&ZxEmulator::instance(), [failedIndex, message] {
-            auto& emulator = ZxEmulator::instance();
-            if (emulator.selectedFilterIndex() == failedIndex) {
-                emulator.setSelectedFilterIndex(0);
-                emulator.showMessage(message, ZxEmulator::Warning);
-            }
-        }, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(
+                &ZxEmulator::instance(),
+                [failedIndex, message] {
+                    auto &emulator = ZxEmulator::instance();
+                    if (emulator.selectedFilterIndex() == failedIndex) {
+                        emulator.setSelectedFilterIndex(0);
+                        emulator.showMessage(message, ZxEmulator::Warning);
+                    }
+                },
+                Qt::QueuedConnection);
     }
 }
 

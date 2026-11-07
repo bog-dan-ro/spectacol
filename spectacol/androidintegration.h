@@ -24,4 +24,4 @@ class QObject;
 namespace AndroidIntegration {
 void install(QObject *parent);
 QString displayName(const QUrl &url);
-}
+} // namespace AndroidIntegration

@@ -33,7 +33,8 @@ class UartScriptApi;
 
 /// The QObject and sockets live on the UI thread; the runtime and every QJSValue
 /// are created, called and destroyed exclusively on Engine's emulation thread.
-class NextUartHooks : public QObject {
+class NextUartHooks : public QObject
+{
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Use ZxEmulator.uartHooks")
@@ -43,16 +44,34 @@ class NextUartHooks : public QObject {
     Q_PROPERTY(int piPort READ piPort WRITE setPiPort NOTIFY configurationChanged)
     Q_PROPERTY(QString errorString READ errorString NOTIFY statusChanged)
     Q_PROPERTY(bool downloading READ downloading NOTIFY statusChanged)
-  public:
+public:
     explicit NextUartHooks(QObject *parent = nullptr);
     ~NextUartHooks() override;
     zxkit::EngineConfig::ThreadHooks threadHooks();
-    QString espScript() const { return m_paths[0]; }
-    QString piScript() const { return m_paths[1]; }
-    QString piHost() const { return m_piHost; }
-    int piPort() const { return m_piPort; }
-    QString errorString() const { return m_error; }
-    bool downloading() const { return m_downloading; }
+    QString espScript() const
+    {
+        return m_paths[0];
+    }
+    QString piScript() const
+    {
+        return m_paths[1];
+    }
+    QString piHost() const
+    {
+        return m_piHost;
+    }
+    int piPort() const
+    {
+        return m_piPort;
+    }
+    QString errorString() const
+    {
+        return m_error;
+    }
+    bool downloading() const
+    {
+        return m_downloading;
+    }
     void setEspScript(const QString &path);
     void setPiScript(const QString &path);
     void setPiHost(const QString &host);
@@ -60,17 +79,20 @@ class NextUartHooks : public QObject {
     Q_INVOKABLE void reload();
     Q_INVOKABLE void downloadScript(int channel, const QUrl &url);
     Q_INVOKABLE void useBundled(int channel);
-  signals:
+signals:
     void configurationChanged();
     void statusChanged();
 
-  public:
+public:
     // Used by the runtime, never accesses JS from the QObject's thread.
     void command(QVariantMap command);
     void reportError(const QString &error);
-    quint64 runtimeThreadId() const { return m_threadId.load(); }
+    quint64 runtimeThreadId() const
+    {
+        return m_threadId.load();
+    }
 
-  private:
+private:
     friend class NextUartRuntime;
     friend class UartScriptApi;
     void configure();
@@ -85,31 +107,36 @@ class NextUartHooks : public QObject {
     QNetworkAccessManager m_downloads;
     QHash<int, QPointer<QAbstractSocket>> m_sockets;
     QMutex m_mutex;
-    struct Configuration {
+    struct Configuration
+    {
         std::array<QString, 2> source;
         QString piHost;
         int piPort = 0;
     } m_configuration;
     QList<QVariantMap> m_commands, m_events;
-    std::atomic<uint64_t> m_revision{0};
-    std::atomic<bool> m_eventsPending{false}, m_commandsPending{false};
-    std::atomic<quint64> m_threadId{0};
+    std::atomic<uint64_t> m_revision{ 0 };
+    std::atomic<bool> m_eventsPending{ false }, m_commandsPending{ false };
+    std::atomic<quint64> m_threadId{ 0 };
     std::unique_ptr<NextUartRuntime> m_runtime;
 };
 
-class UartScriptApi : public QObject {
+class UartScriptApi : public QObject
+{
     Q_OBJECT
-  public:
-    UartScriptApi(NextUartRuntime &runtime, unsigned channel) : m_runtime(runtime), m_channel(channel) {}
+public:
+    UartScriptApi(NextUartRuntime &runtime, unsigned channel)
+        : m_runtime(runtime), m_channel(channel)
+    {
+    }
     Q_INVOKABLE int receive(const QVariantList &bytes);
-    Q_INVOKABLE void network(const QString &operation, int id, const QString &host = {}, int port = 0,
-                             const QVariantList &bytes = {}, bool udp = false);
+    Q_INVOKABLE void network(const QString &operation, int id, const QString &host = {},
+                             int port = 0, const QVariantList &bytes = {}, bool udp = false);
     Q_INVOKABLE QVariantMap configuration() const;
     Q_INVOKABLE void setTimer(int id, int milliseconds);
     Q_INVOKABLE void cancelTimer(int id);
     Q_INVOKABLE void log(const QString &message);
 
-  private:
+private:
     NextUartRuntime &m_runtime;
     unsigned m_channel;
 };

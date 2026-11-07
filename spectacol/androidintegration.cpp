@@ -27,37 +27,52 @@
 using namespace Qt::StringLiterals;
 namespace AndroidIntegration {
 namespace {
-class IntentHandler final : public QObject, public QtAndroidPrivate::NewIntentListener {
+class IntentHandler final : public QObject, public QtAndroidPrivate::NewIntentListener
+{
 public:
     explicit IntentHandler(QObject *parent) : QObject(parent)
     {
         QtAndroidPrivate::registerNewIntentListener(this);
-        handle(QJniObject(QNativeInterface::QAndroidApplication::context()).callObjectMethod(
-            "getIntent", "()Landroid/content/Intent;"));
+        handle(QJniObject(QNativeInterface::QAndroidApplication::context())
+                       .callObjectMethod("getIntent", "()Landroid/content/Intent;"));
     }
-    ~IntentHandler() override { QtAndroidPrivate::unregisterNewIntentListener(this); }
-    bool handleNewIntent(JNIEnv *, jobject intent) override { return handle(QJniObject(intent)); }
+    ~IntentHandler() override
+    {
+        QtAndroidPrivate::unregisterNewIntentListener(this);
+    }
+    bool handleNewIntent(JNIEnv *, jobject intent) override
+    {
+        return handle(QJniObject(intent));
+    }
+
 private:
     bool handle(const QJniObject &intent)
     {
-        if (!intent.isValid() || intent.callObjectMethod("getAction", "()Ljava/lang/String;").toString()
-                                     != u"android.intent.action.VIEW"_s)
+        if (!intent.isValid()
+            || intent.callObjectMethod("getAction", "()Ljava/lang/String;").toString()
+                    != u"android.intent.action.VIEW"_s)
             return false;
         const QUrl url(intent.callObjectMethod("getDataString", "()Ljava/lang/String;").toString());
         if (url.scheme() != u"content"_s && !url.isLocalFile())
             return false;
         // Android delivers new intents on its Java UI thread, not Qt's GUI thread.
-        QMetaObject::invokeMethod(this, [url] {
-            auto &emulator = ZxEmulator::instance();
-            const auto path = emulator.importFile(url);
-            if (!path.isEmpty())
-                emulator.load(path);
-        }, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(
+                this,
+                [url] {
+                    auto &emulator = ZxEmulator::instance();
+                    const auto path = emulator.importFile(url);
+                    if (!path.isEmpty())
+                        emulator.load(path);
+                },
+                Qt::QueuedConnection);
         return true;
     }
 };
+} // namespace
+void install(QObject *parent)
+{
+    new IntentHandler(parent);
 }
-void install(QObject *parent) { new IntentHandler(parent); }
 
 QString displayName(const QUrl &url)
 {
@@ -65,20 +80,25 @@ QString displayName(const QUrl &url)
         return QFileInfo(url.isLocalFile() ? url.toLocalFile() : url.toString()).fileName();
     const auto uriString = QJniObject::fromString(url.toString());
     const auto uri = QJniObject::callStaticObjectMethod("android/net/Uri", "parse",
-        "(Ljava/lang/String;)Landroid/net/Uri;", uriString.object<jstring>());
-    const auto resolver = QJniObject(QNativeInterface::QAndroidApplication::context()).callObjectMethod(
-        "getContentResolver", "()Landroid/content/ContentResolver;");
-    auto cursor = resolver.callObjectMethod("query",
-        "(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;)Landroid/database/Cursor;",
-        uri.object(), nullptr, nullptr, nullptr, nullptr);
+                                                        "(Ljava/lang/String;)Landroid/net/Uri;",
+                                                        uriString.object<jstring>());
+    const auto resolver =
+            QJniObject(QNativeInterface::QAndroidApplication::context())
+                    .callObjectMethod("getContentResolver", "()Landroid/content/ContentResolver;");
+    auto cursor = resolver.callObjectMethod(
+            "query",
+            "(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/"
+            "String;)Landroid/database/Cursor;",
+            uri.object(), nullptr, nullptr, nullptr, nullptr);
     QString name;
     if (cursor.isValid()) {
         const auto columnName = QJniObject::fromString(u"_display_name"_s);
-        const auto column = cursor.callMethod<jint>("getColumnIndex", "(Ljava/lang/String;)I", columnName.object<jstring>());
+        const auto column = cursor.callMethod<jint>("getColumnIndex", "(Ljava/lang/String;)I",
+                                                    columnName.object<jstring>());
         if (column >= 0 && cursor.callMethod<jboolean>("moveToFirst"))
             name = cursor.callObjectMethod("getString", "(I)Ljava/lang/String;", column).toString();
         cursor.callMethod<void>("close");
     }
     return name.isEmpty() ? QFileInfo(url.path()).fileName() : name;
 }
-}
+} // namespace AndroidIntegration

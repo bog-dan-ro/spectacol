@@ -21,9 +21,9 @@
 #include <atomic>
 
 namespace {
-    std::atomic_uint_fast32_t s_blockErrors{0};
-    std::atomic<int> s_debuggerOutputBase{16};
-}
+std::atomic_uint_fast32_t s_blockErrors{ 0 };
+std::atomic<int> s_debuggerOutputBase{ 16 };
+} // namespace
 
 int debuggerOutputBase()
 {
@@ -44,4 +44,3 @@ void hideErrors()
 {
     ++s_blockErrors;
 }
-

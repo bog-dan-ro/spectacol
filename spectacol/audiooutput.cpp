@@ -30,7 +30,10 @@ AudioOutput::AudioOutput(const QAudioDevice &device, QObject *parent)
     });
 }
 
-AudioOutput::~AudioOutput() { stop(); }
+AudioOutput::~AudioOutput()
+{
+    stop();
+}
 
 void AudioOutput::start()
 {
@@ -43,9 +46,10 @@ void AudioOutput::start()
     }
     QAudioFormat format;
     // Float callbacks avoid an extra PCM copy on the common device path.
-    for (const auto type : {QAudioFormat::Float, QAudioFormat::Int16}) {
-        for (const auto rate : {int(AudioBuffer::InputRate), device.preferredFormat().sampleRate()}) {
-            for (const auto channels : {2, 1}) {
+    for (const auto type : { QAudioFormat::Float, QAudioFormat::Int16 }) {
+        for (const auto rate :
+             { int(AudioBuffer::InputRate), device.preferredFormat().sampleRate() }) {
+            for (const auto channels : { 2, 1 }) {
                 format.setSampleFormat(type);
                 format.setSampleRate(rate);
                 format.setChannelCount(channels);
@@ -62,7 +66,8 @@ void AudioOutput::start()
         emit errorOccurred(tr("The audio output does not support PCM playback."));
         return;
     }
-    const auto buffer = std::make_shared<AudioBuffer>(format.sampleRate(), format.channelCount(), m_control);
+    const auto buffer =
+            std::make_shared<AudioBuffer>(format.sampleRate(), format.channelCount(), m_control);
     m_sink = std::make_unique<QAudioSink>(device, format);
     m_activeDevice = device.id();
     m_sink->setNativePeriodFrameCount(512);
@@ -72,7 +77,9 @@ void AudioOutput::start()
     });
     publishBuffer(buffer);
     if (format.sampleFormat() == QAudioFormat::Float) {
-        m_sink->start([buffer](QSpan<float> output) { buffer->render({output.data(), std::size_t(output.size())}); });
+        m_sink->start([buffer](QSpan<float> output) {
+            buffer->render({ output.data(), std::size_t(output.size()) });
+        });
     } else {
         m_sink->start([buffer](QSpan<int16_t> output) {
             std::array<float, 1'024> temporary;
@@ -80,13 +87,15 @@ void AudioOutput::start()
                 const auto count = (std::min)(qsizetype(temporary.size()), output.size() - done);
                 buffer->render(std::span(temporary).first(std::size_t(count)));
                 for (qsizetype i = 0; i < count; ++i)
-                    output[done + i] = int16_t(std::clamp(temporary[std::size_t(i)] * 32768.0f, -32768.0f, 32767.0f));
+                    output[done + i] = int16_t(
+                            std::clamp(temporary[std::size_t(i)] * 32768.0f, -32768.0f, 32767.0f));
                 done += count;
             }
         });
     }
     if (m_sink->error() != QtAudio::NoError) {
-        emit errorOccurred(tr("Can't start the audio output (error %1).").arg(int(m_sink->error())));
+        emit errorOccurred(
+                tr("Can't start the audio output (error %1).").arg(int(m_sink->error())));
         stop();
     }
 }

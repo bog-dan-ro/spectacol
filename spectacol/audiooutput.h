@@ -34,13 +34,20 @@ public:
     // Device lifecycle stays on the owner thread; PCM never passes through it.
     void start();
     void stop();
-    void setPaused(bool paused) noexcept { m_control->setPaused(paused); }
-    void setMuted(bool muted) noexcept { m_control->setMuted(muted); }
+    void setPaused(bool paused) noexcept
+    {
+        m_control->setPaused(paused);
+    }
+    void setMuted(bool muted) noexcept
+    {
+        m_control->setMuted(muted);
+    }
     void write(std::span<const int16_t> samples, uint32_t rate, uint8_t channels,
                uint32_t speedPercent);
     AudioBuffer::Statistics statistics() const;
 Q_SIGNALS:
     void errorOccurred(const QString &message);
+
 private:
     Q_DISABLE_COPY_MOVE(AudioOutput)
     std::shared_ptr<AudioBuffer> buffer() const;

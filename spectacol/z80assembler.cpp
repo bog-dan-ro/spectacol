@@ -27,15 +27,12 @@ namespace {
 zxkit::AssemblerOptions assemblerOptions(bool z80n)
 {
     // Plain numbers are in the base the debugger shows them in
-    return {.z80n = z80n, .defaultBase = debuggerOutputBase()};
+    return { .z80n = z80n, .defaultBase = debuggerOutputBase() };
 }
 
 } // namespace
 
-Z80Assembler::Z80Assembler(QObject *parent)
-    : QValidator(parent)
-{
-}
+Z80Assembler::Z80Assembler(QObject *parent) : QValidator(parent) { }
 
 bool Z80Assembler::write(const QString &asmLine, int address) const
 {
@@ -59,7 +56,8 @@ bool Z80Assembler::write(const QString &asmLine, int address) const
 QValidator::State Z80Assembler::validate(QString &value, int &) const
 {
     const bool z80n = ZxEmulator::instance().emulator().readLock()->cpu().isZ80nEnabled();
-    return zxkit::Assembler::assemble(value.toStdString(), uint16_t(m_address), assemblerOptions(z80n))
-               ? Acceptable
-               : Intermediate;
+    return zxkit::Assembler::assemble(value.toStdString(), uint16_t(m_address),
+                                      assemblerOptions(z80n))
+            ? Acceptable
+            : Intermediate;
 }

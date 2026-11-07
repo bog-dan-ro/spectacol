@@ -25,7 +25,8 @@
 #include <zxkit/core/Emulator.h>
 #include <zxkit/core/Shared.h>
 
-class DebuggerMemoryModel : public QAbstractListModel {
+class DebuggerMemoryModel : public QAbstractListModel
+{
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Use the ZxEmulator debugger models")
@@ -42,30 +43,61 @@ class DebuggerMemoryModel : public QAbstractListModel {
     Q_PROPERTY(QString error READ error NOTIFY errorChanged FINAL)
 public:
     enum Role : int { Address = Qt::UserRole + 1, AddressText, Cells, Ascii };
-    explicit DebuggerMemoryModel(const zxkit::Shared<zxkit::Emulator>& core, QObject* parent = nullptr);
-    int rowCount(const QModelIndex& parent = {}) const override;
-    QVariant data(const QModelIndex& index, int role) const override;
+    explicit DebuggerMemoryModel(const zxkit::Shared<zxkit::Emulator> &core,
+                                 QObject *parent = nullptr);
+    int rowCount(const QModelIndex &parent = {}) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
-    QStringList bankNames() const { return m_banks; }
-    int bankId() const { return m_bank; }
+    QStringList bankNames() const
+    {
+        return m_banks;
+    }
+    int bankId() const
+    {
+        return m_bank;
+    }
     void setBankId(int bank);
-    int columns() const { return m_columns; }
+    int columns() const
+    {
+        return m_columns;
+    }
     void setColumns(int columns);
-    int cursor() const { return m_cursor; }
+    int cursor() const
+    {
+        return m_cursor;
+    }
     void setCursor(int cursor);
-    int address() const { return m_base + m_cursor; }
-    int addressLimit() const { return m_size - 1; }
-    int byteValue() const { return m_bytes[m_cursor]; }
+    int address() const
+    {
+        return m_base + m_cursor;
+    }
+    int addressLimit() const
+    {
+        return m_size - 1;
+    }
+    int byteValue() const
+    {
+        return m_bytes[m_cursor];
+    }
     QString addressText() const;
-    bool editable() const { return m_editable; }
-    bool writable() const { return m_writable; }
+    bool editable() const
+    {
+        return m_editable;
+    }
+    bool writable() const
+    {
+        return m_writable;
+    }
     void setEditable(bool editable);
-    QString error() const { return m_error; }
+    QString error() const
+    {
+        return m_error;
+    }
     Q_INVOKABLE void refresh();
-    Q_INVOKABLE bool goTo(const QString& hex);
+    Q_INVOKABLE bool goTo(const QString &hex);
     Q_INVOKABLE void moveCursor(int delta);
-    Q_INVOKABLE bool writeByte(const QString& hex, bool allowRom = false);
-    static bool parseHex(const QString& text, quint32 limit, quint32& value);
+    Q_INVOKABLE bool writeByte(const QString &hex, bool allowRom = false);
+    static bool parseHex(const QString &text, quint32 limit, quint32 &value);
 signals:
     void banksChanged();
     void columnsChanged();
@@ -74,9 +106,9 @@ signals:
     void errorChanged();
 
 private:
-    bool fail(const QString& text);
+    bool fail(const QString &text);
     zxkit::Shared<zxkit::Emulator> m_core;
-    std::array<uint8_t, 256> m_bytes {};
+    std::array<uint8_t, 256> m_bytes{};
     QStringList m_banks;
     QString m_error;
     int m_bank = -1;
@@ -91,7 +123,8 @@ private:
 
 // Frozen on refresh/pause. Reads raw register latches and effective MMU mappings,
 // never CPU I/O ports or register handlers with side effects.
-class DebuggerStateModel : public QAbstractListModel {
+class DebuggerStateModel : public QAbstractListModel
+{
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Use the ZxEmulator debugger models")
@@ -99,17 +132,22 @@ class DebuggerStateModel : public QAbstractListModel {
 public:
     enum class Kind { NextRegisters, Mmu };
     enum Role : int { Address = Qt::UserRole + 1, AddressText, ValueText, Details };
-    DebuggerStateModel(const zxkit::Shared<zxkit::Emulator>& core, Kind kind, QObject* parent = nullptr);
-    int rowCount(const QModelIndex& parent = {}) const override;
-    QVariant data(const QModelIndex& index, int role) const override;
+    DebuggerStateModel(const zxkit::Shared<zxkit::Emulator> &core, Kind kind,
+                       QObject *parent = nullptr);
+    int rowCount(const QModelIndex &parent = {}) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
-    bool available() const { return m_available; }
+    bool available() const
+    {
+        return m_available;
+    }
     Q_INVOKABLE void refresh();
 signals:
     void availableChanged();
 
 private:
-    struct Row {
+    struct Row
+    {
         int address;
         QString location, value, details;
     };

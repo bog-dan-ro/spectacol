@@ -58,14 +58,12 @@ public:
     };
     Q_ENUM(BreakpointType)
 
-    enum BreakpointLife {
-        Permanent = 0,
-        Oneshot
-    };
+    enum BreakpointLife { Permanent = 0, Oneshot };
     Q_ENUM(BreakpointLife)
 
 private:
-    struct DebuggerBreakpoint {
+    struct DebuggerBreakpoint
+    {
         int id = 0;
         BreakpointType type = BreakOnExecute;
         uint16_t address = 0;
@@ -87,7 +85,10 @@ public:
     explicit BreakpointsModel(QObject *parent = nullptr);
     void breakpointsUpdated();
 
-    const Addresses &addresses() const { return m_addresses; }
+    const Addresses &addresses() const
+    {
+        return m_addresses;
+    }
 
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent) const override;

@@ -23,13 +23,7 @@
 
 class PokeFinderModel : public QAbstractListModel
 {
-    enum {
-        Page = Qt::UserRole + 1,
-        Offset,
-        OffsetText,
-        Value,
-        Breakpoint
-    };
+    enum { Page = Qt::UserRole + 1, Offset, OffsetText, Value, Breakpoint };
 
 public:
     explicit PokeFinderModel(QObject *parent = nullptr);
@@ -42,14 +36,14 @@ protected:
     QHash<int, QByteArray> roleNames() const;
 
 private:
-    enum {
-        NoBreakpoint = 0,
-        OnRead = 1,
-        OnWrite = 2
-    };
-    struct PokeFinderData {
-        PokeFinderData(uint16_t bank, uint16_t offset, uint8_t value, uint8_t breakpoints = NoBreakpoint)
-            : bank(bank), offset(offset), value(value), breakpoints(breakpoints) {}
+    enum { NoBreakpoint = 0, OnRead = 1, OnWrite = 2 };
+    struct PokeFinderData
+    {
+        PokeFinderData(uint16_t bank, uint16_t offset, uint8_t value,
+                       uint8_t breakpoints = NoBreakpoint)
+            : bank(bank), offset(offset), value(value), breakpoints(breakpoints)
+        {
+        }
         uint16_t bank;
         uint16_t offset;
         uint8_t value;

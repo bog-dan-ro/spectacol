@@ -37,7 +37,7 @@ using namespace Qt::StringLiterals;
 using namespace std::literals;
 
 #ifdef Q_OS_ANDROID
-#  include <QCoreApplication>
+#include <QCoreApplication>
 #endif
 
 namespace {
@@ -67,9 +67,7 @@ bool validSpeakerType(const QString &type)
 
 } // namespace
 
-ZxSettings::ZxSettings(ZxEmulator &emulator)
-    : QObject(&emulator)
-    , m_zxEmulator(emulator)
+ZxSettings::ZxSettings(ZxEmulator &emulator) : QObject(&emulator), m_zxEmulator(emulator)
 {
     // The built-in machines, the ones the emulator's registry has
     const zxkit::MachineRegistry machines;
@@ -84,10 +82,10 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
     {
         QSettings s;
         s.beginGroup(u"Screen"_s);
-        m_borderMargins = {uint16_t(std::clamp(s.value(u"borderLeft"_s, 32).toInt(), 0, 128)),
-                           uint16_t(std::clamp(s.value(u"borderTop"_s, 32).toInt(), 0, 128)),
-                           uint16_t(std::clamp(s.value(u"borderRight"_s, 32).toInt(), 0, 128)),
-                           uint16_t(std::clamp(s.value(u"borderBottom"_s, 32).toInt(), 0, 128))};
+        m_borderMargins = { uint16_t(std::clamp(s.value(u"borderLeft"_s, 32).toInt(), 0, 128)),
+                            uint16_t(std::clamp(s.value(u"borderTop"_s, 32).toInt(), 0, 128)),
+                            uint16_t(std::clamp(s.value(u"borderRight"_s, 32).toInt(), 0, 128)),
+                            uint16_t(std::clamp(s.value(u"borderBottom"_s, 32).toInt(), 0, 128)) };
         s.endGroup();
         s.beginGroup(u"General"_s);
         m_hasStartButton = s.value("hasStartButton", false).toBool();
@@ -123,9 +121,11 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
 
         s.beginGroup(u"Gamepad"_s);
         m_fastForwardToggle = s.value(u"fastForwardToggle"_s, false).toBool();
-        m_directionMapping = std::clamp(s.value(u"directionMapping"_s, int(JoystickDirections)).toInt(), 0, 2);
+        m_directionMapping =
+                std::clamp(s.value(u"directionMapping"_s, int(JoystickDirections)).toInt(), 0, 2);
         const auto directions = s.value(u"directionKeys"_s).toList();
-        for (int i = 0; i < std::min(int(directions.size()), int(ControllerInput::DirectionCount)); ++i)
+        for (int i = 0; i < std::min(int(directions.size()), int(ControllerInput::DirectionCount));
+             ++i)
             if (ControllerInput::isSpectrumKey(directions[i].toInt()))
                 m_directionKeys[i] = directions[i].toInt();
         QVariantMap map = s.value(u"actionsMap"_s).toMap();
@@ -141,7 +141,8 @@ ZxSettings::ZxSettings(ZxEmulator &emulator)
         m_joystickOpacity = opacity(u"joystickOpacity"_s);
         m_buttonsOpacity = opacity(u"buttonsOpacity"_s);
     }
-    connect(ZxImage::instance(), &ZxImage::sourceGeometryChanged, this, &ZxSettings::borderLimitsChanged, Qt::QueuedConnection);
+    connect(ZxImage::instance(), &ZxImage::sourceGeometryChanged, this,
+            &ZxSettings::borderLimitsChanged, Qt::QueuedConnection);
 
     connect(&NextSdCard::instance(), &NextSdCard::ready, this, [this] {
         if (m_pendingMachineIndex >= 0)
@@ -182,19 +183,27 @@ void ZxSettings::applyToEmulator()
     ZxImage::instance()->setBorderMargins(m_borderMargins);
     m_zxEmulator.emulator().writeLock()->audioMixer().setStereoMode(ayStereoMode(m_ayStereo));
     m_zxEmulator.emulator().writeLock()->audioMixer().setAyModel(
-        m_ayModel == u"YM2149"_s ? zxkit::AyModel::YM2149 : zxkit::AyModel::AY8912);
+            m_ayModel == u"YM2149"_s ? zxkit::AyModel::YM2149 : zxkit::AyModel::AY8912);
     m_zxEmulator.emulator().writeLock()->audioMixer().setSpeakerModel(speakerModel(m_speakerType));
     applyTapeOptions();
     m_zxEmulator.setSpeed(m_emulationSpeed);
     // One by one: a peripheral that can't start (e.g. a missing ROM) must not stop the others
     if (m_kempstonJoystick)
-        m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) { emulator.attachPeripheral(std::make_unique<zxkit::KempstonJoystickPeripheral>()); });
+        m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) {
+            emulator.attachPeripheral(std::make_unique<zxkit::KempstonJoystickPeripheral>());
+        });
     if (m_kempstonMouse)
-        m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) { emulator.attachPeripheral(std::make_unique<zxkit::KempstonMousePeripheral>()); });
+        m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) {
+            emulator.attachPeripheral(std::make_unique<zxkit::KempstonMousePeripheral>());
+        });
     if (m_interface1)
-        m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) { emulator.attachPeripheral(std::make_unique<zxkit::Interface1Peripheral>()); });
+        m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) {
+            emulator.attachPeripheral(std::make_unique<zxkit::Interface1Peripheral>());
+        });
     if (m_interface2)
-        m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) { emulator.attachPeripheral(std::make_unique<zxkit::Interface2Peripheral>()); });
+        m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) {
+            emulator.attachPeripheral(std::make_unique<zxkit::Interface2Peripheral>());
+        });
 
     // The machine picked last time. The Next needs its SD card image: without it
     // stay on the 48K, picking the Next again offers to download it.
@@ -207,14 +216,18 @@ void ZxSettings::applyToEmulator()
 QVariantMap ZxSettings::borderLimits() const
 {
     const auto limits = ZxImage::instance()->borderLimits();
-    return {{u"left"_s, limits.left()}, {u"top"_s, limits.top()},
-            {u"right"_s, limits.right()}, {u"bottom"_s, limits.bottom()}};
+    return { { u"left"_s, limits.left() },
+             { u"top"_s, limits.top() },
+             { u"right"_s, limits.right() },
+             { u"bottom"_s, limits.bottom() } };
 }
 
 void ZxSettings::setBorderMargins(int left, int top, int right, int bottom)
 {
-    const zxkit::BorderMargins margins{uint16_t(std::clamp(left, 0, 128)), uint16_t(std::clamp(top, 0, 128)),
-                                       uint16_t(std::clamp(right, 0, 128)), uint16_t(std::clamp(bottom, 0, 128))};
+    const zxkit::BorderMargins margins{ uint16_t(std::clamp(left, 0, 128)),
+                                        uint16_t(std::clamp(top, 0, 128)),
+                                        uint16_t(std::clamp(right, 0, 128)),
+                                        uint16_t(std::clamp(bottom, 0, 128)) };
     if (margins == m_borderMargins)
         return;
     m_borderMargins = margins;
@@ -249,7 +262,9 @@ void ZxSettings::applyMachine(int idx, bool persist)
             emit currentMachineChanged();
             return;
         }
-        if (!m_zxEmulator.withEmulator([&sdCard](zxkit::Emulator &emulator) { emulator.insertSdCard(sdCard.imagePath().toStdString()); }))
+        if (!m_zxEmulator.withEmulator([&sdCard](zxkit::Emulator &emulator) {
+                emulator.insertSdCard(sdCard.imagePath().toStdString());
+            }))
             return;
     }
 
@@ -264,9 +279,13 @@ void ZxSettings::applyMachine(int idx, bool persist)
             s.setValue("machine", QString::fromStdString(machineId));
         }
     } catch (const zxkit::Exception &e) {
-        m_zxEmulator.showMessage(tr("Can't select the machine: %1").arg(QString::fromUtf8(e.rawMessage())), ZxEmulator::Error);
+        m_zxEmulator.showMessage(
+                tr("Can't select the machine: %1").arg(QString::fromUtf8(e.rawMessage())),
+                ZxEmulator::Error);
     } catch (const std::exception &e) {
-        m_zxEmulator.showMessage(tr("Can't select the machine: %1").arg(QString::fromUtf8(e.what())), ZxEmulator::Error);
+        m_zxEmulator.showMessage(
+                tr("Can't select the machine: %1").arg(QString::fromUtf8(e.what())),
+                ZxEmulator::Error);
     }
     m_zxEmulator.engine().refreshFrame();
     emit currentMachineChanged();
@@ -400,7 +419,8 @@ void ZxSettings::setAYStereoSeparation(const QString &AYStereoSeparation)
     s.beginGroup(u"Sound"_s);
     s.setValue("ayStereo", AYStereoSeparation);
 
-    m_zxEmulator.emulator().writeLock()->audioMixer().setStereoMode(ayStereoMode(AYStereoSeparation));
+    m_zxEmulator.emulator().writeLock()->audioMixer().setStereoMode(
+            ayStereoMode(AYStereoSeparation));
     emit settingsCurrentChanged();
 }
 
@@ -418,7 +438,7 @@ void ZxSettings::setAyModel(const QString &model)
     s.beginGroup(u"Sound"_s);
     s.setValue(u"ayModel"_s, model);
     m_zxEmulator.emulator().writeLock()->audioMixer().setAyModel(
-        model == u"YM2149"_s ? zxkit::AyModel::YM2149 : zxkit::AyModel::AY8912);
+            model == u"YM2149"_s ? zxkit::AyModel::YM2149 : zxkit::AyModel::AY8912);
     emit settingsCurrentChanged();
 }
 
@@ -578,16 +598,15 @@ bool ZxSettings::showOrientationChooser() const
 #ifndef Q_OS_ANDROID
     return false;
 #else
-    static const auto uiMode = QJniObject::getStaticObjectField("android/content/Context", "UI_MODE_SERVICE", "Ljava/lang/String;");
-    auto service = QJniObject{QNativeInterface::QAndroidApplication::context()}
-                       .callObjectMethod("getSystemService",
-                                         "(Ljava/lang/String;)Ljava/lang/Object;",
-                                         uiMode.object());
-    static const auto typeTv = QJniObject::getStaticField<jint>("android.content.res.Configuration", "UI_MODE_TYPE_TELEVISION");
+    static const auto uiMode = QJniObject::getStaticObjectField(
+            "android/content/Context", "UI_MODE_SERVICE", "Ljava/lang/String;");
+    auto service = QJniObject{ QNativeInterface::QAndroidApplication::context() }.callObjectMethod(
+            "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;", uiMode.object());
+    static const auto typeTv = QJniObject::getStaticField<jint>("android.content.res.Configuration",
+                                                                "UI_MODE_TYPE_TELEVISION");
     return service.callMethod<jint>("getCurrentModeType") != typeTv;
 #endif
 }
-
 
 int ZxSettings::screenOrientation() const
 {
@@ -606,9 +625,12 @@ void ZxSettings::setScreenOrientation(int orientation)
     Q_UNUSED(orientation);
     return;
 #else
-    static const int fullSensor = QJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_FULL_SENSOR");
-    static const int sensorLandscape = QJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_SENSOR_LANDSCAPE");
-    static const int sensorPortrait = QJniObject::getStaticField<jint>("android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_SENSOR_PORTRAIT");
+    static const int fullSensor = QJniObject::getStaticField<jint>(
+            "android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_FULL_SENSOR");
+    static const int sensorLandscape = QJniObject::getStaticField<jint>(
+            "android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_SENSOR_LANDSCAPE");
+    static const int sensorPortrait = QJniObject::getStaticField<jint>(
+            "android/content/pm/ActivityInfo", "SCREEN_ORIENTATION_SENSOR_PORTRAIT");
     int request;
     switch (orientation) {
     case Sensors:
@@ -623,8 +645,9 @@ void ZxSettings::setScreenOrientation(int orientation)
     default:
         return;
     }
-    QNativeInterface::QAndroidApplication::runOnAndroidMainThread([request]{
-        QJniObject{QNativeInterface::QAndroidApplication::context()}.callMethod<void>("setRequestedOrientation", "(I)V", request);
+    QNativeInterface::QAndroidApplication::runOnAndroidMainThread([request] {
+        QJniObject{ QNativeInterface::QAndroidApplication::context() }.callMethod<void>(
+                "setRequestedOrientation", "(I)V", request);
     });
     QSettings s;
     s.beginGroup(u"Screen"_s);
@@ -637,7 +660,7 @@ ZxSettings::FillMode ZxSettings::fillMode() const
 {
     QSettings s;
     s.beginGroup(u"Screen"_s);
-    return (FillMode) s.value("fillMode", PreserveAspectFit).toInt();
+    return (FillMode)s.value("fillMode", PreserveAspectFit).toInt();
 }
 
 void ZxSettings::setFillMode(ZxSettings::FillMode fill)
@@ -717,7 +740,8 @@ void ZxSettings::setReduceMotion(bool reduce)
 
 ZxSettings::UiMode ZxSettings::uiMode() const
 {
-    return UiMode(std::clamp(QSettings{}.value(u"Ui/mode"_s, int(AutoUi)).toInt(), int(AutoUi), int(DesktopUi)));
+    return UiMode(std::clamp(QSettings{}.value(u"Ui/mode"_s, int(AutoUi)).toInt(), int(AutoUi),
+                             int(DesktopUi)));
 }
 
 void ZxSettings::setUiMode(UiMode mode)
@@ -798,13 +822,18 @@ void ZxSettings::setLoaderAcceleration(int acceleration)
     emit settingsCurrentChanged();
 }
 
-qreal ZxSettings::deadZone() const { return m_deadZone; }
+qreal ZxSettings::deadZone() const
+{
+    return m_deadZone;
+}
 
 void ZxSettings::setDeadZone(qreal value)
 {
-    if (!std::isfinite(value)) return;
+    if (!std::isfinite(value))
+        return;
     value = std::clamp(value, 0.0, 0.95);
-    if (m_deadZone == value) return;
+    if (m_deadZone == value)
+        return;
     m_deadZone = value;
     persistControllerMapping();
     emit deadZoneChanged(value);
@@ -878,12 +907,22 @@ QStringList ZxSettings::directionKeyNames() const
     QStringList result;
     for (const int key : m_directionKeys) {
         switch (key) {
-        case Qt::Key_Shift: result.append(tr("Caps Shift")); break;
-        case Qt::Key_Control: result.append(tr("Symbol Shift")); break;
+        case Qt::Key_Shift:
+            result.append(tr("Caps Shift"));
+            break;
+        case Qt::Key_Control:
+            result.append(tr("Symbol Shift"));
+            break;
         case Qt::Key_Enter:
-        case Qt::Key_Return: result.append(tr("Enter")); break;
-        case Qt::Key_Space: result.append(tr("Space")); break;
-        default: result.append(QString(QChar(key))); break;
+        case Qt::Key_Return:
+            result.append(tr("Enter"));
+            break;
+        case Qt::Key_Space:
+            result.append(tr("Space"));
+            break;
+        default:
+            result.append(QString(QChar(key)));
+            break;
         }
     }
     return result;
@@ -891,8 +930,8 @@ QStringList ZxSettings::directionKeyNames() const
 
 void ZxSettings::setDirectionKey(int index, int key)
 {
-    if (index < 0 || index >= ControllerInput::DirectionCount || !ControllerInput::isSpectrumKey(key)
-        || m_directionKeys[index] == key)
+    if (index < 0 || index >= ControllerInput::DirectionCount
+        || !ControllerInput::isSpectrumKey(key) || m_directionKeys[index] == key)
         return;
     m_directionKeys[index] = key;
     persistControllerMapping();
@@ -902,17 +941,23 @@ void ZxSettings::setDirectionKey(int index, int key)
 QVariantMap ZxSettings::controllerMapping()
 {
     QVariantList keys;
-    for (const int key : m_directionKeys) keys.append(key);
+    for (const int key : m_directionKeys)
+        keys.append(key);
     QVariantMap actions;
     std::unique_lock lock(m_gamepadActionsMutex);
-    for (const auto &[button, action] : m_gamepadActions) actions.insert(QString::number(button), action);
-    return {{u"directionMode"_s, m_directionMapping}, {u"directionKeys"_s, keys},
-            {u"deadZone"_s, m_deadZone}, {u"actions"_s, actions}, {u"fastForwardToggle"_s, m_fastForwardToggle}};
+    for (const auto &[button, action] : m_gamepadActions)
+        actions.insert(QString::number(button), action);
+    return { { u"directionMode"_s, m_directionMapping },
+             { u"directionKeys"_s, keys },
+             { u"deadZone"_s, m_deadZone },
+             { u"actions"_s, actions },
+             { u"fastForwardToggle"_s, m_fastForwardToggle } };
 }
 
 void ZxSettings::persistControllerMapping()
 {
-    if (m_controllerOverride) return;
+    if (m_controllerOverride)
+        return;
     const auto mapping = controllerMapping();
     QSettings settings;
     settings.setValue(u"Gamepad/directionMapping"_s, m_directionMapping);
@@ -928,7 +973,8 @@ void ZxSettings::applyControllerMapping(const QVariantMap &mapping, bool tempora
     m_controllerOverride = temporary;
     m_directionMapping = mapping.value(u"directionMode"_s).toInt();
     const auto keys = mapping.value(u"directionKeys"_s).toList();
-    for (int i = 0; i < ControllerInput::DirectionCount; ++i) m_directionKeys[i] = keys[i].toInt();
+    for (int i = 0; i < ControllerInput::DirectionCount; ++i)
+        m_directionKeys[i] = keys[i].toInt();
     m_deadZone = mapping.value(u"deadZone"_s).toDouble();
     m_fastForwardToggle = mapping.value(u"fastForwardToggle"_s).toBool();
     {
@@ -945,7 +991,8 @@ void ZxSettings::applyControllerMapping(const QVariantMap &mapping, bool tempora
 
 void ZxSettings::setFastForwardToggle(bool toggle)
 {
-    if (m_fastForwardToggle == toggle) return;
+    if (m_fastForwardToggle == toggle)
+        return;
     m_fastForwardToggle = toggle;
     persistControllerMapping();
     emit controllerMappingChanged();
@@ -953,13 +1000,24 @@ void ZxSettings::setFastForwardToggle(bool toggle)
 
 void ZxSettings::setControlOpacity(qreal &member, qreal value, const QString &key)
 {
-    if (!std::isfinite(value)) return;
+    if (!std::isfinite(value))
+        return;
     value = std::clamp(value, 0.1, 1.0);
-    if (member == value) return;
+    if (member == value)
+        return;
     member = value;
     QSettings().setValue(u"Controls/"_s + key, value);
     emit controlsAppearanceChanged();
 }
-void ZxSettings::setKeyboardOpacity(qreal value) { setControlOpacity(m_keyboardOpacity, value, u"keyboardOpacity"_s); }
-void ZxSettings::setJoystickOpacity(qreal value) { setControlOpacity(m_joystickOpacity, value, u"joystickOpacity"_s); }
-void ZxSettings::setButtonsOpacity(qreal value) { setControlOpacity(m_buttonsOpacity, value, u"buttonsOpacity"_s); }
+void ZxSettings::setKeyboardOpacity(qreal value)
+{
+    setControlOpacity(m_keyboardOpacity, value, u"keyboardOpacity"_s);
+}
+void ZxSettings::setJoystickOpacity(qreal value)
+{
+    setControlOpacity(m_joystickOpacity, value, u"joystickOpacity"_s);
+}
+void ZxSettings::setButtonsOpacity(qreal value)
+{
+    setControlOpacity(m_buttonsOpacity, value, u"buttonsOpacity"_s);
+}

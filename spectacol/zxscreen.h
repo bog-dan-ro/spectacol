@@ -33,7 +33,8 @@ class ZxScreen : public QQuickItem
     QML_ELEMENT
     Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY fullScreenChanged)
     // Releases the Kempston mouse while something covers the screen (pages, menus)
-    Q_PROPERTY(bool mouseGrabSuspended READ mouseGrabSuspended WRITE setMouseGrabSuspended NOTIFY mouseGrabSuspendedChanged)
+    Q_PROPERTY(bool mouseGrabSuspended READ mouseGrabSuspended WRITE setMouseGrabSuspended NOTIFY
+                       mouseGrabSuspendedChanged)
 
 public:
     explicit ZxScreen(QQuickItem *parent = nullptr);
@@ -64,7 +65,7 @@ private:
     void updateImplicitSize();
     void updateMouseGrab(bool grabbed);
     void sendMouseMotion(QPointF position);
-    void applySoftwareFilter(QImage& image, QRect& dirty);
+    void applySoftwareFilter(QImage &image, QRect &dirty);
 
 private:
     QSize m_imageSize;
@@ -79,6 +80,6 @@ private:
     // Used only during rendering, with the GUI thread blocked. ZxImage keeps
     // native frames; the emulation callback never runs software filters.
     zxkit::VideoFilterPipeline m_filterPipeline;
-    zxkit::VideoFrame m_filterSource{0, 0};
+    zxkit::VideoFrame m_filterSource{ 0, 0 };
     QImage m_filteredImage;
 };

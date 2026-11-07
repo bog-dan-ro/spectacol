@@ -39,28 +39,36 @@ class ZxSettings : public QObject
 
     Q_PROPERTY(QStringList machinesModel READ machinesModel CONSTANT)
     Q_PROPERTY(QString currentMachine READ currentMachine NOTIFY currentMachineChanged)
-    Q_PROPERTY(int currentMachineIndex READ currentMachineIndex WRITE setCurrentMachineIndex NOTIFY currentMachineChanged)
+    Q_PROPERTY(int currentMachineIndex READ currentMachineIndex WRITE setCurrentMachineIndex NOTIFY
+                       currentMachineChanged)
     Q_PROPERTY(bool hasStartButton READ hasStartButton NOTIFY hasStartButtonChanged)
 
     // General Options
-    Q_PROPERTY(int emulationSpeed READ emulationSpeed WRITE setEmulationSpeed NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(int emulationSpeed READ emulationSpeed WRITE setEmulationSpeed NOTIFY
+                       settingsCurrentChanged)
     Q_PROPERTY(bool autoLoad READ autoLoad WRITE setAutoLoad NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool detectLoaders READ detectLoaders WRITE setDetectLoaders NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool restrictToSpectacol READ restrictToSpectacol WRITE setRestrictToSpectacol NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool detectLoaders READ detectLoaders WRITE setDetectLoaders NOTIFY
+                       settingsCurrentChanged)
+    Q_PROPERTY(bool restrictToSpectacol READ restrictToSpectacol WRITE setRestrictToSpectacol NOTIFY
+                       settingsCurrentChanged)
     Q_PROPERTY(bool swipe4menu READ swipe4menu WRITE setSwipe4menu NOTIFY swipe4menuChanged)
     // The UI: larger for a TV, without animations, and the overlay (gamepad, touch) or desktop layout
     Q_PROPERTY(bool largeUi READ largeUi WRITE setLargeUi NOTIFY uiChanged)
     Q_PROPERTY(bool reduceMotion READ reduceMotion WRITE setReduceMotion NOTIFY uiChanged)
     Q_PROPERTY(UiMode uiMode READ uiMode WRITE setUiMode NOTIFY uiChanged)
-    Q_PROPERTY(bool autoSaveOnExit READ autoSaveOnExit WRITE setAutoSaveOnExit NOTIFY autoSaveOnExitChanged)
-    Q_PROPERTY(int loaderAcceleration READ loaderAcceleration WRITE setLoaderAcceleration NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool autoSaveOnExit READ autoSaveOnExit WRITE setAutoSaveOnExit NOTIFY
+                       autoSaveOnExitChanged)
+    Q_PROPERTY(int loaderAcceleration READ loaderAcceleration WRITE setLoaderAcceleration NOTIFY
+                       settingsCurrentChanged)
     Q_PROPERTY(int messageLevel READ messageLevel WRITE setMessageLevel NOTIFY messageLevelChanged)
 
     // Screen Options
     Q_PROPERTY(bool showOrientationChooser READ showOrientationChooser CONSTANT)
-    Q_PROPERTY(int screenOrientation READ screenOrientation WRITE setScreenOrientation NOTIFY screenOrientationChanged)
+    Q_PROPERTY(int screenOrientation READ screenOrientation WRITE setScreenOrientation NOTIFY
+                       screenOrientationChanged)
     Q_PROPERTY(FillMode fillMode READ fillMode WRITE setFillMode NOTIFY fillModeChanged)
-    Q_PROPERTY(bool smoothScaling READ smoothScaling WRITE setSmoothScaling NOTIFY smoothScalingChanged)
+    Q_PROPERTY(bool smoothScaling READ smoothScaling WRITE setSmoothScaling NOTIFY
+                       smoothScalingChanged)
     Q_PROPERTY(bool leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
     Q_PROPERTY(int borderLeft READ borderLeft NOTIFY borderMarginsChanged)
     Q_PROPERTY(int borderTop READ borderTop NOTIFY borderMarginsChanged)
@@ -69,69 +77,113 @@ class ZxSettings : public QObject
     Q_PROPERTY(QVariantMap borderLimits READ borderLimits NOTIFY borderLimitsChanged)
 
     // Sound Options
-    Q_PROPERTY(bool soundEnabled READ soundEnabled WRITE setSoundEnabled NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool loadingSound READ loadingSound WRITE setLoadingSound NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(QString AYStereoSeparation READ AYStereoSeparation WRITE setAYStereoSeparation NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(
+            bool soundEnabled READ soundEnabled WRITE setSoundEnabled NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(
+            bool loadingSound READ loadingSound WRITE setLoadingSound NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(QString AYStereoSeparation READ AYStereoSeparation WRITE setAYStereoSeparation NOTIFY
+                       settingsCurrentChanged)
     Q_PROPERTY(QString ayModel READ ayModel WRITE setAyModel NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(QString speakerType READ speakerType WRITE setSpeakerType NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(
+            QString speakerType READ speakerType WRITE setSpeakerType NOTIFY settingsCurrentChanged)
 
-
-    Q_PROPERTY(bool fastForwardToggle READ fastForwardToggle WRITE setFastForwardToggle NOTIFY controllerMappingChanged FINAL)
-    Q_PROPERTY(qreal keyboardOpacity READ keyboardOpacity WRITE setKeyboardOpacity NOTIFY controlsAppearanceChanged FINAL)
-    Q_PROPERTY(qreal joystickOpacity READ joystickOpacity WRITE setJoystickOpacity NOTIFY controlsAppearanceChanged FINAL)
-    Q_PROPERTY(qreal buttonsOpacity READ buttonsOpacity WRITE setButtonsOpacity NOTIFY controlsAppearanceChanged FINAL)
+    Q_PROPERTY(bool fastForwardToggle READ fastForwardToggle WRITE setFastForwardToggle NOTIFY
+                       controllerMappingChanged FINAL)
+    Q_PROPERTY(qreal keyboardOpacity READ keyboardOpacity WRITE setKeyboardOpacity NOTIFY
+                       controlsAppearanceChanged FINAL)
+    Q_PROPERTY(qreal joystickOpacity READ joystickOpacity WRITE setJoystickOpacity NOTIFY
+                       controlsAppearanceChanged FINAL)
+    Q_PROPERTY(qreal buttonsOpacity READ buttonsOpacity WRITE setButtonsOpacity NOTIFY
+                       controlsAppearanceChanged FINAL)
 
     // Peripherals Options
-    Q_PROPERTY(bool kempstonJoystick READ kempstonJoystick WRITE setKempstonJoystick NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool kempstonMouse READ kempstonMouse WRITE setKempstonMouse NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool kempstonJoystick READ kempstonJoystick WRITE setKempstonJoystick NOTIFY
+                       settingsCurrentChanged)
+    Q_PROPERTY(bool kempstonMouse READ kempstonMouse WRITE setKempstonMouse NOTIFY
+                       settingsCurrentChanged)
     Q_PROPERTY(bool interface1 READ interface1 WRITE setInterface1 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool interface2 READ interface2 WRITE setInterface2 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool full48kOSK READ full48kOSK WRITE setFull48kOSK NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool joystickPrompt READ joystickPrompt WRITE setJoystickPrompt NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool recreatedSpectrum READ recreatedSpectrum WRITE setRecreatedSpectrum NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(bool joystickPrompt READ joystickPrompt WRITE setJoystickPrompt NOTIFY
+                       settingsCurrentChanged)
+    Q_PROPERTY(bool recreatedSpectrum READ recreatedSpectrum WRITE setRecreatedSpectrum NOTIFY
+                       settingsCurrentChanged)
     Q_PROPERTY(qreal deadZone READ deadZone WRITE setDeadZone NOTIFY deadZoneChanged)
-    Q_PROPERTY(int directionMapping READ directionMapping WRITE setDirectionMapping NOTIFY controllerMappingChanged)
+    Q_PROPERTY(int directionMapping READ directionMapping WRITE setDirectionMapping NOTIFY
+                       controllerMappingChanged)
     Q_PROPERTY(QStringList directionKeyNames READ directionKeyNames NOTIFY controllerMappingChanged)
 
 public:
-    enum DirectionMapping { JoystickDirections = ControllerInput::Joystick, QaopDirections = ControllerInput::Qaop,
-                            CustomDirections = ControllerInput::Custom };
+    enum DirectionMapping {
+        JoystickDirections = ControllerInput::Joystick,
+        QaopDirections = ControllerInput::Qaop,
+        CustomDirections = ControllerInput::Custom
+    };
     Q_ENUM(DirectionMapping)
-    bool fastForwardToggle() const { return m_fastForwardToggle; }
+    bool fastForwardToggle() const
+    {
+        return m_fastForwardToggle;
+    }
     void setFastForwardToggle(bool toggle);
-    qreal keyboardOpacity() const { return m_keyboardOpacity; }
-    qreal joystickOpacity() const { return m_joystickOpacity; }
-    qreal buttonsOpacity() const { return m_buttonsOpacity; }
+    qreal keyboardOpacity() const
+    {
+        return m_keyboardOpacity;
+    }
+    qreal joystickOpacity() const
+    {
+        return m_joystickOpacity;
+    }
+    qreal buttonsOpacity() const
+    {
+        return m_buttonsOpacity;
+    }
     void setKeyboardOpacity(qreal value);
     void setJoystickOpacity(qreal value);
     void setButtonsOpacity(qreal value);
     QVariantMap controllerMapping();
     void applyControllerMapping(const QVariantMap &mapping, bool temporary);
-    bool controllerOverride() const { return m_controllerOverride; }
-    int directionMapping() const { return m_directionMapping; }
+    bool controllerOverride() const
+    {
+        return m_controllerOverride;
+    }
+    int directionMapping() const
+    {
+        return m_directionMapping;
+    }
     void setDirectionMapping(int mode);
     QStringList directionKeyNames() const;
-    const std::array<int, ControllerInput::DirectionCount> &directionKeys() const { return m_directionKeys; }
+    const std::array<int, ControllerInput::DirectionCount> &directionKeys() const
+    {
+        return m_directionKeys;
+    }
     Q_INVOKABLE int directionKey(int index) const;
     Q_INVOKABLE void setDirectionKey(int index, int key);
-    int borderLeft() const { return m_borderMargins.left; }
-    int borderTop() const { return m_borderMargins.top; }
-    int borderRight() const { return m_borderMargins.right; }
-    int borderBottom() const { return m_borderMargins.bottom; }
+    int borderLeft() const
+    {
+        return m_borderMargins.left;
+    }
+    int borderTop() const
+    {
+        return m_borderMargins.top;
+    }
+    int borderRight() const
+    {
+        return m_borderMargins.right;
+    }
+    int borderBottom() const
+    {
+        return m_borderMargins.bottom;
+    }
     QVariantMap borderLimits() const;
     Q_INVOKABLE void setBorderMargins(int left, int top, int right, int bottom);
     enum UiMode {
-        AutoUi,    // the desktop layout without a gamepad or a touch screen, else the overlay
+        AutoUi, // the desktop layout without a gamepad or a touch screen, else the overlay
         OverlayUi,
         DesktopUi
     };
     Q_ENUM(UiMode)
 
-    enum FillMode {
-        PreserveAspectFit = 0,
-        PreserveAspect,
-        Stretch
-    };
+    enum FillMode { PreserveAspectFit = 0, PreserveAspect, Stretch };
     Q_ENUM(FillMode)
 
     enum Actions {
@@ -178,7 +230,10 @@ public:
     QString AYStereoSeparation() const;
     void setAYStereoSeparation(const QString &AYStereoSeparation);
 
-    QString ayModel() const { return m_ayModel; }
+    QString ayModel() const
+    {
+        return m_ayModel;
+    }
     void setAyModel(const QString &model);
 
     QString speakerType() const;
@@ -248,7 +303,8 @@ public:
     void setRecreatedSpectrum(bool recreatedSpectrum);
 
 public slots:
-    inline int gamepadAction(int gamepadButton) {
+    inline int gamepadAction(int gamepadButton)
+    {
         std::unique_lock<std::mutex> lock(m_gamepadActionsMutex);
         auto it = m_gamepadActions.find(gamepadButton);
         if (it != m_gamepadActions.end())
@@ -273,11 +329,7 @@ private:
     void applyMachine(int idx, bool persist);
     void applyTapeOptions();
 
-    enum ScreenOrientation {
-        Sensors = 0,
-        Landscape,
-        Portrait
-    };
+    enum ScreenOrientation { Sensors = 0, Landscape, Portrait };
 
 signals:
     void borderLimitsChanged();
@@ -327,9 +379,9 @@ private:
 
     // Default button actions map
     std::unordered_map<int, int> m_gamepadActions = {
-        {QGamepadManager::ButtonX, ToggleKeyboard},
-        {QGamepadManager::ButtonY, ToggleCursorJoystick},
-        {QGamepadManager::ButtonL2, QuickSaveSnapshot},
-        {QGamepadManager::ButtonR2, QuickLoadSnapshot}
+        { QGamepadManager::ButtonX, ToggleKeyboard },
+        { QGamepadManager::ButtonY, ToggleCursorJoystick },
+        { QGamepadManager::ButtonL2, QuickSaveSnapshot },
+        { QGamepadManager::ButtonR2, QuickLoadSnapshot }
     };
 };

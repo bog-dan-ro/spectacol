@@ -42,15 +42,11 @@ class DisassambleModel : public QAbstractListModel
         Annotation
     };
 
-    enum ColorType {
-        Paper,
-        Ink
-    };
+    enum ColorType { Paper, Ink };
 
-    struct DisassambleData {
-        DisassambleData(uint16_t address,
-                        uint16_t currentPc,
-                        const QByteArray &bytes,
+    struct DisassambleData
+    {
+        DisassambleData(uint16_t address, uint16_t currentPc, const QByteArray &bytes,
                         const QString &disassamble,
                         const std::unordered_set<int> &types = std::unordered_set<int>());
         QColor background, foreground;
@@ -61,10 +57,7 @@ class DisassambleModel : public QAbstractListModel
     };
 
 public:
-    enum Origin {
-        Start,
-        End
-    };
+    enum Origin { Start, End };
     Q_ENUM(Origin)
 
 public:
@@ -81,7 +74,10 @@ public:
     bool canFetchMore(const QModelIndex &parent) const;
     void fetchMore(const QModelIndex &parent);
 
-    int delta() const { return -m_delta; }
+    int delta() const
+    {
+        return -m_delta;
+    }
 
 signals:
     void deltaChanged();
@@ -90,7 +86,8 @@ protected:
     QHash<int, QByteArray> roleNames() const;
 
 private:
-    static QColor color(ColorType colorType, const std::unordered_set<int> &types, uint16_t address, uint16_t currentPc);
+    static QColor color(ColorType colorType, const std::unordered_set<int> &types, uint16_t address,
+                        uint16_t currentPc);
     using DisassambleDataVector = std::vector<DisassambleData>;
     DisassambleDataVector disassambleTemp(uint16_t address, int delta, uint16_t instructions);
 

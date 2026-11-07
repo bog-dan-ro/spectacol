@@ -1,0 +1,39 @@
+# Copyright (c) 2026, BogDan Vatra. SPDX-License-Identifier: GPL-3.0-or-later
+# Qt-style C++ formatting: https://wiki.qt.io/Qt_Coding_Style
+BasedOnStyle: WebKit
+Standard: Latest
+UseTab: Never
+IndentWidth: 4
+ContinuationIndentWidth: 8
+ColumnLimit: 100
+AccessModifierOffset: -4
+NamespaceIndentation: None
+PointerAlignment: Right
+ReferenceAlignment: Pointer
+SpaceAfterTemplateKeyword: true
+SpaceBeforeCpp11BracedList: false
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterStruct: true
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: false
+  AfterControlStatement: Never
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+BreakConstructorInitializers: BeforeColon
+PackConstructorInitializers: NextLine
+ConstructorInitializerIndentWidth: 4
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Empty
+IndentCaseLabels: false
+AlignAfterOpenBracket: Align
+AlignEscapedNewlines: Left
+FixNamespaceComments: true
+SortIncludes: Never
+ReflowComments: false

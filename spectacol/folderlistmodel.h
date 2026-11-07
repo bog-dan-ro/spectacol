@@ -31,17 +31,16 @@ class FolderListModel : public QAbstractListModel
     Q_PROPERTY(QString search READ search WRITE setSearch NOTIFY searchChanged FINAL)
     Q_PROPERTY(QString folder READ folder WRITE setFolder NOTIFY folderChanged)
     Q_PROPERTY(QString rootFolder READ rootFolder WRITE setRootFolder NOTIFY rootFolderChanged)
-    Q_PROPERTY(FileSortCriteria sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged)
-    Q_PROPERTY(bool showDirsFirst READ showDirsFirst WRITE setShowDirsFirst NOTIFY showDirsFirstChanged)
+    Q_PROPERTY(FileSortCriteria sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY
+                       sortCriteriaChanged)
+    Q_PROPERTY(bool showDirsFirst READ showDirsFirst WRITE setShowDirsFirst NOTIFY
+                       showDirsFirstChanged)
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
-    Q_PROPERTY(FilterType filterClass READ filterClass WRITE setFilterClass NOTIFY filterClassChanged)
+    Q_PROPERTY(
+            FilterType filterClass READ filterClass WRITE setFilterClass NOTIFY filterClassChanged)
 
 public:
-    enum FileFields {
-        Name = Qt::DisplayRole,
-        Path = Qt::UserRole,
-        IsDir
-    };
+    enum FileFields { Name = Qt::DisplayRole, Path = Qt::UserRole, IsDir };
     Q_ENUM(FileFields)
 
     enum FileSortCriteria {
@@ -57,12 +56,21 @@ public:
     FolderListModel(QObject *parent = nullptr);
     ~FolderListModel();
 
-    QString search() const { return m_search; }
+    QString search() const
+    {
+        return m_search;
+    }
     void setSearch(const QString &search);
-    QString folder() const { return m_folder; }
+    QString folder() const
+    {
+        return m_folder;
+    }
     void setFolder(QString folder);
 
-    QString rootFolder() const { return m_rootFolder; }
+    QString rootFolder() const
+    {
+        return m_rootFolder;
+    }
     void setRootFolder(QString rootFolder);
 
     FileSortCriteria sortCriteria() const;
@@ -98,6 +106,7 @@ public:
     int rowCount(const QModelIndex &parent) const override;
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
+
 private:
     bool canOpen(const QString &path);
 

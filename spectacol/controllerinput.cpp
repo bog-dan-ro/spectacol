@@ -23,11 +23,12 @@
 bool ControllerInput::isSpectrumKey(int key)
 {
     return (key >= Qt::Key_A && key <= Qt::Key_Z) || (key >= Qt::Key_0 && key <= Qt::Key_9)
-        || key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Space
-        || key == Qt::Key_Return || key == Qt::Key_Enter;
+            || key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Space
+            || key == Qt::Key_Return || key == Qt::Key_Enter;
 }
 
-void ControllerInput::configure(int mode, const std::array<int, DirectionCount> &keys, double deadZone)
+void ControllerInput::configure(int mode, const std::array<int, DirectionCount> &keys,
+                                double deadZone)
 {
     clear();
     m_mode = std::clamp(mode, int(Joystick), int(Custom));
@@ -47,7 +48,7 @@ void ControllerInput::axis(Axis axis, double value)
 void ControllerInput::press(int id, int action, quint8 direction)
 {
     if (!m_buttons.contains(id))
-        m_buttons.insert(id, {action, direction});
+        m_buttons.insert(id, { action, direction });
 }
 
 std::optional<int> ControllerInput::release(int id)
@@ -101,7 +102,8 @@ ControllerInput::State ControllerInput::state() const
     if (m_mode == Joystick) {
         state.joystick = buttons;
     } else {
-        constexpr std::array<quint8, DirectionCount> bits{UpBit, DownBit, LeftBit, RightBit, FireBit};
+        constexpr std::array<quint8, DirectionCount> bits{ UpBit, DownBit, LeftBit, RightBit,
+                                                           FireBit };
         const auto &keys = m_mode == Qaop ? qaopKeys : m_keys;
         for (int i = 0; i < DirectionCount; ++i)
             if (buttons & bits[i])
@@ -132,9 +134,9 @@ HeldKeyState::Changes HeldKeyState::update()
         keys.unite(source);
     Changes changes;
     for (const int key : m_keys - keys)
-        changes.append({key, false});
+        changes.append({ key, false });
     for (const int key : keys - m_keys)
-        changes.append({key, true});
+        changes.append({ key, true });
     m_keys = std::move(keys);
     return changes;
 }

@@ -21,11 +21,7 @@
 
 using namespace Qt::StringLiterals;
 
-ZxTape::ZxTape(ZxEmulator *emulator)
-    : QObject(emulator)
-    , m_zxEmulator(emulator)
-{
-}
+ZxTape::ZxTape(ZxEmulator *emulator) : QObject(emulator), m_zxEmulator(emulator) { }
 
 QString ZxTape::suggestedFileName() const
 {
@@ -79,7 +75,9 @@ void ZxTape::refreshData()
         const auto &blocks = emulator->tapeDeck().blocks();
         for (const auto &blk : blocks) {
             const QString desc = QString::fromStdString(blk.description);
-            const int prefix = desc.startsWith(u"Program: "_s) ? 9 : desc.startsWith(u"PZX Program: "_s) ? 13 : 0;
+            const int prefix = desc.startsWith(u"Program: "_s) ? 9
+                    : desc.startsWith(u"PZX Program: "_s)      ? 13
+                                                               : 0;
             if (prefix) {
                 progName = desc.mid(prefix).trimmed();
                 break;
@@ -107,16 +105,12 @@ void ZxTape::togglePlay()
 
 void ZxTape::rewind()
 {
-    m_zxEmulator->withEmulator([](zxkit::Emulator &emulator) {
-        emulator.tapeDeck().rewind();
-    });
+    m_zxEmulator->withEmulator([](zxkit::Emulator &emulator) { emulator.tapeDeck().rewind(); });
 }
 
 void ZxTape::clear()
 {
-    m_zxEmulator->withEmulator([](zxkit::Emulator &emulator) {
-        emulator.tapeDeck().clear();
-    });
+    m_zxEmulator->withEmulator([](zxkit::Emulator &emulator) { emulator.tapeDeck().clear(); });
     setHasTape(false);
     setProgramName({});
     setPlaying(false);
@@ -126,7 +120,8 @@ bool ZxTape::write(QString filePath)
 {
     refreshData();
     if (!m_hasTape) {
-        m_zxEmulator->showMessage(tr("The tape is empty. Enter SAVE in BASIC before exporting it."), ZxEmulator::Warning);
+        m_zxEmulator->showMessage(tr("The tape is empty. Enter SAVE in BASIC before exporting it."),
+                                  ZxEmulator::Warning);
         return false;
     }
     if (!m_zxEmulator->saveMediaFile(filePath))

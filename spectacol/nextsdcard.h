@@ -44,7 +44,7 @@ class NextSdCard : public QObject
     Q_PROPERTY(QString downloadUrl READ downloadUrl NOTIFY stateChanged)
     Q_PROPERTY(QString backupPath READ backupPath NOTIFY stateChanged)
 
-  public:
+public:
     enum State { Idle, Checking, Downloading, Extracting, Ready, Failed };
     Q_ENUM(State)
 
@@ -60,11 +60,23 @@ class NextSdCard : public QObject
     bool isCustomImage() const;
     bool available() const;
 
-    State state() const { return m_state; }
-    double progress() const { return m_progress; }
-    QString errorString() const { return m_errorString; }
+    State state() const
+    {
+        return m_state;
+    }
+    double progress() const
+    {
+        return m_progress;
+    }
+    QString errorString() const
+    {
+        return m_errorString;
+    }
     QString downloadUrl() const;
-    QString backupPath() const { return m_backupPath; }
+    QString backupPath() const
+    {
+        return m_backupPath;
+    }
 
     /// Asks the UI to offer the download (emits `downloadRequested`).
     void requestDownload();
@@ -96,9 +108,9 @@ private:
     qint64 m_expectedSize = -1; // the whole zip, as announced by the server
     bool m_forceDownload = false;
     QString m_backupPath;
-    bool m_freshZip = false;    // the zip was downloaded by this attempt
+    bool m_freshZip = false; // the zip was downloaded by this attempt
     std::jthread m_extractThread;
-    std::atomic<bool> m_cancel{false};
+    std::atomic<bool> m_cancel{ false };
     State m_state = Idle;
     double m_progress = 0;
     QString m_errorString;

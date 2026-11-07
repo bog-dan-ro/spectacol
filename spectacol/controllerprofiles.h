@@ -35,10 +35,19 @@ class ControllerProfiles : public QObject
 public:
     explicit ControllerProfiles(QObject *parent = nullptr);
     QStringList names() const;
-    QString gameName() const { return m_gameName; }
+    QString gameName() const
+    {
+        return m_gameName;
+    }
     QString gameProfile() const;
-    bool hasGame() const { return !m_gameKey.isEmpty(); }
-    QString lastError() const { return m_error; }
+    bool hasGame() const
+    {
+        return !m_gameKey.isEmpty();
+    }
+    QString lastError() const
+    {
+        return m_error;
+    }
     void setGame(const QString &title);
     bool rememberGame(const QString &title, const QString &profile);
     QVariantMap mapping(const QString &name) const;
@@ -54,6 +63,7 @@ signals:
     void errorChanged();
     void failed(const QString &message);
     void activationRequested(const QString &name);
+
 private:
     bool store(const QJsonObject &profiles, const QJsonObject &games);
     bool fail(const QString &message);

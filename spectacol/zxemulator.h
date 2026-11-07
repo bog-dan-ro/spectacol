@@ -69,15 +69,18 @@ class ZxEmulator : public QObject
     Q_PROPERTY(bool fastForward READ fastForward NOTIFY fastForwardChanged FINAL)
     Q_PROPERTY(bool touchscreen MEMBER m_touchscreen CONSTANT)
     Q_PROPERTY(bool paused READ paused WRITE setPaused NOTIFY pausedChanged)
-    Q_PROPERTY(bool processInputEvents READ processInputEvents WRITE setProcessInputEvents NOTIFY processInputEventsChanged)
+    Q_PROPERTY(bool processInputEvents READ processInputEvents WRITE setProcessInputEvents NOTIFY
+                       processInputEventsChanged)
     Q_PROPERTY(bool mouseGrabbed READ mouseGrabbed NOTIFY mouseGrabbedChanged)
     Q_PROPERTY(int gamepadId READ gamepadId WRITE setGamepadId NOTIFY gamepadIdChanged)
     Q_PROPERTY(QString dataPath READ dataPath WRITE setDataPath NOTIFY dataPathChanged)
     Q_PROPERTY(bool saveSnapshotEnabled READ saveSnapshotEnabled NOTIFY saveSnapshotEnabledChanged)
     Q_PROPERTY(QStringList filtersModel READ filtersModel CONSTANT)
-    Q_PROPERTY(int selectedFilterIndex READ selectedFilterIndex WRITE setSelectedFilterIndex NOTIFY selectedFilterIndexChanged)
+    Q_PROPERTY(int selectedFilterIndex READ selectedFilterIndex WRITE setSelectedFilterIndex NOTIFY
+                       selectedFilterIndexChanged)
     Q_PROPERTY(QStringList joysticksModel READ joysticksModel CONSTANT)
-    Q_PROPERTY(int selectedJoysticksIndex READ selectedJoysticksIndex WRITE setSelectedJoysticksIndex NOTIFY selectedJoysticksIndexChanged)
+    Q_PROPERTY(int selectedJoysticksIndex READ selectedJoysticksIndex WRITE
+                       setSelectedJoysticksIndex NOTIFY selectedJoysticksIndexChanged)
     Q_PROPERTY(int pokeFinderCount READ pokeFinderCount NOTIFY pokeFinderCountChanged)
     Q_PROPERTY(const ZxTape *tape MEMBER m_tape CONSTANT)
     Q_PROPERTY(Disks *disks MEMBER m_disks CONSTANT)
@@ -93,9 +96,9 @@ class ZxEmulator : public QObject
     Q_PROPERTY(bool debuggerReady READ debuggerReady NOTIFY pausedChanged FINAL)
     Q_PROPERTY(QString debuggerStatus READ debuggerStatus NOTIFY debuggerStatusChanged FINAL)
     Q_PROPERTY(const BreakpointsModel *breakpointsModel READ breakpointsModel CONSTANT)
-    Q_PROPERTY(const DisassambleModel* disassambleModel READ disassambleModel CONSTANT)
-    Q_PROPERTY(const PokeFinderModel* pokeFinderModel READ pokeFinderModel CONSTANT)
-    Q_PROPERTY(ZXGamesModel* onlineGamesModel READ onlineGamesModel CONSTANT)
+    Q_PROPERTY(const DisassambleModel *disassambleModel READ disassambleModel CONSTANT)
+    Q_PROPERTY(const PokeFinderModel *pokeFinderModel READ pokeFinderModel CONSTANT)
+    Q_PROPERTY(ZXGamesModel *onlineGamesModel READ onlineGamesModel CONSTANT)
 
     Q_PROPERTY(bool showControlsIcons MEMBER m_showControlsIcons NOTIFY showControlsIconsChanged)
 
@@ -121,17 +124,10 @@ class ZxEmulator : public QObject
     Q_PROPERTY(QString HL_ READ HL_ WRITE setHL_ NOTIFY registersChanged)
 
 public:
-    enum ErrorLevel {
-        Info,
-        Warning,
-        Error
-    };
+    enum ErrorLevel { Info, Warning, Error };
     Q_ENUM(ErrorLevel)
 
-    enum ControlType {
-        CursorJoystick,
-        Keyboard48K
-    };
+    enum ControlType { CursorJoystick, Keyboard48K };
     Q_ENUM(ControlType)
 
     enum UiItemType {
@@ -155,18 +151,35 @@ public:
     static ZxEmulator &instance();
     ~ZxEmulator();
 
-    ControllerProfiles *controllerProfiles() const { return m_controllerProfiles.get(); }
-    bool fastForward() const { return m_fastForwardIndicator; }
-    NextUartHooks *uartHooks() const { return m_uartHooks.get(); }
-    zxkit::Engine &engine() { return *m_engine; }
-    const zxkit::Engine &engine() const { return *m_engine; }
+    ControllerProfiles *controllerProfiles() const
+    {
+        return m_controllerProfiles.get();
+    }
+    bool fastForward() const
+    {
+        return m_fastForwardIndicator;
+    }
+    NextUartHooks *uartHooks() const
+    {
+        return m_uartHooks.get();
+    }
+    zxkit::Engine &engine()
+    {
+        return *m_engine;
+    }
+    const zxkit::Engine &engine() const
+    {
+        return *m_engine;
+    }
     /// The emulated machine, shared with the Engine thread: lock it to use it.
     /// The Engine holds the lock for a scanline at a time, so a lock never waits long.
-    const zxkit::Shared<zxkit::Emulator> &emulator() const { return m_engine->emulator(); }
+    const zxkit::Shared<zxkit::Emulator> &emulator() const
+    {
+        return m_engine->emulator();
+    }
 
     /// Runs `fn(emulator)` with the emulator locked, shows the error if it throws.
-    template <typename F>
-    bool withEmulator(F &&fn)
+    template <typename F> bool withEmulator(F &&fn)
     {
         try {
             auto emulator = m_engine->emulator().writeLock();
@@ -192,8 +205,14 @@ public:
     zxkit::Z80Registers registers() const;
 
     bool paused() const;
-    bool emulationQuiescent() const { return m_engineQuiescent; }
-    bool canResumeRzxInput() const { return m_pauseCount == 1 && !m_paused && m_processInputEvents.load(); }
+    bool emulationQuiescent() const
+    {
+        return m_engineQuiescent;
+    }
+    bool canResumeRzxInput() const
+    {
+        return m_pauseCount == 1 && !m_paused && m_processInputEvents.load();
+    }
     void setPaused(bool paused);
 
     QString dataPath() const;
@@ -248,30 +267,50 @@ public:
     QString HL_() const;
     void setHL_(const QString &value);
 
-    BreakpointsModel *breakpointsModel() { return &m_breakpointsModel; }
+    BreakpointsModel *breakpointsModel()
+    {
+        return &m_breakpointsModel;
+    }
     void updateDebugger();
     DebuggerMemoryModel *debugMemory();
     DebuggerStateModel *debugNextRegisters();
     DebuggerStateModel *debugMmu();
-    bool debuggerReady() const { return paused() && m_engineQuiescent; }
+    bool debuggerReady() const
+    {
+        return paused() && m_engineQuiescent;
+    }
     QString debuggerStatus() const;
-    RomOverrides *roms() const { return m_roms.get(); }
-    PokeModel *pokes() const { return m_pokes.get(); }
-    DebugSymbols *symbols() { return &m_symbols; }
+    RomOverrides *roms() const
+    {
+        return m_roms.get();
+    }
+    PokeModel *pokes() const
+    {
+        return m_pokes.get();
+    }
+    DebugSymbols *symbols()
+    {
+        return &m_symbols;
+    }
     Q_INVOKABLE int resolveDebuggerAddress(const QString &text);
     Q_INVOKABLE int symbolAddress(int row);
 
-
     int pokeFinderCount() const;
 
-    bool processInputEvents() const { return m_processInputEvents.load(); }
+    bool processInputEvents() const
+    {
+        return m_processInputEvents.load();
+    }
     // Like paused, it nests: every false must be balanced by a true.
     void setProcessInputEvents(bool processEvents);
 
-    int gamepadId() const { return m_gamepadId; }
+    int gamepadId() const
+    {
+        return m_gamepadId;
+    }
     void setGamepadId(int gamepadId);
 
-    QString saveFilePath(const QString& fileName);
+    QString saveFilePath(const QString &fileName);
 
     void writeAudioSamples(std::span<const int16_t> samples, uint32_t sampleRate, uint8_t channels);
     /// Emulation speed, in percent of the machine's real speed.
@@ -281,7 +320,10 @@ public:
     void mouseButton(Qt::MouseButton button, bool pressed);
     void mouseMotion(int dx, int dy);
     void setMouseGrabSuspended(bool suspended);
-    bool mouseGrabbed() const { return m_mouseGrabbed; }
+    bool mouseGrabbed() const
+    {
+        return m_mouseGrabbed;
+    }
     void setMouseGrabbed(bool grabbed);
 
     ZxSettings *settings() const;
@@ -290,7 +332,7 @@ public:
     const DisassambleModel *disassambleModel() const;
 
     const PokeFinderModel *pokeFinderModel() const;
-    ZXGamesModel* onlineGamesModel();
+    ZXGamesModel *onlineGamesModel();
 
 public slots:
     void quit();
@@ -336,11 +378,9 @@ public slots:
     void watchMemory(int type);
     void enableBreakpoint(int id, bool enabled);
 
-
     void toggleBreakpoint(int address);
     void addBreakpointPage(int address, int page, int type = BreakpointsModel::BreakOnWrite);
     void debuggerCommand(const QString &command);
-
 
     void disassamble();
     void disassambleFetchUp(int lines);
@@ -360,15 +400,17 @@ public slots:
 
     void pokeMemory(int address, int page, int value);
 
-    void keyPress(int qtKey, int modifiers = 0, bool autoRepeat = false, bool virtualKeyboard = true);
-    void keyRelease(int qtKey, int modifiers = 0, bool autoRepeat = false, bool virtualKeyboard = true);
+    void keyPress(int qtKey, int modifiers = 0, bool autoRepeat = false,
+                  bool virtualKeyboard = true);
+    void keyRelease(int qtKey, int modifiers = 0, bool autoRepeat = false,
+                    bool virtualKeyboard = true);
     // The on-screen CoBra column, independent of the Spectrum modifier mapping.
     void setCobraKeyState(int qtKey, bool pressed);
     void gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value, bool touch = false);
     void gamepadButtonPressEvent(QGamepadManager::GamepadButton button, bool touch = false);
-    void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button, bool touch = false, bool cancelled = false);
+    void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button, bool touch = false,
+                                   bool cancelled = false);
     void releaseTouchJoystick();
-
 
     void showMessage(QString message, ZxEmulator::ErrorLevel level = Info);
 
@@ -427,7 +469,16 @@ private:
     QString m_loadedFileName;
     int m_selectedFilterIndex = 0;
     // The joysticks the gamepad can be: the order of joysticksModel()
-    enum JoystickKind : int { NoJoystick = 0, CursorKeys, KempstonJoystick, Sinclair1, Sinclair2, FullerJoystick, Timex1, Timex2 };
+    enum JoystickKind : int {
+        NoJoystick = 0,
+        CursorKeys,
+        KempstonJoystick,
+        Sinclair1,
+        Sinclair2,
+        FullerJoystick,
+        Timex1,
+        Timex2
+    };
     void setJoystickButtons(uint8_t buttons);
     void attachJoystick(int kind);
     int m_selectedJoystickIndex = CursorKeys;
@@ -461,9 +512,9 @@ private:
     std::unique_ptr<PokeModel> m_pokes;
     DebugSymbols m_symbols;
     std::unique_ptr<AudioOutput> m_audioOutput;
-    std::atomic_bool m_debuggerActivated{false};
+    std::atomic_bool m_debuggerActivated{ false };
     bool m_resetPokeFinder = true;
-    std::atomic_bool m_processInputEvents{true};
+    std::atomic_bool m_processInputEvents{ true };
     int m_inputEventsBlockers = 0;
     bool m_mouseGrabbed = false;
     int m_gamepadId = -1;
@@ -474,11 +525,11 @@ private:
     ZxTape *m_tape = nullptr;
     Disks *m_disks = nullptr;
     SdCardFiles *m_sdCard = nullptr;
-    ZxRecording* m_recording = nullptr;
+    ZxRecording *m_recording = nullptr;
     bool m_showControlsIcons = true;
     bool m_paused = false; // togglePaused()
     bool m_engineQuiescent = true;
     QSet<int> m_pressedRzxButtons;
     std::array<bool, ControllerInput::AxisCount> m_rzxAxisActive{};
-    int m_pauseCount = 0;  // setPaused() nests
+    int m_pauseCount = 0; // setPaused() nests
 };

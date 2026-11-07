@@ -39,15 +39,17 @@ RomOverrides::RomOverrides(QObject *parent) : QObject(parent)
         const auto qid = QString::fromStdString(id);
         m_ids.append(qid);
         m_names.append(QString::fromUtf8(machine->name()));
-        if (id == "48k"sv) m_index = int(m_ids.size() - 1);
+        if (id == "48k"sv)
+            m_index = int(m_ids.size() - 1);
         // Ask the core itself for names/sizes; never duplicate its ROM catalogue.
         zxkit::EmulatorConfig config;
         config.machineId = id;
         config.romResolver = [&](std::string_view name, std::size_t size) {
             const auto qname = QString::fromUtf8(name);
-            m_slots[qid].append({qname, qsizetype(size)});
+            m_slots[qid].append({ qname, qsizetype(size) });
             QFile bundled(u":/roms/"_s + qname);
-            if (bundled.open(QIODevice::ReadOnly)) m_bundled[qname] = bundled.readAll();
+            if (bundled.open(QIODevice::ReadOnly))
+                m_bundled[qname] = bundled.readAll();
             return std::vector<uint8_t>(size, 0);
         };
         zxkit::Emulator probe(std::move(config));
@@ -56,32 +58,41 @@ RomOverrides::RomOverrides(QObject *parent) : QObject(parent)
     const QDir resources(u":/roms"_s);
     for (const auto &name : resources.entryList(QDir::Files)) {
         QFile file(resources.filePath(name));
-        if (file.open(QIODevice::ReadOnly)) m_bundled[name] = file.readAll();
+        if (file.open(QIODevice::ReadOnly))
+            m_bundled[name] = file.readAll();
     }
     QSettings settings;
     for (auto it = m_slots.cbegin(); it != m_slots.cend(); ++it) {
         for (const auto &slot : it.value()) {
             const auto k = key(it.key(), slot.name);
             const auto label = settings.value(u"CustomROMs/"_s + k).toString();
-            if (label.isEmpty()) continue;
+            if (label.isEmpty())
+                continue;
             QFile file(storedPath(it.key(), slot.name));
             if (file.open(QIODevice::ReadOnly) && file.size() == slot.size) {
                 const auto bytes = file.readAll();
                 if (bytes.size() == slot.size && file.error() == QFileDevice::NoError)
-                    m_overrides.insert(k, {bytes, label});
-                else m_error = tr("Cannot read saved ROM %1; using the default").arg(slot.name);
-            } else m_error = tr("Missing or invalid saved ROM %1; using the default").arg(slot.name);
+                    m_overrides.insert(k, { bytes, label });
+                else
+                    m_error = tr("Cannot read saved ROM %1; using the default").arg(slot.name);
+            } else
+                m_error = tr("Missing or invalid saved ROM %1; using the default").arg(slot.name);
         }
     }
 }
-QString RomOverrides::key(const QString &machine, const QString &name) const { return machine + u'/' + name; }
+QString RomOverrides::key(const QString &machine, const QString &name) const
+{
+    return machine + u'/' + name;
+}
 QString RomOverrides::storedPath(const QString &machine, const QString &name) const
 {
-    return QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)).filePath(u"ROMs/"_s + key(machine, name));
+    return QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+            .filePath(u"ROMs/"_s + key(machine, name));
 }
 void RomOverrides::setMachineIndex(int index)
 {
-    if (index < 0 || index >= m_ids.size() || index == m_index) return;
+    if (index < 0 || index >= m_ids.size() || index == m_index)
+        return;
     m_index = index;
     m_error.clear();
     emit errorChanged();
@@ -94,34 +105,51 @@ QVariantList RomOverrides::romSlots() const
     const std::lock_guard guard(m_mutex);
     for (const auto &slot : m_slots[machine]) {
         const auto custom = m_overrides.constFind(key(machine, slot.name));
-        result.append(QVariantMap{{u"name"_s, slot.name}, {u"size"_s, slot.size},
-            {u"custom"_s, custom != m_overrides.cend()},
-            {u"source"_s, custom != m_overrides.cend() ? custom->label : tr("Default ROM")}});
+        result.append(QVariantMap{
+                { u"name"_s, slot.name },
+                { u"size"_s, slot.size },
+                { u"custom"_s, custom != m_overrides.cend() },
+                { u"source"_s,
+                  custom != m_overrides.cend() ? custom->label : tr("Default ROM") } });
     }
     return result;
 }
-bool RomOverrides::fail(const QString &message) { m_error = message; emit errorChanged(); return false; }
+bool RomOverrides::fail(const QString &message)
+{
+    m_error = message;
+    emit errorChanged();
+    return false;
+}
 bool RomOverrides::useFile(int index, const QString &path)
 {
     const auto machine = m_ids[m_index];
     const auto list = m_slots.value(machine);
-    if (index < 0 || index >= list.size()) return fail(tr("Choose a ROM slot"));
+    if (index < 0 || index >= list.size())
+        return fail(tr("Choose a ROM slot"));
     const auto &slot = list[index];
     const QUrl url(path);
     QFile file(url.isLocalFile() ? url.toLocalFile() : path);
-    if (!file.open(QIODevice::ReadOnly)) return fail(tr("Cannot open ROM: %1").arg(file.errorString()));
-    if (file.size() != slot.size) return fail(tr("%1 requires exactly %2 bytes; this file has %3").arg(slot.name).arg(slot.size).arg(file.size()));
+    if (!file.open(QIODevice::ReadOnly))
+        return fail(tr("Cannot open ROM: %1").arg(file.errorString()));
+    if (file.size() != slot.size)
+        return fail(tr("%1 requires exactly %2 bytes; this file has %3")
+                            .arg(slot.name)
+                            .arg(slot.size)
+                            .arg(file.size()));
     const auto bytes = file.readAll();
-    if (bytes.size() != slot.size || file.error() != QFileDevice::NoError) return fail(tr("Cannot read the complete ROM"));
+    if (bytes.size() != slot.size || file.error() != QFileDevice::NoError)
+        return fail(tr("Cannot read the complete ROM"));
     const auto target = storedPath(machine, slot.name);
-    if (!QDir().mkpath(QFileInfo(target).absolutePath())) return fail(tr("Cannot create the ROM folder"));
+    if (!QDir().mkpath(QFileInfo(target).absolutePath()))
+        return fail(tr("Cannot create the ROM folder"));
     QSaveFile output(target);
-    if (!output.open(QIODevice::WriteOnly) || output.write(bytes) != bytes.size() || !output.commit())
+    if (!output.open(QIODevice::WriteOnly) || output.write(bytes) != bytes.size()
+        || !output.commit())
         return fail(tr("Cannot store ROM: %1").arg(output.errorString()));
     const auto label = QFileInfo(path).fileName();
     {
         const std::lock_guard guard(m_mutex);
-        m_overrides[key(machine, slot.name)] = {bytes, label};
+        m_overrides[key(machine, slot.name)] = { bytes, label };
     }
     QSettings().setValue(u"CustomROMs/"_s + key(machine, slot.name), label);
     m_error.clear();
@@ -133,7 +161,8 @@ bool RomOverrides::restore(int index)
 {
     const auto machine = m_ids[m_index];
     const auto list = m_slots.value(machine);
-    if (index < 0 || index >= list.size()) return false;
+    if (index < 0 || index >= list.size())
+        return false;
     const auto &slot = list[index];
     // Remove the preference first; stale files are harmless if removal fails.
     QSettings().remove(u"CustomROMs/"_s + key(machine, slot.name));
@@ -149,15 +178,18 @@ bool RomOverrides::restore(int index)
 }
 bool RomOverrides::restoreMachine()
 {
-    for (int i = 0, count = m_slots.value(m_ids[m_index]).size(); i < count; ++i) restore(i);
+    for (int i = 0, count = m_slots.value(m_ids[m_index]).size(); i < count; ++i)
+        restore(i);
     return true;
 }
-std::vector<uint8_t> RomOverrides::resolve(std::string_view machine, std::string_view name, std::size_t size) const
+std::vector<uint8_t> RomOverrides::resolve(std::string_view machine, std::string_view name,
+                                           std::size_t size) const
 {
     const std::lock_guard guard(m_mutex);
     const auto qname = QString::fromUtf8(name);
     const auto custom = m_overrides.constFind(key(QString::fromUtf8(machine), qname));
     const auto bytes = custom != m_overrides.cend() ? custom->bytes : m_bundled.value(qname);
-    if (size && std::size_t(bytes.size()) != size) return {};
-    return {bytes.begin(), bytes.end()};
+    if (size && std::size_t(bytes.size()) != size)
+        return {};
+    return { bytes.begin(), bytes.end() };
 }

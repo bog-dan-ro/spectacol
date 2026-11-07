@@ -45,28 +45,50 @@ class ZxRecording : public QObject
     Q_PROPERTY(quint64 durationMs READ durationMs NOTIFY transportChanged)
 
 public:
-    enum class Type {
-        None,
-        Playback,
-        Recording,
-        Unsaved
-    };
+    enum class Type { None, Playback, Recording, Unsaved };
     Q_ENUM(Type)
 
 public:
     explicit ZxRecording(ZxEmulator *parent = nullptr);
-    Type type() const { return m_type; }
-    quint64 completedFrames() const { return m_progress.completedFrames; }
-    quint64 totalFrames() const { return m_progress.totalFrames; }
+    Type type() const
+    {
+        return m_type;
+    }
+    quint64 completedFrames() const
+    {
+        return m_progress.completedFrames;
+    }
+    quint64 totalFrames() const
+    {
+        return m_progress.totalFrames;
+    }
     QString statusText() const;
-    QString playbackError() const { return QString::fromStdString(m_progress.error); }
-    bool hasProgress() const { return m_progress.state != zxkit::RzxState::Idle; }
+    QString playbackError() const
+    {
+        return QString::fromStdString(m_progress.error);
+    }
+    bool hasProgress() const
+    {
+        return m_progress.state != zxkit::RzxState::Idle;
+    }
     void refresh();
     void mediaLoaded();
-    bool waitingForInput() const { return m_pauseOwned; }
-    bool seeking() const { return m_seeking; }
-    quint64 positionMs() const { return m_positionMs; }
-    quint64 durationMs() const { return m_durationMs; }
+    bool waitingForInput() const
+    {
+        return m_pauseOwned;
+    }
+    bool seeking() const
+    {
+        return m_seeking;
+    }
+    quint64 positionMs() const
+    {
+        return m_positionMs;
+    }
+    quint64 durationMs() const
+    {
+        return m_durationMs;
+    }
     bool resumeOnGameplayInput();
 
 public slots:
@@ -96,7 +118,8 @@ private:
     QTimer m_progressTimer;
     QTimer m_seekTimer;
     QElapsedTimer m_seekProgressClock;
-    bool m_pauseOwned = false, m_seeking = false, m_resumeAfterSeek = false, m_stopRequested = false;
+    bool m_pauseOwned = false, m_seeking = false, m_resumeAfterSeek = false,
+         m_stopRequested = false;
     std::optional<quint64> m_seekRequest = std::nullopt;
     quint64 m_positionMs = 0, m_durationMs = 0, m_generation = 0;
 };

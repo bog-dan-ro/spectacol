@@ -24,7 +24,6 @@
 
 #include <zxkit/video/VideoFrame.h>
 
-
 class QRhiTexture;
 
 class ZxImage : public QObject
@@ -33,6 +32,7 @@ class ZxImage : public QObject
 private:
     ZxImage();
     ~ZxImage();
+
 public:
     struct Frame
     {

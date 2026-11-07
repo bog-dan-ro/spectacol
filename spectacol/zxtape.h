@@ -35,11 +35,17 @@ class ZxTape : public QObject
 public:
     explicit ZxTape(ZxEmulator *parent = 0);
     void updateBrowseData();
-    QString programName() const { return m_programName; }
+    QString programName() const
+    {
+        return m_programName;
+    }
     void setProgramName(const QString &programName);
     Q_INVOKABLE void refreshData();
     Q_INVOKABLE bool canSaveTap() const;
-    bool playing() const { return m_playing; }
+    bool playing() const
+    {
+        return m_playing;
+    }
     void setPlaying(bool playing);
     QString suggestedFileName() const;
 

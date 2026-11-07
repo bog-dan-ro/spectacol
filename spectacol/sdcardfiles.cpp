@@ -43,11 +43,10 @@ QString localPath(const QUrl &url)
 } // namespace
 
 SdCardFiles::SdCardFiles(ZxEmulator *parent)
-    : QObject{parent}
-    , m_zxEmulator(parent)
-    , m_folder(u"/"_s)
+    : QObject{ parent }, m_zxEmulator(parent), m_folder(u"/"_s)
 {
-    connect(m_zxEmulator->settings(), &ZxSettings::currentMachineChanged, this, &SdCardFiles::updateInUse);
+    connect(m_zxEmulator->settings(), &ZxSettings::currentMachineChanged, this,
+            &SdCardFiles::updateInUse);
     connect(&NextSdCard::instance(), &NextSdCard::imagePathChanged, this, [this] {
         m_folder = u"/"_s;
         refresh();
@@ -111,25 +110,30 @@ void SdCardFiles::refresh()
     m_available = false;
     m_entries.clear();
     if (NextSdCard::instance().available()) {
-        withVolume([this](zxkit::FatVolume &volume) {
-            auto entries = volume.list(m_folder.toStdString());
-            if (!entries) {
-                m_folder = u"/"_s;
-                entries = volume.list("/");
-            }
-            std::ranges::stable_sort(*entries, [](const auto &a, const auto &b) { return a.isDirectory > b.isDirectory; });
-            if (m_folder != u"/"_s)
-                m_entries.append(QVariantMap{{u"name"_s, u".."_s}, {u"size"_s, 0}, {u"isDir"_s, true}});
-            for (const auto &e : *entries) {
-                m_entries.append(QVariantMap{{u"name"_s, QString::fromStdString(e.name)},
-                                             {u"size"_s, qint64(e.size)},
-                                             {u"isDir"_s, e.isDirectory}});
-            }
-            m_readOnly = !volume.isWritable();
-            m_totalBytes = qint64(volume.totalBytes());
-            m_freeBytes = qint64(volume.freeBytes());
-            m_available = true;
-        }, false);
+        withVolume(
+                [this](zxkit::FatVolume &volume) {
+                    auto entries = volume.list(m_folder.toStdString());
+                    if (!entries) {
+                        m_folder = u"/"_s;
+                        entries = volume.list("/");
+                    }
+                    std::ranges::stable_sort(*entries, [](const auto &a, const auto &b) {
+                        return a.isDirectory > b.isDirectory;
+                    });
+                    if (m_folder != u"/"_s)
+                        m_entries.append(QVariantMap{
+                                { u"name"_s, u".."_s }, { u"size"_s, 0 }, { u"isDir"_s, true } });
+                    for (const auto &e : *entries) {
+                        m_entries.append(QVariantMap{ { u"name"_s, QString::fromStdString(e.name) },
+                                                      { u"size"_s, qint64(e.size) },
+                                                      { u"isDir"_s, e.isDirectory } });
+                    }
+                    m_readOnly = !volume.isWritable();
+                    m_totalBytes = qint64(volume.totalBytes());
+                    m_freeBytes = qint64(volume.freeBytes());
+                    m_available = true;
+                },
+                false);
     }
     emit changed();
 }
@@ -149,18 +153,24 @@ void SdCardFiles::openFolder(const QString &name)
 void SdCardFiles::addFile(const QUrl &file)
 {
     const QString path = localPath(file);
-    QFile f{path};
+    QFile f{ path };
     if (!f.open(QIODeviceBase::ReadOnly)) {
         m_zxEmulator->showMessage(tr("Can't open %1").arg(path), ZxEmulator::Error);
         return;
     }
     // Read the file before locking the emulator
     const QByteArray bytes = f.readAll();
-    const QString name = QFileInfo{f.fileName()}.fileName();
-    const auto data = std::span(reinterpret_cast<const uint8_t *>(bytes.constData()), size_t(bytes.size()));
-    if (withVolume([&](zxkit::FatVolume &volume) { volume.writeFile(childPath(name).toStdString(), data); }, true)) {
-        m_zxEmulator->showMessage(m_inUse ? tr("'%1' copied to %2, the Next restarts").arg(name, m_folder)
-                                          : tr("'%1' copied to %2").arg(name, m_folder));
+    const QString name = QFileInfo{ f.fileName() }.fileName();
+    const auto data =
+            std::span(reinterpret_cast<const uint8_t *>(bytes.constData()), size_t(bytes.size()));
+    if (withVolume(
+                [&](zxkit::FatVolume &volume) {
+                    volume.writeFile(childPath(name).toStdString(), data);
+                },
+                true)) {
+        m_zxEmulator->showMessage(
+                m_inUse ? tr("'%1' copied to %2, the Next restarts").arg(name, m_folder)
+                        : tr("'%1' copied to %2").arg(name, m_folder));
     }
     refresh();
 }
@@ -169,7 +179,11 @@ void SdCardFiles::makeFolder(const QString &name)
 {
     if (name.trimmed().isEmpty())
         return;
-    withVolume([&](zxkit::FatVolume &volume) { volume.makeDirectory(childPath(name.trimmed()).toStdString()); }, true);
+    withVolume(
+            [&](zxkit::FatVolume &volume) {
+                volume.makeDirectory(childPath(name.trimmed()).toStdString());
+            },
+            true);
     refresh();
 }
 
@@ -177,7 +191,8 @@ void SdCardFiles::remove(const QString &name)
 {
     if (name.isEmpty() || name == u".."_s)
         return;
-    if (withVolume([&](zxkit::FatVolume &volume) { volume.remove(childPath(name).toStdString()); }, true))
+    if (withVolume([&](zxkit::FatVolume &volume) { volume.remove(childPath(name).toStdString()); },
+                   true))
         m_zxEmulator->showMessage(tr("'%1' removed").arg(name));
     refresh();
 }

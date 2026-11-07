@@ -25,10 +25,7 @@ using namespace Qt::StringLiterals;
 
 #define MAX_POSSIBLE 20
 
-PokeFinderModel::PokeFinderModel(QObject *parent)
-    : QAbstractListModel(parent)
-{
-}
+PokeFinderModel::PokeFinderModel(QObject *parent) : QAbstractListModel(parent) { }
 
 void PokeFinderModel::update()
 {
@@ -51,7 +48,8 @@ void PokeFinderModel::update()
             if (it->second.contains(BreakpointsModel::BreakOnWrite))
                 breakpoints |= OnWrite;
         }
-        data.emplace_back(PokeFinderData(cand.page16k, cand.offset, cand.currentValue, breakpoints));
+        data.emplace_back(
+                PokeFinderData(cand.page16k, cand.offset, cand.currentValue, breakpoints));
     }
 
     const bool sameSize = data.size() == m_data.size();

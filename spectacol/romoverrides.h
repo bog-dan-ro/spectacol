@@ -24,7 +24,8 @@
 #include <mutex>
 #include <vector>
 
-class RomOverrides : public QObject {
+class RomOverrides : public QObject
+{
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Use ZxEmulator.roms")
@@ -34,22 +35,41 @@ class RomOverrides : public QObject {
     Q_PROPERTY(QString error READ error NOTIFY errorChanged FINAL)
 public:
     explicit RomOverrides(QObject *parent = nullptr);
-    QStringList machines() const { return m_names; }
-    int machineIndex() const { return m_index; }
+    QStringList machines() const
+    {
+        return m_names;
+    }
+    int machineIndex() const
+    {
+        return m_index;
+    }
     void setMachineIndex(int index);
     QVariantList romSlots() const;
-    QString error() const { return m_error; }
+    QString error() const
+    {
+        return m_error;
+    }
     Q_INVOKABLE bool useFile(int slot, const QString &path);
     Q_INVOKABLE bool restore(int slot);
     Q_INVOKABLE bool restoreMachine();
     // Called under the emulator lock, possibly on the Engine thread. No file I/O.
-    std::vector<uint8_t> resolve(std::string_view machine, std::string_view name, std::size_t size) const;
+    std::vector<uint8_t> resolve(std::string_view machine, std::string_view name,
+                                 std::size_t size) const;
 signals:
     void changed();
     void errorChanged();
+
 private:
-    struct Slot { QString name; qsizetype size; };
-    struct Override { QByteArray bytes; QString label; };
+    struct Slot
+    {
+        QString name;
+        qsizetype size;
+    };
+    struct Override
+    {
+        QByteArray bytes;
+        QString label;
+    };
     bool fail(const QString &message);
     QString key(const QString &machine, const QString &name) const;
     QString storedPath(const QString &machine, const QString &name) const;

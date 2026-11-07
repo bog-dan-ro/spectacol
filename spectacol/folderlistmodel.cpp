@@ -30,57 +30,68 @@
 using namespace Qt::StringLiterals;
 
 namespace {
-    QString canonicalFolder(QString path) {
-        const QUrl url(path);
-        if (url.isLocalFile()) path = url.toLocalFile();
-        const QFileInfo info(path);
-        const auto canonical = info.canonicalFilePath();
-        return canonical.isEmpty() ? info.absoluteFilePath() : canonical;
-    }
-    bool within(const QString &folder, const QString &root) {
-        return root.isEmpty() || root == u"/"_s || folder == root || folder.startsWith(root + u'/');
-    }
-}
-
-FolderListModel::FolderListModel(QObject *parent)
-    : QAbstractListModel(parent)
+QString canonicalFolder(QString path)
 {
+    const QUrl url(path);
+    if (url.isLocalFile())
+        path = url.toLocalFile();
+    const QFileInfo info(path);
+    const auto canonical = info.canonicalFilePath();
+    return canonical.isEmpty() ? info.absoluteFilePath() : canonical;
 }
-
-FolderListModel::~FolderListModel()
+bool within(const QString &folder, const QString &root)
 {
+    return root.isEmpty() || root == u"/"_s || folder == root || folder.startsWith(root + u'/');
 }
+} // namespace
+
+FolderListModel::FolderListModel(QObject *parent) : QAbstractListModel(parent) { }
+
+FolderListModel::~FolderListModel() { }
 
 void FolderListModel::setFolder(QString folder)
 {
     folder = canonicalFolder(folder);
-    if (!within(folder, m_rootFolder) || !QFileInfo(folder).isDir()) folder = m_rootFolder;
-    if (m_folder == folder) return;
+    if (!within(folder, m_rootFolder) || !QFileInfo(folder).isDir())
+        folder = m_rootFolder;
+    if (m_folder == folder)
+        return;
     m_folder = folder;
-    if (!m_search.isEmpty()) { m_search.clear(); emit searchChanged(); }
+    if (!m_search.isEmpty()) {
+        m_search.clear();
+        emit searchChanged();
+    }
     emit folderChanged(m_folder);
     refresh();
 }
 void FolderListModel::setRootFolder(QString rootFolder)
 {
     rootFolder = canonicalFolder(rootFolder);
-    if (m_rootFolder == rootFolder) return;
+    if (m_rootFolder == rootFolder)
+        return;
     m_rootFolder = rootFolder;
     emit rootFolderChanged(m_rootFolder);
-    if (!within(m_folder, m_rootFolder)) setFolder(m_rootFolder);
-    else refresh();
+    if (!within(m_folder, m_rootFolder))
+        setFolder(m_rootFolder);
+    else
+        refresh();
 }
 void FolderListModel::setSearch(const QString &search)
 {
-    if (m_search == search) return;
+    if (m_search == search)
+        return;
     m_search = search;
     emit searchChanged();
     refilter();
 }
 QString FolderListModel::selectionKey() const
 {
-    return u"FileSelections/"_s + QString::fromLatin1(QCryptographicHash::hash(
-        (m_folder + u'|' + QString::number(m_filterClass)).toUtf8(), QCryptographicHash::Sha256).toHex());
+    return u"FileSelections/"_s
+            + QString::fromLatin1(
+                    QCryptographicHash::hash(
+                            (m_folder + u'|' + QString::number(m_filterClass)).toUtf8(),
+                            QCryptographicHash::Sha256)
+                            .toHex());
 }
 
 FolderListModel::FileSortCriteria FolderListModel::sortCriteria() const
@@ -120,19 +131,24 @@ int FolderListModel::currentIndex() const
 
 void FolderListModel::setCurrentIndex(int currentIndex)
 {
-    if (m_refreshing || currentIndex < 0 || std::size_t(currentIndex) >= m_files.size()) return;
+    if (m_refreshing || currentIndex < 0 || std::size_t(currentIndex) >= m_files.size())
+        return;
     const bool changed = m_currentIndex != currentIndex;
     m_currentIndex = currentIndex;
-    if (m_search.isEmpty()) rememberSelection(currentIndex);
-    if (changed) emit currentIndexChanged(currentIndex);
+    if (m_search.isEmpty())
+        rememberSelection(currentIndex);
+    if (changed)
+        emit currentIndexChanged(currentIndex);
 }
 
 void FolderListModel::rememberSelection(int index)
 {
-    if (m_refreshing || index < 0 || std::size_t(index) >= m_files.size()) return;
+    if (m_refreshing || index < 0 || std::size_t(index) >= m_files.size())
+        return;
     QSettings settings;
     const auto key = selectionKey(), selected = path(index);
-    if (settings.value(key).toString() != selected) settings.setValue(key, selected);
+    if (settings.value(key).toString() != selected)
+        settings.setValue(key, selected);
 }
 
 FolderListModel::FilterType FolderListModel::filterClass() const
@@ -197,11 +213,7 @@ QVariant FolderListModel::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> FolderListModel::roleNames() const
 {
-    static QHash<int, QByteArray> ret = {
-        {Name, "name"},
-        {Path, "path"},
-        {IsDir, "isDir"}
-    };
+    static QHash<int, QByteArray> ret = { { Name, "name" }, { Path, "path" }, { IsDir, "isDir" } };
     return ret;
 }
 
@@ -213,7 +225,8 @@ bool FolderListModel::canOpen(const QString &path)
     if (!f.open(QIODevice::ReadOnly))
         return false;
     const auto buffer = f.read(64);
-    const std::span<const uint8_t> span(reinterpret_cast<const uint8_t *>(buffer.constData()), size_t(buffer.size()));
+    const std::span<const uint8_t> span(reinterpret_cast<const uint8_t *>(buffer.constData()),
+                                        size_t(buffer.size()));
     const auto fileClass = zxkit::classifyMediaFile(path.toStdString(), span);
     if (fileClass == zxkit::MediaClass::Unknown)
         return false;
@@ -237,28 +250,38 @@ void FolderListModel::refresh()
     while (it.hasNext()) {
         it.next();
         const auto &info = it.fileInfo();
-        if (!within(info.canonicalFilePath(), m_rootFolder)) continue;
-        if (m_filterClass != HostFiles && info.suffix().compare(u"pok"_s, Qt::CaseInsensitive) == 0) continue;
-        if (info.isDir() || canOpen(info.absoluteFilePath())) m_allFiles.push_back(info);
+        if (!within(info.canonicalFilePath(), m_rootFolder))
+            continue;
+        if (m_filterClass != HostFiles && info.suffix().compare(u"pok"_s, Qt::CaseInsensitive) == 0)
+            continue;
+        if (info.isDir() || canOpen(info.absoluteFilePath()))
+            m_allFiles.push_back(info);
     }
     std::sort(m_allFiles.begin(), m_allFiles.end(), [this](const QFileInfo &a, const QFileInfo &b) {
-        if (m_showDirsFirst && a.isDir() != b.isDir()) return a.isDir();
-        if (m_sortCriteria == ByDateDesc && a.lastModified() != b.lastModified()) return a.lastModified() > b.lastModified();
+        if (m_showDirsFirst && a.isDir() != b.isDir())
+            return a.isDir();
+        if (m_sortCriteria == ByDateDesc && a.lastModified() != b.lastModified())
+            return a.lastModified() > b.lastModified();
         return QString::compare(a.fileName(), b.fileName(), Qt::CaseInsensitive) < 0;
     });
     refilter();
 }
 void FolderListModel::refilter()
 {
-    const QString selected = m_search.isEmpty() ? QSettings().value(selectionKey()).toString() : path(m_currentIndex);
+    const QString selected = m_search.isEmpty() ? QSettings().value(selectionKey()).toString()
+                                                : path(m_currentIndex);
     m_refreshing = true;
     beginResetModel();
     m_files.clear();
     for (const auto &info : m_allFiles)
-        if (info.fileName().contains(m_search, Qt::CaseInsensitive)) m_files.push_back(info);
+        if (info.fileName().contains(m_search, Qt::CaseInsensitive))
+            m_files.push_back(info);
     m_currentIndex = m_files.empty() ? -1 : 0;
     for (std::size_t i = 0; i < m_files.size(); ++i)
-        if (m_files[i].absoluteFilePath() == selected) { m_currentIndex = int(i); break; }
+        if (m_files[i].absoluteFilePath() == selected) {
+            m_currentIndex = int(i);
+            break;
+        }
     endResetModel();
     m_refreshing = false;
     emit currentIndexChanged(m_currentIndex);

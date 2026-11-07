@@ -47,16 +47,40 @@ public:
     explicit ZXGamesModel(const zxonline::Endpoints &endpoints, QObject *parent = nullptr);
     ~ZXGamesModel() override;
 
-    int source() const { return m_source; }
+    int source() const
+    {
+        return m_source;
+    }
     void setSource(int source);
     QStringList sources() const;
-    bool searching() const { return !m_searchReply.isNull(); }
-    bool loadingDetails() const { return !m_detailReply.isNull(); }
-    bool downloading() const { return !m_downloadReply.isNull(); }
-    bool hasMore() const { return m_hasMore; }
-    bool searched() const { return m_searched; }
-    int total() const { return m_total; }
-    QString errorString() const { return m_error; }
+    bool searching() const
+    {
+        return !m_searchReply.isNull();
+    }
+    bool loadingDetails() const
+    {
+        return !m_detailReply.isNull();
+    }
+    bool downloading() const
+    {
+        return !m_downloadReply.isNull();
+    }
+    bool hasMore() const
+    {
+        return m_hasMore;
+    }
+    bool searched() const
+    {
+        return m_searched;
+    }
+    int total() const
+    {
+        return m_total;
+    }
+    QString errorString() const
+    {
+        return m_error;
+    }
     QVariantMap details() const;
 
     int rowCount(const QModelIndex &parent = {}) const override;

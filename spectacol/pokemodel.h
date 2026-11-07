@@ -29,19 +29,27 @@
 #include <zxkit/core/Shared.h>
 
 // The pokes (trainers) the user applied to the running program
-class PokeModel : public QAbstractListModel {
+class PokeModel : public QAbstractListModel
+{
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Use ZxEmulator.pokes")
     Q_PROPERTY(QStringList bankNames READ bankNames NOTIFY banksChanged FINAL)
-    Q_PROPERTY(int selectedBank READ selectedBank WRITE setSelectedBank NOTIFY selectedBankChanged FINAL)
+    Q_PROPERTY(int selectedBank READ selectedBank WRITE setSelectedBank NOTIFY selectedBankChanged
+                       FINAL)
     Q_PROPERTY(int addressLimit READ addressLimit NOTIFY selectedBankChanged FINAL)
 
     Q_PROPERTY(QString sourcePath READ sourcePath NOTIFY sourceChanged FINAL)
     Q_PROPERTY(QString pokesFolder READ pokesFolder WRITE setPokesFolder NOTIFY sourceChanged FINAL)
 public:
-    QString sourcePath() const { return m_source; }
-    QString pokesFolder() const { return m_folder; }
+    QString sourcePath() const
+    {
+        return m_source;
+    }
+    QString pokesFolder() const
+    {
+        return m_folder;
+    }
     void setPokesFolder(const QString &folder);
     Q_INVOKABLE bool choosePokesFolder(const QString &folder);
     void gameLoaded(const QString &path);
@@ -52,8 +60,14 @@ public:
 
 public:
     explicit PokeModel(const zxkit::Shared<zxkit::Emulator> &core, QObject *parent = nullptr);
-    QStringList bankNames() const { return m_bankNames; }
-    int selectedBank() const { return m_selectedBank; }
+    QStringList bankNames() const
+    {
+        return m_bankNames;
+    }
+    int selectedBank() const
+    {
+        return m_selectedBank;
+    }
     void setSelectedBank(int index);
     int addressLimit() const;
 
@@ -77,20 +91,23 @@ signals:
     void selectedBankChanged();
 
 private:
-    struct Bank {
+    struct Bank
+    {
         int id;
         int maximum;
     };
     QStringList m_bankNames;
     std::vector<Bank> m_banks;
     int m_selectedBank = 0;
-    struct Patch {
+    struct Patch
+    {
         int bank = 0, address = 0;
         uint8_t original = 0;
         uint16_t value = 0;
         bool resolved = false;
     };
-    struct Trainer {
+    struct Trainer
+    {
         QString name;
         std::vector<Patch> patches;
         std::string machine;

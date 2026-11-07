@@ -23,23 +23,35 @@
 
 using namespace Qt::StringLiterals;
 namespace {
-QString hex(quint32 value, int digits = 4) { return u"$%1"_s.arg(value, digits, 16, u'0').toUpper(); }
-QString byte(uint8_t value) { return u"%1"_s.arg(value, 2, 16, u'0').toUpper(); }
+QString hex(quint32 value, int digits = 4)
+{
+    return u"$%1"_s.arg(value, digits, 16, u'0').toUpper();
 }
+QString byte(uint8_t value)
+{
+    return u"%1"_s.arg(value, 2, 16, u'0').toUpper();
+}
+} // namespace
 
-DebuggerMemoryModel::DebuggerMemoryModel(const zxkit::Shared<zxkit::Emulator>& core, QObject* parent)
-    : QAbstractListModel(parent)
-    , m_core(core)
+DebuggerMemoryModel::DebuggerMemoryModel(const zxkit::Shared<zxkit::Emulator> &core,
+                                         QObject *parent)
+    : QAbstractListModel(parent), m_core(core)
 {
     refresh();
 }
-int DebuggerMemoryModel::rowCount(const QModelIndex& parent) const { return parent.isValid() ? 0 : (m_count + m_columns - 1) / m_columns; }
+int DebuggerMemoryModel::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : (m_count + m_columns - 1) / m_columns;
+}
 QHash<int, QByteArray> DebuggerMemoryModel::roleNames() const
 {
-    static const QHash<int, QByteArray> roles = { { Address, "address" }, { AddressText, "addressText" }, { Cells, "cells" }, { Ascii, "ascii" } };
+    static const QHash<int, QByteArray> roles = { { Address, "address" },
+                                                  { AddressText, "addressText" },
+                                                  { Cells, "cells" },
+                                                  { Ascii, "ascii" } };
     return roles;
 }
-QVariant DebuggerMemoryModel::data(const QModelIndex& index, int role) const
+QVariant DebuggerMemoryModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.column() != 0 || index.row() < 0 || index.row() >= rowCount())
         return {};
@@ -59,14 +71,19 @@ QVariant DebuggerMemoryModel::data(const QModelIndex& index, int role) const
     case Ascii: {
         QString text;
         for (int i = 0; i < count; ++i)
-            text.append(m_bytes[start + i] >= 32 && m_bytes[start + i] < 127 ? QChar(m_bytes[start + i]) : u'.');
+            text.append(m_bytes[start + i] >= 32 && m_bytes[start + i] < 127
+                                ? QChar(m_bytes[start + i])
+                                : u'.');
         return text;
     }
     }
     return {};
 }
-QString DebuggerMemoryModel::addressText() const { return hex(address(), m_bank < 0 ? 4 : 6); }
-bool DebuggerMemoryModel::parseHex(const QString& text, quint32 limit, quint32& value)
+QString DebuggerMemoryModel::addressText() const
+{
+    return hex(address(), m_bank < 0 ? 4 : 6);
+}
+bool DebuggerMemoryModel::parseHex(const QString &text, quint32 limit, quint32 &value)
 {
     auto trimmed = text.trimmed();
     if (trimmed.startsWith(u'$'))
@@ -80,7 +97,7 @@ bool DebuggerMemoryModel::parseHex(const QString& text, quint32 limit, quint32& 
     value = quint32(parsed);
     return true;
 }
-bool DebuggerMemoryModel::fail(const QString& text)
+bool DebuggerMemoryModel::fail(const QString &text)
 {
     m_error = text;
     emit errorChanged();
@@ -89,26 +106,31 @@ bool DebuggerMemoryModel::fail(const QString& text)
 void DebuggerMemoryModel::refresh()
 {
     QStringList banks = { tr("CPU address space") };
-    std::array<uint8_t, 256> bytes {};
+    std::array<uint8_t, 256> bytes{};
     bool writable = false;
     int bankId = m_bank, size = 0, base = 0, count = 0, cursor = 0;
     {
         const auto core = m_core.readLock();
-        for (const auto& bank : core->mmu().banks())
-            banks.append(QString::fromUtf8(bank.name().data(), qsizetype(bank.name().size())) + u" (%1 KiB)"_s.arg(bank.size() / 1024));
+        for (const auto &bank : core->mmu().banks())
+            banks.append(QString::fromUtf8(bank.name().data(), qsizetype(bank.name().size()))
+                         + u" (%1 KiB)"_s.arg(bank.size() / 1024));
         if (bankId <= 0 || bankId >= banks.size())
             bankId = -1;
-        size = bankId < 0 ? 65536
-                          : int(std::min<std::size_t>(core->mmu().bank(zxkit::BankId(bankId)).size(), (std::numeric_limits<int>::max)()));
+        size = bankId < 0
+                ? 65536
+                : int(std::min<std::size_t>(core->mmu().bank(zxkit::BankId(bankId)).size(),
+                                            (std::numeric_limits<int>::max)()));
         base = std::clamp(m_base, 0, (std::max)(0, size - 1)) & ~255;
         count = (std::min)(256, size - base);
         cursor = std::clamp(m_cursor, 0, (std::max)(0, count - 1));
         if (bankId < 0) {
             for (int i = 0; i < count; ++i)
                 bytes[i] = core->mmu().peek(uint16_t(base + i));
-            writable = core->mmu().effectiveMapping(unsigned(base + cursor) >> zxkit::Mmu::kPageShift).writable;
+            writable = core->mmu()
+                               .effectiveMapping(unsigned(base + cursor) >> zxkit::Mmu::kPageShift)
+                               .writable;
         } else {
-            const auto& bank = core->mmu().bank(zxkit::BankId(bankId));
+            const auto &bank = core->mmu().bank(zxkit::BankId(bankId));
             for (int i = 0; i < count; ++i)
                 bytes[i] = bank.page1k(unsigned(base + i) / 1024)[(base + i) & 1023];
             writable = bank.isWritable();
@@ -157,13 +179,14 @@ void DebuggerMemoryModel::setCursor(int cursor)
 }
 void DebuggerMemoryModel::moveCursor(int delta)
 {
-    const int next = int(std::clamp<qint64>(qint64(address()) + delta, 0, (std::max)(0, m_size - 1)));
+    const int next =
+            int(std::clamp<qint64>(qint64(address()) + delta, 0, (std::max)(0, m_size - 1)));
     const int base = next & ~255;
     m_cursor = next - base;
     m_base = base;
     refresh();
 }
-bool DebuggerMemoryModel::goTo(const QString& text)
+bool DebuggerMemoryModel::goTo(const QString &text)
 {
     quint32 address;
     if (!parseHex(text, quint32((std::max)(0, m_size - 1)), address))
@@ -182,7 +205,7 @@ void DebuggerMemoryModel::setEditable(bool editable)
     m_editable = editable;
     emit editableChanged();
 }
-bool DebuggerMemoryModel::writeByte(const QString& text, bool allowRom)
+bool DebuggerMemoryModel::writeByte(const QString &text, bool allowRom)
 {
     quint32 value;
     if (!m_editable)
@@ -193,7 +216,8 @@ bool DebuggerMemoryModel::writeByte(const QString& text, bool allowRom)
     {
         auto core = m_core.writeLock();
         if (m_bank < 0) {
-            const auto& map = core->mmu().effectiveMapping(unsigned(address()) >> zxkit::Mmu::kPageShift);
+            const auto &map =
+                    core->mmu().effectiveMapping(unsigned(address()) >> zxkit::Mmu::kPageShift);
             if (!map.writable && (!allowRom || !map.bankId))
                 error = tr("This address is read-only or unmapped");
             else
@@ -201,7 +225,7 @@ bool DebuggerMemoryModel::writeByte(const QString& text, bool allowRom)
         } else if (std::size_t(m_bank) > core->mmu().banks().size()) {
             error = tr("Memory bank changed; refresh the view");
         } else {
-            auto& bank = core->mmu().bank(zxkit::BankId(m_bank));
+            auto &bank = core->mmu().bank(zxkit::BankId(m_bank));
             if (std::size_t(address()) >= bank.size())
                 error = tr("Memory bank changed; refresh the view");
             else if (!bank.isWritable() && !allowRom)
@@ -218,24 +242,29 @@ bool DebuggerMemoryModel::writeByte(const QString& text, bool allowRom)
     return true;
 }
 
-DebuggerStateModel::DebuggerStateModel(const zxkit::Shared<zxkit::Emulator>& core, Kind kind, QObject* parent)
-    : QAbstractListModel(parent)
-    , m_core(core)
-    , m_kind(kind)
+DebuggerStateModel::DebuggerStateModel(const zxkit::Shared<zxkit::Emulator> &core, Kind kind,
+                                       QObject *parent)
+    : QAbstractListModel(parent), m_core(core), m_kind(kind)
 {
     refresh();
 }
-int DebuggerStateModel::rowCount(const QModelIndex& parent) const { return parent.isValid() ? 0 : int(m_rows.size()); }
+int DebuggerStateModel::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : int(m_rows.size());
+}
 QHash<int, QByteArray> DebuggerStateModel::roleNames() const
 {
-    static const QHash<int, QByteArray> roles = { { Address, "address" }, { AddressText, "addressText" }, { ValueText, "valueText" }, { Details, "details" } };
+    static const QHash<int, QByteArray> roles = { { Address, "address" },
+                                                  { AddressText, "addressText" },
+                                                  { ValueText, "valueText" },
+                                                  { Details, "details" } };
     return roles;
 }
-QVariant DebuggerStateModel::data(const QModelIndex& index, int role) const
+QVariant DebuggerStateModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.column() != 0 || index.row() < 0 || index.row() >= rowCount())
         return {};
-    const auto& row = m_rows[index.row()];
+    const auto &row = m_rows[index.row()];
     switch (role) {
     case Address:
         return row.address;
@@ -255,7 +284,7 @@ void DebuggerStateModel::refresh()
     {
         const auto core = m_core.readLock();
         if (m_kind == Kind::NextRegisters) {
-            const auto* next = dynamic_cast<const zxkit::ZxNextMachine*>(&core->machine());
+            const auto *next = dynamic_cast<const zxkit::ZxNextMachine *>(&core->machine());
             available = next != nullptr;
             if (next)
                 for (int reg = 0; reg < 256; ++reg) {
@@ -284,22 +313,26 @@ void DebuggerStateModel::refresh()
                             description = tr("MMU slot %1 (8 KiB page)").arg(reg - 0x50);
                         break;
                     }
-                    rows.push_back({ reg, hex(reg, 2), hex(next->nextReg().peek(uint8_t(reg)), 2), description });
+                    rows.push_back({ reg, hex(reg, 2), hex(next->nextReg().peek(uint8_t(reg)), 2),
+                                     description });
                 }
         } else {
             for (unsigned slot = 0; slot < zxkit::Mmu::kSlotCount; ++slot) {
-                const auto& map = core->mmu().effectiveMapping(slot);
+                const auto &map = core->mmu().effectiveMapping(slot);
                 const auto name = [&](zxkit::BankId id) {
                     if (!id)
                         return tr("Unmapped");
                     const auto text = core->mmu().bank(id).name();
                     return QString::fromUtf8(text.data(), qsizetype(text.size()));
                 };
-                rows.push_back({ int(slot * 1024), hex(slot * 1024) + u"–"_s + hex(slot * 1024 + 1023),
-                    name(map.bankId) + u" : "_s + hex(quint32(map.readPage1k) * 1024, 6),
-                    (map.writable ? tr("Write %1 : %2").arg(name(map.writeBankId), hex(quint32(map.writePage1k) * 1024, 6))
-                                  : tr("Read-only"))
-                        + (map.contended ? tr(" · contended") : QString {}) });
+                rows.push_back(
+                        { int(slot * 1024), hex(slot * 1024) + u"–"_s + hex(slot * 1024 + 1023),
+                          name(map.bankId) + u" : "_s + hex(quint32(map.readPage1k) * 1024, 6),
+                          (map.writable ? tr("Write %1 : %2")
+                                                  .arg(name(map.writeBankId),
+                                                       hex(quint32(map.writePage1k) * 1024, 6))
+                                        : tr("Read-only"))
+                                  + (map.contended ? tr(" · contended") : QString{}) });
             }
         }
     }

@@ -32,20 +32,29 @@ public:
     static constexpr uint32_t InputRate = 48'000;
     static constexpr uint32_t Capacity = 65'536; // bounded, including very fast playback
     static constexpr uint32_t RateScale = 65'536;
-    struct Statistics {
+    struct Statistics
+    {
         uint32_t underruns = 0;
         uint32_t overflows = 0;
         uint32_t queuedFrames = 0;
         uint32_t renderedFrames = 0;
     };
 
-    struct Control {
-        void setPaused(bool paused) noexcept { setFlag(1, paused); }
-        void setMuted(bool muted) noexcept { setFlag(2, muted); }
+    struct Control
+    {
+        void setPaused(bool paused) noexcept
+        {
+            setFlag(1, paused);
+        }
+        void setMuted(bool muted) noexcept
+        {
+            setFlag(2, muted);
+        }
+
     private:
         friend class AudioBuffer;
         void setFlag(uint32_t flag, bool on) noexcept;
-        std::atomic<uint32_t> state{1}; // low two bits: paused, muted
+        std::atomic<uint32_t> state{ 1 }; // low two bits: paused, muted
     };
     explicit AudioBuffer(uint32_t outputRate = InputRate, uint32_t channels = 2,
                          std::shared_ptr<Control> control = {});
@@ -59,7 +68,8 @@ public:
     Statistics statistics() const noexcept;
 
 private:
-    struct Frame {
+    struct Frame
+    {
         int16_t left = 0, right = 0;
         uint32_t generation = 0;
         uint32_t rate = RateScale;
@@ -70,11 +80,11 @@ private:
     std::vector<Frame> m_frames;
     const uint32_t m_outputRate;
     const uint32_t m_channels;
-    alignas(64) std::atomic<uint32_t> m_write{0};
-    alignas(64) std::atomic<uint32_t> m_read{0};
+    alignas(64) std::atomic<uint32_t> m_write{ 0 };
+    alignas(64) std::atomic<uint32_t> m_read{ 0 };
     const std::shared_ptr<Control> m_control;
-    std::atomic<uint32_t> m_rate{RateScale};
-    std::atomic<uint32_t> m_underruns{0}, m_overflows{0}, m_rendered{0};
+    std::atomic<uint32_t> m_rate{ RateScale };
+    std::atomic<uint32_t> m_underruns{ 0 }, m_overflows{ 0 }, m_rendered{ 0 };
     // Producer-only rate estimation.
     std::chrono::steady_clock::time_point m_previousPush = {};
     uint32_t m_previousFrames = 0;

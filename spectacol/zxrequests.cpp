@@ -45,9 +45,9 @@ bool supportedMedia(QString name)
     name = name.toLower();
     if (name.endsWith(u".zip"_s))
         name.chop(4);
-    static const QStringList formats{u"tap"_s, u"tzx"_s, u"sna"_s, u"szx"_s, u"z80"_s,
-        u"nex"_s, u"rzx"_s, u"dsk"_s, u"trd"_s, u"scl"_s, u"mgt"_s,
-        u"img"_s, u"opd"_s, u"td0"_s};
+    static const QStringList formats{ u"tap"_s, u"tzx"_s, u"sna"_s, u"szx"_s, u"z80"_s,
+                                      u"nex"_s, u"rzx"_s, u"dsk"_s, u"trd"_s, u"scl"_s,
+                                      u"mgt"_s, u"img"_s, u"opd"_s, u"td0"_s };
     return formats.contains(QFileInfo(name).suffix());
 }
 
@@ -104,7 +104,8 @@ QUrl zxinfoFileUrl(const Endpoints &endpoints, const QString &path)
     // Follow ZXInfo's own download-link mapping, rather than treating catalogue
     // paths as API-relative URLs. Unknown relative paths are not downloads.
     if (path.startsWith(u"/pub/sinclair/"_s)) {
-        const QString mirror = u"download/World_of_Spectrum_June_2017_Mirror/World of Spectrum June 2017 Mirror.zip/World of Spectrum June 2017 Mirror/sinclair/"_s;
+        const QString mirror =
+                u"download/World_of_Spectrum_June_2017_Mirror/World of Spectrum June 2017 Mirror.zip/World of Spectrum June 2017 Mirror/sinclair/"_s;
         return endpoints.archive.resolved(relativePath(mirror + path.mid(14)));
     }
     if (path.startsWith(u"/zxdb/"_s))
@@ -114,7 +115,8 @@ QUrl zxinfoFileUrl(const Endpoints &endpoints, const QString &path)
 
 void addFile(Details &details, Media file)
 {
-    if (!supportedMedia(file.name) || (file.url.scheme() != u"https"_s && file.url.scheme() != u"http"_s))
+    if (!supportedMedia(file.name)
+        || (file.url.scheme() != u"https"_s && file.url.scheme() != u"http"_s))
         return;
     for (const auto &existing : details.files)
         if (existing.url == file.url)
@@ -124,11 +126,12 @@ void addFile(Details &details, Media file)
 } // namespace
 
 Endpoints::Endpoints()
-    : archive(u"https://archive.org/"_s)
-    , zxinfo(u"https://api.zxinfo.dk/v5/"_s)
-    , zxinfoMedia(u"https://zxinfo.dk/media/"_s)
-    , spectrumComputing(u"https://spectrumcomputing.co.uk/"_s)
-{}
+    : archive(u"https://archive.org/"_s),
+      zxinfo(u"https://api.zxinfo.dk/v5/"_s),
+      zxinfoMedia(u"https://zxinfo.dk/media/"_s),
+      spectrumComputing(u"https://spectrumcomputing.co.uk/"_s)
+{
+}
 
 QUrl searchUrl(const Endpoints &endpoints, int source, const QString &text, int page)
 {
@@ -169,8 +172,9 @@ QUrl searchUrl(const Endpoints &endpoints, int source, const QString &text, int 
 
 QUrl detailsUrl(const Endpoints &endpoints, int source, const QString &id)
 {
-    QUrl url = (source == 1 ? endpoints.zxinfo : endpoints.archive)
-                   .resolved(QUrl((source == 1 ? u"entries/"_s : u"metadata/"_s) + segment(id)));
+    QUrl url =
+            (source == 1 ? endpoints.zxinfo : endpoints.archive)
+                    .resolved(QUrl((source == 1 ? u"entries/"_s : u"metadata/"_s) + segment(id)));
     if (source == 1)
         url.setQuery(u"mode=full"_s);
     return url;
@@ -193,7 +197,7 @@ Page parsePage(const QJsonObject &object, int source, const Endpoints &endpoints
             const auto id = hit.value(u"_id"_s).toString();
             const auto title = entry.value(u"title"_s).toString();
             if (!id.isEmpty() && !title.isEmpty())
-                page.games.append({id, title, summary(entry), screenshotUrl(entry, endpoints)});
+                page.games.append({ id, title, summary(entry), screenshotUrl(entry, endpoints) });
         }
     } else {
         const auto response = object.value(u"response"_s).toObject();
@@ -205,13 +209,18 @@ Page parsePage(const QJsonObject &object, int source, const Endpoints &endpoints
             const auto id = entry.value(u"identifier"_s).toString();
             const auto title = textValue(entry.value(u"title"_s));
             if (!id.isEmpty() && !title.isEmpty())
-                page.games.append({id, title, {}, endpoints.archive.resolved(QUrl(u"services/img/"_s + segment(id)))});
+                page.games.append(
+                        { id,
+                          title,
+                          {},
+                          endpoints.archive.resolved(QUrl(u"services/img/"_s + segment(id))) });
         }
     }
     return page;
 }
 
-Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int source, const QString &id)
+Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int source,
+                     const QString &id)
 {
     Details details;
     if (source == 1) {
@@ -219,7 +228,7 @@ Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int 
         details.title = entry.value(u"title"_s).toString();
         details.subtitle = summary(entry);
         QStringList description;
-        for (const auto &key : {u"genre"_s, u"availability"_s, u"language"_s}) {
+        for (const auto &key : { u"genre"_s, u"availability"_s, u"language"_s }) {
             const auto text = textValue(entry.value(key));
             if (!text.isEmpty())
                 description.append(text);
@@ -236,12 +245,18 @@ Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int 
         for (const auto &value : files) {
             const auto file = value.toObject();
             const auto path = file.value(u"path"_s).toString();
-            const auto name = QFileInfo(path.startsWith(u'/') ? path : QUrl(path).path()).fileName();
+            const auto name =
+                    QFileInfo(path.startsWith(u'/') ? path : QUrl(path).path()).fileName();
             QString label = file.value(u"format"_s).toString();
             if (!label.isEmpty())
                 label += u" · "_s;
             label += name;
-            addFile(details, {zxinfoFileUrl(endpoints, path), name, label, {}, file.value(u"size"_s).toInteger()});
+            addFile(details,
+                    { zxinfoFileUrl(endpoints, path),
+                      name,
+                      label,
+                      {},
+                      file.value(u"size"_s).toInteger() });
         }
     } else {
         const auto metadata = object.value(u"metadata"_s).toObject();
@@ -255,12 +270,16 @@ Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int 
         details.screenshot = endpoints.archive.resolved(QUrl(u"services/img/"_s + segment(id)));
         for (const auto &value : object.value(u"files"_s).toArray()) {
             const auto file = value.toObject();
-            if (file.value(u"private"_s).toString() == u"true"_s || file.value(u"private"_s).toBool())
+            if (file.value(u"private"_s).toString() == u"true"_s
+                || file.value(u"private"_s).toBool())
                 continue;
             const auto name = file.value(u"name"_s).toString();
-            const QUrl url = endpoints.archive.resolved(QUrl(u"download/"_s + segment(id) + u'/' + segment(name)));
-            addFile(details, {url, QFileInfo(name).fileName(), name, file.value(u"md5"_s).toString().toLatin1().toLower(),
-                              textValue(file.value(u"size"_s)).toLongLong()});
+            const QUrl url = endpoints.archive.resolved(
+                    QUrl(u"download/"_s + segment(id) + u'/' + segment(name)));
+            addFile(details,
+                    { url, QFileInfo(name).fileName(), name,
+                      file.value(u"md5"_s).toString().toLatin1().toLower(),
+                      textValue(file.value(u"size"_s)).toLongLong() });
         }
     }
     if (details.title.isEmpty())
@@ -270,8 +289,12 @@ Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int 
 
 QString downloadName(int source, const QString &id, const Media &file)
 {
-    const auto hash = QString::fromLatin1(QCryptographicHash::hash(file.url.toEncoded(), QCryptographicHash::Sha256).toHex().left(10));
-    QString name = (source == 1 ? u"zxinfo-"_s : u"archive-"_s) + id + u'-' + hash + u'-' + file.name;
+    const auto hash = QString::fromLatin1(
+            QCryptographicHash::hash(file.url.toEncoded(), QCryptographicHash::Sha256)
+                    .toHex()
+                    .left(10));
+    QString name =
+            (source == 1 ? u"zxinfo-"_s : u"archive-"_s) + id + u'-' + hash + u'-' + file.name;
     for (QChar &ch : name)
         if (ch.unicode() < 32 || ch.unicode() == 127 || u"<>:\"/\\|?*"_s.contains(ch))
             ch = u'_';

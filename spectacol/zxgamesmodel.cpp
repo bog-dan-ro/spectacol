@@ -42,13 +42,12 @@ QJsonObject readObject(QNetworkReply &reply)
 }
 } // namespace
 
-ZXGamesModel::ZXGamesModel(QObject *parent)
-    : ZXGamesModel(zxonline::Endpoints{}, parent)
-{}
+ZXGamesModel::ZXGamesModel(QObject *parent) : ZXGamesModel(zxonline::Endpoints{}, parent) { }
 
 ZXGamesModel::ZXGamesModel(const zxonline::Endpoints &endpoints, QObject *parent)
     : QAbstractListModel(parent), m_endpoints(endpoints)
-{}
+{
+}
 
 ZXGamesModel::~ZXGamesModel()
 {
@@ -59,7 +58,7 @@ ZXGamesModel::~ZXGamesModel()
 
 QStringList ZXGamesModel::sources() const
 {
-    return {u"Internet Archive"_s, u"ZXInfo"_s};
+    return { u"Internet Archive"_s, u"ZXInfo"_s };
 }
 
 void ZXGamesModel::setSource(int source)
@@ -83,17 +82,25 @@ QVariant ZXGamesModel::data(const QModelIndex &index, int role) const
         return {};
     const auto &game = m_games[index.row()];
     switch (role) {
-    case Title: return game.title;
-    case Subtitle: return game.subtitle;
-    case Identifier: return game.id;
-    case Screenshot: return game.screenshot;
-    default: return {};
+    case Title:
+        return game.title;
+    case Subtitle:
+        return game.subtitle;
+    case Identifier:
+        return game.id;
+    case Screenshot:
+        return game.screenshot;
+    default:
+        return {};
     }
 }
 
 QHash<int, QByteArray> ZXGamesModel::roleNames() const
 {
-    return {{Title, "title"}, {Subtitle, "subtitle"}, {Identifier, "identifier"}, {Screenshot, "screenshot"}};
+    return { { Title, "title" },
+             { Subtitle, "subtitle" },
+             { Identifier, "identifier" },
+             { Screenshot, "screenshot" } };
 }
 
 bool ZXGamesModel::canFetchMore(const QModelIndex &parent) const
@@ -116,10 +123,13 @@ QVariantMap ZXGamesModel::details() const
 {
     QVariantList files;
     for (const auto &file : m_details.files)
-        files.append(QVariantMap{{u"label"_s, file.label}, {u"url"_s, file.url}});
-    return {{u"title"_s, m_details.title}, {u"subtitle"_s, m_details.subtitle},
-            {u"description"_s, m_details.description}, {u"website"_s, m_details.website},
-            {u"screenshot"_s, m_details.screenshot}, {u"files"_s, files}};
+        files.append(QVariantMap{ { u"label"_s, file.label }, { u"url"_s, file.url } });
+    return { { u"title"_s, m_details.title },
+             { u"subtitle"_s, m_details.subtitle },
+             { u"description"_s, m_details.description },
+             { u"website"_s, m_details.website },
+             { u"screenshot"_s, m_details.screenshot },
+             { u"files"_s, files } };
 }
 
 void ZXGamesModel::abort(QPointer<QNetworkReply> &reply)
@@ -175,7 +185,8 @@ void ZXGamesModel::setError(const QString &error)
 QNetworkReply *ZXGamesModel::get(const QUrl &url)
 {
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"Spectacol/1.6 (+https://github.com/bog-dan-ro/spectacol)"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader,
+                      u"Spectacol/1.6 (+https://github.com/bog-dan-ro/spectacol)"_s);
     request.setTransferTimeout(30000);
     return m_network.get(request);
 }
@@ -220,7 +231,8 @@ void ZXGamesModel::fetchPage()
             ++m_nextPage;
             succeeded = true;
         } catch (const std::exception &error) {
-            setError(tr("%1 search failed: %2").arg(sources()[m_source], QString::fromUtf8(error.what())));
+            setError(tr("%1 search failed: %2")
+                             .arg(sources()[m_source], QString::fromUtf8(error.what())));
         }
         m_searchReply.clear();
         reply->deleteLater();
@@ -247,7 +259,8 @@ void ZXGamesModel::select(int row)
     const auto reply = m_detailReply;
     connect(reply, &QNetworkReply::finished, this, [this, reply] {
         try {
-            m_details = zxonline::parseDetails(readObject(*reply), m_endpoints, m_source, m_selectedId);
+            m_details =
+                    zxonline::parseDetails(readObject(*reply), m_endpoints, m_source, m_selectedId);
             emit detailsChanged();
         } catch (const std::exception &error) {
             setError(tr("Could not load title details: %1").arg(QString::fromUtf8(error.what())));
@@ -279,12 +292,14 @@ void ZXGamesModel::download(int fileIndex, const QString &folder)
                 throw std::runtime_error("The server did not return a media file");
             if (file.size > 0 && bytes.size() != file.size)
                 throw std::runtime_error("The downloaded size does not match the catalogue");
-            if (!file.md5.isEmpty() && QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex() != file.md5)
+            if (!file.md5.isEmpty()
+                && QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex() != file.md5)
                 throw std::runtime_error("The downloaded checksum does not match the catalogue");
             if (!QFileInfo(path).absoluteDir().mkpath(u"."_s))
                 throw std::runtime_error("Cannot create the download folder");
             QSaveFile output(path);
-            if (!output.open(QIODevice::WriteOnly) || output.write(bytes) != bytes.size() || !output.commit())
+            if (!output.open(QIODevice::WriteOnly) || output.write(bytes) != bytes.size()
+                || !output.commit())
                 throw std::runtime_error(output.errorString().toStdString());
             saved = true;
         } catch (const std::exception &error) {

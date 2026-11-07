@@ -21,7 +21,9 @@
 #include <stdexcept>
 
 AudioBuffer::AudioBuffer(uint32_t outputRate, uint32_t channels, std::shared_ptr<Control> control)
-    : m_frames(Capacity), m_outputRate(outputRate), m_channels(channels),
+    : m_frames(Capacity),
+      m_outputRate(outputRate),
+      m_channels(channels),
       m_control(control ? std::move(control) : std::make_shared<Control>())
 {
     if (!outputRate || (channels != 1 && channels != 2))
@@ -33,7 +35,8 @@ void AudioBuffer::Control::setFlag(uint32_t flag, bool on) noexcept
     auto current = state.load(std::memory_order_relaxed);
     while (bool(current & flag) != on
            && !state.compare_exchange_weak(current, ((current + 4) & ~flag) | (on ? flag : 0),
-                                          std::memory_order_release, std::memory_order_relaxed)) {}
+                                           std::memory_order_release, std::memory_order_relaxed)) {
+    }
 }
 
 void AudioBuffer::setActive(bool active) noexcept
@@ -44,7 +47,7 @@ void AudioBuffer::setActive(bool active) noexcept
 void AudioBuffer::beginFade() noexcept
 {
     m_fadeRemaining = (std::max)(1u, m_outputRate / 200);
-    m_fadeStep = {m_last[0] / m_fadeRemaining, m_last[1] / m_fadeRemaining};
+    m_fadeStep = { m_last[0] / m_fadeRemaining, m_last[1] / m_fadeRemaining };
     m_gain = 0;
 }
 
@@ -71,7 +74,8 @@ void AudioBuffer::push(std::span<const int16_t> stereo, uint32_t speedPercent,
             const auto seconds = std::chrono::duration<double>(now - m_previousPush).count();
             // Average time per input sample, not instantaneous frequency:
             // reciprocal averaging would bias duration under scheduling jitter.
-            const auto period = std::clamp(seconds * InputRate / m_previousFrames, 1.0 / 256, 100.0);
+            const auto period =
+                    std::clamp(seconds * InputRate / m_previousFrames, 1.0 / 256, 100.0);
             m_turboRate = 1.0 / (0.8 / m_turboRate + period * 0.2);
         }
         rate = m_turboRate;
@@ -89,7 +93,8 @@ void AudioBuffer::push(std::span<const int16_t> stereo, uint32_t speedPercent,
         return;
     }
     for (uint32_t i = 0; i < count; ++i)
-        m_frames[(write + i) & (Capacity - 1)] = {stereo[i * 2], stereo[i * 2 + 1], control, encodedRate};
+        m_frames[(write + i) & (Capacity - 1)] = { stereo[i * 2], stereo[i * 2 + 1], control,
+                                                   encodedRate };
     m_write.store(write + count, std::memory_order_release);
 }
 
@@ -119,7 +124,8 @@ void AudioBuffer::render(std::span<float> output) noexcept
     // Queued PCM keeps the speed at which it was generated. Applying a new
     // speed to older packets would stretch a turbo buffer into a long backlog.
     const double rate = (read != write ? m_frames[read & (Capacity - 1)].rate
-                                      : m_rate.load(std::memory_order_acquire)) / double(RateScale);
+                                       : m_rate.load(std::memory_order_acquire))
+            / double(RateScale);
     const auto target = targetFrames(rate);
     if (control & 3) {
         read = write;
@@ -132,7 +138,8 @@ void AudioBuffer::render(std::span<float> output) noexcept
     }
     // A slow occupancy feedback corrects device-clock drift without touching
     // emulation speed. At normal speeds the pitch correction is at most 0.1%.
-    const double desiredDrift = std::clamp((double(write - read) - target) / target * 0.01, -0.001, 0.001);
+    const double desiredDrift =
+            std::clamp((double(write - read) - target) / target * 0.01, -0.001, 0.001);
     const double duration = double(output.size() / m_channels) / m_outputRate;
     m_drift += (desiredDrift - m_drift) * (std::min)(duration, 1.0);
     const double outputRatio = double(InputRate) / m_outputRate * (1 + m_drift) / RateScale;
@@ -141,15 +148,14 @@ void AudioBuffer::render(std::span<float> output) noexcept
     for (std::size_t i = 0; i + m_channels <= output.size(); i += m_channels) {
         std::array<float, 2> value{};
         if (m_primed) {
-            if (write - read < 2
-                || m_frames[read & (Capacity - 1)].generation != control
+            if (write - read < 2 || m_frames[read & (Capacity - 1)].generation != control
                 || m_frames[(read + 1) & (Capacity - 1)].generation != control) {
                 m_primed = false;
             } else {
                 const auto &a = m_frames[read & (Capacity - 1)];
                 const auto &b = m_frames[(read + 1) & (Capacity - 1)];
-                value = {float((a.left + (b.left - a.left) * m_fraction) / 32768.0),
-                         float((a.right + (b.right - a.right) * m_fraction) / 32768.0)};
+                value = { float((a.left + (b.left - a.left) * m_fraction) / 32768.0),
+                          float((a.right + (b.right - a.right) * m_fraction) / 32768.0) };
                 // Advance one output sample in time, honoring rate boundaries
                 // inside that interval. A fast packet must not skip the first
                 // samples of a following normal-speed packet.
@@ -219,6 +225,7 @@ AudioBuffer::Statistics AudioBuffer::statistics() const noexcept
 {
     const auto read = m_read.load(std::memory_order_acquire);
     const auto write = m_write.load(std::memory_order_acquire);
-    return {m_underruns.load(std::memory_order_relaxed), m_overflows.load(std::memory_order_relaxed),
-            (std::min)(write - read, Capacity), m_rendered.load(std::memory_order_relaxed)};
+    return { m_underruns.load(std::memory_order_relaxed),
+             m_overflows.load(std::memory_order_relaxed), (std::min)(write - read, Capacity),
+             m_rendered.load(std::memory_order_relaxed) };
 }
