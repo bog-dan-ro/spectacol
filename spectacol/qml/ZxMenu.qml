@@ -195,6 +195,10 @@ ZxMenuItem {
 
     ZxMenuItem {
         text: qsTr("Machine")
+        onAboutToShow: {
+            multifaceButton.enabled = ZxEmulator.canNextNmi(true);
+            divMmcButton.enabled = ZxEmulator.canNextNmi(false);
+        }
         ZxMenuItem {
             text: qsTr("Choose machine ...")
             onTriggered: {
@@ -252,12 +256,16 @@ ZxMenuItem {
             }
         }
         ZxMenuItem {
+            id: multifaceButton
             visible: ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
+            enabled: false
             text: qsTr("Multiface button")
             onTriggered: { menuBar.close(); ZxEmulator.nextNmi(true); }
         }
         ZxMenuItem {
+            id: divMmcButton
             visible: ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
+            enabled: false
             text: qsTr("DivMMC drive button")
             onTriggered: { menuBar.close(); ZxEmulator.nextNmi(false); }
         }

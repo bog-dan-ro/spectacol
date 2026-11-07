@@ -1410,6 +1410,11 @@ void ZxEmulator::hardReset()
     m_engine->refreshFrame();
 }
 
+bool ZxEmulator::canNextNmi(bool multiface) const
+{
+    return emulator().readLock()->canTriggerNextNmi(multiface);
+}
+
 void ZxEmulator::nextNmi(bool multiface)
 {
     if (!emulator().writeLock()->triggerNextNmi(multiface))

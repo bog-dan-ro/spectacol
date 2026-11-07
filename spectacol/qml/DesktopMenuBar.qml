@@ -42,6 +42,7 @@ MenuBar {
     }
 
     function fill(menu) {
+        (menu.source || rootMenu).aboutToShow();
         for (let i = menu.count - 1; i >= 0; --i) {
             const item = menu.itemAt(i);
             if (item.subMenu)
@@ -89,6 +90,7 @@ MenuBar {
         id: itemComponent
         MenuItem {
             property var source
+            enabled: source ? source.enabled : false
             onTriggered: source.trigger()
         }
     }

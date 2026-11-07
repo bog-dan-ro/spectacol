@@ -38,16 +38,27 @@ ColumnLayout {
 
     function decrementCurrentIndex()
     {
-        menuView.decrementCurrentIndex();
+        moveCurrentIndex(-1);
     }
 
     function incrementCurrentIndex()
     {
-        menuView.incrementCurrentIndex();
+        moveCurrentIndex(1);
+    }
+
+    function moveCurrentIndex(step)
+    {
+        for (let i = 0; i < menuModel.count; ++i) {
+            menuView.currentIndex = (menuView.currentIndex + step + menuModel.count) % menuModel.count;
+            if (menuModel.get(menuView.currentIndex).modelData.enabled)
+                return;
+        }
     }
 
     function openMenu(menu, index)
     {
+        if (!menu.enabled)
+            return;
         if (menu.children.length)
             pushMenu(menu, index);
         else
@@ -73,6 +84,7 @@ ColumnLayout {
     onCurrentMenuChanged: {
         menuModel.clear();
         if (currentMenu !== null) {
+            currentMenu.aboutToShow();
             let items = currentMenu.children, len = currentMenu.children.length;
             for (let i = 0; i < len; ++i) {
                 var item = items[i];
@@ -253,6 +265,7 @@ ColumnLayout {
             id: menuItem
             required property var modelData
             required property int index
+            enabled: modelData.enabled
             objectName: "menuItem" + index
             width: menuView.width
             height: Theme.rowHeight
@@ -271,7 +284,7 @@ ColumnLayout {
                     text: root.plainText(menuItem.modelData.text)
                     elide: Text.ElideRight
                     font.pixelSize: Theme.body
-                    color: Theme.text
+                    color: menuItem.enabled ? Theme.text : Theme.textMuted
                 }
                 Text {
                     visible: menuItem.modelData.children.length > 0

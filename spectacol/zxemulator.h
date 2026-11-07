@@ -316,6 +316,7 @@ public slots:
     void reset();
     void hardReset();
     void nmi();
+    bool canNextNmi(bool multiface) const;
     void nextNmi(bool multiface);
     Q_INVOKABLE void setNextKeyState(int key, bool pressed);
     void quickSaveSnapshot();

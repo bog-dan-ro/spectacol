@@ -4,8 +4,10 @@ Item {
     property string text
 
     signal triggered()
+    signal aboutToShow()
 
     function trigger() {
-        triggered();
+        if (enabled)
+            triggered();
     }
 }
