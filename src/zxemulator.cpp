@@ -2093,12 +2093,13 @@ void ZxEmulator::gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button
     case ZxSettings::ToggleCursorJoystick:
         if (m_paused)
             return;
-        if (m_showControlsIcons)
-            emit showControlsIconsChanged(m_showControlsIcons = false);
-        QTimer::singleShot(0, this, [this, action] {
-            emit toggleOnScreenControls(*action == ZxSettings::ToggleKeyboard ? Keyboard48K
-                                                                              : CursorJoystick);
-        });
+        QMetaObject::invokeMethod(
+                this,
+                [this, action] {
+                    emit toggleOnScreenControls(
+                            *action == ZxSettings::ToggleKeyboard ? Keyboard48K : CursorJoystick);
+                },
+                Qt::QueuedConnection);
         break;
     case ZxSettings::TogglePause:
         togglePaused();

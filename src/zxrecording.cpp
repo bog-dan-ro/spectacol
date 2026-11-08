@@ -208,12 +208,15 @@ void ZxRecording::resume()
         return;
     const auto generation = m_generation;
     // The input which resumed us must reach the guest before its next instruction.
-    QTimer::singleShot(0, this, [this, generation] {
-        if (generation == m_generation && !m_seeking) {
-            releasePause();
-            refresh();
-        }
-    });
+    QMetaObject::invokeMethod(
+            this,
+            [this, generation] {
+                if (generation == m_generation && !m_seeking) {
+                    releasePause();
+                    refresh();
+                }
+            },
+            Qt::QueuedConnection);
 }
 
 bool ZxRecording::resumeOnGameplayInput()
