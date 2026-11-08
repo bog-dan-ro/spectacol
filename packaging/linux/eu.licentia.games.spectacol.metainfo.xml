@@ -16,6 +16,14 @@
     <p>Load tapes, disks, snapshots and recordings, browse online software
     catalogues, and explore programs with the built-in debugger and assembler.</p>
   </description>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/bog-dan-ro/spectacol/refs/heads/master/packaging/flatpak/screen0.png</image>
+      <caption>128K</caption>
+    </screenshot>
+  </screenshots>
+
   <launchable type="desktop-id">eu.licentia.games.spectacol.desktop</launchable>
   <url type="homepage">https://github.com/bog-dan-ro/spectacol</url>
   <url type="bugtracker">https://github.com/bog-dan-ro/spectacol/issues</url>
