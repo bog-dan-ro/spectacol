@@ -29,11 +29,9 @@ modules:
       - -DFETCHCONTENT_SOURCE_DIR_SAFECPP=/run/build/spectacol/dependencies/safecpp
       - -DFETCHCONTENT_SOURCE_DIR_ZXKIT=/run/build/spectacol/dependencies/zxkit
     sources:
-      - type: dir
-        path: ../..
-        skip:
-          - .git
-          - build
+      - type: git
+        url: https://github.com/bog-dan-ro/spectacol.git
+        tag: master
       - type: git
         url: https://github.com/bog-dan-ro/safecpp.git
         tag: v1.0

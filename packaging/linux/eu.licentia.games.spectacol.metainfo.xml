@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org> -->
+<!-- Copyright (c) 2026, BogDan Vatra <bogdan@kde.org> -->
 <component type="desktop-application">
   <id>eu.licentia.games.spectacol</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <name>Spectacol</name>
   <summary>Play and debug ZX Spectrum software</summary>
+  <developer id="eu.licentia">
+    <name>BogDan Vatra</name>
+  </developer>
   <description>
     <p>Spectacol emulates the ZX Spectrum family, including the ZX Spectrum Next,
     Timex and Romanian computers. Its interface supports keyboards, touch screens
@@ -16,9 +19,6 @@
   <launchable type="desktop-id">eu.licentia.games.spectacol.desktop</launchable>
   <url type="homepage">https://github.com/bog-dan-ro/spectacol</url>
   <url type="bugtracker">https://github.com/bog-dan-ro/spectacol/issues</url>
-  <developer id="io.github.bog-dan-ro">
-    <name>BogDan Vatra</name>
-  </developer>
   <provides>
     <binary>spectacol</binary>
   </provides>
@@ -27,4 +27,16 @@
     <category>Emulator</category>
   </categories>
   <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="3.8.0.0" date="2026-11-08">
+      <url type="details">https://github.com/bog-dan-ro/spectacol/releases/tag/v3.8.0</url>
+      <description>
+        <p>Alpha 0 release</p>
+          <ul>
+            <li>Ported to Qt 6.11.x</li>
+            <li>Ported to ZxKit</li>
+          </ul>
+      </description>
+    </release>
+  </releases>
 </component>
