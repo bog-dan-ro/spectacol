@@ -112,32 +112,35 @@ qt_add_qml_module(spectacol
     URI Spectacol
     VERSION 1.0
     SOURCES
-        audiooutput.cpp audiooutput.h
         audiobuffer.cpp audiobuffer.h
+        audiooutput.cpp audiooutput.h
         breakpointsmodel.cpp breakpointsmodel.h
-        debuggermodels.cpp debuggermodels.h
-        debugsymbols.cpp debugsymbols.h
-        romoverrides.cpp romoverrides.h
-        disassamblemodel.cpp disassamblemodel.h
-        folderlistmodel.cpp folderlistmodel.h
-        zxemulator.cpp zxemulator.h
-        zxrecording.cpp zxrecording.h
-        zxscreen.cpp zxscreen.h
-        screenfilters.h
-        zxsettings.cpp zxsettings.h
         controllerinput.cpp controllerinput.h
         controllerprofiles.cpp controllerprofiles.h
+        debuggermodels.cpp debuggermodels.h
+        debugsymbols.cpp debugsymbols.h
+        disassamblemodel.cpp disassamblemodel.h
+        disks.h disks.cpp
+        folderlistmodel.cpp folderlistmodel.h
+        nextsdcard.h nextsdcard.cpp
         nextuarthooks.cpp nextuarthooks.h
-        zxtape.cpp zxtape.h
-        zxtapedata.cpp zxtapedata.h
-        zximage.cpp zximage.h
         pokefindermodel.cpp pokefindermodel.h
         pokemodel.cpp pokemodel.h
         qmlui.cpp qmlui.h
+        romoverrides.cpp romoverrides.h
+        screenfilters.h
+        sdcardfiles.h sdcardfiles.cpp
         spectrumscreen.cpp spectrumscreen.h
         z80assembler.cpp z80assembler.h
+        zxemulator.cpp zxemulator.h
         zxgamesmodel.cpp zxgamesmodel.h
+        zximage.cpp zximage.h
+        zxrecording.cpp zxrecording.h
         zxrequests.cpp zxrequests.h
+        zxscreen.cpp zxscreen.h
+        zxsettings.cpp zxsettings.h
+        zxtape.cpp zxtape.h
+        zxtapedata.cpp zxtapedata.h
 
     QML_FILES
         qml/AboutPage.qml
@@ -216,9 +219,7 @@ qt_add_qml_module(spectacol
         qml/Utils.js
         qml/ZxMenuItem.qml
         qml/private/TextSizes.qml
-        SOURCES disks.h disks.cpp
-        SOURCES nextsdcard.h nextsdcard.cpp
-        SOURCES sdcardfiles.h sdcardfiles.cpp
+
 )
 
 target_link_libraries(spectacol PRIVATE
@@ -236,7 +237,7 @@ qt_add_resources(spectacol "uart_scripts"
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(spectacolAppId "io.github.bog_dan_ro.spectacol")
+    set(spectacolAppId "eu.licentia.games.spectacol")
     set_target_properties(spectacol PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
     install(TARGETS spectacol
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime

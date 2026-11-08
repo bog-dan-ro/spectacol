@@ -44,13 +44,13 @@ if(NOT TARGET ZX::Kit)
         FetchContent_Declare(
             ZxKit
             GIT_REPOSITORY https://github.com/bog-dan-ro/ZxKit.git
-            GIT_TAG c22493baa0d78211ba48b078493fad04c6aebaa5
+            GIT_TAG master
         )
     endif()
     FetchContent_MakeAvailable(ZxKit)
 endif()
 
-add_subdirectory(spectacol)
+add_subdirectory(src)
 
 option(SPECTACOL_BUILD_TESTS "Build Spectacol's offline catalogue and input tests" OFF)
 if(SPECTACOL_BUILD_TESTS)
