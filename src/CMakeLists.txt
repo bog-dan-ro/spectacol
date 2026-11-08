@@ -255,11 +255,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     install(FILES "${gamepadQmlDir}/qmldir"
         DESTINATION qml/QtGamepadLegacy COMPONENT Runtime
     )
+    set(gamepadBackends "")
     foreach(backend IN ITEMS QEvdevGamepadBackendPlugin QSdl2GamepadBackendPlugin)
         if(TARGET ${backend})
             install(TARGETS ${backend}
                 LIBRARY DESTINATION plugins/legacygamepads COMPONENT Runtime
             )
+            list(APPEND gamepadBackends ${backend})
         endif()
     endforeach()
 
@@ -300,4 +302,102 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     install(FILES "${zxkitSourceDir}/LICENSES/ayumi.txt"
         DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol COMPONENT Runtime
     )
+
+    # The appImage target installs the Runtime component into a fresh AppDir and
+    # packages it with linuxdeploy and its Qt plugin.
+    find_program(SPECTACOL_LINUXDEPLOY
+        NAMES linuxdeploy "linuxdeploy-${CMAKE_HOST_SYSTEM_PROCESSOR}.AppImage"
+        DOC "linuxdeploy executable"
+    )
+    set(linuxdeployDir "")
+    if(SPECTACOL_LINUXDEPLOY)
+        get_filename_component(linuxdeployDir "${SPECTACOL_LINUXDEPLOY}" DIRECTORY)
+    endif()
+    find_program(SPECTACOL_LINUXDEPLOY_PLUGIN_QT
+        NAMES linuxdeploy-plugin-qt "linuxdeploy-plugin-qt-${CMAKE_HOST_SYSTEM_PROCESSOR}.AppImage"
+        HINTS "${linuxdeployDir}"
+        DOC "linuxdeploy-plugin-qt executable"
+    )
+    if(SPECTACOL_LINUXDEPLOY AND SPECTACOL_LINUXDEPLOY_PLUGIN_QT)
+        get_filename_component(linuxdeployPluginDir "${SPECTACOL_LINUXDEPLOY_PLUGIN_QT}" DIRECTORY)
+        set(appDir "${CMAKE_BINARY_DIR}/AppDir")
+        set(appImagePath
+            "${CMAKE_BINARY_DIR}/packages/Spectacol-${PROJECT_VERSION}-${CMAKE_SYSTEM_PROCESSOR}.AppImage")
+        set(qtPluginsDir "${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS}")
+        get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+        set(installConfig "")
+        if(isMultiConfig)
+            set(installConfig --config $<CONFIG>)
+        endif()
+
+        # linuxdeploy's Qt plugin deploys the Wayland platform library without its
+        # dynamically loaded EGL, shell and decoration integrations. Stage these
+        # first so linuxdeploy also resolves and bundles their shared dependencies.
+        set(stageWaylandPlugins "")
+        foreach(pluginType IN ITEMS
+                wayland-graphics-integration-client
+                wayland-shell-integration
+                wayland-decoration-client)
+            if(IS_DIRECTORY "${qtPluginsDir}/${pluginType}")
+                list(APPEND stageWaylandPlugins
+                    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+                        "${qtPluginsDir}/${pluginType}" "${appDir}/usr/plugins/${pluginType}"
+                )
+            endif()
+        endforeach()
+        file(GLOB platformPlugins RELATIVE "${qtPluginsDir}/platforms"
+            "${qtPluginsDir}/platforms/libqoffscreen.so"
+            "${qtPluginsDir}/platforms/libqwayland*.so"
+        )
+        list(SORT platformPlugins)
+        list(JOIN platformPlugins "$<SEMICOLON>" platformPlugins)
+
+        add_custom_target(appImage
+            # A fresh AppDir prevents files from older packages leaking in.
+            COMMAND "${CMAKE_COMMAND}" -E rm -rf "${appDir}"
+            COMMAND "${CMAKE_COMMAND}" --install "${CMAKE_BINARY_DIR}" ${installConfig}
+                --component Runtime --prefix "${appDir}/usr"
+            # appimagetool's metadata lookup still uses the older AppStream suffix.
+            COMMAND "${CMAKE_COMMAND}" -E create_symlink "${spectacolAppId}.metainfo.xml"
+                "${appDir}/usr/${CMAKE_INSTALL_DATADIR}/metainfo/${spectacolAppId}.appdata.xml"
+            ${stageWaylandPlugins}
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/packages"
+            # Both linuxdeploy and the generated image can run without a FUSE mount.
+            # linuxdeploy looks for its plugins beside itself and in PATH.
+            COMMAND "${CMAKE_COMMAND}" -E env
+                --modify "PATH=path_list_prepend:${linuxdeployPluginDir}"
+                "QMAKE=${QT6_INSTALL_PREFIX}/${QT6_INSTALL_BINS}/qmake"
+                "QML_SOURCES_PATHS=${CMAKE_CURRENT_SOURCE_DIR}/qml"
+                "QML_MODULES_PATHS=${appDir}/usr/qml"
+                "LD_LIBRARY_PATH=${appDir}/usr/${CMAKE_INSTALL_LIBDIR}:${QT6_INSTALL_PREFIX}/${QT6_INSTALL_LIBS}"
+                "EXTRA_QT_MODULES=svg$<SEMICOLON>waylandclient"
+                "EXTRA_PLATFORM_PLUGINS=${platformPlugins}"
+                APPIMAGE_EXTRACT_AND_RUN=1
+                "VERSION=${PROJECT_VERSION}"
+                "OUTPUT=${appImagePath}"
+                "${SPECTACOL_LINUXDEPLOY}" --appdir "${appDir}" --plugin qt --output appimage
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+            COMMENT "Creating ${appImagePath}"
+            USES_TERMINAL
+            VERBATIM
+        )
+        add_dependencies(appImage spectacol GamepadLegacyQuickPrivateplugin ${gamepadBackends})
+    else()
+        set(missingTools "")
+        if(NOT SPECTACOL_LINUXDEPLOY)
+            list(APPEND missingTools
+                "-DSPECTACOL_LINUXDEPLOY=/path/to/linuxdeploy-${CMAKE_HOST_SYSTEM_PROCESSOR}.AppImage")
+        endif()
+        if(NOT SPECTACOL_LINUXDEPLOY_PLUGIN_QT)
+            list(APPEND missingTools
+                "-DSPECTACOL_LINUXDEPLOY_PLUGIN_QT=/path/to/linuxdeploy-plugin-qt-${CMAKE_HOST_SYSTEM_PROCESSOR}.AppImage")
+        endif()
+        list(JOIN missingTools " " missingTools)
+        add_custom_target(appImage
+            COMMAND "${CMAKE_COMMAND}" -E echo
+                "appImage needs linuxdeploy and its Qt plugin: configure with ${missingTools}"
+            COMMAND "${CMAKE_COMMAND}" -E false
+            VERBATIM
+        )
+    endif()
 endif()

@@ -72,12 +72,12 @@ flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/fl
 flatpak install --user flathub org.kde.Sdk//6.11 org.kde.Platform//6.11
 flatpak-builder --user --force-clean --jobs=4 \
     --state-dir=build/flatpak-state --repo=build/flatpak-repo \
-    build/flatpak packaging/flatpak/io.github.bog_dan_ro.spectacol.json
+    build/flatpak packaging/flatpak/eu.licentia.games.spectacol.yaml
 mkdir -p build/packages
 flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
-    build/flatpak-repo build/packages/Spectacol.flatpak io.github.bog_dan_ro.spectacol
+    build/flatpak-repo build/packages/Spectacol.flatpak eu.licentia.games.spectacol
 flatpak install --user build/packages/Spectacol.flatpak
-flatpak run io.github.bog_dan_ro.spectacol
+flatpak run eu.licentia.games.spectacol
 ```
 
 The manifest builds the current Spectacol working tree. Dependencies are pinned
@@ -98,24 +98,30 @@ source and Flathub submission.
 ### AppImage
 
 Use a complete Qt 6.11+ desktop SDK with Quick, Multimedia, ShaderTools, SVG and
-Wayland support, a C++23 compiler, Ninja, Python 3, and
+Wayland support, a C++23 compiler, Ninja, and
 [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy/releases) with its
 [Qt plugin](https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases).
 Download tools for the build machine's architecture, put both executables in the
-same directory and make them executable. The script does not download tools.
+same directory and make them executable. The build does not download them.
+
+The `appImage` target packages a configured build directory, like `apk` on Android.
+CMake looks for `linuxdeploy` (or `linuxdeploy-ARCH.AppImage`) in `PATH`, and for
+`linuxdeploy-plugin-qt` (or `linuxdeploy-plugin-qt-ARCH.AppImage`) beside it or in `PATH`.
+Otherwise pass `SPECTACOL_LINUXDEPLOY` and `SPECTACOL_LINUXDEPLOY_PLUGIN_QT`:
 
 ```sh
-python3 tools/build_appimage.py --qt-prefix /path/to/Qt/6.11.1/gcc_64 \
-    --linuxdeploy /path/to/linuxdeploy-x86_64.AppImage
-chmod +x build/packages/Spectacol-*.AppImage
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_PREFIX_PATH=/path/to/Qt/6.11.1/gcc_64 \
+    -DSPECTACOL_LINUXDEPLOY=/path/to/linuxdeploy-x86_64.AppImage \
+    -DSPECTACOL_LINUXDEPLOY_PLUGIN_QT=/path/to/linuxdeploy-plugin-qt-x86_64.AppImage
+cmake --build build --target appImage    # or: ninja -C build appImage
 ./build/packages/Spectacol-1.6.0.5-x86_64.AppImage
 ```
 
-The helper configures a Release build and installs only the `Runtime` component
-into a fresh AppDir. linuxdeploy bundles Qt, QML imports, SVG/Wayland support and
+The target builds Spectacol and installs only the `Runtime` component into a fresh
+`build/AppDir`. linuxdeploy bundles Qt, QML imports, SVG/Wayland support and
 shared-library dependencies, then writes `build/packages/Spectacol-VERSION-ARCH.AppImage`.
-`--build-dir`, `--output-dir`, `--jobs` and extra CMake arguments after `--` are
-supported. Staging directories remain inside the build directory for inspection.
+The AppDir remains in the build directory for inspection.
 Build release AppImages on the oldest distribution you support: the build host's
 glibc and C++ runtime set the minimum host requirements. Build each architecture on a matching
 machine/toolchain.
@@ -142,7 +148,7 @@ APPIMAGE_EXTRACT_AND_RUN=1 QT_QPA_PLATFORM=offscreen \
 
 Also launch the package with `QT_QPA_PLATFORM=wayland` in a Wayland session and
 `QT_QPA_PLATFORM=xcb` with an X server. These exercise the real graphics paths;
-the offscreen check does not load Wayland's EGL integration. The helper stages
+the offscreen check does not load Wayland's EGL integration. The target stages
 the Wayland graphics, shell and decoration plugins before dependency deployment.
 
 ## Software screen filters

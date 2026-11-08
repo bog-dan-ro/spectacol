@@ -34,6 +34,11 @@ find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Quick Multimedia Sha
 
 qt_standard_project_setup(REQUIRES ${QT_REQUIRED_VERSION})
 
+# Keep every QML module (Spectacol and QtGamepadLegacy) under one import path.
+# Qt Creator's QML code model only reads import paths from QML_IMPORT_PATH.
+set(QT_QML_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/qml")
+set(QML_IMPORT_PATH "${QT_QML_OUTPUT_DIRECTORY}" CACHE STRING "QML import paths for Qt Creator" FORCE)
+
 if(NOT TARGET ZX::Kit)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../include/zxkit/zxkit.h")
         FetchContent_Declare(

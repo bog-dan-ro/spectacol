@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org> -->
 <component type="desktop-application">
-  <id>io.github.bog_dan_ro.spectacol</id>
+  <id>eu.licentia.games.spectacol</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <name>Spectacol</name>
@@ -13,7 +13,7 @@
     <p>Load tapes, disks, snapshots and recordings, browse online software
     catalogues, and explore programs with the built-in debugger and assembler.</p>
   </description>
-  <launchable type="desktop-id">io.github.bog_dan_ro.spectacol.desktop</launchable>
+  <launchable type="desktop-id">eu.licentia.games.spectacol.desktop</launchable>
   <url type="homepage">https://github.com/bog-dan-ro/spectacol</url>
   <url type="bugtracker">https://github.com/bog-dan-ro/spectacol/issues</url>
   <developer id="io.github.bog-dan-ro">
