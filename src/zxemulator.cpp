@@ -401,6 +401,14 @@ ZxEmulator::ZxEmulator(QObject *parent)
     const auto feature = QJniObject::fromString(u"android.hardware.touchscreen"_s);
     m_touchscreen = manager.callMethod<jboolean>("hasSystemFeature", "(Ljava/lang/String;)Z",
                                                  feature.object<jstring>());
+#else
+    const auto devices = QInputDevice::devices();
+    for (const auto device : devices) {
+        if (device->type() == QInputDevice::DeviceType::TouchScreen) {
+            m_touchscreen = true;
+            break;
+        }
+    }
 #endif
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_tape, QQmlEngine::CppOwnership);

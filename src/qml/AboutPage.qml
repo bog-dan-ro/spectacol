@@ -98,7 +98,7 @@ Sheet {
             currentIndex: page.tab
             onCurrentIndexChanged: page.tab = currentIndex
             Repeater {
-                model: Theme.mobileUi ? [qsTr("About"), qsTr("Menus"), qsTr("Games")] : page.tabs
+                model: Theme.touchScreenUi ? [qsTr("About"), qsTr("Menus"), qsTr("Games")] : page.tabs
                 delegate: TabButton {
                     required property string modelData
                     required property int index

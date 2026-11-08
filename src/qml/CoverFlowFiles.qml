@@ -311,7 +311,7 @@ Item
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: headerColumn.implicitHeight + Theme.sp(Theme.mobileUi ? 2 : 8)
+        height: headerColumn.implicitHeight + Theme.sp(Theme.touchScreenUi ? 2 : 8)
         color: Theme.surface
 
         Column {
@@ -319,11 +319,11 @@ Item
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: Theme.sp(Theme.mobileUi ? 1 : 6)
-            anchors.rightMargin: Theme.sp(Theme.mobileUi ? 1 : 6)
+            anchors.leftMargin: Theme.sp(Theme.touchScreenUi ? 1 : 6)
+            anchors.rightMargin: Theme.sp(Theme.touchScreenUi ? 1 : 6)
             spacing: Theme.sp(1)
             RowLayout {
-                visible: Theme.mobileUi
+                visible: Theme.touchScreenUi
                 width: parent.width
                 spacing: Theme.sp(2)
                 ToolButton {
@@ -354,7 +354,7 @@ Item
                 width: parent.width
                 Button {
                     objectName: "filesUp"
-                    text: Theme.mobileUi ? "↑" : qsTr("Up")
+                    text: Theme.touchScreenUi ? "↑" : qsTr("Up")
                     Accessible.name: qsTr("Up a folder")
                     Layout.minimumWidth: Theme.rowHeight
                     Layout.minimumHeight: Theme.rowHeight
@@ -385,14 +385,14 @@ Item
                 }
             }
             Text {
-                visible: !Theme.mobileUi
+                visible: !Theme.touchScreenUi
                 text: (artist_text_label.root ? qsTr("Open a file") : qsTr("‹ Up a folder")).toUpperCase()
                 font.pixelSize: Theme.caption
                 font.letterSpacing: Theme.uiScale
                 color: Theme.textMuted
             }
             Text {
-                visible: !Theme.mobileUi
+                visible: !Theme.touchScreenUi
                 width: parent.width
                 text: filesModel.folder
                 elide: Text.ElideMiddle
@@ -411,11 +411,11 @@ Item
     }
 
     ShaderEffect {
-        visible: fileList.viewMode === 0 && !Theme.mobileUi
+        visible: fileList.viewMode === 0 && !Theme.touchScreenUi
         smooth: true
         property variant source : ShaderEffectSource {
             sourceItem: filesView
-            live: fileList.viewMode === 0 && !Theme.mobileUi
+            live: fileList.viewMode === 0 && !Theme.touchScreenUi
             width : fileList.width
             height : fileList.height
         }

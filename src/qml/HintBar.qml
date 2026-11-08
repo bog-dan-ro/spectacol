@@ -26,11 +26,11 @@ import Spectacol
 Item {
     id: bar
     property var hints: []
-    readonly property bool compact: Theme.mobileUi || width < Theme.sp(150)
+    readonly property bool compact: Theme.touchScreenUi || width < Theme.sp(150)
     readonly property bool gamepad: Theme.gamepadHints
     readonly property var shownHints: Theme.remoteHints
         ? hints.filter(h => ["A", "B", "◀▶", "↑↓"].includes(h.pad)) : hints
-    readonly property bool plainActions: Theme.mobileUi && !Theme.showHintBar
+    readonly property bool plainActions: Theme.touchScreenUi && !Theme.showHintBar
     implicitHeight: bar.compact ? Theme.rowHeight + Theme.sp(2) : flow.implicitHeight + Theme.sp(6)
 
     function padColor(pad: string): color {

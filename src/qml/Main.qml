@@ -27,7 +27,7 @@ import "private"
 ApplicationWindow {
     id: mainScreen
     visible: true
-    visibility: Qt.platform.os === "android" ? Window.FullScreen : Window.AutomaticVisibility
+    visibility: Theme.touchScreenUi ? Window.FullScreen : Window.AutomaticVisibility
 
     width: 320 * 3
     height: 256 * 3

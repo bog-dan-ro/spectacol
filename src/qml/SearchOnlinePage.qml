@@ -138,8 +138,8 @@ Sheet {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Theme.sp(Theme.mobileUi ? 2 : 5)
-        spacing: Theme.sp(Theme.mobileUi ? 1 : 3)
+        anchors.margins: Theme.sp(Theme.touchScreenUi ? 2 : 5)
+        spacing: Theme.sp(Theme.touchScreenUi ? 1 : 3)
         GridLayout {
             columns: page.narrow ? 2 : 3
             Layout.fillWidth: true

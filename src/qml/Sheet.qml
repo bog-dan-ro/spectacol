@@ -106,11 +106,11 @@ FocusScope {
                 objectName: "sheetHeader"
                 visible: sheet.title !== "" || sheet.crumb !== ""
                 Layout.fillWidth: true
-                Layout.preferredHeight: Theme.mobileUi ? Theme.headerHeight : desktopHeader.implicitHeight + Theme.sp(10)
+                Layout.preferredHeight: Theme.touchScreenUi ? Theme.headerHeight : desktopHeader.implicitHeight + Theme.sp(10)
 
                 ColumnLayout {
                     id: desktopHeader
-                    visible: !Theme.mobileUi
+                    visible: !Theme.touchScreenUi
                     anchors.fill: parent
                     anchors.leftMargin: Theme.sp(6)
                     anchors.rightMargin: Theme.sp(6)
@@ -136,7 +136,7 @@ FocusScope {
                     }
                 }
                 RowLayout {
-                    visible: Theme.mobileUi
+                    visible: Theme.touchScreenUi
                     anchors.fill: parent
                     anchors.leftMargin: Theme.sp(1)
                     anchors.rightMargin: Theme.sp(1)

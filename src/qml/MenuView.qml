@@ -130,21 +130,21 @@ ColumnLayout {
     Item {
         objectName: "menuHeader"
         Layout.fillWidth: true
-        Layout.preferredHeight: Theme.mobileUi ? Theme.headerHeight : headerColumn.implicitHeight + Theme.sp(10)
+        Layout.preferredHeight: Theme.touchScreenUi ? Theme.headerHeight : headerColumn.implicitHeight + Theme.sp(10)
 
         ColumnLayout {
             id: headerColumn
             anchors.fill: parent
-            anchors.leftMargin: Theme.sp(Theme.mobileUi ? 1 : 6)
-            anchors.rightMargin: Theme.sp(Theme.mobileUi ? 1 : 6)
-            anchors.topMargin: Theme.mobileUi ? 0 : Theme.sp(6)
-            anchors.bottomMargin: Theme.mobileUi ? 0 : Theme.sp(4)
+            anchors.leftMargin: Theme.sp(Theme.touchScreenUi ? 1 : 6)
+            anchors.rightMargin: Theme.sp(Theme.touchScreenUi ? 1 : 6)
+            anchors.topMargin: Theme.touchScreenUi ? 0 : Theme.sp(6)
+            anchors.bottomMargin: Theme.touchScreenUi ? 0 : Theme.sp(4)
             spacing: Theme.sp(1)
 
             RowLayout {
                 spacing: Theme.sp(3)
                 ToolButton {
-                    visible: Theme.mobileUi
+                    visible: Theme.touchScreenUi
                     objectName: "menuBack"
                     text: root.menus.length ? "‹" : "×"
                     font.pixelSize: Theme.title
@@ -155,7 +155,7 @@ ColumnLayout {
                 }
                 // the 128K's rainbow stripe
                 Row {
-                    visible: !Theme.mobileUi && root.menus.length === 0
+                    visible: !Theme.touchScreenUi && root.menus.length === 0
                     Repeater {
                         model: Theme.stripe
                         delegate: Rectangle {
@@ -168,9 +168,9 @@ ColumnLayout {
                     }
                 }
                 Text {
-                    visible: !Theme.mobileUi && root.menus.length > 0
+                    visible: !Theme.touchScreenUi && root.menus.length > 0
                     text: "‹"
-                    font.pixelSize: Theme.mobileUi ? Theme.body : Theme.pageTitle
+                    font.pixelSize: Theme.touchScreenUi ? Theme.body : Theme.pageTitle
                     color: Theme.textMuted
                 }
                 Text {
@@ -179,13 +179,13 @@ ColumnLayout {
                     Accessible.role: Accessible.StaticText
                     Accessible.name: text
                     elide: Text.ElideRight
-                    font.pixelSize: Theme.mobileUi ? Theme.body : Theme.pageTitle
+                    font.pixelSize: Theme.touchScreenUi ? Theme.body : Theme.pageTitle
                     font.weight: Font.DemiBold
                     color: Theme.text
                 }
             }
             Text {
-                visible: !Theme.mobileUi
+                visible: !Theme.touchScreenUi
                 Layout.fillWidth: true
                 text: (root.menus.length === 0 ? ZxEmulator.settings.currentMachine
                                                : root.menus.map(m => m.menu === root.rootMenu ? "Spectacol" : root.plainText(m.menu.text)).join(" › ")).toUpperCase()
@@ -198,7 +198,7 @@ ColumnLayout {
 
         MouseArea {
             anchors.fill: parent
-            enabled: !Theme.mobileUi && root.menus.length > 0
+            enabled: !Theme.touchScreenUi && root.menus.length > 0
             onClicked: root.popMenu()
         }
 
@@ -296,7 +296,7 @@ ColumnLayout {
 
             MouseArea {
                 anchors.fill: parent
-                hoverEnabled: !Theme.mobileUi
+                hoverEnabled: !Theme.touchScreenUi
                 onEntered: menuView.currentIndex = menuItem.index
                 onClicked: root.openMenu(menuItem.modelData, menuItem.index)
             }
