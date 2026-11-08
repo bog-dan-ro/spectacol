@@ -203,9 +203,9 @@ Item {
         const extraCodes = [Qt.Key_F1, Qt.Key_F2, Qt.Key_F3, Qt.Key_F4,
                             Qt.Key_Escape, Qt.Key_Enter, Qt.Key_Control, Qt.Key_ScrollLock];
         const extraLabels = ["F1", "F2", "F3", "F4", "ESC", "LINE FEED", "CTRL", "NO SCROLL"];
-        const nextCodes = [14,9,11,12, 3,1,2,0, 10,8,13,15, 7,6,5,4];
-        const nextLabels = ["EDIT","CAPS LOCK","TRUE VIDEO","INV VIDEO", "UP","LEFT","DOWN","RIGHT",
-                            "GRAPH","EXTEND","BREAK","DELETE", ";", "\"", ",", "."];
+        const nextCodes = [14,9,11,12, 10,8,13,15, 7,6,3,5, 4,1,2,0];
+        const nextLabels = ["EDIT","CAPS LOCK","TRUE VIDEO","INV VIDEO", "GRAPH","EXTEND","BREAK","DELETE",
+                            ";", "\"", "\u2191", ",", ".", "\u2190", "\u2193", "\u2192"];
         for (let row = 0; row < 4; ++row) {
             for (let column = 0; column < 10; ++column) {
                 const original = zx48Keyboard.get(row * 10 + column);
