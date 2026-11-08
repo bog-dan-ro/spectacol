@@ -41,6 +41,8 @@ qt_add_resources(spectacol "resources"
         images/keyboard-icon.svg
         images/pause.svg
         images/play.svg
+        images/sticky-shift-on.svg
+        images/sticky-shift.svg
 
         qtquickcontrols2.conf
 

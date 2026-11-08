@@ -382,12 +382,25 @@ ApplicationWindow {
                 }
             }
 
-            RoundButton {
+            // Not dimmed with the others: it is used together with the on-screen keyboard.
+            Image {
                 id: stickyCSSSButton
-                radius: 7
-                checkable: true
-                checked: false
-                text: onScreen48Keyboard.cobraMode ? "Sticky CS/SS/CTRL" : "Sticky CS/SS"
+                property bool checked: false
+                height: Screen.pixelDensity * 7
+                width: Screen.pixelDensity * 7
+                sourceSize: Qt.size(width, height)
+                fillMode: Image.PreserveAspectFit
+                source: checked ? "qrc:/images/sticky-shift-on.svg" : "qrc:/images/sticky-shift.svg"
+                Accessible.role: Accessible.CheckBox
+                Accessible.name: onScreen48Keyboard.cobraMode ? "Sticky CS/SS/CTRL" : "Sticky CS/SS"
+                Accessible.checkable: true
+                Accessible.checked: checked
+                Accessible.onPressAction: checked = !checked
+                Accessible.onToggleAction: checked = !checked
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: stickyCSSSButton.checked = !stickyCSSSButton.checked
+                }
             }
 
             Image {
