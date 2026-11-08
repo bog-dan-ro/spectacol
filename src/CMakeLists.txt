@@ -375,8 +375,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
                 "EXTRA_QT_MODULES=svg$<SEMICOLON>waylandclient"
                 "EXTRA_PLATFORM_PLUGINS=${platformPlugins}"
                 APPIMAGE_EXTRACT_AND_RUN=1
-                "VERSION=${PROJECT_VERSION}"
-                "OUTPUT=${appImagePath}"
+                # appimagetool fails on any appstreamcli warning, including an
+                # unreachable homepage: validate the metadata without the network.
+                AS_VALIDATE_NONET=1
+                "LINUXDEPLOY_OUTPUT_VERSION=${PROJECT_VERSION}"
+                "LDAI_OUTPUT=${appImagePath}"
                 "${SPECTACOL_LINUXDEPLOY}" --appdir "${appDir}" --plugin qt --output appimage
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
             COMMENT "Creating ${appImagePath}"
