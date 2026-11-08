@@ -50,9 +50,9 @@ Sheet {
     }
     Keys.onPressed: event => { if (event.key === Qt.Key_F2) { openRoms(); event.accepted = true; } }
     function choose(index: int) {
+        pageLoader.source = "";
         if (index !== ZxEmulator.settings.currentMachineIndex)
             ZxEmulator.settings.currentMachineIndex = index;
-        pageLoader.source = "";
     }
 
     // The chip next to the focused one in a direction, by position
