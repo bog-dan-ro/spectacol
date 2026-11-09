@@ -135,6 +135,7 @@ qt_add_qml_module(spectacol
         qmlui.cpp qmlui.h
         romoverrides.cpp romoverrides.h
         screenfilters.h
+        screenfilterinput.cpp screenfilterinput.h
         sdcardfiles.h sdcardfiles.cpp
         spectrumscreen.cpp spectrumscreen.h
         z80assembler.cpp z80assembler.h

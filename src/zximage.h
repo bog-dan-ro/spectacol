@@ -38,6 +38,7 @@ public:
     {
         QImage image;
         QRect dirty;
+        QSize pixelScale{ 1, 1 };
     };
 
     static ZxImage *instance();
@@ -67,6 +68,7 @@ private:
     mutable QMutex m_syncVars;
     QImage m_frameImage;
     QRect m_frameDirty;
+    QSize m_pixelScale{ 1, 1 };
 };
 
 // The ZX screen texture, it uploads only the parts of the frame that changed

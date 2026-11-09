@@ -195,7 +195,7 @@ Sheet {
             Layout.fillHeight: true
             readonly property int columns: Math.max(1, Math.floor(width / Theme.sp(page.narrow ? 44 : 64)))
             cellWidth: width / columns
-            cellHeight: Math.min(cellWidth * 0.625, Theme.sp(32)) + Theme.sp(24)
+            cellHeight: Theme.sp(24)
             clip: true
             model: page.catalogue
             keyNavigationWraps: false
@@ -217,7 +217,6 @@ Sheet {
                 required property int index
                 required property string title
                 required property string subtitle
-                required property url screenshot
                 width: results.cellWidth
                 height: results.cellHeight
                 Rectangle {
@@ -231,21 +230,6 @@ Sheet {
                         anchors.fill: parent
                         anchors.margins: Theme.sp(3)
                         spacing: Theme.sp(1)
-                        Image {
-                            id: preview
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            source: card.screenshot
-                            asynchronous: true
-                            fillMode: Image.PreserveAspectFit
-                            Text {
-                                anchors.centerIn: parent
-                                visible: preview.status !== Image.Ready
-                                text: preview.status === Image.Loading ? qsTr("Loading…") : qsTr("No screenshot")
-                                font.pixelSize: Theme.caption
-                                color: Theme.textMuted
-                            }
-                        }
                         Text {
                             Layout.fillWidth: true
                             text: card.title
@@ -365,9 +349,11 @@ Sheet {
                     }
                     Image {
                         id: fullPreview
+                        objectName: "onlinePreview"
                         Layout.fillWidth: true
                         Layout.preferredHeight: Math.min(width * 0.625, Math.max(Theme.sp(20), detailScroll.availableHeight - Theme.sp(16)))
-                        source: page.catalogue.details.screenshot
+                        source: detailDialog.visible ? page.catalogue.details.screenshot : ""
+                        sourceSize: Qt.size(640, 480)
                         visible: source.toString().length > 0
                         asynchronous: true
                         fillMode: Image.PreserveAspectFit

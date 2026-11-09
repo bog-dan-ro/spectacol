@@ -41,6 +41,7 @@ Sheet {
             label: qsTr("Top")
             description: qsTr("Visible lines above the picture")
             kind: "stepper"
+            stepSize: 4
             from: 0; to: page.limits.top
             value: Math.min(page.settings.borderTop, to)
             onMoved: (v) => page.settings.setBorderMargins(page.settings.borderLeft, v, page.settings.borderRight, page.settings.borderBottom)
@@ -48,6 +49,7 @@ Sheet {
         SettingRow {
             label: qsTr("Left")
             kind: "stepper"
+            stepSize: 4
             from: 0; to: page.limits.left
             value: Math.min(page.settings.borderLeft, to)
             onMoved: (v) => page.settings.setBorderMargins(v, page.settings.borderTop, page.settings.borderRight, page.settings.borderBottom)
@@ -55,6 +57,7 @@ Sheet {
         SettingRow {
             label: qsTr("Bottom")
             kind: "stepper"
+            stepSize: 4
             from: 0; to: page.limits.bottom
             value: Math.min(page.settings.borderBottom, to)
             onMoved: (v) => page.settings.setBorderMargins(page.settings.borderLeft, page.settings.borderTop, page.settings.borderRight, v)
@@ -63,6 +66,7 @@ Sheet {
             label: qsTr("Right")
             description: qsTr("Horizontal sizes use standard Spectrum pixels")
             kind: "stepper"
+            stepSize: 4
             from: 0; to: page.limits.right
             value: Math.min(page.settings.borderRight, to)
             onMoved: (v) => page.settings.setBorderMargins(page.settings.borderLeft, page.settings.borderTop, v, page.settings.borderBottom)

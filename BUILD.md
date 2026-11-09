@@ -184,6 +184,8 @@ python3 tests/borders.py
 ```
 
 Choose a filter under **Options → Screen → Screen filter**. Normal is the default.
+Use the D-pad Up/Down to move between screen settings and Left/Right to change
+the focused value. A changes or toggles it; B returns to the emulator.
 The selector includes ZxKit's HQ, xBRZ, Scale/AdvMAME, SaI/Eagle, TV, dot matrix,
 bilinear, nearest, scanlines and RGB masks, plus chained presets such as
 HQ4x + Scanlines and xBRZ4x + RGB mask. HQ4x + TV4x enlarges each dimension
@@ -202,6 +204,10 @@ Filtering runs during rendering and updates immediately even while emulation
 is paused. Native screen dimensions still determine aspect ratio, integer
 scaling and mouse input. Normal bypasses the CPU filters. Unsupported texture
 sizes or processing failures restore Normal and show the error.
+Pixel-art filters remove exact presentation pixel/row duplication before
+processing Next frames, so HQ and xBRZ operate on the logical pixel grid.
+Genuine high-resolution samples are retained; cropping and saved screenshots
+still use the original frame.
 
 Use `--ui-screenshot` to capture the displayed filter. Saved emulator screenshots,
 screen files and snapshot previews retain native pixels. Large software filter

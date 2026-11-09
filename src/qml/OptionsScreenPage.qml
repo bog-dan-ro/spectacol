@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2016, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,156 +16,70 @@
 */
 
 import QtQuick
-import QtQuick.Window
 import QtGamepadLegacy
-import QtQuick.Controls
-import QtQuick.Layouts
 import Spectacol
-import "private"
 
 // @scope main.qml
-
-Flickable {
-    contentHeight: pane.height
+Sheet {
+    id: page
+    crumb: qsTr("Options")
+    title: qsTr("Screen")
+    readonly property var settings: ZxEmulator.settings
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Change") },
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+    ]
 
     GamepadKeyNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        buttonAKey: Qt.Key_Space
+        buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
-        buttonYKey: Qt.Key_Tab
         buttonXKey: Qt.Key_Backtab
+        buttonYKey: Qt.Key_Tab
     }
 
-    FancyPane {
-        id: pane
-        ColumnLayout {
-            spacing: 2.5 * Screen.pixelDensity
-            anchors.horizontalCenter: parent.horizontalCenter
-            Label {
-                text: qsTr("Screen Options")
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 2.5 * Screen.pixelDensity
-                Label {
-                    text: qsTr("Screen filter")
-                }
-                ComboBox {
-                    focus: true
-                    id: screenFilter
-                    Layout.minimumWidth: 50 * Screen.pixelDensity
-                    Layout.fillWidth: true
-                    Keys.onUpPressed: {
-                        if (popup.visible)
-                            decrementCurrentIndex();
-                        else
-                            smoothScaling.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onDownPressed: {
-                        if (popup.visible)
-                            incrementCurrentIndex();
-                        else
-                            screenFillMode.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
-                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
-
-                    model: ZxEmulator.filtersModel
-                    currentIndex: ZxEmulator.selectedFilterIndex
-                    onCurrentIndexChanged: ZxEmulator.selectedFilterIndex = currentIndex
-                }
-            }
-
-            RowLayout {
-                spacing: 2.5 * Screen.pixelDensity
-                Layout.fillWidth: true
-                Label {
-                    text: qsTr("Fill mode")
-                }
-                ComboBox {
-                    id: screenFillMode
-                    Layout.minimumWidth: 50 * Screen.pixelDensity
-                    Layout.fillWidth: true
-                    Keys.onUpPressed: {
-                        if (popup.visible)
-                            decrementCurrentIndex();
-                        else
-                            screenFilter.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onDownPressed: {
-                        if (popup.visible) {
-                            incrementCurrentIndex();
-                        } else if (ZxEmulator.settings.showOrientationChooser) {
-                            screenOrientation.forceActiveFocus(Qt.TabFocusReason);
-                        } else {
-                            smoothScaling.forceActiveFocus(Qt.TabFocusReason);
-                        }
-                    }
-                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex();
-                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex();
-
-                    model: ["Preserve aspect fit", "Preserve aspect", "Stretch"]
-                    currentIndex: ZxEmulator.settings.fillMode
-                    onCurrentIndexChanged: ZxEmulator.settings.fillMode = currentIndex
-                }
-            }
-
-            RowLayout {
-                visible: ZxEmulator.settings.showOrientationChooser
-                spacing: 2.5 * Screen.pixelDensity
-                Layout.fillWidth: true
-                Label {
-                    text: qsTr("Screen orientation")
-                }
-                ComboBox {
-                    id: screenOrientation
-                    Layout.fillWidth: true
-                    Keys.onUpPressed: {
-                        if (popup.visible)
-                            decrementCurrentIndex();
-                        else
-                            screenFillMode.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onDownPressed: {
-                        if (popup.visible)
-                            incrementCurrentIndex();
-                        else
-                            smoothScaling.forceActiveFocus(Qt.TabFocusReason);
-                    }
-                    Keys.onLeftPressed: if (!popup.visible) decrementCurrentIndex()
-                    Keys.onRightPressed: if (!popup.visible) incrementCurrentIndex()
-
-                    model: ["Any", "Landscape", "Portrait"]
-                    currentIndex: ZxEmulator.settings.screenOrientation
-                    onCurrentIndexChanged: ZxEmulator.settings.screenOrientation = currentIndex
-                }
-            }
-
-            CheckBox {
-                id: smoothScaling
-                KeyNavigation.up: ZxEmulator.settings.showOrientationChooser ? screenOrientation : screenFillMode
-                KeyNavigation.down: TextSizes.smallScreen ? leftBorder : screenFilter
-                text: qsTr("Smooth scaling")
-                checked: ZxEmulator.settings.smoothScaling
-                onCheckedChanged: ZxEmulator.settings.smoothScaling = checked
-            }
-
-            CheckBox {
-                id: leftBorder
-                visible: TextSizes.smallScreen
-                KeyNavigation.up: smoothScaling
-                KeyNavigation.down: screenFilter
-                text: qsTr("Left boder")
-                checked: ZxEmulator.settings.leftMargin
-                onCheckedChanged: ZxEmulator.settings.leftMargin = checked
-            }
-
-            Button {
-                Layout.alignment: Qt.AlignHCenter
-                text: qsTr("Close (B)")
-                onClicked: pageLoader.source = ""
-            }
+    SettingsList {
+        SettingRow {
+            objectName: "screenFilter"
+            label: qsTr("Screen filter")
+            description: qsTr("Use Left and Right to preview each filter")
+            kind: "choice"
+            model: ZxEmulator.filtersModel
+            choiceMaximumWidth: Math.max(Theme.sp(18), page.panelWidth * 0.45)
+            currentIndex: ZxEmulator.selectedFilterIndex
+            onActivated: index => ZxEmulator.selectedFilterIndex = index
+        }
+        SettingRow {
+            objectName: "screenFillMode"
+            label: qsTr("Fill mode")
+            description: qsTr("Fit keeps the aspect ratio; Integer uses whole-pixel scaling")
+            kind: "choice"
+            model: [qsTr("Fit"), qsTr("Integer"), qsTr("Stretch")]
+            currentIndex: page.settings.fillMode
+            onActivated: index => page.settings.fillMode = index
+        }
+        SettingRow {
+            objectName: "screenOrientation"
+            visible: page.settings.showOrientationChooser
+            label: qsTr("Screen orientation")
+            kind: "choice"
+            model: [qsTr("Any"), qsTr("Landscape"), qsTr("Portrait")]
+            currentIndex: page.settings.screenOrientation
+            onActivated: index => page.settings.screenOrientation = index
+        }
+        SettingRow {
+            objectName: "smoothScaling"
+            label: qsTr("Smooth scaling")
+            checked: page.settings.smoothScaling
+            onToggled: checked => page.settings.smoothScaling = checked
+        }
+        SettingRow {
+            objectName: "leftMargin"
+            visible: Theme.smallScreen
+            label: qsTr("Reserve space on the left")
+            description: qsTr("Leave room for on-screen controls in landscape")
+            checked: page.settings.leftMargin
+            onToggled: checked => page.settings.leftMargin = checked
         }
     }
 }

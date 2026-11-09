@@ -74,6 +74,9 @@ bool ZxImage::updateImage(const zxkit::VideoFrame &pixels, bool &changed)
     const auto paper = pixels.paperRect();
     const uint32_t sx = std::max(1u, paper.width / 256);
     const uint32_t sy = std::max(1u, paper.height / 192);
+    const QSize pixelScale{ int(sx), int(sy) };
+    const bool scaleChanged = m_pixelScale != pixelScale;
+    m_pixelScale = pixelScale;
     const uint32_t left = std::min<uint32_t>(m_borderMargins.left * sx, paper.x);
     const uint32_t topMargin = std::min<uint32_t>(m_borderMargins.top * sy, paper.y);
     const uint32_t right =
@@ -100,6 +103,10 @@ bool ZxImage::updateImage(const zxkit::VideoFrame &pixels, bool &changed)
         std::ranges::copy(row, reinterpret_cast<uint32_t *>(m_frameImage.scanLine(y)));
         top = std::min(top, y);
         bottom = y;
+    }
+    if (scaleChanged) {
+        top = 0;
+        bottom = size.height() - 1;
     }
     changed = bottom >= 0;
     if (changed)
@@ -154,7 +161,7 @@ QSize ZxImage::imageSize() const
 ZxImage::Frame ZxImage::takeFrame()
 {
     QMutexLocker lock(&m_syncVars);
-    return { m_frameImage, std::exchange(m_frameDirty, {}) };
+    return { m_frameImage, std::exchange(m_frameDirty, {}), m_pixelScale };
 }
 
 ZxTexture::ZxTexture() = default;

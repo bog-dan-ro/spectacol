@@ -65,7 +65,7 @@ private:
     void updateImplicitSize();
     void updateMouseGrab(bool grabbed);
     void sendMouseMotion(QPointF position);
-    void applySoftwareFilter(QImage &image, QRect &dirty);
+    void applySoftwareFilter(QImage &image, QRect &dirty, QSize pixelScale);
 
 private:
     QSize m_imageSize;
@@ -82,4 +82,5 @@ private:
     zxkit::VideoFilterPipeline m_filterPipeline;
     zxkit::VideoFrame m_filterSource{ 0, 0 };
     QImage m_filteredImage;
+    QSize m_filterPixelScale{ 1, 1 };
 };

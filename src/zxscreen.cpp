@@ -21,6 +21,7 @@
 #include "zximage.h"
 #include "zxemulator.h"
 #include "screenfilters.h"
+#include "screenfilterinput.h"
 
 #include <zxkit/core/Exception.h>
 #include <rhi/qrhi.h>
@@ -174,7 +175,7 @@ QSGNode *ZxScreen::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 
     // Layout and integer scaling use the native screen dimensions. Enlarging a
     // texture must not change the screen's geometry or the mouse coordinates.
-    applySoftwareFilter(frame.image, frame.dirty);
+    applySoftwareFilter(frame.image, frame.dirty, frame.pixelScale);
 
     if (window()->rendererInterface()->graphicsApi() == QSGRendererInterface::Software) {
         // The software renderer (no GPU, the offscreen platform) can't use ZxTexture's
@@ -203,9 +204,10 @@ QSGNode *ZxScreen::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     return node;
 }
 
-void ZxScreen::applySoftwareFilter(QImage &image, QRect &dirty)
+void ZxScreen::applySoftwareFilter(QImage &image, QRect &dirty, QSize pixelScale)
 {
-    const bool changed = std::exchange(m_filterChanged, false);
+    const bool changed = std::exchange(m_filterChanged, false) || m_filterPixelScale != pixelScale;
+    m_filterPixelScale = pixelScale;
     try {
         if (changed) {
             m_filterPipeline.setStages(screenFilterPresets()[std::size_t(m_filterIndex)].stages);
@@ -219,8 +221,18 @@ void ZxScreen::applySoftwareFilter(QImage &image, QRect &dirty)
             return;
         }
         if (changed || !dirty.isEmpty() || m_filteredImage.isNull()) {
+            // Pixel-art scalers must see the logical pixel grid, before Next's
+            // presentation duplication. Keep genuine high-resolution samples.
+            const bool pixelArt = std::ranges::any_of(m_filterPipeline.stages(), [](auto stage) {
+                using F = zxkit::VideoFilter;
+                return stage.filter == F::Hq || stage.filter == F::Xbrz || stage.filter == F::Scale
+                        || stage.filter == F::Sai || stage.filter == F::SuperSai
+                        || stage.filter == F::SuperEagle || stage.filter == F::Bilinear;
+            });
+            const auto scale = pixelArt ? filterInputPixelScale(image, pixelScale) : QSize(1, 1);
+            const QSize inputSize(image.width() / scale.width(), image.height() / scale.height());
             const auto size = m_filterPipeline.outputSize(
-                    { uint32_t(image.width()), uint32_t(image.height()) });
+                    { uint32_t(inputSize.width()), uint32_t(inputSize.height()) });
             const auto rhi = static_cast<QRhi *>(window()->rendererInterface()->getResource(
                     window(), QSGRendererInterface::RhiResource));
             if (rhi) {
@@ -229,15 +241,17 @@ void ZxScreen::applySoftwareFilter(QImage &image, QRect &dirty)
                     throw std::runtime_error(
                             "The selected filter exceeds the maximum screen texture size.");
             }
-            if (m_filterSource.width() != uint32_t(image.width())
-                || m_filterSource.height() != uint32_t(image.height()))
-                m_filterSource =
-                        zxkit::VideoFrame(uint32_t(image.width()), uint32_t(image.height()));
-            for (int y = 0; y < image.height(); ++y) {
-                const auto source =
-                        std::span(reinterpret_cast<const uint32_t *>(image.constScanLine(y)),
-                                  std::size_t(image.width()));
-                std::ranges::copy(source, m_filterSource.scanline(uint32_t(y)).begin());
+            if (m_filterSource.width() != uint32_t(inputSize.width())
+                || m_filterSource.height() != uint32_t(inputSize.height()))
+                m_filterSource = zxkit::VideoFrame(uint32_t(inputSize.width()),
+                                                   uint32_t(inputSize.height()));
+            for (int y = 0; y < inputSize.height(); ++y) {
+                const auto source = std::span(
+                        reinterpret_cast<const uint32_t *>(image.constScanLine(y * scale.height())),
+                        std::size_t(image.width()));
+                auto target = m_filterSource.scanline(uint32_t(y));
+                for (int x = 0; x < inputSize.width(); ++x)
+                    target[std::size_t(x)] = source[std::size_t(x * scale.width())];
             }
             const auto &output = m_filterPipeline.apply(m_filterSource);
             // Own the QImage pixels: queued texture uploads may retain them past
