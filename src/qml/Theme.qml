@@ -27,12 +27,12 @@ QtObject {
     // "Large" scales everything by 1.5, for a TV across the room
     readonly property real uiScale: ZxEmulator.settings.largeUi ? 1.5 : 1.0
     readonly property bool smallScreen: Math.min(Screen.height, Screen.width) / Screen.pixelDensity < 80
-    readonly property bool mobileUi: Qt.platform.os === "android" || Qt.platform.os === "ios" || ZxEmulator.touchscreen
+    readonly property bool touchScreenUi: Qt.platform.os === "android" || Qt.platform.os === "ios" || ZxEmulator.touchscreen
     readonly property bool gamepadHints: ZxEmulator.gamepadId !== -1
     // Android TV remotes report D-pad/Select/Back keys without a Gamepad device.
-    readonly property bool remoteHints: mobileUi && !ZxEmulator.touchscreen && !gamepadHints
-    readonly property bool keyboardHints: !mobileUi && !gamepadHints
-    readonly property bool showHintBar: !mobileUi || gamepadHints || remoteHints
+    readonly property bool remoteHints: touchScreenUi && !ZxEmulator.touchscreen && !gamepadHints
+    readonly property bool keyboardHints: !touchScreenUi && !gamepadHints
+    readonly property bool showHintBar: !touchScreenUi || gamepadHints || remoteHints
     readonly property int headerHeight: rowHeight
 
     // The overlay (gamepad, touch, TV) or the desktop layout (menu bar, docked panels)
