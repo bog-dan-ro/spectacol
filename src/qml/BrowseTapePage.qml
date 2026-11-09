@@ -142,7 +142,7 @@ Sheet {
         }
     }
 
-    GamepadKeyNavigation {
+    GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape

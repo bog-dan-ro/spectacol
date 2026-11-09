@@ -226,6 +226,11 @@ bool DesktopInput::eventFilter(QObject *object, QEvent *event)
         return true;
     }
     if (m_visible) {
+        if (navigationEvent && key == Qt::Key_Backspace) {
+            if (pressed)
+                sendKey(Qt::Key_Backspace);
+            return true;
+        }
         if (key == Qt::Key_Escape || key == Qt::Key_Back) {
             if (pressed) {
                 m_dismissedKeys.insert(key);

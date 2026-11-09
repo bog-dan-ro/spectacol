@@ -39,7 +39,7 @@ Rectangle {
             Accessible.name: qsTr("Text being edited")
         }
         ToolButton {
-            text: "\u232b"
+            text: qsTr("\u232b (X)")
             focusPolicy: Qt.NoFocus
             Accessible.name: qsTr("Delete character")
             onClicked: DesktopInput.sendKey(Qt.Key_Backspace)

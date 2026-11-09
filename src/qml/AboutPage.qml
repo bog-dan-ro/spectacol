@@ -48,7 +48,7 @@ Sheet {
     Keys.onLeftPressed: tab = Math.max(0, tab - 1)
     Keys.onRightPressed: tab = Math.min(tabs.length - 1, tab + 1)
 
-    GamepadKeyNavigation {
+    GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
     }

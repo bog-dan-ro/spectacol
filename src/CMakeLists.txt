@@ -152,6 +152,7 @@ qt_add_qml_module(spectacol
     QML_FILES
         qml/AboutPage.qml
         qml/GamepadDiagram.qml
+        qml/GamepadNavigation.qml
         qml/BreakpointsView.qml
         qml/BrowseTapePage.qml
         qml/CalibrateGamepad.qml

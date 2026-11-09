@@ -26,7 +26,7 @@ import Spectacol
 FancyBaseList {
     id: view
 
-    GamepadKeyNavigation {
+    GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
     }
 

@@ -37,7 +37,7 @@ Sheet {
         { pad: "A", key: "Enter", text: qsTr("Choose") },
         { pad: "B", key: "Esc", text: qsTr("Mapping"), action: () => page.closeRequested() }
     ]
-    GamepadKeyNavigation {
+    GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape

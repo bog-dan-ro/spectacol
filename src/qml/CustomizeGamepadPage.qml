@@ -153,7 +153,7 @@ Sheet {
             action: () => pageLoader.source = ""
         }
     ]
-    GamepadKeyNavigation {
+    GamepadNavigation {
         gamepad: Gamepad {
             deviceId: ZxEmulator.gamepadId
         }

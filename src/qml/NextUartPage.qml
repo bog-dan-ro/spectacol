@@ -28,7 +28,7 @@ Sheet {
     hints: [{pad:"A",key:"Enter",text:qsTr("Change")},
             {pad:"B",key:"Esc",text:qsTr("Back"),action:()=>pageLoader.source="OptionsPeripheralsPage.qml"}]
     readonly property NextUartHooks hooks: ZxEmulator.uartHooks
-    GamepadKeyNavigation {
+    GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
     }

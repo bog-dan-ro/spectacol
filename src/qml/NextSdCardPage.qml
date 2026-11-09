@@ -37,7 +37,7 @@ Sheet {
     // closing the page cancels the download
     Component.onDestruction: if (busy) NextSdCard.cancel()
 
-    GamepadKeyNavigation {
+    GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
     }

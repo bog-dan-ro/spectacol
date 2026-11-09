@@ -114,6 +114,8 @@ private slots:
         QVERIFY(root);
         auto *window = qobject_cast<QQuickWindow *>(root.get());
         QVERIFY(window);
+        connect(&policy, &DesktopInput::visibleChanged, root.get(),
+                [&] { root->setProperty("inputPanelVisible", policy.isVisible()); });
         auto *editor = root->findChild<QQuickItem *>(u"editor"_s);
         auto *otherControl = root->findChild<QQuickItem *>(u"otherControl"_s);
         QVERIFY(editor && otherControl);
@@ -140,9 +142,22 @@ private slots:
         QCOMPARE(editor->property("text").toString(), u"Jet Set Willy "_s);
         QVERIFY(editor->hasActiveFocus());
 
+        tap(QGamepadManager::ButtonX);
+        QCOMPARE(editor->property("text").toString(), u"Jet Set Willy"_s);
+        QVERIFY(QMetaObject::invokeMethod(editor, "select", Q_ARG(int, 8), Q_ARG(int, 13)));
+        tap(QGamepadManager::ButtonX);
+        QCOMPARE(editor->property("text").toString(), u"Jet Set "_s);
+        QVERIFY(policy.isVisible());
+        QVERIFY(editor->hasActiveFocus());
+        QCOMPARE(root->property("searchShortcutCount").toInt(), 0);
+        policy.commitText(u"Willy "_s);
+
         tap(QGamepadManager::ButtonB);
         QTRY_VERIFY(!policy.isVisible());
         QCOMPARE(root->property("escapeCount").toInt(), 0);
+        tap(QGamepadManager::ButtonX);
+        QCOMPARE(root->property("searchShortcutCount").toInt(), 1);
+        QCOMPARE(editor->property("text").toString(), u"Jet Set Willy "_s);
         tap(QGamepadManager::ButtonB);
         QCOMPARE(root->property("escapeCount").toInt(), 1);
         tap(QGamepadManager::ButtonA);

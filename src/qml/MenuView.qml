@@ -313,7 +313,7 @@ ColumnLayout {
         ]
     }
 
-    GamepadKeyNavigation {
+    GamepadNavigation {
         id: gamepadKeyNavigation
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         active: false

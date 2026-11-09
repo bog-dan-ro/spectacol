@@ -185,7 +185,7 @@ Item {
         }
     }
 
-    GamepadKeyNavigation {
+    GamepadNavigation {
         id: gamepad
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         active: onScreenKeyboard.visible && !onScreenKeyboard.textInputMode

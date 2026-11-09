@@ -34,10 +34,13 @@ if(NOT ANDROID AND NOT IOS)
     target_link_libraries(test_desktop_input PRIVATE
         Qt6::Test Qt6::Quick Qt6::GuiPrivate Qt::GamepadLegacy
     )
+    set_source_files_properties(../src/qml/GamepadNavigation.qml PROPERTIES
+        QT_RESOURCE_ALIAS GamepadNavigation.qml
+    )
     qt_add_qml_module(test_desktop_input
         URI DesktopInputTest
         OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/DesktopInputTest
-        QML_FILES DesktopInputWindow.qml
+        QML_FILES DesktopInputWindow.qml ../src/qml/GamepadNavigation.qml
     )
     add_test(NAME desktop_input COMMAND test_desktop_input)
     set_tests_properties(desktop_input PROPERTIES ENVIRONMENT

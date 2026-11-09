@@ -102,7 +102,8 @@ source and Flathub submission.
 When an editable field gains focus, desktop builds open Spectacol's ZX on-screen
 keyboard if a gamepad is attached or no physical keyboard is attached. Connecting
 a gamepad enables it even when a physical keyboard is present. The D-pad selects
-a key, A types it, and B hides the keyboard before closing the page or dialog. A reopens
+a key, A types it, X deletes a character (or the selected text), and B hides the keyboard
+before closing the page or dialog. A reopens
 it while the field still has focus. Touch input works too. Caps Shift enters
 uppercase letters; Caps Shift + 0 deletes, and Symbol Shift enters punctuation.
 A copy of the edited field above the keys keeps text visible in dialogs.

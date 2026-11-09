@@ -26,6 +26,8 @@ ApplicationWindow {
     visible: true
     property int escapeCount: 0
     property int acceptedCount: 0
+    property bool inputPanelVisible: false
+    property int searchShortcutCount: 0
 
     TextField {
         objectName: "editor"
@@ -34,6 +36,12 @@ ApplicationWindow {
         width: 300
         inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
         Keys.onEscapePressed: window.escapeCount++
+        Keys.onPressed: event => {
+            if (event.key === Qt.Key_F3) {
+                window.searchShortcutCount++;
+                event.accepted = true;
+            }
+        }
         onAccepted: window.acceptedCount++
     }
     Button {
@@ -42,9 +50,11 @@ ApplicationWindow {
         y: 20
         text: "Other"
     }
-    GamepadKeyNavigation {
+    GamepadNavigation {
+        textInputActive: window.inputPanelVisible
         gamepad: Gamepad { deviceId: 4242 }
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
+        buttonXKey: Qt.Key_F3
     }
 }

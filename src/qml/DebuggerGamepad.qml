@@ -76,7 +76,7 @@ QtObject {
         onButtonBChanged: if (buttonB)
             root.tap(Qt.Key_Escape)
         onButtonXChanged: if (buttonX)
-            root.tap(root.buttonXKey)
+            root.tap(DesktopInput.visible ? Qt.Key_Backspace : root.buttonXKey)
         onButtonYChanged: if (buttonY)
             root.tap(root.buttonYKey)
         onButtonStartChanged: if (buttonStart)

@@ -90,7 +90,7 @@ Item {
             parent.visible = false;
     }
 
-    GamepadKeyNavigation {
+    GamepadNavigation {
         id: gamepad
         active: onScreenJoystick.visible
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }

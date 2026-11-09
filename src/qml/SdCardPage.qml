@@ -72,7 +72,7 @@ Sheet {
         filesView.forceActiveFocus();
     }
 
-    GamepadKeyNavigation {
+    GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         buttonBKey: Qt.Key_Escape
         buttonXKey: Qt.Key_Insert

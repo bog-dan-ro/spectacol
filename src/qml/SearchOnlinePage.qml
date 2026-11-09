@@ -69,7 +69,7 @@ Sheet {
         property alias searchString: query.text
         property int sourceIndex: 0
     }
-    GamepadKeyNavigation {
+    GamepadNavigation {
         gamepad: Gamepad {
             deviceId: ZxEmulator.gamepadId
         }
