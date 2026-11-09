@@ -122,6 +122,7 @@ qt_add_qml_module(spectacol
         breakpointsmodel.cpp breakpointsmodel.h
         controllerinput.cpp controllerinput.h
         controllerprofiles.cpp controllerprofiles.h
+        desktopinput.cpp desktopinput.h
         debuggermodels.cpp debuggermodels.h
         debugsymbols.cpp debugsymbols.h
         disassamblemodel.cpp disassamblemodel.h
@@ -157,6 +158,7 @@ qt_add_qml_module(spectacol
         qml/CoverFlowFiles.qml
         qml/CustomizeGamepadPage.qml
         qml/ControllerProfilesPage.qml
+        qml/DesktopKeyboard.qml
         qml/OptionsControlsPage.qml
         qml/DebuggerPage.qml
         qml/DebuggerGamepad.qml

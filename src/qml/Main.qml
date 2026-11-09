@@ -35,9 +35,22 @@ ApplicationWindow {
     title: qsTr("Spectacol")
 
     property bool portrait: width < height
+
+    Loader {
+        parent: Overlay.overlay
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        z: 1000
+        width: Math.min(parent.width, Theme.sp(250))
+        active: DesktopInput.visible
+        source: active ? "DesktopKeyboard.qml" : ""
+    }
+
     function goBack() {
         const sheet = pageLoader.item as Sheet;
-        if (Qt.inputMethod.visible)
+        if (DesktopInput.visible)
+            DesktopInput.hide();
+        else if (Qt.inputMethod.visible)
             Qt.inputMethod.hide();
         else if (sheet && sheet.closePageActions())
             return;

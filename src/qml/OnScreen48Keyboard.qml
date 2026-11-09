@@ -27,17 +27,20 @@ Item {
     id: onScreenKeyboard
     enabled: visible
 
-    readonly property bool cobraMode: ZxEmulator.settings.currentMachine.startsWith("CoBra 1")
+    property bool textInputMode: false
+    readonly property bool portrait: Window.window ? Window.window.width < Window.window.height : width < height
+    signal textKeyPressed(int key, string text)
+    readonly property bool cobraMode: !textInputMode && ZxEmulator.settings.currentMachine.startsWith("CoBra 1")
     readonly property int cobraFlag: 0x20000000
     readonly property int cobraControlKey: Qt.Key_Control | cobraFlag
-    readonly property bool nextMode: ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
+    readonly property bool nextMode: !textInputMode && ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
     readonly property int nextFlag: 0x10000000
     readonly property int columns: cobraMode ? 12 : nextMode ? 14 : 10
     readonly property bool cobraCtrlPressed: input.heldKeys.indexOf(cobraControlKey) >= 0
     readonly property bool capsPressed: input.heldKeys.indexOf(Qt.Key_Control) >= 0
     readonly property bool symbolPressed: input.heldKeys.indexOf(Qt.Key_Shift) >= 0
     property bool gamepadMode: false
-    property bool stickyCSSS: gamepadMode || stickyCSSSButton.checked
+    property bool stickyCSSS: textInputMode || gamepadMode || stickyCSSSButton.checked
     onCobraModeChanged: releasePressedKeys()
     onNextModeChanged: releasePressedKeys()
     onGamepadModeChanged: releasePressedKeys()
@@ -48,6 +51,11 @@ Item {
         sticky: onScreenKeyboard.stickyCSSS
         extraModifier: onScreenKeyboard.cobraControlKey
         onKeyChanged: (key, pressed) => {
+            if (onScreenKeyboard.textInputMode) {
+                if (pressed && !input.isModifier(key))
+                    onScreenKeyboard.typeTextKey(key);
+                return;
+            }
             if (key & nextFlag)
                 ZxEmulator.setNextKeyState(key & ~nextFlag, pressed);
             else if (key & cobraFlag)
@@ -76,16 +84,67 @@ Item {
     }
 
     anchors {
-        bottomMargin: Screen.pixelDensity * (mainScreen.portrait ? 10 : 4)
-        leftMargin: mainScreen.portrait ? 0 : Screen.pixelDensity * 2
-        rightMargin: mainScreen.portrait ? 0 : Screen.pixelDensity * 2
+        bottomMargin: textInputMode ? 0 : Screen.pixelDensity * (onScreenKeyboard.portrait ? 10 : 4)
+        leftMargin: textInputMode || onScreenKeyboard.portrait ? 0 : Screen.pixelDensity * 2
+        rightMargin: textInputMode || onScreenKeyboard.portrait ? 0 : Screen.pixelDensity * 2
     }
 
     function releasePressedKeys(): void {
         input.clear();
     }
 
+    readonly property var textSymbols: ({
+        "1":"!", "2":"@", "3":"#", "4":"$", "5":"%", "6":"&", "7":"'", "8":"(", "9":")", "0":"_",
+        "Q":"<=", "W":"<>", "E":">=", "R":"<", "T":">", "Y":"[", "U":"]", "I":"`", "O":";", "P":"\"",
+        "A":"~", "S":"|", "D":"\\", "F":"{", "G":"}", "H":"^", "J":"-", "K":"+", "L":"=",
+        "Z":":", "X":"\u00a3", "C":"?", "V":"/", "B":"*", "N":",", "M":"."
+    })
+    function textLabel(key: int): string {
+        if (key === Qt.Key_Shift) return qsTr("Caps Shift");
+        if (key === Qt.Key_Control) return qsTr("Symbols");
+        if (key === Qt.Key_Space) return qsTr("Space");
+        if (key === Qt.Key_Enter) return qsTr("Enter");
+        const caps = input.heldKeys.includes(Qt.Key_Shift);
+        if (caps && key === Qt.Key_0) return "\u232b";
+        const letter = String.fromCharCode(key);
+        if (input.heldKeys.includes(Qt.Key_Control)) return textSymbols[letter] || letter;
+        return caps ? letter : letter.toLowerCase();
+    }
+    function typeTextKey(key: int): void {
+        const caps = input.heldKeys.includes(Qt.Key_Shift);
+        if (key === Qt.Key_Enter)
+            textKeyPressed(Qt.Key_Return, "");
+        else if (key === Qt.Key_Space)
+            textKeyPressed(0, " ");
+        else if (caps && key === Qt.Key_0)
+            textKeyPressed(Qt.Key_Backspace, "");
+        else if (caps && key >= Qt.Key_5 && key <= Qt.Key_8) {
+            const arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right];
+            textKeyPressed(arrows[key - Qt.Key_5], "");
+        } else
+            textKeyPressed(0, textLabel(key));
+    }
+    function navigateTextInput(key: int, pressed: bool): void {
+        if (key === Qt.Key_Return) {
+            if (pressed)
+                input.press("navigation", grid.model.get(grid.currentIndex).code);
+            else
+                input.release("navigation", false);
+        } else if (pressed) {
+            switch (key) {
+            case Qt.Key_Left: grid.moveCurrentIndexLeft(); break;
+            case Qt.Key_Right: grid.moveCurrentIndexRight(); break;
+            case Qt.Key_Up: grid.moveCurrentIndexUp(); break;
+            case Qt.Key_Down: grid.moveCurrentIndexDown(); break;
+            }
+        }
+    }
+
     onVisibleChanged: {
+        if (textInputMode) {
+            if (!visible) releasePressedKeys();
+            return;
+        }
         ZxEmulator.processInputEvents = !visible;
         if (visible) {
             grid.currentIndex = columns * 2;
@@ -117,7 +176,7 @@ Item {
     Timer {
         // A short CS+SS chord switches the ROM into extended mode. Other
         // owners of a modifier keep it held when these latches expire.
-        running: input.latchedKeys.indexOf(Qt.Key_Control) >= 0 &&
+        running: !onScreenKeyboard.textInputMode && input.latchedKeys.indexOf(Qt.Key_Control) >= 0 &&
                  input.latchedKeys.indexOf(Qt.Key_Shift) >= 0
         interval: 200
         onTriggered: {
@@ -129,7 +188,7 @@ Item {
     GamepadKeyNavigation {
         id: gamepad
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        active: onScreenKeyboard.visible
+        active: onScreenKeyboard.visible && !onScreenKeyboard.textInputMode
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
         buttonXKey: Qt.Key_unknown
@@ -200,6 +259,10 @@ Item {
     ListModel { id: nextKeyboard }
 
     Component.onCompleted: {
+        if (textInputMode) {
+            grid.currentIndex = 20;
+            return;
+        }
         const extraCodes = [Qt.Key_F1, Qt.Key_F2, Qt.Key_F3, Qt.Key_F4,
                             Qt.Key_Escape, Qt.Key_Enter, Qt.Key_Control, Qt.Key_ScrollLock];
         const extraLabels = ["F1", "F2", "F3", "F4", "ESC", "LINE FEED", "CTRL", "NO SCROLL"];
@@ -255,15 +318,15 @@ Item {
     GridView {
         id: grid
         highlight: highlightComponent
-        focus: onScreenKeyboard.visible
+        focus: onScreenKeyboard.visible && !onScreenKeyboard.textInputMode
         anchors {
             horizontalCenter: parent.horizontalCenter
             bottom: parent.bottom
         }
-        cellWidth: (mainScreen.portrait || gamepadMode) ? Math.max(1, Math.floor(parent.width / columns)) : Math.min(parent.width / columns, Screen.pixelDensity * 9)
-        cellHeight: mainScreen.portrait ? Screen.pixelDensity * 9 : cellWidth
-        width: Math.min(cellWidth * columns + ((mainScreen.portrait || gamepadMode) ? 0 : 8 * Screen.pixelDensity), parent.width)
-        height: cellHeight * 4 + ((mainScreen.portrait || gamepadMode) ? 0 : 2 * Screen.pixelDensity)
+        cellWidth: (onScreenKeyboard.portrait || gamepadMode || textInputMode) ? Math.max(1, Math.floor(parent.width / columns)) : Math.min(parent.width / columns, Screen.pixelDensity * 9)
+        cellHeight: onScreenKeyboard.portrait && !textInputMode ? Screen.pixelDensity * 9 : cellWidth
+        width: Math.min(cellWidth * columns + ((onScreenKeyboard.portrait || gamepadMode || textInputMode) ? 0 : 8 * Screen.pixelDensity), parent.width)
+        height: cellHeight * 4 + ((onScreenKeyboard.portrait || gamepadMode || textInputMode) ? 0 : 2 * Screen.pixelDensity)
         model: cobraMode ? cobraKeyboard : nextMode ? nextKeyboard : zx48Keyboard
         currentIndex: 24
         onCurrentIndexChanged: input.release("navigation", false)
@@ -279,7 +342,7 @@ Item {
             maximumTouchPoints: 10
             z: 2
             onPressed: (points) => {
-                if (ZxEmulator.paused)
+                if (ZxEmulator.paused && !onScreenKeyboard.textInputMode)
                     return;
                 for (const point of points) {
                     // indexAt takes content coordinates; the view's origin can
@@ -304,7 +367,7 @@ Item {
             id: rec
             width: grid.cellWidth - (Screen.pixelDensity / TextSizes.scaleImage)
             height: grid.cellHeight - (Screen.pixelDensity / TextSizes.scaleImage)
-            radius: ((mainScreen.portrait ? 1 : 2) * Screen.pixelDensity) / TextSizes.scaleImage
+            radius: ((onScreenKeyboard.portrait ? 1 : 2) * Screen.pixelDensity) / TextSizes.scaleImage
             color: (code === cobraControlKey && cobraCtrlPressed) ||
                    (code === Qt.Key_Control && capsPressed) ||
                    (code === Qt.Key_Shift && symbolPressed) ? "blue"
@@ -314,22 +377,22 @@ Item {
                 anchors.fill: parent
                 anchors.leftMargin: parent.radius
                 anchors.rightMargin: parent.radius
-                anchors.topMargin: ZxEmulator.settings.full48kOSK && keyword ? parent.height / 4 : parent.radius
+                anchors.topMargin: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK && keyword ? parent.height / 4 : parent.radius
                 font.family: 'Monospace'
                 font.bold: true
                 font.pixelSize: grid.cellWidth / 4.5
-                horizontalAlignment: ZxEmulator.settings.full48kOSK && keyword ? Text.AlignLeft : Text.AlignHCenter
-                verticalAlignment: ZxEmulator.settings.full48kOSK && keyword ? Text.AlignTop : Text.AlignVCenter
+                horizontalAlignment: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK && keyword ? Text.AlignLeft : Text.AlignHCenter
+                verticalAlignment: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK && keyword ? Text.AlignTop : Text.AlignVCenter
                 style: Text.Outline
                 styleColor: "black"
                 color: !keyword && buttonColor ? buttonColor : "white"
                 width: parent.width
                 wrapMode: Text.WordWrap
-                text: letter
+                text: onScreenKeyboard.textInputMode ? onScreenKeyboard.textLabel(code) : letter
             }
 
             Text {
-                visible: ZxEmulator.settings.full48kOSK
+                visible: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK
                 anchors.left: parent.left
                 anchors.margins: parent.radius
                 style: Text.Outline
@@ -342,7 +405,7 @@ Item {
             }
 
             Text {
-                visible: ZxEmulator.settings.full48kOSK
+                visible: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.rightMargin: parent.radius
@@ -357,7 +420,7 @@ Item {
             }
 
             Text {
-                visible: ZxEmulator.settings.full48kOSK
+                visible: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.topMargin: parent.height / 6 * 3
@@ -371,7 +434,7 @@ Item {
             }
 
             Text {
-                visible: ZxEmulator.settings.full48kOSK
+                visible: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.leftMargin: parent.radius

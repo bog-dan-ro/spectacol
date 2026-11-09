@@ -25,6 +25,26 @@ qt_add_qml_module(test_keyboard_input
 target_link_libraries(test_keyboard_input PRIVATE Qt6::Test Qt6::Qml)
 add_test(NAME keyboard_input COMMAND test_keyboard_input)
 
+if(NOT ANDROID AND NOT IOS)
+    qt_add_executable(test_desktop_input
+        test_desktop_input.cpp
+        ../src/desktopinput.cpp ../src/desktopinput.h
+    )
+    target_include_directories(test_desktop_input PRIVATE ../src)
+    target_link_libraries(test_desktop_input PRIVATE
+        Qt6::Test Qt6::Quick Qt6::GuiPrivate Qt::GamepadLegacy
+    )
+    qt_add_qml_module(test_desktop_input
+        URI DesktopInputTest
+        OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/DesktopInputTest
+        QML_FILES DesktopInputWindow.qml
+    )
+    add_test(NAME desktop_input COMMAND test_desktop_input)
+    set_tests_properties(desktop_input PROPERTIES ENVIRONMENT
+        "QT_QPA_PLATFORM=offscreen"
+    )
+endif()
+
 qt_add_executable(test_next_uart test_next_uart.cpp ../src/nextuarthooks.cpp ../src/nextuarthooks.h)
 target_include_directories(test_next_uart PRIVATE ../src)
 target_link_libraries(test_next_uart PRIVATE Qt6::Test Qt6::Qml Qt6::Network ZX::Kit)

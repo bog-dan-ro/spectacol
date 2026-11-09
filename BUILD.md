@@ -97,6 +97,23 @@ default package supports the JavaScript UART hooks and network adapters.
 This is a local bundle recipe; publishing to Flathub also requires a release
 source and Flathub submission.
 
+### Desktop text input
+
+When an editable field gains focus, desktop builds open Spectacol's ZX on-screen
+keyboard if a gamepad is attached or no physical keyboard is attached. Connecting
+a gamepad enables it even when a physical keyboard is present. The D-pad selects
+a key, A types it, and B hides the keyboard before closing the page or dialog. A reopens
+it while the field still has focus. Touch input works too. Caps Shift enters
+uppercase letters; Caps Shift + 0 deletes, and Symbol Shift enters punctuation.
+A copy of the edited field above the keys keeps text visible in dialogs.
+Android and iOS continue using their system keyboards.
+
+On Linux, keyboard detection reads `/sys/class/input`, including USB and Bluetooth
+keyboards. Steam Input's virtual keyboard and the Steam Deck controller's keyboard
+interface do not count as physical keyboards. Attachment and removal are checked
+once per second, including inside Flatpak. Text is committed through Qt's input
+method events to the original field, preserving its selection and validation.
+
 ### AppImage
 
 Use a complete Qt 6.11+ desktop SDK with Quick, Multimedia, ShaderTools, SVG and
