@@ -12,6 +12,7 @@ finish-args:
   - --device=dri
   - --socket=pulseaudio
   - --device=input
+  - --filesystem=/run/udev:ro
   - --filesystem=home
 
 modules:

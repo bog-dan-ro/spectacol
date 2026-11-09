@@ -86,8 +86,10 @@ and downloaded by Flatpak Builder before the network-isolated build;
 `CMakeLists.txt` and the manifest together. The pinned QtGamepadLegacy revision
 supports Qt 6.11 and retains the Android build fixes.
 
-The sandbox grants graphics, audio, network and controller access. Home and
-removable-media access support Spectacol's built-in file browser, writable disks
+The sandbox grants graphics, audio, network and controller access, including
+read-only access to `/run/udev` for QtGamepadLegacy's controller discovery.
+This lets it identify controllers such as Steam Input's virtual gamepad on Steam Deck.
+Home and removable-media access support Spectacol's built-in file browser, writable disks
 and SD images. Settings use Flatpak's private configuration directory; game data
 defaults to `~/Spectacol` or the folder selected in the app. Host
 serial ports for physical UART adapters need a separate user override; the
