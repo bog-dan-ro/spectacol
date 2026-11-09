@@ -45,6 +45,7 @@ public:
     void write(std::span<const int16_t> samples, uint32_t rate, uint8_t channels,
                uint32_t speedPercent);
     AudioBuffer::Statistics statistics() const;
+
 Q_SIGNALS:
     void errorOccurred(const QString &message);
 

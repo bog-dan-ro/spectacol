@@ -1,5 +1,7 @@
 qt_add_executable(spectacol main.cpp)
+
 target_compile_definitions(spectacol PRIVATE SPECTACOL_VERSION="${PROJECT_VERSION}")
+
 if(ANDROID)
     target_sources(spectacol PRIVATE androidintegration.cpp androidintegration.h)
     # Preserve the highest version code used by the old per-ABI release scheme.
@@ -14,6 +16,7 @@ if(ANDROID)
     include(3rdparty/android_openssl/android_openssl.cmake)
     add_android_openssl_libraries(spectacol)
 endif()
+
 qt_add_resources(spectacol "resources"
     PREFIX "/"
     FILES

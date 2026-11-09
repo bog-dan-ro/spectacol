@@ -55,6 +55,16 @@ if(NOT TARGET ZX::Kit)
     FetchContent_MakeAvailable(ZxKit)
 endif()
 
+add_custom_target(packaging
+    SOURCES
+        packaging/flatpak/eu.licentia.games.spectacol.yaml
+        packaging/flatpak/screen0.png
+        packaging/linux/eu.licentia.games.spectacol.desktop
+        packaging/linux/eu.licentia.games.spectacol.metainfo.xml
+        packaging/linux/eu.licentia.games.spectacol.png
+
+)
+
 add_subdirectory(src)
 
 option(SPECTACOL_BUILD_TESTS "Build Spectacol's offline catalogue and input tests" OFF)
