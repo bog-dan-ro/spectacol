@@ -20,12 +20,24 @@ import QtQuick.Controls
 import Spectacol
 
 ComboBox {
+    id: control
+    property bool openOnRelease: false
     popup.popupType: Popup.Item
     // Release the popup grab as soon as a selection changes the page below it.
     popup.exit: Transition {}
     Keys.onPressed: event => {
-        if (!popup.visible && [Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right].includes(event.key)) {
+        if (!popup.visible && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
+            control.openOnRelease = true;
+            event.accepted = true;
+        } else if (!popup.visible && [Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right].includes(event.key)) {
             ZxEmulator.sendNavigationKey(event.key === Qt.Key_Up || event.key === Qt.Key_Left ? Qt.Key_Backtab : Qt.Key_Tab);
+            event.accepted = true;
+        }
+    }
+    Keys.onReleased: event => {
+        if (control.openOnRelease && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
+            control.openOnRelease = false;
+            popup.open();
             event.accepted = true;
         }
     }

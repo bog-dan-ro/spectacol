@@ -47,8 +47,8 @@ QtObject {
             repeat.stop();
             return;
         }
-        const x = pad.buttonLeft ? -1 : pad.buttonRight ? 1 : Math.abs(pad.axisLeftX) >= 0.5 ? Math.sign(pad.axisLeftX) : 0;
-        const y = pad.buttonUp ? -1 : pad.buttonDown ? 1 : Math.abs(pad.axisLeftY) >= 0.5 ? Math.sign(pad.axisLeftY) : 0;
+        const x = pad.buttonLeft ? -1 : pad.buttonRight ? 1 : Math.abs(pad.axisLeftX) >= 0.5 ? Math.sign(pad.axisLeftX) : Math.abs(pad.axisRightX) >= 0.5 ? Math.sign(pad.axisRightX) : 0;
+        const y = pad.buttonUp ? -1 : pad.buttonDown ? 1 : Math.abs(pad.axisLeftY) >= 0.5 ? Math.sign(pad.axisLeftY) : Math.abs(pad.axisRightY) >= 0.5 ? Math.sign(pad.axisRightY) : 0;
         const next = y < 0 ? Qt.Key_Up : y > 0 ? Qt.Key_Down : x < 0 ? Qt.Key_Left : x > 0 ? Qt.Key_Right : 0;
         if (direction === next)
             return;
@@ -71,6 +71,8 @@ QtObject {
         onButtonRightChanged: root.updateDirection()
         onAxisLeftXChanged: root.updateDirection()
         onAxisLeftYChanged: root.updateDirection()
+        onAxisRightXChanged: root.updateDirection()
+        onAxisRightYChanged: root.updateDirection()
         onButtonAChanged: if (buttonA)
             root.tap(Qt.Key_Select)
         onButtonBChanged: if (buttonB)
@@ -83,13 +85,13 @@ QtObject {
             root.tap(root.buttonStartKey)
         onButtonSelectChanged: if (buttonSelect)
             root.tap(Qt.Key_Escape)
-        onButtonL1Changed: if (buttonL1 && root.transportKeys)
+        onButtonL1Changed: if (buttonL1 && root.transportKeys && !DesktopInput.visible)
             root.tap(root.leftShoulderKey)
-        onButtonR1Changed: if (buttonR1 && root.transportKeys)
+        onButtonR1Changed: if (buttonR1 && root.transportKeys && !DesktopInput.visible)
             root.tap(root.rightShoulderKey)
-        onLeftTriggerChanged: if (leftTrigger && root.transportKeys)
+        onLeftTriggerChanged: if (leftTrigger && root.transportKeys && !DesktopInput.visible)
             root.tap(root.leftTriggerKey)
-        onRightTriggerChanged: if (rightTrigger && root.transportKeys)
+        onRightTriggerChanged: if (rightTrigger && root.transportKeys && !DesktopInput.visible)
             root.tap(root.rightTriggerKey)
         onButtonL3Changed: if (buttonL3)
             root.tap(Qt.Key_PageUp)

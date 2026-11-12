@@ -37,8 +37,8 @@ Item {
     readonly property int nextFlag: 0x10000000
     readonly property int columns: cobraMode ? 12 : nextMode ? 14 : 10
     readonly property bool cobraCtrlPressed: input.heldKeys.indexOf(cobraControlKey) >= 0
-    readonly property bool capsPressed: input.heldKeys.indexOf(Qt.Key_Control) >= 0
-    readonly property bool symbolPressed: input.heldKeys.indexOf(Qt.Key_Shift) >= 0
+    readonly property bool capsPressed: input.heldKeys.indexOf(Qt.Key_Shift) >= 0
+    readonly property bool symbolPressed: input.heldKeys.indexOf(Qt.Key_Control) >= 0
     property bool gamepadMode: false
     property bool stickyCSSS: textInputMode || gamepadMode || stickyCSSSButton.checked
     onCobraModeChanged: releasePressedKeys()
@@ -91,6 +91,14 @@ Item {
 
     function releasePressedKeys(): void {
         input.clear();
+    }
+
+    function gamepadKey(owner: string, key: int, pressed: bool): void {
+        if (!pressed)
+            input.release(owner, false);
+        else if (onScreenKeyboard.visible && Qt.application.state === Qt.ApplicationActive
+                 && (onScreenKeyboard.textInputMode || !ZxEmulator.paused))
+            input.hold(owner, key);
     }
 
     readonly property var textSymbols: ({
@@ -147,7 +155,7 @@ Item {
         }
         ZxEmulator.processInputEvents = !visible;
         if (visible) {
-            grid.currentIndex = columns * 2;
+            grid.currentIndex = columns * 2 + 4;
             grid.forceActiveFocus(Qt.OtherFocusReason);
         } else {
             releasePressedKeys();
@@ -187,7 +195,17 @@ Item {
 
     GamepadNavigation {
         id: gamepad
-        gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
+        gamepad: Gamepad {
+            deviceId: ZxEmulator.gamepadId
+            readonly property bool leftEnter: buttonL2 >= 0.5
+            readonly property bool rightEnter: buttonR2 >= 0.5
+            onButtonL1Changed: onScreenKeyboard.gamepadKey("gamepad:L1", Qt.Key_Shift, buttonL1)
+            onButtonR1Changed: onScreenKeyboard.gamepadKey("gamepad:R1", Qt.Key_Control, buttonR1)
+            onLeftEnterChanged: onScreenKeyboard.gamepadKey("gamepad:L2", Qt.Key_Enter, leftEnter)
+            onRightEnterChanged: onScreenKeyboard.gamepadKey("gamepad:R2", Qt.Key_Enter, rightEnter)
+            onDeviceIdChanged: onScreenKeyboard.releasePressedKeys()
+            onConnectedChanged: if (!connected) onScreenKeyboard.releasePressedKeys()
+        }
         active: onScreenKeyboard.visible && !onScreenKeyboard.textInputMode
         buttonAKey: Qt.Key_Return
         buttonBKey: Qt.Key_Escape
@@ -260,7 +278,7 @@ Item {
 
     Component.onCompleted: {
         if (textInputMode) {
-            grid.currentIndex = 20;
+            grid.currentIndex = 24;
             return;
         }
         const extraCodes = [Qt.Key_F1, Qt.Key_F2, Qt.Key_F3, Qt.Key_F4,
@@ -328,7 +346,7 @@ Item {
         width: Math.min(cellWidth * columns + ((onScreenKeyboard.portrait || gamepadMode || textInputMode) ? 0 : 8 * Screen.pixelDensity), parent.width)
         height: cellHeight * 4 + ((onScreenKeyboard.portrait || gamepadMode || textInputMode) ? 0 : 2 * Screen.pixelDensity)
         model: cobraMode ? cobraKeyboard : nextMode ? nextKeyboard : zx48Keyboard
-        currentIndex: 24
+        currentIndex: onScreenKeyboard.columns * 2 + 4
         onCurrentIndexChanged: input.release("navigation", false)
         onActiveFocusChanged: if (!activeFocus) input.release("navigation", true)
         interactive: false
@@ -369,8 +387,8 @@ Item {
             height: grid.cellHeight - (Screen.pixelDensity / TextSizes.scaleImage)
             radius: ((onScreenKeyboard.portrait ? 1 : 2) * Screen.pixelDensity) / TextSizes.scaleImage
             color: (code === cobraControlKey && cobraCtrlPressed) ||
-                   (code === Qt.Key_Control && capsPressed) ||
-                   (code === Qt.Key_Shift && symbolPressed) ? "blue"
+                   (code === Qt.Key_Shift && capsPressed) ||
+                   (code === Qt.Key_Control && symbolPressed) ? "blue"
                                                            : Qt.rgba(0.5, 0.5, 0.5, 0.75);
             Text {
                 id: letterItem
@@ -446,6 +464,19 @@ Item {
                 font.bold: true
                 font.pixelSize: parent.height / 6
                 text: extred ? extred : ""
+            }
+
+            Text {
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.margins: parent.radius
+                visible: (onScreenKeyboard.gamepadMode || onScreenKeyboard.textInputMode) && text.length > 0
+                text: code === Qt.Key_Shift ? "L1" : code === Qt.Key_Control ? "R1" : code === Qt.Key_Enter ? "L2/R2" : ""
+                font.pixelSize: grid.cellWidth / 7
+                font.bold: true
+                color: Theme.text
+                style: Text.Outline
+                styleColor: Theme.surface
             }
 
         }

@@ -48,7 +48,7 @@ Sheet {
             pad: "Y",
             key: "F4",
             text: qsTr("Source"),
-            action: () => source.forceActiveFocus()
+            action: () => page.chooseSource()
         },
         {
             pad: "B",
@@ -59,7 +59,10 @@ Sheet {
     ]
     Keys.onPressed: event => {
         if (event.key === Qt.Key_F3 || event.key === Qt.Key_F4) {
-            (event.key === Qt.Key_F3 ? query : source).forceActiveFocus();
+            if (event.key === Qt.Key_F3)
+                query.forceActiveFocus();
+            else
+                page.chooseSource();
             event.accepted = true;
         }
     }
@@ -108,6 +111,10 @@ Sheet {
         catalogue.search(query.text);
         results.forceActiveFocus();
     }
+    function chooseSource() {
+        source.forceActiveFocus();
+        source.popup.open();
+    }
     function openDetails(index) {
         if (index < 0 || index >= results.count)
             return;
@@ -143,14 +150,17 @@ Sheet {
         GridLayout {
             columns: page.narrow ? 2 : 3
             Layout.fillWidth: true
-            ComboBox {
+            NavigationComboBox {
                 id: source
+                objectName: "onlineSource"
                 Layout.preferredWidth: Theme.sp(48)
                 Layout.columnSpan: page.narrow ? 2 : 1
                 Layout.fillWidth: page.narrow
                 model: page.catalogue.sources
                 currentIndex: preferences.sourceIndex
                 Accessible.name: qsTr("Search source")
+                KeyNavigation.right: query
+                KeyNavigation.down: page.narrow ? query : results
                 onActivated: {
                     preferences.sourceIndex = currentIndex;
                     page.catalogue.source = currentIndex;
@@ -159,6 +169,7 @@ Sheet {
             }
             FancyTextField {
                 id: query
+                objectName: "onlineQuery"
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
                 placeholderText: qsTr("Title, or one letter to browse")
@@ -166,10 +177,16 @@ Sheet {
                 maximumLength: 200
                 onAccepted: page.performSearch()
                 KeyNavigation.down: results
+                KeyNavigation.up: source
             }
             Button {
+                id: search
                 text: qsTr("Search")
                 onClicked: page.performSearch()
+                Keys.onReturnPressed: page.performSearch()
+                KeyNavigation.left: query
+                KeyNavigation.down: results
+                KeyNavigation.up: source
             }
         }
         Text {
@@ -205,6 +222,11 @@ Sheet {
             Keys.onReturnPressed: page.openDetails(currentIndex)
             Keys.onEnterPressed: page.openDetails(currentIndex)
             Keys.onPressed: event => {
+                if (event.key === Qt.Key_Up && currentIndex < columns) {
+                    query.forceActiveFocus();
+                    event.accepted = true;
+                    return;
+                }
                 const next = currentIndex + (event.key === Qt.Key_Down ? columns : 1);
                 if ((event.key === Qt.Key_Down || event.key === Qt.Key_Right) && currentIndex >= 0 && next >= count && page.catalogue.hasMore) {
                     page.pendingIndex = next;

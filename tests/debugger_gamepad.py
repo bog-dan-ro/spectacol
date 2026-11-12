@@ -71,6 +71,7 @@ def main():
             ('restore-focus',memory+address+editor+[pad('B'),pad('A')],'edit byte at $9000','1280x800'),
             ('step-over-out',at8010+[pad('L1'),pad('R2'),pad('L2')],'step complete','1280x800'),
             ('stick-views', [pad('X'),'nav:AxisLeftY:1','wait','wait','wait','nav:AxisLeftY:0',pad('A')],'labels / source mappings','1280x800'),
+            ('right-stick-views', [pad('X'),'nav:AxisRightY:1','wait','wait','wait','nav:AxisRightY:0',pad('A')],'labels / source mappings','1280x800'),
         ]
         with ThreadPoolExecutor(max_workers=3) as executor: list(executor.map(run,[case for case in cases if not args.case or case[0] in args.case]))
 

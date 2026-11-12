@@ -32,6 +32,11 @@ class KeyboardInputTest : public QObject {
     void press(const QString &owner, int key) {
         QVERIFY(QMetaObject::invokeMethod(input.get(), "press", Q_ARG(QString, owner), Q_ARG(int, key)));
     }
+    void hold(const QString &owner, int key)
+    {
+        QVERIFY(QMetaObject::invokeMethod(input.get(), "hold", Q_ARG(QString, owner),
+                                          Q_ARG(int, key)));
+    }
     void release(const QString &owner, bool cancelled = false) {
         QVERIFY(QMetaObject::invokeMethod(input.get(), "release", Q_ARG(QString, owner), Q_ARG(bool, cancelled)));
     }
@@ -98,6 +103,36 @@ private slots:
         release(u"modifier"_s);
         press(u"finger1"_s, Qt::Key_0);
         release(u"finger1"_s, true);
+        QVERIFY(held().isEmpty());
+    }
+    void gamepadHoldsWithStickyModifiers()
+    {
+        sticky();
+        hold(u"L1"_s, Qt::Key_Shift);
+        hold(u"R1"_s, Qt::Key_Control);
+        press(u"navigation"_s, Qt::Key_A);
+        release(u"navigation"_s);
+        QCOMPARE(held(), (QSet<int>{ Qt::Key_Shift, Qt::Key_Control }));
+        release(u"L1"_s);
+        QCOMPARE(held(), QSet<int>{ Qt::Key_Control });
+        release(u"R1"_s);
+        QVERIFY(held().isEmpty());
+
+        press(u"touch"_s, Qt::Key_Shift);
+        release(u"touch"_s);
+        hold(u"L1"_s, Qt::Key_Shift);
+        press(u"navigation"_s, Qt::Key_A);
+        release(u"navigation"_s);
+        QCOMPARE(held(), QSet<int>{ Qt::Key_Shift });
+        release(u"L1"_s);
+        QVERIFY(held().isEmpty());
+
+        hold(u"L2"_s, Qt::Key_Enter);
+        hold(u"R2"_s, Qt::Key_Enter);
+        release(u"L2"_s);
+        QCOMPARE(held(), QSet<int>{ Qt::Key_Enter });
+        clear();
+        release(u"R2"_s);
         QVERIFY(held().isEmpty());
     }
     void stickyModifierStillTouched() {

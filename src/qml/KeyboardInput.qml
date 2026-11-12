@@ -60,10 +60,18 @@ QtObject {
     }
 
     function press(owner: string, key: int): void {
+        beginPress(owner, key, sticky);
+    }
+
+    function hold(owner: string, key: int): void {
+        beginPress(owner, key, false);
+    }
+
+    function beginPress(owner: string, key: int, latchModifier: bool): void {
         if (!key || _owners[owner] !== undefined)
             return;
         const record = {keys: [], latches: {}, modifier: 0, token: 0};
-        if (sticky && isModifier(key)) {
+        if (latchModifier && isModifier(key)) {
             record.modifier = key;
             if (_latches[key] !== undefined) {
                 delete _latches[key];

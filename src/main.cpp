@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     parser.addOption(uiScreenshotOption);
     const QCommandLineOption uiKeysOption(
             u"ui-keys"_s,
-            u"Press keys in the window, one every 300 ms from 1 s on, e.g. F5,Down,Return (to screenshot a page); click:X:Y clicks at a window position, click:NAME clicks a named UI item, nav:ButtonA sends a gamepad navigation tap, input:TEXT commits text through the input method, down:KEY and up:KEY only press or release a key (e.g. down:Control,0,up:Control), wait idles 300 ms."_s,
+            u"Press keys in the window, one every 300 ms from 1 s on, e.g. F5,Down,Return (to screenshot a page); click:X:Y clicks at a window position, click:NAME clicks a named UI item, nav:ButtonA sends a gamepad navigation tap, nav:ButtonA:1/0 holds/releases it, nav:connect:ID and nav:disconnect:ID simulate hotplug, input:TEXT commits text through the input method, down:KEY and up:KEY only press or release a key (e.g. down:Control,0,up:Control), wait idles 300 ms."_s,
             u"keys"_s);
     parser.addOption(windowSizeOption);
     parser.addOption(uiKeysOption);
@@ -229,6 +229,24 @@ int main(int argc, char *argv[])
             }
             if (keys[i].startsWith(u"nav:"_s)) {
                 const auto parts = keys[i].split(u':');
+                if (parts.value(1) == u"connect"_s || parts.value(1) == u"disconnect"_s) {
+                    bool idOk = false;
+                    const int device = parts.value(2).toInt(&idOk);
+                    if (!idOk) {
+                        qWarning() << "Unknown navigation event" << keys[i];
+                        continue;
+                    }
+                    const bool connected = parts.value(1) == u"connect"_s;
+                    QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer,
+                                       &app, [device, connected] {
+                                           QMetaObject::invokeMethod(
+                                                   QGamepadManager::instance(),
+                                                   connected ? "_q_forwardGamepadConnected"
+                                                             : "_q_forwardGamepadDisconnected",
+                                                   Q_ARG(int, device));
+                                       });
+                    continue;
+                }
                 const auto name = parts.value(1).toLatin1();
                 const auto &meta = QGamepadManager::staticMetaObject;
                 bool axisOk = false, buttonOk = false, valueOk = false;
@@ -243,18 +261,27 @@ int main(int argc, char *argv[])
                 }
                 QTimer::singleShot(
                         std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer, &app,
-                        [buttonOk, button, axis, value] {
+                        [buttonOk, button, axis, valueOk, value] {
                             auto *manager = QGamepadManager::instance();
                             const int device = ZxEmulator::instance().gamepadId();
                             if (buttonOk) {
-                                manager->gamepadButtonPressEvent(
-                                        device, static_cast<QGamepadManager::GamepadButton>(button),
-                                        1);
-                                QTimer::singleShot(80, manager, [manager, device, button] {
+                                if (valueOk && value <= 0) {
                                     manager->gamepadButtonReleaseEvent(
                                             device,
                                             static_cast<QGamepadManager::GamepadButton>(button));
-                                });
+                                    return;
+                                }
+                                manager->gamepadButtonPressEvent(
+                                        device, static_cast<QGamepadManager::GamepadButton>(button),
+                                        valueOk ? value : 1);
+                                if (!valueOk) {
+                                    QTimer::singleShot(80, manager, [manager, device, button] {
+                                        manager->gamepadButtonReleaseEvent(
+                                                device,
+                                                static_cast<QGamepadManager::GamepadButton>(
+                                                        button));
+                                    });
+                                }
                             } else
                                 manager->gamepadAxisEvent(
                                         device, static_cast<QGamepadManager::GamepadAxis>(axis),
