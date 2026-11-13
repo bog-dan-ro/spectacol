@@ -239,7 +239,7 @@ API 37 x86_64 emulator. Physical phone/TV validation remains open.
       and the Scorpion; checked headless with `--ui-keys`).
 - [x] Status indicators: the tape and disk icons follow ZxKit's media activity (the SD card lights the disk icon),
       and the tape browser follows the tape's current block.
-- [x] CoBra 1 keys: on a physical keyboard Ctrl is CTRL, Esc is ESC, Scroll Lock is NO SCROLL, the keypad's Enter
+- [x] CoBra keys: on a physical keyboard Ctrl is CTRL, Esc is ESC, Scroll Lock is NO SCROLL, the keypad's Enter
       is LINE FEED, F1-F4 are F1-F4 (checked headless: `--ui-keys` gained `down:KEY` / `up:KEY`, CTRL+0 starts
       ROM CP/M from the boot manager; scripted key taps last 80 ms so the emulated keyboard scan sees them). The on-screen keyboard's Control stays Symbol Shift. Spectacol's keys
       moved to F5 on: F5 the menu (was F1), F6 the quick open (was F4); listed in the README.

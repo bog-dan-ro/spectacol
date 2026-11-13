@@ -8,11 +8,13 @@
 #include <QDir>
 #include <QFile>
 #include <QSettings>
+#include <QStandardPaths>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
 #include <QUrl>
 #include <algorithm>
+#include <string_view>
 #include <zxkit/machines/ZxNextMachine.h>
 
 using namespace Qt::StringLiterals;
@@ -157,6 +159,43 @@ private slots:
         zxkit::Emulator next(config);
         QCOMPARE(next.mmu().bank(next.machine().romBankId()).bytes()[0], 0x5a);
         QVERIFY(model.restoreMachine());
+    }
+    void cobraRomRenamePersistence()
+    {
+        using namespace std::literals;
+
+        const auto dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        const QByteArray legacyBytes(16384, '\x5a');
+        const QByteArray replacementBytes(16384, '\x76');
+        for (const auto &id : { u"cobra_64k"_s, u"cobra_80k"_s }) {
+            auto legacyId = id;
+            legacyId.insert(5, u'1');
+            const auto legacyKey = u"CustomROMs/"_s + legacyId + u"/cobra1_boot.rom"_s;
+            const auto legacyPath = dataPath + u"/ROMs/"_s + legacyId + u"/cobra1_boot.rom"_s;
+            QVERIFY(QDir().mkpath(QFileInfo(legacyPath).absolutePath()));
+            QFile legacyFile(legacyPath);
+            QVERIFY(legacyFile.open(QIODevice::WriteOnly));
+            QCOMPARE(legacyFile.write(legacyBytes), legacyBytes.size());
+            legacyFile.close();
+            QSettings().setValue(legacyKey, u"legacy.rom"_s);
+
+            RomOverrides renamed;
+            renamed.setMachineIndex(machine(id));
+            QCOMPARE(renamed.romSlots().size(), 5);
+            QCOMPARE(renamed.romSlots()[0].toMap().value(u"source"_s).toString(), u"legacy.rom"_s);
+            QCOMPARE(renamed.resolve(id.toStdString(), "cobra_boot.rom"sv, 16384)[0], 0x5a);
+            const auto otherId = id == u"cobra_64k"_s ? "cobra_80k"sv : "cobra_64k"sv;
+            QVERIFY(renamed.resolve(otherId, "cobra_boot.rom"sv, 16384).empty());
+
+            QVERIFY(renamed.useFile(0, write(u"replacement.rom"_s, replacementBytes)));
+            RomOverrides restarted;
+            restarted.setMachineIndex(machine(id));
+            QCOMPARE(restarted.resolve(id.toStdString(), "cobra_boot.rom"sv, 16384)[0], 0x76);
+            QVERIFY(restarted.restore(0));
+            QVERIFY(!QSettings().contains(legacyKey));
+            RomOverrides restored;
+            QVERIFY(restored.resolve(id.toStdString(), "cobra_boot.rom"sv, 16384).empty());
+        }
     }
     void symbolsAndSourceMappings()
     {

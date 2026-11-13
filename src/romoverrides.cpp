@@ -65,10 +65,19 @@ RomOverrides::RomOverrides(QObject *parent) : QObject(parent)
     for (auto it = m_slots.cbegin(); it != m_slots.cend(); ++it) {
         for (const auto &slot : it.value()) {
             const auto k = key(it.key(), slot.name);
-            const auto label = settings.value(u"CustomROMs/"_s + k).toString();
+            auto sourceMachine = it.key();
+            auto sourceName = slot.name;
+            auto label = settings.value(u"CustomROMs/"_s + k).toString();
+            if (label.isEmpty() && sourceMachine.startsWith(u"cobra_"_s)) {
+                // Keep existing custom ROMs usable after the CoBra profile and ROM rename.
+                sourceMachine.insert(5, u'1');
+                sourceName.insert(5, u'1');
+                label = settings.value(u"CustomROMs/"_s + key(sourceMachine, sourceName))
+                                .toString();
+            }
             if (label.isEmpty())
                 continue;
-            QFile file(storedPath(it.key(), slot.name));
+            QFile file(storedPath(sourceMachine, sourceName));
             if (file.open(QIODevice::ReadOnly) && file.size() == slot.size) {
                 const auto bytes = file.readAll();
                 if (bytes.size() == slot.size && file.error() == QFileDevice::NoError)
@@ -166,6 +175,14 @@ bool RomOverrides::restore(int index)
     const auto &slot = list[index];
     // Remove the preference first; stale files are harmless if removal fails.
     QSettings().remove(u"CustomROMs/"_s + key(machine, slot.name));
+    if (machine.startsWith(u"cobra_"_s)) {
+        auto legacyMachine = machine;
+        auto legacyName = slot.name;
+        legacyMachine.insert(5, u'1');
+        legacyName.insert(5, u'1');
+        QSettings().remove(u"CustomROMs/"_s + key(legacyMachine, legacyName));
+        QFile::remove(storedPath(legacyMachine, legacyName));
+    }
     {
         const std::lock_guard guard(m_mutex);
         m_overrides.remove(key(machine, slot.name));

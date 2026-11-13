@@ -113,7 +113,7 @@ struct MappedZxKeys
     std::optional<zxkit::ZxKey> modifier;
 };
 
-// The CoBra 1's keyboard has a sixth column: CTRL, NO SCROLL, LINE FEED, ESC and F1-F4. The
+// The CoBra's keyboard has a sixth column: CTRL, NO SCROLL, LINE FEED, ESC and F1-F4. The
 // host's keys for them, on a physical keyboard (the on-screen keyboard's Control is Symbol Shift).
 // Spectacol's own keys start at F5.
 std::optional<zxkit::ZxKey> cobraKey(int qtKey, int modifiers)
@@ -146,7 +146,7 @@ std::optional<zxkit::ZxKey> cobraKey(int qtKey, int modifiers)
 
 bool hasCobraKeyboard(const zxkit::Emulator &emulator)
 {
-    return emulator.machine().id().starts_with("cobra1"sv);
+    return emulator.machine().id().starts_with("cobra_"sv);
 }
 
 MappedZxKeys mapQtKeyToZx(int qtKey, int modifiers)

@@ -94,6 +94,10 @@ ZxSettings::ZxSettings(ZxEmulator &emulator) : QObject(&emulator), m_zxEmulator(
         m_detectLoaders = s.value("detectLoaders", true).toBool();
         m_loaderAcceleration = s.value("loaderAcceleration", 1).toInt();
         m_savedMachineId = s.value("machine", u"48k"_s).toString().toStdString();
+        if (m_savedMachineId == "cobra1_64k"sv || m_savedMachineId == "cobra1_80k"sv) {
+            m_savedMachineId.erase(5, 1);
+            s.setValue("machine", QString::fromStdString(m_savedMachineId));
+        }
         s.endGroup();
 
         s.beginGroup(u"Sound"_s);

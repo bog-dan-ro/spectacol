@@ -30,7 +30,7 @@ Item {
     property bool textInputMode: false
     readonly property bool portrait: Window.window ? Window.window.width < Window.window.height : width < height
     signal textKeyPressed(int key, string text)
-    readonly property bool cobraMode: !textInputMode && ZxEmulator.settings.currentMachine.startsWith("CoBra 1")
+    readonly property bool cobraMode: !textInputMode && ZxEmulator.settings.currentMachine.startsWith("CoBra")
     readonly property int cobraFlag: 0x20000000
     readonly property int cobraControlKey: Qt.Key_Control | cobraFlag
     readonly property bool nextMode: !textInputMode && ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
