@@ -209,14 +209,37 @@ Page parsePage(const QJsonObject &object, int source, const Endpoints &endpoints
             const auto id = entry.value(u"identifier"_s).toString();
             const auto title = textValue(entry.value(u"title"_s));
             if (!id.isEmpty() && !title.isEmpty())
-                page.games.append(
-                        { id,
-                          title,
-                          {},
-                          endpoints.archive.resolved(QUrl(u"services/img/"_s + segment(id))) });
+                page.games.append({ id, title, {}, {} });
         }
     }
     return page;
+}
+
+Media archivePreviewMedia(const QJsonObject &object, const Endpoints &endpoints, const QString &id)
+{
+    const auto extension =
+            object.value(u"metadata"_s).toObject().value(u"emulator_ext"_s).toString().toLower();
+    Media selected;
+    int selectedRank = 3;
+    const auto details = parseDetails(object, endpoints, 0, id);
+    for (const auto &file : details.files) {
+        auto name = file.name.toLower();
+        if (name.endsWith(u".zip"_s))
+            name.chop(4);
+        const auto suffix = QFileInfo(name).suffix();
+        const bool snapshot = suffix == u"z80"_s || suffix == u"sna"_s || suffix == u"szx"_s
+                || suffix == u"nex"_s;
+        const bool tape = suffix == u"tap"_s || suffix == u"tzx"_s;
+        const int rank = (snapshot || tape) && !extension.isEmpty() && suffix == extension ? 0
+                : snapshot                                                                 ? 1
+                : tape                                                                     ? 2
+                                                                                           : 3;
+        if (rank < selectedRank) {
+            selected = file;
+            selectedRank = rank;
+        }
+    }
+    return selected;
 }
 
 Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int source,

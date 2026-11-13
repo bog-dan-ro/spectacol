@@ -70,6 +70,7 @@ struct Page
 QUrl searchUrl(const Endpoints &endpoints, int source, const QString &text, int page);
 QUrl detailsUrl(const Endpoints &endpoints, int source, const QString &id);
 Page parsePage(const QJsonObject &object, int source, const Endpoints &endpoints = {});
+Media archivePreviewMedia(const QJsonObject &object, const Endpoints &endpoints, const QString &id);
 Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int source,
                      const QString &id);
 QString downloadName(int source, const QString &id, const Media &file);

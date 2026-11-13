@@ -220,8 +220,12 @@ private slots:
         QVERIFY(model.hasMore());
         QCOMPARE(model.data(model.index(0), ZXGamesModel::Title).toString(), u"Test title"_s);
         const auto thumbnail = model.data(model.index(0), ZXGamesModel::Screenshot).toUrl();
-        QCOMPARE(thumbnail.host(), u"127.0.0.1"_s);
-        QCOMPARE(thumbnail.path(), source ? u"/media/zxscreens/1/test.gif"_s : u"/archive/services/img/1"_s);
+        if (source) {
+            QCOMPARE(thumbnail.host(), u"127.0.0.1"_s);
+            QCOMPARE(thumbnail.path(), u"/media/zxscreens/1/test.gif"_s);
+        } else {
+            QVERIFY(thumbnail.isEmpty());
+        }
         // Reading result roles must not start metadata or media downloads.
         QCOMPARE(server.requests.size(), 1);
         model.loadMore();
@@ -239,6 +243,8 @@ private slots:
             QVERIFY(files[0].toMap()[u"url"_s].toUrl().path().contains(u"Mirror.zip/World of Spectrum"_s));
             QVERIFY(files[1].toMap()[u"url"_s].toUrl().path().startsWith(u"/computing/zxdb/"_s));
             QCOMPARE(model.details()[u"screenshot"_s].toUrl().path(), u"/media/zxscreens/1/test.gif"_s);
+        } else {
+            QCOMPARE(model.details()[u"screenshot"_s].toUrl().path(), u"/archive/services/img/1"_s);
         }
         QTemporaryDir folder;
         QVERIFY(folder.isValid());
@@ -259,6 +265,102 @@ private slots:
         server.handler = [](const QUrl &) -> Response { return {tape, 200, "application/octet-stream"}; };
         model.download(0, folder.path());
         QTRY_COMPARE(downloaded.size(), 2);
+        QVERIFY(model.errorString().isEmpty());
+    }
+
+    void archivePreviewUsesSnapshot()
+    {
+        auto document = QJsonDocument::fromJson(entry(0)).object();
+        auto metadata = document[u"metadata"_s].toObject();
+        metadata[u"emulator_ext"_s] = u"z80"_s;
+        document[u"metadata"_s] = metadata;
+        auto files = document[u"files"_s].toArray();
+        files.prepend(QJsonObject{ { u"name"_s, u"00cover.png"_s } });
+        files.append(QJsonObject{ { u"name"_s, u"Game.z80"_s } });
+        document[u"files"_s] = files;
+        const auto media = zxonline::archivePreviewMedia(document, {}, u"game"_s);
+        QCOMPARE(media.name, u"Game.z80"_s);
+        QCOMPARE(media.url.path(), u"/download/game/Game.z80"_s);
+        QCOMPARE(zxonline::parseDetails(document, {}, 0, u"game"_s).screenshot.path(),
+                 u"/services/img/game"_s);
+        files.removeLast();
+        document[u"files"_s] = files;
+        QCOMPARE(zxonline::archivePreviewMedia(document, {}, u"game"_s).name, u"Test:1.tap"_s);
+        document[u"files"_s] = QJsonArray{ QJsonObject{ { u"name"_s, u"00cover.png"_s } } };
+        QVERIFY(zxonline::archivePreviewMedia(document, {}, u"game"_s).url.isEmpty());
+    }
+
+    void archivePreviewDownloadAndCache()
+    {
+        Server server;
+        server.handler = [](const QUrl &url) -> Response {
+            if (url.path().contains(u"metadata/"_s))
+                return { entry(0) };
+            if (url.path().contains(u"search"_s))
+                return { page(0) };
+            return { tape, 200, "application/octet-stream" };
+        };
+        QString path;
+        {
+            ZXGamesModel model(server.endpoints());
+            model.search();
+            QTRY_VERIFY(!model.searching());
+            QCOMPARE(server.requests.size(), 1);
+            model.loadScreenshot(0);
+            model.loadScreenshot(0);
+            QVERIFY(model.data(model.index(0), ZXGamesModel::ScreenshotLoading).toBool());
+            QTRY_VERIFY(!model.data(model.index(0), ZXGamesModel::ScreenshotLoading).toBool());
+            const auto preview = model.data(model.index(0), ZXGamesModel::Screenshot).toUrl();
+            QCOMPARE(preview.scheme(), u"image"_s);
+            QCOMPARE(preview.host(), u"spectrum"_s);
+            path = preview.path();
+            QCOMPARE(readFile(path), tape);
+            QCOMPARE(server.requests.size(), 3);
+            QVERIFY(model.details()[u"title"_s].toString().isEmpty());
+            model.loadScreenshot(0);
+            QCOMPARE(server.requests.size(), 3);
+            model.search();
+            QTRY_VERIFY(!model.searching());
+            model.loadScreenshot(0);
+            QCOMPARE(model.data(model.index(0), ZXGamesModel::Screenshot).toUrl(), preview);
+            QCOMPARE(server.requests.size(), 4);
+            model.select(0);
+            QTRY_VERIFY(!model.loadingDetails());
+            QCOMPARE(model.details()[u"screenshot"_s].toUrl().path(), u"/archive/services/img/1"_s);
+            QCOMPARE(readFile(path), tape);
+        }
+        QVERIFY(!QFileInfo::exists(path));
+    }
+
+    void previewCancellationAndFailure()
+    {
+        Server server;
+        bool fail = false;
+        server.handler = [&fail](const QUrl &url) -> Response {
+            if (url.path().contains(u"metadata/"_s))
+                return { entry(0) };
+            if (url.path().contains(u"search"_s))
+                return { page(0) };
+            return { tape, fail ? 404 : 200, "application/octet-stream", 150 };
+        };
+        ZXGamesModel model(server.endpoints());
+        model.search();
+        QTRY_VERIFY(!model.searching());
+        model.loadScreenshot(0);
+        QTRY_COMPARE(server.requests.size(), 3);
+        model.search(u"replacement"_s);
+        QTRY_VERIFY(!model.searching());
+        QTest::qWait(200);
+        QVERIFY(model.data(model.index(0), ZXGamesModel::Screenshot).toUrl().isEmpty());
+        QVERIFY(!model.data(model.index(0), ZXGamesModel::ScreenshotLoading).toBool());
+        fail = true;
+        model.loadScreenshot(0);
+        QTRY_VERIFY(!model.data(model.index(0), ZXGamesModel::ScreenshotLoading).toBool());
+        QVERIFY(model.data(model.index(0), ZXGamesModel::Screenshot).toUrl().isEmpty());
+        QVERIFY(model.errorString().isEmpty());
+        model.select(0);
+        QTRY_VERIFY(!model.loadingDetails());
+        QCOMPARE(model.details()[u"title"_s].toString(), u"Test title"_s);
         QVERIFY(model.errorString().isEmpty());
     }
 

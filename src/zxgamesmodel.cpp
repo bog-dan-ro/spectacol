@@ -19,6 +19,7 @@
 
 #include <QCryptographicHash>
 #include <QDir>
+#include <QFileInfo>
 #include <QJsonDocument>
 #include <QNetworkRequest>
 #include <QSaveFile>
@@ -40,6 +41,22 @@ QJsonObject readObject(QNetworkReply &reply)
         throw std::runtime_error("The service returned invalid JSON");
     return document.object();
 }
+
+QByteArray readMedia(QNetworkReply &reply, const zxonline::Media &file)
+{
+    if (reply.error() != QNetworkReply::NoError)
+        throw std::runtime_error(reply.errorString().toStdString());
+    const auto bytes = reply.readAll();
+    const auto contentType = reply.header(QNetworkRequest::ContentTypeHeader).toString();
+    if (bytes.isEmpty() || contentType.startsWith(u"text/html"_s, Qt::CaseInsensitive))
+        throw std::runtime_error("The server did not return a media file");
+    if (file.size > 0 && bytes.size() != file.size)
+        throw std::runtime_error("The downloaded size does not match the catalogue");
+    if (!file.md5.isEmpty()
+        && QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex() != file.md5)
+        throw std::runtime_error("The downloaded checksum does not match the catalogue");
+    return bytes;
+}
 } // namespace
 
 ZXGamesModel::ZXGamesModel(QObject *parent) : ZXGamesModel(zxonline::Endpoints{}, parent) { }
@@ -51,6 +68,8 @@ ZXGamesModel::ZXGamesModel(const zxonline::Endpoints &endpoints, QObject *parent
 
 ZXGamesModel::~ZXGamesModel()
 {
+    for (auto &reply : m_screenshotReplies)
+        abort(reply);
     abort(m_searchReply);
     abort(m_detailReply);
     abort(m_downloadReply);
@@ -90,6 +109,8 @@ QVariant ZXGamesModel::data(const QModelIndex &index, int role) const
         return game.id;
     case Screenshot:
         return game.screenshot;
+    case ScreenshotLoading:
+        return m_source == 0 && m_screenshotReplies.contains(game.id);
     default:
         return {};
     }
@@ -100,7 +121,8 @@ QHash<int, QByteArray> ZXGamesModel::roleNames() const
     return { { Title, "title" },
              { Subtitle, "subtitle" },
              { Identifier, "identifier" },
-             { Screenshot, "screenshot" } };
+             { Screenshot, "screenshot" },
+             { ScreenshotLoading, "screenshotLoading" } };
 }
 
 bool ZXGamesModel::canFetchMore(const QModelIndex &parent) const
@@ -117,6 +139,73 @@ void ZXGamesModel::fetchMore(const QModelIndex &parent)
 void ZXGamesModel::loadMore()
 {
     fetchMore({});
+}
+
+void ZXGamesModel::updateScreenshot(const QString &id, const QUrl &url)
+{
+    for (qsizetype row = 0; row < m_games.size(); ++row) {
+        if (m_games[row].id == id) {
+            m_games[row].screenshot = url;
+            emit dataChanged(index(int(row)), index(int(row)), { Screenshot, ScreenshotLoading });
+            return;
+        }
+    }
+}
+
+void ZXGamesModel::loadScreenshot(int row)
+{
+    if (m_source != 0 || row < 0 || row >= m_games.size())
+        return;
+    const auto id = m_games[row].id;
+    if (m_screenshotReplies.contains(id))
+        return;
+    if (m_screenshotCache.contains(id)) {
+        updateScreenshot(id, m_screenshotCache.value(id));
+        return;
+    }
+    auto *reply = get(zxonline::detailsUrl(m_endpoints, 0, id));
+    m_screenshotReplies.insert(id, reply);
+    emit dataChanged(index(row), index(row), { ScreenshotLoading });
+    connect(reply, &QNetworkReply::finished, this, [this, reply, id] {
+        try {
+            const auto file = zxonline::archivePreviewMedia(readObject(*reply), m_endpoints, id);
+            if (file.url.isEmpty() || !m_previewDirectory.isValid()) {
+                m_screenshotReplies.remove(id);
+                m_screenshotCache.insert(id, {});
+                updateScreenshot(id, {});
+            } else {
+                auto *mediaReply = get(file.url);
+                m_screenshotReplies.insert(id, mediaReply);
+                connect(mediaReply, &QNetworkReply::finished, this, [this, mediaReply, id, file] {
+                    QUrl screenshot;
+                    try {
+                        const auto bytes = readMedia(*mediaReply, file);
+                        const auto name =
+                                QString::fromLatin1(QCryptographicHash::hash(
+                                                            id.toUtf8(), QCryptographicHash::Sha256)
+                                                            .toHex())
+                                + u'.' + QFileInfo(file.name).completeSuffix();
+                        const auto path = m_previewDirectory.filePath(name);
+                        QSaveFile output(path);
+                        if (output.open(QIODevice::WriteOnly) && output.write(bytes) == bytes.size()
+                            && output.commit()) {
+                            screenshot = QUrl(u"image://spectrum/"_s + path);
+                            m_screenshotCache.insert(id, screenshot);
+                        }
+                    } catch (const std::exception &) {
+                        // Preview failures leave details and downloads available.
+                    }
+                    m_screenshotReplies.remove(id);
+                    updateScreenshot(id, screenshot);
+                    mediaReply->deleteLater();
+                });
+            }
+        } catch (const std::exception &) {
+            m_screenshotReplies.remove(id);
+            updateScreenshot(id, {});
+        }
+        reply->deleteLater();
+    });
 }
 
 QVariantMap ZXGamesModel::details() const
@@ -145,6 +234,9 @@ void ZXGamesModel::abort(QPointer<QNetworkReply> &reply)
 
 void ZXGamesModel::cancel()
 {
+    for (auto &reply : m_screenshotReplies)
+        abort(reply);
+    m_screenshotReplies.clear();
     abort(m_searchReply);
     abort(m_detailReply);
     abort(m_downloadReply);
@@ -284,17 +376,7 @@ void ZXGamesModel::download(int fileIndex, const QString &folder)
     connect(reply, &QNetworkReply::finished, this, [this, reply, file, path] {
         bool saved = false;
         try {
-            if (reply->error() != QNetworkReply::NoError)
-                throw std::runtime_error(reply->errorString().toStdString());
-            const auto bytes = reply->readAll();
-            const auto contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
-            if (bytes.isEmpty() || contentType.startsWith(u"text/html"_s, Qt::CaseInsensitive))
-                throw std::runtime_error("The server did not return a media file");
-            if (file.size > 0 && bytes.size() != file.size)
-                throw std::runtime_error("The downloaded size does not match the catalogue");
-            if (!file.md5.isEmpty()
-                && QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex() != file.md5)
-                throw std::runtime_error("The downloaded checksum does not match the catalogue");
+            const auto bytes = readMedia(*reply, file);
             if (!QFileInfo(path).absoluteDir().mkpath(u"."_s))
                 throw std::runtime_error("Cannot create the download folder");
             QSaveFile output(path);

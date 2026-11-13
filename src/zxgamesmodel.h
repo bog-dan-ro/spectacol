@@ -20,9 +20,11 @@
 #include "zxrequests.h"
 
 #include <QAbstractListModel>
+#include <QHash>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QPointer>
+#include <QTemporaryDir>
 #include <QVariantMap>
 
 class ZXGamesModel : public QAbstractListModel
@@ -40,7 +42,13 @@ class ZXGamesModel : public QAbstractListModel
     Q_PROPERTY(QVariantMap details READ details NOTIFY detailsChanged)
 
 public:
-    enum ZXRole { Title = Qt::DisplayRole, Subtitle = Qt::UserRole, Identifier, Screenshot };
+    enum ZXRole {
+        Title = Qt::DisplayRole,
+        Subtitle = Qt::UserRole,
+        Identifier,
+        Screenshot,
+        ScreenshotLoading
+    };
     Q_ENUM(ZXRole)
 
     explicit ZXGamesModel(QObject *parent = nullptr);
@@ -92,6 +100,7 @@ public:
 public slots:
     void search(const QString &title = {});
     void loadMore();
+    void loadScreenshot(int row);
     void select(int row);
     void download(int fileIndex, const QString &folder);
     void cancel();
@@ -110,12 +119,16 @@ private:
     QNetworkReply *get(const QUrl &url);
     void abort(QPointer<QNetworkReply> &reply);
     void setError(const QString &error);
+    void updateScreenshot(const QString &id, const QUrl &url);
 
     zxonline::Endpoints m_endpoints;
     QNetworkAccessManager m_network;
     QPointer<QNetworkReply> m_searchReply;
     QPointer<QNetworkReply> m_detailReply;
     QPointer<QNetworkReply> m_downloadReply;
+    QHash<QString, QPointer<QNetworkReply>> m_screenshotReplies;
+    QHash<QString, QUrl> m_screenshotCache;
+    QTemporaryDir m_previewDirectory;
     QList<zxonline::Game> m_games;
     zxonline::Details m_details;
     QString m_selectedId;

@@ -212,7 +212,7 @@ Sheet {
             Layout.fillHeight: true
             readonly property int columns: Math.max(1, Math.floor(width / Theme.sp(page.narrow ? 44 : 64)))
             cellWidth: width / columns
-            cellHeight: Theme.sp(24)
+            cellHeight: cellWidth * 0.75 + Theme.sp(24)
             clip: true
             model: page.catalogue
             keyNavigationWraps: false
@@ -239,8 +239,11 @@ Sheet {
                 required property int index
                 required property string title
                 required property string subtitle
+                required property url screenshot
+                required property bool screenshotLoading
                 width: results.cellWidth
                 height: results.cellHeight
+                Component.onCompleted: page.catalogue.loadScreenshot(card.index)
                 Rectangle {
                     anchors.fill: parent
                     anchors.margins: Theme.sp(1)
@@ -252,6 +255,24 @@ Sheet {
                         anchors.fill: parent
                         anchors.margins: Theme.sp(3)
                         spacing: Theme.sp(1)
+                        Image {
+                            id: preview
+                            objectName: "onlineThumbnail" + card.index
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            source: card.screenshot
+                            sourceSize: Qt.size(320, 240)
+                            asynchronous: true
+                            fillMode: Image.PreserveAspectFit
+                            smooth: false
+                            Text {
+                                anchors.centerIn: parent
+                                visible: preview.status !== Image.Ready
+                                text: card.screenshotLoading || preview.status === Image.Loading ? qsTr("Loading…") : qsTr("No screenshot")
+                                font.pixelSize: Theme.caption
+                                color: Theme.textMuted
+                            }
+                        }
                         Text {
                             Layout.fillWidth: true
                             text: card.title
