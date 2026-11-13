@@ -17,8 +17,8 @@
 
 #include "filemanagerpanel.h"
 
-#include <zxkit/debug/Disassembler.h>
-#include <zxkit/peripherals/storage/FatVolume.h>
+#include <zxkit/media/FatImage.h>
+#include <zxkit/media/MediaView.h>
 #include <zxkit/media/BasicCodec.h>
 #include <zxkit/media/MediaPreview.h>
 #include <zxkit/media/TapeFormats.h>
@@ -52,9 +52,7 @@ namespace {
 
 // Whole images are edited in memory: leave SD-card sized images to the SD card page
 constexpr qint64 MaxMediaBytes = 128 * 1024 * 1024;
-constexpr qint64 MaxViewBytes = 256 * 1024;
 constexpr qint64 MaxTextBytes = 1024 * 1024;
-constexpr std::size_t MaxDisassemblyBytes = 64 * 1024;
 constexpr int ScreenBytes = 6912;
 
 bool tapeSuffix(const QString &suffix)
@@ -73,12 +71,7 @@ bool mediaSuffix(const QString &suffix)
 
 bool textSuffix(const QString &suffix)
 {
-    static const QSet<QString> suffixes = { u"doc"_s, u"me"_s,  u"prn"_s,    u"lst"_s, u"c"_s,
-                                            u"h"_s,   u"mac"_s, u"sub"_s,    u"bas"_s, u"txt"_s,
-                                            u"asm"_s, u"a80"_s, u"z80asm"_s, u"md"_s,  u"pok"_s,
-                                            u"sld"_s, u"sym"_s, u"nfo"_s,    u"diz"_s, u"ini"_s,
-                                            u"cfg"_s };
-    return suffixes.contains(suffix);
+    return zxkit::textFileName((u"x."_s + suffix).toStdString());
 }
 
 QString hostKind(const QFileInfo &info)
@@ -136,30 +129,27 @@ bool readOnlyAttribute(std::string_view key)
 }
 
 // The kind of data a media file holds: its tape/+3DOS type, or TR-DOS's letter
-QString dataKind(const QString &filesystem, const zxkit::MediaAttributes &attributes, uint64_t size)
+// An entry's tag: what zxkit::mediaContent() says it holds
+QString contentKind(zxkit::MediaContent content)
 {
-    const auto type = attribute(attributes, "type"sv);
-    if (!type)
-        return u"file"_s;
-    if (trdos(filesystem)) {
-        switch (*type) {
-        case 'B':
-            return u"basic"_s;
-        case 'C':
-            return size == ScreenBytes ? u"screen"_s : u"code"_s;
-        case 'D':
-            return u"array"_s;
-        }
-        return u"file"_s;
-    }
-    switch (*type) {
-    case 0:
+    switch (content) {
+    case zxkit::MediaContent::Basic:
         return u"basic"_s;
-    case 1:
-    case 2:
+    case zxkit::MediaContent::NumberArray:
+    case zxkit::MediaContent::CharacterArray:
         return u"array"_s;
-    case 3:
-        return size == ScreenBytes ? u"screen"_s : u"code"_s;
+    case zxkit::MediaContent::Code:
+        return u"code"_s;
+    case zxkit::MediaContent::Screen:
+        return u"screen"_s;
+    case zxkit::MediaContent::Text:
+        return u"text"_s;
+    case zxkit::MediaContent::TapeBlock:
+        return u"block"_s;
+    case zxkit::MediaContent::Snapshot:
+        return u"snapshot"_s;
+    case zxkit::MediaContent::Unknown:
+        break;
     }
     return u"file"_s;
 }
@@ -188,109 +178,13 @@ bool writeHostFile(const QString &path, std::span<const uint8_t> bytes, QString 
     return true;
 }
 
-QString hex(uint64_t value, int digits)
+QStringList toQt(const std::vector<std::string> &lines)
 {
-    return QString::number(value, 16).toUpper().rightJustified(digits, u'0');
-}
-
-QStringList hexLines(std::span<const uint8_t> data, uint32_t origin)
-{
-    QStringList lines;
-    const auto size = std::min<std::size_t>(data.size(), MaxViewBytes);
-    const int digits = origin + size > 0x10000 ? 6 : 4;
-    for (std::size_t offset = 0; offset < size; offset += 16) {
-        QString bytes;
-        QString text;
-        for (std::size_t i = offset; i < offset + 16; ++i) {
-            if (i < size) {
-                bytes += hex(data[i], 2) + u' ';
-                text += QChar(char16_t(data[i] >= 32 && data[i] < 127 ? data[i] : '.'));
-            } else {
-                bytes += u"   "_s;
-            }
-        }
-        lines.append(hex(origin + offset, digits) + u"  "_s + bytes + u' ' + text);
-    }
-    if (data.size() > size)
-        lines.append(FileManagerPanel::tr("… %1 more bytes").arg(data.size() - size));
-    return lines;
-}
-
-// From `origin` on; when `restart` falls inside an instruction, the next one starts there
-QStringList disassemblyLines(std::span<const uint8_t> data, uint16_t origin, int restart = -1)
-{
-    QStringList lines;
-    const auto size = std::min(data.size(), MaxDisassemblyBytes);
-    const auto read = [&](uint16_t address) -> uint8_t {
-        const auto offset = uint16_t(address - origin);
-        return offset < size ? data[offset] : 0;
-    };
-    const auto restartOffset = std::size_t(restart - origin);
-    for (std::size_t offset = 0; offset < size;) {
-        const auto instruction =
-                zxkit::Disassembler::disassembleOne(read, uint16_t(origin + offset), false);
-        QString bytes;
-        for (unsigned i = 0; i < instruction.length; ++i)
-            bytes += hex(instruction.bytes[i], 2) + u' ';
-        lines.append(hex(instruction.address, 4) + u"  "_s + bytes.leftJustified(12)
-                     + fromStd(instruction.mnemonic));
-        auto next = offset + std::max<unsigned>(1, instruction.length);
-        if (restart >= origin && restartOffset > offset && restartOffset < next)
-            next = restartOffset;
-        offset = next;
-    }
-    return lines;
-}
-
-// A file's text: UTF-8, or 7-bit ASCII as CP/M keeps it (WordStar sets bit 7 for formatting)
-struct TextContent
-{
-    QString text;
-    bool utf8 = true;
-    bool bit7 = false; // there were bit-7 characters, which are dropped
-};
-
-// The text in `data` when it reads as text: any line endings, ending at CP/M's end-of-file mark
-// when that falls in the last 128-byte record
-std::optional<TextContent> asText(std::span<const uint8_t> data)
-{
-    auto text = data;
-    if (const auto end = std::ranges::find(data, uint8_t(0x1A));
-        end != data.end() && data.end() - end <= 128)
-        text = data.first(std::size_t(end - data.begin()));
-    if (text.empty())
-        return std::nullopt;
-    std::size_t control = 0;
-    std::size_t high = 0;
-    for (const auto c : text) {
-        control += (c < 32 && c != '\t' && c != '\n' && c != '\r' && c != '\f') || c == 127;
-        high += c >= 128;
-    }
-    if (control * 50 > text.size() || high * 2 > text.size())
-        return std::nullopt;
-    TextContent result;
-    const auto chars = reinterpret_cast<const char *>(text.data());
-    result.text = QString::fromUtf8(chars, qsizetype(text.size()));
-    if (result.text.contains(QChar::ReplacementCharacter)) {
-        QByteArray ascii(chars, qsizetype(text.size()));
-        for (auto &c : ascii)
-            c = char(uint8_t(c) & 0x7F);
-        result.text = QString::fromLatin1(ascii);
-        result.utf8 = false;
-        result.bit7 = high > 0;
-    }
-    result.text.replace(u"\r\n"_s, u"\n"_s);
-    result.text.replace(u'\r', u'\n');
-    return result;
-}
-
-// The line ending a text uses, to save it back the same way
-QByteArray lineEnding(std::span<const uint8_t> data)
-{
-    const std::string_view text(reinterpret_cast<const char *>(data.data()), data.size());
-    if (text.find("\r\n"sv) != text.npos)
-        return "\r\n";
-    return text.find('\r') != text.npos && text.find('\n') == text.npos ? "\r" : "\n";
+    QStringList out;
+    out.reserve(qsizetype(lines.size()));
+    for (const auto &line : lines)
+        out.append(QString::fromStdString(line));
+    return out;
 }
 
 QStringList textLines(const QString &text)
@@ -482,22 +376,11 @@ QString trdosName(const QString &name, const zxkit::MediaAttributes &attributes)
 // The filesystem profiles that read the image: [{profile, files}], those with files first
 QVariantList readableProfiles(std::span<const uint8_t> bytes, const std::string &extension)
 {
-    QVariantList withFiles;
-    QVariantList empty;
-    for (const auto &profile : zxkit::MediaArchive::profiles()) {
-        zxkit::MediaOptions options;
-        options.filesystem = profile;
-        try {
-            const auto list = zxkit::MediaArchive::open(bytes, extension, options).list();
-            const auto files = std::ranges::count_if(
-                    list, [](const zxkit::MediaEntry &entry) { return !entry.directory; });
-            QVariantMap choice{ { u"profile"_s, fromStd(profile) },
-                                { u"files"_s, qsizetype(files) } };
-            (files ? withFiles : empty).append(choice);
-        } catch (const std::exception &) {
-        }
-    }
-    return withFiles.isEmpty() ? empty : withFiles;
+    QVariantList choices;
+    for (const auto &match : zxkit::MediaArchive::probe(bytes, extension))
+        choices.append(QVariantMap{ { u"profile"_s, fromStd(match.profile) },
+                                    { u"files"_s, qsizetype(match.files) } });
+    return choices;
 }
 
 // What a host file or an entry holds when it is an image to open, else empty
@@ -656,8 +539,19 @@ public:
         writable = m_file.open(QIODevice::ReadWrite);
         if (!writable && !m_file.open(QIODevice::ReadOnly))
             return false;
+        zxkit::FatVolume::BlockWriter writer;
+        if (writable)
+            writer = [this](uint64_t lba, std::span<const uint8_t, 512> in) {
+                return m_file.seek(qint64(lba * 512))
+                        && m_file.write(reinterpret_cast<const char *>(in.data()), 512) == 512;
+            };
         try {
-            volume();
+            m_fat.emplace(
+                    [this](uint64_t lba, std::span<uint8_t, 512> out) {
+                        return m_file.seek(qint64(lba * 512))
+                                && m_file.read(reinterpret_cast<char *>(out.data()), 512) == 512;
+                    },
+                    std::move(writer));
             return true;
         } catch (const std::exception &) {
             m_file.close();
@@ -670,75 +564,32 @@ public:
     }
     std::vector<zxkit::MediaEntry> entries(std::string_view folder, bool recursive) const override
     {
-        const auto fat = volume();
-        std::vector<zxkit::MediaEntry> out;
-        std::vector<std::string> folders{ std::string(folder) };
-        for (std::size_t i = 0; i < folders.size(); ++i) {
-            if (folders.size() > 65536)
-                throw std::runtime_error("FAT directory tree exceeds limit (possibly cyclic)");
-            const auto list = fat.list(folders[i]);
-            if (!list)
-                continue;
-            for (const auto &item : *list) {
-                const auto name = folders[i].empty() ? item.name : folders[i] + '/' + item.name;
-                out.push_back({ name, item.size, item.isDirectory, attributes(item.attributes) });
-                if (recursive && item.isDirectory)
-                    folders.push_back(name);
-            }
-        }
-        return out;
+        return m_fat->list(folder, recursive);
     }
     std::vector<uint8_t> read(std::string_view name) const override
     {
-        auto bytes = volume().readFile(name);
-        if (!bytes)
-            throw std::runtime_error("FAT file not found");
-        return std::move(*bytes);
+        return m_fat->read(name);
     }
     void put(std::string_view name, std::span<const uint8_t> bytes,
-             const zxkit::MediaAttributes &changes) override
+             const zxkit::MediaAttributes &attributes) override
     {
-        check(changes);
-        if (const auto entry = find(name))
-            if (entry->attributes.at("readonly"s))
-                throw std::runtime_error("File is read-only; clear readonly first");
-        volume().writeFile(name, bytes);
-        if (!changes.empty())
-            setAttributes(name, changes);
+        m_fat->put(name, bytes, attributes);
     }
     void remove(std::string_view name) override
     {
-        if (const auto entry = find(name); entry && entry->attributes.at("readonly"s))
-            throw std::runtime_error("File is read-only; clear readonly first");
-        volume().remove(name);
+        m_fat->remove(name);
     }
     void rename(std::string_view from, std::string_view to, bool replace) override
     {
-        if (replace) {
-            if (const auto entry = find(to)) {
-                if (entry->directory)
-                    throw std::runtime_error("Cannot replace a directory");
-                remove(to);
-            }
-        }
-        volume().rename(from, to);
+        m_fat->rename(from, to, replace);
     }
     void setAttributes(std::string_view name, const zxkit::MediaAttributes &changes) override
     {
-        check(changes);
-        const auto entry = find(name);
-        if (!entry)
-            throw std::runtime_error("FAT file not found");
-        uint8_t bits = 0;
-        for (const auto &[key, bit] : bitsByName)
-            if (changes.contains(key) ? changes.at(std::string(key))
-                                      : entry->attributes.at(std::string(key)))
-                bits |= bit;
-        volume().setFileAttributes(name, bits);
+        m_fat->setAttributes(name, changes);
     }
     void makeDirectory(std::string_view name) override
     {
-        volume().makeDirectory(name);
+        m_fat->makeDirectory(name);
     }
     void commit() override
     {
@@ -752,50 +603,8 @@ public:
     }
 
 private:
-    static constexpr std::array<std::pair<std::string_view, uint8_t>, 4> bitsByName = {
-        { { "readonly"sv, 1 }, { "hidden"sv, 2 }, { "system"sv, 4 }, { "archive"sv, 32 } }
-    };
-    static zxkit::MediaAttributes attributes(uint8_t bits)
-    {
-        zxkit::MediaAttributes out;
-        for (const auto &[key, bit] : bitsByName)
-            out[std::string(key)] = (bits & bit) ? 1 : 0;
-        return out;
-    }
-    static void check(const zxkit::MediaAttributes &changes)
-    {
-        for (const auto &[key, value] : changes)
-            if (std::ranges::find(bitsByName, key, &std::pair<std::string_view, uint8_t>::first)
-                == bitsByName.end())
-                throw std::runtime_error("Unsupported attribute: " + key);
-    }
-    std::optional<zxkit::MediaEntry> find(std::string_view name) const
-    {
-        const auto slash = name.rfind('/');
-        const auto list =
-                entries(slash == name.npos ? std::string_view{} : name.substr(0, slash), false);
-        // FAT names are case-insensitive
-        const auto wanted = QString::fromUtf8(name.data(), qsizetype(name.size()));
-        for (const auto &entry : list)
-            if (QString::fromStdString(entry.name).compare(wanted, Qt::CaseInsensitive) == 0)
-                return entry;
-        return std::nullopt;
-    }
-    zxkit::FatVolume volume() const
-    {
-        const auto reader = [this](uint64_t lba, std::span<uint8_t, 512> out) {
-            return m_file.seek(qint64(lba * 512))
-                    && m_file.read(reinterpret_cast<char *>(out.data()), 512) == 512;
-        };
-        if (!writable)
-            return zxkit::FatVolume(reader);
-        return zxkit::FatVolume(reader, [this](uint64_t lba, std::span<const uint8_t, 512> in) {
-            return m_file.seek(qint64(lba * 512))
-                    && m_file.write(reinterpret_cast<const char *>(in.data()), 512) == 512;
-        });
-    }
-
-    mutable QFile m_file;
+    QFile m_file;
+    std::optional<zxkit::FatImage> m_fat;
 };
 
 bool fatSignature(const QString &path)
@@ -1214,9 +1023,8 @@ void FileManagerPanel::listMedia()
             entry.kind = u"basic"_s;
             entry.info = tr("Listing");
         } else {
-            entry.kind = dataKind(fs, entry.attributes, item.size);
-            if (entry.kind == u"file"_s && textSuffix(QFileInfo(rest).suffix().toLower()))
-                entry.kind = u"text"_s;
+            entry.kind = contentKind(
+                    zxkit::mediaContent(fs.toStdString(), item.name, entry.attributes, item.size));
             QStringList info{ typeText(fs, entry.attributes, entry.kind),
                               flagsText(entry.attributes) };
             info.removeAll(QString());
@@ -1329,9 +1137,10 @@ QString FileManagerPanel::saveImage(const QString &dataUrl, const QString &name)
 
 QStringList FileManagerPanel::disassemble(const QByteArray &bytes, int origin, int address) const
 {
-    return disassemblyLines(std::span(reinterpret_cast<const uint8_t *>(bytes.constData()),
-                                      std::size_t(bytes.size())),
-                            uint16_t(origin), address);
+    return toQt(
+            zxkit::disassemblyLines(std::span(reinterpret_cast<const uint8_t *>(bytes.constData()),
+                                              std::size_t(bytes.size())),
+                                    uint16_t(origin), address));
 }
 
 int FileManagerPanel::parseAddress(const QString &text) const
@@ -1946,191 +1755,109 @@ QVariantMap FileManagerPanel::view(int row) const
         fail(QString::fromUtf8(e.what()));
         return {};
     }
-    QVariantList pages;
-    QString title = entry.name;
-    const auto param1 = attribute(entry.attributes, "param1"sv);
     const auto fs = filesystem();
-    const auto hexPage = [](const QStringList &lines) {
-        return linesPage(tr("Hex"), lines, u"hex"_s);
-    };
-    // With its bytes and address, for going to an address inside an instruction
-    const auto disassemblyPage = [](std::span<const uint8_t> bytes, uint16_t origin,
-                                    const QString &pageTitle) {
-        auto page = linesPage(pageTitle, disassemblyLines(bytes, origin), u"disassembly"_s);
-        const auto size = std::min(bytes.size(), MaxDisassemblyBytes);
-        page[u"bytes"_s] =
-                QByteArray(reinterpret_cast<const char *>(bytes.data()), qsizetype(size));
-        page[u"origin"_s] = int(origin);
-        return page;
-    };
-    const auto addScreen = [&](std::span<const uint8_t> screen, const QString &screenTitle) {
-        try {
-            pages.append(
-                    QVariantMap{ { u"title"_s, screenTitle },
-                                 { u"image"_s, imageUrl(zxkit::renderScrToVideoFrame(screen)) } });
-        } catch (const std::exception &) {
-        }
-    };
-    // Exactly a screen shows as one first; anything larger can be looked at as one, last
-    const auto screenFirst = [&](std::span<const uint8_t> bytes) {
-        if (bytes.size() == std::size_t(ScreenBytes))
-            addScreen(bytes, tr("Screen"));
-    };
-    const auto screenLast = [&](std::span<const uint8_t> bytes) {
-        if (bytes.size() > std::size_t(ScreenBytes))
-            addScreen(bytes.first(ScreenBytes), tr("As screen"));
-    };
-    const auto addBasic = [&](std::span<const uint8_t> program, zxkit::BasicDialect dialect) {
-        try {
-            QStringList lines;
-            QVariantList parts;
-            for (const auto &line : zxkit::BasicCodec::listingLines(program, dialect)) {
-                QString text;
-                QVariantList row;
-                for (const auto &part : line) {
-                    const auto piece = fromStd(part.text);
-                    text += piece;
-                    QVariantMap map{ { u"k"_s, partKind(part.kind) }, { u"t"_s, piece } };
-                    // A protected number: what LIST shows instead of the value used
-                    if (part.listed)
-                        map[u"l"_s] = fromStd(*part.listed);
-                    row.append(map);
-                }
-                lines.append(text);
-                parts.append(QVariant(row));
-            }
-            // Unhacked: the values the program uses; unfiltered: every byte, as the editor has it
-            auto page = linesPage(tr("Unhacked"), lines, u"basic"_s);
-            page[u"parts"_s] = parts;
-            pages.append(page);
-            pages.append(
-                    linesPage(tr("Unfiltered"),
-                              textLines(fromStd(zxkit::BasicCodec::decompile(program, dialect))),
-                              u"lossless"_s));
-            // Where USR calls land in the program: machine code to read, often hidden in a REM
-            constexpr qint64 basicStart = 23755;
-            QList<qint64> calls;
-            for (const auto &line : parts) {
-                const auto row = line.toList();
-                for (qsizetype k = 0; k < row.size(); ++k) {
-                    if (row[k].toMap()[u"t"_s] != u"USR"_s)
-                        continue;
-                    for (auto next = k + 1; next < row.size(); ++next) {
-                        const auto part = row[next].toMap();
-                        if (part[u"k"_s] == u"number"_s) {
-                            const auto target = part[u"t"_s].toLongLong();
-                            if (target >= basicStart && target < basicStart + qint64(program.size())
-                                && !calls.contains(target))
-                                calls.append(target);
-                        }
-                        if (part[u"k"_s] != u"text"_s)
-                            break;
+    QString title = entry.name;
+    QVariantList pages;
+    // ZxKit's views, with Spectacol's titles
+    const auto addPages = [&](const std::vector<zxkit::MediaViewPage> &views) {
+        using Kind = zxkit::MediaViewPage::Kind;
+        for (const auto &view : views) {
+            const auto lines = toQt(view.lines);
+            switch (view.kind) {
+            case Kind::Basic: {
+                QVariantList parts;
+                for (const auto &line : view.listing) {
+                    QVariantList row;
+                    for (const auto &part : line) {
+                        QVariantMap map{ { u"k"_s, partKind(part.kind) },
+                                         { u"t"_s, fromStd(part.text) } };
+                        // A protected number: what LIST shows instead of the value used
+                        if (part.listed)
+                            map[u"l"_s] = fromStd(*part.listed);
+                        row.append(map);
                     }
+                    parts.append(QVariant(row));
                 }
+                auto page = linesPage(tr("Unhacked"), lines, u"basic"_s);
+                page[u"parts"_s] = parts;
+                pages.append(page);
+                break;
             }
-            for (const auto target : calls)
-                pages.append(disassemblyPage(program.subspan(std::size_t(target - basicStart)),
-                                             uint16_t(target), tr("USR %1").arg(target)));
-        } catch (const std::exception &e) {
-            pages.append(linesPage(tr("Unhacked"), { QString::fromUtf8(e.what()) }));
+            case Kind::Unfiltered:
+                pages.append(linesPage(tr("Unfiltered"), lines, u"lossless"_s));
+                break;
+            case Kind::Usr:
+            case Kind::Disassembly: {
+                // With its bytes and address, for going to an address inside an instruction
+                auto page = linesPage(view.kind == Kind::Usr ? tr("USR %1").arg(view.address)
+                                                             : tr("Disassembly"),
+                                      lines, u"disassembly"_s);
+                page[u"bytes"_s] = QByteArray(reinterpret_cast<const char *>(view.bytes.data()),
+                                              qsizetype(view.bytes.size()));
+                page[u"origin"_s] = int(view.address);
+                pages.append(page);
+                break;
+            }
+            case Kind::Screen:
+            case Kind::AsScreen:
+                pages.append(QVariantMap{
+                        { u"title"_s, view.kind == Kind::Screen ? tr("Screen") : tr("As screen") },
+                        { u"image"_s, imageUrl(*view.screen) } });
+                break;
+            case Kind::Hex:
+                pages.append(linesPage(tr("Hex"), lines, u"hex"_s));
+                break;
+            case Kind::Raw:
+                pages.append(
+                        linesPage(entry.key.endsWith(u".tap"_s) ? tr("Raw TAP") : tr("Raw TZX"),
+                                  lines, u"hex"_s));
+                break;
+            case Kind::Text:
+                pages.append(linesPage(tr("Text"), lines));
+                break;
+            case Kind::Array:
+                pages.append(linesPage(tr("Array"), lines));
+                break;
+            case Kind::Block:
+                if (!lines.isEmpty())
+                    title = tr("Block %1: %2")
+                                    .arg(blockIndex(entry.key).value_or(0))
+                                    .arg(lines.first());
+                pages.append(linesPage(tr("Block"), lines));
+                break;
+            }
         }
     };
-    const auto &kind = entry.kind;
-    if (kind == u"block"_s) {
-        try {
-            const auto blocks = parseBlock(data);
-            if (!blocks.empty()) {
-                const auto &block = blocks.front();
-                title = tr("Block %1: %2")
-                                .arg(blockIndex(entry.key).value_or(0))
-                                .arg(fromStd(block.description));
-                // A ROM-style block holds its flag and checksum around the data
-                std::span<const uint8_t> payload = block.data;
-                if (payload.size() >= 2
-                    && (payload.size() == std::size_t(ScreenBytes) + 2 || block.isRomBlock()))
-                    payload = payload.subspan(1, payload.size() - 2);
-                screenFirst(payload);
-                QStringList details{
-                    tr("TZX block ID: %1").arg(hex(uint8_t(block.type), 2)),
-                    tr("Data: %1 bytes").arg(block.data.size()),
-                    tr("Pause after: %1 ms").arg(block.pauseAfterMs),
-                };
-                if (block.type == zxkit::TapeBlockType::StandardData
-                    || block.type == zxkit::TapeBlockType::TurboData) {
-                    details.append(
-                            tr("Pilot: %1 × %2 T").arg(block.pilotPulses).arg(block.pilotPulse));
-                    details.append(
-                            tr("Sync: %1, %2 T").arg(block.sync1Pulse).arg(block.sync2Pulse));
-                    details.append(tr("Bits: 0 = %1 T, 1 = %2 T")
-                                           .arg(block.zeroPulse)
-                                           .arg(block.onePulse));
-                }
-                pages.append(linesPage(tr("Block"), details));
-                if (!block.data.empty())
-                    pages.append(hexPage(hexLines(block.data, 0)));
-                screenLast(payload);
+    try {
+        if (m_media && fs == u"tape"_s && entry.key.startsWith(u"basic/"_s)) {
+            // The listing file is the editable text: show the program like the other views do
+            try {
+                addPages(zxkit::viewMedia(m_media->read(basicPath(entry).toStdString()),
+                                          zxkit::MediaContent::Basic));
+            } catch (const std::exception &) {
             }
-        } catch (const std::exception &e) {
-            pages.append(linesPage(tr("Block"), { QString::fromUtf8(e.what()) }));
-        }
-        pages.append(linesPage(entry.key.endsWith(u".tap"_s) ? tr("Raw TAP") : tr("Raw TZX"),
-                               hexLines(data, 0), u"hex"_s));
-    } else if (kind == u"basic"_s && m_media && fs == u"tape"_s
-               && entry.key.startsWith(u"basic/"_s)) {
-        // The listing file is the editable text: show the program like the other views do
-        try {
-            addBasic(m_media->read(basicPath(entry).toStdString()),
-                     zxkit::BasicDialect::Spectrum128);
-        } catch (const std::exception &) {
-        }
-        pages.append(
-                linesPage(tr("Editable text"),
-                          textLines(QString::fromUtf8(reinterpret_cast<const char *>(data.data()),
-                                                      qsizetype(data.size())))));
-    } else if (kind == u"basic"_s && m_media) {
-        addBasic(data, zxkit::BasicDialect::Spectrum128);
-        pages.append(hexPage(hexLines(data, 23755)));
-    } else if (kind == u"array"_s) {
-        const bool characters = attribute(entry.attributes, "type"sv) == 2;
-        try {
             pages.append(linesPage(
-                    tr("Array"),
-                    textLines(fromStd(zxkit::BasicCodec::decompileArray(data, characters)))));
-        } catch (const std::exception &) {
+                    tr("Editable text"),
+                    textLines(QString::fromUtf8(reinterpret_cast<const char *>(data.data()),
+                                                qsizetype(data.size())))));
+        } else if (!m_media && entry.media) {
+            // An image to open: its bytes
+            pages.append(linesPage(tr("Hex"), toQt(zxkit::hexLines(data, 0)), u"hex"_s));
+        } else if (m_media) {
+            addPages(zxkit::viewMedia(
+                    data,
+                    zxkit::mediaContent(fs.toStdString(), entry.key.toStdString(), entry.attributes,
+                                        data.size()),
+                    zxkit::mediaLoadAddress(entry.key.toStdString(), entry.attributes),
+                    entry.name.toStdString()));
+        } else {
+            addPages(zxkit::viewMedia(data,
+                                      zxkit::fileContent(entry.name.toStdString(), data.size()), 0,
+                                      entry.name.toStdString()));
         }
-        pages.append(hexPage(hexLines(data, 0)));
-    } else if (kind == u"screen"_s || kind == u"code"_s) {
-        const auto origin = uint16_t(param1.value_or(kind == u"screen"_s ? 16384 : 0));
-        if (data.size() >= std::size_t(ScreenBytes) && kind == u"screen"_s)
-            addScreen(std::span(data).first(ScreenBytes), tr("Screen"));
-        else
-            screenFirst(data);
-        pages.append(hexPage(hexLines(data, origin)));
-        if (kind == u"code"_s || m_media)
-            pages.append(disassemblyPage(data, origin, tr("Disassembly")));
-        if (kind == u"code"_s)
-            screenLast(data);
-    } else if (kind == u"snapshot"_s) {
-        try {
-            pages.append(QVariantMap{
-                    { u"title"_s, tr("Screen") },
-                    { u"image"_s,
-                      imageUrl(zxkit::extractMediaPreview(data, entry.name.toStdString())) } });
-        } catch (const std::exception &) {
-        }
-        pages.append(hexPage(hexLines(data, 0)));
-    } else if (const auto text = kind == u"text"_s || kind == u"file"_s
-                       ? asText(std::span(data).first(
-                                 std::min<std::size_t>(data.size(), MaxTextBytes)))
-                       : std::nullopt) {
-        pages.append(linesPage(tr("Text"), textLines(text->text)));
-        pages.append(hexPage(hexLines(data, 0)));
-    } else {
-        screenFirst(data);
-        pages.append(hexPage(hexLines(data, 0)));
-        if (m_media)
-            pages.append(disassemblyPage(data, uint16_t(param1.value_or(0)), tr("Disassembly")));
-        screenLast(data);
+    } catch (const std::exception &e) {
+        fail(QString::fromUtf8(e.what()));
+        return {};
     }
     QString subtitle = entry.info;
     if (entry.size >= 0)
@@ -2154,10 +1881,10 @@ QVariantMap FileManagerPanel::editable(int row) const
         if (entry.kind == u"text"_s || entry.kind == u"file"_s) {
             if (entry.size > MaxTextBytes)
                 return {};
-            const auto text = asText(readEntry(entry));
+            const auto text = zxkit::mediaText(readEntry(entry));
             if (!text)
                 return {};
-            QVariantMap result{ { u"title"_s, entry.name }, { u"text"_s, text->text } };
+            QVariantMap result{ { u"title"_s, entry.name }, { u"text"_s, fromStd(text->text) } };
             if (text->bit7)
                 result[u"note"_s] =
                         tr("Saving keeps 7-bit ASCII: WordStar's bit-7 formatting is dropped.");
@@ -2202,12 +1929,12 @@ bool FileManagerPanel::saveText(int row, const QString &text)
     if (entry.kind != u"basic"_s) {
         // A text file keeps its encoding and line endings: CR LF on CP/M, CR on the Spectrum
         try {
-            const auto original = readEntry(entry);
-            if (const auto content = asText(original); content && !content->utf8)
-                utf8 = text.toLatin1();
-            const auto ending = lineEnding(original);
-            if (ending != "\n")
-                utf8.replace("\n", ending);
+            if (const auto content = zxkit::mediaText(readEntry(entry))) {
+                if (!content->utf8)
+                    utf8 = text.toLatin1();
+                if (content->lineEnding != "\n"sv)
+                    utf8.replace("\n", QByteArray::fromStdString(content->lineEnding));
+            }
         } catch (const std::exception &) {
         }
     }

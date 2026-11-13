@@ -129,7 +129,7 @@ private slots:
         // Data larger than a screen can still be looked at as one
         writeFile(root.filePath(u"big.bin"_s), QByteArray(7000, 0));
         left.refresh();
-        QCOMPARE(pageTitles(left.view(left.rowOf(u"big.bin"_s))), u"Hex,As screen"_s);
+        QCOMPARE(pageTitles(left.view(left.rowOf(u"big.bin"_s))), u"Hex,Disassembly,As screen"_s);
         QVERIFY(left.remove(left.rowOf(u"big.bin"_s)));
 
         // Marked entries move together; a folder is removed with its contents

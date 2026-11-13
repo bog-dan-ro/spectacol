@@ -74,7 +74,9 @@ emulator keeps the copy it loaded: reinsert it to use the changes.
 
 ## Viewer and editor
 
-The viewer (F3) shows the views that fit the file; ← → switch them. Long lines wrap.
+The viewer (F3) shows the views that fit the file; ← → switch them. Long lines wrap. The
+pages come from ZxKit's `MediaView` API, which `zxmedia view` uses too, so the command line
+shows a file the same way.
 
 - ↑ ↓ move a line cursor. Space or Return (A) starts a selection that moving extends (Shift+↑ ↓
   and Shift+click too, Ctrl+A selects all); Ctrl+C (X) copies it, or the cursor's line.
