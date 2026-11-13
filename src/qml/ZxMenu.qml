@@ -182,6 +182,14 @@ ZxMenuItem {
 
 
         }
+
+        ZxMenuItem {
+            text: qsTr("&File manager ...")
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "FileManagerPage.qml";
+            }
+        }
     }
 
 

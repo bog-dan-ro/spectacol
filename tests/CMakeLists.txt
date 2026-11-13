@@ -134,3 +134,11 @@ qt_add_resources(test_media_icons "preview_icons"
 )
 add_test(NAME media_icons COMMAND test_media_icons)
 set_tests_properties(media_icons PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+qt_add_executable(test_file_manager
+    test_file_manager.cpp
+    ../src/filemanagerpanel.cpp ../src/filemanagerpanel.h
+)
+target_include_directories(test_file_manager PRIVATE ../src)
+target_link_libraries(test_file_manager PRIVATE Qt6::Test Qt6::Gui Qt6::Qml ZX::Kit)
+add_test(NAME file_manager COMMAND test_file_manager)
+set_tests_properties(file_manager PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

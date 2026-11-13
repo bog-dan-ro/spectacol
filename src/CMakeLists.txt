@@ -126,6 +126,7 @@ qt_add_qml_module(spectacol
         debugsymbols.cpp debugsymbols.h
         disassamblemodel.cpp disassamblemodel.h
         disks.h disks.cpp
+        filemanagerpanel.cpp filemanagerpanel.h
         folderlistmodel.cpp folderlistmodel.h
         nextsdcard.h nextsdcard.cpp
         nextuarthooks.cpp nextuarthooks.h
@@ -181,6 +182,9 @@ qt_add_qml_module(spectacol
         qml/FancyText.qml
         qml/FancyTextField.qml
         qml/FileBrowserPage.qml
+        qml/FileManagerPage.qml
+        qml/FileManagerPanelView.qml
+        qml/FileViewerPage.qml
         qml/FiltersPage.qml
         qml/ZxMenu.qml
         qml/Joysticks.qml

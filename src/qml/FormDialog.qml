@@ -30,6 +30,7 @@ Dialog {
     property string errorMessage
     property bool acceptable: true
     property var commit: null
+    property string acceptText: qsTr("Save")
     parent: Overlay.overlay
     popupType: Popup.Item
     anchors.centerIn: parent
@@ -88,16 +89,21 @@ Dialog {
     }
     footer: RowLayout {
         Item { Layout.fillWidth: true }
+        // Return is the gamepad's A: buttons only take Space themselves
         Button {
             objectName: "formSave"
-            text: qsTr("Save")
+            text: dialog.acceptText
             enabled: dialog.acceptable
             onClicked: dialog.save()
+            Keys.onReturnPressed: dialog.save()
+            Keys.onEnterPressed: dialog.save()
         }
         Button {
             objectName: "formCancel"
             text: Theme.gamepadHints ? qsTr("Cancel (B)") : qsTr("Cancel")
             onClicked: dialog.reject()
+            Keys.onReturnPressed: dialog.reject()
+            Keys.onEnterPressed: dialog.reject()
         }
         Keys.onPressed: event => {
             if ([Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right].includes(event.key)) {

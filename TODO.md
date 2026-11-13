@@ -79,6 +79,16 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
 - [x] A compact list/grid alternative to cover flow, with remembered folder/selection and local filename search
       ([#18](https://github.com/bog-dan-ro/spectacol/issues/18),
       [#32](https://github.com/bog-dan-ro/spectacol/issues/32)); usable with touch, keyboard and gamepad.
+- [x] **Media → File manager**: twin panels over host folders and the inside of tapes and disks
+      (ZxKit's `MediaArchive`). Create, rename, copy, move and recursively delete files and folders; new
+      tape/disk images; tape files, BASIC text and raw blocks (append, reorder, remove); per-filesystem
+      attributes; BASIC/screen/hex/disassembly viewer; BASIC and text editor; profile probing for disks the
+      detection can't settle. The Next's SD card (FAT, edited in place) and images inside images, e.g. its
+      CP/M drive `nextzxos/cpm-a.p3d`; the Next restarts after its own card changed. Keyboard (Midnight
+      Commander keys), gamepad and touch; `test_file_manager` covers the model. See `docs/file-manager.md`.
+- [ ] File manager follow-ups: Android document-provider (`content://`) folders; inserting a disk or
+      seeking the tape at an entry; a ROM-spacing BASIC compile mode so edited 48K programs need no
+      `\{KEYWORD}` escapes; images nested inside a card are limited to 128 MiB (they are edited in memory).
 
 ## Debugger
 
