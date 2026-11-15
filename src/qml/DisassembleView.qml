@@ -50,6 +50,13 @@ ListView {
         function onDeltaChanged() { view.currentIndex = ZxEmulator.disassambleModel.delta; }
     }
 
+    TextMetrics {
+        id: columns
+        font.family: Theme.monoFamily
+        font.pixelSize: Theme.body
+        text: "0"
+    }
+
     Z80Assembler {
         id: assembler
     }
@@ -101,7 +108,7 @@ ListView {
             readonly property color ink: row.foreground
 
             width: view.width
-            height: asmEdit.contentHeight + asmEdit.topPadding + asmEdit.bottomPadding + Theme.sp(1) + (annotationLabel.visible ? annotationLabel.implicitHeight + Theme.sp(1) : 0)
+            height: Math.max(Theme.touchScreenUi ? Theme.sp(10) : 0, asmEdit.contentHeight + asmEdit.topPadding + asmEdit.bottomPadding + Theme.sp(1)) + (annotationLabel.visible ? annotationLabel.implicitHeight + Theme.sp(1) : 0)
             color: paper
             radius: Theme.radiusSmall
             border.width: view.currentIndex === row.index ? Theme.focusLine : 0
@@ -120,7 +127,8 @@ ListView {
                 anchors { left: parent.left; right: parent.right; bottom: parent.bottom; margins: Theme.sp(1) }
                 visible: row.annotation.length > 0
                 text: row.annotation
-                color: Theme.textMuted
+                // on the cursor's or a breakpoint's coloured row the muted grey is hard to read
+                color: row.paper.a > 0 ? row.ink : Theme.textMuted
                 font.pixelSize: Theme.caption
                 elide: Text.ElideMiddle
             }
@@ -131,30 +139,29 @@ ListView {
                     mono: true
                     Layout.fillHeight: true
                     Layout.fillWidth: false
-                    horizontalAlignment: Text.AlignRight
-                    font.pixelSize: TextSizes.scale12
+                    Layout.leftMargin: Theme.sp(2)
+                    Layout.preferredWidth: columns.advanceWidth * 4
+                    horizontalAlignment: Text.AlignLeft
                     style: Text.Normal
-                    Layout.preferredWidth: 4 * TextSizes.scale12
                     color: row.ink
-                    text: row.addressText
+                    // the rows are hex: "0x" on every one only takes room
+                    text: row.addressText.replace(/^0x/i, "")
                 }
-
-                Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyText {
                     mono: true
                     Layout.fillHeight: true
                     Layout.fillWidth: false
-                    Layout.preferredWidth: 4 * TextSizes.scale12
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: TextSizes.scale16 / 2
+                    Layout.leftMargin: Theme.sp(2)
+                    Layout.preferredWidth: columns.advanceWidth * 8 * Theme.caption / Theme.body
+                    horizontalAlignment: Text.AlignLeft
+                    font.pixelSize: Theme.caption
                     style: Text.Normal
                     color: row.ink
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    text: row.bytesText
+                    opacity: 0.7
+                    elide: Text.ElideRight
+                    text: row.bytesText.replace(/0x/gi, "").replace(/\s+/g, "")
                 }
-
-                Item { Layout.fillWidth: false; Layout.preferredWidth: 1.5 * Screen.pixelDensity }
 
                 FancyTextField {
                     mono: true
@@ -162,7 +169,6 @@ ListView {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignLeft
-                    font.pixelSize: TextSizes.scale12
                     color: row.ink
                     font.bold: false
                     readOnly: true

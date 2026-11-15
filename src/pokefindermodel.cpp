@@ -17,6 +17,10 @@
 
 #include "pokefindermodel.h"
 
+#include <QCoreApplication>
+
+#include <algorithm>
+
 #include "breakpointsmodel.h"
 #include "zxemulator.h"
 #include "qmlui.h"
@@ -27,29 +31,49 @@ using namespace Qt::StringLiterals;
 
 PokeFinderModel::PokeFinderModel(QObject *parent) : QAbstractListModel(parent) { }
 
+zxkit::Breakpoint PokeFinderModel::locationBreakpoint(int page16k, int offset,
+                                                      zxkit::BreakpointType type,
+                                                      zxkit::BankId ramBank)
+{
+    zxkit::Breakpoint bp;
+    bp.type = type;
+    bp.page1k = uint16_t(page16k * 16 + ((offset & 0x3FFF) >> 10));
+    bp.bankId = ramBank;
+    bp.address = uint16_t(offset & 1023);
+    bp.mask = 1023;
+    return bp;
+}
+
+bool PokeFinderModel::sameLocation(const zxkit::Breakpoint &a, const zxkit::Breakpoint &b)
+{
+    return a.type == b.type && a.address == b.address && a.mask == b.mask && a.page1k == b.page1k
+            && a.bankId == b.bankId && !a.condition && !b.condition;
+}
+
 void PokeFinderModel::update()
 {
-    std::vector<zxkit::PokeCandidate> candidates;
+    std::vector<PokeFinderData> data;
     {
         const auto emulator = ZxEmulator::instance().emulator().readLock();
         const auto &pf = emulator->debugger().pokeFinder();
-        if (pf.count() > 0 && pf.count() <= MAX_POSSIBLE)
-            candidates = pf.results(MAX_POSSIBLE);
-    }
-
-    std::vector<PokeFinderData> data;
-    const auto &addresses = ZxEmulator::instance().breakpointsModel()->addresses();
-    for (const auto &cand : candidates) {
-        uint8_t breakpoints = NoBreakpoint;
-        const uint16_t absAddr = uint16_t(0x4000 + cand.offset);
-        if (auto it = addresses.find(absAddr); it != addresses.end()) {
-            if (it->second.contains(BreakpointsModel::BreakOnRead))
-                breakpoints = OnRead;
-            if (it->second.contains(BreakpointsModel::BreakOnWrite))
-                breakpoints |= OnWrite;
+        if (pf.count() > 0 && pf.count() <= MAX_POSSIBLE) {
+            const auto ramBank = emulator->machine().ramBankId();
+            const auto &breakpoints = emulator->debugger().breakpoints().breakpoints();
+            const auto has = [&](const zxkit::PokeCandidate &cand, zxkit::BreakpointType type) {
+                const auto wanted = locationBreakpoint(cand.page16k, cand.offset, type, ramBank);
+                return std::ranges::any_of(breakpoints, [&](const zxkit::Breakpoint &bp) {
+                    return bp.enabled && sameLocation(bp, wanted);
+                });
+            };
+            for (const auto &cand : pf.results(MAX_POSSIBLE)) {
+                uint8_t flags = NoBreakpoint;
+                if (has(cand, zxkit::BreakpointType::MemoryRead))
+                    flags |= OnRead;
+                if (has(cand, zxkit::BreakpointType::MemoryWrite))
+                    flags |= OnWrite;
+                data.emplace_back(cand.page16k, cand.offset, cand.currentValue, flags);
+            }
         }
-        data.emplace_back(
-                PokeFinderData(cand.page16k, cand.offset, cand.currentValue, breakpoints));
     }
 
     const bool sameSize = data.size() == m_data.size();
@@ -88,16 +112,19 @@ QVariant PokeFinderModel::data(const QModelIndex &index, int role) const
 
     case Breakpoint:
         switch (m_data[index.row()].breakpoints) {
-        case 1:
-            return u"Break on Read"_s;
-        case 2:
-            return u"Break on Write"_s;
-        case 3:
-            return u"Break on R/W"_s;
+        case OnRead:
+            return QCoreApplication::translate("PokeFinderModel", "On read");
+        case OnWrite:
+            return QCoreApplication::translate("PokeFinderModel", "On write");
+        case OnRead | OnWrite:
+            return QCoreApplication::translate("PokeFinderModel", "On read and write");
         default:
-            return u""_s;
+            return QString();
         }
         break;
+
+    case BreakFlags:
+        return int(m_data[index.row()].breakpoints);
     }
 
     return {};
@@ -111,5 +138,6 @@ QHash<int, QByteArray> PokeFinderModel::roleNames() const
     roles[OffsetText] = "offsetText";
     roles[Value] = "value";
     roles[Breakpoint] = "breakpoint";
+    roles[BreakFlags] = "breakFlags";
     return roles;
 }

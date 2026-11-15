@@ -19,15 +19,23 @@
 
 #include <QAbstractListModel>
 
+#include <zxkit/debug/Breakpoints.h>
+
 #include <vector>
 
 class PokeFinderModel : public QAbstractListModel
 {
-    enum { Page = Qt::UserRole + 1, Offset, OffsetText, Value, Breakpoint };
+    enum { Page = Qt::UserRole + 1, Offset, OffsetText, Value, Breakpoint, BreakFlags };
 
 public:
     explicit PokeFinderModel(QObject *parent = nullptr);
     void update();
+
+    /// The breakpoint the poke finder sets on a location: its 1K page of the machine's RAM
+    /// bank and the offset in it, so it follows the page wherever it is mapped
+    static zxkit::Breakpoint locationBreakpoint(int page16k, int offset, zxkit::BreakpointType type,
+                                                zxkit::BankId ramBank);
+    static bool sameLocation(const zxkit::Breakpoint &a, const zxkit::Breakpoint &b);
 
 protected:
     // QAbstractItemModel interface

@@ -154,7 +154,7 @@ FocusScope {
                 required property real size
                 required property bool marked
                 width: list.width
-                height: Math.round(Theme.rowHeight * 0.75)
+                height: Theme.listRowHeight
 
                 Rectangle {
                     anchors.fill: parent
@@ -203,12 +203,19 @@ FocusScope {
                     }
                 }
 
+                // A finger opens with one tap (a long press marks); the mouse selects, and
+                // opens with a double click
                 TapHandler {
-                    onTapped: {
+                    onTapped: (eventPoint, button) => {
                         list.currentIndex = entry.index;
-                        view.clicked();
+                        if (eventPoint.device.type === PointerDevice.TouchScreen)
+                            view.openRequested();
+                        else
+                            view.clicked();
                     }
-                    onDoubleTapped: {
+                    onDoubleTapped: (eventPoint, button) => {
+                        if (eventPoint.device.type === PointerDevice.TouchScreen)
+                            return;
                         list.currentIndex = entry.index;
                         view.openRequested();
                     }

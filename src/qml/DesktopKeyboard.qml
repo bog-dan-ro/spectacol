@@ -39,13 +39,19 @@ Rectangle {
             Accessible.name: qsTr("Text being edited")
         }
         ToolButton {
-            text: qsTr("\u232b (X)")
+            // "(X)": the gamepad's X deletes too
+            text: Theme.gamepadHints ? qsTr("(X)") : ""
+            icon.source: "qrc:/images/backspace.svg"
+            icon.color: "transparent"
+            icon.width: Theme.sp(6)
+            icon.height: Theme.sp(6)
             focusPolicy: Qt.NoFocus
+            implicitHeight: Theme.touchTarget
             Accessible.name: qsTr("Delete character")
             onClicked: DesktopInput.sendKey(Qt.Key_Backspace)
         }
         ToolButton {
-            text: qsTr("Close (B)")
+            text: Theme.gamepadHints ? qsTr("Close (B)") : qsTr("Close")
             focusPolicy: Qt.NoFocus
             onClicked: DesktopInput.hide()
         }

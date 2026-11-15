@@ -29,23 +29,38 @@ qt_add_resources(spectacol "resources"
         images/arrow-up-left.svg
         images/arrow-up-right.svg
         images/arrow-up.svg
+        images/back.svg
+        images/backspace.svg
         images/binary.svg
         images/cassette-broken.svg
         images/cassette-fast.svg
         images/cassette-tape.svg
         images/cassette-unknown.svg
         images/cassette-wait.svg
+        images/check.svg
+        images/chevron-right.svg
+        images/close.svg
         images/controller-icon.svg
+        images/dpad-left-right.svg
+        images/dpad-up-down.svg
         images/draw-fire.svg
         images/fastforward.svg
         images/floppy.svg
         images/folder.svg
         images/gamepad.svg
         images/keyboard-icon.svg
+        images/menu.svg
+        images/minus.svg
+        images/more.svg
         images/pause.svg
         images/play.svg
+        images/plus.svg
+        images/status-error.svg
+        images/status-info.svg
+        images/status-warning.svg
         images/sticky-shift-on.svg
         images/sticky-shift.svg
+        images/up.svg
 
         qtquickcontrols2.conf
 
@@ -127,6 +142,7 @@ qt_add_qml_module(spectacol
         disassamblemodel.cpp disassamblemodel.h
         disks.h disks.cpp
         filemanagerpanel.cpp filemanagerpanel.h
+        fileviewdocument.cpp fileviewdocument.h
         folderlistmodel.cpp folderlistmodel.h
         nextsdcard.h nextsdcard.cpp
         nextuarthooks.cpp nextuarthooks.h
@@ -223,6 +239,7 @@ qt_add_qml_module(spectacol
         qml/PageActions.qml
         qml/Hud.qml
         qml/Sheet.qml
+        qml/SvgIcon.qml
         qml/SectionTitle.qml
         qml/SettingRow.qml
         qml/SettingsList.qml

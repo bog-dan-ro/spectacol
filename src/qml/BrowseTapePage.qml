@@ -136,7 +136,7 @@ Sheet {
 
             Button {
                 Layout.fillWidth: true
-                text: Theme.gamepadHints ? qsTr("Close <b>(B)</b>") : qsTr("Close")
+                text: Theme.gamepadHints ? qsTr("Close (B)") : qsTr("Close")
                 onClicked: showData.close()
             }
         }
@@ -195,18 +195,19 @@ Sheet {
             width: view.width
             height: Math.max(Theme.rowHeight, blockColumn.implicitHeight + Theme.sp(4))
 
-            Text {
+            // The block playing
+            SvgIcon {
                 id: playing
                 x: Theme.sp(3)
                 anchors.verticalCenter: parent.verticalCenter
                 width: Theme.sp(5)
-                text: block.isCurrent ? "▶" : ""
-                font.pixelSize: Theme.body
-                color: Theme.accent
+                height: Theme.sp(5)
+                name: block.isCurrent ? "play" : ""
             }
             Column {
                 id: blockColumn
                 anchors.left: playing.right
+                anchors.leftMargin: Theme.sp(2)
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.sp(3)
                 anchors.verticalCenter: parent.verticalCenter

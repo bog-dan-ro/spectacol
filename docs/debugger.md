@@ -2,8 +2,14 @@
 
 Open **Machine → Debugger**. The page pauses emulation and blocks gameplay input.
 **Continue** runs with the page open; **Pause** stops it again. Views remain frozen
-and edits are disabled while running. **Close** resumes gameplay. Inspectors are
-created on first use and refreshed on a stop or an explicit refresh, without polling.
+and edits are disabled while running. The **‹** button (Escape, gamepad B) closes it and
+resumes gameplay. Inspectors are created on first use and refreshed on a stop, without polling.
+
+On a wide screen the disassembly stays on the left with the chosen view on the right (the CPU
+registers and the breakpoints list under them at first), and the game shows between them. On a phone one view shows at a time.
+The toolbar holds the status, the views list (F2, gamepad X) and the transport; its
+**Breakpoint** button toggles an execution breakpoint on the selected instruction, as a long
+press on the row does. ← → move between the two panes.
 
 - **Step (F11 / gamepad L1):** execute one instruction.
 - **Next (F10 / R2):** step over CALL/RST and repeated block instructions.

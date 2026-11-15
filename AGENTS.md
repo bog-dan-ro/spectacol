@@ -16,7 +16,10 @@ cmake --build build
 # headless check: QT_QPA_PLATFORM=offscreen ./build/bin/spectacol --machine next --quit-after 14 --screenshot next.png
 # the whole UI: --ui-screenshot ui.png [--window-size 1280x800] (the offscreen platform renders with Qt Quick's
 # software backend, ZxScreen has a path for it); --ui-keys F5,Down,Return presses keys to open a page first
-# (click:X:Y clicks), e.g. the desktop menu bar
+# (click:X:Y clicks), e.g. the desktop menu bar; page:NAME.qml opens a page directly
+# input profiles without the hardware: SPECTACOL_TOUCHSCREEN=1 (a phone; with
+# QT_QPA_PLATFORM=offscreen:configfile=screen.json for its size), SPECTACOL_TOUCHSCREEN=0
+# with --ui-keys nav:connect:4242 (a gamepad), SPECTACOL_KEYBOARD=0 (no physical keyboard)
 ```
 
 Configuring needs network access. The top-level `CMakeLists.txt` uses `FetchContent` for:
@@ -66,6 +69,23 @@ New C++/QML sources, shaders, images and ROMs must be listed explicitly in `spec
 - A page is a `Sheet` (crumb, title, `hints` for the `HintBar`, content); settings pages use `SettingsList` and
   `SettingRow`; pick-one lists use `OptionList`. `TextSizes` only maps the old names onto `Theme`.
 - Leave the screen filter UI (`OptionsScreenPage.qml`, `FiltersPage.qml`, `filtersModel`, `selectedFilterIndex`) alone.
+
+- Three input profiles must work on every page: touch only (phones, tablets: `Theme.touchScreenUi`,
+  the sheet's back button and ⋮ menu instead of the hint bar), gamepad or TV remote only
+  (`Theme.gamepadHints` / `remoteHints`), and the desktop (`Theme.desktopMode`: menu bar, docked pages).
+  Interactive rows and buttons are at least `Theme.touchTarget` high on touch screens
+  (`Theme.listRowHeight` for dense lists). Don't put gamepad or key names in button labels:
+  the `HintBar` shows the right ones for the device.
+- Screens that need a lot of typing (the file manager's BASIC/text editor) are offered only with a
+  physical keyboard: `Theme.hardwareKeyboard`. Text fields elsewhere use the OS keyboard on
+  Android and iOS, and `DesktopKeyboard` (our own) on the other platforms.
+- `Main.qml` blocks `ZxEmulator.processInputEvents` (`uiOwnsInput`) while the menu or any page is open, so
+  the UI has the keys and the gamepad. Pages don't have to set it; `sendNavigationKey()` (the sticks,
+  `DebuggerGamepad`) only works while it is false. The property nests: every `= false` needs one `= true`.
+- Symbols are icons from `src/images` (`SvgIcon`, or a button's `icon.source`), never font characters such
+  as ☰ ‹ › ⋮ × ✓ ▶: Android's fonts lack many of them. See `src/images/README.md`.
+- Pick the control for the content: read-only source text (BASIC, text files) is a `TextArea` whose
+  `textDocument` C++ styles (`FileViewDocument`); long addressed tables (hex, disassembly) are `ListView`s.
 
 #### Input and navigation
 

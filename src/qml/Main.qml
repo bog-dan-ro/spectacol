@@ -72,6 +72,11 @@ ApplicationWindow {
         enabled: Qt.platform.os === "android"
         onActivated: mainScreen.goBack()
     }
+    // The UI owns the keys and the gamepad while the menu or a page is open. Kept here, not
+    // in each page: one that forgot left the sticks (sendNavigationKey) dead.
+    // ZxEmulator.processInputEvents nests: exactly one block for each time this turns true.
+    readonly property bool uiOwnsInput: menuBar.position > 0 || pageLoader.status === Loader.Ready
+    onUiOwnsInputChanged: ZxEmulator.processInputEvents = !uiOwnsInput
     // The menu, for the overlay's drawer and the desktop layout's menu bar
     property ZxMenu zxMenu: ZxMenu {}
     // A page docked next to the screen (desktop layout): the screen makes room for it
@@ -331,7 +336,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 mouseGrabSuspended: pageLoader.status !== Loader.Null || menuBar.position > 0 || !ZxEmulator.processInputEvents
 
-                onFullScreenChanged: mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
+                onFullScreenChanged: (fullScreen) => mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
             }
         }
 
@@ -368,13 +373,56 @@ ApplicationWindow {
             verticalItemAlignment: Grid.AlignVCenter
             columns: mainScreen.portrait ? 6 : 1
             rows: mainScreen.portrait ? 1 : 6
-            columnSpacing: Screen.pixelDensity
-            rowSpacing: Screen.pixelDensity
+            columnSpacing: 0
+            rowSpacing: 0
 
             opacity: ZxEmulator.settings.buttonsOpacity
             property real buttonsOpacity: (onScreenCursorJoystick.visible || onScreen48Keyboard.visible) ? 0.25 : 1.0
-            Button {
-                text: "="
+
+            // A finger-sized target around a small icon, so the rail hides little of the game
+            component RailButton: Item {
+                id: rail
+                property url icon
+                property bool dimmed: true
+                property alias pressed: area.pressed
+                signal clicked
+                signal pressStarted
+                signal pressEnded
+                signal pressCanceled
+                width: Theme.touchTarget
+                height: Theme.touchTarget
+                opacity: dimmed ? screenButtonsGrid.buttonsOpacity : 1
+                Accessible.role: Accessible.Button
+                Accessible.onPressAction: clicked()
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: Theme.sp(10)
+                    height: Theme.sp(10)
+                    radius: width / 2
+                    color: area.pressed ? Theme.accentFill : Theme.scrim
+                }
+                Image {
+                    anchors.centerIn: parent
+                    width: Theme.sp(7)
+                    height: Theme.sp(7)
+                    sourceSize: Qt.size(width, height)
+                    fillMode: Image.PreserveAspectFit
+                    source: rail.icon
+                }
+                MouseArea {
+                    id: area
+                    anchors.fill: parent
+                    onClicked: rail.clicked()
+                    onPressed: rail.pressStarted()
+                    onReleased: rail.pressEnded()
+                    onCanceled: rail.pressCanceled()
+                }
+            }
+
+            RailButton {
+                objectName: "menuButton"
+                icon: "qrc:/images/menu.svg"
+                Accessible.name: qsTr("Menu")
                 onClicked: {
                     if (menuBar.position)
                         menuBar.close();
@@ -382,77 +430,42 @@ ApplicationWindow {
                         menuBar.open();
                 }
             }
-            Image {
-                opacity: parent.buttonsOpacity
-                height: Screen.pixelDensity * 5
-                width: Screen.pixelDensity * 7
-                sourceSize: Qt.size(width, height)
-                fillMode: Image.PreserveAspectFit
-                source: "qrc:/images/keyboard-icon.svg"
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: toggleOnScreenControls(ZxEmulator.Keyboard48K, false);
-                }
+            RailButton {
+                icon: "qrc:/images/keyboard-icon.svg"
+                Accessible.name: qsTr("Keyboard")
+                onClicked: toggleOnScreenControls(ZxEmulator.Keyboard48K, false)
             }
 
             // Not dimmed with the others: it is used together with the on-screen keyboard.
-            Image {
+            RailButton {
                 id: stickyCSSSButton
                 property bool checked: false
-                height: Screen.pixelDensity * 7
-                width: Screen.pixelDensity * 7
-                sourceSize: Qt.size(width, height)
-                fillMode: Image.PreserveAspectFit
-                source: checked ? "qrc:/images/sticky-shift-on.svg" : "qrc:/images/sticky-shift.svg"
+                dimmed: false
+                icon: checked ? "qrc:/images/sticky-shift-on.svg" : "qrc:/images/sticky-shift.svg"
                 Accessible.role: Accessible.CheckBox
                 Accessible.name: onScreen48Keyboard.cobraMode ? "Sticky CS/SS/CTRL" : "Sticky CS/SS"
                 Accessible.checkable: true
                 Accessible.checked: checked
-                Accessible.onPressAction: checked = !checked
                 Accessible.onToggleAction: checked = !checked
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: stickyCSSSButton.checked = !stickyCSSSButton.checked
-                }
+                onClicked: checked = !checked
             }
 
-            Image {
-                opacity: parent.buttonsOpacity
-                height: Screen.pixelDensity * 5
-                width: Screen.pixelDensity * 7
-                sourceSize: Qt.size(width, height)
-                fillMode: Image.PreserveAspectFit
-                source: "qrc:/images/controller-icon.svg"
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: toggleOnScreenControls(ZxEmulator.CursorJoystick, false)
-                }
+            RailButton {
+                icon: "qrc:/images/controller-icon.svg"
+                Accessible.name: qsTr("Joystick")
+                onClicked: toggleOnScreenControls(ZxEmulator.CursorJoystick, false)
             }
-            Image {
-                opacity: parent.buttonsOpacity
-                height: Screen.pixelDensity * 7
-                width: Screen.pixelDensity * 7
-                sourceSize: Qt.size(width, height)
-                fillMode: Image.PreserveAspectFit
-                source: "qrc:/images/fastforward.svg"
-                MouseArea {
-                    anchors.fill: parent
-                    onPressed: ZxEmulator.speedup()
-                    onReleased: ZxEmulator.slowdown()
-                    onCanceled: ZxEmulator.cancelFastForward()
-                }
+            RailButton {
+                icon: "qrc:/images/fastforward.svg"
+                Accessible.name: qsTr("Fast-forward")
+                onPressStarted: ZxEmulator.speedup()
+                onPressEnded: ZxEmulator.slowdown()
+                onPressCanceled: ZxEmulator.cancelFastForward()
             }
-            Image {
-                opacity: parent.buttonsOpacity
-                height: Screen.pixelDensity * 7
-                width: Screen.pixelDensity * 7
-                sourceSize: Qt.size(width, height)
-                fillMode: Image.PreserveAspectFit
-                source: ZxEmulator.paused ? "qrc:/images/play.svg" : "qrc:/images/pause.svg"
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: ZxEmulator.togglePaused()
-                }
+            RailButton {
+                icon: ZxEmulator.paused ? "qrc:/images/play.svg" : "qrc:/images/pause.svg"
+                Accessible.name: ZxEmulator.paused ? qsTr("Resume") : qsTr("Pause")
+                onClicked: ZxEmulator.togglePaused()
             }
         }
 
@@ -479,6 +492,7 @@ ApplicationWindow {
         Loader {
             z: parent.z + 20
             id: pageLoader
+            objectName: "pageLoader"
             anchors.fill: parent
             visible: status === Loader.Ready
             // Every page pauses the emulation while it is open, unless it says otherwise

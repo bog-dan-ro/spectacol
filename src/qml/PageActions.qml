@@ -33,9 +33,12 @@ ToolButton {
     visible: availableActions.length > 0
     implicitWidth: Theme.rowHeight
     implicitHeight: Theme.rowHeight
-    text: "⋮"
-    font.pixelSize: Theme.title
-    Accessible.name: qsTr("Page actions")
+    text: qsTr("Page actions")
+    icon.source: "qrc:/images/more.svg"
+    icon.color: Theme.text
+    icon.width: Theme.sp(6)
+    icon.height: Theme.sp(6)
+    display: AbstractButton.IconOnly
     onClicked: menu.open()
     function close(): bool {
         if (!menu.visible) return false;
@@ -50,7 +53,16 @@ ToolButton {
         dim: false
         x: button.width - width
         y: button.height
-        width: Math.min(Theme.sp(65), button.windowWidth)
+        width: Math.min(Theme.sp(75), button.windowWidth)
+        // A long list scrolls on a short screen
+        height: Math.min(implicitHeight, Math.max(Theme.rowHeight * 3, button.Window.height - Theme.rowHeight - Theme.sp(4)))
+        background: Rectangle {
+            implicitWidth: Theme.sp(75)
+            color: Theme.raised
+            radius: Theme.radiusSmall
+            border.width: Theme.line
+            border.color: Theme.outline
+        }
         // Some actions replace the page. Release its popup grab before invoking them.
         exit: Transition {}
         onClosed: {

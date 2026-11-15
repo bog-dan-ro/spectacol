@@ -34,7 +34,8 @@ def ocr(path):
     mask.save(red)
     if 'symbols-import-jump' in path.stem:
         zoom = path.with_name(path.stem + '-annotation.png')
-        image.crop((0, 240, image.width, min(360, image.height))).resize((image.width * 3, 360)).save(zoom)
+        # The disassembly pane's first row and its annotation
+        image.crop((0, 225, min(480, image.width), min(300, image.height))).resize((1920, 300)).save(zoom)
         text += subprocess.check_output(['tesseract', str(zoom), 'stdout', '--psm', '11'], stderr=subprocess.DEVNULL, text=True).lower()
     return text + subprocess.check_output(['tesseract', str(red), 'stdout', '--psm', '11'],
                                          stderr=subprocess.DEVNULL, text=True).lower()

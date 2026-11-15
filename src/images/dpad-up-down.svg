@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
+     SPDX-License-Identifier: GPL-3.0-or-later
+     Original Spectacol artwork. Palette roles are defined in qml/Theme.qml. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 24 24">
+  <title>Up and down</title>
+  <g fill="none" stroke="#001a1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3.5v17M8 7.5l4-4 4 4m-8 9 4 4 4-4"/>
+  </g>
+</svg>

@@ -174,19 +174,30 @@ Sheet {
                                 readonly property bool focused: index === page.focusIndex
 
                                 visible: page.groupOf(modelData) === group.index
-                                width: visible ? label.implicitWidth + Theme.sp(6) : 0
+                                width: visible ? chipContent.implicitWidth + Theme.sp(6) : 0
                                 height: visible ? Theme.sp(10) : 0
                                 radius: Theme.radiusSmall
                                 color: focused ? Theme.accentFill : "transparent"
                                 border.width: focused ? Theme.focusLine : Theme.line
                                 border.color: focused ? Theme.accent : current ? Theme.textMuted : Theme.outline
 
-                                Text {
-                                    id: label
+                                Row {
+                                    id: chipContent
                                     anchors.centerIn: parent
-                                    text: (chip.current ? "✓ " : "") + page.shortName(chip.modelData)
-                                    font.pixelSize: Theme.body
-                                    color: Theme.text
+                                    spacing: Theme.sp(1)
+                                    SvgIcon {
+                                        visible: chip.current
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: Theme.sp(5)
+                                        height: Theme.sp(5)
+                                        name: "check"
+                                    }
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: page.shortName(chip.modelData)
+                                        font.pixelSize: Theme.body
+                                        color: Theme.text
+                                    }
                                 }
                                 MouseArea {
                                     anchors.fill: parent

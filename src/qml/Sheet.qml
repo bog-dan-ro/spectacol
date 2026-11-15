@@ -143,11 +143,14 @@ FocusScope {
                     spacing: Theme.sp(2)
                     ToolButton {
                         objectName: "sheetBack"
-                        text: "‹"
-                        font.pixelSize: Theme.pageTitle
+                        text: qsTr("Back")
+                        icon.source: "qrc:/images/back.svg"
+                        icon.color: Theme.text
+                        icon.width: Theme.sp(6)
+                        icon.height: Theme.sp(6)
+                        display: AbstractButton.IconOnly
                         implicitWidth: Theme.rowHeight
                         implicitHeight: Theme.rowHeight
-                        Accessible.name: qsTr("Back")
                         onClicked: sheet.back()
                     }
                     Label {

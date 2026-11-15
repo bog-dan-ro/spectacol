@@ -22,20 +22,28 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Spectacol
 
-FocusScope {
+// @scope main.qml
+Sheet {
     id: page
     readonly property PokeModel pokes: ZxEmulator.pokes
+    crumb: qsTr("Machine")
+    title: qsTr("Poke memory")
+    preferredWidth: Theme.sp(160)
+    hints: [
+        { pad: "A", key: "Enter", text: qsTr("Toggle"), action: () => page.toggleCurrent() },
+        { pad: "Y", key: "F3", text: qsTr("Add poke"), action: () => page.addPoke() },
+        { pad: "X", key: "F2", text: qsTr("Clear list"), action: () => page.pokes.clear() },
+        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => { if (!page.closeNested()) pageLoader.source = ""; } }
+    ]
     Component.onCompleted: {
-        ZxEmulator.processInputEvents = false;
         pokes.refreshBanks();
-        view.forceActiveFocus();
+        Qt.callLater(() => view.forceActiveFocus());
     }
-    Component.onDestruction: ZxEmulator.processInputEvents = true
     function addPoke() {
         editor.returnFocus = addButton;
         editor.open();
     }
-    function closeDialog(): bool {
+    function closeNested(): bool {
         if (trainerFile.closeNested() || trainerFolder.closeNested()) return true;
         if (valuesDialog.visible) { valuesDialog.reject(); return true; }
         if (bank.popup.visible) {
@@ -69,9 +77,6 @@ FocusScope {
         case Qt.Key_F2:
             pokes.clear();
             break;
-        case Qt.Key_Escape:
-            pageLoader.source = "";
-            break;
         default:
             if (![Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right].includes(event.key))
                 return;
@@ -82,11 +87,6 @@ FocusScope {
     }
     DebuggerGamepad {
         transportKeys: false
-    }
-    Rectangle {
-        anchors.fill: parent
-        color: Theme.raised
-        z: -1
     }
     HostPathDialog {
         id: trainerFile
@@ -155,7 +155,7 @@ FocusScope {
             Layout.fillWidth: true
             wrapMode: Text.Wrap
         }
-        TextField {
+        FancyTextField {
             id: address
             objectName: "pokeAddress"
             Layout.fillWidth: true
@@ -164,7 +164,7 @@ FocusScope {
             onAccepted: value.forceActiveFocus(Qt.TabFocusReason)
         }
         Label { text: qsTr("Value (decimal, 0–255)"); color: Theme.text }
-        TextField {
+        FancyTextField {
             id: value
             objectName: "pokeValue"
             Layout.fillWidth: true
@@ -176,11 +176,6 @@ FocusScope {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Theme.sp(3)
-        Label {
-            text: qsTr("Poke memory")
-            color: Theme.text
-            font.pixelSize: Theme.pageTitle
-        }
         Label {
             Layout.fillWidth: true
             text: qsTr("CPU write addresses or offsets in a writable physical bank. Addresses and values are decimal.")
@@ -194,16 +189,12 @@ FocusScope {
             Button {
                 id: addButton
                 objectName: "pokeAdd"
-                text: Theme.gamepadHints ? qsTr("Add poke (Y)") : qsTr("Add poke")
+                text: qsTr("Add poke")
                 onClicked: page.addPoke()
             }
             Button {
-                text: Theme.gamepadHints ? qsTr("Clear list (X)") : qsTr("Clear list")
+                text: qsTr("Clear list")
                 onClicked: pokes.clear()
-            }
-            Button {
-                text: Theme.gamepadHints ? qsTr("Close (B)") : qsTr("Close")
-                onClicked: pageLoader.source = ""
             }
         }
         RowLayout {
@@ -251,7 +242,8 @@ FocusScope {
             Keys.onReturnPressed: page.toggleCurrent()
             Keys.onSelectPressed: page.toggleCurrent()
             Keys.onSpacePressed: page.toggleCurrent()
-            delegate: ItemDelegate {
+            // The box shows whether the trainer is on; a click asks for its values first
+            delegate: CheckDelegate {
                 id: row
                 required property int index
                 required property string label
@@ -261,7 +253,9 @@ FocusScope {
                 width: view.width
                 enabled: !disabled
                 highlighted: view.currentIndex === index
-                text: (active ? "☑ " : "☐ ") + label
+                checkable: false
+                checked: active
+                text: label
                 onClicked: {
                     view.currentIndex = index;
                     page.toggleCurrent();
@@ -272,8 +266,7 @@ FocusScope {
         }
         Label {
             Layout.fillWidth: true
-            text: (Theme.gamepadHints ? qsTr("A: toggle poke · B: back · X: clear list · Y: add") + "\n" : "")
-                  + qsTr("Turning a trainer off restores its original bytes. Clearing the list keeps the current memory values.")
+            text: qsTr("Turning a trainer off restores its original bytes. Clearing the list keeps the current memory values.")
             color: Theme.textMuted
             font.pixelSize: Theme.caption
             wrapMode: Text.Wrap

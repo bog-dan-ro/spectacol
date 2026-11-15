@@ -330,9 +330,12 @@ Item
                     objectName: "filesClose"
                     implicitWidth: Theme.rowHeight
                     implicitHeight: Theme.rowHeight
-                    text: "‹"
-                    font.pixelSize: Theme.pageTitle
-                    Accessible.name: qsTr("Close files")
+                    text: qsTr("Close files")
+                    icon.source: "qrc:/images/back.svg"
+                    icon.color: Theme.text
+                    icon.width: Theme.sp(6)
+                    icon.height: Theme.sp(6)
+                    display: AbstractButton.IconOnly
                     onClicked: fileList.fileSelected("")
                 }
                 Label {
@@ -354,7 +357,12 @@ Item
                 width: parent.width
                 Button {
                     objectName: "filesUp"
-                    text: Theme.touchScreenUi ? "↑" : qsTr("Up")
+                    text: qsTr("Up")
+                    icon.source: Theme.touchScreenUi ? "qrc:/images/up.svg" : ""
+                    icon.color: Theme.text
+                    icon.width: Theme.sp(6)
+                    icon.height: Theme.sp(6)
+                    display: Theme.touchScreenUi ? AbstractButton.IconOnly : AbstractButton.TextOnly
                     Accessible.name: qsTr("Up a folder")
                     Layout.minimumWidth: Theme.rowHeight
                     Layout.minimumHeight: Theme.rowHeight
@@ -368,7 +376,7 @@ Item
                     currentIndex: fileList.viewMode
                     onActivated: fileList.viewMode = currentIndex
                 }
-                TextField {
+                FancyTextField {
                     id: search
                     objectName: "filesSearch"
                     Layout.fillWidth: true

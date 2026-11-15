@@ -48,7 +48,7 @@ FormDialog {
         text: dialog.directory ? qsTr("Folder path") : qsTr("File path")
         color: Theme.text
     }
-    TextField {
+    FancyTextField {
         id: pathField
         objectName: "hostPath"
         Layout.fillWidth: true

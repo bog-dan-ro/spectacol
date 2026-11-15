@@ -410,6 +410,12 @@ ZxEmulator::ZxEmulator(QObject *parent)
         }
     }
 #endif
+    // For UI checks without the hardware: 1 is a touch-only device, 0 hides a laptop's panel
+    if (bool ok = false; qEnvironmentVariableIsSet("SPECTACOL_TOUCHSCREEN")) {
+        const int forced = qEnvironmentVariableIntValue("SPECTACOL_TOUCHSCREEN", &ok);
+        if (ok)
+            m_touchscreen = forced != 0;
+    }
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_tape, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(m_recording, QQmlEngine::CppOwnership);
@@ -2419,18 +2425,38 @@ void ZxEmulator::toggleBreakpoint(int address)
     m_pokeFinderModel.update();
 }
 
-void ZxEmulator::addBreakpointPage(int address, int page, int type)
+bool ZxEmulator::togglePokeBreakpoint(int offset, int page, int type)
 {
-    zxkit::Breakpoint bp;
-    bp.type = zxkit::BreakpointType(type);
-    bp.address = uint16_t(address);
-    bp.page1k = uint16_t(page * 16 + ((address & 0x3FFF) >> 10));
-    bp.bankId = emulator().readLock()->machine().ramBankId();
-    bp.address &= 1023;
-    bp.mask = 1023;
-    emulator().writeLock()->addBreakpoint(std::move(bp));
+    const auto bpType = zxkit::BreakpointType(type);
+    bool set = false;
+    {
+        auto emulator = this->emulator().writeLock();
+        const auto wanted = PokeFinderModel::locationBreakpoint(page, offset, bpType,
+                                                                emulator->machine().ramBankId());
+        std::vector<uint32_t> existing;
+        for (const auto &bp : emulator->debugger().breakpoints().breakpoints()) {
+            if (PokeFinderModel::sameLocation(bp, wanted))
+                existing.push_back(bp.id);
+        }
+        if (existing.empty()) {
+            emulator->addBreakpoint(wanted);
+            set = true;
+        } else {
+            for (const auto id : existing)
+                emulator->removeBreakpoint(id);
+        }
+    }
     m_breakpointsModel.breakpointsUpdated();
     m_pokeFinderModel.update();
+    const auto where = tr("bank %1, offset %2").arg(page).arg(formatNumber(uint16_t(offset)));
+    const bool write = bpType == zxkit::BreakpointType::MemoryWrite;
+    showMessage(set ? (write ? tr("The game stops when it writes to %1.")
+                             : tr("The game stops when it reads %1."))
+                                .arg(where)
+                    : (write ? tr("Removed the write breakpoint at %1.")
+                             : tr("Removed the read breakpoint at %1."))
+                                .arg(where));
+    return set;
 }
 
 int ZxEmulator::resolveDebuggerAddress(const QString &text)

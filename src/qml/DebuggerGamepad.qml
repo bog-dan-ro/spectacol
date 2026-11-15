@@ -73,8 +73,10 @@ QtObject {
         onAxisLeftYChanged: root.updateDirection()
         onAxisRightXChanged: root.updateDirection()
         onAxisRightYChanged: root.updateDirection()
+        // Our on-screen keyboard takes A as a key press (DesktopInput turns Return into one);
+        // Select would only ask the input method to show again
         onButtonAChanged: if (buttonA)
-            root.tap(Qt.Key_Select)
+            root.tap(DesktopInput.visible ? Qt.Key_Return : Qt.Key_Select)
         onButtonBChanged: if (buttonB)
             root.tap(Qt.Key_Escape)
         onButtonXChanged: if (buttonX)

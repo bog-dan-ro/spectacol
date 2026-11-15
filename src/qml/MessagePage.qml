@@ -55,19 +55,11 @@ Rectangle {
         spacing: Theme.sp(3)
 
         // The level: a colour and a symbol, never the colour alone
-        Rectangle {
+        SvgIcon {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: Math.round(Theme.body * 1.5)
             Layout.preferredHeight: Layout.preferredWidth
-            radius: width / 2
-            color: toast.level === ZxEmulator.Error ? Theme.danger : toast.level === ZxEmulator.Warning ? Theme.warning : Theme.accent
-            Text {
-                anchors.centerIn: parent
-                text: toast.level === ZxEmulator.Error ? "×" : toast.level === ZxEmulator.Warning ? "!" : "i"
-                font.pixelSize: Theme.body
-                font.weight: Font.Bold
-                color: "#101217"
-            }
+            name: toast.level === ZxEmulator.Error ? "status-error" : toast.level === ZxEmulator.Warning ? "status-warning" : "status-info"
         }
 
         Text {

@@ -34,6 +34,11 @@ QtObject {
     readonly property bool keyboardHints: !touchScreenUi && !gamepadHints
     readonly property bool showHintBar: !touchScreenUi || gamepadHints || remoteHints
     readonly property int headerHeight: rowHeight
+    // A real keyboard: the text editors are only offered with one
+    readonly property bool hardwareKeyboard: DesktopInput.physicalKeyboardPresent
+    // Fingers: rows and buttons are at least touchTarget high
+    readonly property int touchTarget: rowHeight
+    readonly property int listRowHeight: touchScreenUi ? rowHeight : Math.round(rowHeight * 0.75)
 
     // The overlay (gamepad, touch, TV) or the desktop layout (menu bar, docked panels)
     readonly property bool desktopMode: {

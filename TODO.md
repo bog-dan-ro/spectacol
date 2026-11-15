@@ -170,8 +170,33 @@ measurement limits. Generated evidence remains under the build directories.
         About/controller help scroll independently of the header, with compact phone tabs. Quick Open
         keeps view/search controls, moves file actions/device import to ⋮, and avoids reflecting its footer.
   - [ ] Options › Screen and the filters list keep the old look: they hold the screen filter UI (owner's work).
-  - [ ] Still the old structure, only recoloured: poke finder, the
-        gamepad calibration, the on-screen keyboard and joysticks.
+  - [ ] Still the old structure, only recoloured: the gamepad calibration, the on-screen keyboard and
+        joysticks.
+  - [x] Input-profile review (touch only, gamepad only, desktop), from headless screenshots of every page as a
+        phone (landscape and portrait), with a simulated gamepad and as a desktop:
+        - `Main.qml` owns the UI's input (`uiOwnsInput`): 17 pages never claimed it, so the sticks did nothing
+          in them (the file manager, every Options page, About, the SD card, the save pages).
+        - File manager: B/Back closes it from anywhere (`..` or Backspace go up); a tap opens, a long press
+          marks, every action is in the ⋮ menu, 48 dp rows and panel tabs on a narrow screen; the BASIC/text
+          editor only with a physical keyboard (`Theme.hardwareKeyboard`, also detected on Android).
+        - Viewer: sources are a read-only `TextArea` styled through its `textDocument` (`FileViewDocument`);
+          hex and disassembly stay a `ListView`.
+        - Debugger: one toolbar row (status, views, transport, a Breakpoint button), the disassembly always
+          visible with the chosen view beside it and the game between them on a wide screen, readable rows.
+        - Poke finder and Poke memory are `Sheet`s (back button, hints, no gamepad names in labels); the poke
+          finder fits a phone. Its break on read/write buttons toggle, show the location's breakpoints and say
+          what they did; ZxKit keeps one unconditional breakpoint of a type per location.
+        - Our on-screen keyboard types with A in the debugger and the other `DebuggerGamepad` pages.
+        - The debugger's two-pane layout shows the breakpoints list under the registers.
+        - Symbols are icons (`SvgIcon`, `src/images`): the menu, back, close, actions, chevrons, steppers,
+          checks, folder and play markers, backspace, D-pad hints and the toast's level. Android's fonts showed
+          some font symbols (☰) as nothing.
+        - The touch rail has 48 dp targets and a menu button; Save As scrolls on short screens;
+          `FancyTextField` has its own placeholder (Material's floating one overlapped the text).
+  - [ ] Input-profile follow-ups: check on a physical phone, an Android TV and a Steam Deck; the debugger's
+        memory, breakpoints and labels views still use dense rows and default buttons on touch; the native
+        `MessageDialog`s (quit, remove, overwrite) are not navigable with a gamepad on every platform; a
+        gamepad shortcut for toggling a breakpoint (today: the toolbar's button, or a long press).
   - [x] Controller mapping uses themed settings rows and a key/action dialog with D-pad navigation and focus
         restoration on close, including direction presets and custom keys.
   - [x] Tape creation/export and snapshot Save As use themed sheets with keyboard/gamepad actions and

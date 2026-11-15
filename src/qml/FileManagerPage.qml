@@ -60,23 +60,26 @@ Sheet {
     ]).concat(viewer.addressed ? [{ pad: "Y", key: "G", text: qsTr("Go to"), action: () => page.askAddress() }] : [])
     readonly property var padHints: [
         { pad: "A", key: "Enter", text: qsTr("Open"), action: () => page.openCurrent() },
-        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => page.goBack() },
+        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => page.goBack() },
         { pad: "X", key: "F2", text: qsTr("Actions"), action: () => page.showActions() },
         { pad: "Y", key: "Ins", text: qsTr("Mark"), action: () => page.markCurrent() },
         { pad: "◀▶", key: "Tab", text: qsTr("Panel") }
     ].concat(activePanel.tapeBlocks ? [{ pad: "L2/R2", key: "[ ]", text: qsTr("Move block") }] : [])
     readonly property var keyHints: [
-        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => page.goBack() },
+        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => page.goBack() },
         { pad: "F2", key: "F2", text: qsTr("Menu"), action: () => page.showActions() },
-        { pad: "F3", key: "F3", text: qsTr("View"), action: () => page.viewCurrent() },
-        { pad: "F4", key: "F4", text: qsTr("Edit"), action: () => page.editCurrent() },
+        { pad: "F3", key: "F3", text: qsTr("View"), action: () => page.viewCurrent() }
+    ].concat(Theme.hardwareKeyboard ? [{ pad: "F4", key: "F4", text: qsTr("Edit"), action: () => page.editCurrent() }] : []).concat([
         { pad: "F5", key: "F5", text: qsTr("Copy"), action: () => page.copyCurrent(false) },
         { pad: "F6", key: "F6", text: qsTr("Move"), action: () => page.copyCurrent(true) },
         { pad: "F7", key: "F7", text: qsTr("Folder"), action: () => page.makeFolder() },
-        { pad: "F8", key: "F8", text: qsTr("Delete"), action: () => page.removeCurrent() },
-        { pad: "F10", key: "F10", text: qsTr("Close"), action: () => page.closePage() }
-    ].concat(activePanel.tapeBlocks ? [{ pad: "[ ]", key: "[ ]", text: qsTr("Move block") }] : [])
-    hints: viewer.visible ? viewerHints : Theme.gamepadHints ? padHints : keyHints
+        { pad: "F8", key: "F8", text: qsTr("Delete"), action: () => page.removeCurrent() }
+    ]).concat(activePanel.tapeBlocks ? [{ pad: "[ ]", key: "[ ]", text: qsTr("Move block") }] : [])
+    // Fingers get every action in the header's menu: there are no keys to press
+    readonly property var touchHints: [{ pad: "B", key: "Esc", text: qsTr("Close"), action: () => page.goBack() }]
+        .concat(actions().filter(entry => entry.enabled !== false)
+                         .map(entry => ({ pad: "", key: "", text: entry.text, action: entry.action })))
+    hints: viewer.visible ? viewerHints : Theme.gamepadHints ? padHints : Theme.touchScreenUi ? touchHints : keyHints
 
     function closePage() {
         pageLoader.source = "";
@@ -132,7 +135,8 @@ Sheet {
             viewer.close();
             return;
         }
-        goUp();
+        // Back leaves the file manager from anywhere; ".." (or Backspace) goes up a folder
+        closePage();
     }
 
     function goUp() {
@@ -169,6 +173,9 @@ Sheet {
     }
 
     function editCurrent() {
+        // Typing a program needs a real keyboard
+        if (!Theme.hardwareKeyboard)
+            return;
         const content = activePanel.editable(row);
         if (content.text === undefined) {
             showError(qsTr("Only BASIC programs and text can be edited."));
@@ -293,29 +300,36 @@ Sheet {
         otherPanel.folder = activePanel.folder;
     }
 
+    // An action's name, with its key where there is a keyboard
+    function keyed(text: string, key: string): string {
+        return Theme.keyboardHints ? qsTr("%1 (%2)").arg(text).arg(key) : text;
+    }
+
     function actions(): var {
         const panel = activePanel;
         const entries = [
-            { text: qsTr("View (F3)"), action: viewCurrent },
-            { text: qsTr("Edit BASIC or text (F4)"), action: editCurrent },
-            { text: qsTr("Copy to the other panel (F5)"), action: () => copyCurrent(false) },
-            { text: qsTr("Move to the other panel (F6)"), action: () => copyCurrent(true) },
-            { text: qsTr("Rename (Shift+F6)"), action: renameCurrent },
-            { text: qsTr("Delete (F8)"), action: removeCurrent },
-            { text: qsTr("Attributes (Alt+Enter)"), action: editAttributes, enabled: panel.inMedia },
-            { text: qsTr("Mark or unmark (Insert)"), action: markCurrent },
-            { text: panel.markedCount ? qsTr("Unmark all (*)") : qsTr("Mark all (*)"), action: toggleAllMarks }
+            { text: keyed(qsTr("View"), "F3"), action: viewCurrent },
+            { text: keyed(qsTr("Copy to the other panel"), "F5"), action: () => copyCurrent(false) },
+            { text: keyed(qsTr("Move to the other panel"), "F6"), action: () => copyCurrent(true) },
+            { text: keyed(qsTr("Rename"), "Shift+F6"), action: renameCurrent },
+            { text: keyed(qsTr("Delete"), "F8"), action: removeCurrent },
+            { text: keyed(qsTr("Attributes"), "Alt+Enter"), action: editAttributes, enabled: panel.inMedia },
+            { text: keyed(qsTr("Mark or unmark"), "Insert"), action: markCurrent },
+            { text: panel.markedCount ? keyed(qsTr("Unmark all"), "*") : keyed(qsTr("Mark all"), "*"), action: toggleAllMarks }
         ];
+        if (Theme.hardwareKeyboard)
+            entries.splice(1, 0, { text: keyed(qsTr("Edit BASIC or text"), "F4"), action: editCurrent });
         if (panel.tapeBlocks) {
-            entries.push({ text: qsTr("Move block up ([)"), action: () => moveBlock(-1) });
-            entries.push({ text: qsTr("Move block down (])"), action: () => moveBlock(1) });
+            entries.push({ text: keyed(qsTr("Move block up"), "["), action: () => moveBlock(-1) });
+            entries.push({ text: keyed(qsTr("Move block down"), "]"), action: () => moveBlock(1) });
         }
-        entries.push({ text: qsTr("New folder (F7)"), action: makeFolder, enabled: panel.canMakeFolder });
-        entries.push({ text: qsTr("New tape or disk image (Shift+F4)"), action: newImage, enabled: !panel.inMedia });
-        entries.push({ text: qsTr("Load in the emulator (Shift+Enter)"), action: loadInEmulator });
-        entries.push({ text: qsTr("Same folder in the other panel (Alt+O)"), action: sameFolderInOther, enabled: !panel.inMedia });
-        entries.push({ text: qsTr("Refresh (Ctrl+R)"), action: () => { leftPanel.refresh(); rightPanel.refresh(); } });
-        entries.push({ text: qsTr("Close the file manager (F10)"), action: closePage });
+        entries.push({ text: keyed(qsTr("New folder"), "F7"), action: makeFolder, enabled: panel.canMakeFolder });
+        entries.push({ text: keyed(qsTr("New tape or disk image"), "Shift+F4"), action: newImage, enabled: !panel.inMedia });
+        entries.push({ text: keyed(qsTr("Load in the emulator"), "Shift+Enter"), action: loadInEmulator });
+        entries.push({ text: keyed(qsTr("Same folder in the other panel"), "Alt+O"), action: sameFolderInOther, enabled: !panel.inMedia });
+        entries.push({ text: keyed(qsTr("Refresh"), "Ctrl+R"), action: () => { leftPanel.refresh(); rightPanel.refresh(); } });
+        if (!Theme.touchScreenUi)
+            entries.push({ text: keyed(qsTr("Close the file manager"), "F10"), action: closePage });
         return entries;
     }
 
@@ -398,7 +412,7 @@ Sheet {
             break;
         case Qt.Key_PageUp:
         case Qt.Key_PageDown: {
-            const rows = Math.max(1, Math.floor(activeView.height / (Theme.rowHeight * 0.75)) - 2);
+            const rows = Math.max(1, Math.floor(activeView.height / Theme.listRowHeight) - 2);
             activeView.select(row + (event.key === Qt.Key_PageUp ? -rows : rows));
             break;
         }
@@ -481,6 +495,28 @@ Sheet {
         anchors.fill: parent
         anchors.margins: Theme.sp(3)
         spacing: Theme.sp(2)
+
+        // One panel at a time on a narrow screen: these switch between the two
+        TabBar {
+            objectName: "fileManagerPanels"
+            visible: !page.twin
+            Layout.fillWidth: true
+            focusPolicy: Qt.NoFocus
+            currentIndex: page.rightActive ? 1 : 0
+            Repeater {
+                model: [leftPanel, rightPanel]
+                delegate: TabButton {
+                    required property FileManagerPanel modelData
+                    required property int index
+                    focusPolicy: Qt.NoFocus
+                    implicitHeight: Theme.touchTarget
+                    text: (modelData.location.replace(/\/+$/, "").split("/").pop() || "/")
+                    Accessible.name: index ? qsTr("Right panel: %1").arg(modelData.location)
+                                           : qsTr("Left panel: %1").arg(modelData.location)
+                    onClicked: page.setRight(index === 1)
+                }
+            }
+        }
 
         RowLayout {
             Layout.fillWidth: true
@@ -602,7 +638,7 @@ Sheet {
                 required property var modelData
                 text: modelData.text
                 enabled: modelData.enabled !== false
-                implicitHeight: Math.round(Theme.rowHeight * 0.85)
+                implicitHeight: Theme.touchScreenUi ? Theme.touchTarget : Math.round(Theme.rowHeight * 0.85)
                 onTriggered: Qt.callLater(modelData.action)
             }
         }

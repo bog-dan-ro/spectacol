@@ -16,13 +16,16 @@
 */
 
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Templates as T
 import Spectacol
 
-// A text field in Theme's style; `mono` for code, addresses and hex
-TextField {
+// A text field in Theme's style; `mono` for code, addresses and hex. Built on the template,
+// not on the application's Controls style: Material's floating placeholder does not fit here.
+T.TextField {
     id: field
     property bool mono: false
+    implicitWidth: Math.max(Theme.sp(30), contentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(Theme.sp(10), contentHeight + topPadding + bottomPadding)
     font.family: mono ? Theme.monoFamily : Qt.application.font.family
     font.pixelSize: Theme.body
     color: Theme.text
@@ -36,8 +39,19 @@ TextField {
     horizontalAlignment: Text.AlignLeft
     verticalAlignment: Text.AlignVCenter
     inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+    Text {
+        x: field.leftPadding
+        y: field.topPadding
+        width: field.width - field.leftPadding - field.rightPadding
+        height: field.height - field.topPadding - field.bottomPadding
+        visible: !field.length && !field.preeditText
+        text: field.placeholderText
+        font: field.font
+        color: field.placeholderTextColor
+        verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
+    }
     background: Rectangle {
-        implicitHeight: Theme.sp(10)
         radius: Theme.radiusSmall
         color: field.readOnly ? "transparent" : Theme.raised
         border.width: field.activeFocus ? Theme.focusLine : field.readOnly ? 0 : Theme.line

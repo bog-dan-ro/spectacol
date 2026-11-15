@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
+     SPDX-License-Identifier: GPL-3.0-or-later
+     Original Spectacol artwork. Palette roles are defined in qml/Theme.qml. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 24 24">
+  <title>Information</title>
+  <g fill="none" stroke="#001a1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10" fill="#00d7d7" stroke="none"/>
+    <path d="M12 11v6M12 7.5h.01" stroke-width="2.5"/>
+  </g>
+</svg>

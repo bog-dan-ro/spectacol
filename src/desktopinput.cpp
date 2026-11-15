@@ -29,7 +29,10 @@
 #include <QPointer>
 #include <QWindow>
 
-#ifdef Q_OS_LINUX
+#ifdef Q_OS_ANDROID
+#include <QJniObject>
+#include <QtCore/qnativeinterface.h>
+#elif defined(Q_OS_LINUX)
 #include <linux/input.h>
 #endif
 
@@ -42,7 +45,7 @@ QByteArray readDeviceFile(const QString &path)
     return file.open(QIODevice::ReadOnly) ? file.readAll().trimmed() : QByteArray{};
 }
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 bool hasKey(const QList<QByteArray> &words, int key)
 {
     constexpr int bitsPerWord = sizeof(unsigned long) * 8;
@@ -61,8 +64,13 @@ DesktopInput::DesktopInput(QObject *parent) : DesktopInput(u"/sys/class/input"_s
 DesktopInput::DesktopInput(const QString &inputDirectory, QObject *parent)
     : QObject(parent), m_inputDirectory(inputDirectory)
 {
-    if (!supported())
+    if (!supported()) {
+        // The OS has its own keyboard: only tell the UI whether a real one is attached
+        m_physicalKeyboardPresent = hasPhysicalKeyboard(m_inputDirectory);
+        connect(qGuiApp, &QGuiApplication::applicationStateChanged, this,
+                &DesktopInput::refreshDevices);
         return;
+    }
 
     m_physicalKeyboardPresent = hasPhysicalKeyboard(m_inputDirectory);
     qGuiApp->installEventFilter(this);
@@ -91,7 +99,21 @@ bool DesktopInput::supported()
 
 bool DesktopInput::hasPhysicalKeyboard(const QString &inputDirectory)
 {
-#ifdef Q_OS_LINUX
+    // For UI checks without the hardware: 0 is a device with no keyboard
+    if (bool ok = false; qEnvironmentVariableIsSet("SPECTACOL_KEYBOARD")) {
+        const int forced = qEnvironmentVariableIntValue("SPECTACOL_KEYBOARD", &ok);
+        if (ok)
+            return forced != 0;
+    }
+#ifdef Q_OS_ANDROID
+    Q_UNUSED(inputDirectory);
+    // Configuration.keyboard == KEYBOARD_QWERTY
+    const auto configuration =
+            QJniObject(QNativeInterface::QAndroidApplication::context())
+                    .callObjectMethod("getResources", "()Landroid/content/res/Resources;")
+                    .callObjectMethod("getConfiguration", "()Landroid/content/res/Configuration;");
+    return configuration.isValid() && configuration.getField<jint>("keyboard") == 2;
+#elif defined(Q_OS_LINUX)
     const QDir inputs(inputDirectory);
     for (const auto &entry : inputs.entryList({ u"event*"_s }, QDir::Dirs)) {
         const QString device = inputs.filePath(entry + u"/device/"_s);

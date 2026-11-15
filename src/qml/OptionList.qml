@@ -65,12 +65,11 @@ ListView {
                 font.pixelSize: Theme.body
                 color: Theme.text
             }
-            Text {
+            SvgIcon {
                 visible: entry.index === list.checkedIndex
-                text: "✓"
-                font.pixelSize: Theme.title
-                font.weight: Font.Bold
-                color: Theme.success
+                name: "check"
+                Layout.preferredWidth: Theme.sp(6)
+                Layout.preferredHeight: Theme.sp(6)
             }
         }
 

@@ -201,7 +201,7 @@ FocusScope {
 
             component StepButton: Rectangle {
                 id: stepButton
-                property string glyph
+                property string icon
                 property int delta
                 property bool active: true
                 Layout.preferredWidth: Theme.sp(8)
@@ -211,11 +211,11 @@ FocusScope {
                 border.width: Theme.line
                 border.color: Theme.outline
                 opacity: active ? 1 : 0.35
-                Text {
+                SvgIcon {
                     anchors.centerIn: parent
-                    text: stepButton.glyph
-                    font.pixelSize: Theme.title
-                    color: Theme.text
+                    width: Theme.sp(5)
+                    height: Theme.sp(5)
+                    name: stepButton.icon
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -227,7 +227,7 @@ FocusScope {
             }
 
             StepButton {
-                glyph: row.kind === "stepper" ? "−" : "‹"
+                icon: row.kind === "stepper" ? "minus" : "back"
                 delta: -1
                 active: row.kind === "stepper" ? row.value > row.from : row.currentIndex > 0
             }
@@ -242,18 +242,27 @@ FocusScope {
                 color: Theme.text
             }
             StepButton {
-                glyph: row.kind === "stepper" ? "+" : "›"
+                icon: row.kind === "stepper" ? "plus" : "chevron-right"
                 delta: 1
                 active: row.kind === "stepper" ? row.value < row.to : row.currentIndex < row.model.length - 1
             }
         }
 
         // action
-        Text {
+        RowLayout {
             visible: row.kind === "action"
-            text: row.actionText + "  ›"
-            font.pixelSize: Theme.body
-            color: Theme.textMuted
+            spacing: Theme.sp(1)
+            Text {
+                text: row.actionText
+                font.pixelSize: Theme.body
+                color: Theme.textMuted
+            }
+            SvgIcon {
+                name: "chevron-right"
+                Layout.preferredWidth: Theme.sp(5)
+                Layout.preferredHeight: Theme.sp(5)
+                opacity: 0.6
+            }
         }
     }
 

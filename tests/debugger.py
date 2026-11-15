@@ -81,10 +81,11 @@ def main():
                 assert pc(target) == expected, (name, hex(pc(target)), hex(expected))
             if name.startswith('disassembly-address-'):
                 first_rows = output/(name+'-address.png')
-                Image.open(image).crop((0, 245, 1280, 650)).save(first_rows)
+                # The disassembly pane's rows, below its address field
+                Image.open(image).crop((0, 225, 470, 650)).save(first_rows)
                 text = subprocess.check_output(['tesseract', str(first_rows), 'stdout', '--psm', '11'], stderr=subprocess.DEVNULL, text=True).lower()
                 address = int(name.rsplit('-', 1)[1], 16)
-                addresses = re.findall(r'[0o]x([0-9a-f]{4})\b', text)
+                addresses = re.findall(r'\b([0-9a-f]{4})\b', text.replace('o', '0'))
                 assert addresses and int(addresses[0],16) == address, (name, text)
             if name.startswith('breakpoint-toggle-'):
                 text = subprocess.check_output(['tesseract', str(image), 'stdout', '--psm', '11'], stderr=subprocess.DEVNULL, text=True).lower()

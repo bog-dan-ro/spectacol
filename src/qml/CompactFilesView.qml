@@ -57,7 +57,7 @@ GridView {
         width: view.cellWidth - Theme.sp(1)
         height: view.cellHeight - Theme.sp(1)
         highlighted: view.currentIndex === index
-        text: (isDir ? "▸ " : "") + name
+        text: name
         contentItem: ColumnLayout {
             spacing: Theme.sp(1)
             Image {
@@ -70,12 +70,23 @@ GridView {
                 smooth: false
                 asynchronous: true
             }
-            Label {
+            RowLayout {
                 Layout.fillWidth: true
-                text: row.text
-                color: Theme.text
-                elide: Text.ElideRight
-                font.pixelSize: Theme.body
+                spacing: Theme.sp(2)
+                // In the list a folder shows as one; the grid has its cover
+                SvgIcon {
+                    visible: !view.grid && row.isDir
+                    name: "folder"
+                    Layout.preferredWidth: Theme.sp(6)
+                    Layout.preferredHeight: Theme.sp(6)
+                }
+                Label {
+                    Layout.fillWidth: true
+                    text: row.text
+                    color: Theme.text
+                    elide: Text.ElideRight
+                    font.pixelSize: Theme.body
+                }
             }
         }
         onClicked: {

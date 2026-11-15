@@ -60,10 +60,20 @@ Sheet {
             page.accepted();
         }
     }
-    ColumnLayout {
+    // Scrolls: a phone in landscape, or one with its keyboard up, is shorter than the form
+    Flickable {
+        id: scroller
         anchors.fill: parent
-        anchors.margins: Theme.sp(6)
-        spacing: Theme.sp(4)
+        contentHeight: form.implicitHeight + 2 * Theme.sp(Theme.touchScreenUi ? 3 : 6)
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
+        ScrollIndicator.vertical: ScrollIndicator {}
+    ColumnLayout {
+        id: form
+        x: Theme.sp(Theme.touchScreenUi ? 3 : 6)
+        y: x
+        width: scroller.width - 2 * x
+        spacing: Theme.sp(Theme.touchScreenUi ? 2 : 4)
         Text {
             text: qsTr("File name (.%1)").arg(page.selectedFormat)
             font.pixelSize: Theme.body
@@ -139,6 +149,6 @@ Sheet {
                 Keys.onReturnPressed: page.canceled()
             }
         }
-        Item { Layout.fillHeight: true }
+    }
     }
 }

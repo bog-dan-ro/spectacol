@@ -379,7 +379,8 @@ public slots:
     void enableBreakpoint(int id, bool enabled);
 
     void toggleBreakpoint(int address);
-    void addBreakpointPage(int address, int page, int type = BreakpointsModel::BreakOnWrite);
+    /// Sets or removes a poke finder location's read or write breakpoint; true when it is set
+    Q_INVOKABLE bool togglePokeBreakpoint(int offset, int page, int type);
     void debuggerCommand(const QString &command);
 
     void disassamble();

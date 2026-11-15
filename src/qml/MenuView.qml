@@ -146,11 +146,14 @@ ColumnLayout {
                 ToolButton {
                     visible: Theme.touchScreenUi
                     objectName: "menuBack"
-                    text: root.menus.length ? "‹" : "×"
-                    font.pixelSize: Theme.title
+                    text: root.menus.length ? qsTr("Back") : qsTr("Close menu")
+                    icon.source: root.menus.length ? "qrc:/images/back.svg" : "qrc:/images/close.svg"
+                    icon.color: Theme.text
+                    icon.width: Theme.sp(6)
+                    icon.height: Theme.sp(6)
+                    display: AbstractButton.IconOnly
                     implicitWidth: Theme.rowHeight
                     implicitHeight: Theme.rowHeight
-                    Accessible.name: root.menus.length ? qsTr("Back") : qsTr("Close menu")
                     onClicked: root.popMenu()
                 }
                 // the 128K's rainbow stripe
@@ -286,11 +289,12 @@ ColumnLayout {
                     font.pixelSize: Theme.body
                     color: menuItem.enabled ? Theme.text : Theme.textMuted
                 }
-                Text {
+                SvgIcon {
                     visible: menuItem.modelData.children.length > 0
-                    text: "›"
-                    font.pixelSize: Theme.title
-                    color: menuItem.index === menuView.currentIndex ? Theme.text : Theme.textMuted
+                    name: "chevron-right"
+                    Layout.preferredWidth: Theme.sp(5)
+                    Layout.preferredHeight: Theme.sp(5)
+                    opacity: menuItem.index === menuView.currentIndex ? 1 : 0.6
                 }
             }
 
@@ -317,7 +321,6 @@ ColumnLayout {
         id: gamepadKeyNavigation
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
         active: false
-        onActiveChanged: ZxEmulator.processInputEvents = !gamepadKeyNavigation.active
         upKey: Qt.Key_Up
         downKey: Qt.Key_Down
         buttonAKey: Qt.Key_Return

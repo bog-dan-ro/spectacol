@@ -26,7 +26,7 @@ Sheet {
     crumb: qsTr("Options / Controls")
     title: qsTr("On-screen controls and fast-forward")
     hints: [
-        { pad: "↔", key: "Left / Right", text: qsTr("Change") },
+        { pad: "◀▶", key: "Left / Right", text: qsTr("Change") },
         { pad: "B", key: "Esc", text: qsTr("Back"), action: () => page.closeRequested() }
     ]
     GamepadNavigation {

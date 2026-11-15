@@ -76,6 +76,11 @@ Item {
                     required property var modelData
                     readonly property bool actionable: typeof modelData.action === "function"
                     readonly property bool round: bar.gamepad && modelData.pad.length === 1
+                    // Symbols are icons: Android's fonts lack ☰ and the arrows
+                    readonly property string padIcon: !bar.gamepad && !Theme.remoteHints ? ""
+                        : modelData.pad === "Menu" ? (bar.gamepad ? "menu" : "")
+                        : modelData.pad === "◀▶" ? "dpad-left-right"
+                        : modelData.pad === "↑↓" ? "dpad-up-down" : ""
                     visible: !bar.plainActions || actionable
                     implicitWidth: content.implicitWidth + (bar.plainActions ? Theme.sp(4) : 0)
                     implicitHeight: bar.compact ? Theme.rowHeight : Math.max(content.implicitHeight, Theme.sp(8))
@@ -121,15 +126,27 @@ Item {
                                 visible: !bar.plainActions
                                 anchors.verticalCenter: parent.verticalCenter
                                 height: Math.round(Theme.caption * 1.7)
-                                width: visible ? (hint.round ? height : Math.max(height, keyLabel.implicitWidth + Theme.sp(3))) : 0
-                                radius: hint.round ? height / 2 : Theme.radiusSmall
-                                color: bar.gamepad ? bar.padColor(hint.modelData.pad) : Theme.raised
+                                width: visible ? (hint.round || hint.padIcon === "menu" ? height
+                                                  : hint.padIcon ? Math.round(height * 1.5)
+                                                  : Math.max(height, keyLabel.implicitWidth + Theme.sp(3))) : 0
+                                radius: hint.round || hint.padIcon === "menu" ? height / 2 : Theme.radiusSmall
+                                // the arrow icons are dark: the remote's pills take the gamepad's colour for them
+                                color: bar.gamepad || hint.padIcon ? bar.padColor(hint.modelData.pad) : Theme.raised
                                 border.width: bar.gamepad ? 0 : Theme.line
                                 border.color: Theme.outline
+                                SvgIcon {
+                                    id: padSymbol
+                                    anchors.centerIn: parent
+                                    visible: hint.padIcon !== ""
+                                    width: hint.padIcon === "menu" ? parent.height : parent.height - Theme.sp(1)
+                                    height: width
+                                    name: hint.padIcon
+                                }
                                 Text {
                                     id: keyLabel
                                     anchors.centerIn: parent
-                                    text: bar.gamepad ? (hint.modelData.pad === "Menu" ? "☰" : hint.modelData.pad)
+                                    visible: !padSymbol.visible
+                                    text: bar.gamepad ? hint.modelData.pad
                                           : Theme.remoteHints ? (hint.modelData.pad === "A" ? qsTr("OK") : hint.modelData.pad === "B" ? qsTr("Back") : hint.modelData.pad)
                                           : hint.modelData.key
                                     font.pixelSize: Math.round(Theme.caption * 0.9)

@@ -66,7 +66,7 @@ FocusScope {
                 text: qsTr("Clear")
                 onClicked: ZxEmulator.symbols.clear()
             }
-            TextField {
+            FancyTextField {
                 id: search
                 objectName: "symbolsSearch"
                 Layout.fillWidth: true

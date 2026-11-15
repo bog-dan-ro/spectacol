@@ -59,7 +59,7 @@ FocusScope {
                 currentIndex: pane.memory.bankId < 0 ? 0 : pane.memory.bankId
                 onActivated: pane.memory.bankId = currentIndex === 0 ? -1 : currentIndex
             }
-            TextField {
+            FancyTextField {
                 id: location
                 objectName: "memoryAddress"
                 Layout.preferredWidth: Theme.sp(25)

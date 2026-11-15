@@ -23,14 +23,15 @@ as the file manager closes, because NextZXOS caches the card.
 | Action | Keyboard | Gamepad |
 | --- | --- | --- |
 | Open a folder or image, view a file | Enter | A |
-| Back: close a dialog or the viewer, else the parent folder, else close | Esc, Backspace | B |
+| Back: close a dialog or the viewer, else the file manager | Esc | B |
+| Parent folder (also the `..` row) | Backspace | A on `..` |
 | Actions menu (every action below) | F2, F9 | X |
 | Mark or unmark, then move down | Insert, Space | Y |
 | Switch panel | Tab, ← → | D-pad ← → |
 | Page up / down | PageUp, PageDown | L1, R1 |
 | Move a tape block up / down | [ ] | L2, R2 |
 | View | F3 | menu |
-| Edit a BASIC program or text file | F4 | menu |
+| Edit a BASIC program or text file (only with a physical keyboard) | F4 | - |
 | New tape or disk image | Shift+F4 | menu |
 | Copy / move to the other panel | F5 / F6 | menu |
 | Rename | Shift+F6 | menu |
@@ -45,8 +46,12 @@ as the file manager closes, because NextZXOS caches the card.
 | Save in the editor | F2, Ctrl+S | X |
 
 Operations act on the marked entries, or on the one under the cursor. Copies ask before
-overwriting. In dialogs Return (A) confirms. Touch screens use the sheet's ⋮ menu; a long
-press marks.
+overwriting. In dialogs Return (A) confirms. The D-pad and both sticks move the cursor.
+
+On touch screens a tap opens a folder, an image or a file's viewer, a long press marks, and
+the sheet's ⋮ menu has every action. A narrow screen shows one panel at a time, with tabs to
+switch between the two. The BASIC and text editor is offered only when a physical keyboard is
+attached.
 
 ## Inside images
 
@@ -77,6 +82,12 @@ emulator keeps the copy it loaded: reinsert it to use the changes.
 The viewer (F3) shows the views that fit the file; ← → switch them. Long lines wrap. The
 pages come from ZxKit's `MediaView` API, which `zxmedia view` uses too, so the command line
 shows a file the same way.
+
+Source pages (BASIC listings, text, arrays, tape block details) are a read-only `TextArea`
+whose `textDocument` is filled and styled by `FileViewDocument` (C++), so the mouse and the
+OS's selection handles select text as in any other text field. Hex dumps and disassemblies
+are tables with an address per row and can be long: they stay a `ListView`, which builds only
+the rows on screen.
 
 - ↑ ↓ move a line cursor. Space or Return (A) starts a selection that moving extends (Shift+↑ ↓
   and Shift+click too, Ctrl+A selects all); Ctrl+C (X) copies it, or the cursor's line.

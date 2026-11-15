@@ -42,6 +42,7 @@
 #include <QQuickItem>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QUrl>
 #ifdef Q_OS_ANDROID
 #include "androidintegration.h"
 #endif
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
     parser.addOption(uiScreenshotOption);
     const QCommandLineOption uiKeysOption(
             u"ui-keys"_s,
-            u"Press keys in the window, one every 300 ms from 1 s on, e.g. F5,Down,Return (to screenshot a page); click:X:Y clicks at a window position, click:NAME clicks a named UI item, nav:ButtonA sends a gamepad navigation tap, nav:ButtonA:1/0 holds/releases it, nav:connect:ID and nav:disconnect:ID simulate hotplug, input:TEXT commits text through the input method, down:KEY and up:KEY only press or release a key (e.g. down:Control,0,up:Control), wait idles 300 ms."_s,
+            u"Press keys in the window, one every 300 ms from 1 s on, e.g. F5,Down,Return (to screenshot a page); click:X:Y clicks at a window position, click:NAME clicks a named UI item, page:NAME.qml opens a page, nav:ButtonA sends a gamepad navigation tap, nav:ButtonA:1/0 holds/releases it, nav:connect:ID and nav:disconnect:ID simulate hotplug, input:TEXT commits text through the input method, down:KEY and up:KEY only press or release a key (e.g. down:Control,0,up:Control), wait idles 300 ms."_s,
             u"keys"_s);
     parser.addOption(windowSizeOption);
     parser.addOption(uiKeysOption);
@@ -336,6 +337,20 @@ int main(int argc, char *argv[])
                 } else {
                     qWarning().noquote() << "Unknown controller event" << keys[i];
                 }
+                continue;
+            }
+            if (keys[i].startsWith(u"page:"_s)) {
+                // page:NAME opens a page directly, e.g. page:DebuggerPage.qml
+                const QString page = keys[i].mid(5);
+                QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer,
+                                   &app, [page, window] {
+                                       auto *w = window();
+                                       auto *loader = w
+                                               ? w->findChild<QQuickItem *>(u"pageLoader"_s)
+                                               : nullptr;
+                                       if (loader)
+                                           loader->setProperty("source", QUrl(page));
+                                   });
                 continue;
             }
             if (keys[i].startsWith(u"click:"_s)) {

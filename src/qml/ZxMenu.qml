@@ -84,7 +84,7 @@ ZxMenuItem {
                 }
             }
             ZxMenuItem {
-                text: "Open"
+                text: qsTr("Open")
                 onTriggered: {
                     menuBar.close();
                     pageLoader.source = "TapesFileBrowserPage.qml";
@@ -92,7 +92,7 @@ ZxMenuItem {
             }
 
             ZxMenuItem {
-                text: "Save"
+                text: qsTr("Save")
                 onTriggered: {
                     menuBar.close();
                     pageLoader.source = "SaveTapePage.qml";
@@ -194,7 +194,7 @@ ZxMenuItem {
 
 
     ZxMenuItem {
-        text: "Joystick type"
+        text: qsTr("Joystick type")
         onTriggered: {
             menuBar.close();
             pageLoader.source = "Joysticks.qml";
@@ -323,14 +323,6 @@ ZxMenuItem {
         }
 
         ZxMenuItem {
-            visible: false
-            text: qsTr("Media")
-            onTriggered: {
-                menuBar.close();
-                pageLoader.source = "OptionsMediaPage.qml";
-            }
-        }
-        ZxMenuItem {
             text: qsTr("(Virtual) Gamepad")
             ZxMenuItem {
                 text: qsTr("Controller mapping")
@@ -364,7 +356,7 @@ ZxMenuItem {
         text: qsTr("Help")
 
         ZxMenuItem {
-            text: "About .."
+            text: qsTr("About ..")
             onTriggered: {
                 menuBar.close();
                 pageLoader.source = "AboutPage.qml";
@@ -372,7 +364,7 @@ ZxMenuItem {
         }
 
         ZxMenuItem {
-            text: "Features and bugs"
+            text: qsTr("Features and bugs")
             onTriggered:  {
                 menuBar.close();
                 Qt.openUrlExternally("https://github.com/bog-dan-ro/spectacol/issues");
@@ -382,7 +374,7 @@ ZxMenuItem {
 
 
     ZxMenuItem {
-        text: "Quit"
+        text: qsTr("Quit")
         onTriggered: quitDialog.open()
     }
 }

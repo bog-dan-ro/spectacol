@@ -23,6 +23,9 @@ import QtQuick.Layouts
 import Spectacol
 
 // The file manager's viewer: a file's BASIC listing, hex dump, disassembly or screen.
+// Sources (BASIC, text) are a read-only TextArea whose document FileViewDocument styles, so the
+// mouse and the OS select text as anywhere else. Hex dumps and disassemblies are long tables
+// with an address per row: a ListView, which only builds the rows on screen.
 // Left/Right switch the views. Up/Down move a line cursor; Space or Return (A) starts and ends
 // a selection that moving extends (Shift too), Ctrl+C (X) copies it, G (Y) goes to an address.
 // A screen copies as an image, or Ctrl+S (Y) saves it as a PNG. Escape or Backspace (B) clears
@@ -42,20 +45,44 @@ FocusScope {
     readonly property var pageLines: restarted[tabs.currentIndex] ?? page.lines ?? []
     readonly property bool screenPage: (page.image ?? "") !== ""
     readonly property bool addressed: page.style === "hex" || page.style === "disassembly"
-    readonly property int selectionFirst: anchor < 0 ? lines.currentIndex : Math.min(anchor, lines.currentIndex)
-    readonly property int selectionLast: anchor < 0 ? lines.currentIndex : Math.max(anchor, lines.currentIndex)
+    readonly property bool textPage: !screenPage && !addressed
+    // The line the cursor is on, and how many there are
+    readonly property int row: textPage ? source.lineOf(edit.cursorPosition) : lines.currentIndex
+    readonly property int rowCount: textPage ? source.lineCount : lines.count
+    readonly property int selectionFirst: anchor < 0 ? row : Math.min(anchor, row)
+    readonly property int selectionLast: anchor < 0 ? row : Math.max(anchor, row)
     signal closed
     signal goToRequested
     signal saveRequested
 
+    // Puts the cursor on a line; a started selection reaches from its anchor to that line
+    function setRow(target: int) {
+        if (!textPage) {
+            lines.currentIndex = target;
+            return;
+        }
+        if (anchor < 0) {
+            edit.deselect();
+            edit.cursorPosition = source.lineStart(target);
+        } else if (target >= anchor) {
+            edit.select(source.lineStart(anchor), source.lineEnd(target));
+        } else {
+            edit.select(source.lineEnd(anchor), source.lineStart(target));
+        }
+    }
+    function toStart() {
+        anchor = -1;
+        status = "";
+        lines.currentIndex = 0;
+        lines.positionViewAtBeginning();
+        edit.deselect();
+        edit.cursorPosition = 0;
+    }
     function show(newContent: var) {
         content = newContent;
         restarted = {};
-        anchor = -1;
-        status = "";
         tabs.currentIndex = 0;
-        lines.currentIndex = 0;
-        lines.positionViewAtBeginning();
+        toStart();
         visible = true;
         forceActiveFocus();
     }
@@ -74,37 +101,46 @@ FocusScope {
         if (!pages.length)
             return;
         tabs.currentIndex = (tabs.currentIndex + delta + pages.length) % pages.length;
-        anchor = -1;
-        status = "";
-        lines.currentIndex = 0;
-        lines.positionViewAtBeginning();
+        toStart();
     }
     // Moves the line cursor; a started selection, or Shift, extends the selection
     function move(rows: int, extend: bool) {
-        if (screenPage || !lines.count)
+        if (screenPage || !rowCount)
             return;
+        const from = row;
         if (extend && anchor < 0)
-            anchor = lines.currentIndex;
-        lines.currentIndex = Math.max(0, Math.min(lines.count - 1, lines.currentIndex + rows));
-        lines.positionViewAtIndex(lines.currentIndex, ListView.Contain);
+            anchor = from;
+        setRow(Math.max(0, Math.min(rowCount - 1, from + rows)));
+        if (!textPage)
+            lines.positionViewAtIndex(lines.currentIndex, ListView.Contain);
     }
     function pageRows(): int {
-        return Math.max(1, Math.floor(lines.height / lineHeight.height) - 1);
+        return Math.max(1, Math.floor((textPage ? scroll.height : lines.height) / lineHeight.height) - 1);
     }
     function toggleSelection() {
-        if (!screenPage)
-            anchor = anchor < 0 ? lines.currentIndex : -1;
+        if (screenPage)
+            return;
+        const at = row;
+        anchor = anchor < 0 ? at : -1;
+        setRow(at);
     }
     function selectAll() {
-        if (screenPage || !lines.count)
+        if (screenPage || !rowCount)
             return;
         anchor = 0;
-        lines.currentIndex = lines.count - 1;
+        setRow(rowCount - 1);
     }
     function copy() {
         if (screenPage) {
             panel.copyImage(page.image);
             status = qsTr("The screen is copied.");
+            return;
+        }
+        // Text picked with the mouse or the OS's handles: exactly that
+        if (textPage && anchor < 0 && edit.selectedText.length) {
+            panel.copyText(edit.selectedText.replace(/\u2029/g, "\n"));
+            status = qsTr("The selection is copied.");
+            edit.deselect();
             return;
         }
         if (!pageLines.length)
@@ -162,7 +198,8 @@ FocusScope {
 
     visible: false
 
-    Keys.onPressed: event => {
+    Keys.onPressed: event => handleKey(event)
+    function handleKey(event: var) {
         const shift = (event.modifiers & Qt.ShiftModifier) !== 0;
         const control = (event.modifiers & Qt.ControlModifier) !== 0;
         status = "";
@@ -195,10 +232,10 @@ FocusScope {
             move(pageRows(), shift);
             break;
         case Qt.Key_Home:
-            move(-lines.count, shift);
+            move(-rowCount, shift);
             break;
         case Qt.Key_End:
-            move(lines.count, shift);
+            move(rowCount, shift);
             break;
         case Qt.Key_Return:
         case Qt.Key_Enter:
@@ -256,71 +293,42 @@ FocusScope {
         font.pixelSize: Theme.body
         text: "0"
     }
-    TextMetrics {
-        id: numberColumn
-        font.family: Theme.monoFamily
-        font.pixelSize: Theme.body
-        text: "0000 "
-    }
 
-    // Styled text: escaped, with runs of spaces kept (single ones still wrap)
+    // A table row's text, coloured: escaped, with runs of spaces kept
     function escaped(text: string): string {
         return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/  /g, " &nbsp;");
     }
-    function coloured(text: string, colour: color, italic: bool): string {
-        const span = `<font color="${colour}">${escaped(text)}</font>`;
-        return italic ? `<i>${span}</i>` : span;
+    function coloured(text: string, colour: color): string {
+        return `<font color="${colour}">${escaped(text)}</font>`;
     }
-    function styled(line: var, style: string): string {
-        switch (style) {
-        case "basic": {
-            const colours = { keyword: Theme.accent, number: Theme.padX, string: Theme.warning, comment: Theme.textMuted,
-                              control: Theme.padY, code: Theme.textMuted };
-            let out = "";
-            for (let i = 1; i < line.length; ++i) {
-                const part = line[i];
-                // A protected number: LIST's decoy struck through, then the value used
-                if (part.l !== undefined)
-                    out += (part.l ? `<s>${coloured(part.l, Theme.textMuted, false)}</s>&nbsp;` : "")
-                            + `<b>${coloured(part.t, Theme.danger, false)}</b>`;
-                else
-                    out += part.k in colours ? coloured(part.t, colours[part.k], part.k === "comment" || part.k === "code")
-                                             : escaped(part.t);
-            }
-            return out;
-        }
-        case "lossless": {
-            // \{KEYWORD} tokens, \xHH bytes, strings and !raw data
-            const pattern = /(\\\{[^}]*\})|(\\x[0-9A-Fa-f]{2})|("[^"]*"?)|(!raw .*)/g;
-            const text = String(line);
-            let out = "";
-            let at = 0;
-            for (let match = pattern.exec(text); match; match = pattern.exec(text)) {
-                out += escaped(text.slice(at, match.index));
-                const colour = match[1] ? Theme.accent : match[3] ? Theme.warning : Theme.textMuted;
-                out += coloured(match[0], colour, false);
-                at = match.index + match[0].length;
-            }
-            return out + escaped(text.slice(at));
-        }
-        case "hex": {
+    function styled(line: string, style: string): string {
+        if (style === "hex") {
             // ADDR  HH HH … (16 bytes)  text
             const address = line.indexOf(" ");
             if (address < 0 || !/^[0-9A-F]+$/.test(line.slice(0, address)))
-                return coloured(line, Theme.textMuted, false);
-            return coloured(line.slice(0, address), Theme.textMuted, false) + escaped(line.slice(address, address + 50))
-                    + coloured(line.slice(address + 50), Theme.textMuted, false);
+                return coloured(line, Theme.textMuted);
+            return coloured(line.slice(0, address), Theme.textMuted) + escaped(line.slice(address, address + 50))
+                    + coloured(line.slice(address + 50), Theme.textMuted);
         }
-        case "disassembly": {
-            // ADDR  bytes        MNEMONIC operands
-            const instruction = line.slice(18);
-            const space = instruction.indexOf(" ");
-            const mnemonic = space < 0 ? instruction : instruction.slice(0, space);
-            return coloured(line.slice(0, 18), Theme.textMuted, false) + coloured(mnemonic, Theme.accent, false)
-                    + escaped(space < 0 ? "" : instruction.slice(space));
-        }
-        }
-        return escaped(String(line));
+        // ADDR  bytes        MNEMONIC operands
+        const instruction = line.slice(18);
+        const space = instruction.indexOf(" ");
+        const mnemonic = space < 0 ? instruction : instruction.slice(0, space);
+        return coloured(line.slice(0, 18), Theme.textMuted) + coloured(mnemonic, Theme.accent)
+                + escaped(space < 0 ? "" : instruction.slice(space));
+    }
+
+    FileViewDocument {
+        id: source
+        document: edit.textDocument
+        page: viewer.textPage ? viewer.page : ({})
+        keywordColor: Theme.accent
+        numberColor: Theme.padX
+        stringColor: Theme.warning
+        controlColor: Theme.padY
+        mutedColor: Theme.textMuted
+        protectedColor: Theme.danger
+        onPageChanged: edit.cursorPosition = 0
     }
 
     ColumnLayout {
@@ -349,6 +357,7 @@ FocusScope {
             objectName: "fileViewerTabs"
             Layout.fillWidth: true
             focusPolicy: Qt.NoFocus
+            onCurrentIndexChanged: viewer.toStart()
             Repeater {
                 model: viewer.pages
                 delegate: TabButton {
@@ -364,46 +373,73 @@ FocusScope {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            ScrollView {
+                id: scroll
+                objectName: "fileViewerSource"
+                anchors.fill: parent
+                visible: viewer.textPage
+                TextArea {
+                    id: edit
+                    objectName: "fileViewerText"
+                    readOnly: true
+                    selectByMouse: true
+                    persistentSelection: true
+                    wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
+                    textFormat: TextEdit.PlainText
+                    font.family: Theme.monoFamily
+                    font.pixelSize: Theme.body
+                    color: Theme.text
+                    selectionColor: Theme.accent
+                    selectedTextColor: Theme.textOnAccent
+                    leftPadding: 0
+                    rightPadding: Theme.sp(2)
+                    topPadding: 0
+                    bottomPadding: 0
+                    background: null
+                    // The viewer's keys first: the arrows move by line, Left and Right switch views
+                    Keys.onPressed: event => viewer.handleKey(event)
+                    // A press starts the mouse's own selection
+                    onPressed: viewer.anchor = -1
+                    // The line the cursor is on
+                    Rectangle {
+                        z: -1
+                        visible: edit.selectionStart === edit.selectionEnd
+                        y: edit.cursorRectangle.y
+                        width: edit.width
+                        height: edit.cursorRectangle.height
+                        color: Qt.alpha(Theme.accent, 0.07)
+                    }
+                }
+            }
+
             ListView {
                 id: lines
                 objectName: "fileViewerLines"
-                readonly property string style: viewer.page.style ?? "text"
+                readonly property string style: viewer.page.style ?? "hex"
                 anchors.fill: parent
-                visible: !viewer.screenPage
+                visible: viewer.addressed
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
                 highlightMoveDuration: 0
-                model: style === "basic" ? (viewer.page.parts ?? []) : viewer.pageLines
+                model: viewer.addressed ? viewer.pageLines : []
                 ScrollIndicator.vertical: ScrollIndicator {}
-                // Long lines wrap; a BASIC line's continuation stays right of its number
                 delegate: Item {
                     id: row
-                    required property var modelData
+                    required property string modelData
                     required property int index
-                    readonly property bool basic: lines.style === "basic"
                     readonly property bool selected: viewer.anchor >= 0 && index >= viewer.selectionFirst
                                                      && index <= viewer.selectionLast
                     width: lines.width
-                    height: Math.max(number.implicitHeight, body.implicitHeight)
+                    height: Math.max(Theme.touchScreenUi ? Theme.sp(8) : 0, body.implicitHeight)
                     Rectangle {
                         anchors.fill: parent
                         visible: row.selected || row.ListView.isCurrentItem
                         color: row.selected ? Theme.accentFill : Qt.alpha(Theme.accent, 0.07)
                     }
                     Text {
-                        id: number
-                        visible: row.basic
-                        width: row.basic ? numberColumn.advanceWidth : 0
-                        text: row.basic && row.modelData.length ? row.modelData[0].t : ""
-                        textFormat: Text.PlainText
-                        font.family: Theme.monoFamily
-                        font.pixelSize: Theme.body
-                        color: Theme.textMuted
-                    }
-                    Text {
                         id: body
-                        x: number.width
-                        width: row.width - x
+                        width: row.width
+                        anchors.verticalCenter: parent.verticalCenter
                         text: viewer.styled(row.modelData, lines.style)
                         textFormat: Text.StyledText
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
