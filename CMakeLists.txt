@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(Spectacol
-    VERSION 4.8.0.0
+    VERSION 4.8.1.0
     LANGUAGES CXX
 )
 

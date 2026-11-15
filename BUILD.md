@@ -330,9 +330,15 @@ cmake --build build-android-x86_64 --target apk --parallel
 For ARM64, use `android_arm64_v8a` and a separate build directory. The command builds optimized
 native code in a debug-signed APK, suitable for installing and `adb run-as` testing. The APK is under
 `spectacol/android-build/build/outputs/apk/debug/`. A distributable release needs your release signing
-configuration and a monotonically increasing `-DSPECTACOL_ANDROID_VERSION_CODE=...`; the default
-1641605 preserves the highest version code of the old per-ABI scheme. Debug signatures cannot upgrade
-a release signed with another key.
+configuration. Debug signatures cannot upgrade a release signed with another key.
+
+Every ABI is a separate APK, and CMake derives its version code from the ABI and the project version,
+`<Platform><Bits><Major><Minor><Patch><Tweak>`: platform 0 for ARM and 1 for x86, 32 or 64 bits, then
+one digit for each version component. Version 4.8.0.0 gives 324800 (`armeabi-v7a`, written 0324800),
+644800 (`arm64-v8a`), 1324800 (`x86`) and 1644800 (`x86_64`); the configure step prints the code.
+Raise the project version for every store upload: it must stay above the 1.6.0.5 codes (0641605,
+1641605) and every later release. Multi-ABI builds (`QT_ANDROID_BUILD_ALL_ABIS` or several
+`QT_ANDROID_ABIS`) are refused, since one APK can't have per-ABI codes.
 
 The build fetches the Qt 6.12 GamepadLegacy fork, including its Java JAR, and packages the OpenSSL 3
 libraries from `android_openssl`. ZxKit probes NDK support for `std::jthread` and propagates

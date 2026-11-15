@@ -4,12 +4,48 @@ target_compile_definitions(spectacol PRIVATE SPECTACOL_VERSION="${PROJECT_VERSIO
 
 if(ANDROID)
     target_sources(spectacol PRIVATE androidintegration.cpp androidintegration.h)
-    # Preserve the highest version code used by the old per-ABI release scheme.
-    set(SPECTACOL_ANDROID_VERSION_CODE 1641605 CACHE STRING "Android APK/AAB version code")
+
+    # Each ABI is a separate APK with its own version code, so the store can offer all of them
+    # side by side. The scheme Spectacol has used since 2019 is
+    # <Platform><Bits><Major><Minor><Patch><Tweak>, with one digit for each version component:
+    #   Platform: 0 ARM, 1 x86. Bits: 32 or 64.
+    #   4.8.0.0 -> armeabi-v7a 0324800, arm64-v8a 0644800, x86 1324800, x86_64 1644800.
+    # The leading 0 of the ARM codes is not part of the number. Release 1.6.0.5 used 0321605,
+    # 0641605, 1321605 and 1641605; the codes of every ABI must keep growing from there.
+    list(LENGTH QT_ANDROID_ABIS androidAbiCount)
+    if(QT_ANDROID_BUILD_ALL_ABIS OR androidAbiCount GREATER 1)
+        message(FATAL_ERROR "Spectacol's Android version codes are per ABI: build each ABI "
+            "in its own build directory, without QT_ANDROID_BUILD_ALL_ABIS or several QT_ANDROID_ABIS.")
+    endif()
+    if(CMAKE_ANDROID_ARCH_ABI STREQUAL "armeabi-v7a")
+        set(androidVersionCode "32")
+    elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a")
+        set(androidVersionCode "64")
+    elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "x86")
+        set(androidVersionCode "132")
+    elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "x86_64")
+        set(androidVersionCode "164")
+    else()
+        message(FATAL_ERROR "No Android version code scheme for the ${CMAKE_ANDROID_ARCH_ABI} ABI.")
+    endif()
+    foreach(versionComponent IN ITEMS MAJOR MINOR PATCH TWEAK)
+        set(versionDigit "${PROJECT_VERSION_${versionComponent}}")
+        if(versionDigit STREQUAL "")
+            set(versionDigit 0)
+        endif()
+        if(NOT versionDigit MATCHES "^[0-9]$")
+            message(FATAL_ERROR "The Android version code has one digit for each version "
+                "component, ${PROJECT_VERSION} doesn't fit.")
+        endif()
+        string(APPEND androidVersionCode "${versionDigit}")
+    endforeach()
+    message(STATUS "Spectacol ${PROJECT_VERSION} ${CMAKE_ANDROID_ARCH_ABI} Android version code: "
+        "${androidVersionCode}")
+
     set_target_properties(spectacol PROPERTIES
         QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
         QT_ANDROID_MIN_SDK_VERSION 28
-        QT_ANDROID_VERSION_CODE "${SPECTACOL_ANDROID_VERSION_CODE}"
+        QT_ANDROID_VERSION_CODE "${androidVersionCode}"
         QT_ANDROID_VERSION_NAME "${PROJECT_VERSION}"
         QT_QML_IMPORT_PATH "${CMAKE_BINARY_DIR}/qml"
     )
