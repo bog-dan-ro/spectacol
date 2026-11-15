@@ -70,6 +70,7 @@
           <li> Debugger with breakpoints, watchpoints, memory and MMU inspectors and assembler symbols</li>
           <li> Online search in ZXInfo and the Internet Archive</li>
         </ul>
+      </description>
     </release>
   </releases>
 </component>
