@@ -101,8 +101,12 @@ the rows on screen.
   digits are a decoy for the number the program stores (`CLEAR 99999` storing 25285), the decoy
   is struck through and the value used follows it in red;
   Lines show in any order (repeated line numbers, numbers above 9999), with embedded colour codes
-  as `{INK 6}` and machine code in a REM as `{machine code: N bytes at ADDRESS}`; each USR into
-  the program gets a **USR ADDRESS** disassembly (the program taken to start at 23755);
+  as `{INK 6}`, and machine code as `{machine code: N bytes at ADDRESS}`: in a REM, or after a
+  credit in a line BASIC can't hold, as cracked loaders have (`0 POKE AND COPY BY G&B SOFT
+  {machine code: 44 bytes at 23832}`). Each USR into the program (`USR 23760`, `USR VAL"23760"`,
+  `USR (PEEK 23635+256*PEEK 23636+5)`) gets a **USR ADDRESS** disassembly of its code to the end
+  of the line. The program is taken to start at 23755, or at 23813 after Interface 1's channels
+  when its USR calls land on code there or it uses `LOAD *` (`BasicCodec::programStart`);
 - **Unfiltered**: every byte of the program, as the editor has it: `\{KEYWORD}` tokens, hidden
   numbers and colour codes as `\xHH`, and the variables after `!raw`;
 - **Screen**: 6912-byte screens (tape blocks too: flag, 6912 bytes, checksum) and snapshot
