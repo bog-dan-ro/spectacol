@@ -125,7 +125,7 @@ process CPU is mainly the audio backend's approximately 94 callbacks/s. Changing
 audio lifecycle to remove those callbacks would require a separate resume/device
 study; the independent audio feeder is preserved.
 
-The complete matrix covers all 36 UI presets. Representative final costs on the
+The complete matrix covers all 36 UI presets of the time (the menu now lists eight of them). Representative final costs on the
 animated test snapshot (whole-machine percentages): Normal 0.50%, HQ2x about
 1.2%, xBRZ4x 1.53%, bilinear 4x 3.93%, and HQ4x+TV4x 6.55%. Bilinear 4x was
 5.09% before the kernel change. These short windows rank costs; the paired native
