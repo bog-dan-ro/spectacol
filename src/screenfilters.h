@@ -34,46 +34,22 @@ struct ScreenFilterPreset
 
 // Shared by the existing QML selector, persistent settings and the renderer.
 // IDs describe ordered stages so saved choices are independent of menu order.
+// A short list, one for each look: ZxKit offers every filter at every scale, which is too
+// many choices for a menu. Settings saved with another preset fall back to its filter here.
 inline std::span<const ScreenFilterPreset> screenFilterPresets()
 {
     using F = zxkit::VideoFilter;
-    static const std::vector<ScreenFilterPreset> presets = [] {
-        std::vector<ScreenFilterPreset> result{
-            { u"normal"_s, u"Normal"_s, {} },
-            { u"scanlines:1"_s, u"CRT Scanlines"_s, { { F::Scanlines, 1 } } },
-            { u"2xsai:2"_s, u"2xSaI"_s, { { F::Sai, 2 } } },
-            { u"hq:2"_s, u"HQ2x"_s, { { F::Hq, 2 } } },
-        };
-        for (const auto &info : zxkit::videoFilterCatalog()) {
-            for (uint32_t scale = info.minScale; scale <= info.maxScale; ++scale) {
-                const auto id = QString::fromUtf8(info.id.data(), qsizetype(info.id.size()))
-                        + u":"_s + QString::number(scale);
-                if ((info.filter == F::Nearest || info.filter == F::Bilinear) && scale == 1)
-                    continue; // Normal already covers identity scaling.
-                bool exists = false;
-                for (const auto &preset : result)
-                    exists |= preset.id == id;
-                if (exists)
-                    continue;
-                auto name = QString::fromUtf8(info.name.data(), qsizetype(info.name.size()));
-                if (scale > 1 && info.filter != F::Sai && info.filter != F::SuperSai)
-                    name += u" "_s + QString::number(scale) + u"x"_s;
-                result.push_back({ id, name, { { info.filter, scale } } });
-            }
-        }
-        result.push_back({ u"hq:2+tv:2"_s, u"HQ2x + TV2x (4x)"_s, { { F::Hq, 2 }, { F::Tv, 2 } } });
-        result.push_back({ u"hq:4+scanlines:1"_s,
-                           u"HQ4x + Scanlines"_s,
-                           { { F::Hq, 4 }, { F::Scanlines, 1 } } });
-        result.push_back({ u"xbrz:4+scanlines:1"_s,
-                           u"xBRZ4x + Scanlines"_s,
-                           { { F::Xbrz, 4 }, { F::Scanlines, 1 } } });
-        result.push_back({ u"xbrz:4+rgbmask:1"_s,
-                           u"xBRZ4x + RGB mask"_s,
-                           { { F::Xbrz, 4 }, { F::RgbMask, 1 } } });
-        result.push_back(
-                { u"hq:4+tv:4"_s, u"HQ4x + TV4x (16x)"_s, { { F::Hq, 4 }, { F::Tv, 4 } } });
-        return result;
-    }();
+    static const std::vector<ScreenFilterPreset> presets{
+        { u"normal"_s, u"Normal"_s, {} },
+        { u"scanlines:1"_s, u"CRT Scanlines"_s, { { F::Scanlines, 1 } } },
+        { u"rgbmask:1"_s, u"RGB phosphor mask"_s, { { F::RgbMask, 1 } } },
+        { u"tv:2"_s, u"TV2x"_s, { { F::Tv, 2 } } },
+        { u"hq:2"_s, u"HQ2x"_s, { { F::Hq, 2 } } },
+        { u"hq:4"_s, u"HQ4x"_s, { { F::Hq, 4 } } },
+        { u"xbrz:4"_s, u"xBRZ4x"_s, { { F::Xbrz, 4 } } },
+        { u"xbrz:4+scanlines:1"_s,
+          u"xBRZ4x + Scanlines"_s,
+          { { F::Xbrz, 4 }, { F::Scanlines, 1 } } },
+    };
     return presets;
 }

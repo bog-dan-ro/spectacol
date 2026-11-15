@@ -187,10 +187,11 @@ python3 tests/borders.py
 Choose a filter under **Options → Screen → Screen filter**. Normal is the default.
 Use the D-pad Up/Down to move between screen settings and Left/Right to change
 the focused value. A changes or toggles it; B returns to the emulator.
-The selector includes ZxKit's HQ, xBRZ, Scale/AdvMAME, SaI/Eagle, TV, dot matrix,
-bilinear, nearest, scanlines and RGB masks, plus chained presets such as
-HQ4x + Scanlines and xBRZ4x + RGB mask. HQ4x + TV4x enlarges each dimension
-16 times; the same-resolution scanline presets retain the scaler's dimensions.
+The selector keeps one preset for each look: Normal, CRT Scanlines, RGB phosphor
+mask, TV2x, HQ2x, HQ4x, xBRZ4x and xBRZ4x + Scanlines. ZxKit's `ZX::VideoFilters`
+offers more filters and scales (Scale/AdvMAME, SaI/Eagle, dot matrix, bilinear...);
+`screenfilters.h` chooses the ones the menu shows. A saved preset that is no longer
+listed uses the same filter at the listed scale (`xbrz:6` becomes xBRZ4x), else Normal.
 
 The choice is restored on startup using the stable preset ID in
 `Screen/softwareFilter`, independent of menu ordering. For example, an isolated
@@ -198,7 +199,7 @@ headless configuration can append:
 
 ```ini
 [Screen]
-softwareFilter=hq:4+scanlines:1
+softwareFilter=xbrz:4+scanlines:1
 ```
 
 Filtering runs during rendering and updates immediately even while emulation

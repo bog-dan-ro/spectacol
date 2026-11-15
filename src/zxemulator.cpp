@@ -527,12 +527,15 @@ ZxEmulator::ZxEmulator(QObject *parent)
         settings.beginGroup(u"Screen"_s);
         const auto savedFilter = settings.value(u"softwareFilter"_s, u"normal"_s).toString();
         const auto presets = screenFilterPresets();
-        for (std::size_t index = 0; index < presets.size(); ++index) {
-            if (presets[index].id == savedFilter) {
-                m_selectedFilterIndex = int(index);
-                break;
-            }
-        }
+        const auto exact = std::ranges::find(presets, savedFilter, &ScreenFilterPreset::id);
+        // A preset from the longer list of older versions: the same filter at another scale
+        const auto family = savedFilter.section(u':', 0, 0) + u':';
+        const auto similar = std::ranges::find_if(presets, [&](const ScreenFilterPreset &preset) {
+            return preset.id.startsWith(family);
+        });
+        const auto chosen = exact != presets.end() ? exact : similar;
+        if (chosen != presets.end())
+            m_selectedFilterIndex = int(chosen - presets.begin());
     }
     m_selectedJoystickIndex = std::clamp(QSettings().value("joystick", int(CursorKeys)).toInt(),
                                          int(NoJoystick), int(Timex2));
