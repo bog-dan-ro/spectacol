@@ -57,6 +57,15 @@ Sheet {
             onToggled: (on) => ZxEmulator.settings.restrictToSpectacol = on
         }
         SettingRow {
+            objectName: "importOldFiles"
+            visible: ZxEmulator.deviceStorage.legacyFolder !== ""
+            label: qsTr("Files from Spectacol 4")
+            description: qsTr("Copy the games and snapshots it kept in “%1”").arg(ZxEmulator.deviceStorage.legacyFolder)
+            kind: "action"
+            actionText: qsTr("Copy")
+            onClicked: pageLoader.source = "ImportOldFilesPage.qml"
+        }
+        SettingRow {
             visible: ZxEmulator.touchscreen
             label: qsTr("Swipe to open the menu")
             checked: ZxEmulator.settings.swipe4menu

@@ -16,17 +16,74 @@
 */
 
 #include "androidintegration.h"
+#include "contenturi.h"
 #include "zxemulator.h"
 
 #include <QCoreApplication>
+#include <QFile>
 #include <QFileInfo>
+#include <QJniEnvironment>
 #include <QJniObject>
 #include <QMetaObject>
+#include <QtCore/private/qandroidextras_p.h>
 #include <QtCore/private/qjnihelpers_p.h>
+
+#include <zxkit/media/MediaPreview.h>
+
+#include <span>
 
 using namespace Qt::StringLiterals;
 namespace AndroidIntegration {
 namespace {
+// android.content.Intent and android.app.Activity constants
+constexpr jint grantRead = 0x1;
+constexpr jint grantWrite = 0x2;
+constexpr jint resultOk = -1;
+constexpr int pickFolderRequest = 0x5350;
+
+QJniObject context()
+{
+    return QJniObject(QNativeInterface::QAndroidApplication::context());
+}
+
+QJniObject contentResolver()
+{
+    return context().callObjectMethod("getContentResolver", "()Landroid/content/ContentResolver;");
+}
+
+QJniObject parseUri(const QString &uri)
+{
+    return QJniObject::callStaticObjectMethod("android/net/Uri", "parse",
+                                              "(Ljava/lang/String;)Landroid/net/Uri;",
+                                              QJniObject::fromString(uri).object<jstring>());
+}
+
+QJniObject folderIntent()
+{
+    return QJniObject("android/content/Intent", "(Ljava/lang/String;)V",
+                      QJniObject::fromString(u"android.intent.action.OPEN_DOCUMENT_TREE"_s)
+                              .object<jstring>());
+}
+
+// The UriPermission entries Android keeps for us
+template <typename Fn> void forEachGrant(Fn &&fn)
+{
+    const auto list =
+            contentResolver().callObjectMethod("getPersistedUriPermissions", "()Ljava/util/List;");
+    if (!list.isValid())
+        return;
+    const auto count = list.callMethod<jint>("size");
+    for (jint i = 0; i < count; ++i) {
+        const auto grant = list.callObjectMethod("get", "(I)Ljava/lang/Object;", i);
+        const auto uri = grant.callObjectMethod("getUri", "()Landroid/net/Uri;");
+        jint flags = 0;
+        if (grant.callMethod<jboolean>("isReadPermission"))
+            flags |= grantRead;
+        if (grant.callMethod<jboolean>("isWritePermission"))
+            flags |= grantWrite;
+        fn(uri, uri.toString(), flags);
+    }
+}
 class IntentHandler final : public QObject, public QtAndroidPrivate::NewIntentListener
 {
 public:
@@ -60,6 +117,23 @@ private:
                 this,
                 [url] {
                     auto &emulator = ZxEmulator::instance();
+                    // The Files app offers us any octet stream: copy only what we can load
+                    const auto name = displayName(url);
+                    QFile input;
+                    const auto header = openDocument(url, input) ? input.read(64) : QByteArray();
+                    input.close();
+                    const std::span<const uint8_t> bytes(
+                            reinterpret_cast<const uint8_t *>(header.constData()),
+                            size_t(header.size()));
+                    if (zxkit::classifyMediaFile(name.toStdString(), bytes)
+                        == zxkit::MediaClass::Unknown) {
+                        emulator.showMessage(
+                                QCoreApplication::translate("AndroidIntegration",
+                                                            "Spectacol can't open \"%1\".")
+                                        .arg(name),
+                                ZxEmulator::Warning);
+                        return;
+                    }
                     const auto path = emulator.importFile(url);
                     if (!path.isEmpty())
                         emulator.load(path);
@@ -100,5 +174,96 @@ QString displayName(const QUrl &url)
         cursor.callMethod<void>("close");
     }
     return name.isEmpty() ? QFileInfo(url.path()).fileName() : name;
+}
+
+bool openDocument(const QUrl &url, QFile &file)
+{
+    if (url.isLocalFile() || url.scheme() != u"content"_s) {
+        file.setFileName(url.isLocalFile() ? url.toLocalFile() : url.toString());
+        return file.open(QIODevice::ReadOnly);
+    }
+    // The URI exactly as Android sent it: its grant is for that string
+    const auto descriptor = contentResolver().callObjectMethod(
+            "openFileDescriptor",
+            "(Landroid/net/Uri;Ljava/lang/String;)Landroid/os/ParcelFileDescriptor;",
+            parseUri(url.toString(QUrl::FullyEncoded)).object(),
+            QJniObject::fromString(u"r"_s).object<jstring>());
+    QJniEnvironment env;
+    if (!env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose)
+        && descriptor.isValid()) {
+        const int fd = descriptor.callMethod<jint>("detachFd");
+        if (fd >= 0 && file.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle))
+            return true;
+    }
+    // Qt's own content engine handles the providers it knows
+    file.setFileName(url.toString());
+    return file.open(QIODevice::ReadOnly);
+}
+
+bool canPickFolders()
+{
+    const auto manager = context().callObjectMethod("getPackageManager",
+                                                    "()Landroid/content/pm/PackageManager;");
+    // Needs the manifest's <queries> entry for OPEN_DOCUMENT_TREE
+    return folderIntent()
+            .callObjectMethod(
+                    "resolveActivity",
+                    "(Landroid/content/pm/PackageManager;)Landroid/content/ComponentName;",
+                    manager.object())
+            .isValid();
+}
+
+void pickFolder(const QString &initialDocument, std::function<void(const QString &tree)> done)
+{
+    auto intent = folderIntent();
+    if (!initialDocument.isEmpty()) {
+        const auto extra = QJniObject::fromString(u"android.provider.extra.INITIAL_URI"_s);
+        intent.callObjectMethod(
+                "putExtra", "(Ljava/lang/String;Landroid/os/Parcelable;)Landroid/content/Intent;",
+                extra.object<jstring>(), parseUri(initialDocument).object());
+    }
+    QtAndroidPrivate::startActivity(
+            intent, pickFolderRequest,
+            [done = std::move(done)](int, int resultCode, const QJniObject &data) {
+                // Android's UI thread: keep the grant while the result's flags are at hand
+                QString tree;
+                const auto uri = resultCode == resultOk && data.isValid()
+                        ? data.callObjectMethod("getData", "()Landroid/net/Uri;")
+                        : QJniObject();
+                if (uri.isValid()) {
+                    const jint flags = data.callMethod<jint>("getFlags") & (grantRead | grantWrite);
+                    contentResolver().callMethod<void>("takePersistableUriPermission",
+                                                       "(Landroid/net/Uri;I)V", uri.object(),
+                                                       flags);
+                    QJniEnvironment env;
+                    if (env.checkAndClearExceptions())
+                        qWarning() << "Android didn't keep the access to" << uri.toString();
+                    tree = uri.toString();
+                }
+                QMetaObject::invokeMethod(qApp, [done, tree] { done(tree); }, Qt::QueuedConnection);
+            });
+}
+
+void releaseFolder(const QString &tree)
+{
+    const auto root = ContentUri::canonical(tree);
+    forEachGrant([&](const QJniObject &uri, const QString &text, jint flags) {
+        if (ContentUri::canonical(text) != root || !flags)
+            return;
+        contentResolver().callMethod<void>("releasePersistableUriPermission",
+                                           "(Landroid/net/Uri;I)V", uri.object(), flags);
+        QJniEnvironment env;
+        env.checkAndClearExceptions();
+    });
+}
+
+QStringList grantedFolders()
+{
+    QStringList folders;
+    forEachGrant([&](const QJniObject &, const QString &text, jint flags) {
+        if (flags & grantRead)
+            folders.append(text);
+    });
+    return folders;
 }
 } // namespace AndroidIntegration

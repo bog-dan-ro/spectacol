@@ -54,6 +54,8 @@ GridView {
         required property string name
         required property string path
         required property bool isDir
+        required property bool isDevice
+        readonly property string folderIcon: isDevice ? "folder-device" : "folder"
         width: view.cellWidth - Theme.sp(1)
         height: view.cellHeight - Theme.sp(1)
         highlighted: view.currentIndex === index
@@ -64,7 +66,7 @@ GridView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: view.grid
-                source: visible ? (row.isDir ? "qrc:/images/folder.svg" : "image://spectrum/" + row.path) : ""
+                source: visible ? (row.isDir ? "qrc:/images/" + row.folderIcon + ".svg" : "image://spectrum/" + row.path) : ""
                 sourceSize: Qt.size(Math.ceil(view.cellWidth * view.pixelRatio), Math.ceil(view.cellHeight * view.pixelRatio))
                 fillMode: Image.PreserveAspectFit
                 smooth: false
@@ -76,7 +78,7 @@ GridView {
                 // In the list a folder shows as one; the grid has its cover
                 SvgIcon {
                     visible: !view.grid && row.isDir
-                    name: "folder"
+                    name: row.folderIcon
                     Layout.preferredWidth: Theme.sp(6)
                     Layout.preferredHeight: Theme.sp(6)
                 }

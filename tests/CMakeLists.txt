@@ -104,6 +104,8 @@ qt_add_executable(test_files_features
     ../src/romoverrides.cpp ../src/romoverrides.h
     ../src/debugsymbols.cpp ../src/debugsymbols.h
     ../src/folderlistmodel.cpp ../src/folderlistmodel.h
+    ../src/contenturi.cpp ../src/contenturi.h
+    ../src/devicestorage.cpp ../src/devicestorage.h
 )
 target_include_directories(test_files_features PRIVATE ../src)
 target_link_libraries(test_files_features PRIVATE Qt6::Test Qt6::Qml ZX::Kit)

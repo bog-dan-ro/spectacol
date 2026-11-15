@@ -16,6 +16,7 @@
 */
 
 #include "pokemodel.h"
+#include "contenturi.h"
 
 #include <QDir>
 #include <QFile>
@@ -322,7 +323,12 @@ void PokeModel::discover()
     if (m_game.isEmpty())
         return;
     const QFileInfo game(m_game);
-    QStringList folders{ game.absolutePath() };
+    QStringList folders;
+    // Qt can't tell a device folder document's parent; Android storage ids are paths
+    if (!ContentUri::isContent(m_game))
+        folders.append(game.absolutePath());
+    else if (const auto parent = ContentUri::parentFolder(m_game); !parent.isEmpty())
+        folders.append(parent);
     if (!m_folder.isEmpty() && !folders.contains(m_folder))
         folders.append(m_folder);
     for (const auto &folder : folders) {

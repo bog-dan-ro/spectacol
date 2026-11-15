@@ -35,6 +35,7 @@
 #include <zxkit/peripherals/expansion/ExpansionPeripherals.h>
 
 #include "audiooutput.h"
+#include "contenturi.h"
 #include <QBuffer>
 #include <QDateTime>
 #include <QDebug>
@@ -647,6 +648,9 @@ ZxEmulator::ZxEmulator(QObject *parent)
     qRegisterMetaType<ErrorLevel>("ErrorLevel");
 
     setDataPath(dataPath());
+    m_deviceStorage = std::make_unique<DeviceStorage>(dataPath(), this);
+    connect(m_deviceStorage.get(), &DeviceStorage::message, this,
+            [this](const QString &text, int level) { showMessage(text, ErrorLevel(level)); });
     m_debuggerActivated.store(false);
     m_processInputEvents.store(true);
     configureController();
@@ -1178,8 +1182,14 @@ QString ZxEmulator::importFile(const QUrl &url)
 #else
     const auto name = QFileInfo(url.path()).fileName();
 #endif
+#ifdef Q_OS_ANDROID
+    QFile input;
+    const bool opened = AndroidIntegration::openDocument(url, input);
+#else
     QFile input(url.toString());
-    if (!input.open(QIODevice::ReadOnly)) {
+    const bool opened = input.open(QIODevice::ReadOnly);
+#endif
+    if (!opened) {
         showMessage(tr("Can't open '%1': %2").arg(name, input.errorString()), Error);
         return {};
     }
@@ -1633,6 +1643,11 @@ bool ZxEmulator::copyToFavourites(const QString &filePath)
 
 void ZxEmulator::remove(const QString &path)
 {
+    // Device folders hold the user's own files; Android's Files app manages them
+    if (ContentUri::isContent(path)) {
+        showMessage(tr("Spectacol doesn't delete files in device folders."), Warning);
+        return;
+    }
     QFileInfo inf(path);
     if (inf.isDir()) {
         QDir dir(path);
@@ -1663,6 +1678,15 @@ QString ZxEmulator::folderName(const QString &path)
 bool ZxEmulator::copy(const QString &from, const QString &to, bool override)
 {
     QFileInfo inf{ from };
+    if (ContentUri::isContent(to)) {
+        showMessage(tr("Spectacol doesn't change device folders. Paste into a Spectacol folder."),
+                    Warning);
+        return true;
+    }
+    if (ContentUri::isContent(from) && inf.isDir()) {
+        showMessage(tr("Copy the games inside a device folder one by one."), Warning);
+        return true;
+    }
     if (inf.isDir()) {
         QDir src{ from };
         QDir dst{ to + QDir::separator() + src.dirName() };

@@ -116,15 +116,16 @@ def main():
             fixture.write_bytes(expected)
             adb("push", str(fixture), shared)
             config = temp / "Spectacol.conf"
+            # The joystick chooser would open over the menu after each load
             config.write_text("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath="
-                              + data + "\n[Screen]\norientation=1\n")
+                              + data + "\n[Screen]\norientation=1\n[Peripherals]\njoystickPrompt=false\n")
             adb("push", str(config), staging)
             private("mkdir", "-p", str(Path(settings).parent), data)
             private("cp", staging, settings)
             start("cold", document)
             snapshot("cold", expected)
             start("warm")
-            assert any(label(n) == "=" for n in nodes()), "Main window did not appear"
+            assert any(label(n) == "Menu" for n in nodes()), "Main window did not appear"
             key(3)  # Home: the intent must bring a backgrounded activity back to life.
             shell("am", "start", "-W", "-n", activity, "-a", "android.intent.action.VIEW",
                   "--grant-read-uri-permission", "-d", document)
@@ -134,18 +135,20 @@ def main():
             for name in imported:
                 assert private("cat", data + "/Imported/" + name).stdout == expected
             start("export", document, timed=False)
-            assert any(label(n) == "=" for n in nodes()), "Main window did not appear"
+            assert any(label(n) == "Menu" for n in nodes()), "Main window did not appear"
             # The window can become accessible before its queued VIEW import.
             deadline = time.monotonic() + 10
             while len(private("ls", data + "/Imported").stdout.decode().splitlines()) < 3:
                 assert time.monotonic() < deadline, "Export source did not load"
                 time.sleep(.2)
             time.sleep(.5)
-            key(135)  # F5: drawer, then Media / Save snapshot as
-            for _ in range(4):
-                key(20)
-            key(66)
-            key(66)
+            # F5: the drawer, then Media / Save snapshot as (by name: the items move)
+            for _ in range(3):
+                key(135)
+                if any(label(n) == "Media" for n in nodes()):
+                    break
+            tap(lambda n: label(n) == "Media")
+            tap(lambda n: label(n) == "Save snapshot as")
             time.sleep(1)
             assert any(label(n) == "Export…" for n in nodes()), "Save page did not open"
             key(4)  # Dismiss the input method; the save page must remain open.
@@ -164,6 +167,32 @@ def main():
             start("export-reload", uri)
             snapshot("export-reload", expected)
             print("Native snapshot export and content-provider reload passed", flush=True)
+
+            # The Files app opens documents by id, without a name to match: Android types Spectrum
+            # media as octet streams. Spectacol takes those, but not every file.
+            def opens(uri, mime):
+                result = shell("cmd", "package", "query-activities", "--brief", "-a",
+                               "android.intent.action.VIEW", "-d", uri, "-t", mime)
+                return activity in result.stdout.decode().replace(" ", "")
+            for uri in ["content://com.android.providers.downloads.documents/document/msf%3A1",
+                        "content://com.android.providers.media.documents/document/document%3A1"]:
+                assert opens(uri, "application/octet-stream"), uri
+                assert opens(uri, "application/zip"), uri
+                assert not opens(uri, "image/png"), uri
+            junk_name = token + ".bin"
+            with tempfile.TemporaryDirectory() as temporary:
+                junk = Path(temporary) / junk_name
+                junk.write_bytes(b"not a Spectrum file" * 8)
+                adb("push", str(junk), "/sdcard/Download/" + junk_name)
+            before = private("ls", data + "/Imported").stdout.decode().splitlines()
+            shell("am", "start", "-W", "-n", activity, "-a", "android.intent.action.VIEW",
+                  "--grant-read-uri-permission", "-t", "application/octet-stream", "-d",
+                  "content://com.android.externalstorage.documents/document/"
+                  + quote("primary:Download/" + junk_name, safe=""))
+            time.sleep(3)
+            after = private("ls", data + "/Imported").stdout.decode().splitlines()
+            assert after == before, ("an unsupported file was imported", after)
+            print("Octet-stream documents open in Spectacol; other files are refused", flush=True)
     finally:
         (output / "logcat.txt").write_bytes(adb("logcat", "-d", "-t", "3000", check=False).stdout)
         (output / "last-screen.png").write_bytes(adb("exec-out", "screencap", "-p", check=False).stdout)
@@ -177,7 +206,8 @@ def main():
         else:
             private("rm", "-f", settings, check=False)
         private("rm", "-rf", data, check=False)
-        shell("rm", "-f", staging, shared, exported, "/sdcard/" + token + ".xml", check=False)
+        shell("rm", "-f", staging, shared, exported, "/sdcard/" + token + ".xml",
+              "/sdcard/Download/" + token + ".bin", check=False)
 
 
 if __name__ == "__main__":

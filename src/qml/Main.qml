@@ -17,7 +17,6 @@
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Window
 import QtGamepadLegacy
@@ -48,7 +47,10 @@ ApplicationWindow {
 
     function goBack() {
         const sheet = pageLoader.item as Sheet;
-        if (DesktopInput.visible)
+        // Back answers the quit question (no) instead of asking it again
+        if (quitDialog.visible)
+            quitDialog.reject();
+        else if (DesktopInput.visible)
             DesktopInput.hide();
         else if (Qt.inputMethod.visible)
             Qt.inputMethod.hide();
@@ -76,6 +78,7 @@ ApplicationWindow {
     // in each page: one that forgot left the sticks (sendNavigationKey) dead.
     // ZxEmulator.processInputEvents nests: exactly one block for each time this turns true.
     readonly property bool uiOwnsInput: menuBar.position > 0 || pageLoader.status === Loader.Ready
+                                        || quitDialog.visible
     onUiOwnsInputChanged: ZxEmulator.processInputEvents = !uiOwnsInput
     // The menu, for the overlay's drawer and the desktop layout's menu bar
     property ZxMenu zxMenu: ZxMenu {}
@@ -129,11 +132,16 @@ ApplicationWindow {
         }
     }
 
-    MessageDialog {
+    // Asked over the game too: it pauses it and takes the gamepad while it is open
+    ConfirmDialog {
         id: quitDialog
-        title: "Spectacol"
-        text: "Quit ?"
-        buttons: MessageDialog.Yes | MessageDialog.No
+        objectName: "quitDialog"
+        text: qsTr("Quit Spectacol?")
+        acceptText: qsTr("Quit")
+        rejectText: qsTr("Cancel")
+        ownGamepad: true
+        onAboutToShow: ZxEmulator.paused = true
+        onClosed: ZxEmulator.paused = false
         onAccepted: ZxEmulator.quit()
     }
 
@@ -547,6 +555,16 @@ ApplicationWindow {
             onScreen48Keyboard.gamepadMode = gamepad;
             onScreen48Keyboard.visible = !onScreen48Keyboard.visible;
             break;
+        }
+    }
+
+    // Android: Spectacol 4's files are still in shared storage; offer to copy them (at start,
+    // unless another page, the welcome one for one, is already open)
+    Connections {
+        target: ZxEmulator.deviceStorage
+        function onOfferLegacyImport() {
+            if (pageLoader.source.toString() === "")
+                pageLoader.source = "ImportOldFilesPage.qml";
         }
     }
 

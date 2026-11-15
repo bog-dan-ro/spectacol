@@ -1,0 +1,253 @@
+#!/usr/bin/env python3
+"""Check device folders and the Spectacol 4 file import on a disposable English Android emulator.
+
+Copyright (c) 2015-2026, BogDan Vatra. GPL-3.0-or-later.
+Requires an installed debug APK. Temporarily replaces and then restores the app's settings, adds
+folders to shared storage and removes them afterwards, and force-stops Spectacol. It drives
+Android's folder picker: do not run it against a device being used interactively.
+"""
+import argparse
+from pathlib import Path
+import re
+import shlex
+import shutil
+import subprocess
+import tempfile
+import time
+import uuid
+import xml.etree.ElementTree as ET
+
+from controller import make_diagnostic
+
+PACKAGE = "eu.licentia.games.spectacol"
+ACTIVITY = PACKAGE + "/org.qtproject.qt.android.bindings.QtActivity"
+PICKER = "com.google.android.documentsui:id/"
+
+
+def main():
+    repo = Path(__file__).resolve().parents[1]
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--adb", default=shutil.which("adb") or "adb")
+    parser.add_argument("--serial", required=True)
+    parser.add_argument("--output", type=Path, default=repo / "build/android-storage")
+    args = parser.parse_args()
+    output = args.output.resolve()
+    output.mkdir(parents=True, exist_ok=True)
+    token = "spectacol-storage-" + uuid.uuid4().hex[:8]
+
+    def adb(*words, check=True):
+        return subprocess.run([args.adb, "-s", args.serial, *words], capture_output=True,
+                              check=check, timeout=60)
+
+    def shell(*words, check=True):
+        return adb("shell", shlex.join(words), check=check)
+
+    def private(*words, check=True):
+        return shell("run-as", PACKAGE, *words, check=check)
+
+    base = private("pwd").stdout.decode().strip() + "/files"
+    settings = base + "/settings/Licentia/Spectacol.conf"
+    staging = "/data/local/tmp/" + token + ".conf"
+    data = base + "/" + token
+    old_name = token + "-old"
+    games_name = token + "-games"
+    old = "/sdcard/" + old_name
+    games = "/sdcard/" + games_name
+    dump = "/sdcard/" + token + ".xml"
+
+    def nodes():
+        shell("uiautomator", "dump", dump)
+        raw = shell("cat", dump).stdout
+        (output / "last-ui.xml").write_bytes(raw)
+        return list(ET.fromstring(raw).iter("node"))
+
+    def label(node):
+        return node.get("text") or node.get("content-desc") or ""
+
+    def wait_for(predicate, what, timeout=20):
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            found = nodes()
+            # Android explains immersive mode the first time
+            cling = [n for n in found if n.get("resource-id") == "com.android.systemui:id/ok"]
+            if cling:
+                press(cling[0])
+                continue
+            matches = [n for n in found if predicate(n)]
+            if matches:
+                return matches
+            time.sleep(.5)
+        raise AssertionError(what + " did not appear; see last-ui.xml")
+
+    def press(node):
+        x1, y1, x2, y2 = map(int, re.findall(r"\d+", node.get("bounds")))
+        shell("input", "tap", str((x1 + x2) // 2), str((y1 + y2) // 2))
+        time.sleep(.7)
+
+    def tap(text, what=None):
+        press(wait_for(lambda n: label(n) == text, what or repr(text))[0])
+
+    def gone(text, timeout=10):
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            if not any(label(n) == text for n in nodes()):
+                return True
+            time.sleep(.5)
+        return False
+
+    def picker_folder(name, from_root):
+        if from_root:
+            crumbs = wait_for(lambda n: n.get("resource-id") == PICKER + "breadcrumb_text",
+                              "The folder picker")
+            press(min(crumbs, key=lambda n: int(re.findall(r"\d+", n.get("bounds"))[0])))
+            press(wait_for(lambda n: label(n) == name and n.get("resource-id") == "android:id/title",
+                           "Folder " + name)[0])
+        wait_for(lambda n: n.get("resource-id") == PICKER + "header_title"
+                 and label(n) == "Files in " + name, "The picker in " + name)
+        press(wait_for(lambda n: n.get("resource-id") == "android:id/button1", "Use this folder")[0])
+        press(wait_for(lambda n: n.get("resource-id") == "android:id/button1"
+                       and label(n).lower() == "allow", "Allow")[0])
+
+    def write_settings(text):
+        with tempfile.TemporaryDirectory() as temporary:
+            config = Path(temporary) / "Spectacol.conf"
+            config.write_text(text)
+            adb("push", str(config), staging)
+        private("mkdir", "-p", str(Path(settings).parent))
+        private("cp", staging, settings)
+
+    def start(arguments=None):
+        words = ["am", "start", "-S", "-W", "-n", ACTIVITY]
+        if arguments:
+            words += ["--es", "applicationArguments", shlex.join(arguments)]
+        shell(*words)
+
+    def persisted():
+        """The trees Android keeps for Spectacol across restarts."""
+        text = shell("dumpsys", "activity", "permissions").stdout.decode(errors="replace")
+        trees = set()
+        for block in re.findall(r"UriPermission\{\S+ (\S+)[^}]*\}\s*\n([^\n]*)\n([^\n]*)", text):
+            uri, owner, modes = block
+            if "targetPkg=" + PACKAGE in owner and "persisted=0x0" not in modes:
+                trees.add(uri)
+        return trees
+
+    def read_private(path):
+        return private("cat", path, check=False).stdout
+
+    saved_settings = private("cat", settings, check=False)
+    shell("am", "force-stop", PACKAGE)
+    try:
+        with tempfile.TemporaryDirectory(prefix=token) as temporary:
+            temp = Path(temporary)
+            fixture = temp / "game.sna"
+            make_diagnostic(fixture)
+            expected = bytearray(fixture.read_bytes())
+            # A visible screen tells a loaded snapshot from the ROM's
+            expected[27:27 + 6144] = bytes([0xAA, 0x55]) * 3072
+            expected[27 + 6144:27 + 6912] = bytes([0x47]) * 768
+            fixture.write_bytes(expected)
+            old_snapshot = b"ZXST" + token.encode()
+            (temp / "old.szx").write_bytes(old_snapshot)
+
+            # Spectacol 4 kept its files in shared storage: the app offers to copy them once.
+            shell("mkdir", "-p", old + "/Favourites", old + "/Snapshots/" + token)
+            adb("push", str(fixture), old + "/Favourites/" + token + ".sna")
+            adb("push", str(temp / "old.szx"), old + "/Snapshots/" + token + "/old.szx")
+            shell("touch", "-d", "2019-05-04T13:14:15", old + "/Snapshots/" + token + "/old.szx")
+            old_time = shell("stat", "-c", "%Y", old + "/Snapshots/" + token + "/old.szx")
+            write_settings("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=/storage/emulated/0/"
+                           + old_name + "/\n")
+            start()
+            tap("Choose the old folder", "The offer to copy Spectacol 4's files")
+            # The picker starts in the old folder: the user only confirms it
+            picker_folder(old_name, from_root=False)
+            wait_for(lambda n: label(n) == "Done", "The copy's summary")
+            assert read_private(base + "/Favourites/" + token + ".sna") == expected
+            assert read_private(base + "/Snapshots/" + token + "/old.szx") == old_snapshot
+            copied_time = private("stat", "-c", "%Y", base + "/Snapshots/" + token + "/old.szx")
+            assert copied_time.stdout.strip() == old_time.stdout.strip(), "modification time"
+            assert b"legacyImport=done" in read_private(settings)
+            assert not any(old_name in uri for uri in persisted()), "the old folder's grant was kept"
+            print("Spectacol 4 files copied, times kept, grant released", flush=True)
+            tap("Done")
+            start()
+            wait_for(lambda n: label(n) == "Menu", "The main window")
+            time.sleep(2)
+            assert gone("Choose the old folder", 2), "the offer came back"
+            print("No offer after the copy", flush=True)
+
+            # Device folders: granted once, listed in the Spectacol folder, browsed in place.
+            shell("am", "force-stop", PACKAGE)
+            shell("mkdir", "-p", games + "/Sub")
+            adb("push", str(fixture), games + "/Sub/" + token + ".sna")
+            adb("push", str(temp / "old.szx"), games + "/notes.txt")
+            private("mkdir", "-p", data)
+            write_settings("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=" + data
+                           + "\n[LocalFilesView]\nmode=1\n")
+            start(["--machine", "48k", "--quit-after", "90", "--screenshot", data + "/device.sna",
+                   "--ui-keys", "page:FileBrowserPage.qml"])
+            tap("Page actions", "Quick Open")
+            tap("Add device folder…")
+            picker_folder(games_name, from_root=True)
+            # Quick Open goes into the new folder
+            wait_for(lambda n: label(n) == games_name and "Label" in (n.get("resource-id") or ""),
+                     "The device folder's title")
+            wait_for(lambda n: label(n) == "Sub", "The device folder's sub folder")
+            assert gone("notes.txt", 1), "a text file was listed"
+            tap("Sub")
+            tap(token + ".sna", "The game in the device folder")
+            deadline = time.monotonic() + 100
+            raw = b""
+            while time.monotonic() < deadline:
+                raw = read_private(data + "/device.sna")
+                if len(raw) == 49179:
+                    break
+                time.sleep(1)
+            (output / "device.sna").write_bytes(raw)
+            assert len(raw) == 49179, raw[:100]
+            assert raw[27:27 + 6912] == expected[27:27 + 6912], "the device folder's game did not load"
+            assert any(games_name in uri for uri in persisted()), "the device folder's grant was not kept"
+            print("Device folder granted, browsed and its game loaded", flush=True)
+
+            # After a restart Quick Open reopens where it was, inside the device folder: the grant
+            # is still there, and Up climbs out of it to the Spectacol folder, which lists it.
+            start(["--ui-keys", "page:FileBrowserPage.qml"])
+            wait_for(lambda n: label(n) == token + ".sna", "The game after a restart")
+            tap("Up a folder")
+            wait_for(lambda n: label(n) == "Sub", "The device folder after a restart")
+            tap("Up a folder")
+            wait_for(lambda n: label(n) == "Recordings", "The Spectacol folder")
+            wait_for(lambda n: label(n) == games_name, "The device folder in the Spectacol folder")
+            tap("Page actions")
+            tap("Remove")
+            # Spectacol's own dialog: it names the folder, and forgetting it is not deleting it
+            message = wait_for(lambda n: label(n).startswith("Stop showing \""),
+                               "Stop showing the device folder?")
+            assert games_name in label(message[0]), label(message[0])
+            assert "Its files stay on the device" in label(message[0]), label(message[0])
+            tap("Stop showing")
+            assert gone(games_name), "the forgotten folder is still listed"
+            assert not any(games_name in uri for uri in persisted()), "the forgotten folder's grant"
+            assert shell("ls", games + "/Sub/" + token + ".sna", check=False).returncode == 0, \
+                "forgetting a device folder touched its files"
+            print("Device folder kept across restarts and forgotten", flush=True)
+    finally:
+        (output / "logcat.txt").write_bytes(adb("logcat", "-d", "-t", "3000", check=False).stdout)
+        (output / "last-screen.png").write_bytes(adb("exec-out", "screencap", "-p", check=False).stdout)
+        shell("am", "force-stop", PACKAGE, check=False)
+        if saved_settings.returncode == 0:
+            with tempfile.TemporaryDirectory() as temporary:
+                backup = Path(temporary) / "settings.conf"
+                backup.write_bytes(saved_settings.stdout)
+                adb("push", str(backup), staging)
+                private("cp", staging, settings)
+        else:
+            private("rm", "-f", settings, check=False)
+        private("rm", "-rf", data, base + "/Favourites/" + token + ".sna",
+                base + "/Snapshots/" + token, check=False)
+        shell("rm", "-rf", old, games, staging, dump, check=False)
+
+
+if __name__ == "__main__":
+    main()

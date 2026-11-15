@@ -194,9 +194,12 @@ measurement limits. Generated evidence remains under the build directories.
         - The touch rail has 48 dp targets and a menu button; Save As scrolls on short screens;
           `FancyTextField` has its own placeholder (Material's floating one overlapped the text).
   - [ ] Input-profile follow-ups: check on a physical phone, an Android TV and a Steam Deck; the debugger's
-        memory, breakpoints and labels views still use dense rows and default buttons on touch; the native
-        `MessageDialog`s (quit, remove, overwrite) are not navigable with a gamepad on every platform; a
+        memory, breakpoints and labels views still use dense rows and default buttons on touch; a
         gamepad shortcut for toggling a breakpoint (today: the toolbar's button, or a long press).
+  - [x] The quit, remove, replace and forget questions are `ConfirmDialog`s, not the system's message boxes:
+        Left/Right pick, A/Return/OK answer, B/Escape/Back is no, touch works. Quit pauses the game and
+        drives itself with the gamepad over it; Android's Back answers it instead of asking again.
+        `tests/android_quit.py` checks Back, D-pad/OK, touch and Enter on the emulator.
   - [x] Controller mapping uses themed settings rows and a key/action dialog with D-pad navigation and focus
         restoration on close, including direction presets and custom keys.
   - [x] Tape creation/export and snapshot Save As use themed sheets with keyboard/gamepad actions and
@@ -222,7 +225,10 @@ API 37 x86_64 emulator. Physical phone/TV validation remains open.
       [#153](https://github.com/bog-dan-ro/spectacol/issues/153)). Local saves remain atomic;
       document-provider destinations use direct writes.
 - [x] Open `content://` files from other apps on cold and warm starts; copy them into app storage and
-      load through `QFile` / `MediaFile::fromBytes()`.
+      load through `QFile` / `MediaFile::fromBytes()`. The Files app's Downloads and category views send
+      documents by id, typed as octet streams: a second filter takes those (and ZIPs), the import
+      classifies them by display name and header first, and opens them with
+      `ContentResolver.openFileDescriptor()` (Qt's engine can't open the Downloads provider's documents).
 - [x] Drop obsolete storage permissions and `requestLegacyExternalStorage`; minimum API 28, current Qt
       target SDK, 16 KiB native library alignment. Build both x86_64 and ARM64 packages.
 - [x] Detect touch hardware, show on-screen controls, balance pause/resume across application states and
@@ -239,11 +245,18 @@ API 37 x86_64 emulator. Physical phone/TV validation remains open.
       orientation after creating the Qt window so startup rotation also resizes its surface. On the
       Qt 6.12/API 37 phone emulator, `tests/android_ui.py --rotation-only` covers fresh defaults, both
       saved choices and live changes through Options › Screen; physical phone rotation remains to verify.
-- [ ] Offer migration of old shared data when readable. The old directory is preserved and its location
-      is remembered as `Android/legacyDataPath`; individual files can already be imported through the picker.
-- [ ] Browse a granted games folder (`content://`) in the in-app cover flow, retaining its URI permission.
-      The cover flow currently browses app storage; shared files use the native picker.
+- [x] Copy Spectacol 4's shared data. Android lists the old folder but hides its files, so the copy goes
+      through the folder picker, opened at the old folder (`Android/legacyDataPath`): offered once at start,
+      and in Options › General. A worker copies into app storage, keeping times, skipping identical files
+      and numbering different ones; the originals stay, the grant is released, `Android/legacyImport`
+      records done/never.
+- [x] Device folders: Quick Open's “Add device folder…” keeps a `content://` tree grant and lists the folder
+      first in the Spectacol folder; Quick Open, the tape browser and the disk picker browse it in place and
+      load from it. Up returns to the Spectacol folder, also from a remembered sub folder. Removing its entry
+      only forgets it. `tests/android_storage.py` checks both on the emulator, including after a restart.
 - [ ] Validate physical gamepads, on-screen controls, audio latency and Android TV remote navigation on devices.
+      Also on a device: picking a device folder on an SD card and a cloud provider (opaque document ids:
+      Up leaves the folder), and the folder picker's absence on TVs (the action is then hidden).
 - [ ] APK installation regression ([#156](https://github.com/bog-dan-ro/spectacol/issues/156)): emulator
       debug APK install/upgrade and signature/alignment checks pass. Verify release-signed APKs and upgrades
       with the actual publishing key on Android 13+ phones and TVs; diagnose the reported invalid package

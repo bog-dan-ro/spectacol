@@ -37,6 +37,9 @@ Item
     property alias folder: filesModel.folder
     property alias filterClass: filesModel.filterClass
     property alias viewMode: browserPrefs.mode
+    readonly property var deviceStorage: ZxEmulator.deviceStorage
+    // Android: folders of the shared storage the user granted, listed in the Spectacol folder
+    readonly property bool deviceFolders: deviceStorage.available && filterClass !== FolderListModel.HostFiles
     Settings {
         id: browserPrefs
         category: "LocalFilesView"
@@ -57,8 +60,9 @@ Item
         if (fileActions.close()) return true;
         if (modePicker.popup.visible) { modePicker.popup.close(); return true; }
         if (deviceFile.visible) { deviceFile.close(); focusFiles(); return true; }
-        if (copyDialog.visible) { copyDialog.close(); focusFiles(); return true; }
-        if (removeDialog.visible) { removeDialog.close(); focusFiles(); return true; }
+        if (forgetDialog.visible) { forgetDialog.reject(); return true; }
+        if (copyDialog.visible) { copyDialog.reject(); return true; }
+        if (removeDialog.visible) { removeDialog.reject(); return true; }
         return false;
     }
     Component.onCompleted: {
@@ -78,6 +82,7 @@ Item
         else if (event.key === Qt.Key_C && viewMode !== 0) filesView.copyPressed();
         else if (event.key === Qt.Key_P && viewMode !== 0) copyDialog.copy();
         else if (event.key === Qt.Key_Y && viewMode !== 0) folder = ZxEmulator.dataPath;
+        else if (event.key === Qt.Key_F4 && deviceFolders) deviceStorage.addFolder();
         else return;
         event.accepted = true;
     }
@@ -100,7 +105,24 @@ Item
         leftShoulderKey: Qt.Key_C
         rightShoulderKey: Qt.Key_P
         leftTriggerKey: Qt.Key_Home
-        rightTriggerKey: Qt.Key_unknown
+        rightTriggerKey: fileList.deviceFolders ? Qt.Key_F4 : Qt.Key_unknown
+    }
+
+    Connections {
+        target: fileList.deviceStorage
+        function onFolderAdded(path) {
+            fileList.folder = path;
+            fileList.focusFiles();
+        }
+    }
+
+    function copyCurrent() {
+        const row = filesModel.currentIndex;
+        if (filesModel.isDeviceFolder(row)) {
+            messagePage.showMessage(ZxEmulator.Info, qsTr("Open the device folder and copy the games inside it."));
+            return;
+        }
+        filesView.copyPath = filesModel.path(row);
     }
 
 
@@ -119,11 +141,13 @@ Item
         color: Theme.raised
     }
 
-    MessageDialog {
+    ConfirmDialog {
         id: copyDialog
-        title: "Spectacol"
-        text: qsTr("Override \"") + ZxEmulator.fileName(filesView.copyPath) + "\" ?";
-        buttons: MessageDialog.Yes | MessageDialog.No
+        text: qsTr("Replace \"%1\" in this folder?").arg(ZxEmulator.fileName(filesView.copyPath))
+        acceptText: qsTr("Replace")
+        rejectText: qsTr("Cancel")
+        destructive: true
+        onClosed: fileList.focusFiles()
         onAccepted: {
             ZxEmulator.copy(filesView.copyPath, fileList.folder, true);
             filesView.copyPath = "";
@@ -148,14 +172,18 @@ Item
     FolderListModel {
         id: filesModel
         rootFolder: ZxEmulator.settings.restrictToSpectacol ? ZxEmulator.dataPath : "/"
+        homeFolder: fileList.deviceFolders ? ZxEmulator.dataPath : ""
+        deviceFolders: fileList.deviceFolders ? fileList.deviceStorage.folders : []
         sortCriteria: folder.indexOf(ZxEmulator.snapshotsPath(), 0) === 0 ? FolderListModel.ByDateDesc : folder.indexOf(ZxEmulator.recordingsPath(), 0) === 0 ? FolderListModel.ByDateDesc : FolderListModel.ByName
     }
 
-    MessageDialog {
+    ConfirmDialog {
         id: removeDialog
-        title: "Spectacol"
-        text: qsTr("Remove \"") + filePath + "\" ?";
-        buttons: MessageDialog.Yes | MessageDialog.No
+        text: qsTr("Remove \"%1\"?").arg(ZxEmulator.fileName(filePath))
+        acceptText: qsTr("Remove")
+        rejectText: qsTr("Cancel")
+        destructive: true
+        onClosed: fileList.focusFiles()
         property string filePath
         onAccepted: {
             ZxEmulator.remove(filePath)
@@ -163,9 +191,32 @@ Item
             filesView.currentIndex = 0;
         }
         function remove() {
-            removeDialog.filePath = filesModel.path(filesView.currentIndex);
+            const row = filesModel.currentIndex;
+            if (filesModel.isDeviceFolder(row)) {
+                forgetDialog.filePath = filesModel.path(row);
+                forgetDialog.fileName = ZxEmulator.fileName(forgetDialog.filePath) || filesModel.data(filesModel.index(row, 0));
+                forgetDialog.open();
+                return;
+            }
+            if (filesModel.inDeviceFolder) {
+                messagePage.showMessage(ZxEmulator.Info, qsTr("Spectacol doesn't delete files in device folders."));
+                return;
+            }
+            removeDialog.filePath = filesModel.path(row);
             removeDialog.open();
         }
+    }
+
+    // Removing a device folder only gives back Spectacol's access to it
+    ConfirmDialog {
+        id: forgetDialog
+        property string filePath
+        property string fileName
+        text: qsTr("Stop showing \"%1\"? Its files stay on the device.").arg(fileName)
+        acceptText: qsTr("Stop showing")
+        rejectText: qsTr("Cancel")
+        onClosed: fileList.focusFiles()
+        onAccepted: fileList.deviceStorage.forgetFolder(filePath)
     }
 
     CoverFlow {
@@ -190,7 +241,7 @@ Item
         property string copyPath: ""
         onCopyPathChanged: {
             if (copyPath.length)
-                messagePage.showMessage(ZxEmulator.Info, "\"" + copyPath + qsTr("\" copied to clipboard. Use <b>Paste</b> to paste it to another folder."))
+                messagePage.showMessage(ZxEmulator.Info, "\"" + ZxEmulator.fileName(copyPath) + qsTr("\" copied to clipboard. Use <b>Paste</b> to paste it to another folder."))
         }
         property bool canCopy: {
             if (!copyPath.length)
@@ -212,7 +263,7 @@ Item
         onDeletePressed: removeDialog.remove()
         onResetPressed: fileList.folder = ZxEmulator.dataPath
 
-        onCopyPressed: copyPath = filesModel.path(filesView.currentIndex)
+        onCopyPressed: fileList.copyCurrent()
         onPastePressed: copyDialog.copy()
 
         delegate: Component {
@@ -231,7 +282,7 @@ Item
                 Behavior on delScale {SpringAnimation {spring : 5; damping: 1; epsilon: 0.005}}
                 onStatusChanged: if (status === Image.Ready) scale_anim.start();
                 sourceSize: Qt.size(fileList.coverPixels, fileList.coverPixels)
-                source : "image://spectrum/" + path
+                source : isDevice ? "qrc:/images/folder-device.svg" : "image://spectrum/" + path
                 smooth : false
 
                 NumberAnimation {id : scale_anim; target : album_delegate; property: "scale"; from : 0; to : delScale; duration : 500; easing.type: Easing.InOutQuad}
@@ -286,12 +337,14 @@ Item
             { pad: "A", key: "Enter", text: qsTr("Open"), action: () => fileList.openRow(filesModel.currentIndex) },
             { pad: "B", key: "Esc", text: qsTr("Close"), action: () => fileList.fileSelected("") },
             { pad: "X", key: "Del", text: qsTr("Remove"), action: () => removeDialog.remove() },
-            { pad: "L1", key: "C", text: qsTr("Copy"), action: () => filesView.copyPath = filesModel.path(filesModel.currentIndex) },
+            { pad: "L1", key: "C", text: qsTr("Copy"), action: () => fileList.copyCurrent() },
             { pad: "R1", key: "P", text: filesView.canCopy ? qsTr("Paste") : qsTr("Paste (copy first)"), action: () => copyDialog.copy() },
             { pad: "Y", key: "F3", text: qsTr("Search"), action: () => search.forceActiveFocus() },
             { pad: "Start", key: "F2", text: qsTr("View"), action: () => fileList.viewMode = (fileList.viewMode + 1) % 3 },
             { pad: "L2", key: "Home", text: qsTr("Spectacol folder"), action: () => fileList.folder = ZxEmulator.dataPath }
-        ]
+        ].concat(fileList.deviceFolders ? [
+            { pad: "R2", key: "F4", text: qsTr("Add device folder…"), action: () => fileList.deviceStorage.addFolder() }
+        ] : [])
     }
 
     CompactFilesView {
@@ -340,7 +393,7 @@ Item
                 }
                 Label {
                     Layout.fillWidth: true
-                    text: artist_text_label.root ? qsTr("Open a file") : ZxEmulator.fileName(filesModel.folder)
+                    text: artist_text_label.root ? qsTr("Open a file") : filesModel.folderName
                     elide: Text.ElideMiddle
                     font.pixelSize: Theme.title
                     color: Theme.text
@@ -402,7 +455,7 @@ Item
             Text {
                 visible: !Theme.touchScreenUi
                 width: parent.width
-                text: filesModel.folder
+                text: filesModel.folderTitle
                 elide: Text.ElideMiddle
                 font.pixelSize: Theme.title
                 font.weight: Font.DemiBold

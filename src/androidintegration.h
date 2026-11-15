@@ -18,10 +18,28 @@
 #pragma once
 
 #include <QString>
+#include <QStringList>
 #include <QUrl>
 
+#include <functional>
+
+class QFile;
 class QObject;
 namespace AndroidIntegration {
 void install(QObject *parent);
 QString displayName(const QUrl &url);
+// Opens a document another app gave us (content://) for reading, the way Android expects
+// (ContentResolver.openFileDescriptor); Qt's content engine can't open every provider's documents.
+bool openDocument(const QUrl &url, QFile &file);
+
+// Whether this device has Android's folder picker (some TVs don't).
+bool canPickFolders();
+// Opens Android's folder picker, at initialDocument when it is set (a document URI). The access
+// the user grants is kept across restarts. done runs on the GUI thread with the folder's tree URI,
+// or with an empty string when the user cancels.
+void pickFolder(const QString &initialDocument, std::function<void(const QString &tree)> done);
+// Gives back the access kept for a folder.
+void releaseFolder(const QString &tree);
+// The folders whose access Android keeps for us.
+QStringList grantedFolders();
 } // namespace AndroidIntegration

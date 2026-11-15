@@ -31,6 +31,7 @@
 #include "zxgamesmodel.h"
 #include "controllerinput.h"
 #include "controllerprofiles.h"
+#include "devicestorage.h"
 
 Q_MOC_INCLUDE("zxrecording.h")
 Q_MOC_INCLUDE("zxsettings.h")
@@ -90,6 +91,7 @@ class ZxEmulator : public QObject
     Q_PROPERTY(PokeModel *pokes READ pokes CONSTANT FINAL)
     Q_PROPERTY(DebugSymbols *symbols READ symbols CONSTANT FINAL)
     Q_PROPERTY(ZxSettings *settings READ settings CONSTANT)
+    Q_PROPERTY(DeviceStorage *deviceStorage READ deviceStorage CONSTANT FINAL)
     Q_PROPERTY(DebuggerMemoryModel *debugMemory READ debugMemory CONSTANT FINAL)
     Q_PROPERTY(DebuggerStateModel *debugNextRegisters READ debugNextRegisters CONSTANT FINAL)
     Q_PROPERTY(DebuggerStateModel *debugMmu READ debugMmu CONSTANT FINAL)
@@ -154,6 +156,10 @@ public:
     ControllerProfiles *controllerProfiles() const
     {
         return m_controllerProfiles.get();
+    }
+    DeviceStorage *deviceStorage() const
+    {
+        return m_deviceStorage.get();
     }
     bool fastForward() const
     {
@@ -522,6 +528,7 @@ private:
     ZXGamesModel m_onlineGamesModel;
     std::unique_ptr<ZxSettings> m_settings;
     std::unique_ptr<ControllerProfiles> m_controllerProfiles;
+    std::unique_ptr<DeviceStorage> m_deviceStorage;
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
     ZxTape *m_tape = nullptr;
     Disks *m_disks = nullptr;

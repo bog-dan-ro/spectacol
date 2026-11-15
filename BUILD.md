@@ -341,9 +341,34 @@ APK with the SDK's `zipalign -c -P 16 4` and `apksigner verify` as well.
 The Qt 6 manifest uses app storage and no obsolete shared-storage permissions. **Quick Open → ⋮ → Device
 files…** imports a file through Android's picker; **Save snapshot → Export…** and **Export tape → Export
 to device…** write to a selected document. Files opened from another app are copied into app storage
-before loading, including when Spectacol is already running. App data stays private. Old shared data
-is left in place; its saved location is retained as `Android/legacyDataPath` and files can be imported
-through the picker. Automatic migration and browsing a granted folder in the cover flow remain TODOs.
+before loading, including when Spectacol is already running. App data stays private.
+
+The Files app opens a download or a media document by its id (`content://…/document/msf%3A42`), without
+a name in the URI, and Android types Spectrum media as `application/octet-stream`. Besides the filter on
+file name extensions, the manifest therefore takes `content:` octet streams and ZIP archives. Before
+copying anything, Spectacol classifies the document by its provider's display name and first bytes, and
+refuses other files with a message. It opens these documents through
+`ContentResolver.openFileDescriptor()` with the URI as Android sent it; Qt's content engine can't open
+every provider's documents (the Downloads one, for one).
+
+**Quick Open → ⋮ → Add device folder…** (R2 on a gamepad, F4 on a keyboard) asks Android's folder picker
+for a folder of games. Spectacol keeps the grant (`takePersistableUriPermission`) and lists the folder,
+with a device badge, first in its own folder, in Quick Open, the tape browser and the disk picker. Inside
+it Quick Open browses the `content://` tree in place, by file name (reading every document's header would
+be one provider round trip per file), and loads games straight from it. Up climbs back to the Spectacol
+folder; storage document ids give the way up from a remembered sub folder as well. Spectacol doesn't
+delete, paste into or copy whole folders out of device folders. Remove on the folder's own entry only
+forgets it and gives the grant back. Grants for folders that are no longer device folders are released
+at start. Picking a folder needs the manifest's `<queries>` entry for `OPEN_DOCUMENT_TREE`; devices without
+a picker (some TVs) don't offer the action.
+
+Spectacol 4 kept its data in shared storage, which a current app can't read: Android lists its folders
+but hides the files. When the saved data path was there, Spectacol records it as
+`Android/legacyDataPath` and, at start, offers to copy it (also under **Options › General › Files from
+Spectacol 4**). The folder picker opens at the old folder (`EXTRA_INITIAL_URI`); after “Use this folder”
+and “Allow” a worker thread copies everything into app storage, keeping modification times. Identical
+files are skipped, a different file with a used name gets a numbered one, and the originals stay where
+they are. The grant is released afterwards, and `Android/legacyImport` (`done` or `never`) stops the offer.
 
 Run device regressions on a disposable emulator with an English system UI:
 
@@ -352,8 +377,31 @@ python3 tests/android.py --adb "$ANDROID_SDK_ROOT/platform-tools/adb" --serial e
 ```
 
 The script requires an installed debug APK. It temporarily replaces the app's settings, restores them
-on exit, and checks cold/warm document intents and native snapshot export. Do not interact with the
-emulator while it runs. Physical gamepads, Android TV remotes and audio latency still need device checks.
+on exit, and checks cold/warm document intents and native snapshot export. It also checks that the
+Files app's id-only documents resolve to Spectacol (octet streams and ZIPs, not pictures) and that an
+unsupported file isn't imported. Do not interact with the
+emulator while it runs.
+
+Device folders and the Spectacol 4 copy have their own check, which drives Android's folder picker:
+
+```sh
+python3 tests/android_storage.py --adb "$ANDROID_SDK_ROOT/platform-tools/adb" --serial emulator-5554
+```
+
+It fakes a Spectacol 4 folder in shared storage and checks the offer, the picker's starting folder, the
+copied files and their times, the released grant and that the offer doesn't come back. Then it grants a
+games folder from Quick Open, browses it, loads a game from it, restarts (Quick Open reopens inside it,
+the grant still works), climbs out with Up and forgets the folder, whose files stay. Shared folders,
+copied files and settings are restored; output goes to `build/android-storage`.
+
+The quit question is Spectacol's own dialog, like the file browser's remove, replace and forget
+questions: the system's message boxes can't be reached with a gamepad or a remote everywhere. Back
+asks it in the game and answers no in it; Left/Right pick, OK or A answers, B or Escape is no. The
+game pauses while it is open, and a gamepad drives it over the game. Check it with:
+
+```sh
+python3 tests/android_quit.py --adb "$ANDROID_SDK_ROOT/platform-tools/adb" --serial emulator-5554
+``` Physical gamepads, Android TV remotes and audio latency still need device checks.
 On the tested API 37 x86_64 emulator, `-gpu host` renders correctly; SwiftShader's OpenGL driver showed
 incomplete frames. Check that an AVD's system image is actually installed before diagnosing Qt.
 

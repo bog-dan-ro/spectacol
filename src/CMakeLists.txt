@@ -47,6 +47,7 @@ qt_add_resources(spectacol "resources"
         images/fastforward.svg
         images/floppy.svg
         images/folder.svg
+        images/folder-device.svg
         images/gamepad.svg
         images/keyboard-icon.svg
         images/menu.svg
@@ -135,10 +136,12 @@ qt_add_qml_module(spectacol
         audiooutput.cpp audiooutput.h
         breakpointsmodel.cpp breakpointsmodel.h
         controllerinput.cpp controllerinput.h
+        contenturi.cpp contenturi.h
         controllerprofiles.cpp controllerprofiles.h
         desktopinput.cpp desktopinput.h
         debuggermodels.cpp debuggermodels.h
         debugsymbols.cpp debugsymbols.h
+        devicestorage.cpp devicestorage.h
         disassamblemodel.cpp disassamblemodel.h
         disks.h disks.cpp
         filemanagerpanel.cpp filemanagerpanel.h
@@ -185,6 +188,7 @@ qt_add_qml_module(spectacol
         qml/RomsPage.qml
         qml/DebugSymbolsView.qml
         qml/CompactFilesView.qml
+        qml/ConfirmDialog.qml
         qml/NavigationComboBox.qml
         qml/DebuggerMemoryView.qml
         qml/DebuggerStateView.qml
@@ -230,6 +234,7 @@ qt_add_qml_module(spectacol
         qml/RzxControlsPage.qml
         qml/SaveSnapshotPage.qml
         qml/SaveTapePage.qml
+        qml/ImportOldFilesPage.qml
         qml/NewTapePage.qml
         qml/SearchOnlinePage.qml
         qml/StandardGamepad.qml

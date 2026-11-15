@@ -1,6 +1,8 @@
 /* Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
    SPDX-License-Identifier: GPL-3.0-or-later */
+#include "contenturi.h"
 #include "debugsymbols.h"
+#include "devicestorage.h"
 #include "folderlistmodel.h"
 #include "pokemodel.h"
 #include "romoverrides.h"
@@ -12,6 +14,7 @@
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
+#include <QTimeZone>
 #include <QUrl>
 #include <algorithm>
 #include <string_view>
@@ -288,6 +291,259 @@ private slots:
         restarted.rememberSelection(0); // opening a filtered result is an explicit selection
         restarted.setSearch({});
         QCOMPARE(restarted.path(restarted.currentIndex()), directory.filePath(u"ignored.txt"_s));
+    }
+    void contentUris()
+    {
+        const auto tree = u"content://com.android.externalstorage.documents/tree/primary%3AGames"_s;
+        const auto root = tree + u"/document/primary%3AGames"_s;
+        const auto sub = tree + u"/document/primary%3AGames%2FSub"_s;
+        const auto game = tree + u"/document/primary%3AGames%2FSub%2FJet%20Set%20(Willy).tap"_s;
+        QVERIFY(ContentUri::isContent(tree));
+        QVERIFY(!ContentUri::isContent(u"/sdcard/Games"_s));
+        QCOMPARE(ContentUri::canonical(tree), root);
+        QCOMPARE(ContentUri::canonical(tree + u'/'), root);
+        QCOMPARE(ContentUri::canonical(u"/home/x"_s), u"/home/x"_s);
+        // the same encoding as Android's Uri.encode(): "()" stay, a space doesn't
+        QCOMPARE(ContentUri::canonical(tree + u"/document/primary%3AGames%2FSub%2FJet Set %28Willy%29.tap"_s), game);
+        QVERIFY(ContentUri::sameTree(tree, game));
+        QVERIFY(!ContentUri::sameTree(tree, u"content://com.android.externalstorage.documents/tree/primary%3AGamesX"_s));
+        QVERIFY(!ContentUri::sameTree(tree, u"/sdcard/Games"_s));
+        QCOMPARE(ContentUri::treeRoot(game), root);
+        QCOMPARE(ContentUri::parentFolder(game), sub);
+        QCOMPARE(ContentUri::parentFolder(sub), root);
+        QVERIFY(ContentUri::parentFolder(root).isEmpty());
+        QCOMPARE(ContentUri::name(game), u"Jet Set (Willy).tap"_s);
+        QCOMPARE(ContentUri::name(tree), u"Games"_s);
+        // a whole volume: its id ends with ':'
+        const auto card = u"content://com.android.externalstorage.documents/tree/1A2B-3C4D%3A"_s;
+        const auto cardGame = card + u"/document/1A2B-3C4D%3AGames%2Fx.z80"_s;
+        QCOMPARE(ContentUri::parentFolder(cardGame), card + u"/document/1A2B-3C4D%3AGames"_s);
+        QCOMPARE(ContentUri::parentFolder(card + u"/document/1A2B-3C4D%3AGames"_s), card + u"/document/1A2B-3C4D%3A"_s);
+        // opaque ids (a cloud provider's): no parent, and the way down is kept by the model
+        const auto opaque = u"content://com.example.docs/tree/acc%3D1%3Broot/document/acc%3D1%3Bdoc%3D42"_s;
+        QVERIFY(ContentUri::parentFolder(opaque).isEmpty());
+        // QDir::filePath() joins names to a tree: not a document
+        QCOMPARE(ContentUri::canonical(tree + u"/Sub/x.tap"_s), tree + u"/Sub/x.tap"_s);
+        QVERIFY(ContentUri::parentFolder(tree + u"/Sub/x.tap"_s).isEmpty());
+
+        const auto document = u"content://com.android.externalstorage.documents/document/"_s;
+        QCOMPARE(ContentUri::documentForPath(u"/storage/emulated/0/Spectacol/"_s), document + u"primary%3ASpectacol"_s);
+        QCOMPARE(ContentUri::documentForPath(u"/sdcard/My Games"_s), document + u"primary%3AMy%20Games"_s);
+        QCOMPARE(ContentUri::documentForPath(u"/storage/1a2b-3c4d/Spectacol"_s), document + u"1A2B-3C4D%3ASpectacol"_s);
+        QVERIFY(ContentUri::documentForPath(u"/data/user/0/eu.licentia.games.spectacol/files"_s).isEmpty());
+        QVERIFY(ContentUri::documentForPath(u"Spectacol"_s).isEmpty());
+        QCOMPARE(ContentUri::displayPath(u"/storage/emulated/0/Spectacol/"_s), u"Internal storage/Spectacol"_s);
+        QCOMPARE(ContentUri::displayPath(u"/storage/1A2B-3C4D/Spectacol"_s), u"1A2B-3C4D/Spectacol"_s);
+    }
+    void deviceFolderNavigation()
+    {
+        QTemporaryDir directory;
+        QVERIFY(directory.isValid());
+        QDir(directory.path()).mkdir(u"Snapshots"_s);
+        QFile tape(directory.filePath(u"Local.tap"_s));
+        QVERIFY(tape.open(QIODevice::WriteOnly));
+        tape.write("1234");
+        tape.close();
+        const auto games = u"content://com.android.externalstorage.documents/tree/primary%3AGames"_s;
+        const auto gamesRoot = games + u"/document/primary%3AGames"_s;
+        const auto sub = games + u"/document/primary%3AGames%2FSub"_s;
+        const auto deep = games + u"/document/primary%3AGames%2FSub%2FDeep"_s;
+        const auto music = u"content://com.android.externalstorage.documents/tree/primary%3AMusic"_s;
+
+        FolderListModel model;
+        QAbstractItemModelTester contract(&model, QAbstractItemModelTester::FailureReportingMode::QtTest);
+        model.setRootFolder(directory.path());
+        model.setHomeFolder(directory.path());
+        model.setDeviceFolders({ games, music });
+        QCOMPARE(model.rowCount({}), 4);
+        // the device folders come first, before the folders
+        QVERIFY(model.isDeviceFolder(0) && model.isDeviceFolder(1));
+        QCOMPARE(model.data(model.index(0), FolderListModel::Name).toString(), u"Games"_s);
+        QCOMPARE(model.path(0), gamesRoot);
+        QVERIFY(model.isDir(0));
+        QCOMPARE(model.data(model.index(1), FolderListModel::IsDevice).toBool(), true);
+        QCOMPARE(model.path(2), directory.filePath(u"Snapshots"_s));
+        QVERIFY(!model.isDeviceFolder(2));
+        model.setCurrentIndex(0);
+
+        // in: the title follows the way down
+        model.setFolder(model.path(0));
+        QCOMPARE(model.folder(), gamesRoot);
+        QVERIFY(model.inDeviceFolder());
+        QCOMPARE(model.folderTitle(), u"Games"_s);
+        model.setFolder(sub);
+        model.setFolder(deep);
+        QCOMPARE(model.folderTitle(), u"Games/Sub/Deep"_s);
+        QCOMPARE(model.folderName(), u"Deep"_s);
+        model.cdUp();
+        QCOMPARE(model.folder(), sub);
+        model.cdUp();
+        QCOMPARE(model.folder(), gamesRoot);
+        // Up from the device folder: back where we came from, on its row
+        model.cdUp();
+        QCOMPARE(model.folder(), directory.path());
+        QVERIFY(!model.inDeviceFolder());
+        QCOMPARE(model.currentIndex(), 0);
+
+        // straight into a sub folder (Quick Open remembers the last one): the ids give the way
+        model.setFolder(deep);
+        QCOMPARE(model.folderTitle(), u"Games/Sub/Deep"_s);
+        model.cdUp();
+        QCOMPARE(model.folder(), sub);
+        QCOMPARE(model.folderTitle(), u"Games/Sub"_s);
+        model.cdUp();
+        QCOMPARE(model.folder(), gamesRoot);
+        model.cdUp();
+        QCOMPARE(model.folder(), directory.path());
+        // opaque document ids: only the folder itself, and Up leaves the tree
+        const auto cloud = u"content://com.example.docs/tree/root"_s;
+        const auto cloudFolder = cloud + u"/document/f%3D42"_s;
+        model.setDeviceFolders({ games, music, cloud });
+        model.setFolder(cloudFolder);
+        QCOMPARE(model.folder(), cloudFolder);
+        QCOMPARE(model.folderName(), u"f=42"_s);
+        model.cdUp();
+        QCOMPARE(model.folder(), directory.path());
+        model.setDeviceFolders({ games, music });
+
+        // folders that weren't granted can't be opened
+        model.setFolder(u"content://com.android.externalstorage.documents/tree/primary%3ADCIM"_s);
+        QCOMPARE(model.folder(), directory.path());
+
+        // forgotten while in it
+        model.setFolder(sub);
+        model.setDeviceFolders({ music });
+        QCOMPARE(model.folder(), directory.path());
+        QCOMPARE(model.rowCount({}), 3);
+
+        // only the home folder lists them, and only for media
+        model.setFolder(directory.filePath(u"Snapshots"_s));
+        QCOMPARE(model.rowCount({}), 0);
+        model.setFolder(directory.path());
+        model.setFilterClass(FolderListModel::HostFiles);
+        QVERIFY(!model.isDeviceFolder(0));
+        QCOMPARE(model.rowCount({}), 2);
+    }
+    void copyTree()
+    {
+        QTemporaryDir source;
+        QTemporaryDir destination;
+        QVERIFY(source.isValid() && destination.isValid());
+        auto make = [](const QString &path, const QByteArray &bytes, const QDateTime &time = {}) {
+            QDir().mkpath(QFileInfo(path).absolutePath());
+            QFile file(path);
+            QVERIFY(file.open(QIODevice::WriteOnly));
+            QCOMPARE(file.write(bytes), bytes.size());
+            QVERIFY(file.flush()); // a later write would set the time again
+            if (time.isValid())
+                QVERIFY(file.setFileTime(time, QFileDevice::FileModificationTime));
+        };
+        const QDateTime saved(QDate(2019, 5, 4), QTime(13, 14, 15), QTimeZone::UTC);
+        make(source.filePath(u"Snapshots/Jetpac/1.szx"_s), "ZXST-one", saved);
+        make(source.filePath(u"Downloaded/j/jet/Jetpac.tap"_s), "tape");
+        make(source.filePath(u"same.sna"_s), "identical");
+        make(source.filePath(u"clash.sna"_s), "from the old folder");
+        QDir(source.path()).mkpath(u"Empty"_s);
+        make(destination.filePath(u"same.sna"_s), "identical");
+        make(destination.filePath(u"clash.sna"_s), "already here!!!!!!!");
+        make(destination.filePath(u"clash_1.sna"_s), "taken too");
+
+        QStringList shown;
+        const auto result = DeviceStorage::copyTree(source.path(), destination.path(), {},
+                                                    [&](int copied, const QString &name) {
+                                                        QCOMPARE(copied, shown.size() + 1);
+                                                        shown.append(name);
+                                                    });
+        QCOMPARE(result.copied, 3);
+        QCOMPARE(result.skipped, 1);
+        QCOMPARE(result.renamed, 1);
+        QVERIFY(result.failed.isEmpty());
+        QVERIFY(!result.stopped);
+        QVERIFY(shown.contains(u"Snapshots/Jetpac/1.szx"_s));
+        auto read = [&](const QString &name) {
+            QFile file(destination.filePath(name));
+            return file.open(QIODevice::ReadOnly) ? file.readAll() : QByteArray();
+        };
+        QCOMPARE(read(u"Snapshots/Jetpac/1.szx"_s), "ZXST-one");
+        QCOMPARE(QFileInfo(destination.filePath(u"Snapshots/Jetpac/1.szx"_s)).lastModified().toUTC(), saved);
+        QCOMPARE(read(u"Downloaded/j/jet/Jetpac.tap"_s), "tape");
+        QCOMPARE(read(u"clash.sna"_s), "already here!!!!!!!");
+        QCOMPARE(read(u"clash_1.sna"_s), "taken too");
+        QCOMPARE(read(u"clash_2.sna"_s), "from the old folder");
+        QVERIFY(QFileInfo(destination.filePath(u"Empty"_s)).isDir());
+
+        // again: everything is already there
+        const auto again = DeviceStorage::copyTree(source.path(), destination.path());
+        QCOMPARE(again.copied, 0);
+        QCOMPARE(again.skipped, 4); // clash_2.sna is the old clash.sna
+
+        std::stop_source stop;
+        stop.request_stop();
+        QTemporaryDir other;
+        const auto stopped = DeviceStorage::copyTree(source.path(), other.path(), stop.get_token());
+        QVERIFY(stopped.stopped);
+        QCOMPARE(stopped.copied, 0);
+        QVERIFY(!DeviceStorage::copyTree(source.filePath(u"missing"_s), other.path()).failed.isEmpty());
+    }
+    void legacyImport()
+    {
+        QTemporaryDir old;
+        QTemporaryDir data;
+        QVERIFY(old.isValid() && data.isValid());
+        QDir(old.path()).mkpath(u"Snapshots/Game"_s);
+        QFile snapshot(old.filePath(u"Snapshots/Game/1.szx"_s));
+        QVERIFY(snapshot.open(QIODevice::WriteOnly));
+        snapshot.write("ZXST");
+        snapshot.close();
+        QSettings().remove(u"Android"_s);
+        {
+            DeviceStorage storage(data.path());
+            QSignalSpy offered(&storage, &DeviceStorage::offerLegacyImport);
+            QVERIFY(!offered.wait(50)); // nothing to bring over
+            QVERIFY(storage.legacyFolder().isEmpty());
+            QVERIFY(!storage.available()); // desktop: the whole file system is there
+        }
+        QSettings().setValue(u"Android/legacyDataPath"_s, old.path() + u'/');
+        {
+            DeviceStorage storage(data.path());
+            QSignalSpy offered(&storage, &DeviceStorage::offerLegacyImport);
+            QVERIFY(offered.wait(1000));
+            storage.postponeLegacyImport(false);
+        }
+        {
+            DeviceStorage storage(data.path());
+            QSignalSpy offered(&storage, &DeviceStorage::offerLegacyImport);
+            QVERIFY(offered.wait(1000)); // later is the next start
+            QSignalSpy messages(&storage, &DeviceStorage::message);
+            QSignalSpy importing(&storage, &DeviceStorage::importingChanged);
+            storage.importLegacyFolder();
+            QVERIFY(storage.importing());
+            QTRY_VERIFY(!storage.importing());
+            QCOMPARE(storage.importedFiles(), 1);
+            QCOMPARE(importing.size(), 2);
+            QCOMPARE(messages.size(), 1);
+            QVERIFY(storage.importSummary().contains(u"1 file"_s));
+            QVERIFY(QFile::exists(data.filePath(u"Snapshots/Game/1.szx"_s)));
+        }
+        {
+            DeviceStorage storage(data.path());
+            QSignalSpy offered(&storage, &DeviceStorage::offerLegacyImport);
+            QVERIFY(!offered.wait(50)); // done
+            QVERIFY(!storage.legacyFolder().isEmpty()); // Options can still copy them again
+        }
+        QSettings().setValue(u"Android/legacyImport"_s, u"later"_s);
+        {
+            DeviceStorage storage(data.path());
+            QSignalSpy offered(&storage, &DeviceStorage::offerLegacyImport);
+            QVERIFY(offered.wait(1000));
+            storage.postponeLegacyImport(true);
+        }
+        {
+            DeviceStorage storage(data.path());
+            QSignalSpy offered(&storage, &DeviceStorage::offerLegacyImport);
+            QVERIFY(!offered.wait(50)); // never
+        }
+        QSettings().remove(u"Android"_s);
     }
 };
 QTEST_GUILESS_MAIN(FilesFeaturesTest)

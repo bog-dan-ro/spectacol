@@ -20,6 +20,7 @@ values in sync if Theme's palette changes. Shape conveys state as well as colour
 | Assets | Meaning and consumers |
 | --- | --- |
 | `folder.svg`, `floppy.svg` | Folders and disk media in Quick Open's covers/grid, through `SpectrumScreenImageProvider`; the grid also reads the folder SVG directly. |
+| `folder-device.svg` | A device folder (an Android shared-storage folder the user granted) in Quick Open's covers, list and grid; the folder with an accent badge. |
 | `binary.svg` | Data without a screen preview in the tape inspector. |
 | `cassette-wait.svg` | Path whose preview is not yet available. |
 | `cassette-broken.svg` | File cannot be read (cross badge). |

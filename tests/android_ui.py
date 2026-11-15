@@ -185,7 +185,7 @@ def main():
         key(23)
         capture('native-open-files', ['Covers', 'Page actions'])
         key(4)
-        capture('native-back', ['='])
+        capture('native-back', ['Menu'])
 
     def configure(temp, large=False, orientation=None, fill_mode=0):
         shell('am', 'force-stop', package)
@@ -247,7 +247,7 @@ def main():
                     for fill_mode in range(3):
                         configure(temp, large, 2 if portrait else 1, fill_mode)
                         start(f'display-{fill_mode}', [])
-                        tree = capture(f'display-{fill_mode}', ['='])
+                        tree = capture(f'display-{fill_mode}', ['Menu'])
                         image = Image.open(io.BytesIO(screen())).convert('RGB')
                         # The authored snapshot has a white border. It must reach the
                         # usable window's right edge for fit, integer and stretch modes.
@@ -255,13 +255,13 @@ def main():
                         assert min(pixel) >= 160 and max(pixel)-min(pixel) <= 2, \
                             ('ZX image is inset from the right edge', fill_mode, pixel)
                         if not portrait:
-                            control = bounds(next(n for n in tree if label(n) == '='))
+                            control = bounds(next(n for n in tree if label(n) == 'Menu'))
                             assert control[0] == 0, control
                         if fill_mode == 0:
-                            tap('=')
+                            tap('Menu')
                             capture('edge-menu-opened', ['Spectacol', 'Quick Open'])
                             tap('Close menu')
-                            capture('edge-menu-closed', ['='])
+                            capture('edge-menu-closed', ['Menu'])
                     continue
                 if args.native_only:
                     native_check()
@@ -274,9 +274,9 @@ def main():
                 assert any(abs((b[2]-b[0])-width) < 4 and abs((b[3]-b[1])-height) < 4 for b in surfaces), \
                     'Qt surface differs from native display after rotation (see screenshots/XML)'
                 tap('Close menu')
-                tree = capture('drawer-closed', ['='])
+                tree = capture('drawer-closed', ['Menu'])
                 if not portrait:
-                    for text in ['=', 'Sticky CS/SS']:
+                    for text in ['Menu', 'Sticky CS/SS']:
                         control = bounds(next(n for n in tree if label(n) == text))
                         assert control[0] == 0, ('Control rail is inset from window edge', text, control)
                 windows = shell('dumpsys', 'window', 'windows').stdout.decode()
@@ -298,7 +298,7 @@ def main():
                 swipe()
                 capture('gamepad-help')
                 tap('Back')
-                capture('about-closed', ['='])
+                capture('about-closed', ['Menu'])
 
                 start('files', ['F6'])
                 capture('files', ['Page actions', 'Covers'])
@@ -312,7 +312,7 @@ def main():
                 key(4)
                 capture('picker-back', ['Page actions', 'Covers'])
                 tap('Close files')
-                capture('files-closed', ['='])
+                capture('files-closed', ['Menu'])
 
                 start('machines', ['F5']+['Down']*6+['Return', 'Return'])
                 capture('machines', ['Choose a machine', 'Page actions'])
@@ -322,7 +322,7 @@ def main():
                 tap('Back')
                 capture('roms-back', ['Choose a machine'])
                 tap('Back')
-                capture('machines-closed', ['='])
+                capture('machines-closed', ['Menu'])
 
                 start('online', ['F5']+['Down']*3+['Return'])
                 capture('online', ['Search online', 'Search'])
@@ -333,7 +333,7 @@ def main():
                 outside_menu()
                 capture('online-actions-closed', ['Search online'])
                 tap('Back')
-                capture('online-closed', ['='])
+                capture('online-closed', ['Menu'])
                 if args.native_input:
                     native_check()
         print('Android chrome checks passed', flush=True)
