@@ -8,7 +8,7 @@ should also work on the other platforms Qt supports.
 - CMake 3.25 or later and Ninja (or another generator).
 - A C++23 compiler: GCC 14 or later, or Clang 18 or later.
 - Qt 6.11 or later with the Quick, Multimedia and ShaderTools modules (the Qt online installer has them).
-- zlib.
+- zlib, optional: without a zlib package, ZxKit fetches and builds [zlib](https://github.com/madler/zlib).
 - Network access when configuring the first time: CMake's `FetchContent` downloads
   - [qtgamepadlegacy](https://github.com/bog-dan-ro/qtgamepadlegacy) (a pinned revision), the gamepad support;
   - [ZxKit](https://github.com/bog-dan-ro/ZxKit) (a pinned revision), the emulation library, unless Spectacol lives in ZxKit's
@@ -170,6 +170,50 @@ Also launch the package with `QT_QPA_PLATFORM=wayland` in a Wayland session and
 `QT_QPA_PLATFORM=xcb` with an X server. These exercise the real graphics paths;
 the offscreen check does not load Wayland's EGL integration. The target stages
 the Wayland graphics, shell and decoration plugins before dependency deployment.
+
+## Windows
+
+`packaging/windows/build.sh` cross-compiles a portable 64-bit Windows package on Linux, in Docker:
+
+```sh
+packaging/windows/build.sh
+```
+
+The first run builds the `spectacol-windows-build` image from `packaging/windows/Dockerfile`: Debian
+testing's MinGW-w64 (GCC with POSIX threads) and Qt 6.12 (qtbase, qtsvg, qtshadertools, qtdeclarative,
+qtmultimedia), built from source twice: for the tools that run during the build, and for Windows. This
+takes a while; later runs reuse the image. The image tag follows the Dockerfile and the toolchain file, so
+changing them builds a new image (`docker image rm` removes old ones). `--rebuild-image` builds it again
+from scratch, e.g. to pick up Debian updates.
+
+The container builds as the calling user, from the read-only working tree, in `build/windows-x86_64`
+(`--build-dir`), with `--build-type` (`Release` by default) and `--jobs`. Like the CMake build, it uses
+the ZxKit checkout that contains Spectacol, otherwise ZxKit's GitHub `master`; `--zxkit DIR` picks a
+checkout and `--fetch-zxkit` GitHub. ZxKit builds its own zlib, since MinGW has no zlib package.
+
+The result is `build/windows-x86_64/packages/Spectacol-VERSION-windows-x86_64.zip`: unzip it anywhere
+and run `spectacol.exe`. windeployqt only runs on Windows, so `packaging/windows/deploy.py` does its
+job: it adds Qt's platform (Windows and offscreen), image format, icon engine, TLS (Schannel), network
+information and multimedia plugins, the QML modules that `qmlimportscanner` finds in `src/qml`, and
+every DLL these and the application import (Qt, libstdc++, libgcc and winpthreads), found with
+`objdump`. Windows' own DLLs are not packaged. `qt.conf` points Qt at the `plugins` and `qml` folders.
+`licenses` adds Qt's LGPL/GPL texts and the MinGW-w64 notice to the Linux package's licenses.
+
+Qt Multimedia uses its Windows Media Foundation backend; the image has no FFmpeg. `fxc` exists only on
+Windows, so the shaders are packaged as HLSL (the build prints a "Failed to run fxc" message for each)
+and Direct3D compiles them at startup, with the `d3dcompiler_47.dll` of Windows 10 and later.
+
+`spectacol.exe` is a GUI program: Qt sends `qInfo()` and warnings (`--list-machines`, for one) to the
+debugger output, unless `QT_FORCE_STDERR_LOGGING=1` is set and stderr is redirected. The headless
+checks work under Wine, which ignores the Unix `QT_*` variables, so set them in its `cmd`, in the
+unzipped folder:
+
+```sh
+wine cmd /c 'set QT_QPA_PLATFORM=offscreen&& set QT_FORCE_STDERR_LOGGING=1&& spectacol.exe --machine 128k --quit-after 6 --ui-screenshot Z:\tmp\ui.png'
+```
+
+The offscreen platform finds no fonts on Windows, so text in such screenshots shows as boxes; the
+Windows platform uses the system fonts.
 
 ## Software screen filters
 

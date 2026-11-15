@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(Spectacol
-    VERSION 4.8.1.0
+    VERSION 5.0.0.1
     LANGUAGES CXX
 )
 
@@ -62,6 +62,11 @@ add_custom_target(packaging
         packaging/linux/eu.licentia.games.spectacol.desktop
         packaging/linux/eu.licentia.games.spectacol.metainfo.xml
         packaging/linux/eu.licentia.games.spectacol.png
+        packaging/windows/build.sh
+        packaging/windows/deploy.py
+        packaging/windows/Dockerfile
+        packaging/windows/mingw-w64-x86_64.cmake
+        packaging/windows/qt.conf
 
 )
 

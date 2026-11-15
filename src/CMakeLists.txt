@@ -306,17 +306,44 @@ qt_add_resources(spectacol "uart_scripts"
     FILES uart/esp.js uart/pi.js
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(spectacolAppId "eu.licentia.games.spectacol")
-    set_target_properties(spectacol PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+if(WIN32)
+    set_target_properties(spectacol PROPERTIES
+        WIN32_EXECUTABLE TRUE
+        # Qt generates the version and icon resource from these
+        QT_TARGET_VERSION "${PROJECT_VERSION}"
+        QT_TARGET_PRODUCT_NAME "Spectacol"
+        QT_TARGET_DESCRIPTION "Spectacol ZX Spectrum emulator"
+        QT_TARGET_COMPANY_NAME "Licentia"
+        QT_TARGET_COPYRIGHT "Copyright (c) 2015-2026, BogDan Vatra"
+        QT_TARGET_RC_ICONS "${PROJECT_SOURCE_DIR}/packaging/windows/spectacol.ico"
+    )
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR WIN32)
+    if(WIN32)
+        # A portable folder: the libraries beside spectacol.exe, qt.conf points
+        # Qt at plugins/ and qml/. packaging/windows/build.sh adds Qt itself.
+        set(runtimeBinDir .)
+        set(runtimeLibDir .)
+        set(licenseDir licenses)
+        install(FILES "${PROJECT_SOURCE_DIR}/packaging/windows/qt.conf"
+            DESTINATION . COMPONENT Runtime
+        )
+    else()
+        set_target_properties(spectacol PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+        set(runtimeBinDir ${CMAKE_INSTALL_BINDIR})
+        set(runtimeLibDir ${CMAKE_INSTALL_LIBDIR})
+        set(licenseDir ${CMAKE_INSTALL_DATADIR}/licenses/spectacol)
+    endif()
     install(TARGETS spectacol
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
+        RUNTIME DESTINATION ${runtimeBinDir} COMPONENT Runtime
     )
 
     # FetchContent's Qt module also has SDK install rules. The Runtime component
     # selects only the libraries, QML module and controller backends we ship.
     install(TARGETS GamepadLegacy GamepadLegacyQuickPrivate zxkit zxkit_video_filters
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+        RUNTIME DESTINATION ${runtimeBinDir} COMPONENT Runtime
+        LIBRARY DESTINATION ${runtimeLibDir} COMPONENT Runtime
     )
     install(TARGETS GamepadLegacyQuickPrivateplugin
         LIBRARY DESTINATION qml/QtGamepadLegacy COMPONENT Runtime
@@ -326,7 +353,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         DESTINATION qml/QtGamepadLegacy COMPONENT Runtime
     )
     set(gamepadBackends "")
-    foreach(backend IN ITEMS QEvdevGamepadBackendPlugin QSdl2GamepadBackendPlugin)
+    foreach(backend IN ITEMS
+            QEvdevGamepadBackendPlugin QSdl2GamepadBackendPlugin QXInputGamepadBackendPlugin)
         if(TARGET ${backend})
             install(TARGETS ${backend}
                 LIBRARY DESTINATION plugins/legacygamepads COMPONENT Runtime
@@ -335,6 +363,34 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         endif()
     endforeach()
 
+    install(FILES roms/README.copyright
+        DESTINATION ${licenseDir}
+        RENAME ROMs.txt COMPONENT Runtime
+    )
+    get_target_property(zxkitSourceDir ZX::Kit SOURCE_DIR)
+    install(FILES "${zxkitSourceDir}/LICENSE"
+        DESTINATION ${licenseDir}
+        RENAME COPYING COMPONENT Runtime
+    )
+    install(FILES "${qtgamepad_SOURCE_DIR}/LICENSE.LGPLv3"
+        DESTINATION ${licenseDir}
+        RENAME QtGamepadLegacy.LGPLv3 COMPONENT Runtime
+    )
+    install(FILES "${zxkitSourceDir}/src/video/filters/README.md"
+        DESTINATION ${licenseDir}
+        RENAME VideoFilters.md COMPONENT Runtime
+    )
+    install(FILES "${zxkitSourceDir}/src/video/filters/xbrz/License.txt"
+        DESTINATION ${licenseDir}
+        RENAME xBRZ.txt COMPONENT Runtime
+    )
+    install(FILES "${zxkitSourceDir}/LICENSES/ayumi.txt"
+        DESTINATION ${licenseDir} COMPONENT Runtime
+    )
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(spectacolAppId "eu.licentia.games.spectacol")
     install(FILES "${PROJECT_SOURCE_DIR}/packaging/linux/${spectacolAppId}.desktop"
         DESTINATION ${CMAKE_INSTALL_DATADIR}/applications COMPONENT Runtime
     )
@@ -348,31 +404,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     install(FILES "${PROJECT_SOURCE_DIR}/packaging/linux/${spectacolAppId}.png"
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/128x128/apps COMPONENT Runtime
     )
-    install(FILES roms/README.copyright
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
-        RENAME ROMs.txt COMPONENT Runtime
-    )
-    get_target_property(zxkitSourceDir ZX::Kit SOURCE_DIR)
-    install(FILES "${zxkitSourceDir}/LICENSE"
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
-        RENAME COPYING COMPONENT Runtime
-    )
-    install(FILES "${qtgamepad_SOURCE_DIR}/LICENSE.LGPLv3"
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
-        RENAME QtGamepadLegacy.LGPLv3 COMPONENT Runtime
-    )
-    install(FILES "${zxkitSourceDir}/src/video/filters/README.md"
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
-        RENAME VideoFilters.md COMPONENT Runtime
-    )
-    install(FILES "${zxkitSourceDir}/src/video/filters/xbrz/License.txt"
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol
-        RENAME xBRZ.txt COMPONENT Runtime
-    )
-    install(FILES "${zxkitSourceDir}/LICENSES/ayumi.txt"
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/spectacol COMPONENT Runtime
-    )
-
     # The appImage target installs the Runtime component into a fresh AppDir and
     # packages it with linuxdeploy and its Qt plugin.
     find_program(SPECTACOL_LINUXDEPLOY
