@@ -21,6 +21,7 @@
 #include <rhi/qrhi.h>
 
 #include <algorithm>
+#include <iterator>
 #include <span>
 #include <utility>
 
@@ -93,6 +94,8 @@ bool ZxImage::updateImage(const zxkit::VideoFrame &pixels, bool &changed)
     }
     int top = size.height();
     int bottom = -1;
+    int leftmost = size.width();
+    int rightmost = -1;
     for (int y = 0; y < size.height(); ++y) {
         const auto row =
                 pixels.scanline(sourceY + uint32_t(y)).subspan(sourceX, uint32_t(size.width()));
@@ -100,17 +103,28 @@ bool ZxImage::updateImage(const zxkit::VideoFrame &pixels, bool &changed)
                 reinterpret_cast<const uint32_t *>(m_frameImage.constScanLine(y)), row.size());
         if (!resized && std::ranges::equal(row, current))
             continue;
-        std::ranges::copy(row, reinterpret_cast<uint32_t *>(m_frameImage.scanLine(y)));
+        const auto first = resized ? row.begin() : std::ranges::mismatch(row, current).in1;
+        const auto last = resized
+                ? row.end()
+                : std::mismatch(row.rbegin(), std::make_reverse_iterator(first), current.rbegin())
+                          .first.base();
+        const int left = int(first - row.begin());
+        const int right = int(last - row.begin());
+        std::copy(first, last, reinterpret_cast<uint32_t *>(m_frameImage.scanLine(y)) + left);
+        leftmost = std::min(leftmost, left);
+        rightmost = std::max(rightmost, right - 1);
         top = std::min(top, y);
         bottom = y;
     }
     if (scaleChanged) {
         top = 0;
         bottom = size.height() - 1;
+        leftmost = 0;
+        rightmost = size.width() - 1;
     }
     changed = bottom >= 0;
     if (changed)
-        m_frameDirty |= QRect(0, top, size.width(), bottom - top + 1);
+        m_frameDirty |= QRect(leftmost, top, rightmost - leftmost + 1, bottom - top + 1);
     return resized;
 }
 

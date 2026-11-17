@@ -254,16 +254,12 @@ void ZxScreen::applySoftwareFilter(QImage &image, QRect &dirty, QSize pixelScale
                     target[std::size_t(x)] = source[std::size_t(x * scale.width())];
             }
             const auto &output = m_filterPipeline.apply(m_filterSource);
-            // Own the QImage pixels: queued texture uploads may retain them past
-            // the next pipeline.apply(), which reuses its buffers.
-            m_filteredImage =
-                    QImage(reinterpret_cast<const uchar *>(output.pixels().data()),
-                           int(output.width()), int(output.height()),
-                           qsizetype(output.width()) * sizeof(uint32_t), QImage::Format_RGBA8888)
-                            .copy();
-            if (m_filteredImage.isNull())
-                throw std::bad_alloc();
-            dirty = m_filteredImage.rect(); // Neighborhood filters also change adjacent rows.
+            const auto updated = m_filterPipeline.updatedRect();
+            const QRect filteredDirty(int(updated.x), int(updated.y), int(updated.width),
+                                      int(updated.height));
+            // Own these pixels: queued uploads may retain the previous image.
+            // Reuse storage and copy/upload only the updated filter output.
+            dirty = copyFilterOutput(output, m_filteredImage, filteredDirty);
         }
         image = m_filteredImage;
     } catch (const std::exception &error) {

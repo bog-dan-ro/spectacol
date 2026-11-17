@@ -18,9 +18,16 @@
 #pragma once
 
 #include <QImage>
+#include <QRect>
 #include <QSize>
+
+#include <zxkit/video/VideoFrame.h>
 
 // Collapse only exact copies within the frame's presentation grid. A genuine
 // high-resolution pixel prevents horizontal collapse, while doubled rows can
 // still be removed independently. Input pixels must be 32-bit RGBA.
 QSize filterInputPixelScale(const QImage &image, QSize maximumScale);
+
+// Own the filtered pixels for queued uploads, reusing an unshared allocation.
+// Resizing initializes the complete image; otherwise copies only dirty pixels.
+QRect copyFilterOutput(const zxkit::VideoFrame &source, QImage &image, QRect dirty);

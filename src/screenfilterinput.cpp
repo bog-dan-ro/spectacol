@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
+#include <new>
 
 QSize filterInputPixelScale(const QImage &image, QSize maximumScale)
 {
@@ -53,4 +54,27 @@ QSize filterInputPixelScale(const QImage &image, QSize maximumScale)
             scale.setWidth(horizontal);
     }
     return scale;
+}
+
+QRect copyFilterOutput(const zxkit::VideoFrame &source, QImage &image, QRect dirty)
+{
+    const QSize size(int(source.width()), int(source.height()));
+    if (image.size() != size || image.format() != QImage::Format_RGBA8888) {
+        image = QImage(size, QImage::Format_RGBA8888);
+        if (image.isNull())
+            throw std::bad_alloc();
+        dirty = image.rect();
+    }
+    dirty &= image.rect();
+    if (dirty.isEmpty())
+        return dirty;
+    // bits() detaches if a previous upload still retains the QImage.
+    auto *destination = image.bits();
+    for (int y = dirty.top(); y <= dirty.bottom(); ++y) {
+        const auto row = source.scanline(uint32_t(y));
+        std::copy(row.begin() + dirty.left(), row.begin() + dirty.right() + 1,
+                  reinterpret_cast<uint32_t *>(destination + y * image.bytesPerLine())
+                          + dirty.left());
+    }
+    return dirty;
 }
