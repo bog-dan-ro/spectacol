@@ -32,7 +32,42 @@ The command line:
 ```sh
 ./build/bin/spectacol [--machine ID] [file]   # e.g. --machine 128k game.tzx
 ./build/bin/spectacol --list-machines
+./build/bin/spectacol --rebenchmark-graphics
 ```
+
+On platforms other than Android, the first graphical launch benchmarks the graphics APIs compiled
+into Qt: Vulkan/OpenGL on Linux, D3D11/D3D12 on Windows, Metal/OpenGL on Apple platforms.
+Unsupported APIs are recorded as failures. The test uses Qt Quick offscreen rendering, Next-sized
+texture uploads through Spectacol's screen texture, and GPU completion; it validates changing pixels
+before timing, excludes warmup, and measures frames for 600 ms per API without vsync.
+These timings compare rendering paths; they do not diagnose emulation, audio or presentation stalls.
+
+The fastest API and all measurements are saved under `GraphicsBenchmark` in the application's
+`QSettings`. Subsequent launches reuse them. Qt/OS/kernel, window-system or screen-resolution changes
+invalidate the cache. Use `--rebenchmark-graphics` after a graphics driver or GPU change, or to retry
+an interrupted test. An API is marked before testing, so if its driver crashes or needs force-closing,
+the next launch skips it and continues with the others. A native driver call that hangs cannot be
+cancelled in-process; relaunch the application to continue with the next API.
+
+Android never runs rendering benchmarks or restarts automatically. **Options → General → Graphics
+API** directly selects OpenGL (the default) or Vulkan, effective on the next launch. Only the chosen
+Vulkan device's native initialization is checked, without creating QML or rendering any frames;
+initialization failure selects and saves OpenGL. A Vulkan launch interrupted before its first rendered
+frame also recovers to OpenGL on the next launch. Existing benchmark results and the
+`--rebenchmark-graphics` option are ignored on Android, and the benchmark/retest row is hidden.
+
+On other platforms, **Options → General → Graphics API** shows the current API and allows Automatic (the default) or a
+manual choice from the platform's APIs. Manual selection bypasses the benchmark and takes effect
+after relaunching. The adjacent **Graphics benchmark** row shows saved FPS and schedules a retest
+on the next launch, restoring Automatic mode. `--rebenchmark-graphics` also restores Automatic and
+can recover from a manual choice that fails to initialize. Environment overrides take precedence
+over both modes. Manual mode is intended for diagnostics and may select an unsupported API.
+
+If every API fails or takes more than 50 ms per frame (below 20 FPS), startup shows a raster-rendered
+error window with the results, without starting the emulator UI. Touch, mouse, keyboard Back/Escape/
+Enter, and gamepad accept/back close it. Explicit `QSG_RHI_BACKEND`, `QT_QUICK_BACKEND` and
+`QMLSCENE_DEVICE` overrides bypass auto-selection and leave its cache intact. The `offscreen` and
+`minimal` platforms use software rendering and leave the GPU benchmark cache intact as well.
 
 Headless runs (for checks and screenshots) use Qt's offscreen platform. Use throwaway settings and data
 directories, so your own settings stay untouched:

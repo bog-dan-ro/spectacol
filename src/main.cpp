@@ -18,6 +18,7 @@
 #include "zxemulator.h"
 #include "zxsettings.h"
 #include "spectrumscreen.h"
+#include "graphicsbackend.h"
 
 #include <QCommandLineParser>
 
@@ -67,6 +68,8 @@ int main(int argc, char *argv[])
             u"machine"_s, u"Start with machine <id> (see --list-machines)."_s, u"id"_s);
     const QCommandLineOption listMachinesOption(u"list-machines"_s,
                                                 u"Print the machine ids and exit."_s);
+    const QCommandLineOption rebenchmarkGraphicsOption(
+            u"rebenchmark-graphics"_s, u"Rerun the graphics API benchmark and save the results."_s);
     const QCommandLineOption quitAfterOption(u"quit-after"_s, u"Quit after <seconds>."_s,
                                              u"seconds"_s);
     const QCommandLineOption screenshotOption(
@@ -82,6 +85,7 @@ int main(int argc, char *argv[])
             u"WxH"_s);
     parser.addOption(machineOption);
     parser.addOption(listMachinesOption);
+    parser.addOption(rebenchmarkGraphicsOption);
     parser.addOption(quitAfterOption);
     parser.addOption(screenshotOption);
     parser.addOption(uiScreenshotOption);
@@ -106,13 +110,22 @@ int main(int argc, char *argv[])
                               << "(see --list-machines)";
         return 1;
     }
-
-    QQmlApplicationEngine engine;
 #if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID)
     QDir appPath{ QCoreApplication::applicationDirPath() };
     appPath.cdUp();
     QCoreApplication::addLibraryPath(appPath.absoluteFilePath(u"lib"_s));
     QCoreApplication::addLibraryPath(appPath.absoluteFilePath(u"plugins"_s));
+#endif
+    const auto graphics = GraphicsBackend::configure(parser.isSet(rebenchmarkGraphicsOption));
+    if (!graphics.error.isEmpty()) {
+#ifdef Q_OS_ANDROID
+        QNativeInterface::QAndroidApplication::hideSplashScreen();
+#endif
+        return GraphicsBackend::showError(graphics.error);
+    }
+
+    QQmlApplicationEngine engine;
+#if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID)
     engine.addImportPath(appPath.absoluteFilePath(u"qml"_s));
 #endif
 
@@ -131,9 +144,20 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_ANDROID
     // Apply the saved orientation after the Qt window exists, so its surface
     // receives the same resize as the Android activity at startup.
-    if (window()) {
+    if (auto *mainWindow = window()) {
+        // Keep the native splash through startup until a real UI frame exists.
+        QObject::connect(
+                mainWindow, &QQuickWindow::frameSwapped, &app,
+                [] {
+                    GraphicsBackend::confirmStartup();
+                    QNativeInterface::QAndroidApplication::hideSplashScreen(150);
+                },
+                Qt::ConnectionType(Qt::QueuedConnection | Qt::SingleShotConnection));
         auto *settings = ZxEmulator::instance().settings();
         settings->setScreenOrientation(settings->screenOrientation());
+    } else {
+        QNativeInterface::QAndroidApplication::hideSplashScreen();
+        return 1;
     }
 #endif
 
@@ -456,7 +480,6 @@ int main(int argc, char *argv[])
     }
 #ifdef Q_OS_ANDROID
     AndroidIntegration::install(&app);
-    QNativeInterface::QAndroidApplication::hideSplashScreen();
 #endif
     return app.exec();
 }

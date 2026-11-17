@@ -101,6 +101,27 @@ Sheet {
 
         SectionTitle { text: qsTr("Interface") }
         SettingRow {
+            objectName: "graphicsApi"
+            label: qsTr("Graphics API")
+            description: qsTr("In use: %1. Changes take effect when Spectacol is relaunched.").arg(GraphicsSettings.activeApi)
+            kind: "choice"
+            model: GraphicsSettings.choices
+            currentIndex: GraphicsSettings.selectedIndex
+            choiceMaximumWidth: Theme.sp(28)
+            onActivated: (index) => GraphicsSettings.selectedIndex = index
+        }
+        SettingRow {
+            objectName: "graphicsBenchmark"
+            visible: GraphicsSettings.benchmarkAvailable
+            label: qsTr("Graphics benchmark")
+            description: GraphicsSettings.measurements + "\n"
+                         + (GraphicsSettings.restartRequired ? qsTr("Relaunch Spectacol to apply graphics changes.")
+                                                             : qsTr("Retest all APIs and select the fastest on the next launch."))
+            kind: "action"
+            actionText: GraphicsSettings.retestPending ? qsTr("Queued") : qsTr("Retest")
+            onClicked: GraphicsSettings.retest()
+        }
+        SettingRow {
             label: qsTr("Layout")
             description: qsTr("Desktop: a menu bar and docked panels. Overlay: for gamepads, touch and TVs")
             kind: "choice"

@@ -1,3 +1,16 @@
+qt_add_executable(test_graphics_backend
+    test_graphics_backend.cpp
+    ../src/graphicsbackend.cpp ../src/graphicsbackend.h
+    ../src/graphicssettings.cpp ../src/graphicssettings.h
+    ../src/zximage.cpp ../src/zximage.h
+)
+target_include_directories(test_graphics_backend PRIVATE ../src)
+target_link_libraries(test_graphics_backend PRIVATE
+    Qt6::Test Qt6::Quick Qt6::GuiPrivate Qt::GamepadLegacy ZX::Kit
+)
+add_test(NAME graphics_backend COMMAND test_graphics_backend)
+set_tests_properties(graphics_backend PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 15)
+
 qt_add_executable(test_online
     test_online.cpp
     ../src/zxgamesmodel.cpp ../src/zxgamesmodel.h

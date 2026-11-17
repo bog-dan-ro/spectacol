@@ -187,6 +187,8 @@ qt_add_qml_module(spectacol
         filemanagerpanel.cpp filemanagerpanel.h
         fileviewdocument.cpp fileviewdocument.h
         folderlistmodel.cpp folderlistmodel.h
+        graphicsbackend.cpp graphicsbackend.h
+        graphicssettings.cpp graphicssettings.h
         nextsdcard.h nextsdcard.cpp
         nextuarthooks.cpp nextuarthooks.h
         pokefindermodel.cpp pokefindermodel.h
@@ -250,6 +252,7 @@ qt_add_qml_module(spectacol
         qml/Joysticks.qml
         qml/MachineTypePage.qml
         qml/Main.qml
+        qml/GraphicsBenchmark.qml
         qml/MenuView.qml
         qml/MessagePage.qml
         qml/NextSdCardPage.qml
