@@ -126,6 +126,30 @@ private slots:
         input.clear();
         QVERIFY(input.state().keys.isEmpty());
     }
+    void axisDirectionChanges()
+    {
+        ControllerInput input;
+        QVERIFY(!input.axis(ControllerInput::TouchX, 0.2));
+        QVERIFY(input.axis(ControllerInput::TouchX, 0.4));
+        QCOMPARE(input.state().joystick, ControllerInput::RightBit);
+        QVERIFY(!input.axis(ControllerInput::TouchX, 0.8));
+        QVERIFY(!input.axis(ControllerInput::TouchX, 2.0));
+        QVERIFY(input.axis(ControllerInput::TouchX, -0.4));
+        QCOMPARE(input.state().joystick, ControllerInput::LeftBit);
+        QVERIFY(!input.axis(ControllerInput::TouchX, -1.0));
+        QVERIFY(input.axis(ControllerInput::TouchX, std::numeric_limits<double>::quiet_NaN()));
+        QCOMPARE(input.state().joystick, 0);
+        QVERIFY(!input.axis(ControllerInput::TouchX, 0));
+
+        input.axis(ControllerInput::LeftY, -1);
+        QVERIFY(input.axis(ControllerInput::TouchY, -1));
+        QVERIFY(!input.axis(ControllerInput::TouchY, -0.7));
+        QVERIFY(input.axis(ControllerInput::TouchY, 0));
+        QCOMPARE(input.state().joystick, ControllerInput::UpBit);
+        input.configure(ControllerInput::Joystick, ControllerInput::qaopKeys, 0);
+        QVERIFY(!input.axis(ControllerInput::TouchX, 0));
+        QVERIFY(input.axis(ControllerInput::TouchX, 0.001));
+    }
     void deadZone()
     {
         ControllerInput input;

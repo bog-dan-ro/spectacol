@@ -2076,14 +2076,12 @@ void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double valu
     const bool resumed = fresh && m_recording->resumeOnGameplayInput();
     if ((m_pauseCount || m_paused || !m_processInputEvents) && !resumed) {
         // A release can arrive before the queued transport resume.
-        if (!active) {
-            m_controller.axis(target, 0);
+        if (!active && m_controller.axis(target, 0))
             applyControllerState();
-        }
         return;
     }
-    m_controller.axis(target, value);
-    applyControllerState();
+    if (m_controller.axis(target, value))
+        applyControllerState();
 }
 
 void ZxEmulator::gamepadButtonPressEvent(QGamepadManager::GamepadButton button, bool touch)

@@ -5,6 +5,10 @@ target_compile_definitions(spectacol PRIVATE SPECTACOL_VERSION="${PROJECT_VERSIO
 if(ANDROID)
     target_sources(spectacol PRIVATE androidintegration.cpp androidintegration.h)
 
+    # Qt defaults Android Release/Profile builds to -Oz. Frame handoff,
+    # filtering and audio callbacks also need speed optimization in the host.
+    target_compile_options(spectacol PRIVATE $<$<CONFIG:Release,RelWithDebInfo>:-O2>)
+
     # Each ABI is a separate APK with its own version code, so the store can offer all of them
     # side by side. The scheme Spectacol has used since 2019 is
     # <Platform><Bits><Major><Minor><Patch><Tweak>, with one digit for each version component:

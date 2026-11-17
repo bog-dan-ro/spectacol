@@ -48,7 +48,8 @@ public:
 
     static bool isSpectrumKey(int key);
     void configure(int mode, const std::array<int, DirectionCount> &keys, double deadZone);
-    void axis(Axis axis, double value);
+    // Returns whether this source's digital direction changed.
+    bool axis(Axis axis, double value);
     void press(int id, int action, quint8 direction = 0);
     std::optional<int> release(int id);
     void clear();
@@ -57,6 +58,8 @@ public:
     State state() const;
 
 private:
+    quint8 axisButtons(Axis axis, double value) const;
+
     struct Button
     {
         int action;

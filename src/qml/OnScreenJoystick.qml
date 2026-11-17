@@ -24,12 +24,34 @@ import "private"
 Item {
     id: touchJoystick
     enabled: visible
-    function releaseDirections() {
-        returnAnimation.stop();
-        thumb.anchors.horizontalCenterOffset = 0;
-        thumb.anchors.verticalCenterOffset = 0;
+    function releaseDirections(animateReturn = false) {
         ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftX, 0, true);
         ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftY, 0, true);
+        if (animateReturn) {
+            returnAnimation.restart();
+        } else {
+            returnAnimation.stop();
+            thumb.anchors.horizontalCenterOffset = 0;
+            thumb.anchors.verticalCenterOffset = 0;
+        }
+    }
+    function updatePosition(point) {
+        returnAnimation.stop();
+        const radius = touch.width * 0.5;
+        if (radius <= 0) {
+            releaseDirections();
+            return;
+        }
+        const dx = point.x - radius;
+        const dy = point.y - touch.height * 0.5;
+        const distanceSquared = dx * dx + dy * dy;
+        const scale = distanceSquared > radius * radius ? radius / Math.sqrt(distanceSquared) : 1;
+        const offsetX = dx * scale;
+        const offsetY = dy * scale;
+        thumb.anchors.horizontalCenterOffset = offsetX;
+        thumb.anchors.verticalCenterOffset = offsetY;
+        ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftX, offsetX / radius, true);
+        ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftY, offsetY / radius, true);
     }
     function releaseInputs() {
         releaseDirections();
@@ -66,25 +88,11 @@ Item {
             onCanceled: touchJoystick.releaseDirections()
             id: touch
             anchors.fill: parent
-            touchPoints: TouchPoint {
-                property int mcx : x - touch.width * 0.5
-                property int mcy : y - touch.height * 0.5
-                property bool fingerOutOfBounds : fingerDistance2 < distanceBound2
-                property real fingerDistance2 : mcx * mcx + mcy * mcy
-                property real distanceBound : touch.width * 0.5
-                property real distanceBound2 : distanceBound * distanceBound
-                onPressedChanged: pressed ? returnAnimation.stop() : returnAnimation.restart()
-                onAreaChanged: {
-                    if (fingerOutOfBounds) {
-                        thumb.anchors.horizontalCenterOffset = mcx
-                        thumb.anchors.verticalCenterOffset = mcy
-                    } else {
-                        const angle = Math.atan2(mcy, mcx)
-                        thumb.anchors.horizontalCenterOffset = Math.cos(angle) * distanceBound
-                        thumb.anchors.verticalCenterOffset = Math.sin(angle) * distanceBound
-                    }
-                }
-            }
+            maximumTouchPoints: 1
+            touchPoints: TouchPoint {}
+            onPressed: points => touchJoystick.updatePosition(points[0])
+            onUpdated: points => touchJoystick.updatePosition(points[0])
+            onReleased: touchJoystick.releaseDirections(true)
         }
 
         Rectangle {
@@ -95,8 +103,6 @@ Item {
             radius: width / 2
             anchors {
                 centerIn: parent
-                onHorizontalCenterOffsetChanged: ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftX, anchors.horizontalCenterOffset / parent.radius, true)
-                onVerticalCenterOffsetChanged: ZxEmulator.gamepadAxisEvent(GamepadManager.AxisLeftY, anchors.verticalCenterOffset / parent.radius, true)
             }
         }
     }

@@ -39,10 +39,24 @@ void ControllerInput::configure(int mode, const std::array<int, DirectionCount> 
     m_deadZone = std::isfinite(deadZone) ? std::clamp(deadZone, 0.0, 1.0) : 0.4;
 }
 
-void ControllerInput::axis(Axis axis, double value)
+quint8 ControllerInput::axisButtons(Axis axis, double value) const
 {
-    if (axis >= LeftX && axis < AxisCount)
-        m_axes[axis] = std::isfinite(value) ? std::clamp(value, -1.0, 1.0) : 0.0;
+    const bool horizontal = axis % 2 == 0;
+    if (value < 0 && value <= -m_deadZone)
+        return horizontal ? LeftBit : UpBit;
+    if (value > 0 && value >= m_deadZone)
+        return horizontal ? RightBit : DownBit;
+    return 0;
+}
+
+bool ControllerInput::axis(Axis axis, double value)
+{
+    if (axis < LeftX || axis >= AxisCount)
+        return false;
+    value = std::isfinite(value) ? std::clamp(value, -1.0, 1.0) : 0.0;
+    const bool changed = axisButtons(axis, m_axes[axis]) != axisButtons(axis, value);
+    m_axes[axis] = value;
+    return changed;
 }
 
 void ControllerInput::press(int id, int action, quint8 direction)
@@ -82,13 +96,8 @@ void ControllerInput::clearTouch()
 ControllerInput::State ControllerInput::state() const
 {
     quint8 buttons = 0;
-    for (int i = 0; i < AxisCount; ++i) {
-        const bool horizontal = i % 2 == 0;
-        if (m_axes[i] < 0 && m_axes[i] <= -m_deadZone)
-            buttons |= horizontal ? LeftBit : UpBit;
-        else if (m_axes[i] > 0 && m_axes[i] >= m_deadZone)
-            buttons |= horizontal ? RightBit : DownBit;
-    }
+    for (int i = 0; i < AxisCount; ++i)
+        buttons |= axisButtons(static_cast<Axis>(i), m_axes[i]);
     State state;
     for (const auto &button : m_buttons) {
         state.actions.insert(button.action);
