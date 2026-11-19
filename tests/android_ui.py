@@ -36,7 +36,8 @@ def main():
     parser.add_argument('--rotation-only', action='store_true',
                         help='Only check default/saved orientation and live Options → Screen changes')
     parser.add_argument('--display-only', action='store_true',
-                        help='Check fullscreen, right-aligned video in every scaling mode and the window-edge menu button')
+                        help='Check fullscreen, right-aligned video in every scaling mode and the safe-area menu button')
+    parser.add_argument('--cutout', action='store_true', help='Emulate a camera cutout during the checks')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -61,6 +62,8 @@ def main():
     saved = private('cat', settings, check=False)
     display = {k: shell('wm', k).stdout.decode() for k in ('size', 'density')}
     rotation = shell('wm', 'get-ignore-orientation-request').stdout.decode()
+    cutout_overlay = 'com.android.internal.display.cutout.emulation.hole'
+    cutout_was_enabled = '[x] ' + cutout_overlay in shell('cmd', 'overlay', 'list').stdout.decode()
     scenario = ''
     seq = 0
 
@@ -150,6 +153,18 @@ def main():
         print(f'{scenario}: {name}', flush=True)
         return tree
 
+    def check_control_insets(tree):
+        displays = shell('dumpsys', 'window', 'displays').stdout.decode()
+        (output / f'{scenario}-window-insets.txt').write_text(displays)
+        insets = re.search(r'mDisplayCutout=DisplayCutout\{insets=Rect\((\d+), (\d+) - (\d+), (\d+)\)', displays)
+        left = int(insets[1]) if insets else 0
+        if args.cutout and not scenario.endswith('portrait'):
+            assert left > 0, 'The emulated camera cutout has no left inset'
+        for text in ['Menu', 'Sticky CS/SS']:
+            control = bounds(next(n for n in tree if label(n) == text))
+            assert control[0] >= left, ('Control rail overlaps the camera cutout', text, control, left)
+        return left
+
     def start(name, keys):
         shell('am', 'force-stop', package)
         words = ['--machine', '48k', '--quit-after', '90']
@@ -170,6 +185,7 @@ def main():
 
     def native_check():
         start('native-input', [])
+        check_control_insets(capture('native-controls', ['Menu', 'Sticky CS/SS']))
         key(82)
         capture('native-menu', ['Spectacol', 'Quick Open'])
         # Android may consume the first D-pad event when leaving touch mode.
@@ -191,7 +207,7 @@ def main():
         shell('am', 'force-stop', package)
         config = temp/'Spectacol.conf'
         config.write_text(f'[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath={data}\n'
-                          f'[Peripherals]\njoystickPrompt=false\n[Ui]\nmode=0\nlarge={str(large).lower()}\n'
+                          f'[Android]\nlegacyImport=never\n[Peripherals]\njoystickPrompt=false\n[Ui]\nmode=0\nlarge={str(large).lower()}\n'
                           + ('' if orientation is None else f'[Screen]\nleftMargin=true\norientation={orientation}\nfillMode={fill_mode}\n'))
         adb('push', str(config), staging)
         private('cp', staging, settings)
@@ -237,6 +253,8 @@ def main():
             shell('wm', 'size', '1080x2400')
             shell('wm', 'density', '480')
             shell('wm', 'set-ignore-orientation-request', 'false')
+            if args.cutout:
+                shell('cmd', 'overlay', 'enable', '--user', '0', cutout_overlay)
             if args.rotation_only:
                 rotation_check(temp)
             for scenario in ([] if args.rotation_only else args.case or ['landscape']):
@@ -255,8 +273,7 @@ def main():
                         assert min(pixel) >= 160 and max(pixel)-min(pixel) <= 2, \
                             ('ZX image is inset from the right edge', fill_mode, pixel)
                         if not portrait:
-                            control = bounds(next(n for n in tree if label(n) == 'Menu'))
-                            assert control[0] == 0, control
+                            check_control_insets(tree)
                         if fill_mode == 0:
                             tap('Menu')
                             capture('edge-menu-opened', ['Spectacol', 'Quick Open'])
@@ -276,9 +293,7 @@ def main():
                 tap('Close menu')
                 tree = capture('drawer-closed', ['Menu'])
                 if not portrait:
-                    for text in ['Menu', 'Sticky CS/SS']:
-                        control = bounds(next(n for n in tree if label(n) == text))
-                        assert control[0] == 0, ('Control rail is inset from window edge', text, control)
+                    check_control_insets(tree)
                 windows = shell('dumpsys', 'window', 'windows').stdout.decode()
                 (output/f'{scenario}-windows.txt').write_text(windows)
                 status = re.search(r'Window #[^\n]* u0 StatusBar\}:.*?(?=\n  Window #|\Z)', windows, re.S)
@@ -350,6 +365,8 @@ def main():
         private('rm', '-rf', data, check=False)
         shell('rm', '-f', staging, '/sdcard/'+token+'.xml', check=False)
         shell('wm', 'set-ignore-orientation-request', 'true' if 'true' in rotation.lower() else 'false', check=False)
+        if args.cutout and not cutout_was_enabled:
+            shell('cmd', 'overlay', 'disable', '--user', '0', cutout_overlay, check=False)
         for kind, original in display.items():
             override = re.search(r'Override (?:size|density): (\S+)', original)
             shell('wm', kind, override.group(1) if override else 'reset', check=False)

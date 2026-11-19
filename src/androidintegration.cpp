@@ -22,6 +22,7 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
+#include <QJniArray>
 #include <QJniEnvironment>
 #include <QJniObject>
 #include <QMetaObject>
@@ -198,6 +199,64 @@ bool openDocument(const QUrl &url, QFile &file)
     // Qt's own content engine handles the providers it knows
     file.setFileName(url.toString());
     return file.open(QIODevice::ReadOnly);
+}
+
+std::vector<Document> listFolder(const QString &folder)
+{
+    const auto uri = parseUri(ContentUri::canonical(folder));
+    const auto parentId = QJniObject::callStaticObjectMethod(
+            "android/provider/DocumentsContract", "getDocumentId",
+            "(Landroid/net/Uri;)Ljava/lang/String;", uri.object());
+    const auto children = QJniObject::callStaticObjectMethod(
+            "android/provider/DocumentsContract", "buildChildDocumentsUriUsingTree",
+            "(Landroid/net/Uri;Ljava/lang/String;)Landroid/net/Uri;", uri.object(),
+            parentId.object<jstring>());
+    const auto columns = QJniArray<jstring>::fromContainer(QStringList{
+            u"document_id"_s, u"_display_name"_s, u"mime_type"_s, u"last_modified"_s });
+    const auto cursor = contentResolver().callObjectMethod(
+            "query",
+            "(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/"
+            "String;)Landroid/database/Cursor;",
+            children.object(), columns.object<jobjectArray>(), nullptr, nullptr, nullptr);
+    QJniEnvironment env;
+    if (env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose) || !cursor.isValid())
+        return {};
+
+    std::vector<Document> documents;
+    const auto column = [&](const QString &name) {
+        return cursor.callMethod<jint>("getColumnIndex", "(Ljava/lang/String;)I",
+                                       QJniObject::fromString(name).object<jstring>());
+    };
+    const auto idColumn = column(u"document_id"_s);
+    const auto nameColumn = column(u"_display_name"_s);
+    const auto typeColumn = column(u"mime_type"_s);
+    const auto modifiedColumn = column(u"last_modified"_s);
+    if (idColumn >= 0 && nameColumn >= 0 && typeColumn >= 0) {
+        while (cursor.callMethod<jboolean>("moveToNext")) {
+            const auto id = cursor.callObjectMethod("getString", "(I)Ljava/lang/String;", idColumn);
+            const auto name =
+                    cursor.callObjectMethod("getString", "(I)Ljava/lang/String;", nameColumn)
+                            .toString();
+            const auto type =
+                    cursor.callObjectMethod("getString", "(I)Ljava/lang/String;", typeColumn)
+                            .toString();
+            const auto document = QJniObject::callStaticObjectMethod(
+                    "android/provider/DocumentsContract", "buildDocumentUriUsingTree",
+                    "(Landroid/net/Uri;Ljava/lang/String;)Landroid/net/Uri;", uri.object(),
+                    id.object<jstring>());
+            QDateTime modified;
+            if (modifiedColumn >= 0
+                && !cursor.callMethod<jboolean>("isNull", "(I)Z", modifiedColumn))
+                modified = QDateTime::fromMSecsSinceEpoch(
+                        cursor.callMethod<jlong>("getLong", "(I)J", modifiedColumn));
+            documents.push_back({ name, document.toString(), modified,
+                                  type == u"vnd.android.document/directory"_s });
+        }
+    }
+    cursor.callMethod<void>("close");
+    if (env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose))
+        return {};
+    return documents;
 }
 
 bool canPickFolders()

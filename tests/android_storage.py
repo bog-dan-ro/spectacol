@@ -45,6 +45,7 @@ def main():
     def private(*words, check=True):
         return shell("run-as", PACKAGE, *words, check=check)
 
+    assert shell("getprop", "ro.kernel.qemu").stdout.strip() == b"1", "Use a disposable emulator"
     base = private("pwd").stdout.decode().strip() + "/files"
     settings = base + "/settings/Licentia/Spectacol.conf"
     staging = "/data/local/tmp/" + token + ".conf"
@@ -105,8 +106,11 @@ def main():
         wait_for(lambda n: n.get("resource-id") == PICKER + "header_title"
                  and label(n) == "Files in " + name, "The picker in " + name)
         press(wait_for(lambda n: n.get("resource-id") == "android:id/button1", "Use this folder")[0])
-        press(wait_for(lambda n: n.get("resource-id") == "android:id/button1"
-                       and label(n).lower() == "allow", "Allow")[0])
+        allow = wait_for(lambda n: n.get("resource-id") == "android:id/button1"
+                         and label(n).lower() == "allow", "Allow")[0]
+        opened = time.monotonic()
+        press(allow)
+        return opened
 
     def write_settings(text):
         with tempfile.TemporaryDirectory() as temporary:
@@ -150,6 +154,22 @@ def main():
             old_snapshot = b"ZXST" + token.encode()
             (temp / "old.szx").write_bytes(old_snapshot)
 
+            # A reinstall has neither first_start nor an old dataPath setting. Welcome closes
+            # first; the import offer must follow it and remain available in General options.
+            write_settings("[General]\nautoSaveOnExit=false\ndataPath=" + data + "\n")
+            start()
+            wait_for(lambda n: n.get("resource-id", "").endswith(".aboutTabs"), "The first-start welcome")
+            shell("input", "keyevent", "4")
+            tap("Choose the old folder", "The import offer after the first-start welcome")
+            # No settings survived the reinstall: the picker uses the default Spectacol folder.
+            wait_for(lambda n: n.get("resource-id") == "android:id/button1", "The folder picker")
+            shell("input", "keyevent", "4")
+            tap("Don't ask again")
+            start()
+            wait_for(lambda n: label(n) == "Menu", "The main window")
+            assert gone("Choose the old folder", 2), "Don't ask again was ignored"
+            print("Fresh-install import offered after welcome; declining is kept", flush=True)
+
             # Spectacol 4 kept its files in shared storage: the app offers to copy them once.
             shell("mkdir", "-p", old + "/Favourites", old + "/Snapshots/" + token)
             adb("push", str(fixture), old + "/Favourites/" + token + ".sna")
@@ -182,15 +202,25 @@ def main():
             shell("mkdir", "-p", games + "/Sub")
             adb("push", str(fixture), games + "/Sub/" + token + ".sna")
             adb("push", str(temp / "old.szx"), games + "/notes.txt")
+            bulk = temp / "bulk"
+            bulk.mkdir()
+            for index in range(100):
+                (bulk / f"game-{index:03}.sna").write_bytes(expected)
+            adb("push", str(bulk) + "/.", games + "/")
             private("mkdir", "-p", data)
             write_settings("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=" + data
+                           + "\n[Android]\nlegacyImport=never\n[Peripherals]\njoystickPrompt=false"
                            + "\n[LocalFilesView]\nmode=1\n")
             start(["--machine", "48k", "--quit-after", "90", "--screenshot", data + "/device.sna",
                    "--ui-keys", "page:FileBrowserPage.qml"])
             tap("Page actions", "Quick Open")
             tap("Add device folder…")
-            picker_folder(games_name, from_root=True)
+            opened = picker_folder(games_name, from_root=True)
             # Quick Open goes into the new folder
+            wait_for(lambda n: label(n) == "game-000.sna", "Games in the 100-file device folder", timeout=8)
+            elapsed = time.monotonic() - opened
+            assert elapsed < 8, f"Opening the device folder took {elapsed:.1f}s"
+            print(f"100-file device folder shown in {elapsed:.1f}s including UI automation", flush=True)
             wait_for(lambda n: label(n) == games_name and "Label" in (n.get("resource-id") or ""),
                      "The device folder's title")
             wait_for(lambda n: label(n) == "Sub", "The device folder's sub folder")

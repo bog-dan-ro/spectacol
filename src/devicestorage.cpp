@@ -29,6 +29,9 @@
 #include <QPointer>
 #include <QSaveFile>
 #include <QSettings>
+#ifdef Q_OS_ANDROID
+#include <QJniObject>
+#endif
 
 #include <algorithm>
 #include <optional>
@@ -183,6 +186,14 @@ DeviceStorage::DeviceStorage(QString dataPath, QObject *parent)
     m_legacyPath = settings.value(legacyPathKey).toString();
     m_folders = settings.value(foldersKey).toStringList();
 #ifdef Q_OS_ANDROID
+    // A reinstall has no old settings, but the Spectacol 3 folder can still be there.
+    // Scoped storage prevents probing it; let the user choose it through the picker.
+    if (m_legacyPath.isEmpty()) {
+        const auto shared = QJniObject::callStaticObjectMethod(
+                "android/os/Environment", "getExternalStorageDirectory", "()Ljava/io/File;");
+        m_legacyPath = shared.callObjectMethod("getAbsolutePath", "()Ljava/lang/String;").toString()
+                + u"/Spectacol"_s;
+    }
     // Android drops a grant when its folder goes away or the user revokes it; a tree that
     // is no device folder is a leftover of an interrupted import.
     QStringList granted;

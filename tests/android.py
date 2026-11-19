@@ -118,7 +118,7 @@ def main():
             config = temp / "Spectacol.conf"
             # The joystick chooser would open over the menu after each load
             config.write_text("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath="
-                              + data + "\n[Screen]\norientation=1\n[Peripherals]\njoystickPrompt=false\n")
+                              + data + "\n[Android]\nlegacyImport=never\n[Screen]\norientation=1\n[Peripherals]\njoystickPrompt=false\n")
             adb("push", str(config), staging)
             private("mkdir", "-p", str(Path(settings).parent), data)
             private("cp", staging, settings)

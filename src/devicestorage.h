@@ -28,7 +28,7 @@
 
 // Android's shared storage, which the app can only read through folders the user picks:
 // - device folders, granted once and listed in Quick Open's Spectacol folder;
-// - the folder where Spectacol 4 kept its files, which it copies into app storage once.
+// - the folder where Spectacol 3 kept its files, which it copies into app storage once.
 class DeviceStorage : public QObject
 {
     Q_OBJECT
@@ -62,7 +62,7 @@ public:
     // Device folders can be added (Android, with a folder picker)
     bool available() const;
     QStringList folders() const;
-    // Where Spectacol 4 kept its files, as people know the place; empty when there was nothing.
+    // The saved Spectacol 3 folder, or its default location on Android after a reinstall.
     QString legacyFolder() const;
     bool importing() const;
     int importedFiles() const;

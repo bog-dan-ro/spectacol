@@ -50,13 +50,14 @@ def snapshot(extension, metadata=b'', mode=0, machine=1):
         struct.pack_into('<H', header, 8, 0xFFFE)
         header[29] = 1 | (mode << 6)
         return header + ram
-    if extension == 'z80v3':
-        header = bytearray(87)
+    if extension in ('z80v2', 'z80v3'):
+        header = bytearray(87 if extension == 'z80v3' else 55)
         struct.pack_into('<H', header, 8, 0xFFFE)
-        header[29] = 0x81
-        struct.pack_into('<HH', header, 30, 55, 0x8000)
-        for key, value in enumerate((0x0103, 0x0203, 0x0403, 0x0803, 0x1003)):
-            struct.pack_into('<H', header, 63 + key * 2, value)
+        header[29] = 1 | (mode << 6)
+        struct.pack_into('<HH', header, 30, len(header) - 32, 0x8000)
+        if extension == 'z80v3':
+            for key, value in enumerate((0x0103, 0x0203, 0x0403, 0x0803, 0x1003)):
+                struct.pack_into('<H', header, 63 + key * 2, value)
         return header + b''.join(b'\xff\xff' + bytes([page]) + ram[i*16384:(i+1)*16384]
                                   for i, page in enumerate((8, 4, 5)))
     regs = bytearray(37)
@@ -125,14 +126,19 @@ def main():
         ('sna-prompt', 'sna', b'', 3, True, 1, True),
         ('prompt-disabled', 'sna', b'', 2, False, 1, False),
         ('metadata-with-prompt-disabled', 'szx', joy(4), 4, False, 1, False),
-        ('z80-cursor', 'z80', 0, 1, False, 1, True),
+        ('z80-default-prompt', 'z80', 0, 3, True, 1, True),
+        ('z80-default-prompt-disabled', 'z80', 0, 1, False, 1, False),
         ('z80-kempston', 'z80', 1, 2, False, 1, True),
         ('z80-sinclair2', 'z80', 2, 4, False, 1, True),
         ('z80-sinclair1', 'z80', 3, 3, False, 1, True),
-        ('z80v3-custom-sinclair2', 'z80v3', b'', 4, False, 1, True),
+        ('z80v2-default-prompt', 'z80v2', 0, 3, True, 1, True),
+        ('z80v3-default-prompt', 'z80v3', 0, 3, True, 1, True),
+        ('z80v3-custom-sinclair2', 'z80v3', 2, 4, False, 1, True),
         ('zip-szx', 'szx', joy(1), 5, False, 1, True),
         ('browser-sna', 'sna', b'', 3, True, 1, True),
         ('browser-szx', 'szx', joy(4), 4, False, 1, True),
+        ('browser-z80', 'z80', 0, 3, True, 1, True),
+        ('zip-z80', 'z80', 0, 3, True, 1, True),
     ]
     with tempfile.TemporaryDirectory(prefix='session-', dir=output) as temporary:
         session = Path(temporary)
@@ -150,10 +156,10 @@ def main():
             if name.startswith('browser-'):
                 with settings.open('a') as config_file:
                     config_file.write(f'[FileBrowser]\npath={files}\n')
-            source = files / ('game.' + ('z80' if extension == 'z80v3' else extension))
+            source = files / ('game.' + ('z80' if extension.startswith('z80') else extension))
             source.write_bytes(snapshot(extension, metadata if isinstance(metadata, bytes) else b'',
                                         metadata if isinstance(metadata, int) else 0, machine))
-            if name == 'zip-szx':
+            if name.startswith('zip-'):
                 archive = home / 'game.zip'
                 with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as zipped:
                     zipped.write(source, source.name)

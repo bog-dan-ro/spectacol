@@ -65,12 +65,10 @@ static QRect imageRect(QSize imageSize, QSize outputSize, ZxSettings::FillMode f
         break;
     }
 
+    const int x = (outputSize.width() - size.width()) / 2;
 #ifdef Q_OS_ANDROID
-    const int x = outputSize.width() - size.width();
-    // Keep it at the top right; portrait controls go below the image.
     const int y = 0;
 #else
-    const int x = (outputSize.width() - size.width()) / 2;
     const int y = (outputSize.height() - size.height()) / 2;
 #endif
     return { QPoint{ x, y }, size };

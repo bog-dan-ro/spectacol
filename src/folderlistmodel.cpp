@@ -17,6 +17,9 @@
 
 #include "folderlistmodel.h"
 #include "contenturi.h"
+#ifdef Q_OS_ANDROID
+#include "androidintegration.h"
+#endif
 
 #include <zxkit/media/MediaPreview.h>
 
@@ -416,25 +419,38 @@ void FolderListModel::refresh()
             m_allFiles.push_back({ deviceName(tree), ContentUri::treeRoot(tree), {}, true, true });
     }
     if (!m_folder.isEmpty()) {
-        QDirIterator it(m_folder, QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
-        while (it.hasNext()) {
-            it.next();
-            const auto &info = it.fileInfo();
-            if (!content && !within(info.canonicalFilePath(), m_rootFolder))
-                continue;
-            const auto name = content ? it.fileName() : info.fileName();
-            if (m_filterClass != HostFiles
-                && QFileInfo(name).suffix().compare(u"pok"_s, Qt::CaseInsensitive) == 0)
-                continue;
-            const bool dir = info.isDir();
-            // Every document read is a round trip to its provider: go by the names there
-            if (!dir && !(content ? accepts(name, {}) : canOpen(info.absoluteFilePath())))
-                continue;
-            m_allFiles.push_back(
-                    { name,
-                      content ? ContentUri::canonical(it.filePath()) : info.absoluteFilePath(),
-                      m_sortCriteria == ByDateDesc ? info.lastModified() : QDateTime{}, dir,
-                      false });
+#ifdef Q_OS_ANDROID
+        if (content) {
+            for (const auto &document : AndroidIntegration::listFolder(m_folder)) {
+                if (!document.directory && !accepts(document.name, {}))
+                    continue;
+                m_allFiles.push_back({ document.name, ContentUri::canonical(document.path),
+                                       document.modified, document.directory, false });
+            }
+        } else
+#endif
+        {
+            QDirIterator it(m_folder,
+                            QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
+            while (it.hasNext()) {
+                it.next();
+                const auto &info = it.fileInfo();
+                if (!content && !within(info.canonicalFilePath(), m_rootFolder))
+                    continue;
+                const auto name = content ? it.fileName() : info.fileName();
+                if (m_filterClass != HostFiles
+                    && QFileInfo(name).suffix().compare(u"pok"_s, Qt::CaseInsensitive) == 0)
+                    continue;
+                const bool dir = info.isDir();
+                // Every document read is a round trip to its provider: go by the names there
+                if (!dir && !(content ? accepts(name, {}) : canOpen(info.absoluteFilePath())))
+                    continue;
+                m_allFiles.push_back(
+                        { name,
+                          content ? ContentUri::canonical(it.filePath()) : info.absoluteFilePath(),
+                          m_sortCriteria == ByDateDesc ? info.lastModified() : QDateTime{}, dir,
+                          false });
+            }
         }
     }
     std::stable_sort(m_allFiles.begin(), m_allFiles.end(), [this](const Entry &a, const Entry &b) {

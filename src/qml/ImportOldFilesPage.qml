@@ -29,7 +29,7 @@ Sheet {
     readonly property var storage: ZxEmulator.deviceStorage
     readonly property bool finished: !storage.importing && storage.importSummary !== ""
     crumb: qsTr("Options")
-    title: qsTr("Files from Spectacol 4")
+    title: qsTr("Files from Spectacol 3")
     hints: storage.importing || finished ? [
         { pad: "B", key: "Esc", text: qsTr("Close"), action: () => pageLoader.source = "" }
     ] : [
@@ -57,7 +57,7 @@ Sheet {
             spacing: Theme.sp(5)
             Text {
                 Layout.fillWidth: true
-                text: qsTr("Spectacol 4 kept your games, snapshots and recordings in “%1”. Android lets Spectacol read that folder only after you choose it.").arg(page.storage.legacyFolder)
+                text: qsTr("Spectacol 3 kept your games, snapshots and recordings in “%1”. Android lets Spectacol read that folder only after you choose it.").arg(page.storage.legacyFolder)
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.body
                 color: Theme.text

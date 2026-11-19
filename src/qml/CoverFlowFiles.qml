@@ -282,7 +282,7 @@ Item
                 Behavior on delScale {SpringAnimation {spring : 5; damping: 1; epsilon: 0.005}}
                 onStatusChanged: if (status === Image.Ready) scale_anim.start();
                 sourceSize: Qt.size(fileList.coverPixels, fileList.coverPixels)
-                source : isDevice ? "qrc:/images/folder-device.svg" : "image://spectrum/" + path
+                source : isDir ? (isDevice ? "qrc:/images/folder-device.svg" : "qrc:/images/folder.svg") : "image://spectrum/" + path
                 smooth : false
 
                 NumberAnimation {id : scale_anim; target : album_delegate; property: "scale"; from : 0; to : delScale; duration : 500; easing.type: Easing.InOutQuad}

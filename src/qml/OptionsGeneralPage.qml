@@ -59,7 +59,7 @@ Sheet {
         SettingRow {
             objectName: "importOldFiles"
             visible: ZxEmulator.deviceStorage.legacyFolder !== ""
-            label: qsTr("Files from Spectacol 4")
+            label: qsTr("Files from Spectacol 3")
             description: qsTr("Copy the games and snapshots it kept in “%1”").arg(ZxEmulator.deviceStorage.legacyFolder)
             kind: "action"
             actionText: qsTr("Copy")

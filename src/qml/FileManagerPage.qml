@@ -442,6 +442,7 @@ Sheet {
     FileManagerPanel {
         id: leftPanel
         peer: rightPanel
+        topmostFolder: ZxEmulator.settings.restrictToSpectacol ? ZxEmulator.dataPath : ""
         onLocationChanged: settings.setValue("leftFolder", leftPanel.folder)
         onMediaWritten: path => page.noteWritten(path)
         onFailed: text => page.showError(text)
@@ -450,6 +451,7 @@ Sheet {
     FileManagerPanel {
         id: rightPanel
         peer: leftPanel
+        topmostFolder: ZxEmulator.settings.restrictToSpectacol ? ZxEmulator.dataPath : ""
         onLocationChanged: settings.setValue("rightFolder", rightPanel.folder)
         onMediaWritten: path => page.noteWritten(path)
         onFailed: text => page.showError(text)

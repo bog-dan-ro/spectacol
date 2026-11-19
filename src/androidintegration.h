@@ -17,11 +17,13 @@
 
 #pragma once
 
+#include <QDateTime>
 #include <QString>
 #include <QStringList>
 #include <QUrl>
 
 #include <functional>
+#include <vector>
 
 class QFile;
 class QObject;
@@ -31,6 +33,16 @@ QString displayName(const QUrl &url);
 // Opens a document another app gave us (content://) for reading, the way Android expects
 // (ContentResolver.openFileDescriptor); Qt's content engine can't open every provider's documents.
 bool openDocument(const QUrl &url, QFile &file);
+
+struct Document
+{
+    QString name;
+    QString path;
+    QDateTime modified;
+    bool directory = false;
+};
+// Read names, document URIs and metadata in one provider query, without opening the files.
+std::vector<Document> listFolder(const QString &folder);
 
 // Whether this device has Android's folder picker (some TVs don't).
 bool canPickFolders();

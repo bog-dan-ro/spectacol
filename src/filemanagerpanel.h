@@ -28,9 +28,7 @@
 
 #include <cstdint>
 #include <memory>
-#include <optional>
 #include <span>
-#include <string>
 #include <vector>
 
 class FileManagerMedia;
@@ -45,6 +43,8 @@ class FileManagerPanel : public QAbstractListModel
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_PROPERTY(QString topmostFolder READ topmostFolder WRITE setTopmostFolder NOTIFY
+                       topmostFolderChanged FINAL)
     Q_PROPERTY(QString folder READ folder WRITE setFolder NOTIFY locationChanged FINAL)
     Q_PROPERTY(QString location READ location NOTIFY locationChanged FINAL)
     Q_PROPERTY(QString mediaPath READ mediaPath NOTIFY locationChanged FINAL)
@@ -168,6 +168,9 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+    QString topmostFolder() const;
+    void setTopmostFolder(const QString &newTopmostFolder);
+
 signals:
     void locationChanged();
     void countChanged();
@@ -179,6 +182,8 @@ signals:
     void filesystemNeeded(int row, const QVariantList &choices, const QString &message);
     /// A host file was changed: the emulator may have to read it again (the SD card)
     void mediaWritten(const QString &path);
+
+    void topmostFolderChanged();
 
 private:
     struct Entry
@@ -237,4 +242,5 @@ private:
     std::vector<Parent> m_parents; // outermost first
     std::vector<Entry> m_entries;
     QPointer<FileManagerPanel> m_peer;
+    QString m_topmostFolder;
 };

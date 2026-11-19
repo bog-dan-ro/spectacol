@@ -867,6 +867,10 @@ int FileManagerPanel::up()
         QDir dir(m_folder);
         if (dir.isRoot() || !dir.cdUp())
             return -1;
+
+        if (!dir.absolutePath().startsWith(m_topmostFolder))
+            return 0;
+
         left = QDir(m_folder).dirName();
         m_folder = dir.absolutePath();
     }
@@ -2063,4 +2067,21 @@ QHash<int, QByteArray> FileManagerPanel::roleNames() const
              { IsParent, "isParent" }, { IsMedia, "isMedia" }, { Size, "size" },
              { Info, "info" },         { Marked, "marked" },   { Kind, "kind" },
              { Label, "label" } };
+}
+
+QString FileManagerPanel::topmostFolder() const
+{
+    return m_topmostFolder;
+}
+
+void FileManagerPanel::setTopmostFolder(const QString &newTopmostFolder)
+{
+    if (m_topmostFolder == newTopmostFolder)
+        return;
+    m_topmostFolder = newTopmostFolder.isEmpty() ? QString{ }
+            : newTopmostFolder.back() == u'/' ? newTopmostFolder.left(newTopmostFolder.size() - 1)
+                                              : newTopmostFolder;
+    emit topmostFolderChanged();
+    if (!m_folder.startsWith(m_topmostFolder))
+        setFolder(m_topmostFolder);
 }

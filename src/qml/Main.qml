@@ -34,6 +34,14 @@ ApplicationWindow {
     title: qsTr("Spectacol")
 
     property bool portrait: width < height
+    property bool legacyImportPending: false
+
+    function offerPendingLegacyImport() {
+        if (legacyImportPending && pageLoader.source.toString() === "" && menuBar.position === 0 && !quitDialog.visible) {
+            legacyImportPending = false;
+            pageLoader.source = "ImportOldFilesPage.qml";
+        }
+    }
 
     Loader {
         parent: Overlay.overlay
@@ -85,6 +93,8 @@ ApplicationWindow {
     // A page docked next to the screen (desktop layout): the screen makes room for it
     readonly property real dockWidth: Theme.desktopMode && pageLoader.status === Loader.Ready && pageLoader.item.panelWidth !== undefined
                                       && pageLoader.item.panelWidth < mainRectangle.width * 0.7 ? pageLoader.item.panelWidth : 0
+
+    property real keyboardHeight: ZxEmulator.settings.overlappedKeboard ? 0 : onScreen48Keyboard.visible ? onScreen48Keyboard.keyboardHeight : 0
 
     menuBar: DesktopMenuBar {
         visible: Theme.desktopMode
@@ -161,6 +171,7 @@ ApplicationWindow {
             } else {
                 mainRectangle.forceActiveFocus(Qt.PopupFocusReason);
             }
+            mainScreen.offerPendingLegacyImport();
         })
         dragMargin: ZxEmulator.settings.swipe4menu ? Qt.styleHints.startDragDistance : 0
 
@@ -337,11 +348,12 @@ ApplicationWindow {
             anchors.fill: parent
             anchors.leftMargin: (ZxEmulator.settings.leftMargin && mainScreen.height < mainScreen.width) ? 10 * Screen.pixelDensity : 0
             anchors.rightMargin: mainScreen.dockWidth
+            anchors.bottomMargin: mainScreen.keyboardHeight
 
             ZxScreen {
                 id: zxScreen
-                fullScreen: Qt.platform.os === "android"
                 anchors.fill: parent
+                fullScreen: Qt.platform.os === "android"
                 mouseGrabSuspended: pageLoader.status !== Loader.Null || menuBar.position > 0 || !ZxEmulator.processInputEvents
 
                 onFullScreenChanged: (fullScreen) => mainScreen.visibility = fullScreen ? Window.FullScreen : Window.AutomaticVisibility;
@@ -372,9 +384,6 @@ ApplicationWindow {
             id: screenButtonsGrid
             objectName: "screenControls"
             anchors.fill: parent
-            // The landscape control rail belongs to the window edge, outside
-            // the safe-area padding used by pages and the ZX viewport.
-            anchors.leftMargin: mainScreen.portrait ? 0 : -mainScreen.leftPadding
             anchors.topMargin: mainScreen.portrait ? zxScreen.implicitHeight : 0;
             visible: ZxEmulator.touchscreen && ZxEmulator.showControlsIcons
             horizontalItemAlignment: mainScreen.portrait ? Grid.AlignHCenter : Grid.AlignLeft
@@ -501,6 +510,7 @@ ApplicationWindow {
             z: parent.z + 20
             id: pageLoader
             objectName: "pageLoader"
+            onSourceChanged: Qt.callLater(mainScreen.offerPendingLegacyImport)
             anchors.fill: parent
             visible: status === Loader.Ready
             // Every page pauses the emulation while it is open, unless it says otherwise
@@ -558,13 +568,12 @@ ApplicationWindow {
         }
     }
 
-    // Android: Spectacol 4's files are still in shared storage; offer to copy them (at start,
-    // unless another page, the welcome one for one, is already open)
+    // Keep the import offer until the welcome page (or another startup page) closes.
     Connections {
         target: ZxEmulator.deviceStorage
         function onOfferLegacyImport() {
-            if (pageLoader.source.toString() === "")
-                pageLoader.source = "ImportOldFilesPage.qml";
+            mainScreen.legacyImportPending = true;
+            Qt.callLater(mainScreen.offerPendingLegacyImport);
         }
     }
 

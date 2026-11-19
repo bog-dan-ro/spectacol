@@ -90,6 +90,13 @@ first_start=false
 dataPath=/tmp/spx/data/Spectacol/
 ```
 
+New settings start with the 128K machine. A saved machine selection or `--machine` overrides that default.
+`python3 tests/startup.py` checks those choices and the import offer after the welcome page closes.
+`python3 tests/joysticks.py` checks snapshot input preferences and the chooser: when “Ask for the
+joystick” is enabled, a Z80 snapshot with zero joystick bits prompts because those bits can mean
+either Cursor or an unspecified preference. Nonzero mappings and assigned controller profiles still apply.
+Both scripts accept `--binary` and `--output` and keep their artifacts under `build/`.
+
 ## Linux packages
 
 Both package formats install the desktop launcher, the existing Spectacol icon,
@@ -441,7 +448,8 @@ every provider's documents (the Downloads one, for one).
 for a folder of games. Spectacol keeps the grant (`takePersistableUriPermission`) and lists the folder,
 with a device badge, first in its own folder, in Quick Open, the tape browser and the disk picker. Inside
 it Quick Open browses the `content://` tree in place, by file name (reading every document's header would
-be one provider round trip per file), and loads games straight from it. Up climbs back to the Spectacol
+be one provider round trip per file). Names, types and modification times are read in a single provider
+query, so opening a large folder does not query each file separately. Games load straight from it. Up climbs back to the Spectacol
 folder; storage document ids give the way up from a remembered sub folder as well. Spectacol doesn't
 delete, paste into or copy whole folders out of device folders. Remove on the folder's own entry only
 forgets it and gives the grant back. Grants for folders that are no longer device folders are released
@@ -450,8 +458,10 @@ a picker (some TVs) don't offer the action.
 
 Spectacol 4 kept its data in shared storage, which a current app can't read: Android lists its folders
 but hides the files. When the saved data path was there, Spectacol records it as
-`Android/legacyDataPath` and, at start, offers to copy it (also under **Options › General › Files from
-Spectacol 4**). The folder picker opens at the old folder (`EXTRA_INITIAL_URI`); after “Use this folder”
+`Android/legacyDataPath`. A fresh installation offers the default shared-storage `Spectacol` folder
+without requiring old settings. The offer waits for the welcome or another startup page to close, and
+is also under **Options › General › Files from Spectacol 4**. The folder picker opens at the old folder
+(`EXTRA_INITIAL_URI`); after “Use this folder”
 and “Allow” a worker thread copies everything into app storage, keeping modification times. Identical
 files are skipped, a different file with a used name gets a numbered one, and the originals stay where
 they are. The grant is released afterwards, and `Android/legacyImport` (`done` or `never`) stops the offer.
@@ -497,7 +507,7 @@ shortcuts. Connected gamepads retain button hints; a TV without touch or a gamep
 Narrow hint rows scroll horizontally instead of taking multiple rows from the content. About and its
 controller help scroll within the page. Quick Open keeps view/search controls visible, and omits the
 cover reflection on mobile. Android starts fullscreen to hide system bars (swipe to reveal them);
-its landscape control rail aligns to the window's left edge, independently of viewport and safe-area padding.
+its landscape control rail stays within the window's safe area, clear of the camera cutout.
 The emulated image stays at the top right on Android, using the selected scaling mode.
 
 ```sh
@@ -509,9 +519,15 @@ phone profile (800 × 360 in landscape). Each page starts in a fresh process; sc
 opens it, then real Android touch tests the header, scrolling, actions, native picker and ROM settings.
 `--case large-landscape` also checks Large text. `--native-input` adds Android Menu/D-pad/OK/Back;
 `--native-only` runs just that input probe. `--display-only` checks right alignment in all three
-scaling modes and taps the menu button at the window edge. Settings, display overrides and the emulator's
+scaling modes and taps the menu button. Add `--cutout` to emulate a camera cutout and check that the
+landscape controls respect its inset. Settings, display overrides and the emulator's
 ignore-orientation policy are restored. Screenshots, accessibility trees and logcat go under
 `build/android-ui`. This does not replace physical phone, controller or TV checks.
+
+On emulator 37.2.13 with the API 37 image, the cold landscape `--display-only` check can fail because
+Qt's SurfaceView keeps its portrait width after the native display rotates. This was also observed
+with host graphics and ANGLE. `--native-only --cutout` separately checks the control bounds against
+Android's camera inset and exercises Menu/D-pad/OK/Back; it does not validate viewport sizing.
 
 `--case portrait` and `--case large-portrait` also check that the Qt surface matches the native display.
 Android defaults to Any (sensor orientation); existing Landscape/Portrait choices remain saved. The

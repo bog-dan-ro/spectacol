@@ -27,6 +27,7 @@ Item {
     id: onScreenKeyboard
     enabled: visible
 
+    property real keyboardHeight: grid.height
     property bool textInputMode: false
     readonly property bool portrait: Window.window ? Window.window.width < Window.window.height : width < height
     signal textKeyPressed(int key, string text)
@@ -84,7 +85,7 @@ Item {
     }
 
     anchors {
-        bottomMargin: textInputMode ? 0 : Screen.pixelDensity * (onScreenKeyboard.portrait ? 10 : 4)
+        bottomMargin: textInputMode ? 0 : Screen.pixelDensity * (onScreenKeyboard.portrait ? 10 : 0)
         leftMargin: textInputMode || onScreenKeyboard.portrait ? 0 : Screen.pixelDensity * 2
         rightMargin: textInputMode || onScreenKeyboard.portrait ? 0 : Screen.pixelDensity * 2
     }

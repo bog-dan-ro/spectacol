@@ -75,7 +75,7 @@ ZxSettings::ZxSettings(ZxEmulator &emulator) : QObject(&emulator), m_zxEmulator(
     for (std::size_t i = 0; i < m_machineIds.size(); ++i) {
         auto prof = machines.create(m_machineIds[i]);
         m_machineNames << QString::fromUtf8(prof->name().data(), qsizetype(prof->name().size()));
-        if (m_machineIds[i] == "48k"sv)
+        if (m_machineIds[i] == "128k"sv)
             m_currentMachineIndex = int(i);
     }
 
@@ -93,7 +93,7 @@ ZxSettings::ZxSettings(ZxEmulator &emulator) : QObject(&emulator), m_zxEmulator(
         m_autoLoad = s.value("autoLoad", true).toBool();
         m_detectLoaders = s.value("detectLoaders", true).toBool();
         m_loaderAcceleration = s.value("loaderAcceleration", 1).toInt();
-        m_savedMachineId = s.value("machine", u"48k"_s).toString().toStdString();
+        m_savedMachineId = s.value("machine", u"128k"_s).toString().toStdString();
         if (m_savedMachineId == "cobra1_64k"sv || m_savedMachineId == "cobra1_80k"sv) {
             m_savedMachineId.erase(5, 1);
             s.setValue("machine", QString::fromStdString(m_savedMachineId));
@@ -121,6 +121,7 @@ ZxSettings::ZxSettings(ZxEmulator &emulator) : QObject(&emulator), m_zxEmulator(
         m_deadZone = std::isfinite(deadZone) ? std::clamp(deadZone, 0.0, 0.95) : 0.4;
         m_joystickPrompt = s.value("joystickPrompt", true).toBool();
         m_recreatedSpectrum = s.value("recreatedSpectrum", false).toBool();
+        m_overlappedKeboard = s.value("overlappedKeboard", true).toBool();
         s.endGroup();
 
         s.beginGroup(u"Gamepad"_s);
@@ -210,7 +211,7 @@ void ZxSettings::applyToEmulator()
         });
 
     // The machine picked last time. The Next needs its SD card image: without it
-    // stay on the 48K, picking the Next again offers to download it.
+    // stay on the 128K, picking the Next again offers to download it.
     const auto it = std::ranges::find(m_machineIds, m_savedMachineId);
     if (it == m_machineIds.end() || (*it == "next"sv && !NextSdCard::instance().available()))
         return;
@@ -1041,4 +1042,18 @@ void ZxSettings::setJoystickOpacity(qreal value)
 void ZxSettings::setButtonsOpacity(qreal value)
 {
     setControlOpacity(m_buttonsOpacity, value, u"buttonsOpacity"_s);
+}
+
+bool ZxSettings::overlappedKeboard() const
+{
+    return m_overlappedKeboard;
+}
+
+void ZxSettings::setOverlappedKeboard(bool newOverlappedKeboard)
+{
+    if (m_overlappedKeboard == newOverlappedKeboard)
+        return;
+    m_overlappedKeboard = newOverlappedKeboard;
+    emit overlappedKeboardChanged();
+    QSettings().setValue(u"Peripherals/overlappedKeboard"_s, m_overlappedKeboard);
 }

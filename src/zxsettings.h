@@ -42,6 +42,8 @@ class ZxSettings : public QObject
     Q_PROPERTY(int currentMachineIndex READ currentMachineIndex WRITE setCurrentMachineIndex NOTIFY
                        currentMachineChanged)
     Q_PROPERTY(bool hasStartButton READ hasStartButton NOTIFY hasStartButtonChanged)
+    Q_PROPERTY(bool overlappedKeboard READ overlappedKeboard WRITE setOverlappedKeboard NOTIFY
+                       overlappedKeboardChanged FINAL)
 
     // General Options
     Q_PROPERTY(int emulationSpeed READ emulationSpeed WRITE setEmulationSpeed NOTIFY
@@ -304,6 +306,9 @@ public:
     bool recreatedSpectrum() const;
     void setRecreatedSpectrum(bool recreatedSpectrum);
 
+    bool overlappedKeboard() const;
+    void setOverlappedKeboard(bool newOverlappedKeboard);
+
 public slots:
     inline int gamepadAction(int gamepadButton)
     {
@@ -349,15 +354,15 @@ signals:
     void deadZoneChanged(qreal deadZone);
     void controllerMappingChanged();
     void controlsAppearanceChanged();
-
     void messageLevelChanged(int messageLevel);
+    void overlappedKeboardChanged();
 
 private:
     ZxEmulator &m_zxEmulator;
     zxkit::BorderMargins m_borderMargins;
     bool m_hasStartButton = false;
-    int m_currentMachineIndex = 1; // Default to 48k
-    std::string m_savedMachineId = "48k";
+    int m_currentMachineIndex = -1; // Resolved by machine id in the constructor
+    std::string m_savedMachineId;
     int m_pendingMachineIndex = -1; // the Next, waiting for its SD card image
     bool m_pendingMachinePersist = false;
     int m_emulationSpeed = 100;
@@ -378,6 +383,7 @@ private:
     std::vector<std::string> m_machineIds;
     QStringList m_machineNames;
     std::mutex m_gamepadActionsMutex;
+    bool m_overlappedKeboard = true;
 
     // Default button actions map
     std::unordered_map<int, int> m_gamepadActions = {

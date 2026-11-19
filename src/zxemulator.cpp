@@ -488,7 +488,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
             });
 
     zxkit::EmulatorConfig cfg;
-    cfg.machineId = "48k"s;
+    cfg.machineId = "128k"s;
     cfg.audioSampleRate = 48'000;
     cfg.fullBorder = true;
     m_roms = std::make_unique<RomOverrides>();
@@ -1268,6 +1268,12 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
             return { false, zxkit::MediaClass::Unknown };
         }
         joystick = zxkit::SnapshotFormats::joystickInfo(file.data, file.extension);
+        // Z80's zero joystick bits also occur in snapshots with no input preference.
+        // Ask for that ambiguous default, while retaining declared nonzero mappings.
+        if (file.extension == ".z80"sv && (file.data[29] & 0xc0) == 0
+            && m_settings->joystickPrompt()) {
+            joystick.type.reset();
+        }
     } catch (const std::exception &e) {
         showMessage(QString::fromUtf8(e.what()), Error);
         return { false, zxkit::MediaClass::Unknown };

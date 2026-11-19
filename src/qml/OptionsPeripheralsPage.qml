@@ -37,6 +37,11 @@ Sheet {
 
     SettingsList {
         SettingRow {
+            label: qsTr("Overlapped Virtual Keyboard")
+            checked: ZxEmulator.settings.overlappedKeboard
+            onToggled: (on) => ZxEmulator.settings.overlappedKeboard = on
+        }
+        SettingRow {
             label: qsTr("Kempston joystick")
             checked: ZxEmulator.settings.kempstonJoystick
             onToggled: (on) => ZxEmulator.settings.kempstonJoystick = on

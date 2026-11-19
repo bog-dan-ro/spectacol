@@ -106,7 +106,8 @@ def main():
     try:
         with tempfile.TemporaryDirectory() as temporary:
             config = Path(temporary) / "Spectacol.conf"
-            config.write_text("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=" + data + "\n")
+            config.write_text("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=" + data
+                              + "\n[Android]\nlegacyImport=never\n")
             adb("push", str(config), staging)
         private("mkdir", "-p", str(Path(settings).parent), data)
         private("cp", staging, settings)
