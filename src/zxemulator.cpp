@@ -29,10 +29,12 @@
 
 #include <zxkit/input/Joystick.h>
 #include <zxkit/input/Mouse.h>
+#include <zxkit/media/MediaArchive.h>
 #include <zxkit/media/MediaPreview.h>
 #include <zxkit/media/SnapshotFormats.h>
 #include <zxkit/machines/CloneMachines.h>
 #include <zxkit/peripherals/expansion/ExpansionPeripherals.h>
+#include <zxkit/peripherals/storage/Interface1.h>
 
 #include "audiooutput.h"
 #include "contenturi.h"
@@ -1229,7 +1231,7 @@ QString ZxEmulator::importFile(const QUrl &url)
     return {};
 }
 
-std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &filePath)
+std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &filePath, int drive)
 {
     m_joystickPromptTimer.stop();
     zxkit::MediaFile file;
@@ -1255,6 +1257,16 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
 #endif
         file = zxkit::MediaFile::fromBytes(std::vector<uint8_t>(bytes.begin(), bytes.end()),
                                            QFileInfo(name).suffix().toStdString());
+        if (file.extension == ".mdr"sv) {
+            const bool direct =
+                    QFileInfo(name).suffix().compare(u"mdr"_s, Qt::CaseInsensitive) == 0;
+            return { mountMicrodrive(drive, file.data, name, direct ? input.fileName() : QString{}),
+                     zxkit::MediaClass::Microdrive };
+        }
+        if (drive >= 0) {
+            showMessage(tr("Select an MDR cartridge image."), Error);
+            return { false, zxkit::MediaClass::Unknown };
+        }
         joystick = zxkit::SnapshotFormats::joystickInfo(file.data, file.extension);
     } catch (const std::exception &e) {
         showMessage(QString::fromUtf8(e.what()), Error);
@@ -1314,6 +1326,124 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
         }
     }
     return { loaded, zxkit::classifyMediaFile(file.extension, file.data) };
+}
+
+bool ZxEmulator::mountMicrodrive(int drive, std::span<const uint8_t> bytes, const QString &name,
+                                 const QString &sourcePath)
+{
+    std::size_t insertedDrive = 0;
+    const bool mounted = withEmulator([&](zxkit::Emulator &emulator) {
+        auto insert = [&](zxkit::Interface1Peripheral &device) {
+            if (drive < 0)
+                return device.insertCartridge(bytes);
+            const auto index = std::size_t(drive);
+            if (device.hasCartridge(index))
+                throw zxkit::PeripheralException("Eject the current Microdrive cartridge first"sv);
+            device.insertCartridge(index, bytes);
+            return index;
+        };
+        if (auto device = emulator.interface1()) {
+            insertedDrive = insert(device->get());
+        } else {
+            if (!emulator.machine().supportsInterface1())
+                throw zxkit::PeripheralException(
+                        "ZX Interface 1 is unavailable on the selected machine"sv);
+            auto newDevice = std::make_unique<zxkit::Interface1Peripheral>();
+            insertedDrive = insert(*newDevice);
+            emulator.attachPeripheral(std::move(newDevice));
+        }
+    });
+    if (mounted) {
+        m_microdriveNames[int(insertedDrive)] = name;
+        m_microdrivePaths[int(insertedDrive)] = sourcePath;
+        m_settings->setInterface1(true);
+        showMessage(tr("'%1' inserted into Microdrive %2.").arg(name).arg(insertedDrive + 1));
+    }
+    return mounted;
+}
+
+QStringList ZxEmulator::microdriveLabels() const
+{
+    QStringList labels;
+    const auto core = emulator().readLock();
+    if (auto device = core->interface1()) {
+        for (std::size_t drive = 0; drive < zxkit::Interface1Peripheral::kMaxCartridges; ++drive) {
+            const auto name = device->get().hasCartridge(drive)
+                    ? m_microdriveNames.value(int(drive))
+                    : tr("Empty");
+            labels << tr("Drive %1 · %2").arg(drive + 1).arg(name);
+        }
+    }
+    return labels;
+}
+
+bool ZxEmulator::microdriveInserted(int drive) const
+{
+    const auto core = emulator().readLock();
+    const auto device = core->interface1();
+    return device && device->get().hasCartridge(std::size_t(drive));
+}
+
+bool ZxEmulator::microdriveModified(int drive) const
+{
+    const auto core = emulator().readLock();
+    const auto device = core->interface1();
+    return device && device->get().cartridgeModified(std::size_t(drive));
+}
+
+bool ZxEmulator::microdriveCanSave(int drive) const
+{
+    return !m_microdrivePaths.value(drive).isEmpty() && microdriveInserted(drive);
+}
+
+bool ZxEmulator::insertMicrodrive(int drive, const QString &filePath)
+{
+    return drive >= 0 && loadMediaWithType(filePath, drive).first;
+}
+
+bool ZxEmulator::newMicrodrive(int drive)
+{
+    if (drive < 0)
+        return false;
+    return mountMicrodrive(drive, zxkit::MediaArchive::create("mdr"sv).encode(),
+                           tr("Blank cartridge"));
+}
+
+void ZxEmulator::ejectMicrodrive(int drive)
+{
+    if (withEmulator([drive](zxkit::Emulator &emulator) {
+            if (auto device = emulator.interface1())
+                device->get().ejectCartridge(std::size_t(drive));
+        })) {
+        m_microdriveNames.remove(drive);
+        m_microdrivePaths.remove(drive);
+    }
+}
+
+bool ZxEmulator::saveMicrodrive(int drive, const QString &filePath)
+{
+    const QString destination = filePath.isEmpty() ? m_microdrivePaths.value(drive) : filePath;
+    if (destination.isEmpty())
+        return false;
+
+    std::vector<uint8_t> bytes;
+    if (!withEmulator([&](zxkit::Emulator &emulator) {
+            if (auto device = emulator.interface1())
+                bytes = device->get().saveCartridge(std::size_t(drive));
+            else
+                throw zxkit::PeripheralException("ZX Interface 1 is unavailable"sv);
+        })
+        || !writeFileBytes(destination, bytes))
+        return false;
+
+    {
+        auto core = emulator().writeLock();
+        if (auto device = core->interface1())
+            device->get().markCartridgeSaved(std::size_t(drive), bytes);
+    }
+    m_microdrivePaths[drive] = destination;
+    showMessage(tr("Cartridge saved to '%1'.").arg(destination));
+    return true;
 }
 
 bool ZxEmulator::saveMediaFile(const QString &filePath)
@@ -1600,7 +1730,7 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
     m_recording->refresh();
     if (!loaded) {
         m_loadedFileName = previousName;
-        if (removeOnFail) {
+        if (removeOnFail && mediaClass != zxkit::MediaClass::Microdrive) {
             QFile::remove(filePath);
             emit error(Info, tr("File \"%1\" was removed").arg(filePath));
         }

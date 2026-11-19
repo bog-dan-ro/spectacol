@@ -358,8 +358,8 @@ API 37 x86_64 emulator. Physical phone/TV validation remains open.
 
 Keep these at the very end. DivMMC/esxDOS on classic machines remains postponed.
 
-- [ ] Microdrives and IDE images, as ZxKit gains them. For the microdrive part of
-      [#152](https://github.com/bog-dan-ro/spectacol/issues/152): insert, eject, save and save as `.mdr`.
+- [x] Microdrives: open `.mdr` cartridges and manage all eight drives from the Media menu.
+- [ ] IDE images, as ZxKit gains them.
 - [x] Timex 1/2: restored alongside None, Cursor, Kempston, Sinclair 1/2 and Fuller; real AY joystick
       input on TC2068/TS2068. Incompatible machine choices remain in the chooser with an explanation.
 - [ ] ULAplus on classic machines: expose it only after ZxKit implements it; keep this behind the priorities above.

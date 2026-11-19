@@ -48,7 +48,9 @@ Sheet {
         }
         SettingRow {
             label: qsTr("Interface 1")
-            description: qsTr("Microdrives and the RS232 port")
+            enabled: ZxEmulator.settings.interface1Available
+            description: enabled ? qsTr("Microdrive cartridges")
+                                 : qsTr("Unavailable on this machine")
             checked: ZxEmulator.settings.interface1
             onToggled: (on) => ZxEmulator.settings.interface1 = on
         }

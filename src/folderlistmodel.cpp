@@ -373,6 +373,8 @@ bool FolderListModel::accepts(const QString &fileName, std::span<const uint8_t> 
         return fileClass == zxkit::MediaClass::Tape;
     case Disks:
         return fileClass == zxkit::MediaClass::Disk;
+    case Microdrives:
+        return fileClass == zxkit::MediaClass::Microdrive;
     default:
         break;
     }

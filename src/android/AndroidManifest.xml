@@ -30,6 +30,7 @@
                 <data android:pathPattern=".*\\.trd"/>
                 <data android:pathPattern=".*\\.hdf"/>
                 <data android:pathPattern=".*\\.dsk"/>
+                <data android:pathPattern=".*\\.mdr"/>
                 <data android:pathPattern=".*\\.td0"/>
                 <data android:pathPattern=".*\\.zip"/>
             </intent-filter>

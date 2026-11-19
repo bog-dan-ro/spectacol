@@ -255,6 +255,7 @@ qt_add_qml_module(spectacol
         qml/GraphicsBenchmark.qml
         qml/MenuView.qml
         qml/MessagePage.qml
+        qml/MicrodrivesPage.qml
         qml/NextSdCardPage.qml
         qml/NextUartPage.qml
         qml/FilePickerPage.qml

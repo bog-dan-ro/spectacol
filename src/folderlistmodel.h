@@ -60,7 +60,7 @@ public:
     };
     Q_ENUM(FileSortCriteria)
 
-    enum FilterType { All, Tapes, Disks, HostFiles };
+    enum FilterType { All, Tapes, Disks, HostFiles, Microdrives };
     Q_ENUM(FilterType)
 
 public:

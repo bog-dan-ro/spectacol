@@ -352,6 +352,14 @@ public slots:
     QString snapshotFileName() const;
     QString snapshotFilePath(const QString &folder, const QString &fileName) const;
     void load(const QString &filePath, bool removeOnFail = false);
+    QStringList microdriveLabels() const;
+    bool microdriveInserted(int drive) const;
+    bool microdriveModified(int drive) const;
+    bool microdriveCanSave(int drive) const;
+    bool insertMicrodrive(int drive, const QString &filePath);
+    bool newMicrodrive(int drive);
+    void ejectMicrodrive(int drive);
+    bool saveMicrodrive(int drive, const QString &filePath);
     bool save(const QString &filePath);
     bool copyToFavourites(const QString &filePath);
     void remove(const QString &path);
@@ -468,7 +476,9 @@ private:
     bool activateControllerGame(const QString &title);
     void setInputKeys(quint64 source, const QSet<int> &keys);
     void applyKeyChanges(const HeldKeyState::Changes &changes);
-    std::pair<bool, zxkit::MediaClass> loadMediaWithType(const QString &filePath);
+    std::pair<bool, zxkit::MediaClass> loadMediaWithType(const QString &filePath, int drive = -1);
+    bool mountMicrodrive(int drive, std::span<const uint8_t> bytes, const QString &name,
+                         const QString &sourcePath = {});
     friend class ZxImage;
 
 private:
@@ -532,6 +542,8 @@ private:
     Qt::ApplicationState m_applicationState = Qt::ApplicationActive;
     ZxTape *m_tape = nullptr;
     Disks *m_disks = nullptr;
+    QHash<int, QString> m_microdriveNames;
+    QHash<int, QString> m_microdrivePaths;
     SdCardFiles *m_sdCard = nullptr;
     ZxRecording *m_recording = nullptr;
     bool m_showControlsIcons = true;

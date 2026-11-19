@@ -89,6 +89,14 @@ Quick load finds the newest snapshot across Save As files and per-game quick-sav
 Save failures keep the editor open and leave existing files intact. A failed RZX save keeps the recording in
 memory; **Spectacol → Retry recording save** retries it after the destination is available. Retry before quitting.
 
+### ZX Microdrive
+
+Open an `.mdr` cartridge on a compatible machine to activate Sinclair Interface 1
+and mount it in the first empty drive. Use **Media → Microdrives** to insert,
+eject, save or export cartridges. In BASIC, enter `CAT 1` to list the first
+cartridge. On a 128K or grey +2, use **48 BASIC** for Microdrive commands.
+
+
 ## ZX Spectrum Next
 
 **Media → SD card** browses the card, copies host files through the gamepad browser,

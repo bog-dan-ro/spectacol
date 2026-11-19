@@ -126,6 +126,15 @@ ZxMenuItem {
         }
 
         ZxMenuItem {
+            visible: ZxEmulator.settings.interface1
+            text: qsTr("Microdrives")
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "MicrodrivesPage.qml";
+            }
+        }
+
+        ZxMenuItem {
             visible: ZxEmulator.disks.count > 0
             text: qsTr("Disks")
             ZxMenuItem {

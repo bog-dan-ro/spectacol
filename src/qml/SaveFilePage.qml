@@ -51,7 +51,7 @@ Sheet {
     }
     FileDialog {
         id: deviceFile
-        title: qsTr("Save snapshot to device storage")
+        title: page.title
         fileMode: FileDialog.SaveFile
         defaultSuffix: page.selectedFormat
         currentFile: "file://" + page.folder + "/" + page.fileName

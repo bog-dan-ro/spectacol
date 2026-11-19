@@ -101,6 +101,7 @@ class ZxSettings : public QObject
                        settingsCurrentChanged)
     Q_PROPERTY(bool kempstonMouse READ kempstonMouse WRITE setKempstonMouse NOTIFY
                        settingsCurrentChanged)
+    Q_PROPERTY(bool interface1Available READ interface1Available NOTIFY currentMachineChanged)
     Q_PROPERTY(bool interface1 READ interface1 WRITE setInterface1 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool interface2 READ interface2 WRITE setInterface2 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool full48kOSK READ full48kOSK WRITE setFull48kOSK NOTIFY settingsCurrentChanged)
@@ -245,6 +246,7 @@ public:
     bool kempstonMouse() const;
     void setKempstonMouse(bool kempstonMouse);
 
+    bool interface1Available() const;
     bool interface1() const;
     void setInterface1(bool interface1);
 

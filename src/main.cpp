@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
             u"keys"_s);
     parser.addOption(windowSizeOption);
     parser.addOption(uiKeysOption);
-    parser.addPositionalArgument(u"file"_s, u"Snapshot, tape, disk or recording to load."_s,
+    parser.addPositionalArgument(u"file"_s, u"Snapshot, tape, disk, Microdrive cartridge or recording to load."_s,
                                  u"[file]"_s);
     parser.process(app);
 

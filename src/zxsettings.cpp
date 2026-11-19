@@ -200,10 +200,10 @@ void ZxSettings::applyToEmulator()
         m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) {
             emulator.attachPeripheral(std::make_unique<zxkit::KempstonMousePeripheral>());
         });
-    if (m_interface1)
-        m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) {
+    if (m_interface1 && !m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) {
             emulator.attachPeripheral(std::make_unique<zxkit::Interface1Peripheral>());
-        });
+        }))
+        m_interface1 = false;
     if (m_interface2)
         m_zxEmulator.withEmulator([](zxkit::Emulator &emulator) {
             emulator.attachPeripheral(std::make_unique<zxkit::Interface2Peripheral>());
@@ -306,6 +306,7 @@ void ZxSettings::syncCurrentMachine(std::string_view machineId)
     if (index != m_currentMachineIndex) {
         m_currentMachineIndex = index;
         emit currentMachineChanged();
+        emit settingsCurrentChanged();
     }
 }
 
@@ -502,25 +503,41 @@ void ZxSettings::setKempstonMouse(bool kempstonMouse)
     emit settingsCurrentChanged();
 }
 
+bool ZxSettings::interface1Available() const
+{
+    return m_zxEmulator.emulator().readLock()->machine().supportsInterface1();
+}
+
 bool ZxSettings::interface1() const
 {
-    return m_interface1;
+    return m_interface1 && interface1Available();
 }
 
 void ZxSettings::setInterface1(bool interface1)
 {
     if (m_interface1 == interface1)
         return;
+    if (!m_zxEmulator.withEmulator([interface1](zxkit::Emulator &emulator) {
+            if (interface1) {
+                if (!emulator.interface1())
+                    emulator.attachPeripheral(std::make_unique<zxkit::Interface1Peripheral>());
+            } else if (auto device = emulator.interface1()) {
+                for (std::size_t drive = 0; drive < zxkit::Interface1Peripheral::kMaxCartridges;
+                     ++drive) {
+                    if (device->get().cartridgeModified(drive))
+                        throw zxkit::PeripheralException(
+                                "Save or eject modified Microdrive cartridges before disabling Interface 1"sv);
+                }
+                emulator.detachPeripheral("interface1"sv);
+            }
+        })) {
+        emit settingsCurrentChanged();
+        return;
+    }
     m_interface1 = interface1;
     QSettings s;
     s.beginGroup(u"Peripherals"_s);
     s.setValue("interface1", interface1);
-    m_zxEmulator.withEmulator([interface1](zxkit::Emulator &emulator) {
-        if (interface1)
-            emulator.attachPeripheral(std::make_unique<zxkit::Interface1Peripheral>());
-        else
-            emulator.detachPeripheral("interface1"sv);
-    });
     emit settingsCurrentChanged();
 }
 
