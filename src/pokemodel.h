@@ -52,7 +52,7 @@ public:
     }
     void setPokesFolder(const QString &folder);
     Q_INVOKABLE bool choosePokesFolder(const QString &folder);
-    void gameLoaded(const QString &path);
+    void gameLoaded(const QString &path, const QString &name = {});
     Q_INVOKABLE bool loadPok(const QString &path);
     Q_INVOKABLE QVariantList requestedValues(int row) const;
     enum Roles : int { Label = Qt::DisplayRole, Active = Qt::UserRole + 1, Disabled };
@@ -119,7 +119,7 @@ private:
 private:
     Trainers m_trainers;
     zxkit::Shared<zxkit::Emulator> m_core;
-    QString m_source, m_folder, m_game;
+    QString m_source, m_folder, m_game, m_gameName;
     bool fail(const QString &message);
     void discover();
 };

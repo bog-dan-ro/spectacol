@@ -29,9 +29,7 @@
 #include <QtCore/private/qandroidextras_p.h>
 #include <QtCore/private/qjnihelpers_p.h>
 
-#include <zxkit/media/MediaPreview.h>
-
-#include <span>
+#include <unistd.h>
 
 using namespace Qt::StringLiterals;
 namespace AndroidIntegration {
@@ -115,30 +113,7 @@ private:
             return false;
         // Android delivers new intents on its Java UI thread, not Qt's GUI thread.
         QMetaObject::invokeMethod(
-                this,
-                [url] {
-                    auto &emulator = ZxEmulator::instance();
-                    // The Files app offers us any octet stream: copy only what we can load
-                    const auto name = displayName(url);
-                    QFile input;
-                    const auto header = openDocument(url, input) ? input.read(64) : QByteArray();
-                    input.close();
-                    const std::span<const uint8_t> bytes(
-                            reinterpret_cast<const uint8_t *>(header.constData()),
-                            size_t(header.size()));
-                    if (zxkit::classifyMediaFile(name.toStdString(), bytes)
-                        == zxkit::MediaClass::Unknown) {
-                        emulator.showMessage(
-                                QCoreApplication::translate("AndroidIntegration",
-                                                            "Spectacol can't open \"%1\".")
-                                        .arg(name),
-                                ZxEmulator::Warning);
-                        return;
-                    }
-                    const auto path = emulator.importFile(url);
-                    if (!path.isEmpty())
-                        emulator.load(path);
-                },
+                this, [url] { ZxEmulator::instance().openExternalFile(url); },
                 Qt::QueuedConnection);
         return true;
     }
@@ -153,18 +128,13 @@ QString displayName(const QUrl &url)
 {
     if (url.scheme() != u"content"_s)
         return QFileInfo(url.isLocalFile() ? url.toLocalFile() : url.toString()).fileName();
-    const auto uriString = QJniObject::fromString(url.toString());
-    const auto uri = QJniObject::callStaticObjectMethod("android/net/Uri", "parse",
-                                                        "(Ljava/lang/String;)Landroid/net/Uri;",
-                                                        uriString.object<jstring>());
-    const auto resolver =
-            QJniObject(QNativeInterface::QAndroidApplication::context())
-                    .callObjectMethod("getContentResolver", "()Landroid/content/ContentResolver;");
-    auto cursor = resolver.callObjectMethod(
+    const auto uri = parseUri(url.toString(QUrl::FullyEncoded));
+    const auto columns = QJniArray<jstring>::fromContainer(QStringList{ u"_display_name"_s });
+    auto cursor = contentResolver().callObjectMethod(
             "query",
             "(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/"
             "String;)Landroid/database/Cursor;",
-            uri.object(), nullptr, nullptr, nullptr, nullptr);
+            uri.object(), columns.object<jobjectArray>(), nullptr, nullptr, nullptr);
     QString name;
     if (cursor.isValid()) {
         const auto columnName = QJniObject::fromString(u"_display_name"_s);
@@ -193,8 +163,11 @@ bool openDocument(const QUrl &url, QFile &file)
     if (!env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose)
         && descriptor.isValid()) {
         const int fd = descriptor.callMethod<jint>("detachFd");
-        if (fd >= 0 && file.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle))
-            return true;
+        if (fd >= 0) {
+            if (file.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle))
+                return true;
+            ::close(fd);
+        }
     }
     // Qt's own content engine handles the providers it knows
     file.setFileName(url.toString());

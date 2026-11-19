@@ -17,6 +17,9 @@
 
 #include "pokemodel.h"
 #include "contenturi.h"
+#ifdef Q_OS_ANDROID
+#include "androidintegration.h"
+#endif
 
 #include <QDir>
 #include <QFile>
@@ -310,11 +313,12 @@ bool PokeModel::choosePokesFolder(const QString &folder)
         discover();
     return true;
 }
-void PokeModel::gameLoaded(const QString &path)
+void PokeModel::gameLoaded(const QString &path, const QString &name)
 {
     clear();
     const QUrl url(path);
     m_game = url.isLocalFile() ? url.toLocalFile() : path;
+    m_gameName = name.isEmpty() ? QFileInfo(m_game).fileName() : name;
     if (!m_game.isEmpty())
         discover();
 }
@@ -322,21 +326,34 @@ void PokeModel::discover()
 {
     if (m_game.isEmpty())
         return;
-    const QFileInfo game(m_game);
+    const auto baseName = QFileInfo(m_gameName).completeBaseName();
+    const auto matches = [&baseName](const QFileInfo &file) {
+        return file.suffix().compare(u"pok"_s, Qt::CaseInsensitive) == 0
+                && file.completeBaseName().compare(baseName, Qt::CaseInsensitive) == 0;
+    };
     QStringList folders;
     // Qt can't tell a device folder document's parent; Android storage ids are paths
     if (!ContentUri::isContent(m_game))
-        folders.append(game.absolutePath());
+        folders.append(QFileInfo(m_game).absolutePath());
     else if (const auto parent = ContentUri::parentFolder(m_game); !parent.isEmpty())
         folders.append(parent);
     if (!m_folder.isEmpty() && !folders.contains(m_folder))
         folders.append(m_folder);
     for (const auto &folder : folders) {
+#ifdef Q_OS_ANDROID
+        if (ContentUri::isContent(folder)) {
+            for (const auto &document : AndroidIntegration::listFolder(folder)) {
+                if (!document.directory && matches(QFileInfo(document.name))) {
+                    loadPok(document.path);
+                    return;
+                }
+            }
+            continue;
+        }
+#endif
         const auto files = QDir(folder).entryInfoList(QDir::Files | QDir::Readable, QDir::Name);
         for (const auto &file : files) {
-            if (file.suffix().compare(u"pok"_s, Qt::CaseInsensitive) == 0
-                && file.completeBaseName().compare(game.completeBaseName(), Qt::CaseInsensitive)
-                        == 0) {
+            if (matches(file)) {
                 loadPok(file.absoluteFilePath());
                 return;
             }
@@ -346,14 +363,22 @@ void PokeModel::discover()
 bool PokeModel::loadPok(const QString &path)
 {
     const QUrl url(path);
-    QFile file(url.isLocalFile() ? url.toLocalFile() : path);
-    if (!file.open(QIODevice::ReadOnly))
+    const auto source = url.isLocalFile() ? url.toLocalFile() : path;
+    QFile file(source);
+#ifdef Q_OS_ANDROID
+    const bool opened = ContentUri::isContent(path) ? AndroidIntegration::openDocument(url, file)
+                                                    : file.open(QIODevice::ReadOnly);
+#else
+    const bool opened = file.open(QIODevice::ReadOnly);
+#endif
+    if (!opened)
         return fail(tr("Cannot open trainers: %1").arg(file.errorString()));
-    if (file.size() > 1024 * 1024)
-        return fail(tr("Trainer file is too large (maximum 1 MiB)"));
-    const auto bytes = file.readAll();
+    constexpr qint64 maxSize = 1024 * 1024;
+    const auto bytes = file.read(maxSize + 1);
     if (file.error() != QFileDevice::NoError)
         return fail(tr("Cannot read trainers"));
+    if (bytes.size() > maxSize)
+        return fail(tr("Trainer file is too large (maximum 1 MiB)"));
     // Validate before the core's permissive legacy parser can narrow integers.
     bool named = false, ended = false;
     auto text = QString::fromUtf8(bytes);
@@ -408,7 +433,7 @@ bool PokeModel::loadPok(const QString &path)
             return fail(tr("Turn off active pokes before replacing the trainer list"));
     beginResetModel();
     m_trainers = std::move(trainers);
-    m_source = file.fileName();
+    m_source = source;
     endResetModel();
     emit sourceChanged();
     return true;

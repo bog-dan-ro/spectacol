@@ -206,6 +206,7 @@ def main():
             bulk.mkdir()
             for index in range(100):
                 (bulk / f"game-{index:03}.sna").write_bytes(expected)
+            (bulk / "game-000.POK").write_text("NDevice trainer\nZ 8 36864 77 0\nY\n")
             adb("push", str(bulk) + "/.", games + "/")
             private("mkdir", "-p", data)
             write_settings("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=" + data
@@ -226,7 +227,22 @@ def main():
             wait_for(lambda n: label(n) == "Sub", "The device folder's sub folder")
             assert gone("notes.txt", 1), "a text file was listed"
             tap("Sub")
-            tap(token + ".sna", "The game in the device folder")
+            wait_for(lambda n: label(n) == token + ".sna", "The game in the subfolder")
+            tap("Up a folder")
+            game = wait_for(lambda n: label(n) == "game-000.sna", "The game in the large folder")[0]
+            opened = time.monotonic()
+            press(game)
+            wait_for(lambda n: label(n) == "Menu", "Returning to the game", timeout=8)
+            elapsed = time.monotonic() - opened
+            assert elapsed < 8, f"Opening a game in the large device folder took {elapsed:.1f}s"
+            print(f"Game opened in {elapsed:.1f}s including UI automation", flush=True)
+            shell("input", "keyevent", "135")  # F5 opens the main menu.
+            tap("Machine")
+            tap("Poke memory")
+            wait_for(lambda n: label(n) == "Device trainer", "The matching device-folder trainer")
+            wait_for(lambda n: label(n).startswith("content://")
+                     and label(n).endswith("game-000.POK"), "The matching trainer's document URI")
+            shell("input", "keyevent", "4")
             deadline = time.monotonic() + 100
             raw = b""
             while time.monotonic() < deadline:
@@ -240,10 +256,11 @@ def main():
             assert any(games_name in uri for uri in persisted()), "the device folder's grant was not kept"
             print("Device folder granted, browsed and its game loaded", flush=True)
 
-            # After a restart Quick Open reopens where it was, inside the device folder: the grant
-            # is still there, and Up climbs out of it to the Spectacol folder, which lists it.
+            # After a restart Quick Open reopens the device folder with the saved grant.
             start(["--ui-keys", "page:FileBrowserPage.qml"])
-            wait_for(lambda n: label(n) == token + ".sna", "The game after a restart")
+            wait_for(lambda n: label(n) == "game-000.sna", "The game after a restart")
+            tap("Sub")
+            wait_for(lambda n: label(n) == token + ".sna", "The game in the subfolder after a restart")
             tap("Up a folder")
             wait_for(lambda n: label(n) == "Sub", "The device folder after a restart")
             tap("Up a folder")

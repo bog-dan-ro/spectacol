@@ -37,8 +37,10 @@ Q_MOC_INCLUDE("zxrecording.h")
 Q_MOC_INCLUDE("zxsettings.h")
 
 #include <QGamepadManager>
+#include <QJSValue>
 #include <QPointer>
 #include <QQmlEngine>
+#include <QThreadPool>
 #include <QUrl>
 #include <QTimer>
 
@@ -48,6 +50,7 @@ Q_MOC_INCLUDE("zxsettings.h")
 
 #include <atomic>
 #include <exception>
+#include <functional>
 #include <memory>
 #include <utility>
 
@@ -199,7 +202,10 @@ public:
     /// Loads any media file (the file is read before locking the emulator).
     bool loadMediaFile(const QString &filePath);
     /// Copy a document-provider file into app storage while its URI grant is valid.
-    Q_INVOKABLE QString importFile(const QUrl &url);
+    Q_INVOKABLE void importFile(const QUrl &url, QObject *receiver, QJSValue done);
+#ifdef Q_OS_ANDROID
+    void openExternalFile(const QUrl &url);
+#endif
     /// Saves a snapshot, the tape or a screenshot (the file is written after unlocking the emulator).
     bool saveMediaFile(const QString &filePath);
     /// Replaces local files atomically; selected Android documents use direct writes.
@@ -207,7 +213,7 @@ public:
     bool writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes);
     void releaseInputs();
     /// A consumer drive-A insertion selects a game without reading the media twice.
-    void setLoadedGame(const QString &path);
+    void setLoadedGame(const QString &name);
     zxkit::Z80Registers registers() const;
 
     bool paused() const;
@@ -476,7 +482,12 @@ private:
     bool activateControllerGame(const QString &title);
     void setInputKeys(quint64 source, const QSet<int> &keys);
     void applyKeyChanges(const HeldKeyState::Changes &changes);
-    std::pair<bool, zxkit::MediaClass> loadMediaWithType(const QString &filePath, int drive = -1);
+    struct MediaLoad;
+    static MediaLoad readMedia(const QString &path);
+    std::pair<bool, zxkit::MediaClass> applyMedia(const QString &path, const MediaLoad &media,
+                                                  int drive = -1);
+    void finishLoad(const QString &path, bool removeOnFail, const MediaLoad &media);
+    void importDocument(const QUrl &url, bool checkMedia, std::function<void(QString)> done);
     bool mountMicrodrive(int drive, std::span<const uint8_t> bytes, const QString &name,
                          const QString &sourcePath = {});
     friend class ZxImage;
@@ -484,6 +495,8 @@ private:
 private:
     bool m_touchscreen = false;
     QString m_loadedFileName;
+    QThreadPool m_documentJobs;
+    quint64 m_gameLoadRequest = 0;
     int m_selectedFilterIndex = 0;
     // The joysticks the gamepad can be: the order of joysticksModel()
     enum JoystickKind : int {

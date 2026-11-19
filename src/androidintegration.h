@@ -30,8 +30,7 @@ class QObject;
 namespace AndroidIntegration {
 void install(QObject *parent);
 QString displayName(const QUrl &url);
-// Opens a document another app gave us (content://) for reading, the way Android expects
-// (ContentResolver.openFileDescriptor); Qt's content engine can't open every provider's documents.
+// Read the provider's descriptor directly, including providers Qt's content engine can't open.
 bool openDocument(const QUrl &url, QFile &file);
 
 struct Document

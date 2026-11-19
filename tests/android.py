@@ -193,6 +193,23 @@ def main():
             after = private("ls", data + "/Imported").stdout.decode().splitlines()
             assert after == before, ("an unsupported file was imported", after)
             print("Octet-stream documents open in Spectacol; other files are refused", flush=True)
+
+            # The native picker returns to Quick Open while the document is imported.
+            shell("am", "force-stop", package)
+            config.write_text(config.read_text().replace("orientation=1", "orientation=2"))
+            adb("push", str(config), staging)
+            private("cp", staging, settings)
+            shell("am", "start", "-S", "-W", "-n", activity, "--es", "applicationArguments",
+                  "--machine 48k --quit-after 28 --screenshot " + data
+                  + "/picker.sna --ui-keys page:FileBrowserPage.qml")
+            tap(lambda n: label(n) == "Page actions")
+            tap(lambda n: label(n) == "Device files…")
+            if not any(label(n) == token + ".szx" for n in nodes()):
+                tap(lambda n: n.get("content-desc") in ("Show roots", "Open navigation drawer"))
+                tap(lambda n: label(n) == "Downloads")
+            tap(lambda n: label(n) == token + ".szx")
+            snapshot("picker", expected)
+            print("Quick Open imported and loaded the native picker's document", flush=True)
     finally:
         (output / "logcat.txt").write_bytes(adb("logcat", "-d", "-t", "3000", check=False).stdout)
         (output / "last-screen.png").write_bytes(adb("exec-out", "screencap", "-p", check=False).stdout)

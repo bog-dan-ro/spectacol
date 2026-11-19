@@ -52,7 +52,7 @@ GridView {
         id: row
         required property int index
         required property string name
-        required property string path
+        required property string coverSource
         required property bool isDir
         required property bool isDevice
         readonly property string folderIcon: isDevice ? "folder-device" : "folder"
@@ -66,7 +66,7 @@ GridView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: view.grid
-                source: visible ? (row.isDir ? "qrc:/images/" + row.folderIcon + ".svg" : "image://spectrum/" + row.path) : ""
+                source: visible ? row.coverSource : ""
                 sourceSize: Qt.size(Math.ceil(view.cellWidth * view.pixelRatio), Math.ceil(view.cellHeight * view.pixelRatio))
                 fillMode: Image.PreserveAspectFit
                 smooth: false

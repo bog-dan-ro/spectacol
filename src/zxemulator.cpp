@@ -397,6 +397,8 @@ ZxEmulator::ZxEmulator(QObject *parent)
       m_sdCard(new SdCardFiles(this)),
       m_recording(new ZxRecording(this))
 {
+    // Serialize imports so concurrent selections cannot choose the same output path.
+    m_documentJobs.setMaxThreadCount(1);
 #ifdef Q_OS_ANDROID
     const auto manager =
             QJniObject(QNativeInterface::QAndroidApplication::context())
@@ -1173,36 +1175,44 @@ int ZxEmulator::pokeFinderCount() const
     return int(emulator().readLock()->debugger().pokeFinder().count());
 }
 
-bool ZxEmulator::loadMediaFile(const QString &filePath)
+namespace {
+struct DocumentImport
 {
-    return loadMediaWithType(filePath).first;
-}
+    QString path;
+    QString message;
+    ZxEmulator::ErrorLevel level = ZxEmulator::Error;
+};
 
-QString ZxEmulator::importFile(const QUrl &url)
+DocumentImport copyDocument(const QUrl &url, const QDir &folder, bool checkMedia)
 {
-    if (url.scheme() != u"content"_s)
-        return url.isLocalFile() ? url.toLocalFile() : url.toString();
 #ifdef Q_OS_ANDROID
     const auto name = AndroidIntegration::displayName(url);
-#else
-    const auto name = QFileInfo(url.path()).fileName();
-#endif
-#ifdef Q_OS_ANDROID
     QFile input;
     const bool opened = AndroidIntegration::openDocument(url, input);
 #else
+    const auto name = QFileInfo(url.path()).fileName();
     QFile input(url.toString());
     const bool opened = input.open(QIODevice::ReadOnly);
 #endif
-    if (!opened) {
-        showMessage(tr("Can't open '%1': %2").arg(name, input.errorString()), Error);
-        return {};
+    if (!opened)
+        return { {}, ZxEmulator::tr("Can't open '%1': %2").arg(name, input.errorString()) };
+
+    if (checkMedia) {
+        const auto header = input.peek(64);
+        if (input.error() != QFileDevice::NoError)
+            return { {}, ZxEmulator::tr("Can't read '%1': %2").arg(name, input.errorString()) };
+        const std::span<const uint8_t> bytes(reinterpret_cast<const uint8_t *>(header.constData()),
+                                             size_t(header.size()));
+        if (zxkit::classifyMediaFile(name.toStdString(), bytes) == zxkit::MediaClass::Unknown)
+            return { {},
+                     ZxEmulator::tr("Spectacol can't open \"%1\".").arg(name),
+                     ZxEmulator::Warning };
     }
-    const QDir folder(QDir(dataPath()).filePath(u"Imported"_s));
-    if (!folder.mkpath(u"."_s)) {
-        showMessage(tr("Can't create the Imported folder."), Error);
-        return {};
-    }
+    if (url.isLocalFile())
+        return { url.toLocalFile(), {} };
+    if (!folder.mkpath(u"."_s))
+        return { {}, ZxEmulator::tr("Can't create the Imported folder.") };
+
     const QFileInfo info(saveName(name, u"Imported"_s));
     QString path = folder.filePath(info.fileName());
     for (unsigned n = 1; QFileInfo::exists(path); ++n)
@@ -1210,57 +1220,129 @@ QString ZxEmulator::importFile(const QUrl &url)
                                + (info.suffix().isEmpty() ? QString{} : u'.' + info.suffix()));
     QSaveFile output(path);
     if (output.open(QIODevice::WriteOnly)) {
-        bool written = true;
         for (;;) {
-            const auto bytes = input.read(64 * 1024);
-            if (input.error() != QFileDevice::NoError) {
-                showMessage(tr("Can't read '%1': %2").arg(name, input.errorString()), Error);
-                return {};
-            }
-            if (bytes.isEmpty())
-                break;
-            if (output.write(bytes) != bytes.size()) {
-                written = false;
+            const auto bytes = input.read(256 * 1024);
+            if (input.error() != QFileDevice::NoError)
+                return { {}, ZxEmulator::tr("Can't read '%1': %2").arg(name, input.errorString()) };
+            if (bytes.isEmpty()) {
+                if (output.commit())
+                    return { path, {} };
                 break;
             }
+            if (output.write(bytes) != bytes.size())
+                break;
         }
-        if (written && output.commit())
-            return path;
     }
-    showMessage(tr("Can't import '%1': %2").arg(name, output.errorString()), Error);
-    return {};
+    return { {}, ZxEmulator::tr("Can't import '%1': %2").arg(name, output.errorString()) };
+}
+} // namespace
+
+void ZxEmulator::importFile(const QUrl &url, QObject *receiver, QJSValue done)
+{
+    if (!receiver || !done.isCallable())
+        return;
+    const auto request = ++m_gameLoadRequest;
+    importDocument(url, false,
+                   [this, request, receiver = QPointer(receiver),
+                    done = std::move(done)](const QString &path) {
+                       if (receiver && request == m_gameLoadRequest)
+                           done.call({ QJSValue(path) });
+                   });
 }
 
-std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &filePath, int drive)
+void ZxEmulator::importDocument(const QUrl &url, bool checkMedia, std::function<void(QString)> done)
+{
+    if (!checkMedia && url.scheme() != u"content"_s) {
+        done(url.isLocalFile() ? url.toLocalFile() : url.toString());
+        return;
+    }
+
+    const QDir folder(QDir(dataPath()).filePath(u"Imported"_s));
+    m_documentJobs.start([this, url, folder, checkMedia, done = std::move(done)]() mutable {
+        auto result = copyDocument(url, folder, checkMedia);
+        QMetaObject::invokeMethod(
+                this,
+                [this, result = std::move(result), done = std::move(done)] {
+                    if (!result.message.isEmpty())
+                        showMessage(result.message, result.level);
+                    done(result.path);
+                },
+                Qt::QueuedConnection);
+    });
+}
+
+#ifdef Q_OS_ANDROID
+void ZxEmulator::openExternalFile(const QUrl &url)
+{
+    const auto request = ++m_gameLoadRequest;
+    importDocument(url, true, [this, request](const QString &path) {
+        if (request == m_gameLoadRequest && !path.isEmpty())
+            load(path);
+    });
+}
+#endif
+
+struct ZxEmulator::MediaLoad
+{
+    zxkit::MediaFile file;
+    QString name;
+    QString error;
+};
+
+ZxEmulator::MediaLoad ZxEmulator::readMedia(const QString &path)
+{
+    try {
+        const QUrl url(path);
+        const auto source = url.isLocalFile() ? url.toLocalFile() : path;
+        QFile input(source);
+        QString name;
+        bool opened = false;
+#ifdef Q_OS_ANDROID
+        if (url.scheme() == u"content"_s) {
+            name = AndroidIntegration::displayName(url);
+            opened = AndroidIntegration::openDocument(url, input);
+        } else
+#endif
+        {
+            name = QFileInfo(source).fileName();
+            opened = input.open(QIODevice::ReadOnly);
+        }
+        if (!opened)
+            return { {}, {}, tr("Can't open '%1': %2").arg(path, input.errorString()) };
+        const auto bytes = input.readAll();
+        if (input.error() != QFileDevice::NoError)
+            return { {}, {}, tr("Can't read '%1': %2").arg(path, input.errorString()) };
+        auto file = zxkit::MediaFile::fromBytes(std::vector<uint8_t>(bytes.begin(), bytes.end()),
+                                                QFileInfo(name).suffix().toStdString());
+        return { std::move(file), name, {} };
+    } catch (const std::exception &e) {
+        return { {}, {}, QString::fromUtf8(e.what()) };
+    }
+}
+
+bool ZxEmulator::loadMediaFile(const QString &filePath)
+{
+    return applyMedia(filePath, readMedia(filePath)).first;
+}
+
+std::pair<bool, zxkit::MediaClass> ZxEmulator::applyMedia(const QString &filePath,
+                                                          const MediaLoad &media, int drive)
 {
     m_joystickPromptTimer.stop();
-    zxkit::MediaFile file;
+    if (!media.error.isEmpty()) {
+        showMessage(media.error, Error);
+        return { false, zxkit::MediaClass::Unknown };
+    }
+
+    const auto &file = media.file;
     zxkit::SnapshotJoystickInfo joystick;
     try {
-        // The slow part (reading, unzipping) runs before taking the lock
-        const QUrl url(filePath);
-        QFile input(url.isLocalFile() ? url.toLocalFile() : filePath);
-        if (!input.open(QIODevice::ReadOnly)) {
-            showMessage(tr("Can't open '%1': %2").arg(filePath, input.errorString()), Error);
-            return { false, zxkit::MediaClass::Unknown };
-        }
-        const auto bytes = input.readAll();
-        if (input.error() != QFileDevice::NoError) {
-            showMessage(tr("Can't read '%1': %2").arg(filePath, input.errorString()), Error);
-            return { false, zxkit::MediaClass::Unknown };
-        }
-        // QFile supports Android's content providers; std::ifstream does not.
-#ifdef Q_OS_ANDROID
-        const auto name = AndroidIntegration::displayName(url);
-#else
-        const auto name = QFileInfo(input.fileName()).fileName();
-#endif
-        file = zxkit::MediaFile::fromBytes(std::vector<uint8_t>(bytes.begin(), bytes.end()),
-                                           QFileInfo(name).suffix().toStdString());
         if (file.extension == ".mdr"sv) {
             const bool direct =
-                    QFileInfo(name).suffix().compare(u"mdr"_s, Qt::CaseInsensitive) == 0;
-            return { mountMicrodrive(drive, file.data, name, direct ? input.fileName() : QString{}),
+                    QFileInfo(media.name).suffix().compare(u"mdr"_s, Qt::CaseInsensitive) == 0;
+            const QUrl url(filePath);
+            const auto source = url.isLocalFile() ? url.toLocalFile() : filePath;
+            return { mountMicrodrive(drive, file.data, media.name, direct ? source : QString{}),
                      zxkit::MediaClass::Microdrive };
         }
         if (drive >= 0) {
@@ -1270,7 +1352,7 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
         joystick = zxkit::SnapshotFormats::joystickInfo(file.data, file.extension);
         // Z80's zero joystick bits also occur in snapshots with no input preference.
         // Ask for that ambiguous default, while retaining declared nonzero mappings.
-        if (file.extension == ".z80"sv && (file.data[29] & 0xc0) == 0
+        if (file.extension == ".z80"sv && file.data.size() >= 30 && (file.data[29] & 0xc0) == 0
             && m_settings->joystickPrompt()) {
             joystick.type.reset();
         }
@@ -1282,7 +1364,7 @@ std::pair<bool, zxkit::MediaClass> ZxEmulator::loadMediaWithType(const QString &
     const bool loaded =
             withEmulator([&file](zxkit::Emulator &emulator) { emulator.loadMedia(file); });
     if (loaded) {
-        m_pokes->gameLoaded(filePath);
+        m_pokes->gameLoaded(filePath, media.name);
         m_symbols.clear();
         const auto id = std::string(emulator().readLock()->machine().id());
         if (m_settings)
@@ -1404,7 +1486,7 @@ bool ZxEmulator::microdriveCanSave(int drive) const
 
 bool ZxEmulator::insertMicrodrive(int drive, const QString &filePath)
 {
-    return drive >= 0 && loadMediaWithType(filePath, drive).first;
+    return drive >= 0 && applyMedia(filePath, readMedia(filePath), drive).first;
 }
 
 bool ZxEmulator::newMicrodrive(int drive)
@@ -1730,9 +1812,28 @@ void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
 
 void ZxEmulator::load(const QString &filePath, bool removeOnFail)
 {
+    const auto request = ++m_gameLoadRequest;
+    if (ContentUri::isContent(filePath)) {
+        m_documentJobs.start([this, filePath, removeOnFail, request] {
+            auto media = readMedia(filePath);
+            QMetaObject::invokeMethod(
+                    this,
+                    [this, filePath, removeOnFail, request, media = std::move(media)] {
+                        if (request == m_gameLoadRequest)
+                            finishLoad(filePath, removeOnFail, media);
+                    },
+                    Qt::QueuedConnection);
+        });
+        return;
+    }
+    finishLoad(filePath, removeOnFail, readMedia(filePath));
+}
+
+void ZxEmulator::finishLoad(const QString &filePath, bool removeOnFail, const MediaLoad &media)
+{
     const auto previousName = m_loadedFileName;
-    m_loadedFileName = QFileInfo(filePath).completeBaseName();
-    const auto [loaded, mediaClass] = loadMediaWithType(filePath);
+    m_loadedFileName = QFileInfo(media.name).completeBaseName();
+    const auto [loaded, mediaClass] = applyMedia(filePath, media);
     m_recording->refresh();
     if (!loaded) {
         m_loadedFileName = previousName;
@@ -2678,6 +2779,9 @@ void ZxEmulator::debuggerCommand(const QString &command)
 
 void ZxEmulator::stopEngine()
 {
+    ++m_gameLoadRequest;
+    m_documentJobs.clear();
+    m_documentJobs.waitForDone();
     m_joystickPromptTimer.stop();
     if (m_engine)
         m_engine->stop();
@@ -2748,9 +2852,10 @@ bool ZxEmulator::activateControllerGame(const QString &name)
             && applyControllerMapping(m_controllerProfiles->mapping(profile), true);
 }
 
-void ZxEmulator::setLoadedGame(const QString &path)
+void ZxEmulator::setLoadedGame(const QString &name)
 {
-    m_loadedFileName = QFileInfo(path).completeBaseName();
+    ++m_gameLoadRequest;
+    m_loadedFileName = QFileInfo(name).completeBaseName();
     activateControllerGame(m_loadedFileName);
     emit saveSnapshotEnabledChanged();
 }

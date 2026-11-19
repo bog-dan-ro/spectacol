@@ -351,15 +351,33 @@ QVariant FolderListModel::data(const QModelIndex &index, int role) const
         return entry.dir;
     case IsDevice:
         return entry.device;
+    case CoverSource:
+        if (entry.dir)
+            return entry.device ? u"qrc:/images/folder-device.svg"_s : u"qrc:/images/folder.svg"_s;
+        // The directory query already gave us the names. Covers must not open provider files.
+        if (ContentUri::isContent(entry.path)) {
+            switch (zxkit::classifyMediaFile(entry.name.toStdString(), {})) {
+            case zxkit::MediaClass::Disk:
+                return u"qrc:/images/floppy.svg"_s;
+            case zxkit::MediaClass::Tape:
+            case zxkit::MediaClass::Microdrive:
+                return u"qrc:/images/cassette-tape.svg"_s;
+            default:
+                return u"qrc:/images/binary.svg"_s;
+            }
+        }
+        return u"image://spectrum/"_s + entry.path;
     }
     return {};
 }
 
 QHash<int, QByteArray> FolderListModel::roleNames() const
 {
-    static QHash<int, QByteArray> ret = {
-        { Name, "name" }, { Path, "path" }, { IsDir, "isDir" }, { IsDevice, "isDevice" }
-    };
+    static QHash<int, QByteArray> ret = { { Name, "name" },
+                                          { Path, "path" },
+                                          { IsDir, "isDir" },
+                                          { IsDevice, "isDevice" },
+                                          { CoverSource, "coverSource" } };
     return ret;
 }
 

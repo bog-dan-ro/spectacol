@@ -51,7 +51,7 @@ class FolderListModel : public QAbstractListModel
             FilterType filterClass READ filterClass WRITE setFilterClass NOTIFY filterClassChanged)
 
 public:
-    enum FileFields { Name = Qt::DisplayRole, Path = Qt::UserRole, IsDir, IsDevice };
+    enum FileFields { Name = Qt::DisplayRole, Path = Qt::UserRole, IsDir, IsDevice, CoverSource };
     Q_ENUM(FileFields)
 
     enum FileSortCriteria {

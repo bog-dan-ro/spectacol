@@ -2,6 +2,10 @@
 
 #include "zxemulator.h"
 #include "zxsettings.h"
+#ifdef Q_OS_ANDROID
+#include "androidintegration.h"
+#include "contenturi.h"
+#endif
 
 #include <QFile>
 #include <QFileInfo>
@@ -34,23 +38,40 @@ void Disks::insertDisk(int idx, const QString &path)
 {
     if (idx < 0 || idx >= count())
         return;
-    QFile f{ path };
-    if (!f.open(QIODeviceBase::ReadOnly)) {
+    QFile file(path);
+    QString name;
+    bool opened = false;
+#ifdef Q_OS_ANDROID
+    if (ContentUri::isContent(path)) {
+        const QUrl url(path);
+        name = AndroidIntegration::displayName(url);
+        opened = AndroidIntegration::openDocument(url, file);
+    } else
+#endif
+    {
+        name = QFileInfo(path).fileName();
+        opened = file.open(QIODevice::ReadOnly);
+    }
+    if (!opened) {
         m_zxEmulator->showMessage(tr("Can't open %1").arg(path), ZxEmulator::Error);
         return;
     }
     // Read the file before locking the emulator
-    const auto bytes = f.readAll() | std::ranges::to<std::vector<uint8_t>>();
-    const QString name = QFileInfo{ path }.fileName();
+    const auto bytes = file.readAll() | std::ranges::to<std::vector<uint8_t>>();
+    if (file.error() != QFileDevice::NoError) {
+        m_zxEmulator->showMessage(tr("Can't read '%1': %2").arg(name, file.errorString()),
+                                  ZxEmulator::Error);
+        return;
+    }
     try {
         {
             auto emulator = m_zxEmulator->emulator().writeLock();
-            emulator->insertDisk(std::size_t(idx), bytes, QFileInfo{ path }.suffix().toStdString());
+            emulator->insertDisk(std::size_t(idx), bytes, QFileInfo(name).suffix().toStdString());
             if (idx == 0 && m_zxEmulator->settings()->autoLoad())
                 emulator->autoBootDisk();
         }
         if (idx == 0)
-            m_zxEmulator->setLoadedGame(path);
+            m_zxEmulator->setLoadedGame(name);
         m_zxEmulator->showMessage(tr("'%1' inserted into drive %2:").arg(name, QChar(u'A' + idx)));
     } catch (const std::exception &e) {
         m_zxEmulator->showMessage(
