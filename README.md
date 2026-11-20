@@ -1,5 +1,8 @@
 # Spectacol
 
+<img src="logo/spectacol.png" width="200" align="left">
+<img src="logo/zxkit.png" width="200" align="right">
+
 Spectacol (in Romanian it means **show**) is a [free](http://www.gnu.org/licenses/gpl-3.0.en.html) [ZX Spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum) emulator built on [ZxKit](https://github.com/bog-dan-ro/ZxKit), a modern C++23 ZX Spectrum emulation library, with its own UI made in QML.
 
 > **AI disclosure:** Spectacol's updates were made with **Codex (Skynet)** as the
