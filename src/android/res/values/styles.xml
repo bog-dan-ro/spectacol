@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2015-2026, BogDan Vatra. SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <!-- Match Android's default activity theme for the app's target SDK. -->
+    <style name="SpectacolTheme" parent="@android:style/Theme.DeviceDefault.Light.DarkActionBar"/>
+</resources>

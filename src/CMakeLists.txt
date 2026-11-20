@@ -60,7 +60,6 @@ endif()
 qt_add_resources(spectacol "resources"
     PREFIX "/"
     FILES
-        android/res/drawable/icon.png
         images/arrow-down-left.svg
         images/arrow-down-right.svg
         images/arrow-down.svg
@@ -96,6 +95,7 @@ qt_add_resources(spectacol "resources"
         images/pause.svg
         images/play.svg
         images/plus.svg
+        images/spectacol.png
         images/status-error.svg
         images/status-info.svg
         images/status-warning.svg
@@ -411,7 +411,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     install(FILES "${PROJECT_SOURCE_DIR}/packaging/linux/${spectacolAppId}.metainfo.xml"
         DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo COMPONENT Runtime
     )
-    install(FILES android/res/drawable/icon.png
+    install(FILES images/spectacol.png
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/192x192/apps
         RENAME "${spectacolAppId}.png" COMPONENT Runtime
     )

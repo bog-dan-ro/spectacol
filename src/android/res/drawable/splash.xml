@@ -3,7 +3,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#14161b"/>
+            <solid android:color="@color/splash_background"/>
         </shape>
     </item>
     <item android:width="192dp" android:height="192dp" android:gravity="center">
