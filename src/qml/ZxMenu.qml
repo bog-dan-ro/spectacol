@@ -48,7 +48,7 @@ ZxMenuItem {
     }
 
     ZxMenuItem {
-        text: qsTr("&Quick Open ..")
+        text: qsTr("&File Browser")
         onTriggered: {
             menuBar.close();
             pageLoader.source = "FileBrowserPage.qml";

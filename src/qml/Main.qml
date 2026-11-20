@@ -53,6 +53,21 @@ ApplicationWindow {
         source: active ? "DesktopKeyboard.qml" : ""
     }
 
+    // The sub menu the open page came from, and the one the menu reopens on
+    property var pageReturnPath: null
+    property var menuRestorePath: null
+
+    // Back out of a page: to the sub menu that opened it, else to the game.
+    // A page that has done its job clears pageLoader.source and goes to the game.
+    function closePage() {
+        const path = pageReturnPath;
+        pageLoader.source = "";
+        if (path) {
+            menuRestorePath = path;
+            menuBar.open();
+        }
+    }
+
     function goBack() {
         const sheet = pageLoader.item as Sheet;
         // Back answers the quit question (no) instead of asking it again
@@ -69,7 +84,7 @@ ApplicationWindow {
         else if (menuBar.position)
             menuView.popMenu();
         else if (pageLoader.status !== Loader.Null)
-            pageLoader.source = "";
+            closePage();
         else if (onScreen48Keyboard.visible)
             onScreen48Keyboard.visible = false;
         else if (ZxEmulator.settings.hasStartButton || ZxEmulator.touchscreen)
@@ -94,7 +109,9 @@ ApplicationWindow {
     readonly property real dockWidth: Theme.desktopMode && pageLoader.status === Loader.Ready && pageLoader.item.panelWidth !== undefined
                                       && pageLoader.item.panelWidth < mainRectangle.width * 0.7 ? pageLoader.item.panelWidth : 0
 
-    property real keyboardHeight: ZxEmulator.settings.overlappedKeboard ? 0 : onScreen48Keyboard.visible ? onScreen48Keyboard.keyboardHeight : 0
+    // What the on-screen keyboard covers, and what the screen leaves it (none when it overlaps the screen)
+    readonly property real keyboardSpace: onScreen48Keyboard.visible ? onScreen48Keyboard.keyboardHeight : 0
+    property real keyboardHeight: ZxEmulator.settings.overlappedKeboard ? 0 : keyboardSpace
 
     menuBar: DesktopMenuBar {
         visible: Theme.desktopMode
@@ -208,7 +225,12 @@ ApplicationWindow {
         onPositionChanged: {
             if (wasClosed && position > 0) {
                 wasClosed = false;
-                menuView.reset();
+                if (mainScreen.menuRestorePath) {
+                    menuView.restore(mainScreen.menuRestorePath);
+                    mainScreen.menuRestorePath = null;
+                } else {
+                    menuView.reset();
+                }
             }
             if (position === 1) {
                 onScreenCursorJoystick.visible = false;
@@ -311,7 +333,7 @@ ApplicationWindow {
                     event.accepted = true;
                 } else {
                     if (pageLoader.status !== Loader.Null) {
-                        pageLoader.source = "";
+                        mainScreen.closePage();
                         event.accepted = true;
                     }
                 }
@@ -383,13 +405,21 @@ ApplicationWindow {
         Grid {
             id: screenButtonsGrid
             objectName: "screenControls"
+            // A row under the screen in portrait when it fits above the on-screen keyboard, else a
+            // column on the left. The keyboard is drawn on top: the buttons must stay clear of it.
+            readonly property real freeHeight: parent.height - mainScreen.keyboardSpace
+            // Where ZxScreen draws the image: at the top on Android, else centred
+            readonly property real imageBottom: Qt.platform.os === "android" ? zxScreen.implicitHeight
+                                                                            : (zxScreen.height + zxScreen.implicitHeight) / 2
+            readonly property bool belowScreen: mainScreen.portrait && freeHeight - imageBottom >= Theme.touchTarget
             anchors.fill: parent
-            anchors.topMargin: mainScreen.portrait ? zxScreen.implicitHeight : 0;
+            anchors.topMargin: belowScreen ? imageBottom : 0
             visible: ZxEmulator.touchscreen && ZxEmulator.showControlsIcons
-            horizontalItemAlignment: mainScreen.portrait ? Grid.AlignHCenter : Grid.AlignLeft
+            horizontalItemAlignment: belowScreen ? Grid.AlignHCenter : Grid.AlignLeft
             verticalItemAlignment: Grid.AlignVCenter
-            columns: mainScreen.portrait ? 6 : 1
-            rows: mainScreen.portrait ? 1 : 6
+            flow: belowScreen ? Grid.LeftToRight : Grid.TopToBottom
+            columns: belowScreen ? 6 : -1
+            rows: belowScreen ? 1 : Math.max(1, Math.min(6, Math.floor(freeHeight / Theme.touchTarget)))
             columnSpacing: 0
             rowSpacing: 0
 
@@ -448,6 +478,7 @@ ApplicationWindow {
                 }
             }
             RailButton {
+                objectName: "keyboardButton"
                 icon: "qrc:/images/keyboard-icon.svg"
                 Accessible.name: qsTr("Keyboard")
                 onClicked: toggleOnScreenControls(ZxEmulator.Keyboard48K, false)
@@ -498,6 +529,7 @@ ApplicationWindow {
 
         OnScreen48Keyboard {
             id: onScreen48Keyboard
+            bottomInset: mainRectangle.SafeArea.margins.bottom
             opacity: ZxEmulator.settings.keyboardOpacity
             visible: false
             enabled: visible
@@ -510,7 +542,14 @@ ApplicationWindow {
             z: parent.z + 20
             id: pageLoader
             objectName: "pageLoader"
-            onSourceChanged: Qt.callLater(mainScreen.offerPendingLegacyImport)
+            onSourceChanged: {
+                // A page opened by another page keeps the first one's way back
+                if (source.toString() === "")
+                    mainScreen.pageReturnPath = null;
+                else if (menuView.pendingReturn)
+                    mainScreen.pageReturnPath = menuView.pendingReturn;
+                Qt.callLater(mainScreen.offerPendingLegacyImport);
+            }
             anchors.fill: parent
             visible: status === Loader.Ready
             // Every page pauses the emulation while it is open, unless it says otherwise

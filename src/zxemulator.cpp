@@ -80,6 +80,8 @@ constexpr quint64 kControllerKeys = quint64(3) << 32;
 constexpr quint64 kJoystickKeys = quint64(4) << 32;
 constexpr quint64 kCobraKeys = quint64(5) << 32;
 constexpr quint64 kRecreatedKeys = quint64(6) << 32;
+// quint64(7) << 32: the Next's extra keys
+constexpr quint64 kChordKeys = quint64(8) << 32;
 static_assert(ControllerInput::LeftBit == zxkit::JoystickButtons::Left
               && ControllerInput::RightBit == zxkit::JoystickButtons::Right
               && ControllerInput::UpBit == zxkit::JoystickButtons::Up
@@ -2220,6 +2222,25 @@ void ZxEmulator::setNextKeyState(int key, bool pressed)
         return;
     setInputKeys((quint64(7) << 32) | unsigned(key),
                  pressed ? QSet<int>{ 0x100 + key } : QSet<int>{});
+}
+
+void ZxEmulator::setVirtualChord(int id, const QList<int> &qtKeys, bool pressed)
+{
+    if (id < 0 || (pressed && m_paused))
+        return;
+    QSet<int> keys;
+    if (pressed) {
+        for (const int qtKey : qtKeys) {
+            const auto mapped = mapQtKeyToZx(qtKey, 0);
+            if (mapped.modifier)
+                keys.insert(int(*mapped.modifier));
+            if (mapped.primary)
+                keys.insert(int(*mapped.primary));
+        }
+        if (!keys.isEmpty())
+            m_recording->resumeOnGameplayInput();
+    }
+    setInputKeys(kChordKeys | quint32(id), keys);
 }
 
 void ZxEmulator::setCobraKeyState(int qtKey, bool pressed)

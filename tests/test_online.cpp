@@ -364,6 +364,25 @@ private slots:
         QVERIFY(model.errorString().isEmpty());
     }
 
+    void zxinfoEmptySearch()
+    {
+        Server server;
+        server.handler = [](const QUrl &) -> Response { return { page(1) }; };
+        ZXGamesModel model(server.endpoints());
+        model.setSource(1);
+        // ZXInfo can't list the whole catalogue: an empty search asks for nothing
+        model.search(u"  "_s);
+        QTest::qWait(100);
+        QCOMPARE(server.requests.size(), 0);
+        QVERIFY(!model.searching());
+        QVERIFY(!model.searched());
+        QVERIFY(model.errorString().isEmpty());
+        // One letter still browses it
+        model.search(u"a"_s);
+        QTRY_COMPARE(server.requests.size(), 1);
+        QVERIFY(server.requests.first().toEncoded().contains("byletter/a?"));
+    }
+
     void cancellation()
     {
         Server server;

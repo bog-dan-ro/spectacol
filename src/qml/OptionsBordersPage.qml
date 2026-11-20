@@ -28,7 +28,7 @@ Sheet {
     readonly property var limits: settings.borderLimits
     hints: [
         { pad: "A", key: "← →", text: qsTr("Change") },
-        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => mainScreen.closePage() }
     ]
     GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }

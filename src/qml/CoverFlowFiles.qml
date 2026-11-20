@@ -317,6 +317,8 @@ Item
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
+                        // A click also gives the keys back to the covers, as in the list
+                        filesView.forceActiveFocus();
                         if (isCurrentItem) {
                             fileList.openRow(index);
                         } else {
@@ -421,14 +423,22 @@ Item
                     Layout.minimumWidth: Theme.rowHeight
                     Layout.minimumHeight: Theme.rowHeight
                     enabled: !artist_text_label.root
-                    onClicked: filesModel.cdUp()
+                    // Give the keys back to the files: at the top the button disables itself, focus and all
+                    onClicked: {
+                        filesModel.cdUp();
+                        fileList.focusFiles();
+                    }
+                    Keys.onDownPressed: fileList.focusFiles()
                 }
                 NavigationComboBox {
                     id: modePicker
                     objectName: "filesViewMode"
                     model: [qsTr("Covers"), qsTr("List"), qsTr("Grid")]
                     currentIndex: fileList.viewMode
-                    onActivated: fileList.viewMode = currentIndex
+                    onActivated: {
+                        fileList.viewMode = currentIndex;
+                        fileList.focusFiles();
+                    }
                 }
                 FancyTextField {
                     id: search

@@ -31,14 +31,14 @@ Sheet {
     crumb: qsTr("Options")
     title: qsTr("Files from Spectacol 3")
     hints: storage.importing || finished ? [
-        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => mainScreen.closePage() }
     ] : [
         { pad: "A", key: "Enter", text: qsTr("Choose") },
         { pad: "B", key: "Esc", text: qsTr("Later"), action: () => page.later() }
     ]
     function later() {
         storage.postponeLegacyImport(false);
-        pageLoader.source = "";
+        mainScreen.closePage();
     }
     GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }

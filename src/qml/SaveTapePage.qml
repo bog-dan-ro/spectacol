@@ -29,7 +29,7 @@ Sheet {
     title: qsTr("Export tape")
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Export"), action: () => page.writeTape() },
-        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => mainScreen.closePage() }
     ]
     Component.onCompleted: ZxEmulator.tape.refreshData()
     readonly property bool tapSupported: ZxEmulator.tape.canSaveTap()

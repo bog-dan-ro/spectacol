@@ -25,7 +25,7 @@ Sheet {
     crumb: qsTr("Options")
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Change") },
-        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => mainScreen.closePage() }
     ]
 
     GamepadNavigation {
@@ -75,10 +75,15 @@ Sheet {
         }
         SectionTitle { text: qsTr("Keyboard and gamepad") }
         SettingRow {
-            label: qsTr("Full on-screen keyboard")
-            description: qsTr("All 40 keys of the 48K, instead of the short one")
-            checked: ZxEmulator.settings.full48kOSK
-            onToggled: (on) => ZxEmulator.settings.full48kOSK = on
+            label: qsTr("On-screen keyboard")
+            kind: "choice"
+            model: [qsTr("Short"), qsTr("48K"), qsTr("Spectrum+")]
+            currentIndex: ZxEmulator.settings.keyboardLayout
+            onActivated: (index) => ZxEmulator.settings.keyboardLayout = index
+            description: (currentIndex === ZxSettings.ShortKeyboard ? qsTr("The 48K's keys, with only their letters.")
+                          : currentIndex === ZxSettings.Full48Keyboard ? qsTr("The 48K's keys, with their keywords and symbols.")
+                          : qsTr("The Spectrum+ keys: EDIT, DELETE, the cursor keys and more."))
+                         + " " + qsTr("The ZX Spectrum Next always uses the Spectrum+ keys.")
         }
         SettingRow {
             label: qsTr("Recreated ZX Spectrum keyboard")

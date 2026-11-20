@@ -57,7 +57,8 @@ Dialog {
     property Connections messages: Connections {
         target: ZxEmulator
         function onError(level: int, message: string) {
-            if (dialog.visible)
+            // Only what stops the save. A success message arrives while the dialog is closing.
+            if (dialog.opened && level !== ZxEmulator.Info)
                 dialog.errorMessage = message;
         }
     }

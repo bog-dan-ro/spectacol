@@ -49,6 +49,12 @@ FormDialog {
         if (visible) { reject(); return true; }
         return false;
     }
+    // A typed path as the pickers' URL; URLs (file://, content://) stay as they are
+    function pathUrl(text: string): string {
+        if (text.length === 0 || text.indexOf("://") > 0)
+            return text;
+        return (text.startsWith("/") ? "file://" : "file:///") + text;
+    }
     Label {
         Layout.fillWidth: true
         text: dialog.directory ? qsTr("Folder path") : qsTr("File path")
@@ -67,7 +73,19 @@ FormDialog {
         text: qsTr("Browse…")
         Keys.onReturnPressed: clicked()
         Keys.onEnterPressed: clicked()
-        onClicked: dialog.directory ? folderPicker.open() : filePicker.open()
+        onClicked: {
+            // Start the picker on the current path; a save picker also proposes its name
+            const url = dialog.pathUrl(pathField.text.trim());
+            if (dialog.directory) {
+                if (url)
+                    folderPicker.selectedFolder = url;
+                folderPicker.open();
+            } else {
+                if (url)
+                    filePicker.selectedFile = url;
+                filePicker.open();
+            }
+        }
     }
     FileDialog {
         id: filePicker

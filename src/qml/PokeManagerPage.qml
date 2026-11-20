@@ -33,7 +33,7 @@ Sheet {
         { pad: "A", key: "Enter", text: qsTr("Toggle"), action: () => page.toggleCurrent() },
         { pad: "Y", key: "F3", text: qsTr("Add poke"), action: () => page.addPoke() },
         { pad: "X", key: "F2", text: qsTr("Clear list"), action: () => page.pokes.clear() },
-        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => { if (!page.closeNested()) pageLoader.source = ""; } }
+        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => { if (!page.closeNested()) mainScreen.closePage(); } }
     ]
     Component.onCompleted: {
         pokes.refreshBanks();

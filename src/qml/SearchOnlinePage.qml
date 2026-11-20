@@ -54,7 +54,7 @@ Sheet {
             pad: "B",
             key: "Esc",
             text: qsTr("Close"),
-            action: () => pageLoader.source = ""
+            action: () => mainScreen.closePage()
         }
     ]
     Keys.onPressed: event => {
@@ -191,7 +191,10 @@ Sheet {
         }
         Text {
             Layout.fillWidth: true
-            text: page.catalogue.searching ? qsTr("Searching %1…").arg(source.currentText) : page.catalogue.searched ? qsTr("%1 of %2 titles · %3").arg(results.count).arg(page.catalogue.total).arg(source.currentText) : qsTr("Search by title, or leave the field empty to browse the catalogue.")
+            text: page.catalogue.searching ? qsTr("Searching %1…").arg(source.currentText)
+                : page.catalogue.searched ? qsTr("%1 of %2 titles · %3").arg(results.count).arg(page.catalogue.total).arg(source.currentText)
+                : page.catalogue.source === 1 ? qsTr("Search ZXInfo by title, or type one letter to browse it.")
+                : qsTr("Search by title, or leave the field empty to browse the catalogue.")
             wrapMode: Text.Wrap
             font.pixelSize: Theme.caption
             color: Theme.textMuted

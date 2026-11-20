@@ -33,6 +33,8 @@ ColumnLayout {
     property ZxMenuItem currentMenu: rootMenu
     property var menus: []
     property alias useGamepad: gamepadKeyNavigation.active
+    // While a sub menu's item runs: where Back on the page it opens returns to
+    property var pendingReturn: null
 
     function focusMenu() { menuView.forceActiveFocus(Qt.PopupFocusReason); }
 
@@ -59,10 +61,27 @@ ColumnLayout {
     {
         if (!menu.enabled)
             return;
-        if (menu.children.length)
+        if (menu.children.length) {
             pushMenu(menu, index);
-        else
+        } else {
+            pendingReturn = menus.length ? {"menus": menus, "menu": currentMenu, "item": menu} : null;
             menu.trigger();
+            pendingReturn = null;
+        }
+    }
+
+    // Reopen the sub menu a page came from, on the item that opened it
+    function restore(path)
+    {
+        menus = path.menus;
+        currentMenu = null;
+        currentMenu = path.menu;
+        for (let i = 0; i < menuModel.count; ++i) {
+            if (menuModel.get(i).modelData === path.item) {
+                menuView.currentIndex = i;
+                break;
+            }
+        }
     }
 
     function openSelectedMenu()

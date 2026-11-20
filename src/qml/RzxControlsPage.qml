@@ -42,7 +42,7 @@ Sheet {
             label: qsTr("Recording")
             actionText: qsTr("Start")
             visible: !root.active && root.recording.type !== ZxRecording.Unsaved
-            onClicked: { root.recording.start(); root.closeRequested(); }
+            onClicked: { root.recording.start(); pageLoader.source = ""; }
         }
         SettingRow {
             kind: "action"
@@ -56,7 +56,7 @@ Sheet {
             label: qsTr("Playback")
             actionText: qsTr("Restart")
             visible: !root.active && root.recording.durationMs > 0 && root.recording.type !== ZxRecording.Unsaved
-            onClicked: { root.recording.startPlayback(); root.closeRequested(); }
+            onClicked: { root.recording.startPlayback(); pageLoader.source = ""; }
         }
         SettingRow {
             kind: "action"
@@ -68,7 +68,7 @@ Sheet {
             visible: root.active
             enabled: !root.recording.seeking
             onClicked: {
-                if (root.recording.waitingForInput) { root.recording.resume(); root.closeRequested(); }
+                if (root.recording.waitingForInput) { root.recording.resume(); pageLoader.source = ""; }
                 else root.recording.pause();
             }
         }
@@ -86,7 +86,7 @@ Sheet {
             actionText: qsTr("Back")
             visible: root.seekable
             enabled: !root.recording.seeking && root.recording.positionMs > 0
-            onClicked: { root.recording.rewind(root.seekStepMs); root.closeRequested(); }
+            onClicked: { root.recording.rewind(root.seekStepMs); pageLoader.source = ""; }
         }
         SettingRow {
             kind: "action"
@@ -94,7 +94,7 @@ Sheet {
             actionText: qsTr("Forward")
             visible: root.seekable
             enabled: !root.recording.seeking && root.recording.positionMs < root.recording.durationMs
-            onClicked: { root.recording.fastForward(root.seekStepMs); root.closeRequested(); }
+            onClicked: { root.recording.fastForward(root.seekStepMs); pageLoader.source = ""; }
         }
         SettingRow {
             kind: "action"
@@ -102,7 +102,7 @@ Sheet {
             actionText: qsTr("Seek")
             visible: root.seekable
             enabled: !root.recording.seeking && root.recording.positionMs < root.recording.durationMs
-            onClicked: { root.recording.fastForward(-1); root.closeRequested(); }
+            onClicked: { root.recording.fastForward(-1); pageLoader.source = ""; }
         }
         SettingRow {
             kind: "action"
@@ -111,7 +111,7 @@ Sheet {
             actionText: root.recording.type === ZxRecording.Unsaved ? qsTr("Retry") : qsTr("Stop")
             visible: root.active || root.recording.type === ZxRecording.Unsaved
             enabled: !root.recording.seeking
-            onClicked: { root.recording.stop(); root.closeRequested(); }
+            onClicked: { root.recording.stop(); pageLoader.source = ""; }
         }
     }
 }

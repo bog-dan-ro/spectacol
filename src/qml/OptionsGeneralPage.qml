@@ -26,7 +26,7 @@ Sheet {
     title: qsTr("General")
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Change") },
-        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => mainScreen.closePage() }
     ]
 
     GamepadNavigation {

@@ -82,7 +82,7 @@ Sheet {
     hints: viewer.visible ? viewerHints : Theme.gamepadHints ? padHints : Theme.touchScreenUi ? touchHints : keyHints
 
     function closePage() {
-        pageLoader.source = "";
+        mainScreen.closePage();
     }
 
     // The viewer's screen, as a PNG in the other panel's folder
@@ -293,7 +293,7 @@ Sheet {
         if (!path || (!activePanel.inMedia && ["parent", "folder"].includes(activeView.currentKind)))
             return;
         ZxEmulator.load(path);
-        closePage();
+        pageLoader.source = "";
     }
 
     function sameFolderInOther() {

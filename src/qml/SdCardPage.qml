@@ -34,7 +34,7 @@ Sheet {
     preferredWidth: Theme.sp(180)
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Open folder"), action: () => page.openCurrent() },
-        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => pageLoader.source = "" },
+        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => mainScreen.closePage() },
         { pad: "X", key: "Ins", text: qsTr("Add file"), action: () => { if (page.writable) pageLoader.setSource("FilePickerPage.qml",{purpose:"sdCopy"}); } },
         { pad: "Y", key: "Del", text: qsTr("Remove"), action: () => page.removeCurrent() }
     ]

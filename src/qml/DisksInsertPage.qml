@@ -50,8 +50,11 @@ Item {
             }
 
             onFileSelected: (filePath) => {
-                if (filePath)
-                    ZxEmulator.disks.insertDisk(page.drive, filePath);
+                if (!filePath) {
+                    mainScreen.closePage();
+                    return;
+                }
+                ZxEmulator.disks.insertDisk(page.drive, filePath);
                 pageLoader.source = "";
             }
         }

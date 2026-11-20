@@ -27,7 +27,11 @@ Item {
     id: onScreenKeyboard
     enabled: visible
 
-    property real keyboardHeight: grid.height
+    // The keys and the space under them
+    property real keyboardHeight: grid.height + anchors.bottomMargin
+    // The system bars' space at the bottom of the window. The keyboard's own SafeArea would
+    // depend on this margin.
+    property real bottomInset: 0
     property bool textInputMode: false
     readonly property bool portrait: Window.window ? Window.window.width < Window.window.height : width < height
     signal textKeyPressed(int key, string text)
@@ -36,7 +40,19 @@ Item {
     readonly property int cobraControlKey: Qt.Key_Control | cobraFlag
     readonly property bool nextMode: !textInputMode && ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
     readonly property int nextFlag: 0x10000000
-    readonly property int columns: cobraMode ? 12 : nextMode ? 14 : 10
+    // The Spectrum+ layout on the other machines: its extra keys send 48K key chords
+    readonly property bool plusMode: !textInputMode && !cobraMode && !nextMode
+                                     && ZxEmulator.settings.keyboardLayout === ZxSettings.PlusKeyboard
+    readonly property int plusFlag: 0x08000000
+    readonly property var plusChords: [
+        [Qt.Key_Shift, Qt.Key_1], [Qt.Key_Shift, Qt.Key_2], [Qt.Key_Shift, Qt.Key_3], [Qt.Key_Shift, Qt.Key_4],
+        [Qt.Key_Shift, Qt.Key_9], [Qt.Key_Shift, Qt.Key_Control], [Qt.Key_Shift, Qt.Key_Space], [Qt.Key_Shift, Qt.Key_0],
+        [Qt.Key_Control, Qt.Key_O], [Qt.Key_Control, Qt.Key_P], [Qt.Key_Shift, Qt.Key_7], [Qt.Key_Control, Qt.Key_N],
+        [Qt.Key_Control, Qt.Key_M], [Qt.Key_Shift, Qt.Key_5], [Qt.Key_Shift, Qt.Key_6], [Qt.Key_Shift, Qt.Key_8]]
+    // Keywords and symbols on the keys, or only their letters
+    readonly property bool fullLabels: !textInputMode && (nextMode || plusMode
+                                                          || ZxEmulator.settings.keyboardLayout !== ZxSettings.ShortKeyboard)
+    readonly property int columns: cobraMode ? 12 : nextMode || plusMode ? 14 : 10
     readonly property bool cobraCtrlPressed: input.heldKeys.indexOf(cobraControlKey) >= 0
     readonly property bool capsPressed: input.heldKeys.indexOf(Qt.Key_Shift) >= 0
     readonly property bool symbolPressed: input.heldKeys.indexOf(Qt.Key_Control) >= 0
@@ -44,6 +60,7 @@ Item {
     property bool stickyCSSS: textInputMode || gamepadMode || stickyCSSSButton.checked
     onCobraModeChanged: releasePressedKeys()
     onNextModeChanged: releasePressedKeys()
+    onPlusModeChanged: releasePressedKeys()
     onGamepadModeChanged: releasePressedKeys()
     Component.onDestruction: releasePressedKeys()
 
@@ -59,6 +76,8 @@ Item {
             }
             if (key & nextFlag)
                 ZxEmulator.setNextKeyState(key & ~nextFlag, pressed);
+            else if (key & plusFlag)
+                ZxEmulator.setVirtualChord(key & ~plusFlag, plusChords[key & ~plusFlag], pressed);
             else if (key & cobraFlag)
                 ZxEmulator.setCobraKeyState(key & ~cobraFlag, pressed);
             else if (pressed)
@@ -85,7 +104,8 @@ Item {
     }
 
     anchors {
-        bottomMargin: textInputMode ? 0 : Screen.pixelDensity * (onScreenKeyboard.portrait ? 10 : 0)
+        // As low as the system bars allow
+        bottomMargin: textInputMode ? 0 : bottomInset
         leftMargin: textInputMode || onScreenKeyboard.portrait ? 0 : Screen.pixelDensity * 2
         rightMargin: textInputMode || onScreenKeyboard.portrait ? 0 : Screen.pixelDensity * 2
     }
@@ -276,6 +296,7 @@ Item {
 
     ListModel { id: cobraKeyboard }
     ListModel { id: nextKeyboard }
+    ListModel { id: plusKeyboard }
 
     Component.onCompleted: {
         if (textInputMode) {
@@ -295,6 +316,10 @@ Item {
                     keyword: original.keyword || "", redsymbol: original.redsymbol || "",
                     extgreen: original.extgreen || "", extred: original.extred || "",
                     buttonColor: original.buttonColor || ""});
+                plusKeyboard.append({code: original.code, letter: original.letter,
+                    keyword: original.keyword || "", redsymbol: original.redsymbol || "",
+                    extgreen: original.extgreen || "", extred: original.extred || "",
+                    buttonColor: original.buttonColor || ""});
                 cobraKeyboard.append({code: original.code, letter: original.letter,
                     keyword: original.keyword || "", redsymbol: original.redsymbol || "",
                     extgreen: original.extgreen || "", extred: original.extred || "",
@@ -303,6 +328,8 @@ Item {
             for (let column = 0; column < 4; ++column) {
                 const extra = row * 4 + column;
                 nextKeyboard.append({code: nextCodes[extra] | nextFlag, letter: nextLabels[extra],
+                    keyword: "", redsymbol: "", extgreen: "", extred: "", buttonColor: ""});
+                plusKeyboard.append({code: extra | plusFlag, letter: nextLabels[extra],
                     keyword: "", redsymbol: "", extgreen: "", extred: "", buttonColor: ""});
             }
             for (let column = 0; column < 2; ++column) {
@@ -346,7 +373,7 @@ Item {
         cellHeight: onScreenKeyboard.portrait && !textInputMode ? Screen.pixelDensity * 9 : cellWidth
         width: Math.min(cellWidth * columns + ((onScreenKeyboard.portrait || gamepadMode || textInputMode) ? 0 : 8 * Screen.pixelDensity), parent.width)
         height: cellHeight * 4 + ((onScreenKeyboard.portrait || gamepadMode || textInputMode) ? 0 : 2 * Screen.pixelDensity)
-        model: cobraMode ? cobraKeyboard : nextMode ? nextKeyboard : zx48Keyboard
+        model: cobraMode ? cobraKeyboard : nextMode ? nextKeyboard : plusMode ? plusKeyboard : zx48Keyboard
         currentIndex: onScreenKeyboard.columns * 2 + 4
         onCurrentIndexChanged: input.release("navigation", false)
         onActiveFocusChanged: if (!activeFocus) input.release("navigation", true)
@@ -396,12 +423,12 @@ Item {
                 anchors.fill: parent
                 anchors.leftMargin: parent.radius
                 anchors.rightMargin: parent.radius
-                anchors.topMargin: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK && keyword ? parent.height / 4 : parent.radius
+                anchors.topMargin: onScreenKeyboard.fullLabels && keyword ? parent.height / 4 : parent.radius
                 font.family: 'Monospace'
                 font.bold: true
                 font.pixelSize: grid.cellWidth / 4.5
-                horizontalAlignment: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK && keyword ? Text.AlignLeft : Text.AlignHCenter
-                verticalAlignment: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK && keyword ? Text.AlignTop : Text.AlignVCenter
+                horizontalAlignment: onScreenKeyboard.fullLabels && keyword ? Text.AlignLeft : Text.AlignHCenter
+                verticalAlignment: onScreenKeyboard.fullLabels && keyword ? Text.AlignTop : Text.AlignVCenter
                 style: Text.Outline
                 styleColor: "black"
                 color: !keyword && buttonColor ? buttonColor : "white"
@@ -411,7 +438,7 @@ Item {
             }
 
             Text {
-                visible: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK
+                visible: onScreenKeyboard.fullLabels
                 anchors.left: parent.left
                 anchors.margins: parent.radius
                 style: Text.Outline
@@ -424,7 +451,7 @@ Item {
             }
 
             Text {
-                visible: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK
+                visible: onScreenKeyboard.fullLabels
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.rightMargin: parent.radius
@@ -439,7 +466,7 @@ Item {
             }
 
             Text {
-                visible: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK
+                visible: onScreenKeyboard.fullLabels
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.topMargin: parent.height / 6 * 3
@@ -453,7 +480,7 @@ Item {
             }
 
             Text {
-                visible: !onScreenKeyboard.textInputMode && ZxEmulator.settings.full48kOSK
+                visible: onScreenKeyboard.fullLabels
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.leftMargin: parent.radius

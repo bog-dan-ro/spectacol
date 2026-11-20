@@ -564,18 +564,25 @@ void ZxSettings::setInterface2(bool interface2)
     emit settingsCurrentChanged();
 }
 
-bool ZxSettings::full48kOSK() const
+int ZxSettings::keyboardLayout() const
 {
     QSettings s;
     s.beginGroup(u"Peripherals"_s);
-    return s.value("full48kOSK", true).toBool();
+    // Older versions only had a switch between the short and the full 48K keyboard
+    const int previous = s.value("full48kOSK", true).toBool() ? Full48Keyboard : ShortKeyboard;
+    return std::clamp(s.value("keyboardLayout", previous).toInt(), int(ShortKeyboard),
+                      int(PlusKeyboard));
 }
 
-void ZxSettings::setFull48kOSK(bool full48kOSK)
+void ZxSettings::setKeyboardLayout(int layout)
 {
+    layout = std::clamp(layout, int(ShortKeyboard), int(PlusKeyboard));
+    if (layout == keyboardLayout())
+        return;
     QSettings s;
     s.beginGroup(u"Peripherals"_s);
-    s.setValue("full48kOSK", full48kOSK);
+    s.setValue("keyboardLayout", layout);
+    s.remove("full48kOSK");
     emit settingsCurrentChanged();
 }
 

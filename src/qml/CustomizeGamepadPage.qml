@@ -150,7 +150,7 @@ Sheet {
             pad: "B",
             key: "Esc",
             text: qsTr("Back"),
-            action: () => pageLoader.source = ""
+            action: () => mainScreen.closePage()
         }
     ]
     GamepadNavigation {

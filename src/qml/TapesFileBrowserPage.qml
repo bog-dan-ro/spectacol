@@ -33,8 +33,11 @@ CoverFlowFiles {
     }
 
     onFileSelected: {
-        if (filePath)
-            ZxEmulator.tape.open(filePath);
+        if (!filePath) {
+            mainScreen.closePage();
+            return;
+        }
+        ZxEmulator.tape.open(filePath);
         pageLoader.source = "";
     }
 }

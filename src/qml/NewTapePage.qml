@@ -28,7 +28,7 @@ Sheet {
     title: qsTr("New blank tape")
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Create"), action: () => page.createTape() },
-        { pad: "B", key: "Esc", text: qsTr("Cancel"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Cancel"), action: () => mainScreen.closePage() }
     ]
     Component.onCompleted: ZxEmulator.tape.refreshData()
     function createTape() {

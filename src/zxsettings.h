@@ -106,7 +106,8 @@ class ZxSettings : public QObject
     Q_PROPERTY(bool interface1Available READ interface1Available NOTIFY currentMachineChanged)
     Q_PROPERTY(bool interface1 READ interface1 WRITE setInterface1 NOTIFY settingsCurrentChanged)
     Q_PROPERTY(bool interface2 READ interface2 WRITE setInterface2 NOTIFY settingsCurrentChanged)
-    Q_PROPERTY(bool full48kOSK READ full48kOSK WRITE setFull48kOSK NOTIFY settingsCurrentChanged)
+    Q_PROPERTY(int keyboardLayout READ keyboardLayout WRITE setKeyboardLayout NOTIFY
+                       settingsCurrentChanged)
     Q_PROPERTY(bool joystickPrompt READ joystickPrompt WRITE setJoystickPrompt NOTIFY
                        settingsCurrentChanged)
     Q_PROPERTY(bool recreatedSpectrum READ recreatedSpectrum WRITE setRecreatedSpectrum NOTIFY
@@ -189,6 +190,11 @@ public:
     enum FillMode { PreserveAspectFit = 0, PreserveAspect, Stretch };
     Q_ENUM(FillMode)
 
+    // The on-screen keyboard: the 48K's 40 keys with only their letters or with all their
+    // labels, or the Spectrum+ layout (the Next always uses its own Spectrum+ keyboard)
+    enum KeyboardLayout { ShortKeyboard = 0, Full48Keyboard, PlusKeyboard };
+    Q_ENUM(KeyboardLayout)
+
     enum Actions {
         JoystickFire = int(ControllerAction::Fire),
         ToggleKeyboard = int(ControllerAction::Keyboard),
@@ -255,8 +261,8 @@ public:
     bool interface2() const;
     void setInterface2(bool interface2);
 
-    bool full48kOSK() const;
-    void setFull48kOSK(bool full48kOSK);
+    int keyboardLayout() const;
+    void setKeyboardLayout(int layout);
 
     bool restrictToSpectacol() const;
     void setRestrictToSpectacol(bool restrictToSpectacol);

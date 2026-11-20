@@ -36,7 +36,7 @@ Sheet {
     preferredWidth: Theme.sp(210)
     hints: [
         { pad: "◀▶", key: "←→", text: qsTr("Tabs") },
-        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => mainScreen.closePage() }
     ]
 
     function scrollHelp(direction: int) {

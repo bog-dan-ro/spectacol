@@ -40,7 +40,7 @@ SaveFilePage {
             pageLoader.source = "";
     }
 
-    onCanceled: pageLoader.source = "";
+    onCanceled: mainScreen.closePage();
 
     Settings {
         category: "snapshot"

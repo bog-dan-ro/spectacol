@@ -437,6 +437,9 @@ public slots:
                     bool virtualKeyboard = true);
     // The on-screen CoBra column, independent of the Spectrum modifier mapping.
     void setCobraKeyState(int qtKey, bool pressed);
+    // An on-screen key that holds several keys (the Spectrum+ keys on the 48K), e.g. EDIT is
+    // {Qt::Key_Shift, Qt::Key_1}. Each id is its own input source, independent of the others.
+    void setVirtualChord(int id, const QList<int> &qtKeys, bool pressed);
     void gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value, bool touch = false);
     void gamepadButtonPressEvent(QGamepadManager::GamepadButton button, bool touch = false);
     void gamepadButtonReleaseEvent(QGamepadManager::GamepadButton button, bool touch = false,

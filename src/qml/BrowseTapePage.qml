@@ -33,7 +33,7 @@ Sheet {
         { pad: "A", key: "Enter", text: qsTr("Play from here"), action: () => tapeData.selectBlock(view.currentIndex) },
         { pad: "Y", key: "L", text: qsTr("Reset and load from here"), action: () => page.resetAndLoad() },
         { pad: "X", key: "V", text: qsTr("View data"), action: () => page.showBlock(view.currentIndex) },
-        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => mainScreen.closePage() }
     ]
 
     Component.onCompleted: ZxEmulator.processInputEvents = false

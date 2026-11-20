@@ -292,6 +292,9 @@ void ZXGamesModel::search(const QString &title)
         setError(tr("Use at most 200 characters for a search."));
         return;
     }
+    // ZXInfo (1) has no list of the whole catalogue, only one letter at a time
+    if (m_query.isEmpty() && m_source == 1)
+        return;
     fetchPage();
 }
 

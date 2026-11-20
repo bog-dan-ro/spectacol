@@ -94,7 +94,7 @@ Sheet {
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Switch"), action: () => page.choose(page.focusIndex) },
         { pad: "X", key: "F2", text: qsTr("ROMs"), action: () => page.openRoms() },
-        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => mainScreen.closePage() }
     ]
 
     Component.onCompleted: ZxEmulator.processInputEvents = false

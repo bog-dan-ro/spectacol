@@ -107,63 +107,66 @@ Item {
         }
     }
 
-    // Fire buttonY
-    OnScreenJoystickButton {
-        id: fireButtonY
-        anchors.bottom: fireButtonX.top
-        border.color: "orange"
-        text: "Y"
-        MultiPointTouchArea {
-            anchors.fill: parent
-            maximumTouchPoints: 1
-            onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonY, true)
-            onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY, true)
-            onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY, true, true)
-        }
-    }
-
-    // Fire buttonX
-    OnScreenJoystickButton {
-        id: fireButtonX
-        anchors.bottom: fireButtonB.top
-        border.color: "blue"
-        text: "X"
-        MultiPointTouchArea {
-            anchors.fill: parent
-            maximumTouchPoints: 1
-            onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonX, true)
-            onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX, true)
-            onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX, true, true)
-        }
-    }
-
-    // Fire buttonB
-    OnScreenJoystickButton {
-        id: fireButtonB
-        anchors.bottom: fireButtonA.top
-        border.color: "red"
-        text: "B"
-        MultiPointTouchArea {
-            anchors.fill: parent
-            maximumTouchPoints: 1
-            onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonB, true)
-            onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB, true)
-            onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB, true, true)
-        }
-    }
-
-    // Fire buttonA
-    OnScreenJoystickButton {
-        id: fireButtonA
+    Column {
+        anchors.right: parent.right
         anchors.bottom: parent.bottom
-        border.color: "green"
-        text: "A"
-        MultiPointTouchArea {
-            anchors.fill: parent
-            maximumTouchPoints: 1
-            onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonA, true)
-            onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA, true)
-            onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA, true, true)
+        anchors.bottomMargin: 10 * Screen.pixelDensity
+        spacing: (TextSizes.smallScreen ? 2.5 :  5) * Screen.pixelDensity
+
+        // Fire buttonY
+        OnScreenJoystickButton {
+            id: fireButtonY
+            border.color: "orange"
+            text: "Y"
+            MultiPointTouchArea {
+                anchors.fill: parent
+                maximumTouchPoints: 1
+                onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonY, true)
+                onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY, true)
+                onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonY, true, true)
+            }
+        }
+
+        // Fire buttonX
+        OnScreenJoystickButton {
+            id: fireButtonX
+            border.color: "blue"
+            text: "X"
+            MultiPointTouchArea {
+                anchors.fill: parent
+                maximumTouchPoints: 1
+                onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonX, true)
+                onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX, true)
+                onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonX, true, true)
+            }
+        }
+
+        // Fire buttonB
+        OnScreenJoystickButton {
+            id: fireButtonB
+            border.color: "red"
+            text: "B"
+            MultiPointTouchArea {
+                anchors.fill: parent
+                maximumTouchPoints: 1
+                onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonB, true)
+                onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB, true)
+                onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonB, true, true)
+            }
+        }
+
+        // Fire buttonA
+        OnScreenJoystickButton {
+            id: fireButtonA
+            border.color: "green"
+            text: "A"
+            MultiPointTouchArea {
+                anchors.fill: parent
+                maximumTouchPoints: 1
+                onPressed: ZxEmulator.gamepadButtonPressEvent(GamepadManager.ButtonA, true)
+                onReleased: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA, true)
+                onCanceled: ZxEmulator.gamepadButtonReleaseEvent(GamepadManager.ButtonA, true, true)
+            }
         }
     }
 }

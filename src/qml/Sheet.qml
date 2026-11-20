@@ -43,7 +43,7 @@ FocusScope {
     signal closeRequested
     onCloseRequested: {
         if (closeAction) closeAction();
-        else pageLoader.source = "";
+        else mainScreen.closePage();
     }
 
     anchors.fill: parent

@@ -30,7 +30,7 @@ Sheet {
     preferredWidth: Theme.sp(150)
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Download"), action: () => { if (!busy) NextSdCard.download(); } },
-        { pad: "B", key: "Esc", text: qsTr("Cancel"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Cancel"), action: () => mainScreen.closePage() }
     ]
 
     Component.onCompleted: downloadButton.forceActiveFocus()
@@ -107,7 +107,7 @@ Sheet {
                 text: qsTr("Cancel")
                 onClicked: {
                     NextSdCard.cancel();
-                    pageLoader.source = "";
+                    mainScreen.closePage();
                 }
                 KeyNavigation.left: downloadButton
                 Keys.onReturnPressed: clicked()

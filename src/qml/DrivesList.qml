@@ -30,7 +30,7 @@ Sheet {
     preferredWidth: Theme.sp(100)
     hints: [
         { pad: "A", key: "Enter", text: qsTr("Choose"), action: () => list.chosen(list.currentIndex) },
-        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => pageLoader.source = "" }
+        { pad: "B", key: "Esc", text: qsTr("Back"), action: () => mainScreen.closePage() }
     ]
 
     GamepadNavigation {
