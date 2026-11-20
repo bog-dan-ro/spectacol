@@ -23,6 +23,7 @@
 #include <QUrl>
 
 #include <functional>
+#include <span>
 #include <vector>
 
 class QFile;
@@ -43,6 +44,18 @@ struct Document
 };
 // Read names, document URIs and metadata in one provider query, without opening the files.
 std::vector<Document> listFolder(const QString &folder);
+// Opens a document to replace its content. Not every provider truncates it: resize() it to what
+// was written, before closing.
+bool openDocumentForWriting(const QString &uri, QFile &file);
+// Replaces a document's content
+bool writeDocument(const QString &uri, std::span<const uint8_t> bytes);
+// A new document in a granted folder: a file, or a folder with the mime type
+// "vnd.android.document/directory". Its URI, empty when the provider refused.
+QString createDocument(const QString &folder, const QString &mimeType, const QString &name);
+// The document's URI after renaming it, empty when the provider refused
+QString renameDocument(const QString &uri, const QString &name);
+// Removes a document; a folder goes with everything in it
+bool deleteDocument(const QString &uri);
 
 // Whether this device has Android's folder picker (some TVs don't).
 bool canPickFolders();

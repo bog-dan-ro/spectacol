@@ -1,6 +1,7 @@
 /* Copyright (c) 2015-2026, BogDan Vatra. SPDX-License-Identifier: GPL-3.0-or-later */
 
 #include "filemanagerpanel.h"
+#include "storagefiles.h"
 
 #include <zxkit/media/BasicCodec.h>
 #include <zxkit/media/MediaArchive.h>
@@ -194,6 +195,95 @@ private slots:
         QCOMPARE(free.folder(), root.filePath(u"locked/inner"_s));
         free.setFolder(locked);
         QCOMPARE(free.folder(), QDir::homePath());
+    }
+
+    void deviceFolders()
+    {
+        QTemporaryDir root;
+        QVERIFY(root.isValid());
+        QDir(root.path()).mkpath(u"Snapshots"_s);
+        const auto games =
+                u"content://com.android.externalstorage.documents/tree/primary%3AGames"_s;
+        const auto gamesRoot = games + u"/document/primary%3AGames"_s;
+        const auto sub = games + u"/document/primary%3AGames%2FSub"_s;
+        FileManagerPanel panel;
+        panel.setTopmostFolder(root.path());
+        panel.setHomeFolder(root.path());
+        panel.setDeviceFolders({ games });
+        panel.setFolder(root.path());
+        // The Spectacol folder lists the device folders first
+        QCOMPARE(names(panel), QStringList({ u"Games"_s, u"Snapshots"_s }));
+        QVERIFY(panel.data(panel.index(0), FileManagerPanel::IsDevice).toBool());
+        QVERIFY(!panel.data(panel.index(1), FileManagerPanel::IsDevice).toBool());
+        // A device folder is the user's: never removed, renamed, marked or moved from here
+        QSignalSpy failures(&panel, &FileManagerPanel::failed);
+        QVERIFY(!panel.remove(0));
+        QVERIFY(!panel.rename(0, u"Other"_s));
+        panel.toggleMark(0);
+        QCOMPARE(panel.markedCount(), 0);
+        panel.markAll(true);
+        QCOMPARE(panel.markedCount(), 1);
+        panel.markAll(false);
+        FileManagerPanel other;
+        QTemporaryDir otherFolder;
+        other.setFolder(otherFolder.path());
+        QVERIFY(!panel.copyTo(0, &other, true));
+        QCOMPARE(failures.count(), 3);
+        QString error;
+        QVERIFY(!StorageFiles::remove(gamesRoot, error));
+        QCOMPARE(error, u"Can't remove the device folder itself."_s);
+
+        // In: listed off the GUI thread, the title follows the way down
+        QSignalSpy selected(&panel, &FileManagerPanel::selectRequested);
+        QVERIFY(panel.open(0));
+        QCOMPARE(panel.folder(), gamesRoot);
+        QCOMPARE(panel.location(), u"Games"_s);
+        QTRY_VERIFY(!panel.busy());
+        QCOMPARE(names(panel), QStringList({ u".."_s }));
+        panel.setFolder(sub);
+        QCOMPARE(panel.location(), u"Games/Sub"_s);
+        QTRY_VERIFY(!panel.busy());
+        // Up inside a device folder: the row to select comes with the listing
+        QCOMPARE(panel.up(), 0);
+        QCOMPARE(panel.folder(), gamesRoot);
+        QTRY_COMPARE(selected.count(), 1);
+        // Up from it: back on its row in the Spectacol folder
+        QCOMPARE(panel.up(), 0);
+        QCOMPARE(panel.folder(), root.path());
+        QCOMPARE(names(panel), QStringList({ u"Games"_s, u"Snapshots"_s }));
+
+        // Forgotten while in it
+        QVERIFY(panel.open(0));
+        panel.setDeviceFolders({});
+        QCOMPARE(panel.folder(), root.path());
+        QCOMPARE(names(panel), QStringList({ u"Snapshots"_s }));
+    }
+
+    void largeCopies()
+    {
+        // Beyond the 128 MiB of an image edited in memory, as the Next's card: copied whole
+        QTemporaryDir from;
+        QTemporaryDir to;
+        QVERIFY(from.isValid() && to.isValid());
+        const auto path = from.filePath(u"card.img"_s);
+        const qint64 size = 129 * 1024 * 1024 + 7;
+        {
+            QFile file(path);
+            QVERIFY(file.open(QIODevice::WriteOnly));
+            QVERIFY(file.resize(size)); // sparse
+            QVERIFY(file.seek(size - 4));
+            QCOMPARE(file.write("tail"), 4);
+        }
+        FileManagerPanel left;
+        FileManagerPanel right;
+        left.setFolder(from.path());
+        right.setFolder(to.path());
+        QVERIFY(left.copyTo(left.rowOf(u"card.img"_s), &right));
+        QFile copy(to.filePath(u"card.img"_s));
+        QCOMPARE(copy.size(), size);
+        QVERIFY(copy.open(QIODevice::ReadOnly));
+        QVERIFY(copy.seek(size - 4));
+        QCOMPARE(copy.read(4), QByteArray("tail"));
     }
 
     void newImages()

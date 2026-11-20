@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "storagelocation.h"
+
 #include <QAbstractListModel>
 #include <QDateTime>
 #include <QQmlEngine>
@@ -42,6 +44,8 @@ class FolderListModel : public QAbstractListModel
     Q_PROPERTY(QString folderTitle READ folderTitle NOTIFY folderChanged FINAL)
     Q_PROPERTY(QString folderName READ folderName NOTIFY folderChanged FINAL)
     Q_PROPERTY(bool inDeviceFolder READ inDeviceFolder NOTIFY folderChanged FINAL)
+    // A device folder is being listed
+    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged FINAL)
     Q_PROPERTY(FileSortCriteria sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY
                        sortCriteriaChanged)
     Q_PROPERTY(bool showDirsFirst READ showDirsFirst WRITE setShowDirsFirst NOTIFY
@@ -82,25 +86,25 @@ public:
     void setSearch(const QString &search);
     QString folder() const
     {
-        return m_folder;
+        return m_location.folder();
     }
     void setFolder(QString folder);
 
     QString rootFolder() const
     {
-        return m_rootFolder;
+        return m_location.root();
     }
     void setRootFolder(QString rootFolder);
 
     // Where the device folders are listed (the Spectacol folder)
     QString homeFolder() const
     {
-        return m_homeFolder;
+        return m_location.home();
     }
     void setHomeFolder(QString homeFolder);
     QStringList deviceFolders() const
     {
-        return m_deviceFolders;
+        return m_location.deviceFolders();
     }
     void setDeviceFolders(QStringList deviceFolders);
 
@@ -108,6 +112,10 @@ public:
     QString folderTitle() const;
     QString folderName() const;
     bool inDeviceFolder() const;
+    bool busy() const
+    {
+        return m_busy;
+    }
 
     FileSortCriteria sortCriteria() const;
     void setSortCriteria(FileSortCriteria sortCriteria);
@@ -135,6 +143,7 @@ signals:
     void folderChanged(QString folder);
     void rootFolderChanged(QString rootFolder);
     void homeFolderChanged();
+    void busyChanged();
     void deviceFoldersChanged();
     void sortCriteriaChanged(FolderListModel::FileSortCriteria sortCriteria);
     void showDirsFirstChanged(bool showDirsFirst);
@@ -157,32 +166,23 @@ private:
         bool device = false;
         qint64 size = 0;
     };
-    // A content:// folder we went into: Qt can't go up from one, so the way down is kept
-    struct Step
-    {
-        QString path;
-        QString name;
-    };
-
     bool canOpen(const QString &path);
     bool accepts(const QString &fileName, std::span<const uint8_t> header) const;
-    bool allowed(const QString &folder) const;
-    bool isGranted(const QString &folder) const;
-    QString deviceName(const QString &tree) const;
-    void enter(const QString &folder);
+    // After the folder changed
+    void moved();
+    void sortAndRefilter();
+    void setBusy(bool busy);
     void refilter();
     QString selectionKey() const;
 
 private:
     std::vector<Entry> m_files, m_allFiles;
-    std::vector<Step> m_trail;
-    QString m_trailExit; // the local folder Up returns to from a device folder
-    QString m_folder;
+    StorageLocation m_location;
+    QString m_listedFolder; // the device folder m_allFiles lists
+    int m_listing = 0; // the generation of the listing
+    bool m_busy = false;
     QString m_search;
     bool m_refreshing = false;
-    QString m_rootFolder;
-    QString m_homeFolder;
-    QStringList m_deviceFolders;
     FileSortCriteria m_sortCriteria = ByName;
     bool m_showDirsFirst = true;
     int m_currentIndex = -1;

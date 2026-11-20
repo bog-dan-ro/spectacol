@@ -18,6 +18,15 @@ can copy its programs onto it. A nested image is edited in memory and written ba
 image holding it at each change. When the running Next's own card changes, the Next restarts
 as the file manager closes, because NextZXOS caches the card.
 
+On Android, the Spectacol folder also lists the device folders the user added (**Add device
+folder…** in the actions menu, or in the file browser), marked `DEV`. Android serves their files
+through its document providers, so they are listed off the GUI thread, and a copy into or out of
+one runs in the background while both panels show they are busy. New folders, rename and delete
+work inside them; a device folder itself is never removed or renamed from Spectacol, only
+forgotten (**Forget device folder**), and its files stay on the device. Tape and disk images in
+a device folder open like the others; a FAT card image there is not edited in place. On Android
+both panels browse only the Spectacol folder by default (Options → General).
+
 ## Keys and buttons
 
 | Action | Keyboard | Gamepad |

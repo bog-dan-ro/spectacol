@@ -88,9 +88,13 @@ Leave webcam/voice control, gesture controls, netplay, Google Play sharing, new 
       Commander keys), gamepad and touch; `test_file_manager` covers the model. See `docs/file-manager.md`.
       The viewer, FAT cards and disk probing are ZxKit's (`MediaView`, `FatImage`, `MediaArchive::probe()`),
       shared with `zxmedia`.
-- [ ] File manager follow-ups: Android document-provider (`content://`) folders; inserting a disk or
-      seeking the tape at an entry; a ROM-spacing BASIC compile mode so edited 48K programs need no
-      `\{KEYWORD}` escapes; images nested inside a card are limited to 128 MiB (they are edited in memory).
+- [x] Android device folders (`content://`) in the file manager, shared with the file browser
+      (`StorageLocation`, `StorageFiles`): listed off the GUI thread, browsed, copied both ways in
+      the background, new folders, rename and delete through Android's document API; the folders
+      themselves are only forgotten. On Android both browse only the Spectacol folder by default.
+- [ ] File manager follow-ups: inserting a disk or seeking the tape at an entry; a ROM-spacing BASIC
+      compile mode so edited 48K programs need no `\{KEYWORD}` escapes; images nested inside a card
+      are limited to 128 MiB (they are edited in memory).
 
 ## Debugger
 

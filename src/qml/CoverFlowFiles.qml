@@ -369,6 +369,14 @@ Item
         onCurrentIndexChanged: if (visible && activeFocus) filesModel.currentIndex = currentIndex
         onOpenRequested: row => fileList.openRow(row)
     }
+    // A device folder is being listed
+    BusyIndicator {
+        objectName: "filesBusy"
+        anchors.centerIn: filesView
+        running: filesModel.busy
+        visible: running
+        z: 10
+    }
     // Where we are; a click (or Up) goes to the parent folder, or closes at the top
     Rectangle {
         id : artist_text_label

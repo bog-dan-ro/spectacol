@@ -200,6 +200,8 @@ qt_add_qml_module(spectacol
         sdcardfiles.h sdcardfiles.cpp
         screencache.cpp screencache.h
         spectrumscreen.cpp spectrumscreen.h
+        storagefiles.cpp storagefiles.h
+        storagelocation.cpp storagelocation.h
         z80assembler.cpp z80assembler.h
         zxemulator.cpp zxemulator.h
         zxprinter.cpp

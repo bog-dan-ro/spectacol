@@ -31,8 +31,9 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QImage>
-#include <QSaveFile>
+#include <QFuture>
 #include <QSet>
+#include <QtConcurrent/QtConcurrentRun>
 #include <QUrl>
 
 #include <algorithm>
@@ -74,11 +75,11 @@ bool textSuffix(const QString &suffix)
     return zxkit::textFileName((u"x."_s + suffix).toStdString());
 }
 
-QString hostKind(const QFileInfo &info)
+QString hostKind(bool dir, const QString &name)
 {
-    if (info.isDir())
+    if (dir)
         return u"folder"_s;
-    const auto suffix = info.suffix().toLower();
+    const auto suffix = QFileInfo(name).suffix().toLower();
     if (tapeSuffix(suffix))
         return u"tape"_s;
     if (suffix == u"mdr"_s || suffix == u"nex"_s)
@@ -154,34 +155,15 @@ QString contentKind(zxkit::MediaContent content)
     return u"file"_s;
 }
 
-// Whether path is top or inside it; an empty top allows everything
-bool within(const QString &path, const QString &top)
-{
-    return top.isEmpty() || path == top || path.startsWith(top + u'/');
-}
-
+// Local files and device documents
 std::vector<uint8_t> readHostFile(const QString &path, qint64 limit, QString &error)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        error = FileManagerPanel::tr("Can't open '%1': %2").arg(path, file.errorString());
-        return {};
-    }
-    const auto bytes = file.read(limit);
-    return { bytes.begin(), bytes.end() };
+    return StorageFiles::read(path, limit, error);
 }
 
 bool writeHostFile(const QString &path, std::span<const uint8_t> bytes, QString &error)
 {
-    QSaveFile file(path);
-    if (!file.open(QIODevice::WriteOnly)
-        || file.write(reinterpret_cast<const char *>(bytes.data()), qint64(bytes.size()))
-                != qint64(bytes.size())
-        || !file.commit()) {
-        error = FileManagerPanel::tr("Can't save '%1': %2").arg(path, file.errorString());
-        return false;
-    }
-    return true;
+    return StorageFiles::write(path, bytes, error);
 }
 
 QStringList toQt(const std::vector<std::string> &lines)
@@ -623,11 +605,50 @@ bool fatSignature(const QString &path)
             && (uint8_t(sector[0]) == 0xEB || uint8_t(sector[0]) == 0xE9 || sector[446 + 4] != 0);
 }
 
+// A host file or folder (local, or a device's document) copied into a host folder. The errors
+// are collected, not reported: a copy involving a device folder runs off the GUI thread.
+bool copyHostEntry(const QString &path, bool dir, const QString &folder, const QString &name,
+                   bool overwrite, QStringList &errors)
+{
+    QString error;
+    const auto existing = StorageFiles::find(folder, name);
+    if (dir) {
+        if (existing && !existing->dir) {
+            errors.append(FileManagerPanel::tr("'%1' already exists.").arg(name));
+            return false;
+        }
+        const auto into = existing ? existing->path : StorageFiles::makeFolder(folder, name, error);
+        if (into.isEmpty()) {
+            errors.append(FileManagerPanel::tr("Can't create folder '%1'.").arg(name));
+            return false;
+        }
+        bool ok = true;
+        for (const auto &child : StorageFiles::list(path))
+            ok = copyHostEntry(child.path, child.dir, into, child.name, overwrite, errors) && ok;
+        return ok;
+    }
+    if (existing && !overwrite) {
+        errors.append(FileManagerPanel::tr("'%1' already exists.").arg(name));
+        return false;
+    }
+    if (existing && existing->dir) {
+        errors.append(FileManagerPanel::tr("Can't replace folder '%1'.").arg(name));
+        return false;
+    }
+    // In blocks: a card image is copied whole, without holding it in memory
+    if (StorageFiles::copy(path, folder, name, existing ? existing->path : QString(), error)
+                .isEmpty()) {
+        errors.append(error);
+        return false;
+    }
+    return true;
+}
+
 } // namespace
 
-FileManagerPanel::FileManagerPanel(QObject *parent)
-    : QAbstractListModel(parent), m_folder(QDir::homePath())
+FileManagerPanel::FileManagerPanel(QObject *parent) : QAbstractListModel(parent)
 {
+    m_location.setFolder(QDir::homePath());
     reload();
 }
 
@@ -635,16 +656,18 @@ FileManagerPanel::~FileManagerPanel() = default;
 
 void FileManagerPanel::setFolder(const QString &folder)
 {
-    const QUrl url(folder);
-    auto path = QDir(url.isLocalFile() ? url.toLocalFile() : folder).absolutePath();
     // A remembered folder may have gone, be outside the allowed one or be unreadable (on
-    // Android, the folders above Spectacol's): start from the top
-    const QFileInfo info(path);
-    if (!info.isDir() || !info.isReadable() || !within(path, m_topmostFolder))
-        path = m_topmostFolder.isEmpty() ? QDir::homePath() : m_topmostFolder;
-    if (path == m_folder && !m_media)
+    // Android, the folders above Spectacol's): it starts from the top. The row opened knows
+    // a device folder's name.
+    QString name;
+    for (const auto &entry : m_entries) {
+        if (entry.key == folder && !entry.parent) {
+            name = entry.name;
+            break;
+        }
+    }
+    if (!m_location.setFolder(folder, name) && !m_media)
         return;
-    m_folder = path;
     m_media.reset();
     m_parents.clear();
     m_mediaFolder.clear();
@@ -652,10 +675,48 @@ void FileManagerPanel::setFolder(const QString &folder)
     emit locationChanged();
 }
 
+void FileManagerPanel::setHomeFolder(const QString &folder)
+{
+    const auto previous = m_location.home();
+    m_location.setHome(folder);
+    if (m_location.home() == previous)
+        return;
+    emit homeFolderChanged();
+    if (!m_media && (this->folder() == previous || this->folder() == m_location.home()))
+        reload();
+}
+
+void FileManagerPanel::setDeviceFolders(const QStringList &folders)
+{
+    if (m_location.deviceFolders() == folders)
+        return;
+    const auto previous = folder();
+    m_location.setDeviceFolders(folders);
+    emit deviceFoldersChanged();
+    if (folder() != previous) {
+        // Forgotten while we were in it
+        m_media.reset();
+        m_parents.clear();
+        m_mediaFolder.clear();
+        reload();
+        emit locationChanged();
+    } else if (!m_media && folder() == m_location.home()) {
+        reload();
+    }
+}
+
+void FileManagerPanel::setBusy(bool busy)
+{
+    if (m_busy == busy)
+        return;
+    m_busy = busy;
+    emit busyChanged();
+}
+
 QString FileManagerPanel::location() const
 {
     if (!m_media)
-        return QDir::toNativeSeparators(m_folder);
+        return m_location.inDevice() ? m_location.title() : QDir::toNativeSeparators(folder());
     auto text = QDir::toNativeSeparators(m_media->path);
     for (const auto &parent : m_parents)
         text += u" › "_s
@@ -677,7 +738,7 @@ QString FileManagerPanel::filesystem() const
 
 bool FileManagerPanel::writable() const
 {
-    return m_media ? m_media->writable : QFileInfo(m_folder).isWritable();
+    return m_media ? m_media->writable : StorageFiles::writable(folder());
 }
 
 bool FileManagerPanel::canMakeFolder() const
@@ -750,13 +811,15 @@ bool FileManagerPanel::openImage(int row, const QString &filesystem)
     const auto entry = m_entries[size_t(row)];
     const bool nested = bool(m_media);
     // Panels on the same image share it, so they see each other's changes
-    const auto key =
-            nested ? m_media->key + u'\x1f' + entry.key : QFileInfo(entry.key).absoluteFilePath();
+    const bool document = StorageFiles::isDocument(entry.key);
+    const auto key = nested ? m_media->key + u'\x1f' + entry.key
+            : document      ? entry.key
+                            : QFileInfo(entry.key).absoluteFilePath();
     auto media = filesystem.isEmpty() ? peerMedia(key) : nullptr;
     if (!media) {
         const auto suffix = QFileInfo(entry.name).suffix().toLower();
         // A card image is edited in place, whatever its size
-        if (!nested && (filesystem == u"fat"_s || filesystem.isEmpty())
+        if (!nested && !document && (filesystem == u"fat"_s || filesystem.isEmpty())
             && fatSignature(entry.key)) {
             auto card = std::make_shared<FatMedia>(entry.key);
             if (card->mount())
@@ -833,10 +896,15 @@ bool FileManagerPanel::openImage(int row, const QString &filesystem)
                         throw std::runtime_error(error.toStdString());
                     return bytes;
                 };
-                const QFileInfo info(path);
-                image->modified = info.lastModified();
-                image->size = info.size();
-                image->writable = info.isWritable();
+                if (document) {
+                    // Without a time, refresh() doesn't ask the provider every time
+                    image->writable = true;
+                } else {
+                    const QFileInfo info(path);
+                    image->modified = info.lastModified();
+                    image->size = info.size();
+                    image->writable = info.isWritable();
+                }
             }
             media = image;
         }
@@ -872,17 +940,14 @@ int FileManagerPanel::up()
             m_media.reset();
         }
     } else {
-        QDir dir(m_folder);
-        if (dir.isRoot() || !dir.cdUp())
+        if (!m_location.inDevice() && QDir(folder()).isRoot())
             return -1;
-
         // Not above the allowed folder, nor into one we can't list and come back from
-        if (!within(dir.absolutePath(), m_topmostFolder)
-            || !QFileInfo(dir.absolutePath()).isReadable())
+        left = m_location.name();
+        if (!m_location.goUp())
             return 0;
-
-        left = QDir(m_folder).dirName();
-        m_folder = dir.absolutePath();
+        if (m_location.inDevice())
+            m_select = left; // the listing comes later
     }
     reload();
     emit locationChanged();
@@ -941,6 +1006,13 @@ void FileManagerPanel::reload()
     for (const auto &entry : m_entries)
         if (entry.marked)
             marked.insert(entry.key);
+    if (!m_media && m_location.inDevice()) {
+        listDocuments(marked);
+        return;
+    }
+    m_listedFolder.clear();
+    ++m_listing; // a device folder's listing still on its way is no longer wanted
+    setBusy(false);
     beginResetModel();
     m_entries.clear();
     if (m_media)
@@ -954,25 +1026,79 @@ void FileManagerPanel::reload()
     emit markedChanged();
 }
 
-void FileManagerPanel::listHost()
+FileManagerPanel::Entry FileManagerPanel::parentEntry() const
 {
-    QDir dir(m_folder);
-    if (!dir.isRoot() && m_folder != m_topmostFolder)
-        m_entries.push_back({ u".."_s, QFileInfo(m_folder).absolutePath(), -1, true, true });
-    const auto infos =
-            dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot,
-                              QDir::DirsFirst | QDir::Name | QDir::IgnoreCase | QDir::LocaleAware);
-    for (const auto &info : infos) {
+    Entry entry{ u".."_s, {}, -1, true, true };
+    if (!m_location.inDevice())
+        entry.key = QFileInfo(folder()).absolutePath();
+    return entry;
+}
+
+void FileManagerPanel::appendHost(const std::vector<StorageFiles::Entry> &files)
+{
+    for (const auto &file : files) {
         Entry entry;
-        entry.name = info.fileName();
-        entry.key = info.absoluteFilePath();
-        entry.dir = info.isDir();
-        entry.size = entry.dir ? -1 : info.size();
-        entry.media = !entry.dir && mediaSuffix(info.suffix().toLower());
-        entry.kind = hostKind(info);
-        entry.info = info.lastModified().toString(u"yyyy-MM-dd hh:mm"_s);
+        entry.name = file.name;
+        entry.key = file.path;
+        entry.dir = file.dir;
+        entry.size = file.dir ? -1 : file.size;
+        entry.media = !file.dir && mediaSuffix(QFileInfo(file.name).suffix().toLower());
+        entry.kind = hostKind(file.dir, file.name);
+        entry.modified = file.modified;
+        entry.info = file.modified.toString(u"yyyy-MM-dd hh:mm"_s);
         m_entries.push_back(std::move(entry));
     }
+}
+
+void FileManagerPanel::listHost()
+{
+    if (!m_location.atTop())
+        m_entries.push_back(parentEntry());
+    // The Spectacol folder lists the device folders, first
+    if (!m_location.home().isEmpty() && folder() == m_location.home()) {
+        for (const auto &device : m_location.deviceEntries()) {
+            Entry entry{ device.name, device.path, -1, true };
+            entry.device = true;
+            entry.kind = u"folder"_s;
+            m_entries.push_back(std::move(entry));
+        }
+    }
+    appendHost(StorageFiles::list(folder()));
+}
+
+void FileManagerPanel::listDocuments(const QSet<QString> &marked)
+{
+    const auto shown = folder();
+    if (shown != m_listedFolder) {
+        // A new folder: only the way up until its listing comes
+        beginResetModel();
+        m_entries.clear();
+        m_entries.push_back(parentEntry());
+        endResetModel();
+        emit countChanged();
+        emit markedChanged();
+        m_listedFolder = shown;
+    }
+    const auto generation = ++m_listing;
+    setBusy(true);
+    QtConcurrent::run([shown] {
+        return StorageFiles::list(shown);
+    }).then(this, [this, generation, shown, marked](const std::vector<StorageFiles::Entry> &files) {
+        if (generation != m_listing || shown != folder() || m_media)
+            return;
+        beginResetModel();
+        m_entries.clear();
+        m_entries.push_back(parentEntry());
+        appendHost(files);
+        for (auto &entry : m_entries)
+            entry.marked = !entry.parent && marked.contains(entry.key);
+        endResetModel();
+        emit countChanged();
+        emit markedChanged();
+        setBusy(false);
+        if (!m_select.isEmpty())
+            emit selectRequested(std::max(0, rowOf(std::exchange(m_select, {}))));
+    });
 }
 
 void FileManagerPanel::listMedia()
@@ -1077,7 +1203,7 @@ std::vector<int> FileManagerPanel::targets(int row) const
 
 void FileManagerPanel::toggleMark(int row)
 {
-    if (row < 0 || row >= count() || m_entries[size_t(row)].parent)
+    if (row < 0 || row >= count() || m_entries[size_t(row)].parent || m_entries[size_t(row)].device)
         return;
     m_entries[size_t(row)].marked = !m_entries[size_t(row)].marked;
     emit dataChanged(index(row), index(row), { Marked });
@@ -1087,7 +1213,7 @@ void FileManagerPanel::toggleMark(int row)
 void FileManagerPanel::markAll(bool marked)
 {
     for (auto &entry : m_entries)
-        entry.marked = marked && !entry.parent;
+        entry.marked = marked && !entry.parent && !entry.device;
     if (count())
         emit dataChanged(index(0), index(count() - 1), { Marked });
     emit markedChanged();
@@ -1134,19 +1260,22 @@ QString FileManagerPanel::saveImage(const QString &dataUrl, const QString &name)
             c = u'_';
     if (base.isEmpty())
         base = u"screen"_s;
-    const QDir folder(m_folder);
+    QSet<QString> names;
+    for (const auto &file : StorageFiles::list(folder()))
+        names.insert(file.name);
     auto fileName = base + u".png"_s;
-    for (int n = 2; QFileInfo::exists(folder.filePath(fileName)); ++n)
+    for (int n = 2; names.contains(fileName); ++n)
         fileName = u"%1-%2.png"_s.arg(base).arg(n);
     QString error;
     const std::span<const uint8_t> bytes(reinterpret_cast<const uint8_t *>(png.constData()),
                                          std::size_t(png.size()));
-    if (!writeHostFile(folder.filePath(fileName), bytes, error)) {
+    const auto path = StorageFiles::create(folder(), fileName, bytes, error);
+    if (path.isEmpty()) {
         fail(error);
         return {};
     }
     peerRefresh();
-    return folder.filePath(fileName);
+    return path;
 }
 
 QStringList FileManagerPanel::disassemble(const QByteArray &bytes, int origin, int address) const
@@ -1180,7 +1309,11 @@ int FileManagerPanel::parseAddress(const QString &text) const
 
 bool FileManagerPanel::sameFile(const QString &a, const QString &b) const
 {
-    return !a.isEmpty() && !b.isEmpty() && QFileInfo(a) == QFileInfo(b);
+    if (a.isEmpty() || b.isEmpty())
+        return false;
+    if (StorageFiles::isDocument(a) || StorageFiles::isDocument(b))
+        return StorageLocation::canonical(a) == StorageLocation::canonical(b);
+    return QFileInfo(a) == QFileInfo(b);
 }
 
 int FileManagerPanel::rowOf(const QString &name) const
@@ -1219,6 +1352,8 @@ void FileManagerPanel::peerRefresh()
 
 bool FileManagerPanel::makeFolder(const QString &name)
 {
+    if (m_working)
+        return fail(tr("Wait for the copy to finish."));
     const auto trimmed = name.trimmed();
     if (trimmed.isEmpty() || trimmed.contains(u'/'))
         return fail(tr("Invalid folder name."));
@@ -1230,8 +1365,10 @@ bool FileManagerPanel::makeFolder(const QString &name)
         }
         if (!commit())
             return false;
-    } else if (!QDir(m_folder).mkdir(trimmed)) {
-        return fail(tr("Can't create folder '%1'.").arg(trimmed));
+    } else {
+        QString error;
+        if (StorageFiles::makeFolder(folder(), trimmed, error).isEmpty())
+            return fail(tr("Can't create folder '%1'.").arg(trimmed));
     }
     peerRefresh();
     return true;
@@ -1248,9 +1385,13 @@ QString FileManagerPanel::basicPath(const Entry &entry) const
 
 bool FileManagerPanel::rename(int row, const QString &newName)
 {
+    if (m_working)
+        return fail(tr("Wait for the copy to finish."));
     if (row < 0 || row >= count() || m_entries[size_t(row)].parent)
         return false;
     const auto &entry = m_entries[size_t(row)];
+    if (entry.device)
+        return fail(tr("A device folder keeps its name."));
     const auto name = newName.trimmed();
     if (name.isEmpty() || (!m_media && name.contains(u'/')))
         return fail(tr("Invalid name."));
@@ -1268,8 +1409,10 @@ bool FileManagerPanel::rename(int row, const QString &newName)
         }
         if (!commit())
             return false;
-    } else if (!QDir(m_folder).rename(entry.name, name)) {
-        return fail(tr("Can't rename '%1' to '%2'.").arg(entry.name, name));
+    } else {
+        QString error;
+        if (StorageFiles::rename(entry.key, name, error).isEmpty())
+            return fail(tr("Can't rename '%1' to '%2'.").arg(entry.name, name));
     }
     peerRefresh();
     return true;
@@ -1278,9 +1421,9 @@ bool FileManagerPanel::rename(int row, const QString &newName)
 bool FileManagerPanel::removeSource(const Source &source)
 {
     if (!m_media) {
-        const bool removed =
-                source.dir ? QDir(source.key).removeRecursively() : QFile::remove(source.key);
-        return removed || fail(tr("Can't remove '%1'.").arg(source.name));
+        QString error;
+        return StorageFiles::remove(source.key, error)
+                || fail(tr("Can't remove '%1'.").arg(source.name));
     }
     // Files first (tape blocks from the last, so the numbers stay valid), then folders
     std::vector<std::string> blocks;
@@ -1327,9 +1470,14 @@ bool FileManagerPanel::removeSource(const Source &source)
 
 bool FileManagerPanel::remove(int row)
 {
+    if (m_working)
+        return fail(tr("Wait for the copy to finish."));
     const auto rows = targets(row);
     if (rows.empty())
         return false;
+    // Removing one would remove the user's folder: it is forgotten instead
+    if (std::ranges::any_of(rows, [&](int i) { return m_entries[size_t(i)].device; }))
+        return fail(tr("A device folder isn't removed: forget it to stop showing it."));
     std::vector<Source> sources;
     for (auto i : rows) {
         const auto &entry = m_entries[size_t(i)];
@@ -1399,49 +1547,54 @@ bool FileManagerPanel::putMedia(const QString &name, std::span<const uint8_t> by
     return fail(tr("Can't copy to '%1': %2").arg(name, error));
 }
 
-bool FileManagerPanel::copyInto(const FileManagerPanel &from, const Source &source,
-                                const QString &destination, bool overwrite)
+std::vector<FileManagerPanel::Source> FileManagerPanel::children(const FileManagerPanel &from,
+                                                                 const Source &source) const
 {
+    std::vector<Source> result;
+    if (!from.m_media) {
+        for (const auto &file : StorageFiles::list(source.key))
+            result.push_back({ file.name, file.path, file.dir });
+        return result;
+    }
+    const auto prefix = source.key + u'/';
+    QSet<QString> seen;
+    for (const auto &item : from.m_media->entries(source.key.toStdString(), false)) {
+        const auto name = fromStd(item.name);
+        if (!name.startsWith(prefix))
+            continue;
+        auto rest = name.mid(prefix.size());
+        const bool nested = rest.contains(u'/');
+        rest = rest.section(u'/', 0, 0);
+        if (seen.contains(rest))
+            continue;
+        seen.insert(rest);
+        result.push_back({ rest, prefix + rest, nested || item.directory,
+                           nested ? zxkit::MediaAttributes{} : item.attributes });
+    }
+    return result;
+}
+
+bool FileManagerPanel::copyIntoHost(const FileManagerPanel &from, const Source &source,
+                                    const QString &folder, const QString &name, bool overwrite)
+{
+    if (!from.m_media) {
+        QStringList errors;
+        const bool copied = copyHostEntry(source.key, source.dir, folder, name, overwrite, errors);
+        for (const auto &error : errors)
+            fail(error);
+        return copied;
+    }
+    QString error;
+    const auto existing = StorageFiles::find(folder, name);
     if (source.dir) {
-        std::vector<Source> children;
-        if (!from.m_media) {
-            const auto infos =
-                    QDir(source.key).entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
-            for (const auto &info : infos)
-                children.push_back({ info.fileName(), info.absoluteFilePath(), info.isDir() });
-        } else {
-            const auto prefix = source.key + u'/';
-            QSet<QString> seen;
-            for (const auto &item : from.m_media->entries(source.key.toStdString(), false)) {
-                const auto name = fromStd(item.name);
-                if (!name.startsWith(prefix))
-                    continue;
-                auto rest = name.mid(prefix.size());
-                const bool nested = rest.contains(u'/');
-                rest = rest.section(u'/', 0, 0);
-                if (seen.contains(rest))
-                    continue;
-                seen.insert(rest);
-                children.push_back({ rest, prefix + rest, nested || item.directory,
-                                     nested ? zxkit::MediaAttributes{} : item.attributes });
-            }
-        }
-        if (!m_media) {
-            if (!QDir().mkpath(destination))
-                return fail(tr("Can't create folder '%1'.").arg(destination));
-        } else {
-            const auto name = destination.toStdString();
-            if (!m_media->exists(name) && m_media->entries(name, false).empty()) {
-                try {
-                    m_media->makeDirectory(name);
-                } catch (const std::exception &e) {
-                    return fail(QString::fromUtf8(e.what()));
-                }
-            }
-        }
+        if (existing && !existing->dir)
+            return fail(tr("'%1' already exists.").arg(name));
+        auto into = existing ? existing->path : StorageFiles::makeFolder(folder, name, error);
+        if (into.isEmpty())
+            return fail(tr("Can't create folder '%1'.").arg(name));
         bool ok = true;
-        for (const auto &child : children)
-            ok = copyInto(from, child, destination + u'/' + child.name, overwrite) && ok;
+        for (const auto &child : children(from, source))
+            ok = copyIntoHost(from, child, into, child.name, overwrite) && ok;
         return ok;
     }
     std::vector<uint8_t> bytes;
@@ -1450,15 +1603,38 @@ bool FileManagerPanel::copyInto(const FileManagerPanel &from, const Source &sour
     } catch (const std::exception &e) {
         return fail(QString::fromUtf8(e.what()));
     }
-    if (!m_media) {
-        if (QFileInfo::exists(destination)) {
-            if (!overwrite)
-                return fail(tr("'%1' already exists.").arg(destination));
-            if (QFileInfo(destination).isDir())
-                return fail(tr("Can't replace folder '%1'.").arg(destination));
+    if (existing) {
+        if (!overwrite)
+            return fail(tr("'%1' already exists.").arg(name));
+        if (existing->dir)
+            return fail(tr("Can't replace folder '%1'.").arg(name));
+        return StorageFiles::write(existing->path, bytes, error) || fail(error);
+    }
+    return !StorageFiles::create(folder, name, bytes, error).isEmpty() || fail(error);
+}
+
+bool FileManagerPanel::copyInto(const FileManagerPanel &from, const Source &source,
+                                const QString &destination, bool overwrite)
+{
+    if (source.dir) {
+        const auto name = destination.toStdString();
+        if (!m_media->exists(name) && m_media->entries(name, false).empty()) {
+            try {
+                m_media->makeDirectory(name);
+            } catch (const std::exception &e) {
+                return fail(QString::fromUtf8(e.what()));
+            }
         }
-        QString error;
-        return writeHostFile(destination, bytes, error) || fail(error);
+        bool ok = true;
+        for (const auto &child : children(from, source))
+            ok = copyInto(from, child, destination + u'/' + child.name, overwrite) && ok;
+        return ok;
+    }
+    std::vector<uint8_t> bytes;
+    try {
+        bytes = readSource(from, source);
+    } catch (const std::exception &e) {
+        return fail(QString::fromUtf8(e.what()));
     }
     auto name = destination;
     const auto fs = filesystem();
@@ -1502,7 +1678,10 @@ QStringList FileManagerPanel::conflicts(int row, FileManagerPanel *target,
         const auto &entry = m_entries[size_t(i)];
         const auto name = rows.size() == 1 && !newName.isEmpty() ? newName : entry.name;
         if (!target->m_media) {
-            if (QFileInfo::exists(QDir(target->m_folder).filePath(name)))
+            // What the target lists: a device folder isn't asked again for each name
+            if (std::ranges::any_of(target->m_entries, [&](const Entry &item) {
+                    return !item.parent && !item.device && item.name == name;
+                }))
                 result.append(name);
             continue;
         }
@@ -1526,12 +1705,15 @@ bool FileManagerPanel::copyTo(int row, FileManagerPanel *target, bool move, cons
     const auto rows = targets(row);
     if (rows.empty())
         return false;
+    if (m_working || target->m_working)
+        return fail(tr("Wait for the copy to finish."));
     if (!target->writable())
         return fail(tr("The target is read-only."));
     if (move && !writable())
         return fail(tr("The source is read-only."));
-    const bool sameHostFolder =
-            !m_media && !target->m_media && QFileInfo(m_folder) == QFileInfo(target->m_folder);
+    if (move && std::ranges::any_of(rows, [&](int i) { return m_entries[size_t(i)].device; }))
+        return fail(tr("A device folder can be copied, not moved."));
+    const bool sameHostFolder = !m_media && !target->m_media && folder() == target->folder();
     const bool sameMediaFolder =
             sameMedia(*target) && target->mediaRoot() == mediaRoot() && !tapeBlocks();
     const bool rename = rows.size() == 1 && !newName.trimmed().isEmpty();
@@ -1543,19 +1725,30 @@ bool FileManagerPanel::copyTo(int row, FileManagerPanel *target, bool move, cons
         const auto &entry = m_entries[size_t(i)];
         sources.push_back({ entry.name, entry.key, entry.dir, entry.attributes });
     }
+    if (!m_media && !target->m_media && (m_location.inDevice() || target->m_location.inDevice()))
+        return startHostCopy(std::move(sources), target, move,
+                             rename ? newName.trimmed() : QString(), overwrite);
     bool ok = true;
     for (const auto &source : sources) {
         const auto name = rename ? newName.trimmed() : source.name;
         if (!target->m_media && !m_media) {
-            const auto destination = QDir(target->m_folder).filePath(name);
-            if (source.key == destination
-                || (source.dir && destination.startsWith(source.key + u'/'))) {
+            if (source.dir && target->m_location.inside(source.key)) {
                 ok = fail(tr("Can't copy '%1' into itself.").arg(source.name));
                 continue;
             }
-            if (move && !QFileInfo::exists(destination) && QDir().rename(source.key, destination))
-                continue;
-            if (target->copyInto(*this, source, destination, overwrite)) {
+            const bool local = !StorageFiles::isDocument(source.key)
+                    && !StorageFiles::isDocument(target->folder());
+            if (local) {
+                const auto destination = QDir(target->folder()).filePath(name);
+                if (source.key == destination) {
+                    ok = fail(tr("Can't copy '%1' into itself.").arg(source.name));
+                    continue;
+                }
+                if (move && !QFileInfo::exists(destination)
+                    && QDir().rename(source.key, destination))
+                    continue;
+            }
+            if (target->copyIntoHost(*this, source, target->folder(), name, overwrite)) {
                 if (move)
                     ok = removeSource(source) && ok;
             } else {
@@ -1572,9 +1765,10 @@ bool FileManagerPanel::copyTo(int row, FileManagerPanel *target, bool move, cons
             }
             continue;
         }
-        const auto destination = target->m_media ? target->mediaChild(name, source.dir)
-                                                 : QDir(target->m_folder).filePath(name);
-        if (target->copyInto(*this, source, destination, overwrite)) {
+        const bool copied = target->m_media
+                ? target->copyInto(*this, source, target->mediaChild(name, source.dir), overwrite)
+                : target->copyIntoHost(*this, source, target->folder(), name, overwrite);
+        if (copied) {
             if (move)
                 ok = removeSource(source) && ok;
         } else {
@@ -1591,6 +1785,56 @@ bool FileManagerPanel::copyTo(int row, FileManagerPanel *target, bool move, cons
     if (target != m_peer)
         target->refresh();
     return ok;
+}
+
+bool FileManagerPanel::startHostCopy(std::vector<Source> sources, FileManagerPanel *target,
+                                     bool move, const QString &newName, bool overwrite)
+{
+    std::vector<Source> todo;
+    for (auto &source : sources) {
+        if (source.dir && target->m_location.inside(source.key))
+            fail(tr("Can't copy '%1' into itself.").arg(source.name));
+        else
+            todo.push_back(std::move(source));
+    }
+    if (todo.empty())
+        return false;
+    setWorking(true);
+    target->setWorking(true);
+    QPointer<FileManagerPanel> into(target);
+    QtConcurrent::run([todo, folder = target->folder(), move, newName, overwrite] {
+        QStringList errors;
+        for (const auto &source : todo) {
+            const auto name = newName.isEmpty() ? source.name : newName;
+            if (!copyHostEntry(source.key, source.dir, folder, name, overwrite, errors) || !move)
+                continue;
+            QString error;
+            if (!StorageFiles::remove(source.key, error))
+                errors.append(tr("Can't remove '%1'.").arg(source.name));
+        }
+        return errors;
+    }).then(this, [this, into](const QStringList &errors) {
+        for (const auto &error : errors)
+            fail(error);
+        for (auto &entry : m_entries)
+            entry.marked = false;
+        setWorking(false);
+        if (into)
+            into->setWorking(false);
+        peerRefresh();
+        if (into && into != m_peer)
+            into->refresh();
+        emit copyFinished(errors.isEmpty());
+    });
+    return true;
+}
+
+void FileManagerPanel::setWorking(bool working)
+{
+    if (m_working == working)
+        return;
+    m_working = working;
+    emit busyChanged();
 }
 
 int FileManagerPanel::moveBlock(int row, int delta)
@@ -2017,8 +2261,7 @@ bool FileManagerPanel::createImage(const QString &name, int format)
         return fail(tr("Invalid name."));
     if (QFileInfo(fileName).suffix().toLower() != suffix)
         fileName += u'.' + suffix;
-    const auto path = QDir(m_folder).filePath(fileName);
-    if (QFileInfo::exists(path))
+    if (StorageFiles::find(folder(), fileName))
         return fail(tr("'%1' already exists.").arg(fileName));
     std::vector<uint8_t> bytes;
     try {
@@ -2030,7 +2273,7 @@ bool FileManagerPanel::createImage(const QString &name, int format)
         return fail(QString::fromUtf8(e.what()));
     }
     QString error;
-    if (!writeHostFile(path, bytes, error))
+    if (StorageFiles::create(folder(), fileName, bytes, error).isEmpty())
         return fail(error);
     peerRefresh();
     return true;
@@ -2067,33 +2310,34 @@ QVariant FileManagerPanel::data(const QModelIndex &index, int role) const
         return entry.marked;
     case Kind:
         return entry.parent ? u"parent"_s : entry.kind;
+    case IsDevice:
+        return entry.device;
     }
     return {};
 }
 
 QHash<int, QByteArray> FileManagerPanel::roleNames() const
 {
-    return { { Name, "name" },         { Path, "path" },       { IsDir, "isDir" },
-             { IsParent, "isParent" }, { IsMedia, "isMedia" }, { Size, "size" },
-             { Info, "info" },         { Marked, "marked" },   { Kind, "kind" },
-             { Label, "label" } };
+    return { { Name, "name" },         { Path, "path" },        { IsDir, "isDir" },
+             { IsParent, "isParent" }, { IsMedia, "isMedia" },  { Size, "size" },
+             { Info, "info" },         { Marked, "marked" },    { Kind, "kind" },
+             { Label, "label" },       { IsDevice, "isDevice" } };
 }
 
 QString FileManagerPanel::topmostFolder() const
 {
-    return m_topmostFolder;
+    return m_location.root();
 }
 
 void FileManagerPanel::setTopmostFolder(const QString &newTopmostFolder)
 {
-    if (m_topmostFolder == newTopmostFolder)
+    const auto previous = m_location.root();
+    m_location.setRoot(newTopmostFolder);
+    if (m_location.root() == previous)
         return;
-    m_topmostFolder = newTopmostFolder.isEmpty() ? QString{ }
-            : newTopmostFolder.back() == u'/' ? newTopmostFolder.left(newTopmostFolder.size() - 1)
-                                              : newTopmostFolder;
     emit topmostFolderChanged();
-    if (!within(m_folder, m_topmostFolder))
-        setFolder(m_topmostFolder);
+    if (!m_location.allowed(folder()))
+        setFolder(m_location.root());
     else if (!m_media)
         reload(); // ".." comes or goes
 }

@@ -43,6 +43,7 @@ Sheet {
     readonly property FileManagerPanel activePanel: rightActive ? rightPanel : leftPanel
     readonly property FileManagerPanel otherPanel: rightActive ? leftPanel : rightPanel
     readonly property FileManagerPanelView activeView: rightActive ? rightView : leftView
+    readonly property var deviceStorage: ZxEmulator.deviceStorage
     readonly property bool twin: width >= Theme.sp(170)
     readonly property int row: activeView.currentIndex
     readonly property var popups: [actionsMenu, nameDialog, copyDialog, confirmDialog, attributesDialog,
@@ -326,11 +327,24 @@ Sheet {
         entries.push({ text: keyed(qsTr("New folder"), "F7"), action: makeFolder, enabled: panel.canMakeFolder });
         entries.push({ text: keyed(qsTr("New tape or disk image"), "Shift+F4"), action: newImage, enabled: !panel.inMedia });
         entries.push({ text: keyed(qsTr("Load in the emulator"), "Shift+Enter"), action: loadInEmulator });
+        if (deviceStorage.available) {
+            entries.push({ text: qsTr("Add device folder…"), action: () => deviceStorage.addFolder() });
+            entries.push({ text: qsTr("Forget device folder"), action: forgetCurrent, enabled: activeView.currentDevice });
+        }
         entries.push({ text: keyed(qsTr("Same folder in the other panel"), "Alt+O"), action: sameFolderInOther, enabled: !panel.inMedia });
         entries.push({ text: keyed(qsTr("Refresh"), "Ctrl+R"), action: () => { leftPanel.refresh(); rightPanel.refresh(); } });
         if (!Theme.touchScreenUi)
             entries.push({ text: keyed(qsTr("Close the file manager"), "F10"), action: closePage });
         return entries;
+    }
+
+    // A device folder only stops showing: its files stay on the device
+    function forgetCurrent() {
+        if (activeView.currentDevice) {
+            forgetDialog.path = activeView.currentPath;
+            forgetDialog.name = activeView.currentName;
+            forgetDialog.open();
+        }
     }
 
     function showActions() {
@@ -439,10 +453,31 @@ Sheet {
         event.accepted = true;
     }
 
+    ConfirmDialog {
+        id: forgetDialog
+        property string path
+        property string name
+        text: qsTr("Stop showing \"%1\"? Its files stay on the device.").arg(name)
+        acceptText: qsTr("Stop showing")
+        rejectText: qsTr("Cancel")
+        onAccepted: page.deviceStorage.forgetFolder(path)
+        onClosed: page.activeView.forceActiveFocus()
+    }
+    Connections {
+        target: page.deviceStorage
+        function onFolderAdded(path: string) {
+            page.activePanel.folder = path;
+            page.activeView.forceActiveFocus();
+        }
+    }
+
     FileManagerPanel {
         id: leftPanel
         peer: rightPanel
         topmostFolder: ZxEmulator.settings.restrictToSpectacol ? ZxEmulator.dataPath : ""
+        // Android: the Spectacol folder lists the device folders, as in the file browser
+        homeFolder: page.deviceStorage.available ? ZxEmulator.dataPath : ""
+        deviceFolders: page.deviceStorage.available ? page.deviceStorage.folders : []
         onLocationChanged: settings.setValue("leftFolder", leftPanel.folder)
         onMediaWritten: path => page.noteWritten(path)
         onFailed: text => page.showError(text)
@@ -452,6 +487,9 @@ Sheet {
         id: rightPanel
         peer: leftPanel
         topmostFolder: ZxEmulator.settings.restrictToSpectacol ? ZxEmulator.dataPath : ""
+        // Android: the Spectacol folder lists the device folders, as in the file browser
+        homeFolder: page.deviceStorage.available ? ZxEmulator.dataPath : ""
+        deviceFolders: page.deviceStorage.available ? page.deviceStorage.folders : []
         onLocationChanged: settings.setValue("rightFolder", rightPanel.folder)
         onMediaWritten: path => page.noteWritten(path)
         onFailed: text => page.showError(text)

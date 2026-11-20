@@ -236,6 +236,83 @@ std::vector<Document> listFolder(const QString &folder)
     return documents;
 }
 
+bool openDocumentForWriting(const QString &uri, QFile &file)
+{
+    const auto open = [&](const QString &mode) {
+        auto descriptor = contentResolver().callObjectMethod(
+                "openFileDescriptor",
+                "(Landroid/net/Uri;Ljava/lang/String;)Landroid/os/ParcelFileDescriptor;",
+                parseUri(uri).object(), QJniObject::fromString(mode).object<jstring>());
+        QJniEnvironment env;
+        if (env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose)
+            || !descriptor.isValid())
+            return -1;
+        return int(descriptor.callMethod<jint>("detachFd"));
+    };
+    // Truncating ("wt") isn't supported by every provider: then write ("w") and cut the rest
+    int fd = open(u"wt"_s);
+    if (fd < 0)
+        fd = open(u"w"_s);
+    if (fd < 0)
+        return false;
+    if (!file.open(fd, QIODevice::WriteOnly, QFileDevice::AutoCloseHandle)) {
+        ::close(fd);
+        return false;
+    }
+    return true;
+}
+
+bool writeDocument(const QString &uri, std::span<const uint8_t> bytes)
+{
+    QFile file;
+    if (!openDocumentForWriting(uri, file))
+        return false;
+    const auto size = qint64(bytes.size());
+    return file.write(reinterpret_cast<const char *>(bytes.data()), size) == size
+            && file.resize(size) && file.flush();
+}
+
+QString createDocument(const QString &folder, const QString &mimeType, const QString &name)
+{
+    const auto document = QJniObject::callStaticObjectMethod(
+            "android/provider/DocumentsContract", "createDocument",
+            "(Landroid/content/ContentResolver;Landroid/net/Uri;Ljava/lang/String;Ljava/lang/"
+            "String;)Landroid/net/Uri;",
+            contentResolver().object(), parseUri(ContentUri::canonical(folder)).object(),
+            QJniObject::fromString(mimeType).object<jstring>(),
+            QJniObject::fromString(name).object<jstring>());
+    QJniEnvironment env;
+    if (env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose) || !document.isValid())
+        return {};
+    return ContentUri::canonical(document.toString());
+}
+
+QString renameDocument(const QString &uri, const QString &name)
+{
+    const auto document = QJniObject::callStaticObjectMethod(
+            "android/provider/DocumentsContract", "renameDocument",
+            "(Landroid/content/ContentResolver;Landroid/net/Uri;Ljava/lang/String;)Landroid/net/"
+            "Uri;",
+            contentResolver().object(), parseUri(ContentUri::canonical(uri)).object(),
+            QJniObject::fromString(name).object<jstring>());
+    QJniEnvironment env;
+    if (env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose))
+        return {};
+    // Providers whose ids don't change return no new URI
+    return document.isValid() ? ContentUri::canonical(document.toString())
+                              : ContentUri::canonical(uri);
+}
+
+bool deleteDocument(const QString &uri)
+{
+    const bool deleted = QJniObject::callStaticMethod<jboolean>(
+            "android/provider/DocumentsContract", "deleteDocument",
+            "(Landroid/content/ContentResolver;Landroid/net/Uri;)Z", contentResolver().object(),
+            parseUri(ContentUri::canonical(uri)).object());
+    QJniEnvironment env;
+    return !env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose) && deleted;
+}
+
 bool canPickFolders()
 {
     const auto manager = context().callObjectMethod("getPackageManager",

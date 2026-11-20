@@ -118,11 +118,13 @@ qt_add_executable(test_files_features
     ../src/debugsymbols.cpp ../src/debugsymbols.h
     ../src/folderlistmodel.cpp ../src/folderlistmodel.h
     ../src/screencache.cpp ../src/screencache.h
+    ../src/storagefiles.cpp ../src/storagefiles.h
+    ../src/storagelocation.cpp ../src/storagelocation.h
     ../src/contenturi.cpp ../src/contenturi.h
     ../src/devicestorage.cpp ../src/devicestorage.h
 )
 target_include_directories(test_files_features PRIVATE ../src)
-target_link_libraries(test_files_features PRIVATE Qt6::Test Qt6::Qml ZX::Kit)
+target_link_libraries(test_files_features PRIVATE Qt6::Test Qt6::Qml Qt6::Concurrent ZX::Kit)
 qt_add_resources(test_files_features "feature_roms"
     PREFIX "/roms"
     BASE "../src/roms"
@@ -154,8 +156,11 @@ set_tests_properties(media_icons PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscre
 qt_add_executable(test_file_manager
     test_file_manager.cpp
     ../src/filemanagerpanel.cpp ../src/filemanagerpanel.h
+    ../src/storagefiles.cpp ../src/storagefiles.h
+    ../src/storagelocation.cpp ../src/storagelocation.h
+    ../src/contenturi.cpp ../src/contenturi.h
 )
 target_include_directories(test_file_manager PRIVATE ../src)
-target_link_libraries(test_file_manager PRIVATE Qt6::Test Qt6::Gui Qt6::Qml ZX::Kit)
+target_link_libraries(test_file_manager PRIVATE Qt6::Test Qt6::Gui Qt6::Qml Qt6::Concurrent ZX::Kit)
 add_test(NAME file_manager COMMAND test_file_manager)
 set_tests_properties(file_manager PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")

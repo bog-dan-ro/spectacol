@@ -33,6 +33,9 @@ FocusScope {
     property string currentName
     property string currentKind
     property string currentInfo
+    // A device folder (in the Spectacol folder), and its tree
+    property bool currentDevice
+    property string currentPath
     // A refresh keeps the cursor on the same entry, or at the same place
     property string resetName
     property int resetIndex: 0
@@ -55,7 +58,9 @@ FocusScope {
         return qsTr("%1M").arg(Math.round(bytes / (1024 * 1024)));
     }
 
-    function tag(kind: string): string {
+    function tag(kind: string, device: bool): string {
+        if (device)
+            return qsTr("DEV");
         switch (kind) {
         case "parent": return qsTr("UP");
         case "folder": return qsTr("DIR");
@@ -99,6 +104,10 @@ FocusScope {
             const row = view.panel.rowOf(view.resetName);
             view.select(row >= 0 ? row : view.resetIndex);
         }
+        // A device folder's listing came after Up: the folder left
+        function onSelectRequested(row: int) {
+            view.select(row);
+        }
     }
 
     Rectangle {
@@ -136,6 +145,12 @@ FocusScope {
             highlightMoveDuration: 0
             keyNavigationEnabled: true
             ScrollIndicator.vertical: ScrollIndicator {}
+            BusyIndicator {
+                objectName: "fileManagerBusy"
+                anchors.centerIn: parent
+                running: view.panel.busy
+                visible: running
+            }
             highlight: Rectangle {
                 visible: view.active
                 radius: Theme.radiusSmall
@@ -153,6 +168,8 @@ FocusScope {
                 required property string info
                 required property real size
                 required property bool marked
+                required property bool isDevice
+                required property string path
                 width: list.width
                 height: Theme.listRowHeight
 
@@ -171,7 +188,7 @@ FocusScope {
 
                     Text {
                         Layout.preferredWidth: Theme.caption * 2.4
-                        text: view.tag(entry.kind)
+                        text: view.tag(entry.kind, entry.isDevice)
                         font.family: Theme.monoFamily
                         font.pixelSize: Theme.caption
                         font.weight: Font.DemiBold
@@ -244,6 +261,20 @@ FocusScope {
                     target: view
                     property: "currentInfo"
                     value: entry.info
+                    restoreMode: Binding.RestoreNone
+                }
+                Binding {
+                    when: entry.ListView.isCurrentItem
+                    target: view
+                    property: "currentDevice"
+                    value: entry.isDevice
+                    restoreMode: Binding.RestoreNone
+                }
+                Binding {
+                    when: entry.ListView.isCurrentItem
+                    target: view
+                    property: "currentPath"
+                    value: entry.path
                     restoreMode: Binding.RestoreNone
                 }
             }

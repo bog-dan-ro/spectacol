@@ -17,9 +17,12 @@
 
 #pragma once
 
+#include "storagelocation.h"
+
 #include <QAbstractListModel>
 #include <QDateTime>
 #include <QPointer>
+#include <QSet>
 #include <QQmlEngine>
 #include <QVariantList>
 #include <QVariantMap>
@@ -45,6 +48,13 @@ class FileManagerPanel : public QAbstractListModel
     QML_ELEMENT
     Q_PROPERTY(QString topmostFolder READ topmostFolder WRITE setTopmostFolder NOTIFY
                        topmostFolderChanged FINAL)
+    // The Spectacol folder, which lists the device folders, and those folders (content:// trees)
+    Q_PROPERTY(
+            QString homeFolder READ homeFolder WRITE setHomeFolder NOTIFY homeFolderChanged FINAL)
+    Q_PROPERTY(QStringList deviceFolders READ deviceFolders WRITE setDeviceFolders NOTIFY
+                       deviceFoldersChanged FINAL)
+    // A device folder is being listed, or copied into or out of
+    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged FINAL)
     Q_PROPERTY(QString folder READ folder WRITE setFolder NOTIFY locationChanged FINAL)
     Q_PROPERTY(QString location READ location NOTIFY locationChanged FINAL)
     Q_PROPERTY(QString mediaPath READ mediaPath NOTIFY locationChanged FINAL)
@@ -69,7 +79,8 @@ public:
         Info,
         Marked,
         Kind,
-        Label // what a row shows: the name, or a tape block's number and contents
+        Label, // what a row shows: the name, or a tape block's number and contents
+        IsDevice // a device folder, in the Spectacol folder
     };
     Q_ENUM(Roles)
 
@@ -79,9 +90,23 @@ public:
     /// The host folder: the one shown, or the one holding the open media image
     QString folder() const
     {
-        return m_folder;
+        return m_location.folder();
     }
     void setFolder(const QString &folder);
+    QString homeFolder() const
+    {
+        return m_location.home();
+    }
+    void setHomeFolder(const QString &folder);
+    QStringList deviceFolders() const
+    {
+        return m_location.deviceFolders();
+    }
+    void setDeviceFolders(const QStringList &folders);
+    bool busy() const
+    {
+        return m_busy || m_working;
+    }
     /// The folder, then the image and the folder inside it, for the panel's title
     QString location() const;
     QString mediaPath() const;
@@ -184,6 +209,13 @@ signals:
     void mediaWritten(const QString &path);
 
     void topmostFolderChanged();
+    void homeFolderChanged();
+    void deviceFoldersChanged();
+    void busyChanged();
+    // A device folder's listing came after up() or a refresh: the row to put the cursor on
+    void selectRequested(int row);
+    // A copy that involved a device folder ran off the GUI thread, and is done
+    void copyFinished(bool ok);
 
 private:
     struct Entry
@@ -195,6 +227,8 @@ private:
         bool parent = false;
         bool media = false;
         bool marked = false;
+        bool device = false;
+        QDateTime modified;
         QString kind;
         QString info;
         QString label;
@@ -217,6 +251,18 @@ private:
 
     void reload();
     void listHost();
+    // A device folder: listed off the GUI thread
+    void listDocuments(const QSet<QString> &marked);
+    void appendHost(const std::vector<StorageFiles::Entry> &files);
+    Entry parentEntry() const;
+    void setBusy(bool busy);
+    void setWorking(bool working);
+    bool startHostCopy(std::vector<Source> sources, FileManagerPanel *target, bool move,
+                       const QString &newName, bool overwrite);
+    std::vector<Source> children(const FileManagerPanel &from, const Source &source) const;
+    // Copies into a host folder, local or a device's: folder + name, as documents have no paths
+    bool copyIntoHost(const FileManagerPanel &from, const Source &source, const QString &folder,
+                      const QString &name, bool overwrite);
     void listMedia();
     bool fail(const QString &message) const;
     bool commit();
@@ -236,11 +282,15 @@ private:
     bool removeSource(const Source &source);
     QString basicPath(const Entry &entry) const;
 
-    QString m_folder;
+    StorageLocation m_location;
+    QString m_listedFolder; // the device folder the entries list
+    QString m_select; // the name to select when the device folder's listing comes
+    int m_listing = 0; // the generation of the device folder listing
+    bool m_busy = false;
+    bool m_working = false; // a copy runs off the GUI thread
     std::shared_ptr<FileManagerMedia> m_media;
     QString m_mediaFolder; // "" is the image's root
     std::vector<Parent> m_parents; // outermost first
     std::vector<Entry> m_entries;
     QPointer<FileManagerPanel> m_peer;
-    QString m_topmostFolder;
 };

@@ -16,11 +16,7 @@
 */
 
 #include "folderlistmodel.h"
-#include "contenturi.h"
 #include "screencache.h"
-#ifdef Q_OS_ANDROID
-#include "androidintegration.h"
-#endif
 
 #include <zxkit/media/MediaPreview.h>
 
@@ -29,25 +25,16 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QFuture>
 #include <QSettings>
 #include <QUrl>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include <algorithm>
 
 using namespace Qt::StringLiterals;
 
 namespace {
-QString canonicalFolder(QString path)
-{
-    if (ContentUri::isContent(path))
-        return ContentUri::canonical(path);
-    const QUrl url(path);
-    if (url.isLocalFile())
-        path = url.toLocalFile();
-    const QFileInfo info(path);
-    const auto canonical = info.canonicalFilePath();
-    return canonical.isEmpty() ? info.absoluteFilePath() : canonical;
-}
 bool within(const QString &folder, const QString &root)
 {
     return root.isEmpty() || root == u"/"_s || folder == root || folder.startsWith(root + u'/');
@@ -58,51 +45,9 @@ FolderListModel::FolderListModel(QObject *parent) : QAbstractListModel(parent) {
 
 FolderListModel::~FolderListModel() { }
 
-bool FolderListModel::isGranted(const QString &folder) const
-{
-    return std::ranges::any_of(m_deviceFolders, [&](const QString &tree) {
-        return ContentUri::sameTree(tree, folder);
-    });
-}
-
-bool FolderListModel::allowed(const QString &folder) const
-{
-    if (ContentUri::isContent(folder))
-        return isGranted(folder);
-    return within(folder, m_rootFolder) && QFileInfo(folder).isDir();
-}
-
 void FolderListModel::setFolder(QString folder)
 {
-    folder = canonicalFolder(folder);
-    if (!allowed(folder))
-        folder = m_rootFolder;
-    if (m_folder == folder)
-        return;
-    enter(folder);
-    m_folder = folder;
-    if (!m_search.isEmpty()) {
-        m_search.clear();
-        emit searchChanged();
-    }
-    emit folderChanged(m_folder);
-    refresh();
-}
-
-// Keeps the way down a device folder, for Up and for the title
-void FolderListModel::enter(const QString &folder)
-{
-    if (!ContentUri::isContent(folder)) {
-        m_trail.clear();
-        return;
-    }
-    for (std::size_t i = 0; i < m_trail.size(); ++i) {
-        if (m_trail[i].path == folder) {
-            m_trail.resize(i + 1);
-            return;
-        }
-    }
-    // The row we open knows the provider's name for it
+    // The row we open knows the provider's name for a device folder
     QString name;
     for (const auto &entry : m_allFiles) {
         if (entry.path == folder) {
@@ -110,46 +55,41 @@ void FolderListModel::enter(const QString &folder)
             break;
         }
     }
-    if (name.isEmpty())
-        name = ContentUri::name(folder);
-    if (!m_trail.empty() && ContentUri::sameTree(m_trail.back().path, folder)) {
-        m_trail.push_back({ folder, name });
-        return;
+    if (m_location.setFolder(folder, name))
+        moved();
+}
+
+void FolderListModel::moved()
+{
+    if (!m_search.isEmpty()) {
+        m_search.clear();
+        emit searchChanged();
     }
-    if (!ContentUri::isContent(m_folder))
-        m_trailExit = m_folder;
-    // Straight into a folder below the device folder (Quick Open remembers the last one):
-    // storage document ids give the way down; opaque ones only the folder itself.
-    m_trail.clear();
-    for (auto step = folder; !step.isEmpty(); step = ContentUri::parentFolder(step)) {
-        const auto stepName = step == folder         ? name
-                : step == ContentUri::treeRoot(step) ? deviceName(step)
-                                                     : ContentUri::name(step);
-        m_trail.insert(m_trail.begin(), { step, stepName });
-    }
+    emit folderChanged(m_location.folder());
+    refresh();
 }
 
 void FolderListModel::setRootFolder(QString rootFolder)
 {
-    rootFolder = canonicalFolder(rootFolder);
-    if (m_rootFolder == rootFolder)
+    const auto previous = m_location.root();
+    m_location.setRoot(rootFolder);
+    if (m_location.root() == previous)
         return;
-    m_rootFolder = rootFolder;
-    emit rootFolderChanged(m_rootFolder);
-    if (m_folder.isEmpty() || !allowed(m_folder))
-        setFolder(m_rootFolder);
+    emit rootFolderChanged(m_location.root());
+    if (folder().isEmpty() || !m_location.allowed(folder()))
+        setFolder(m_location.root());
     else
         refresh();
 }
 
 void FolderListModel::setHomeFolder(QString homeFolder)
 {
-    if (!homeFolder.isEmpty())
-        homeFolder = canonicalFolder(homeFolder);
-    if (m_homeFolder == homeFolder)
+    const auto previous = m_location.home();
+    m_location.setHome(homeFolder);
+    if (m_location.home() == previous)
         return;
-    const bool shown = !m_folder.isEmpty() && (m_folder == m_homeFolder || m_folder == homeFolder);
-    m_homeFolder = homeFolder;
+    const bool shown =
+            !folder().isEmpty() && (folder() == previous || folder() == m_location.home());
     emit homeFolderChanged();
     if (shown)
         refresh();
@@ -157,42 +97,30 @@ void FolderListModel::setHomeFolder(QString homeFolder)
 
 void FolderListModel::setDeviceFolders(QStringList deviceFolders)
 {
-    if (m_deviceFolders == deviceFolders)
+    if (m_location.deviceFolders() == deviceFolders)
         return;
-    m_deviceFolders = std::move(deviceFolders);
+    const auto previous = folder();
+    m_location.setDeviceFolders(deviceFolders);
     emit deviceFoldersChanged();
-    if (inDeviceFolder() && !isGranted(m_folder)) {
-        // Forgotten while we were in it
-        setFolder(!m_trailExit.isEmpty()            ? m_trailExit
-                          : !m_homeFolder.isEmpty() ? m_homeFolder
-                                                    : m_rootFolder);
-    } else if (!m_folder.isEmpty() && m_folder == m_homeFolder) {
+    if (folder() != previous)
+        moved(); // forgotten while we were in it
+    else if (!folder().isEmpty() && folder() == m_location.home())
         refresh();
-    }
 }
 
 QString FolderListModel::folderTitle() const
 {
-    if (!inDeviceFolder())
-        return m_folder;
-    QStringList names;
-    for (const auto &step : m_trail)
-        names.append(step.name);
-    if (names.isEmpty())
-        names.append(ContentUri::name(m_folder));
-    return names.join(u'/');
+    return m_location.title();
 }
 
 QString FolderListModel::folderName() const
 {
-    if (!inDeviceFolder())
-        return QFileInfo(m_folder).fileName();
-    return m_trail.empty() ? ContentUri::name(m_folder) : m_trail.back().name;
+    return m_location.name();
 }
 
 bool FolderListModel::inDeviceFolder() const
 {
-    return ContentUri::isContent(m_folder);
+    return m_location.inDevice();
 }
 
 void FolderListModel::setSearch(const QString &search)
@@ -208,7 +136,7 @@ QString FolderListModel::selectionKey() const
     return u"FileSelections/"_s
             + QString::fromLatin1(
                     QCryptographicHash::hash(
-                            (m_folder + u'|' + QString::number(m_filterClass)).toUtf8(),
+                            (folder() + u'|' + QString::number(m_filterClass)).toUtf8(),
                             QCryptographicHash::Sha256)
                             .toHex());
 }
@@ -308,25 +236,8 @@ QString FolderListModel::path(int index)
 
 void FolderListModel::cdUp()
 {
-    if (inDeviceFolder()) {
-        if (m_trail.size() > 1) {
-            setFolder(m_trail[m_trail.size() - 2].path);
-            return;
-        }
-        // Entered below the device folder's root: storage document ids are paths
-        if (const auto parent = ContentUri::parentFolder(m_folder); !parent.isEmpty()) {
-            m_trail.clear();
-            setFolder(parent);
-            return;
-        }
-        setFolder(!m_trailExit.isEmpty()            ? m_trailExit
-                          : !m_homeFolder.isEmpty() ? m_homeFolder
-                                                    : m_rootFolder);
-        return;
-    }
-    QDir d(m_folder);
-    d.cdUp();
-    setFolder(d.absolutePath());
+    if (m_location.goUp())
+        moved();
 }
 
 int FolderListModel::rowCount(const QModelIndex &parent) const
@@ -422,61 +333,65 @@ bool FolderListModel::canOpen(const QString &path)
                                             size_t(buffer.size())));
 }
 
-QString FolderListModel::deviceName(const QString &tree) const
-{
-#ifdef Q_OS_ANDROID
-    // The provider's name for it: one query
-    if (const auto name = QFileInfo(tree).fileName(); !name.isEmpty())
-        return name;
-#endif
-    const auto name = ContentUri::name(tree);
-    return name.isEmpty() ? tr("Device folder") : name;
-}
-
 void FolderListModel::refresh()
 {
-    m_allFiles.clear();
-    const bool content = inDeviceFolder();
-    if (!content && m_filterClass != HostFiles && !m_homeFolder.isEmpty()
-        && m_folder == m_homeFolder) {
-        for (const auto &tree : m_deviceFolders)
-            m_allFiles.push_back({ deviceName(tree), ContentUri::treeRoot(tree), {}, true, true });
+    const auto generation = ++m_listing; // a listing still on its way is no longer wanted
+    if (inDeviceFolder()) {
+        // Every call is a round trip to the provider: off the GUI thread, by the names there
+        const auto shown = folder();
+        if (shown != m_listedFolder) {
+            m_allFiles.clear();
+            refilter();
+            m_listedFolder = shown;
+        }
+        setBusy(true);
+        QtConcurrent::run([shown] {
+            return StorageFiles::list(shown);
+        }).then(this, [this, generation, shown](const std::vector<StorageFiles::Entry> &files) {
+            if (generation != m_listing || shown != folder())
+                return;
+            m_allFiles.clear();
+            for (const auto &file : files) {
+                if (file.dir || accepts(file.name, {}))
+                    m_allFiles.push_back({ file.name, file.path, file.modified, file.dir, false,
+                                           file.dir ? 0 : file.size });
+            }
+            sortAndRefilter();
+            setBusy(false);
+        });
+        return;
     }
-    if (!m_folder.isEmpty()) {
-#ifdef Q_OS_ANDROID
-        if (content) {
-            for (const auto &document : AndroidIntegration::listFolder(m_folder)) {
-                if (!document.directory && !accepts(document.name, {}))
-                    continue;
-                m_allFiles.push_back({ document.name, ContentUri::canonical(document.path),
-                                       document.modified, document.directory, false,
-                                       document.size });
-            }
-        } else
-#endif
-        {
-            QDirIterator it(m_folder,
-                            QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
-            while (it.hasNext()) {
-                it.next();
-                const auto &info = it.fileInfo();
-                if (!content && !within(info.canonicalFilePath(), m_rootFolder))
-                    continue;
-                const auto name = content ? it.fileName() : info.fileName();
-                if (m_filterClass != HostFiles
-                    && QFileInfo(name).suffix().compare(u"pok"_s, Qt::CaseInsensitive) == 0)
-                    continue;
-                const bool dir = info.isDir();
-                // Every document read is a round trip to its provider: go by the names there
-                if (!dir && !(content ? accepts(name, {}) : canOpen(info.absoluteFilePath())))
-                    continue;
-                m_allFiles.push_back(
-                        { name,
-                          content ? ContentUri::canonical(it.filePath()) : info.absoluteFilePath(),
-                          info.lastModified(), dir, false, dir ? 0 : info.size() });
-            }
+    m_listedFolder.clear();
+    setBusy(false);
+    m_allFiles.clear();
+    if (m_filterClass != HostFiles && !m_location.home().isEmpty()
+        && folder() == m_location.home()) {
+        for (const auto &device : m_location.deviceEntries())
+            m_allFiles.push_back({ device.name, device.path, {}, true, true });
+    }
+    if (!folder().isEmpty()) {
+        QDirIterator it(folder(), QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
+        while (it.hasNext()) {
+            it.next();
+            const auto &info = it.fileInfo();
+            if (!within(info.canonicalFilePath(), m_location.root()))
+                continue;
+            const auto name = info.fileName();
+            if (m_filterClass != HostFiles
+                && QFileInfo(name).suffix().compare(u"pok"_s, Qt::CaseInsensitive) == 0)
+                continue;
+            const bool dir = info.isDir();
+            if (!dir && !canOpen(info.absoluteFilePath()))
+                continue;
+            m_allFiles.push_back({ name, info.absoluteFilePath(), info.lastModified(), dir, false,
+                                   dir ? 0 : info.size() });
         }
     }
+    sortAndRefilter();
+}
+
+void FolderListModel::sortAndRefilter()
+{
     std::stable_sort(m_allFiles.begin(), m_allFiles.end(), [this](const Entry &a, const Entry &b) {
         if (a.device != b.device)
             return a.device;
@@ -488,6 +403,15 @@ void FolderListModel::refresh()
     });
     refilter();
 }
+
+void FolderListModel::setBusy(bool busy)
+{
+    if (m_busy == busy)
+        return;
+    m_busy = busy;
+    emit busyChanged();
+}
+
 void FolderListModel::refilter()
 {
     const QString selected = m_search.isEmpty() ? QSettings().value(selectionKey()).toString()
