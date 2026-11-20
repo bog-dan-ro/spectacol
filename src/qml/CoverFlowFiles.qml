@@ -325,6 +325,12 @@ Item
                 }
                 MouseArea {
                     anchors.fill: parent
+                    // The actions menu, for this file or folder (a tap would open a folder)
+                    onPressAndHold: {
+                        filesView.forceActiveFocus();
+                        filesView.currentIndex = index;
+                        fileActions.openMenu();
+                    }
                     onClicked: {
                         // A click also gives the keys back to the covers, as in the list
                         filesView.forceActiveFocus();
@@ -368,6 +374,10 @@ Item
         model: filesModel
         onCurrentIndexChanged: if (visible && activeFocus) filesModel.currentIndex = currentIndex
         onOpenRequested: row => fileList.openRow(row)
+        onContextRequested: row => {
+            filesModel.currentIndex = row;
+            fileActions.openMenu();
+        }
     }
     // A device folder is being listed
     BusyIndicator {

@@ -40,6 +40,11 @@ ToolButton {
     icon.height: Theme.sp(6)
     display: AbstractButton.IconOnly
     onClicked: menu.open()
+    // A long press on an item opens it too, for the item it made current
+    function openMenu() {
+        if (availableActions.length > 0)
+            menu.open();
+    }
     function close(): bool {
         if (!menu.visible) return false;
         menu.close();

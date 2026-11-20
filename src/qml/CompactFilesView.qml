@@ -27,6 +27,7 @@ GridView {
     property bool grid: false
     readonly property real pixelRatio: Window.window ? Window.window.devicePixelRatio : 1
     signal openRequested(int row)
+    signal contextRequested(int row)
     clip: true
     activeFocusOnTab: true
     cellWidth: grid ? width / Math.max(1, Math.floor(width / Theme.sp(48))) : width
@@ -106,6 +107,12 @@ GridView {
             view.currentIndex = index;
             view.forceActiveFocus();
             view.openRequested(index);
+        }
+        // The actions menu, for this file or folder
+        onPressAndHold: {
+            view.currentIndex = index;
+            view.forceActiveFocus();
+            view.contextRequested(index);
         }
         Accessible.name: name
     }
