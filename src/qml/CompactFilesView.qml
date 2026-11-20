@@ -53,6 +53,7 @@ GridView {
         required property int index
         required property string name
         required property string coverSource
+        required property string typeIcon
         required property bool isDir
         required property bool isDevice
         readonly property string folderIcon: isDevice ? "folder-device" : "folder"
@@ -63,6 +64,7 @@ GridView {
         contentItem: ColumnLayout {
             spacing: Theme.sp(1)
             Image {
+                id: cover
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: view.grid
@@ -71,6 +73,15 @@ GridView {
                 fillMode: Image.PreserveAspectFit
                 smooth: false
                 asynchronous: true
+                // The file's kind until its screen is there
+                Image {
+                    anchors.fill: parent
+                    visible: cover.status !== Image.Ready
+                    source: visible ? row.typeIcon : ""
+                    sourceSize: cover.sourceSize
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                }
             }
             RowLayout {
                 Layout.fillWidth: true

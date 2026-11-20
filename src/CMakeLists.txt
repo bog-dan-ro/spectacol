@@ -198,6 +198,7 @@ qt_add_qml_module(spectacol
         screenfilters.h
         screenfilterinput.cpp screenfilterinput.h
         sdcardfiles.h sdcardfiles.cpp
+        screencache.cpp screencache.h
         spectrumscreen.cpp spectrumscreen.h
         z80assembler.cpp z80assembler.h
         zxemulator.cpp zxemulator.h
@@ -305,6 +306,7 @@ qt_add_qml_module(spectacol
 target_link_libraries(spectacol PRIVATE
     ZX::VideoFilters
     Qt::Quick
+    Qt::Concurrent
     Qt::Multimedia
     Qt::GamepadLegacy
     Qt::GuiPrivate

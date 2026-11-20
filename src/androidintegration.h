@@ -39,6 +39,7 @@ struct Document
     QString path;
     QDateTime modified;
     bool directory = false;
+    qint64 size = 0;
 };
 // Read names, document URIs and metadata in one provider query, without opening the files.
 std::vector<Document> listFolder(const QString &folder);

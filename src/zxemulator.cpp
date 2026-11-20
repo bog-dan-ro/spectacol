@@ -45,6 +45,7 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QFuture>
 #include <QGuiApplication>
 #include <QKeyEvent>
 #include <QQmlContext>
@@ -53,6 +54,7 @@
 #include <QSaveFile>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include <algorithm>
 #include <array>
@@ -1262,16 +1264,12 @@ void ZxEmulator::importDocument(const QUrl &url, bool checkMedia, std::function<
     }
 
     const QDir folder(QDir(dataPath()).filePath(u"Imported"_s));
-    m_documentJobs.start([this, url, folder, checkMedia, done = std::move(done)]() mutable {
-        auto result = copyDocument(url, folder, checkMedia);
-        QMetaObject::invokeMethod(
-                this,
-                [this, result = std::move(result), done = std::move(done)] {
-                    if (!result.message.isEmpty())
-                        showMessage(result.message, result.level);
-                    done(result.path);
-                },
-                Qt::QueuedConnection);
+    QtConcurrent::run(&m_documentJobs, [url, folder, checkMedia] {
+        return copyDocument(url, folder, checkMedia);
+    }).then(this, [this, done = std::move(done)](const DocumentImport &result) {
+        if (!result.message.isEmpty())
+            showMessage(result.message, result.level);
+        done(result.path);
     });
 }
 
@@ -1818,15 +1816,11 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
 {
     const auto request = ++m_gameLoadRequest;
     if (ContentUri::isContent(filePath)) {
-        m_documentJobs.start([this, filePath, removeOnFail, request] {
-            auto media = readMedia(filePath);
-            QMetaObject::invokeMethod(
-                    this,
-                    [this, filePath, removeOnFail, request, media = std::move(media)] {
-                        if (request == m_gameLoadRequest)
-                            finishLoad(filePath, removeOnFail, media);
-                    },
-                    Qt::QueuedConnection);
+        QtConcurrent::run(&m_documentJobs, [filePath] {
+            return readMedia(filePath);
+        }).then(this, [this, filePath, removeOnFail, request](QFuture<MediaLoad> media) {
+            if (request == m_gameLoadRequest)
+                finishLoad(filePath, removeOnFail, media.takeResult());
         });
         return;
     }

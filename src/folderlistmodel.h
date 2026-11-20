@@ -51,7 +51,15 @@ class FolderListModel : public QAbstractListModel
             FilterType filterClass READ filterClass WRITE setFilterClass NOTIFY filterClassChanged)
 
 public:
-    enum FileFields { Name = Qt::DisplayRole, Path = Qt::UserRole, IsDir, IsDevice, CoverSource };
+    // CoverSource is the screen, TypeIcon what shows until it is there
+    enum FileFields {
+        Name = Qt::DisplayRole,
+        Path = Qt::UserRole,
+        IsDir,
+        IsDevice,
+        CoverSource,
+        TypeIcon
+    };
     Q_ENUM(FileFields)
 
     enum FileSortCriteria {
@@ -147,6 +155,7 @@ private:
         QDateTime modified;
         bool dir = false;
         bool device = false;
+        qint64 size = 0;
     };
     // A content:// folder we went into: Qt can't go up from one, so the way down is kept
     struct Step

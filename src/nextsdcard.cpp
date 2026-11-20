@@ -36,6 +36,12 @@ namespace {
 constexpr auto kDistroUrl = "https://www.specnext.com/distro/24.11/sn-emulator-24.11.zip";
 constexpr auto kImageName = "cspect-next-1gb.img";
 constexpr QStringView kSettingsKey = u"Next/sdCardImage";
+
+// Where earlier versions downloaded the image
+QString legacyFolder()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/sdcard"_s;
+}
 } // namespace
 
 NextSdCard *NextSdCard::create(QQmlEngine *, QJSEngine *)
@@ -64,8 +70,38 @@ NextSdCard::~NextSdCard()
 
 QString NextSdCard::defaultImagePath() const
 {
-    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/sdcard/"_s
-            + QString::fromUtf8(kImageName);
+    const auto name = QString::fromUtf8(kImageName);
+    const auto legacy = legacyFolder() + u'/' + name;
+    if (m_dataFolder.isEmpty())
+        return legacy;
+    const auto image = m_dataFolder + u"/Next/"_s + name;
+    // An earlier version's image that couldn't move (another file system) stays in use
+    if (!QFileInfo::exists(image) && QFileInfo::exists(legacy))
+        return legacy;
+    return image;
+}
+
+void NextSdCard::setDataFolder(const QString &folder)
+{
+    const auto cleaned = QDir::cleanPath(folder);
+    if (cleaned == m_dataFolder)
+        return;
+    m_dataFolder = cleaned;
+    const auto next = m_dataFolder + u"/Next"_s;
+    const QDir legacy(legacyFolder());
+    const auto name = QString::fromUtf8(kImageName);
+    if (legacy.exists(name) && !QFileInfo::exists(next + u'/' + name) && QDir().mkpath(next)) {
+        // The image, and the downloaded zip that updates it, by renaming: no copy of 1 GB
+        if (QFile::rename(legacy.filePath(name), next + u'/' + name)) {
+            const auto zip = QFileInfo(downloadUrl()).fileName();
+            if (!zip.isEmpty() && legacy.exists(zip))
+                QFile::rename(legacy.filePath(zip), next + u'/' + zip);
+            QDir().rmdir(legacy.path());
+        }
+    }
+    if (m_state == Idle && available())
+        setState(Ready);
+    emit imagePathChanged();
 }
 
 QString NextSdCard::zipPath() const

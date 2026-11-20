@@ -285,6 +285,15 @@ Item
                 sourceSize: Qt.size(fileList.coverPixels, fileList.coverPixels)
                 source: coverSource
                 smooth : false
+                // The file's kind until its screen is there
+                Image {
+                    anchors.fill: parent
+                    visible: album_delegate.status !== Image.Ready
+                    source: visible ? typeIcon : ""
+                    sourceSize: album_delegate.sourceSize
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                }
 
                 NumberAnimation {id : scale_anim; target : album_delegate; property: "scale"; from : 0; to : delScale; duration : 500; easing.type: Easing.InOutQuad}
                 transform: [Rotation {id : rotation; angle : rotAngle; axis {x : 0; y: 1; z : 0} origin.x : width * 0.5; origin.y : height * 0.5}]

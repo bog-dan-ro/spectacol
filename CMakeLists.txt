@@ -30,7 +30,7 @@ if(ANDROID)
     list(APPEND CMAKE_FIND_ROOT_PATH "${CMAKE_BINARY_DIR}")
 endif()
 
-find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Quick Multimedia ShaderTools GuiPrivate)
+find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Quick Multimedia ShaderTools GuiPrivate Concurrent)
 
 qt_standard_project_setup(REQUIRES ${QT_REQUIRED_VERSION})
 

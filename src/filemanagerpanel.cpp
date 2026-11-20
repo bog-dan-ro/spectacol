@@ -154,6 +154,12 @@ QString contentKind(zxkit::MediaContent content)
     return u"file"_s;
 }
 
+// Whether path is top or inside it; an empty top allows everything
+bool within(const QString &path, const QString &top)
+{
+    return top.isEmpty() || path == top || path.startsWith(top + u'/');
+}
+
 std::vector<uint8_t> readHostFile(const QString &path, qint64 limit, QString &error)
 {
     QFile file(path);
@@ -631,9 +637,11 @@ void FileManagerPanel::setFolder(const QString &folder)
 {
     const QUrl url(folder);
     auto path = QDir(url.isLocalFile() ? url.toLocalFile() : folder).absolutePath();
-    // A remembered folder may have gone: start from home
-    if (!QFileInfo(path).isDir())
-        path = QDir::homePath();
+    // A remembered folder may have gone, be outside the allowed one or be unreadable (on
+    // Android, the folders above Spectacol's): start from the top
+    const QFileInfo info(path);
+    if (!info.isDir() || !info.isReadable() || !within(path, m_topmostFolder))
+        path = m_topmostFolder.isEmpty() ? QDir::homePath() : m_topmostFolder;
     if (path == m_folder && !m_media)
         return;
     m_folder = path;
@@ -868,7 +876,9 @@ int FileManagerPanel::up()
         if (dir.isRoot() || !dir.cdUp())
             return -1;
 
-        if (!dir.absolutePath().startsWith(m_topmostFolder))
+        // Not above the allowed folder, nor into one we can't list and come back from
+        if (!within(dir.absolutePath(), m_topmostFolder)
+            || !QFileInfo(dir.absolutePath()).isReadable())
             return 0;
 
         left = QDir(m_folder).dirName();
@@ -947,7 +957,7 @@ void FileManagerPanel::reload()
 void FileManagerPanel::listHost()
 {
     QDir dir(m_folder);
-    if (!dir.isRoot())
+    if (!dir.isRoot() && m_folder != m_topmostFolder)
         m_entries.push_back({ u".."_s, QFileInfo(m_folder).absolutePath(), -1, true, true });
     const auto infos =
             dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot,
@@ -2082,6 +2092,8 @@ void FileManagerPanel::setTopmostFolder(const QString &newTopmostFolder)
             : newTopmostFolder.back() == u'/' ? newTopmostFolder.left(newTopmostFolder.size() - 1)
                                               : newTopmostFolder;
     emit topmostFolderChanged();
-    if (!m_folder.startsWith(m_topmostFolder))
+    if (!within(m_folder, m_topmostFolder))
         setFolder(m_topmostFolder);
+    else if (!m_media)
+        reload(); // ".." comes or goes
 }

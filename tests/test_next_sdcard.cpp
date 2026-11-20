@@ -162,6 +162,27 @@ class NextSdCardTest : public QObject {
         // Unmount all test-owned paths before their temporary directory goes away.
         card.setImagePath({});
     }
+    void imageMovesToTheSpectacolFolder()
+    {
+        QTemporaryDir data;
+        QVERIFY(data.isValid());
+        auto &card = NextSdCard::instance();
+        // Where earlier versions downloaded it: the application's data
+        const auto legacy = card.imagePath();
+        QVERIFY(legacy.endsWith(u"/sdcard/cspect-next-1gb.img"_s));
+        QDir().mkpath(QFileInfo(legacy).absolutePath());
+        QVERIFY(write(legacy, image('L')));
+        card.setDataFolder(data.path());
+        const auto moved = data.filePath(u"Next/cspect-next-1gb.img"_s);
+        QCOMPARE(card.imagePath(), moved);
+        QCOMPARE(read(moved), image('L'));
+        QVERIFY(!QFile::exists(legacy));
+        QVERIFY(card.available());
+        // Without one, the image is downloaded there
+        QVERIFY(QFile::remove(moved));
+        QCOMPARE(card.imagePath(), moved);
+        QVERIFY(!card.available());
+    }
 };
 QTEST_GUILESS_MAIN(NextSdCardTest)
 #include "test_next_sdcard.moc"

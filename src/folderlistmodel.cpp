@@ -17,6 +17,7 @@
 
 #include "folderlistmodel.h"
 #include "contenturi.h"
+#include "screencache.h"
 #ifdef Q_OS_ANDROID
 #include "androidintegration.h"
 #endif
@@ -351,22 +352,26 @@ QVariant FolderListModel::data(const QModelIndex &index, int role) const
         return entry.dir;
     case IsDevice:
         return entry.device;
-    case CoverSource:
+    case TypeIcon:
         if (entry.dir)
             return entry.device ? u"qrc:/images/folder-device.svg"_s : u"qrc:/images/folder.svg"_s;
-        // The directory query already gave us the names. Covers must not open provider files.
-        if (ContentUri::isContent(entry.path)) {
-            switch (zxkit::classifyMediaFile(entry.name.toStdString(), {})) {
-            case zxkit::MediaClass::Disk:
-                return u"qrc:/images/floppy.svg"_s;
-            case zxkit::MediaClass::Tape:
-            case zxkit::MediaClass::Microdrive:
-                return u"qrc:/images/cassette-tape.svg"_s;
-            default:
-                return u"qrc:/images/binary.svg"_s;
-            }
+        switch (zxkit::classifyMediaFile(entry.name.toStdString(), {})) {
+        case zxkit::MediaClass::Disk:
+            return u"qrc:/images/floppy.svg"_s;
+        case zxkit::MediaClass::Tape:
+        case zxkit::MediaClass::Microdrive:
+            return u"qrc:/images/cassette-tape.svg"_s;
+        default:
+            return u"qrc:/images/binary.svg"_s;
         }
-        return u"image://spectrum/"_s + entry.path;
+    case CoverSource:
+        if (entry.dir)
+            return data(index, TypeIcon);
+        // What the listing knows, so the provider asks the storage nothing it doesn't cache
+        return u"image://spectrum/"_s
+                + ScreenCover{ entry.path, entry.name, entry.size,
+                               entry.modified.isValid() ? entry.modified.toMSecsSinceEpoch() : 0 }
+                          .id();
     }
     return {};
 }
@@ -377,7 +382,8 @@ QHash<int, QByteArray> FolderListModel::roleNames() const
                                           { Path, "path" },
                                           { IsDir, "isDir" },
                                           { IsDevice, "isDevice" },
-                                          { CoverSource, "coverSource" } };
+                                          { CoverSource, "coverSource" },
+                                          { TypeIcon, "typeIcon" } };
     return ret;
 }
 
@@ -443,7 +449,8 @@ void FolderListModel::refresh()
                 if (!document.directory && !accepts(document.name, {}))
                     continue;
                 m_allFiles.push_back({ document.name, ContentUri::canonical(document.path),
-                                       document.modified, document.directory, false });
+                                       document.modified, document.directory, false,
+                                       document.size });
             }
         } else
 #endif
@@ -466,8 +473,7 @@ void FolderListModel::refresh()
                 m_allFiles.push_back(
                         { name,
                           content ? ContentUri::canonical(it.filePath()) : info.absoluteFilePath(),
-                          m_sortCriteria == ByDateDesc ? info.lastModified() : QDateTime{}, dir,
-                          false });
+                          info.lastModified(), dir, false, dir ? 0 : info.size() });
             }
         }
     }

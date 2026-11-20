@@ -11,6 +11,7 @@
 #include <QImage>
 #include <QDir>
 #include <QFile>
+#include <QScopeGuard>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
@@ -146,6 +147,53 @@ private slots:
         QCOMPARE(readFile(root.filePath(u"copy/two.bin"_s)), QByteArray("2"));
         QVERIFY(left.remove(left.rowOf(u"games"_s)));
         QVERIFY(!QFileInfo::exists(root.filePath(u"games"_s)));
+    }
+
+    void topmostFolder()
+    {
+        QTemporaryDir root;
+        QVERIFY(root.isValid());
+        QDir(root.path()).mkpath(u"top/games"_s);
+        QDir(root.path()).mkpath(u"top2"_s);
+        const auto top = root.filePath(u"top"_s);
+        FileManagerPanel panel;
+        panel.setTopmostFolder(top);
+        // Remembered folders outside the allowed one (a sibling with the same prefix too) or gone
+        panel.setFolder(root.path());
+        QCOMPARE(panel.folder(), top);
+        panel.setFolder(root.filePath(u"top2"_s));
+        QCOMPARE(panel.folder(), top);
+        panel.setFolder(root.filePath(u"gone"_s));
+        QCOMPARE(panel.folder(), top);
+        // Nothing above the top: no "..", and up stays
+        QCOMPARE(names(panel), QStringList({ u"games"_s }));
+        QCOMPARE(panel.up(), 0);
+        QCOMPARE(panel.folder(), top);
+        panel.setFolder(root.filePath(u"top/games"_s));
+        QCOMPARE(panel.folder(), root.filePath(u"top/games"_s));
+        QCOMPARE(names(panel), QStringList({ u".."_s }));
+        const auto gamesRow = panel.up();
+        QCOMPARE(gamesRow, panel.rowOf(u"games"_s));
+        QCOMPARE(panel.folder(), top);
+
+        // Unrestricted, up stops below a folder that can't be listed, and isn't remembered
+        QDir(root.path()).mkpath(u"locked/inner"_s);
+        const auto locked = root.filePath(u"locked"_s);
+        QVERIFY(QFile::setPermissions(locked, QFileDevice::ExeOwner));
+        const auto unlock = qScopeGuard([&] {
+            QFile::setPermissions(locked,
+                                  QFileDevice::ReadOwner | QFileDevice::WriteOwner
+                                          | QFileDevice::ExeOwner);
+        });
+        if (QFileInfo(locked).isReadable())
+            QSKIP("Running with permission to read any folder");
+        FileManagerPanel free;
+        free.setFolder(root.filePath(u"locked/inner"_s));
+        QCOMPARE(free.folder(), root.filePath(u"locked/inner"_s));
+        QCOMPARE(free.up(), 0);
+        QCOMPARE(free.folder(), root.filePath(u"locked/inner"_s));
+        free.setFolder(locked);
+        QCOMPARE(free.folder(), QDir::homePath());
     }
 
     void newImages()

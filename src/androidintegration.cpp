@@ -185,7 +185,7 @@ std::vector<Document> listFolder(const QString &folder)
             "(Landroid/net/Uri;Ljava/lang/String;)Landroid/net/Uri;", uri.object(),
             parentId.object<jstring>());
     const auto columns = QJniArray<jstring>::fromContainer(QStringList{
-            u"document_id"_s, u"_display_name"_s, u"mime_type"_s, u"last_modified"_s });
+            u"document_id"_s, u"_display_name"_s, u"mime_type"_s, u"last_modified"_s, u"_size"_s });
     const auto cursor = contentResolver().callObjectMethod(
             "query",
             "(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/"
@@ -204,6 +204,7 @@ std::vector<Document> listFolder(const QString &folder)
     const auto nameColumn = column(u"_display_name"_s);
     const auto typeColumn = column(u"mime_type"_s);
     const auto modifiedColumn = column(u"last_modified"_s);
+    const auto sizeColumn = column(u"_size"_s);
     if (idColumn >= 0 && nameColumn >= 0 && typeColumn >= 0) {
         while (cursor.callMethod<jboolean>("moveToNext")) {
             const auto id = cursor.callObjectMethod("getString", "(I)Ljava/lang/String;", idColumn);
@@ -222,8 +223,11 @@ std::vector<Document> listFolder(const QString &folder)
                 && !cursor.callMethod<jboolean>("isNull", "(I)Z", modifiedColumn))
                 modified = QDateTime::fromMSecsSinceEpoch(
                         cursor.callMethod<jlong>("getLong", "(I)J", modifiedColumn));
+            qint64 size = 0;
+            if (sizeColumn >= 0 && !cursor.callMethod<jboolean>("isNull", "(I)Z", sizeColumn))
+                size = cursor.callMethod<jlong>("getLong", "(I)J", sizeColumn);
             documents.push_back({ name, document.toString(), modified,
-                                  type == u"vnd.android.document/directory"_s });
+                                  type == u"vnd.android.document/directory"_s, size });
         }
     }
     cursor.callMethod<void>("close");

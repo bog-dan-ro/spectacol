@@ -69,6 +69,8 @@ bool validSpeakerType(const QString &type)
 
 ZxSettings::ZxSettings(ZxEmulator &emulator) : QObject(&emulator), m_zxEmulator(emulator)
 {
+    // Before anything looks for the Next's SD card image
+    NextSdCard::instance().setDataFolder(m_zxEmulator.dataPath());
     // The built-in machines, the ones the emulator's registry has
     const zxkit::MachineRegistry machines;
     m_machineIds = machines.availableIds();
@@ -590,7 +592,13 @@ bool ZxSettings::restrictToSpectacol() const
 {
     QSettings s;
     s.beginGroup(u"General"_s);
-    return s.value("restrictToSpectacol", false).toBool();
+#ifdef Q_OS_ANDROID
+    // Above Spectacol's folder there are only folders it can't read; device folders are pinned
+    constexpr bool restrictByDefault = true;
+#else
+    constexpr bool restrictByDefault = false;
+#endif
+    return s.value("restrictToSpectacol", restrictByDefault).toBool();
 }
 
 void ZxSettings::setRestrictToSpectacol(bool restrictBrowse)

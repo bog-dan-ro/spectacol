@@ -22,7 +22,14 @@
 
 #include <QFile>
 #include <QFileInfo>
+#include <QFuture>
 #include <QImageReader>
+#include <QPromise>
+#include <QtConcurrent/QtConcurrentRun>
+#ifdef Q_OS_ANDROID
+#include "androidintegration.h"
+#include <QUrl>
+#endif
 
 #include <cstring>
 
@@ -103,53 +110,156 @@ QImage scr2Image(const char *buffer, size_t bufferSize)
 
 namespace {
 
-QImage previewImage(const QString &id, const QSize &requestedSize)
+// Larger files are never read for a cover: images and cards, not Spectrum programs
+constexpr qint64 kMaxCoverFileBytes = 16 * 1024 * 1024;
+// Thousands of compressed screens
+constexpr qint64 kCacheBytes = 64 * 1024 * 1024;
+constexpr int kThreads = 4;
+
+bool openFile(const QString &path, QFile &file)
 {
-    if (id.startsWith("compressed64:")) {
-        auto pos = id.indexOf(u':', 13);
-        if (pos != -1) {
-            bool ok;
-            int delta = id.mid(13, pos - 13).toInt(&ok);
-            if (ok && delta >= 0) {
-                auto buff = qUncompress(QByteArray::fromBase64(id.mid(pos + 1).toLatin1(),
-                                                               QByteArray::Base64UrlEncoding));
-                if (buff.size() - delta >= 0) {
-                    auto img = scr2Image(buff.constData() + delta, buff.size() - delta);
-                    if (!img.isNull())
-                        return img;
-                }
+#ifdef Q_OS_ANDROID
+    if (path.startsWith(u"content:"_s))
+        return AndroidIntegration::openDocument(QUrl(path), file);
+#endif
+    file.setFileName(path);
+    return file.open(QIODevice::ReadOnly);
+}
+
+QByteArray fileScreen(const QByteArray &bytes, const QString &name)
+{
+    BlockErrors silenter;
+    try {
+        const auto screen = zxkit::extractMediaScreen(
+                { reinterpret_cast<const uint8_t *>(bytes.constData()), size_t(bytes.size()) },
+                name.toStdString());
+        return { reinterpret_cast<const char *>(screen.data()), qsizetype(screen.size()) };
+    } catch (...) {
+        return {};
+    }
+}
+
+// A file's screen: from the cache, else read once and kept there
+QImage coverImage(const ScreenCover &cover, const QSize &requestedSize, const ScreenCache &cache,
+                  const QPromise<QImage> &promise)
+{
+    if (zxkit::classifyMediaFile(cover.name.toStdString()) == zxkit::MediaClass::Disk)
+        return iconImage(u"floppy"_s, requestedSize);
+    auto screen = cache.find(cover.path, cover.size, cover.modified);
+    if (!screen) {
+        if (cover.size > kMaxCoverFileBytes)
+            return iconImage(u"cassette-unknown"_s, requestedSize);
+        QFile file;
+        if (promise.isCanceled())
+            return {};
+        if (!openFile(cover.path, file))
+            return iconImage(u"cassette-broken"_s, requestedSize);
+        const auto bytes = file.read(kMaxCoverFileBytes);
+        if (promise.isCanceled())
+            return {};
+        screen = fileScreen(bytes, cover.name);
+        cache.store(cover.path, cover.size, cover.modified, *screen);
+    }
+    if (screen->isEmpty())
+        return iconImage(u"cassette-unknown"_s, requestedSize);
+    return scr2Image(*screen);
+}
+
+QImage compressedImage(const QString &id, const QSize &requestedSize)
+{
+    const auto pos = id.indexOf(u':', 13);
+    if (pos != -1) {
+        bool ok;
+        const int delta = id.mid(13, pos - 13).toInt(&ok);
+        if (ok && delta >= 0) {
+            const auto buff = qUncompress(QByteArray::fromBase64(id.mid(pos + 1).toLatin1(),
+                                                                 QByteArray::Base64UrlEncoding));
+            if (buff.size() - delta >= 0) {
+                auto img = scr2Image(buff.constData() + delta, buff.size() - delta);
+                if (!img.isNull())
+                    return img;
             }
-            return iconImage(u"binary"_s, requestedSize);
         }
     }
-
-    QFileInfo inf(id);
-    if (inf.isDir())
-        return iconImage(u"folder"_s, requestedSize);
-    if (!inf.isFile())
-        return iconImage(u"cassette-wait"_s, requestedSize);
-
-    QFile file(id);
-    if (!file.open(QIODevice::ReadOnly))
-        return iconImage(u"cassette-broken"_s, requestedSize);
-
-    const auto buffer = file.readAll();
-    QImage ret = mediaImage(
-            std::span<const uint8_t>(reinterpret_cast<const uint8_t *>(buffer.constData()),
-                                     size_t(buffer.size())),
-            inf.fileName(), requestedSize);
-    if (ret.isNull())
-        return iconImage(u"cassette-unknown"_s, requestedSize);
-    return ret;
+    return iconImage(u"binary"_s, requestedSize);
 }
+
+QImage screenImage(const QString &id, const QSize &requestedSize, const ScreenCache &cache,
+                   const QPromise<QImage> &promise)
+{
+    if (id.startsWith(u"compressed64:"_s))
+        return compressedImage(id, requestedSize);
+    if (const auto cover = ScreenCover::fromId(id))
+        return coverImage(*cover, requestedSize, cache, promise);
+
+    const QFileInfo info(id);
+    if (info.isDir())
+        return iconImage(u"folder"_s, requestedSize);
+    if (!info.isFile())
+        return iconImage(u"cassette-wait"_s, requestedSize);
+    return coverImage({ id, info.fileName(), info.size(), info.lastModified().toMSecsSinceEpoch() },
+                      requestedSize, cache, promise);
+}
+
+class ScreenResponse : public QQuickImageResponse
+{
+public:
+    explicit ScreenResponse(QFuture<QImage> future) : m_future(std::move(future))
+    {
+        // A canceled response still reports that it has finished, for the engine to drop it.
+        // Queued: a screen found at once must not finish before the engine connects to it.
+        m_future.then(this,
+                      [this](const QImage &image) {
+                          m_image = image;
+                          finishLater();
+                      })
+                .onCanceled(this, [this] { finishLater(); });
+    }
+
+    QQuickTextureFactory *textureFactory() const override
+    {
+        return QQuickTextureFactory::textureFactoryForImage(m_image);
+    }
+
+    void cancel() override
+    {
+        m_future.cancel();
+    }
+
+private:
+    void finishLater()
+    {
+        QMetaObject::invokeMethod(this, &QQuickImageResponse::finished, Qt::QueuedConnection);
+    }
+
+    QFuture<QImage> m_future;
+    QImage m_image;
+};
 
 } // namespace
 
-QImage SpectrumScreenImageProvider::requestImage(const QString &id, QSize *size,
-                                                 const QSize &requestedSize)
+SpectrumScreenImageProvider::SpectrumScreenImageProvider(QString cacheFolder)
+    : m_cache(std::move(cacheFolder))
 {
-    const auto image = previewImage(id, requestedSize);
-    if (size)
-        *size = image.size();
-    return image;
+    m_pool.setMaxThreadCount(kThreads);
+    m_pool.setObjectName(u"Screens"_s);
+    // Keep the cache in bounds; the first screens wait for it
+    m_pool.start([cache = m_cache] { cache.prune(kCacheBytes); });
+}
+
+SpectrumScreenImageProvider::~SpectrumScreenImageProvider()
+{
+    m_pool.clear();
+    m_pool.waitForDone();
+}
+
+QQuickImageResponse *SpectrumScreenImageProvider::requestImageResponse(const QString &id,
+                                                                       const QSize &requestedSize)
+{
+    return new ScreenResponse(QtConcurrent::run(
+            &m_pool, [id, requestedSize, cache = m_cache](QPromise<QImage> &promise) {
+                auto image = screenImage(id, requestedSize, cache, promise);
+                if (!promise.isCanceled())
+                    promise.addResult(std::move(image));
+            }));
 }

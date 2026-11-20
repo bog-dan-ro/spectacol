@@ -117,6 +117,7 @@ qt_add_executable(test_files_features
     ../src/romoverrides.cpp ../src/romoverrides.h
     ../src/debugsymbols.cpp ../src/debugsymbols.h
     ../src/folderlistmodel.cpp ../src/folderlistmodel.h
+    ../src/screencache.cpp ../src/screencache.h
     ../src/contenturi.cpp ../src/contenturi.h
     ../src/devicestorage.cpp ../src/devicestorage.h
 )
@@ -132,10 +133,11 @@ add_test(NAME files_features COMMAND test_files_features)
 qt_add_executable(test_media_icons
     test_media_icons.cpp
     ../src/spectrumscreen.cpp ../src/spectrumscreen.h
+    ../src/screencache.cpp ../src/screencache.h
     ../src/qmlui.cpp ../src/qmlui.h
 )
 target_include_directories(test_media_icons PRIVATE ../src)
-target_link_libraries(test_media_icons PRIVATE Qt6::Test Qt6::Quick ZX::Kit)
+target_link_libraries(test_media_icons PRIVATE Qt6::Test Qt6::Quick Qt6::Concurrent ZX::Kit)
 qt_add_resources(test_media_icons "preview_icons"
     PREFIX "/"
     BASE "../src"

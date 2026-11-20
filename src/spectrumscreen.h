@@ -17,8 +17,11 @@
 
 #pragma once
 
+#include "screencache.h"
+
 #include <QImage>
-#include <QQuickImageProvider>
+#include <QQuickAsyncImageProvider>
+#include <QThreadPool>
 
 QImage buff2Image(const QByteArray &buffer, const QString &fileName = QString());
 QImage buff2Image(const unsigned char *buffer, size_t bufferSize,
@@ -26,11 +29,22 @@ QImage buff2Image(const unsigned char *buffer, size_t bufferSize,
 QImage scr2Image(const QByteArray &buffer);
 QImage scr2Image(const char *buffer, size_t bufferSize);
 
-class SpectrumScreenImageProvider : public QQuickImageProvider
+// image://spectrum/ - the screens media files show, for the file browsers and the tape browser:
+//   cover/...: a file's screen, see ScreenCover; read once, then kept in a ScreenCache
+//   compressed64:DELTA:DATA: the screen at DELTA in qCompress-ed, base64url data
+//   PATH: a local file's screen
+// Several screens load at once on the provider's own threads; the ones no longer shown are
+// canceled. Placeholders are icons at the requested size; screens keep their native pixels.
+class SpectrumScreenImageProvider : public QQuickAsyncImageProvider
 {
 public:
-    SpectrumScreenImageProvider() : QQuickImageProvider(Image, ForceAsynchronousImageLoading) { }
+    explicit SpectrumScreenImageProvider(QString cacheFolder = ScreenCache::defaultFolder());
+    ~SpectrumScreenImageProvider() override;
 
-    // QQuickImageProvider interface
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+    QQuickImageResponse *requestImageResponse(const QString &id,
+                                              const QSize &requestedSize) override;
+
+private:
+    QThreadPool m_pool;
+    ScreenCache m_cache;
 };

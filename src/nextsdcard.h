@@ -58,6 +58,9 @@ public:
     void setImagePath(const QString &path);
     /// The user picked the image (it isn't the downloaded one)
     bool isCustomImage() const;
+    /// The Spectacol folder: the downloaded image is in its Next folder, where the browsers see
+    /// it. An image an earlier version downloaded into the application's data moves there.
+    void setDataFolder(const QString &folder);
     bool available() const;
 
     State state() const
@@ -102,6 +105,7 @@ private:
     void startExtraction();
     void stopExtraction();
 
+    QString m_dataFolder;
     QNetworkAccessManager m_network;
     QPointer<QNetworkReply> m_reply;
     QFile m_zipPart;
