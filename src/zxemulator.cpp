@@ -525,6 +525,8 @@ ZxEmulator::ZxEmulator(QObject *parent)
             m_disassambleModel.update();
     });
     emulator().writeLock()->setRewindEnabled(true, 300);
+    if (QSettings().value(u"Peripherals/zxPrinter"_s, false).toBool())
+        setZxPrinterEnabled(true);
     m_settings->applyToEmulator();
     {
         QSettings settings;

@@ -201,6 +201,7 @@ qt_add_qml_module(spectacol
         spectrumscreen.cpp spectrumscreen.h
         z80assembler.cpp z80assembler.h
         zxemulator.cpp zxemulator.h
+        zxprinter.cpp
         zxgamesmodel.cpp zxgamesmodel.h
         zximage.cpp zximage.h
         zxrecording.cpp zxrecording.h
@@ -249,6 +250,7 @@ qt_add_qml_module(spectacol
         qml/FileViewerPage.qml
         qml/FiltersPage.qml
         qml/ZxMenu.qml
+        qml/ZxPrinterPage.qml
         qml/Joysticks.qml
         qml/MachineTypePage.qml
         qml/Main.qml

@@ -126,6 +126,14 @@ ZxMenuItem {
         }
 
         ZxMenuItem {
+            text: qsTr("ZX Printer")
+            onTriggered: {
+                menuBar.close();
+                pageLoader.source = "ZxPrinterPage.qml";
+            }
+        }
+
+        ZxMenuItem {
             visible: ZxEmulator.settings.interface1
             text: qsTr("Microdrives")
             onTriggered: {

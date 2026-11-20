@@ -25,6 +25,7 @@ import Spectacol
 Dialog {
     id: dialog
     default property alias fields: form.data
+    readonly property alias saveButton: acceptButton
     property Item initialFocus
     property Item returnFocus
     property string errorMessage
@@ -91,6 +92,7 @@ Dialog {
         Item { Layout.fillWidth: true }
         // Return is the gamepad's A: buttons only take Space themselves
         Button {
+            id: acceptButton
             objectName: "formSave"
             text: dialog.acceptText
             enabled: dialog.acceptable

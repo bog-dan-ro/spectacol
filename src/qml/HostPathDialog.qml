@@ -26,16 +26,22 @@ import Spectacol
 FormDialog {
     id: dialog
     property bool directory: false
+    property bool saveFile: false
+    property string defaultSuffix
     property string path: ""
     property var submit: null
     property var nameFilters: [qsTr("All files (*)")]
-    initialFocus: pathField
+    initialFocus: saveFile ? null : pathField
     acceptable: pathField.text.trim().length > 0
     commit: () => !submit || submit(pathField.text.trim())
     onOpened: {
         pathField.text = path;
-        pathField.forceActiveFocus();
-        pathField.selectAll();
+        if (saveFile && acceptable) {
+            saveButton.forceActiveFocus();
+        } else {
+            pathField.forceActiveFocus();
+            pathField.selectAll();
+        }
     }
     function closeNested(): bool {
         if (filePicker.visible) { filePicker.close(); browse.forceActiveFocus(); return true; }
@@ -59,14 +65,21 @@ FormDialog {
         id: browse
         objectName: dialog.directory ? "hostFolderBrowse" : "hostFileBrowse"
         text: qsTr("Browse…")
+        Keys.onReturnPressed: clicked()
+        Keys.onEnterPressed: clicked()
         onClicked: dialog.directory ? folderPicker.open() : filePicker.open()
     }
     FileDialog {
         id: filePicker
         options: Qt.platform.os === "android" ? 0 : FileDialog.DontUseNativeDialog
         title: dialog.title
+        fileMode: dialog.saveFile ? FileDialog.SaveFile : FileDialog.OpenFile
+        defaultSuffix: dialog.defaultSuffix
         nameFilters: dialog.nameFilters
-        onAccepted: { pathField.text = selectedFile.toString(); pathField.forceActiveFocus(); }
+        onAccepted: {
+            pathField.text = selectedFile.toString();
+            (dialog.saveFile ? dialog.saveButton : pathField).forceActiveFocus();
+        }
         onRejected: browse.forceActiveFocus()
     }
     FolderDialog {

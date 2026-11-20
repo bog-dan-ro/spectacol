@@ -97,6 +97,33 @@ eject, save or export cartridges. In BASIC, enter `CAT 1` to list the first
 cartridge. On a 128K or grey +2, use **48 BASIC** for Microdrive commands.
 
 
+### ZX Printer
+
+Open **Media → ZX Printer** and connect the printer. Return to BASIC and use
+`LPRINT`, `LLIST` or `COPY`.
+
+| Machine or BASIC mode | Printer output |
+| --- | --- |
+| Spectrum 16K/48K, Timex 2048/2068, CoBra BASIC | ZX Printer |
+| Spectrum 128K, grey +2, Pentagon | Serial in 128 BASIC, ZX Printer in 48 BASIC |
+| Spectrum +2A, +3 and +3e | Centronics in native BASIC, ZX Printer in 48 BASIC |
+| Scorpion ZS-256 | SuperROM printer output in 128 BASIC, ZX Printer in 48 BASIC |
+| Spectrum Next | ZX Printer in NextBASIC and 48 BASIC, serial in 128 BASIC |
+| HC-2000 | ZX Printer or IF-1 serial |
+
+To use the HC-2000 IF-1 serial output, enter `FORMAT "t";9600` and
+`OPEN #3,"t"` before printing. Set up the channel again after a machine reset.
+
+The Spectrum SE exposes the ZX Printer port to software. The bundled SE
+BASIC ROM does not send `LPRINT` output to it.
+
+Return to the printer page to export the paper as PDF, PNG, PBM or text. PDF
+places the original 92 mm print width on A4 pages and embeds searchable,
+selectable text for recognized Spectrum glyphs. The original printer bitmap
+preserves all graphics and glyphs. TXT export uses `?` for unknown glyphs.
+The paper is kept for the current Spectacol session, including across resets
+and disconnects.
+
 ## ZX Spectrum Next
 
 **Media → SD card** browses the card, copies host files through the gamepad browser,

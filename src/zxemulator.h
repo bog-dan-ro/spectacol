@@ -42,6 +42,7 @@ Q_MOC_INCLUDE("zxsettings.h")
 #include <QQmlEngine>
 #include <QThreadPool>
 #include <QUrl>
+#include <QVariantMap>
 #include <QTimer>
 
 #include <zxkit/core/Engine.h>
@@ -53,6 +54,10 @@ Q_MOC_INCLUDE("zxsettings.h")
 #include <functional>
 #include <memory>
 #include <utility>
+
+namespace zxkit {
+class ZxPrinterPaper;
+}
 
 class AudioOutput;
 class QIODevice;
@@ -357,6 +362,11 @@ public slots:
     QStringList snapshotFormats() const;
     QString snapshotFileName() const;
     QString snapshotFilePath(const QString &folder, const QString &fileName) const;
+    QVariantMap zxPrinterStatus() const;
+    bool setZxPrinterEnabled(bool enabled);
+    void clearZxPrinterPaper();
+    QString zxPrinterExportPath(const QString &format) const;
+    bool exportZxPrinter(const QString &filePath, const QString &format);
     void load(const QString &filePath, bool removeOnFail = false);
     QStringList microdriveLabels() const;
     bool microdriveInserted(int drive) const;
@@ -557,6 +567,8 @@ private:
     Disks *m_disks = nullptr;
     QHash<int, QString> m_microdriveNames;
     QHash<int, QString> m_microdrivePaths;
+    std::shared_ptr<zxkit::ZxPrinterPaper> m_zxPrinterPaper;
+    bool m_zxPrinterEnabled = false;
     SdCardFiles *m_sdCard = nullptr;
     ZxRecording *m_recording = nullptr;
     bool m_showControlsIcons = true;
