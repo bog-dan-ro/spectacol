@@ -32,6 +32,7 @@ Sheet {
     crumb: qsTr("Media")
     title: qsTr("File manager")
     preferredWidth: Theme.sp(400)
+    closeAction: () => page.goBack()
 
     property bool rightActive: false
     property string message
@@ -47,7 +48,9 @@ Sheet {
     readonly property bool twin: width >= Theme.sp(170)
     readonly property int row: activeView.currentIndex
     readonly property var popups: [actionsMenu, nameDialog, copyDialog, confirmDialog, attributesDialog,
-                                   editorDialog, profileDialog, addressDialog]
+                                   editorDialog, profileDialog, addressDialog, forgetDialog]
+    readonly property bool popupOwnsInput: !activeFocus || popupOpen() || DesktopInput.visible
+    readonly property bool canGoUp: activePanel.count > 0 && activePanel.rowOf("..") === 0
 
     readonly property var viewerHints: [
         { pad: "B", key: "Esc", text: viewer.anchor >= 0 ? qsTr("Unselect") : qsTr("Close"), action: () => viewer.back() },
@@ -61,7 +64,8 @@ Sheet {
     ]).concat(viewer.addressed ? [{ pad: "Y", key: "G", text: qsTr("Go to"), action: () => page.askAddress() }] : [])
     readonly property var padHints: [
         { pad: "A", key: "Enter", text: qsTr("Open"), action: () => page.openCurrent() },
-        { pad: "B", key: "Esc", text: qsTr("Close"), action: () => page.goBack() },
+        { pad: "B", key: "Backspace", text: qsTr("Up a folder") },
+        { pad: qsTr("Back"), key: "F10", text: qsTr("Close"), action: () => page.goBack() },
         { pad: "X", key: "F2", text: qsTr("Actions"), action: () => page.showActions() },
         { pad: "Y", key: "Ins", text: qsTr("Mark"), action: () => page.markCurrent() },
         { pad: "◀▶", key: "Tab", text: qsTr("Panel") }
@@ -136,7 +140,6 @@ Sheet {
             viewer.close();
             return;
         }
-        // Back leaves the file manager from anywhere; ".." (or Backspace) goes up a folder
         closePage();
     }
 
@@ -517,7 +520,8 @@ Sheet {
 
     GamepadNavigation {
         gamepad: Gamepad { deviceId: ZxEmulator.gamepadId }
-        buttonBKey: Qt.Key_Escape
+        buttonBKey: page.popupOwnsInput || viewer.visible ? Qt.Key_Escape
+                    : page.canGoUp ? Qt.Key_Backspace : Qt.Key_unknown
         // In the viewer X copies and Y goes to an address (saves a screen)
         buttonXKey: editorDialog.visible ? Qt.Key_F2 : page.popupOpen() ? Qt.Key_unknown
                                          : viewer.visible ? Qt.Key_Copy : Qt.Key_F2
@@ -526,7 +530,7 @@ Sheet {
         buttonR1Key: Qt.Key_PageDown
         buttonL2Key: Qt.Key_BracketLeft
         buttonR2Key: Qt.Key_BracketRight
-        buttonSelectKey: Qt.Key_F10
+        buttonSelectKey: page.popupOwnsInput ? Qt.Key_Escape : Qt.Key_F10
         buttonStartKey: Qt.Key_Menu
         buttonGuideKey: Qt.Key_unknown
     }

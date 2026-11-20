@@ -174,7 +174,10 @@ Sheet {
                         Mapping { button: qsTr("Back"); action: qsTr("Closes the menu or the page; quits from the game") }
                         Mapping { button: qsTr("D-pad, left stick"); action: qsTr("Move through menus and settings") }
                         Mapping { button: "A"; action: qsTr("Select, change") }
-                        Mapping { button: "B"; action: qsTr("Close the page or the menu") }
+                        Mapping {
+                            button: "B"
+                            action: qsTr("Closes the page or menu. Goes up a folder when browsing in the file manager.")
+                        }
                         Mapping { button: "X"; action: qsTr("On-screen number keys") }
                         Mapping { button: "Y"; action: qsTr("On-screen 48K keyboard") }
                     }
