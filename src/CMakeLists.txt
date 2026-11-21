@@ -256,6 +256,7 @@ qt_add_qml_module(spectacol
         qml/FiltersPage.qml
         qml/ZxMenu.qml
         qml/ZxPrinterPage.qml
+        qml/PrinterPreviewDialog.qml
         qml/Joysticks.qml
         qml/MachineTypePage.qml
         qml/Main.qml

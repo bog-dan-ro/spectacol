@@ -35,11 +35,66 @@
 #include <algorithm>
 #include <cstring>
 #include <span>
+#include <vector>
 
 using namespace Qt::StringLiterals;
 using namespace std::literals;
 
 namespace {
+
+constexpr int printerPdfResolution = 254; // 10 pixels/mm.
+constexpr int printWidth = 920; // 92 mm of printable width.
+constexpr int dotsPerRow = zxkit::ZxPrinterPaper::kWidth;
+constexpr int glyphSize = zxkit::ZxPrinterPaper::kGlyphSize;
+
+QPageLayout printerPageLayout()
+{
+    return { QPageSize(QPageSize::A4), QPageLayout::Portrait, QMarginsF(12, 12, 12, 12),
+             QPageLayout::Millimeter };
+}
+
+struct PrinterPage
+{
+    std::size_t firstRow;
+    std::span<const zxkit::ZxPrinterPaper::Row> rows;
+    std::span<const zxkit::ZxPrinterPaper::TextLine> textLines;
+};
+
+std::vector<PrinterPage> printerPages(const zxkit::ZxPrinterPaper &paper)
+{
+    const auto viewport = printerPageLayout().paintRectPixels(printerPdfResolution);
+    const auto rowsPerPage = viewport.height() * dotsPerRow / printWidth;
+    std::vector<PrinterPage> pages;
+    if (rowsPerPage < glyphSize)
+        return pages;
+
+    const auto paperRows = paper.rows();
+    auto textLines = paper.textLines();
+    for (std::size_t firstRow = 0; firstRow < paperRows.size();) {
+        auto endRow = std::min(firstRow + rowsPerPage, paperRows.size());
+        auto endText = std::ranges::lower_bound(textLines, endRow, {},
+                                                &zxkit::ZxPrinterPaper::TextLine::row);
+        if (endText != textLines.begin() && (endText - 1)->row + glyphSize > endRow)
+            endRow = (--endText)->row;
+        const auto textCount = std::size_t(endText - textLines.begin());
+        pages.push_back({ firstRow, paperRows.subspan(firstRow, endRow - firstRow),
+                          textLines.first(textCount) });
+        textLines = textLines.subspan(textCount);
+        firstRow = endRow;
+    }
+    return pages;
+}
+
+QImage printerPageImage(std::span<const zxkit::ZxPrinterPaper::Row> rows)
+{
+    QImage image(dotsPerRow, int(rows.size()), QImage::Format_Mono);
+    if (image.isNull())
+        return {};
+    image.setColorTable({ qRgb(255, 255, 255), qRgb(0, 0, 0) });
+    for (int y = 0; y < image.height(); ++y)
+        std::memcpy(image.scanLine(y), rows[y].data(), rows[y].size());
+    return image;
+}
 
 QByteArray printerPdf(const zxkit::ZxPrinterPaper &paper)
 {
@@ -50,22 +105,18 @@ QByteArray printerPdf(const zxkit::ZxPrinterPaper &paper)
 
     QPdfWriter writer(&buffer);
     writer.setTitle(ZxEmulator::tr("ZX Printer"));
-    writer.setResolution(254); // 10 dots/mm
-    writer.setPageLayout(QPageLayout(QPageSize(QPageSize::A4), QPageLayout::Portrait,
-                                     QMarginsF(12, 12, 12, 12), QPageLayout::Millimeter));
+    writer.setResolution(printerPdfResolution);
+    writer.setPageLayout(printerPageLayout());
     QPainter painter;
     if (!painter.begin(&writer))
         return {};
     painter.setRenderHint(QPainter::LosslessImageRendering);
 
-    constexpr int paperWidth = 920; // 92 mm of printable width on the ZX Printer.
-    constexpr int dotsPerRow = zxkit::ZxPrinterPaper::kWidth;
-    constexpr int glyphSize = zxkit::ZxPrinterPaper::kGlyphSize;
-    const qreal dotScale = qreal(paperWidth) / dotsPerRow;
+    const qreal dotScale = qreal(printWidth) / dotsPerRow;
     const auto viewport = painter.viewport();
-    const auto left = (viewport.width() - paperWidth) / 2;
-    const auto rowsPerPage = viewport.height() * dotsPerRow / paperWidth;
-    if (rowsPerPage < glyphSize)
+    const auto left = (viewport.width() - printWidth) / 2;
+    const auto pages = printerPages(paper);
+    if (pages.empty())
         return {};
 
     QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -80,36 +131,26 @@ QByteArray printerPdf(const zxkit::ZxPrinterPaper &paper)
     const qreal horizontalScale = glyphSize * dotScale / cellAdvance;
     const qreal verticalScale = (glyphSize - 1) * dotScale / (metrics.ascent() + metrics.descent());
 
-    const auto paperRows = paper.rows();
-    auto textLines = paper.textLines();
-    for (std::size_t firstRow = 0; firstRow < paperRows.size();) {
-        auto endRow = std::min(firstRow + rowsPerPage, paperRows.size());
-        auto endText = std::ranges::lower_bound(textLines, endRow, {},
-                                                &zxkit::ZxPrinterPaper::TextLine::row);
-        if (endText != textLines.begin() && (endText - 1)->row + glyphSize > endRow)
-            endRow = (--endText)->row;
-        const auto pageRows = int(endRow - firstRow);
-        QImage image(dotsPerRow, pageRows, QImage::Format_Mono);
+    for (const auto &page : pages) {
+        if (page.firstRow != 0 && !writer.newPage())
+            return {};
+        const auto image = printerPageImage(page.rows);
         if (image.isNull())
             return {};
-        image.setColorTable({ qRgb(255, 255, 255), qRgb(0, 0, 0) });
-        for (int y = 0; y < pageRows; ++y)
-            std::memcpy(image.scanLine(y), paperRows[firstRow + y].data(),
-                        paperRows[firstRow + y].size());
 
-        painter.drawImage(QRectF(left, 0, paperWidth, pageRows * dotScale), image);
+        painter.drawImage(QRectF(left, 0, printWidth, image.height() * dotScale), image);
 
         // Invisible text provides search and selection at the original glyph positions.
         painter.save();
         painter.setOpacity(0);
         painter.translate(left, 0);
         painter.scale(horizontalScale, verticalScale);
-        for (auto line = textLines.begin(); line != endText; ++line) {
+        for (const auto &line : page.textLines) {
             QString text;
-            for (const char16_t character : line->characters)
+            for (const char16_t character : line.characters)
                 text += character == 0 ? u' ' : character;
             const qreal y =
-                    (line->row - firstRow + 0.5) * dotScale / verticalScale + metrics.ascent();
+                    (line.row - page.firstRow + 0.5) * dotScale / verticalScale + metrics.ascent();
             for (qsizetype column = 0; column < text.size();) {
                 if (text[column] == u' ') {
                     ++column;
@@ -126,11 +167,6 @@ QByteArray printerPdf(const zxkit::ZxPrinterPaper &paper)
             }
         }
         painter.restore();
-
-        textLines = textLines.subspan(endText - textLines.begin());
-        firstRow = endRow;
-        if (firstRow < paperRows.size() && !writer.newPage())
-            return {};
     }
     if (!painter.end())
         return {};
@@ -152,6 +188,30 @@ QVariantMap ZxEmulator::zxPrinterStatus() const
              { u"rows"_s, m_zxPrinterPaper ? int(m_zxPrinterPaper->rows().size()) : 0 },
              { u"hasText"_s, m_zxPrinterPaper && !m_zxPrinterPaper->text().empty() },
              { u"truncated"_s, m_zxPrinterPaper && m_zxPrinterPaper->truncated() } };
+}
+
+QVariantMap ZxEmulator::zxPrinterPreviewPage(int index) const
+{
+    QImage image;
+    int pageCount;
+    {
+        const auto core = emulator().readLock();
+        if (!m_zxPrinterPaper)
+            return {};
+        const auto pages = printerPages(*m_zxPrinterPaper);
+        pageCount = int(pages.size());
+        if (index < 0 || index >= pageCount)
+            return {};
+        image = printerPageImage(pages[index].rows);
+    }
+
+    QByteArray png;
+    QBuffer buffer(&png);
+    if (!buffer.open(QIODevice::WriteOnly) || !image.save(&buffer, "PNG"))
+        return { { u"pageCount"_s, pageCount } };
+    return { { u"pageCount"_s, pageCount },
+             { u"sourceSize"_s, image.size() },
+             { u"source"_s, u"data:image/png;base64,"_s + QString::fromLatin1(png.toBase64()) } };
 }
 
 bool ZxEmulator::setZxPrinterEnabled(bool enabled)

@@ -35,7 +35,9 @@ Sheet {
 
     function closeDialog(): bool {
         if (!destination.closeNested()) {
-            if (confirmClear.visible)
+            if (preview.visible)
+                preview.close();
+            else if (confirmClear.visible)
                 confirmClear.reject();
             else
                 closeRequested();
@@ -73,6 +75,14 @@ Sheet {
             }
         }
         SettingRow {
+            id: previewRow
+            objectName: "printPreview"
+            label: qsTr("Preview printout")
+            enabled: page.printer.rows > 0
+            kind: "action"
+            onClicked: preview.open()
+        }
+        SettingRow {
             label: qsTr("Export format")
             kind: "choice"
             enabled: page.printer.rows > 0
@@ -103,6 +113,14 @@ Sheet {
             enabled: page.printer.rows > 0
             kind: "action"
             onClicked: confirmClear.open()
+        }
+    }
+
+    PrinterPreviewDialog {
+        id: preview
+        onClosed: {
+            previewRow.forceActiveFocus(Qt.BacktabFocusReason);
+            settings.ensureVisible(previewRow);
         }
     }
 

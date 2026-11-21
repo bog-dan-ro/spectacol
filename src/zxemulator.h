@@ -363,6 +363,7 @@ public slots:
     QString snapshotFileName() const;
     QString snapshotFilePath(const QString &folder, const QString &fileName) const;
     QVariantMap zxPrinterStatus() const;
+    QVariantMap zxPrinterPreviewPage(int index) const;
     bool setZxPrinterEnabled(bool enabled);
     void clearZxPrinterPaper();
     QString zxPrinterExportPath(const QString &format) const;
