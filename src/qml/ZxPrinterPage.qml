@@ -62,8 +62,9 @@ Sheet {
         id: settings
         SettingRow {
             label: qsTr("Connect ZX Printer")
-            description: page.printer.available ? qsTr("Print from BASIC with LPRINT, LLIST or COPY.")
-                                                : qsTr("Unavailable on this machine")
+            description: !page.printer.available ? qsTr("Unavailable on this machine")
+                       : page.printer.hasEditorPrint ? qsTr("Add a numbered line with Enter, then choose Edit → Print to list the program. Use LPRINT for text or COPY for the screen.")
+                       : qsTr("Print from BASIC with LPRINT, LLIST or COPY.")
             enabled: page.printer.available || page.printer.enabled
             checked: page.printer.enabled
             onToggled: (on) => {

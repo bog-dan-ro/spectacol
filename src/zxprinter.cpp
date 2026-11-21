@@ -17,6 +17,7 @@
 
 #include "zxemulator.h"
 
+#include <zxkit/machines/SinclairMachines.h>
 #include <zxkit/peripherals/expansion/ZxPrinter.h>
 
 #include <QBuffer>
@@ -141,7 +142,12 @@ QByteArray printerPdf(const zxkit::ZxPrinterPaper &paper)
 QVariantMap ZxEmulator::zxPrinterStatus() const
 {
     const auto core = emulator().readLock();
-    return { { u"available"_s, zxkit::ZxPrinterPeripheral::availableOn(core->machine()) },
+    const auto &machine = core->machine();
+    const bool hasEditorPrint = !machine.is48kMode()
+            && (dynamic_cast<const zxkit::Spectrum128kMachine *>(&machine)
+                || dynamic_cast<const zxkit::SpectrumPlus3Machine *>(&machine));
+    return { { u"available"_s, zxkit::ZxPrinterPeripheral::availableOn(machine) },
+             { u"hasEditorPrint"_s, hasEditorPrint },
              { u"enabled"_s, m_zxPrinterEnabled },
              { u"rows"_s, m_zxPrinterPaper ? int(m_zxPrinterPaper->rows().size()) : 0 },
              { u"hasText"_s, m_zxPrinterPaper && !m_zxPrinterPaper->text().empty() },

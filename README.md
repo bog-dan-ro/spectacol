@@ -114,6 +114,11 @@ Open **Media → ZX Printer** and connect the printer. Return to BASIC and use
 | Spectrum Next | ZX Printer in NextBASIC and 48 BASIC, serial in 128 BASIC |
 | HC-2000 | ZX Printer or IF-1 serial |
 
+In the native BASIC editor on the Spectrum **128K, +2, +2A, +3 and +3e**,
+**Edit → Print** sends the current program listing to the printer. Try typing
+`10 REM Spectacol` and pressing **Enter** to add the line before choosing **Print**.
+To print text directly, enter `LPRINT "Spectacol"`.
+
 To use the HC-2000 IF-1 serial output, enter `FORMAT "t";9600` and
 `OPEN #3,"t"` before printing. Set up the channel again after a machine reset.
 
