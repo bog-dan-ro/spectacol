@@ -33,18 +33,16 @@ Sheet {
         buttonBKey: Qt.Key_Escape
     }
     function edit(kind, value) { editor.kind=kind; editor.value=value; editor.open(); }
-    Dialog {
+    FormDialog {
         id: editor
         property string kind
         property string value
-        anchors.centerIn: parent
-        width: Math.min(page.width-Theme.sp(12),Theme.sp(140))
         title: kind==="host" ? qsTr("Pi service host") : kind==="port" ? qsTr("Pi service port") : qsTr("Local script path or HTTPS URL")
-        modal: true
-        focus: true
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        onOpened: { field.text=value; field.forceActiveFocus(); field.selectAll(); }
-        onClosed: settings.forceActiveFocus()
+        acceptText: qsTr("OK")
+        initialFocus: field
+        returnFocus: settings
+        onAboutToShow: field.text = value
+        onOpened: field.selectAll()
         onAccepted: {
             if(kind==="host") page.hooks.piHost=field.text.trim();
             else if(kind==="port") page.hooks.piPort=Number(field.text);
@@ -54,9 +52,9 @@ Sheet {
         }
         TextField {
             id: field
-            width: parent.width
+            Layout.fillWidth: true
             font.pixelSize: Theme.body
-            onAccepted: editor.accept()
+            onAccepted: editor.save()
         }
     }
     SettingsList {

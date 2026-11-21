@@ -80,68 +80,42 @@ Sheet {
     }
 
 
-    // In the window, and Return (the gamepad's A) confirms
-    Dialog {
+    ConfirmDialog {
         id: updateDialog
         title: qsTr("Update downloaded image")
-        anchors.centerIn: parent
-        width: Math.min(page.width-Theme.sp(12),Theme.sp(140))
-        modal: true
-        focus: true
-        standardButtons: Dialog.Ok | Dialog.Cancel
+        text: qsTr("Download the latest official emulator image? The previous downloaded image will be kept as a backup. A custom image is kept unchanged.")
+        acceptText: qsTr("OK")
+        rejectText: qsTr("Cancel")
         onAccepted: {
             NextSdCard.updateDistro();
             pageLoader.setSource("NextSdCardPage.qml",{returnToCard:true});
         }
         onClosed: filesView.forceActiveFocus()
-        Label {
-            width: parent.width
-            wrapMode: Text.WordWrap
-            text: qsTr("Download the latest official emulator image? The previous downloaded image will be kept as a backup. A custom image is kept unchanged.")
-            font.pixelSize: Theme.body
-            color: Theme.text
-        }
     }
 
-    Dialog {
+    ConfirmDialog {
         id: removeDialog
         property string name
         title: qsTr("Remove")
-        anchors.centerIn: parent
-        width: Math.min(page.width * 0.8, Theme.body * 36)
-        modal: true
-        focus: true
-        standardButtons: Dialog.Yes | Dialog.No
-        onOpened: removeQuestion.forceActiveFocus()
+        text: qsTr("Remove '%1' from the SD card?").arg(removeDialog.name)
+        destructive: true
         onAccepted: page.card.remove(name)
         onClosed: filesView.forceActiveFocus()
-        FancyText {
-            id: removeQuestion
-            width: removeDialog.availableWidth
-            wrapMode: Text.WordWrap
-            text: qsTr("Remove '%1' from the SD card?").arg(removeDialog.name)
-            Keys.onReturnPressed: removeDialog.accept()
-        }
     }
 
-    Dialog {
+    FormDialog {
         id: folderDialog
         title: qsTr("New folder")
-        anchors.centerIn: parent
-        modal: true
-        focus: true
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        onOpened: {
-            folderName.text = "";
-            folderName.forceActiveFocus();
-        }
+        acceptText: qsTr("OK")
+        initialFocus: folderName
+        returnFocus: filesView
+        onAboutToShow: folderName.text = ""
         onAccepted: page.card.makeFolder(folderName.text)
-        onClosed: filesView.forceActiveFocus()
         FancyTextField {
             id: folderName
-            implicitWidth: page.width / 3
+            Layout.fillWidth: true
             placeholderText: qsTr("Folder name")
-            onAccepted: folderDialog.accept()
+            onAccepted: folderDialog.save()
         }
     }
 

@@ -62,6 +62,9 @@ Dialog {
                 dialog.errorMessage = message;
         }
     }
+    Overlay.modal: Rectangle {
+        color: Theme.scrim
+    }
     background: Rectangle {
         color: Theme.raised
         radius: Theme.radius
@@ -90,23 +93,24 @@ Dialog {
         }
     }
     footer: RowLayout {
+        spacing: Theme.sp(3)
         Item { Layout.fillWidth: true }
-        // Return is the gamepad's A: buttons only take Space themselves
-        Button {
+        DialogButton {
             id: acceptButton
             objectName: "formSave"
+            Layout.topMargin: Theme.sp(3)
+            Layout.bottomMargin: Theme.sp(3)
             text: dialog.acceptText
             enabled: dialog.acceptable
             onClicked: dialog.save()
-            Keys.onReturnPressed: dialog.save()
-            Keys.onEnterPressed: dialog.save()
         }
-        Button {
+        DialogButton {
             objectName: "formCancel"
-            text: Theme.gamepadHints ? qsTr("Cancel (B)") : qsTr("Cancel")
+            Layout.rightMargin: Theme.sp(3)
+            Layout.topMargin: Theme.sp(3)
+            Layout.bottomMargin: Theme.sp(3)
+            text: qsTr("Cancel")
             onClicked: dialog.reject()
-            Keys.onReturnPressed: dialog.reject()
-            Keys.onEnterPressed: dialog.reject()
         }
         Keys.onPressed: event => {
             if ([Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right].includes(event.key)) {

@@ -235,6 +235,7 @@ qt_add_qml_module(spectacol
         qml/DebugSymbolsView.qml
         qml/CompactFilesView.qml
         qml/ConfirmDialog.qml
+        qml/DialogButton.qml
         qml/NavigationComboBox.qml
         qml/DebuggerMemoryView.qml
         qml/DebuggerStateView.qml

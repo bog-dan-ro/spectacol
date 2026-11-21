@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,13 +16,42 @@
 */
 
 import QtQuick
+import QtGamepadLegacy
+import Spectacol
 
 Canvas {
     id: canvas
-    anchors.fill: parent
-    property color backgroundColor: "transparent"
     property color strokeColor: "black"
     property color gamepadFillColor: "lightgray"
+
+    property int targetButton: GamepadManager.ButtonInvalid
+    property int targetAxis: GamepadManager.AxisInvalid
+    readonly property var buttonBounds: ({
+        [GamepadManager.ButtonStart]: Qt.rect(520, 165, 100, 30),
+        [GamepadManager.ButtonSelect]: Qt.rect(380, 165, 100, 30),
+        [GamepadManager.ButtonA]: Qt.rect(760, 270, 60, 60),
+        [GamepadManager.ButtonB]: Qt.rect(820, 210, 60, 60),
+        [GamepadManager.ButtonX]: Qt.rect(700, 210, 60, 60),
+        [GamepadManager.ButtonY]: Qt.rect(760, 150, 60, 60),
+        [GamepadManager.ButtonL1]: Qt.rect(150, 55, 100, 30),
+        [GamepadManager.ButtonR1]: Qt.rect(750, 55, 100, 30),
+        [GamepadManager.ButtonL2]: Qt.rect(150, 15, 100, 30),
+        [GamepadManager.ButtonR2]: Qt.rect(750, 15, 100, 30),
+        [GamepadManager.ButtonUp]: Qt.rect(165, 140, 50, 75),
+        [GamepadManager.ButtonDown]: Qt.rect(165, 265, 50, 75),
+        [GamepadManager.ButtonRight]: Qt.rect(215, 215, 75, 50),
+        [GamepadManager.ButtonLeft]: Qt.rect(90, 215, 75, 50)
+    })
+    readonly property rect leftStickBounds: Qt.rect(220, 290, 180, 180)
+    readonly property rect rightStickBounds: Qt.rect(600, 290, 180, 180)
+    readonly property rect targetBounds: {
+        if (targetAxis === GamepadManager.AxisLeftX || targetAxis === GamepadManager.AxisLeftY)
+            return leftStickBounds;
+        if (targetAxis === GamepadManager.AxisRightX || targetAxis === GamepadManager.AxisRightY)
+            return rightStickBounds;
+        return buttonBounds[targetButton] ?? Qt.rect(0, 0, 0, 0);
+    }
+    readonly property real diagramScale: Math.min(width / 1000, height / 500)
 
     property var buttonArrowsColors: {"up": "midnightblue", "down": "purple", "border": "white"}
     property var buttonStartColors: {"up": "white", "down": "gray", "border": "black"}
@@ -76,52 +105,42 @@ Canvas {
     onAxisRightXChanged: requestPaint()
     onAxisRightYChanged: requestPaint()
 
-    function drawRoundButton(context, x, y, wh, color, borderColor, text)
+    onWidthChanged: requestPaint()
+    onHeightChanged: requestPaint()
+
+    function drawButton(context, button, colors, pressed, text)
     {
+        const bounds = buttonBounds[button];
+        const round = bounds.width === bounds.height;
         context.save();
-        context.fillStyle = color;
-        context.strokeStyle = borderColor;
+        context.fillStyle = pressed ? colors.down : colors.up;
+        context.strokeStyle = colors.border;
         context.lineWidth = 5;
 
         context.beginPath();
-        context.ellipse(x - wh /2, y - wh /2, wh, wh);
+        if (round)
+            context.ellipse(bounds.x, bounds.y, bounds.width, bounds.height);
+        else
+            context.roundedRect(bounds.x, bounds.y, bounds.width, bounds.height, 2.5, 2.5);
         context.closePath();
         context.fill();
         context.stroke();
 
-        context.lineWidth = 3;
-        context.font = "1 30px sans-serif";
-        context.textAlign = 'center';
-        context.textBaseline = "middle";
-        context.strokeText(text, x, y);
-        context.restore();
-    }
-
-    function drawRectangleButton(context, x, y, w, h, color, borderColor, text)
-    {
-        context.save();
-        context.fillStyle = color;
-        context.strokeStyle = borderColor;
-        context.lineWidth = 5;
-
-        context.beginPath();
-        context.roundedRect(x - w /2, y - h /2, w, h, context.lineWidth / 2, context.lineWidth / 2);
-        context.closePath();
-        context.fill();
-        context.stroke();
-
-        if (text !=='') {
-            context.lineWidth = 2;
-            context.font = "1 20px sans-serif";
-            context.textAlign = 'center';
+        if (text) {
+            context.lineWidth = round ? 3 : 2;
+            context.font = round ? "30px sans-serif" : "20px sans-serif";
+            context.textAlign = "center";
             context.textBaseline = "middle";
-            context.strokeText(text, x, y);
+            context.strokeText(text, bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
         }
         context.restore();
     }
 
-    function drawJoystick(context, x, y, wh, ax, ay)
+    function drawJoystick(context, bounds, ax, ay)
     {
+        const x = bounds.x;
+        const y = bounds.y;
+        const wh = bounds.width;
         context.save();
         context.fillStyle = "lightgray";
         context.strokeStyle = "black";
@@ -165,9 +184,10 @@ Canvas {
     onPaint: {
         var context = canvas.getContext("2d");
         context.reset();
-        context.scale(canvas.width/1000.0, canvas.height/500.0);
-        context.fillStyle = backgroundColor;
-        context.fillRect(0, 0, 1000, 500);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.translate((canvas.width - 1000 * diagramScale) / 2,
+                          (canvas.height - 500 * diagramScale) / 2);
+        context.scale(diagramScale, diagramScale);
 
         context.fillStyle = gamepadFillColor;
         context.strokeStyle = strokeColor;
@@ -194,29 +214,77 @@ Canvas {
         context.stroke();
 
         if (buttonUpPressed)
-            drawRectangleButton(context, 190, 177, 50, 75, buttonArrowsColors["down"], buttonArrowsColors["border"], '');
+            drawButton(context, GamepadManager.ButtonUp, buttonArrowsColors, true);
         if (buttonDownPressed)
-            drawRectangleButton(context, 190, 303, 50, 75, buttonArrowsColors["down"], buttonArrowsColors["border"], '');
+            drawButton(context, GamepadManager.ButtonDown, buttonArrowsColors, true);
         if (buttonLeftPressed)
-            drawRectangleButton(context, 127, 240, 75, 50, buttonArrowsColors["down"], buttonArrowsColors["border"], '');
+            drawButton(context, GamepadManager.ButtonLeft, buttonArrowsColors, true);
         if (buttonRightPressed)
-            drawRectangleButton(context, 253, 240, 75, 50, buttonArrowsColors["down"], buttonArrowsColors["border"], '');
+            drawButton(context, GamepadManager.ButtonRight, buttonArrowsColors, true);
 
-        drawRoundButton(context, 790, 180, 60, buttonYPressed ? buttonYColors["down"] : buttonYColors["up"], buttonYColors["border"], "Y");
-        drawRoundButton(context, 790, 300, 60, buttonAPressed ? buttonAColors["down"] : buttonAColors["up"], buttonAColors["border"], "A");
+        drawButton(context, GamepadManager.ButtonY, buttonYColors, buttonYPressed, "Y");
+        drawButton(context, GamepadManager.ButtonA, buttonAColors, buttonAPressed, "A");
+        drawButton(context, GamepadManager.ButtonX, buttonXColors, buttonXPressed, "X");
+        drawButton(context, GamepadManager.ButtonB, buttonBColors, buttonBPressed, "B");
+        drawButton(context, GamepadManager.ButtonSelect, buttonSelectColors, buttonSelectPressed, "Select");
+        drawButton(context, GamepadManager.ButtonStart, buttonStartColors, buttonStartPressed, "Start");
+        drawButton(context, GamepadManager.ButtonL1, buttonL1Colors, buttonL1Pressed, "L1");
+        drawButton(context, GamepadManager.ButtonL2, buttonL2Colors, buttonL2Pressed, "L2");
+        drawButton(context, GamepadManager.ButtonR1, buttonR1Colors, buttonR1Pressed, "R1");
+        drawButton(context, GamepadManager.ButtonR2, buttonR2Colors, buttonR2Pressed, "R2");
 
-        drawRoundButton(context, 730, 240, 60, buttonXPressed ? buttonXColors["down"] : buttonXColors["up"], buttonXColors["border"], "X");
-        drawRoundButton(context, 850, 240, 60, buttonBPressed ? buttonBColors["down"] : buttonBColors["up"], buttonBColors["border"], "B");
+        drawJoystick(context, leftStickBounds, axisLeftX, axisLeftY);
+        drawJoystick(context, rightStickBounds, axisRightX, axisRightY);
+    }
 
-        drawRectangleButton(context, 430, 180, 100, 30, buttonSelectPressed ? buttonSelectColors["down"] : buttonSelectColors["up"], buttonSelectColors["border"], "Select");
-        drawRectangleButton(context, 570, 180, 100, 30, buttonStartPressed ? buttonStartColors["down"] : buttonStartColors["up"], buttonStartColors["border"], "Start");
+    // The outline uses the drawing's coordinates but animates independently of the canvas.
+    Item {
+        width: 1000
+        height: 500
+        anchors.centerIn: parent
+        scale: canvas.diagramScale
+        visible: canvas.targetBounds.width > 0 && scale > 0
+        Accessible.ignored: true
 
-        drawRectangleButton(context, 200, 70, 100, 30, buttonL1Pressed ? buttonL1Colors["down"] : buttonL1Colors["up"], buttonL1Colors["border"], "L1");
-        drawRectangleButton(context, 200, 30, 100, 30, buttonL2Pressed ? buttonL2Colors["down"] : buttonL2Colors["up"], buttonL2Colors["border"], "L2");
-        drawRectangleButton(context, 800, 70, 100, 30, buttonR1Pressed ? buttonR1Colors["down"] : buttonR1Colors["up"], buttonR1Colors["border"], "R1");
-        drawRectangleButton(context, 800, 30, 100, 30, buttonR2Pressed ? buttonR2Colors["down"] : buttonR2Colors["up"], buttonR2Colors["border"], "R2");
+        Rectangle {
+            id: outline
+            readonly property int stroke: Math.max(1, Math.round(Theme.focusLine / Math.max(canvas.diagramScale, 0.1)))
+            x: canvas.targetBounds.x - stroke
+            y: canvas.targetBounds.y - stroke
+            width: canvas.targetBounds.width + stroke * 2
+            height: canvas.targetBounds.height + stroke * 2
+            radius: canvas.targetBounds.width === canvas.targetBounds.height ? width / 2 : stroke * 2
+            color: "transparent"
+            border.color: Theme.textOnAccent
+            border.width: stroke * 2
 
-        drawJoystick(context, 220, 290, 180, axisLeftX, axisLeftY);
-        drawJoystick(context, 600, 290, 180, axisRightX, axisRightY);
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: Math.round(outline.stroke / 2)
+                radius: outline.radius - anchors.margins
+                color: "transparent"
+                border.color: Theme.accent
+                border.width: outline.stroke
+            }
+
+            Rectangle {
+                id: pulse
+                anchors.fill: parent
+                anchors.margins: -outline.stroke
+                radius: outline.radius + outline.stroke
+                color: "transparent"
+                border.color: Theme.accent
+                border.width: outline.stroke
+                opacity: 0.2
+                visible: !Theme.reduceMotion
+
+                SequentialAnimation {
+                    running: pulse.visible
+                    loops: Animation.Infinite
+                    OpacityAnimator { target: pulse; from: 0.2; to: 0.85; duration: 850; easing.type: Easing.InOutSine }
+                    OpacityAnimator { target: pulse; from: 0.85; to: 0.2; duration: 850; easing.type: Easing.InOutSine }
+                }
+            }
+        }
     }
 }

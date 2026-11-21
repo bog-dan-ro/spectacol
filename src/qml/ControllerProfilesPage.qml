@@ -18,8 +18,8 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Dialogs
+import QtQuick.Layouts
 import QtGamepadLegacy
 import Spectacol
 
@@ -121,39 +121,29 @@ Sheet {
             color: Theme.warning
         }
     }
-    Dialog {
+    FormDialog {
         id: nameDialog
-        parent: Overlay.overlay
         title: qsTr("Save controller profile")
-        modal: true
-        focus: true
-        x: Math.round((parent.width - width) / 2)
-        y: Math.round((parent.height - height) / 2)
-        width: Math.min(page.width - Theme.sp(8), Theme.sp(110))
-        standardButtons: Dialog.Save | Dialog.Cancel
-        onOpened: { nameEdit.forceActiveFocus(); nameEdit.selectAll(); }
+        initialFocus: nameEdit
+        onOpened: nameEdit.selectAll()
         onAccepted: {
             if (ZxEmulator.saveControllerProfile(nameEdit.text))
                 page.selectedName = nameEdit.text.trim();
         }
-        contentItem: FancyTextField {
+        FancyTextField {
             id: nameEdit
             objectName: "profileName"
+            Layout.fillWidth: true
             maximumLength: 64
             placeholderText: qsTr("Profile name")
             selectByMouse: true
-            onAccepted: nameDialog.accept()
+            onAccepted: nameDialog.save()
         }
     }
-    Dialog {
+    ConfirmDialog {
         id: deleteDialog
-        parent: Overlay.overlay
-        title: qsTr("Delete profile “%1”?").arg(page.selectedName)
-        modal: true
-        focus: true
-        x: Math.round((parent.width - width) / 2)
-        y: Math.round((parent.height - height) / 2)
-        standardButtons: Dialog.Yes | Dialog.No
+        text: qsTr("Delete profile “%1”?").arg(page.selectedName)
+        destructive: true
         onAccepted: {
             page.profiles.remove(page.selectedName);
             page.selectedName = page.profiles.names.length ? page.profiles.names[0] : "";

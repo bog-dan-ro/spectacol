@@ -98,50 +98,27 @@ Dialog {
             Layout.alignment: Qt.AlignRight
             spacing: Theme.sp(3)
 
-            component Answer: Button {
+            component Answer: DialogButton {
                 id: answer
                 property Item other
-                signal chosen
-                Layout.minimumHeight: Theme.rowHeight
-                Layout.minimumWidth: Theme.sp(24)
-                // The answer the gamepad or the remote is on shows clearly, with every renderer
-                background: Rectangle {
-                    radius: Theme.radiusSmall
-                    color: answer.activeFocus ? Theme.accent : answer.down || answer.hovered ? Theme.accentFill : "transparent"
-                    border.width: Theme.line
-                    border.color: answer.activeFocus ? Theme.accent : Theme.outline
-                }
-                contentItem: Text {
-                    text: answer.text
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    font.pixelSize: Theme.body
-                    font.weight: Font.DemiBold
-                    color: answer.activeFocus ? Theme.textOnAccent : Theme.text
-                }
-                onClicked: chosen()
-                Keys.onReturnPressed: chosen()
-                Keys.onEnterPressed: chosen()
-                Keys.onSelectPressed: chosen()
                 Keys.onLeftPressed: other.forceActiveFocus(Qt.TabFocusReason)
                 Keys.onRightPressed: other.forceActiveFocus(Qt.TabFocusReason)
                 Keys.onUpPressed: other.forceActiveFocus(Qt.TabFocusReason)
                 Keys.onDownPressed: other.forceActiveFocus(Qt.TabFocusReason)
-                Accessible.name: text
             }
             Answer {
                 id: rejectButton
                 objectName: "confirmNo"
                 text: dialog.rejectText
                 other: acceptButton
-                onChosen: dialog.reject()
+                onClicked: dialog.reject()
             }
             Answer {
                 id: acceptButton
                 objectName: "confirmYes"
                 text: dialog.acceptText
                 other: rejectButton
-                onChosen: dialog.accept()
+                onClicked: dialog.accept()
             }
         }
     }

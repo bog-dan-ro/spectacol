@@ -745,10 +745,9 @@ Sheet {
         // Asked once this dialog has closed, so the question keeps the focus
         property var overwrite: null
         title: move ? qsTr("Move") : qsTr("Copy")
-        acceptText: move ? qsTr("Move") : qsTr("Copy")
+        acceptText: qsTr("OK")
         returnFocus: overwrite ? null : page.activeView
-        // Return (the gamepad's A) copies; a focused button would only take Space
-        initialFocus: names.length === 1 ? copyName : copyText
+        initialFocus: saveButton
         acceptable: names.length !== 1 || copyName.text.trim().length > 0
         onAboutToShow: copyName.text = names.length === 1 ? names[0] : ""
         onClosed: {
@@ -774,13 +773,10 @@ Sheet {
             return ok;
         }
         FancyText {
-            id: copyText
             Layout.fillWidth: true
             wrapMode: Text.Wrap
             text: (copyDialog.move ? qsTr("Move %1 to %2") : qsTr("Copy %1 to %2"))
                   .arg(page.describe(copyDialog.names)).arg(page.otherPanel.location)
-            Keys.onReturnPressed: copyDialog.save()
-            Keys.onEnterPressed: copyDialog.save()
         }
         FancyTextField {
             id: copyName
@@ -791,40 +787,19 @@ Sheet {
         }
     }
 
-    Dialog {
+    ConfirmDialog {
         id: confirmDialog
         objectName: "fileManagerConfirm"
         property var yesAction: null
-        property string text
         function ask(question: string, action: var) {
             text = question;
             yesAction = action;
             open();
         }
-        parent: Overlay.overlay
-        popupType: Popup.Item
-        anchors.centerIn: parent
-        width: Math.min(parent.width - Theme.sp(6), Theme.sp(120))
-        modal: true
-        focus: true
         title: qsTr("Confirm")
-        standardButtons: Dialog.Yes | Dialog.No
-        background: Rectangle {
-            color: Theme.raised
-            radius: Theme.radius
-            border.color: Theme.outline
-        }
-        onOpened: question.forceActiveFocus()
+        destructive: true
         onAccepted: if (yesAction) yesAction()
         onClosed: if (!page.popupOpen()) page.focusActive()
-        FancyText {
-            id: question
-            width: confirmDialog.availableWidth
-            wrapMode: Text.Wrap
-            text: confirmDialog.text
-            Keys.onReturnPressed: confirmDialog.accept()
-            Keys.onEnterPressed: confirmDialog.accept()
-        }
     }
 
     FormDialog {

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2015-2025, BogDan Vatra <bogdan@kde.org>
+    Copyright (c) 2015-2026, BogDan Vatra <bogdan@kde.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,156 +18,95 @@
 // @scope main.qml
 
 import QtQuick
+import QtQuick.Layouts
 import QtGamepadLegacy
 import Spectacol
-import "private"
 
-StandardGamepad {
-    id: confGamepad
-
-    backgroundColor: Theme.surface
+Rectangle {
+    id: calibration
+    color: Theme.raised
 
     property alias deviceId: gamepad.deviceId
     signal configureDone()
 
-    FancyText {
-        id: configureText
-        font.pixelSize: TextSizes.scale12
-        visible: false
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-        horizontalAlignment: Text.AlignHCenter
-    }
+    ColumnLayout {
+        id: calibrationLayout
+        anchors.centerIn: parent
+        width: Math.max(0, calibration.width - Theme.sp(8))
+        height: Math.min(implicitHeight, Math.max(0, calibration.height - Theme.sp(8)))
+        spacing: Theme.sp(2)
 
-    FancyText {
-        id: cancelButtonText
-        font.pixelSize: TextSizes.scale12
-        visible: false
-        anchors.top: configureText.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: qsTr("Press <b>Start</b> button to skip this configuation");
+        FancyText {
+            id: configureText
+            Layout.fillWidth: true
+            visible: text.length > 0
+            font.pixelSize: Theme.title
+            font.weight: Font.DemiBold
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.Wrap
+        }
+        FancyText {
+            Layout.fillWidth: true
+            visible: configureText.visible && diagram.targetButton !== GamepadManager.ButtonStart
+            color: Theme.textMuted
+            font.pixelSize: Theme.caption
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.Wrap
+            text: qsTr("Press Start to skip this step")
+        }
+        StandardGamepad {
+            id: diagram
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredHeight: calibrationLayout.width / 2
+        }
     }
 
     Gamepad {
         id: gamepad
-        onButtonAChanged: (value) => confGamepad.buttonAPressed = value
-        onButtonBChanged: (value) => confGamepad.buttonBPressed = value
-        onButtonXChanged: (value) => confGamepad.buttonXPressed = value
-        onButtonYChanged: (value) => confGamepad.buttonYPressed = value
-        onButtonL1Changed: (value) => confGamepad.buttonL1Pressed = value
-        onButtonR1Changed: (value) => confGamepad.buttonR1Pressed = value
-        onButtonL2Changed: (value) => confGamepad.buttonL2Pressed = value
-        onButtonR2Changed: (value) => confGamepad.buttonR2Pressed = value
-        onButtonUpChanged: (value) => confGamepad.buttonUpPressed = value
-        onButtonLeftChanged: (value) => confGamepad.buttonLeftPressed = value
-        onButtonDownChanged: (value) => confGamepad.buttonDownPressed = value
-        onButtonRightChanged: (value) => confGamepad.buttonRightPressed = value
-        onButtonStartChanged: (value) => confGamepad.buttonStartPressed = value
-        onButtonSelectChanged: (value) => confGamepad.buttonSelectPressed = value
-        onAxisLeftXChanged: (value) => confGamepad.axisLeftX = value
-        onAxisLeftYChanged: (value) => confGamepad.axisLeftY = value
-        onAxisRightXChanged: (value) => confGamepad.axisRightX = value
-        onAxisRightYChanged: (value) => confGamepad.axisRightY = value
+        onButtonAChanged: (value) => diagram.buttonAPressed = value
+        onButtonBChanged: (value) => diagram.buttonBPressed = value
+        onButtonXChanged: (value) => diagram.buttonXPressed = value
+        onButtonYChanged: (value) => diagram.buttonYPressed = value
+        onButtonL1Changed: (value) => diagram.buttonL1Pressed = value
+        onButtonR1Changed: (value) => diagram.buttonR1Pressed = value
+        onButtonL2Changed: (value) => diagram.buttonL2Pressed = value
+        onButtonR2Changed: (value) => diagram.buttonR2Pressed = value
+        onButtonUpChanged: (value) => diagram.buttonUpPressed = value
+        onButtonLeftChanged: (value) => diagram.buttonLeftPressed = value
+        onButtonDownChanged: (value) => diagram.buttonDownPressed = value
+        onButtonRightChanged: (value) => diagram.buttonRightPressed = value
+        onButtonStartChanged: (value) => diagram.buttonStartPressed = value
+        onButtonSelectChanged: (value) => diagram.buttonSelectPressed = value
+        onAxisLeftXChanged: (value) => diagram.axisLeftX = value
+        onAxisLeftYChanged: (value) => diagram.axisLeftY = value
+        onAxisRightXChanged: (value) => diagram.axisRightX = value
+        onAxisRightYChanged: (value) => diagram.axisRightY = value
     }
 
-    property var __buttons: [GamepadManager.ButtonStart,
-        GamepadManager.ButtonSelect,
-        GamepadManager.ButtonA,
-        GamepadManager.ButtonB,
-        GamepadManager.ButtonX,
-        GamepadManager.ButtonY,
-        GamepadManager.ButtonL1,
-        GamepadManager.ButtonR1,
-        GamepadManager.ButtonL2,
-        GamepadManager.ButtonR2,
-        GamepadManager.ButtonUp,
-        GamepadManager.ButtonDown,
-        GamepadManager.ButtonRight,
-        GamepadManager.ButtonLeft];
-
-    property var __axes: [GamepadManager.AxisLeftX,
-        GamepadManager.AxisLeftY,
-        GamepadManager.AxisRightX,
-        GamepadManager.AxisRightY];
-
-    function pressButton(button)
-    {
-        switch(button) {
-        case GamepadManager.ButtonA:
-            confGamepad.buttonAPressed = true;
-            return 'A';
-
-        case GamepadManager.ButtonB:
-            confGamepad.buttonBPressed = true;
-            return 'B';
-
-        case GamepadManager.ButtonX:
-            confGamepad.buttonXPressed = true;
-            return 'X';
-
-        case GamepadManager.ButtonY:
-            confGamepad.buttonYPressed = true;
-            return 'Y';
-
-        case GamepadManager.ButtonL1:
-            confGamepad.buttonL1Pressed = true;
-            return 'L1';
-
-        case GamepadManager.ButtonR1:
-            confGamepad.buttonR1Pressed = true;
-            return 'R1';
-
-        case GamepadManager.ButtonL2:
-            confGamepad.buttonL2Pressed = true;
-            return 'L2';
-
-        case GamepadManager.ButtonR2:
-            confGamepad.buttonR2Pressed = true;
-            return 'R2';
-
-        case GamepadManager.ButtonSelect:
-            confGamepad.buttonSelectPressed = true;
-            return 'Select';
-
-        case GamepadManager.ButtonStart:
-            confGamepad.buttonStartPressed = true;
-            return 'Start';
-
-        case GamepadManager.ButtonUp:
-            confGamepad.buttonUpPressed = true;
-            return 'Up';
-
-        case GamepadManager.ButtonDown:
-            confGamepad.buttonDownPressed = true;
-            return 'Down';
-
-        case GamepadManager.ButtonRight:
-            confGamepad.buttonRightPressed = true;
-            return 'Right';
-
-        case GamepadManager.ButtonLeft:
-            confGamepad.buttonLeftPressed = true;
-            return 'Left';
-        }
-    }
-
-    function pressAxis(axis)
-    {
-        switch (axis) {
-        case GamepadManager.AxisLeftX:
-            confGamepad.axisLeftX = 1;
-            return 'left joystick horizontal';
-        case GamepadManager.AxisLeftY:
-            confGamepad.axisLeftY = 1;
-            return 'left joystick vertical';
-        case GamepadManager.AxisRightX:
-            confGamepad.axisRightX = 1;
-            return 'right joystick horizontal';
-        case GamepadManager.AxisRightY:
-            confGamepad.axisRightY = 1;
-            return 'right joystick vertical';
-        }
-    }
+    readonly property var buttons: [
+        { code: GamepadManager.ButtonStart, label: qsTr("Start", "gamepad button") },
+        { code: GamepadManager.ButtonSelect, label: qsTr("Select", "gamepad button") },
+        { code: GamepadManager.ButtonA, label: "A" },
+        { code: GamepadManager.ButtonB, label: "B" },
+        { code: GamepadManager.ButtonX, label: "X" },
+        { code: GamepadManager.ButtonY, label: "Y" },
+        { code: GamepadManager.ButtonL1, label: "L1" },
+        { code: GamepadManager.ButtonR1, label: "R1" },
+        { code: GamepadManager.ButtonL2, label: "L2" },
+        { code: GamepadManager.ButtonR2, label: "R2" },
+        { code: GamepadManager.ButtonUp, label: qsTr("D-pad Up") },
+        { code: GamepadManager.ButtonDown, label: qsTr("D-pad Down") },
+        { code: GamepadManager.ButtonRight, label: qsTr("D-pad Right") },
+        { code: GamepadManager.ButtonLeft, label: qsTr("D-pad Left") }
+    ]
+    readonly property var axes: [
+        { code: GamepadManager.AxisLeftX, prompt: qsTr("Move the left stick horizontally") },
+        { code: GamepadManager.AxisLeftY, prompt: qsTr("Move the left stick vertically") },
+        { code: GamepadManager.AxisRightX, prompt: qsTr("Move the right stick horizontally") },
+        { code: GamepadManager.AxisRightY, prompt: qsTr("Move the right stick vertically") }
+    ]
+    property int stepIndex: 0
 
     // ZxEmulator.processInputEvents nests, block it only once for the whole sequence
     property bool inputBlocked: false
@@ -182,21 +121,23 @@ StandardGamepad {
     function configureNext()
     {
         blockInput(true);
-        if (__buttons.length > 0) {
-            const but = __buttons.shift();
-            GamepadManager.configureButton(deviceId, but);
-            configureText.text = qsTr("Press button <b>") + pressButton(but) + ("</b> on your gamepad");
-            configureText.visible = true;
-            cancelButtonText.visible = but !== GamepadManager.ButtonStart;
-        } else if (__axes.length > 0) {
-            const axis = __axes.shift();
-            GamepadManager.configureAxis(deviceId, axis);
-            configureText.text = qsTr("Press <b>") + pressAxis(axis) + ("</b> axis on your gamepad");
-            configureText.visible = true;
-            cancelButtonText.visible = true;
+        if (stepIndex < buttons.length) {
+            const button = buttons[stepIndex++];
+            diagram.targetButton = button.code;
+            configureText.text = qsTr("Press %1").arg(button.label);
+            GamepadManager.configureButton(deviceId, button.code);
+            return;
+        }
+
+        diagram.targetButton = GamepadManager.ButtonInvalid;
+        if (stepIndex - buttons.length < axes.length) {
+            const axis = axes[stepIndex++ - buttons.length];
+            diagram.targetAxis = axis.code;
+            configureText.text = axis.prompt;
+            GamepadManager.configureAxis(deviceId, axis.code);
         } else {
-            configureText.visible = false;
-            cancelButtonText.visible = false;
+            diagram.targetAxis = GamepadManager.AxisInvalid;
+            configureText.text = "";
             configureDone();
             blockInput(false);
         }
@@ -212,15 +153,15 @@ StandardGamepad {
         target: GamepadManager
         // The parameter must keep its name: it shadows the root's deviceId alias.
         function onButtonConfigured(deviceId, button) {
-            if (deviceId === confGamepad.deviceId)
+            if (deviceId === calibration.deviceId)
                 configTimer.restart();
         }
         function onAxisConfigured(deviceId, axis) {
-            if (deviceId === confGamepad.deviceId)
+            if (deviceId === calibration.deviceId)
                 configTimer.restart();
         }
         function onConfigurationCanceled(deviceId) {
-            if (deviceId === confGamepad.deviceId)
+            if (deviceId === calibration.deviceId)
                 configTimer.restart();
         }
     }

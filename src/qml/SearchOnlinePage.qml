@@ -486,41 +486,38 @@ Sheet {
             }
             RowLayout {
                 Layout.fillWidth: true
-                Button {
+                DialogButton {
                     id: play
                     Layout.fillWidth: true
                     text: page.catalogue.downloading ? qsTr("Downloading…") : qsTr("Play")
                     enabled: media.count > 0 && !page.catalogue.downloading
                     onClicked: page.playSelection()
-                    Keys.onReturnPressed: page.playSelection()
                     KeyNavigation.up: media
                     KeyNavigation.right: sourcePage
                     KeyNavigation.down: retryDetails
                 }
-                Button {
+                DialogButton {
                     id: sourcePage
                     Layout.fillWidth: true
                     text: qsTr("Source page")
                     enabled: page.catalogue.details.website.toString().length > 0
                     onClicked: Qt.openUrlExternally(page.catalogue.details.website)
-                    Keys.onReturnPressed: clicked()
                     KeyNavigation.left: play
                     KeyNavigation.right: closeDetails
                     KeyNavigation.up: media
                     KeyNavigation.down: retryDetails
                 }
-                Button {
+                DialogButton {
                     id: closeDetails
                     Layout.fillWidth: true
                     text: qsTr("Back")
                     onClicked: detailDialog.close()
-                    Keys.onReturnPressed: detailDialog.close()
                     KeyNavigation.left: sourcePage
                     KeyNavigation.up: media
                     KeyNavigation.down: retryDetails
                 }
             }
-            Button {
+            DialogButton {
                 id: retryDetails
                 visible: page.catalogue.errorString.length > 0 && !page.catalogue.loadingDetails
                 text: qsTr("Retry details")
@@ -528,7 +525,6 @@ Sheet {
                     detailDialog.awaitingFiles = true;
                     page.catalogue.select(results.currentIndex);
                 }
-                Keys.onReturnPressed: clicked()
                 KeyNavigation.up: closeDetails
             }
         }

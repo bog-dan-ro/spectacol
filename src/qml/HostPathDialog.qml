@@ -67,12 +67,10 @@ FormDialog {
         inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
         onAccepted: dialog.save()
     }
-    Button {
+    DialogButton {
         id: browse
         objectName: dialog.directory ? "hostFolderBrowse" : "hostFileBrowse"
         text: qsTr("Browse…")
-        Keys.onReturnPressed: clicked()
-        Keys.onEnterPressed: clicked()
         onClicked: {
             // Start the picker on the current path; a save picker also proposes its name
             const url = dialog.pathUrl(pathField.text.trim());
