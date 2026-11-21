@@ -40,9 +40,9 @@ Item {
     readonly property int cobraControlKey: Qt.Key_Control | cobraFlag
     readonly property bool nextMode: !textInputMode && ZxEmulator.settings.currentMachine === "ZX Spectrum Next"
     readonly property int nextFlag: 0x10000000
-    // The Spectrum+ layout on the other machines: its extra keys send 48K key chords
-    readonly property bool plusMode: !textInputMode && !cobraMode && !nextMode
-                                     && ZxEmulator.settings.keyboardLayout === ZxSettings.PlusKeyboard
+    readonly property bool extendedLayout: !textInputMode && !cobraMode
+                                           && ZxEmulator.settings.keyboardLayout === ZxSettings.PlusKeyboard
+    // On other machines, the extra keys send 48K key chords.
     readonly property int plusFlag: 0x08000000
     readonly property var plusChords: [
         [Qt.Key_Shift, Qt.Key_1], [Qt.Key_Shift, Qt.Key_2], [Qt.Key_Shift, Qt.Key_3], [Qt.Key_Shift, Qt.Key_4],
@@ -50,9 +50,8 @@ Item {
         [Qt.Key_Control, Qt.Key_O], [Qt.Key_Control, Qt.Key_P], [Qt.Key_Shift, Qt.Key_7], [Qt.Key_Control, Qt.Key_N],
         [Qt.Key_Control, Qt.Key_M], [Qt.Key_Shift, Qt.Key_5], [Qt.Key_Shift, Qt.Key_6], [Qt.Key_Shift, Qt.Key_8]]
     // Keywords and symbols on the keys, or only their letters
-    readonly property bool fullLabels: !textInputMode && (nextMode || plusMode
-                                                          || ZxEmulator.settings.keyboardLayout !== ZxSettings.ShortKeyboard)
-    readonly property int columns: cobraMode ? 12 : nextMode || plusMode ? 14 : 10
+    readonly property bool fullLabels: !textInputMode && ZxEmulator.settings.keyboardLayout !== ZxSettings.ShortKeyboard
+    readonly property int columns: cobraMode ? 12 : extendedLayout ? 14 : 10
     readonly property bool cobraCtrlPressed: input.heldKeys.indexOf(cobraControlKey) >= 0
     readonly property bool capsPressed: input.heldKeys.indexOf(Qt.Key_Shift) >= 0
     readonly property bool symbolPressed: input.heldKeys.indexOf(Qt.Key_Control) >= 0
@@ -60,7 +59,7 @@ Item {
     property bool stickyCSSS: textInputMode || gamepadMode || stickyCSSSButton.checked
     onCobraModeChanged: releasePressedKeys()
     onNextModeChanged: releasePressedKeys()
-    onPlusModeChanged: releasePressedKeys()
+    onExtendedLayoutChanged: releasePressedKeys()
     onGamepadModeChanged: releasePressedKeys()
     Component.onDestruction: releasePressedKeys()
 
@@ -373,7 +372,7 @@ Item {
         cellHeight: onScreenKeyboard.portrait && !textInputMode ? Screen.pixelDensity * 9 : cellWidth
         width: Math.min(cellWidth * columns + ((onScreenKeyboard.portrait || gamepadMode || textInputMode) ? 0 : 8 * Screen.pixelDensity), parent.width)
         height: cellHeight * 4 + ((onScreenKeyboard.portrait || gamepadMode || textInputMode) ? 0 : 2 * Screen.pixelDensity)
-        model: cobraMode ? cobraKeyboard : nextMode ? nextKeyboard : plusMode ? plusKeyboard : zx48Keyboard
+        model: cobraMode ? cobraKeyboard : extendedLayout ? (nextMode ? nextKeyboard : plusKeyboard) : zx48Keyboard
         currentIndex: onScreenKeyboard.columns * 2 + 4
         onCurrentIndexChanged: input.release("navigation", false)
         onActiveFocusChanged: if (!activeFocus) input.release("navigation", true)

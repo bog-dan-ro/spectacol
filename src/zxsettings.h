@@ -190,8 +190,7 @@ public:
     enum FillMode { PreserveAspectFit = 0, PreserveAspect, Stretch };
     Q_ENUM(FillMode)
 
-    // The on-screen keyboard: the 48K's 40 keys with only their letters or with all their
-    // labels, or the Spectrum+ layout (the Next always uses its own Spectrum+ keyboard)
+    // The on-screen keyboard: 48K keys with short or full legends, or the Next layout.
     enum KeyboardLayout { ShortKeyboard = 0, Full48Keyboard, PlusKeyboard };
     Q_ENUM(KeyboardLayout)
 

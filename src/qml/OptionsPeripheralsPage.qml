@@ -77,13 +77,12 @@ Sheet {
         SettingRow {
             label: qsTr("On-screen keyboard")
             kind: "choice"
-            model: [qsTr("Short"), qsTr("48K"), qsTr("Spectrum+")]
+            model: [qsTr("Short"), qsTr("48K"), qsTr("Next")]
             currentIndex: ZxEmulator.settings.keyboardLayout
             onActivated: (index) => ZxEmulator.settings.keyboardLayout = index
-            description: (currentIndex === ZxSettings.ShortKeyboard ? qsTr("The 48K's keys, with only their letters.")
+            description: currentIndex === ZxSettings.ShortKeyboard ? qsTr("The 48K's keys, with only their letters.")
                           : currentIndex === ZxSettings.Full48Keyboard ? qsTr("The 48K's keys, with their keywords and symbols.")
-                          : qsTr("The Spectrum+ keys: EDIT, DELETE, the cursor keys and more."))
-                         + " " + qsTr("The ZX Spectrum Next always uses the Spectrum+ keys.")
+                          : qsTr("The Spectrum Next layout includes EDIT, DELETE, the cursor keys and more.")
         }
         SettingRow {
             label: qsTr("Recreated ZX Spectrum keyboard")

@@ -10,6 +10,7 @@ from pathlib import Path
 import struct
 import subprocess
 import tempfile
+import zlib
 
 
 def image(path, cancel_matrix=False):
@@ -62,6 +63,22 @@ def image(path, cancel_matrix=False):
     path.write_bytes(raw)
 
 
+def keyboard_bytes(snapshot):
+    raw = snapshot.read_bytes()
+    assert raw[:4] == b"ZXST"
+    offset = 8
+    while offset + 8 <= len(raw):
+        tag, size = struct.unpack_from("<4sI", raw, offset)
+        start = offset + 8
+        if tag == b"RAMP" and raw[start + 2] == 2:  # Bank 2 is mapped at 0x8000.
+            data = raw[start + 3:start + size]
+            if raw[start] & 1:
+                data = zlib.decompress(data)
+            return data[0x1000:0x100A]
+        offset = start + size
+    raise AssertionError("No RAM bank 2 in " + str(snapshot))
+
+
 def main():
     repo = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
@@ -75,9 +92,12 @@ def main():
         ("next-without-divmmc", "next", "", False, bytes([0, 0] + [31] * 8)),
         ("next-left", "next", "down:Left", False, bytes([2, 0, 30, 31, 31, 15, 31, 31, 31, 31])),
         ("next-cancel-matrix", "next", "down:Left", True, bytes([2, 0] + [31] * 8)),
-        ("next-keyboard", "next", "F7,point:1:down:950:530", False, bytes([8, 0, 30, 31, 31, 31, 23, 31, 31, 31])),
+        ("next-48k-keyboard", "next", "F7,Up,Up,nav:ButtonL1:1,down:Return", False,
+         bytes([0, 0, 30, 31, 31, 15, 31, 31, 31, 31])),
+        ("next-keyboard", "next", ",".join(["F7"] + ["Right"] * 8 + ["down:Return"]), False,
+         bytes([8, 0, 30, 31, 31, 31, 23, 31, 31, 31])),
         ("next-uart-page", "next", "click:320:24,Down,Down,Down,Down,Down,Return,wait,Down,Down,Down,Down,Return", False, None),
-        ("sd-copy", "next", "click:140:24,Down,Down,Down,Return,wait,Insert,wait,Right,Right,Right,Return", False, None),
+        ("sd-copy", "next", "page:SdCardPage.qml,wait,Insert,wait,Right,Right,Right,Return", False, None),
     ]
     with tempfile.TemporaryDirectory(prefix="session-", dir=output) as temporary:
         session = Path(temporary)
@@ -93,10 +113,11 @@ def main():
             (config / "Spectacol.conf").write_text(
                 "[General]\nfirst_start=false\nautoSaveOnExit=false\nrestrictToSpectacol=true\ndataPath=" + str(data)
                 + "\n[Next]\nsdCardImage=" + str(media)
-                + "\n[Sound]\nsoundEnabled=false\n[Peripherals]\ndivMmc=false\ninterface2=false\n")
+                + "\n[Sound]\nsoundEnabled=false\n[Peripherals]\ndivMmc=false\ninterface2=false\n"
+                + ("keyboardLayout=2\n" if name == "next-keyboard" else ""))
             env = os.environ | {"QT_QPA_PLATFORM": "offscreen", "XDG_CONFIG_HOME": str(config.parent),
                                 "XDG_DATA_HOME": str(folder / "xdg-data"), "QT_SCALE_FACTOR": "1"}
-            target = output / (name + ".sna")
+            target = output / (name + ".szx")
             command = [str(args.binary.resolve()), "--machine", machine, "--window-size", "1280x800",
                        "--quit-after", str(max(3, 2 + len(keys.split(",")) * 0.3)), "--screenshot", str(target),
                        "--ui-screenshot", str(output / (name + ".png"))]
@@ -107,8 +128,7 @@ def main():
             log = (output / (name + ".log")).read_text()
             assert not any(x in log for x in ("Can't select", "not attached", "ReferenceError", "TypeError", "is not a type", "Cannot assign")), (name, log)
             if expected is not None:
-                raw = target.read_bytes()
-                actual = raw[27 + 0x5000:27 + 0x500A]
+                actual = keyboard_bytes(target)
                 assert actual == expected, (name, actual.hex(), expected.hex())
             if name == "sd-copy":
                 assert b"PAYLOAD TXT" in media.read_bytes()[8 * 512:9 * 512], "The gamepad picker did not copy the host file"
