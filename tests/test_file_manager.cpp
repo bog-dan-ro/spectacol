@@ -305,6 +305,20 @@ private slots:
         }
     }
 
+    void newHcBasicImage()
+    {
+        QTemporaryDir root;
+        QVERIFY(root.isValid());
+        FileManagerPanel panel;
+        panel.setFolder(root.path());
+        const auto format = formatIndex(panel, u"dsk"_s, u"hc-basic-80"_s);
+        QVERIFY(format >= 0);
+        QVERIFY(panel.createImage(u"basic"_s, format));
+        QCOMPARE(QFileInfo(root.filePath(u"basic.dsk"_s)).size(), 696576);
+        QVERIFY(panel.open(panel.rowOf(u"basic.dsk"_s)));
+        QCOMPARE(panel.filesystem(), u"hc-basic-80"_s);
+    }
+
     void tapes()
     {
         QTemporaryDir root;

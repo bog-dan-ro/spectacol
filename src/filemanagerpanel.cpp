@@ -2243,6 +2243,7 @@ QVariantList FileManagerPanel::imageFormats() const
              format(tr("TR-DOS disk (SCL)"), u"scl"_s, {}),
              format(tr("+D / DISCiPLE disk (MGT)"), u"mgt"_s, u"mgt"_s),
              format(tr("Opus Discovery disk (OPD)"), u"opd"_s, u"opus"_s),
+             format(tr("HC BASIC 640K disk (DSK)"), u"dsk"_s, u"hc-basic-80"_s),
              format(tr("CP/M 720K disk (DSK)"), u"dsk"_s, u"cpm-720"_s),
              format(tr("Microdrive cartridge (MDR)"), u"mdr"_s, {}) };
 }
