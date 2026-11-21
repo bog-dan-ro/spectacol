@@ -16,6 +16,7 @@
 */
 
 #include "romoverrides.h"
+#include "machineregistry.h"
 
 #include <zxkit/core/Emulator.h>
 #include <QDir>
@@ -33,7 +34,7 @@ using namespace std::literals;
 
 RomOverrides::RomOverrides(QObject *parent) : QObject(parent)
 {
-    const zxkit::MachineRegistry registry;
+    const auto registry = spectacolMachineRegistry();
     for (const auto &id : registry.availableIds()) {
         const auto machine = registry.create(id);
         const auto qid = QString::fromStdString(id);

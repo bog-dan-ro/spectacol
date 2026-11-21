@@ -4,6 +4,7 @@
 #include "debugsymbols.h"
 #include "devicestorage.h"
 #include "folderlistmodel.h"
+#include "machineregistry.h"
 #include "pokemodel.h"
 #include "romoverrides.h"
 #include <QAbstractItemModelTester>
@@ -34,7 +35,7 @@ class FilesFeaturesTest : public QObject {
     }
     int machine(const QString &id)
     {
-        const auto ids = zxkit::MachineRegistry().availableIds();
+        const auto ids = spectacolMachineRegistry().availableIds();
         const auto it = std::ranges::find(ids, id.toStdString());
         return int(it - ids.begin());
     }
@@ -122,6 +123,7 @@ private slots:
     void romPersistenceAndMachineScope()
     {
         RomOverrides model;
+        QVERIFY(!model.machines().contains(u"ZX Spectrum 48K (NTSC)"_s));
         model.setMachineIndex(machine(u"48k"_s));
         QCOMPARE(model.romSlots().size(), 1);
         const auto bundled = model.resolve("48k", "48.rom", 16384);

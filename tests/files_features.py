@@ -162,7 +162,7 @@ def main():
             assert pc(snapshot) == 0, hex(pc(snapshot))
         elif name == 'machine-stick':
             _, text, *_ = run(name, MACHINES[:-2] + ['nav:AxisLeftX:1', 'nav:AxisLeftX:0', pad('X')])
-            assert 'custom roms' in text and 'ntsc' in text, text
+            assert 'custom roms' in text and '128k' in text and 'ntsc' not in text, text
         elif name == 'browser-open-touch':
             snapshot, *_ = run(name, BROWSER + ['F2', 'click:filesSearch', 'input:another', 'Return', 'point:0:down:200:217', 'point:0:up:200:217'])
             assert read_snapshot(snapshot)[0][0x5001] == 0x99

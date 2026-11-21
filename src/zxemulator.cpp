@@ -16,6 +16,7 @@
 */
 
 #include "zxemulator.h"
+#include "machineregistry.h"
 #include <QPointer>
 #include <QWindow>
 #include <QQuickWindow>
@@ -496,6 +497,7 @@ ZxEmulator::ZxEmulator(QObject *parent)
     zxkit::EmulatorConfig cfg;
     cfg.machineId = "128k"s;
     cfg.audioSampleRate = 48'000;
+    cfg.machines = spectacolMachineRegistry();
     cfg.fullBorder = true;
     m_roms = std::make_unique<RomOverrides>();
     cfg.machineRomResolver = [this](std::string_view machine, std::string_view name,

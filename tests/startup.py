@@ -22,6 +22,7 @@ def main():
     cases = [
         ('fresh', '', [], 2, False),
         ('saved-48k', '[%General]\nmachine=48k\n', [], 1, False),
+        ('saved-48k-ntsc', '[%General]\nmachine=48k_ntsc\n', [], 1, False),
         ('saved-128k', '[%General]\nmachine=128k\n', [], 2, False),
         ('override-48k', '[%General]\nmachine=128k\n', ['--machine', '48k'], 1, False),
         ('invalid-saved', '[%General]\nmachine=missing\n', [], 2, False),
@@ -54,6 +55,8 @@ def main():
             assert not any(error in result.stderr for error in ('ReferenceError', 'TypeError', 'Binding loop'))
             data = snapshot.read_bytes()
             assert data[:4] == b'ZXST' and data[6] == machine, (name, data[:8])
+            if name == 'saved-48k-ntsc':
+                assert 'machine=48k\n' in (config / 'Spectacol.conf').read_text()
             text = subprocess.check_output(['tesseract', str(screenshot), 'stdout'], stderr=subprocess.DEVNULL,
                                            text=True, timeout=15).lower()
             if importing:

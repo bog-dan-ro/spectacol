@@ -16,6 +16,7 @@
 */
 
 #include "zxsettings.h"
+#include "machineregistry.h"
 #include "zxemulator.h"
 #include "nextsdcard.h"
 #include "zximage.h"
@@ -23,7 +24,6 @@
 #include <zxkit/core/Exception.h>
 #include <zxkit/input/Joystick.h>
 #include <zxkit/input/Mouse.h>
-#include <zxkit/machines/MachineProfile.h>
 #include <zxkit/peripherals/expansion/ExpansionPeripherals.h>
 #include <zxkit/peripherals/storage/Interface1.h>
 
@@ -31,6 +31,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
 #include <string_view>
 
 using namespace Qt::StringLiterals;
@@ -71,8 +72,7 @@ ZxSettings::ZxSettings(ZxEmulator &emulator) : QObject(&emulator), m_zxEmulator(
 {
     // Before anything looks for the Next's SD card image
     NextSdCard::instance().setDataFolder(m_zxEmulator.dataPath());
-    // The built-in machines, the ones the emulator's registry has
-    const zxkit::MachineRegistry machines;
+    const auto machines = spectacolMachineRegistry();
     m_machineIds = machines.availableIds();
     for (std::size_t i = 0; i < m_machineIds.size(); ++i) {
         auto prof = machines.create(m_machineIds[i]);
@@ -99,6 +99,9 @@ ZxSettings::ZxSettings(ZxEmulator &emulator) : QObject(&emulator), m_zxEmulator(
         if (m_savedMachineId == "cobra1_64k"sv || m_savedMachineId == "cobra1_80k"sv) {
             m_savedMachineId.erase(5, 1);
             s.setValue("machine", QString::fromStdString(m_savedMachineId));
+        } else if (m_savedMachineId == "48k_ntsc"sv) {
+            m_savedMachineId = "48k"s;
+            s.setValue(u"machine"_s, u"48k"_s);
         }
         s.endGroup();
 

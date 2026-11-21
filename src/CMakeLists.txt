@@ -189,6 +189,7 @@ qt_add_qml_module(spectacol
         folderlistmodel.cpp folderlistmodel.h
         graphicsbackend.cpp graphicsbackend.h
         graphicssettings.cpp graphicssettings.h
+        machineregistry.h
         nextsdcard.h nextsdcard.cpp
         nextuarthooks.cpp nextuarthooks.h
         pokefindermodel.cpp pokefindermodel.h
