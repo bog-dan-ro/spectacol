@@ -58,10 +58,10 @@
   </categories>
   <content_rating type="oars-1.1"/>
   <releases>
-    <release version="5.0.0.1" date="2026-11-15">
-      <url type="details">https://github.com/bog-dan-ro/spectacol/releases/tag/v5.0.0.1</url>
+    <release version="5.0.0.2" date="2026-11-22">
+      <url type="details">https://github.com/bog-dan-ro/spectacol/releases/tag/v5.0.0.2</url>
       <description>
-        <p>5.0.Beta.1 release</p>
+        <p>5.0.Beta.2 release</p>
         <ul>
           <li> Qt 6 user interface, redesigned from scratch, for touch, gamepad, TV remote and desktop</li>
           <li> ZxKit emulation core: cycle-accurate Z80/Z80N, real-time tapes, disks and the ZX Spectrum Next</li>
@@ -69,6 +69,12 @@
           <li> Twin-panel file manager that opens tapes, disks and SD cards like folders, with a BASIC viewer and editor</li>
           <li> Debugger with breakpoints, watchpoints, memory and MMU inspectors and assembler symbols</li>
           <li> Online search in ZXInfo and the Internet Archive</li>
+          <li> Added Sinclair Interface 1 Microdrive emulation and cartridge controls.</li>
+          <li> Added a ZX Printer preview with searchable PDF, image, and text export.</li>
+          <li> Added tape eject and a prompt to save changes before replacing a tape.</li>
+          <li> Improved File Manager gamepad navigation and added 640 KB HC BASIC disk creation.</li>
+          <li> Reduced CPU use for software screen filters and added a graphics API selector.</li>
+          <li> Added a 48K on-screen keyboard option for the ZX Spectrum Next.</li>
         </ul>
       </description>
     </release>
