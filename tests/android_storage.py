@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check device folders and the Spectacol 4 file import on a disposable English Android emulator.
+"""Check the Android media root, device folders and the Spectacol 4 file import.
 
 Copyright (c) 2015-2026, BogDan Vatra. GPL-3.0-or-later.
 Requires an installed debug APK. Temporarily replaces and then restores the app's settings, adds
@@ -46,10 +46,16 @@ def main():
         return shell("run-as", PACKAGE, *words, check=check)
 
     assert shell("getprop", "ro.kernel.qemu").stdout.strip() == b"1", "Use a disposable emulator"
-    base = private("pwd").stdout.decode().strip() + "/files"
-    settings = base + "/settings/Licentia/Spectacol.conf"
+    app_data = private("pwd").stdout.decode().strip() + "/files"
+    root = app_data + "/Spectacol"
+    settings = app_data + "/settings/Licentia/Spectacol.conf"
     staging = "/data/local/tmp/" + token + ".conf"
-    data = base + "/" + token
+    data = app_data + "/" + token
+    previous_snapshots = app_data + "/Snapshots/" + token + "-upgrade"
+    upgraded_snapshots = root + "/Snapshots/" + token + "-upgrade"
+    imported_snapshots = root + "/Snapshots/" + token
+    previous_image = app_data + "/Next/" + token + ".img"
+    upgraded_image = root + "/Next/" + token + ".img"
     old_name = token + "-old"
     games_name = token + "-games"
     old = "/sdcard/" + old_name
@@ -162,9 +168,11 @@ def main():
 
             # A reinstall has neither first_start nor an old dataPath setting. Welcome closes
             # first; the import offer must follow it and remain available in General options.
-            write_settings("[General]\nautoSaveOnExit=false\ndataPath=" + data + "\n")
+            write_settings("[General]\nautoSaveOnExit=false\n")
             start()
             wait_for(lambda n: n.get("resource-id", "").endswith(".aboutTabs"), "The first-start welcome")
+            assert f"dataPath={root}\n".encode() in read_private(settings)
+            private("test", "-d", root + "/Saves/Snapshots")
             shell("input", "keyevent", "4")
             tap("Choose the old folder", "The import offer after the first-start welcome")
             # No settings survived the reinstall: the picker uses the default Spectacol folder.
@@ -175,6 +183,29 @@ def main():
             wait_for(lambda n: label(n) == "Menu", "The main window")
             assert gone("Choose the old folder", 2), "Don't ask again was ignored"
             print("Fresh-install import offered after welcome; declining is kept", flush=True)
+
+            # The previous beta saved directly in the app data folder. Preserve both copies
+            # when the Spectacol folder already contains a snapshot with the same name.
+            shell("am", "force-stop", PACKAGE)
+            private("mkdir", "-p", previous_snapshots, upgraded_snapshots, app_data + "/Next")
+            adb("push", str(temp / "old.szx"), staging)
+            private("cp", staging, previous_snapshots + "/old.szx")
+            adb("push", str(fixture), staging)
+            private("cp", staging, upgraded_snapshots + "/old.szx")
+            private("cp", staging, previous_image)
+            write_settings("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=" + app_data
+                           + "/\n[Android]\nlegacyImport=never\n[Next]\nsdCardImage=" + previous_image + "\n")
+            start()
+            wait_for(lambda n: label(n) == "Menu", "The main window after upgrading")
+            assert f"dataPath={root}\n".encode() in read_private(settings)
+            assert read_private(upgraded_snapshots + "/old.szx") == expected
+            assert read_private(upgraded_snapshots + "/old_1.szx") == old_snapshot
+            assert f"sdCardImage={upgraded_image}\n".encode() in read_private(settings)
+            assert read_private(upgraded_image) == expected
+            private("test", "!", "-e", previous_snapshots)
+            private("test", "!", "-e", root + "/settings")
+            print("Previous beta snapshots moved into Spectacol; conflicting files kept", flush=True)
+            shell("am", "force-stop", PACKAGE)
 
             # Spectacol 4 kept its files in shared storage: the app offers to copy them once.
             shell("mkdir", "-p", old + "/Favourites", old + "/Snapshots/" + token)
@@ -189,9 +220,9 @@ def main():
             # The picker starts in the old folder: the user only confirms it
             picker_folder(old_name, from_root=False)
             wait_for(lambda n: label(n) == "Done", "The copy's summary")
-            assert read_private(base + "/Favourites/" + token + ".sna") == expected
-            assert read_private(base + "/Snapshots/" + token + "/old.szx") == old_snapshot
-            copied_time = private("stat", "-c", "%Y", base + "/Snapshots/" + token + "/old.szx")
+            assert read_private(root + "/Favourites/" + token + ".sna") == expected
+            assert read_private(imported_snapshots + "/old.szx") == old_snapshot
+            copied_time = private("stat", "-c", "%Y", imported_snapshots + "/old.szx")
             assert copied_time.stdout.strip() == old_time.stdout.strip(), "modification time"
             assert b"legacyImport=done" in read_private(settings)
             assert not any(old_name in uri for uri in persisted()), "the old folder's grant was kept"
@@ -314,8 +345,8 @@ def main():
                 private("cp", staging, settings)
         else:
             private("rm", "-f", settings, check=False)
-        private("rm", "-rf", data, base + "/Favourites/" + token + ".sna",
-                base + "/Snapshots/" + token, check=False)
+        private("rm", "-rf", data, root + "/Favourites/" + token + ".sna", imported_snapshots,
+                previous_snapshots, upgraded_snapshots, previous_image, upgraded_image, check=False)
         shell("rm", "-rf", old, games, staging, dump, check=False)
 
 

@@ -78,6 +78,37 @@ using namespace std::literals;
 
 namespace {
 
+#ifdef Q_OS_ANDROID
+void moveAndroidMedia(const QFileInfo &source, const QString &target, QString &selectedImage)
+{
+    const auto oldPath = source.absoluteFilePath();
+    const QFileInfo existing(target);
+    if (source.isDir() && !source.isSymLink() && existing.isDir() && !existing.isSymLink()) {
+        const QDir destination(target);
+        const auto entries = QDir(oldPath).entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot
+                                                         | QDir::Hidden | QDir::System);
+        for (const auto &entry : entries)
+            moveAndroidMedia(entry, destination.filePath(entry.fileName()), selectedImage);
+        QDir().rmdir(oldPath);
+        return;
+    }
+
+    auto destination = target;
+    const auto suffix = existing.suffix().isEmpty() ? QString{} : u'.' + existing.suffix();
+    for (int number = 1; QFileInfo::exists(destination) || QFileInfo(destination).isSymLink();
+         ++number) {
+        destination = existing.dir().filePath(existing.completeBaseName() + u'_'
+                                              + QString::number(number) + suffix);
+    }
+    if (!QDir().rename(oldPath, destination)) {
+        qWarning().noquote() << "Could not move" << oldPath << "to" << destination;
+        return;
+    }
+    if (selectedImage == oldPath || selectedImage.startsWith(oldPath + u'/'))
+        selectedImage.replace(0, oldPath.size(), destination);
+}
+#endif
+
 constexpr quint64 kPhysicalKeys = quint64(1) << 32;
 constexpr quint64 kVirtualKeys = quint64(2) << 32;
 constexpr quint64 kControllerKeys = quint64(3) << 32;
@@ -737,14 +768,33 @@ QString ZxEmulator::dataPath() const
 
     QSettings s;
 #if defined(Q_OS_ANDROID)
-    const auto appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    path = s.value("dataPath", appData).toString();
-    const auto relative = QDir(appData).relativeFilePath(path);
+    const QDir appData(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    const auto defaultPath = appData.filePath(u"Spectacol"_s);
+    path = s.value(u"dataPath"_s, defaultPath).toString();
+    const auto relative = appData.relativeFilePath(path);
     // Shared external paths saved by the Qt 5 app are no longer writable under
     // scoped storage. Keep its files in place; imports go through the picker.
     if (QDir::isAbsolutePath(relative) || relative == u".."_s || relative.startsWith(u"../"_s)) {
         s.setValue(u"Android/legacyDataPath"_s, path);
-        path = appData;
+        path = defaultPath;
+    } else if (path.isEmpty() || relative == u"."_s) {
+        path = defaultPath;
+    }
+
+    if (path == defaultPath && appData.mkpath(u"Spectacol"_s)) {
+        // The previous beta used AppDataLocation itself as the media folder.
+        const QDir media(path);
+        const auto imageKey = u"Next/sdCardImage"_s;
+        const auto previousImage = s.value(imageKey).toString();
+        auto selectedImage = previousImage;
+        for (const auto &name : { u"Downloaded"_s, u"Favourites"_s, u"Imported"_s, u"Next"_s,
+                                  u"Printouts"_s, u"Recordings"_s, u"Saves"_s, u"Snapshots"_s }) {
+            const QFileInfo source(appData, name);
+            if (source.isDir() && !source.isSymLink())
+                moveAndroidMedia(source, media.filePath(name), selectedImage);
+        }
+        if (selectedImage != previousImage)
+            s.setValue(imageKey, selectedImage);
     }
 #elif defined(Q_OS_IOS)
     path = s.value("dataPath",
