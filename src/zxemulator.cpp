@@ -39,6 +39,7 @@
 
 #include "audiooutput.h"
 #include "contenturi.h"
+#include "storagefiles.h"
 #include <QBuffer>
 #include <QDateTime>
 #include <QDebug>
@@ -1194,7 +1195,7 @@ struct DocumentImport
 DocumentImport copyDocument(const QUrl &url, const QDir &folder, bool checkMedia)
 {
 #ifdef Q_OS_ANDROID
-    const auto name = AndroidIntegration::displayName(url);
+    const auto name = ContentUri::mediaFileName(AndroidIntegration::displayName(url));
     QFile input;
     const bool opened = AndroidIntegration::openDocument(url, input);
 #else
@@ -1291,6 +1292,7 @@ struct ZxEmulator::MediaLoad
     zxkit::MediaFile file;
     QString name;
     QString error;
+    bool archived = false;
 };
 
 ZxEmulator::MediaLoad ZxEmulator::readMedia(const QString &path)
@@ -1303,7 +1305,7 @@ ZxEmulator::MediaLoad ZxEmulator::readMedia(const QString &path)
         bool opened = false;
 #ifdef Q_OS_ANDROID
         if (url.scheme() == u"content"_s) {
-            name = AndroidIntegration::displayName(url);
+            name = ContentUri::mediaFileName(AndroidIntegration::displayName(url));
             opened = AndroidIntegration::openDocument(url, input);
         } else
 #endif
@@ -1316,17 +1318,15 @@ ZxEmulator::MediaLoad ZxEmulator::readMedia(const QString &path)
         const auto bytes = input.readAll();
         if (input.error() != QFileDevice::NoError)
             return { {}, {}, tr("Can't read '%1': %2").arg(path, input.errorString()) };
+        const auto suffix = QFileInfo(name).suffix();
+        const bool archived = suffix.compare(u"zip"_s, Qt::CaseInsensitive) == 0
+                || bytes.startsWith("PK\x03\x04");
         auto file = zxkit::MediaFile::fromBytes(std::vector<uint8_t>(bytes.begin(), bytes.end()),
-                                                QFileInfo(name).suffix().toStdString());
-        return { std::move(file), name, {} };
+                                                suffix.toStdString());
+        return { std::move(file), name, {}, archived };
     } catch (const std::exception &e) {
         return { {}, {}, QString::fromUtf8(e.what()) };
     }
-}
-
-bool ZxEmulator::loadMediaFile(const QString &filePath)
-{
-    return applyMedia(filePath, readMedia(filePath)).first;
 }
 
 std::pair<bool, zxkit::MediaClass> ZxEmulator::applyMedia(const QString &filePath,
@@ -1538,16 +1538,10 @@ bool ZxEmulator::saveMicrodrive(int drive, const QString &filePath)
     return true;
 }
 
-bool ZxEmulator::saveMediaFile(const QString &filePath)
+bool ZxEmulator::saveMediaFile(const QString &filePath, const QString &format, QString *savedPath)
 {
     std::vector<uint8_t> bytes;
-#ifdef Q_OS_ANDROID
-    const auto name = AndroidIntegration::displayName(QUrl(filePath));
-#else
-    const auto url = QUrl(filePath);
-    const auto name = url.isLocalFile() ? url.toLocalFile() : filePath;
-#endif
-    const QString suffix = QFileInfo(name).suffix();
+    const QString suffix = format.isEmpty() ? QFileInfo(fileName(filePath)).suffix() : format;
     if (suffix.compare(u"png"_s, Qt::CaseInsensitive) == 0) {
         // Save the native cropped picture, before software filters or window scaling.
         QByteArray encoded;
@@ -1573,31 +1567,60 @@ bool ZxEmulator::saveMediaFile(const QString &filePath)
         };
         zxkit::SnapshotFormats::setJoystickInfo(bytes, extension, types[m_selectedJoystickIndex]);
     }
-    if (!writeFileBytes(filePath, bytes))
+    const auto destination = writeMediaBytes(filePath, bytes, !format.isEmpty());
+    if (destination.isEmpty())
         return false;
+    if (savedPath)
+        *savedPath = destination;
     const auto profile = m_controllerProfiles->gameProfile();
     if (!profile.isEmpty()
         && (extension == ".szx"sv || extension == ".z80"sv || extension == ".sna"sv
             || extension == ".nex"sv))
-        m_controllerProfiles->rememberGame(QFileInfo(name).completeBaseName(), profile);
+        m_controllerProfiles->rememberGame(
+                QFileInfo(ContentUri::mediaFileName(fileName(destination))).completeBaseName(),
+                profile);
     return true;
+}
+
+QString ZxEmulator::writeMediaBytes(const QString &filePath, std::span<const uint8_t> bytes,
+                                    bool newExport)
+{
+    if (!writeFileBytes(filePath, bytes))
+        return {};
+#ifdef Q_OS_ANDROID
+    if (newExport && ContentUri::isContent(filePath)) {
+        const auto name = fileName(filePath);
+        const auto corrected = ContentUri::mediaFileName(name);
+        if (name != corrected) {
+            const auto renamed = AndroidIntegration::renameDocument(filePath, corrected);
+            if (!renamed.isEmpty())
+                return renamed;
+        }
+    }
+#else
+    Q_UNUSED(newExport)
+#endif
+    return filePath;
 }
 
 bool ZxEmulator::writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes)
 {
+    if (ContentUri::isContent(filePath)) {
+        QString error;
+        if (StorageFiles::write(filePath, bytes, error))
+            return true;
+        showMessage(tr("Can't save '%1'.").arg(fileName(filePath)), Error);
+        return false;
+    }
     const QUrl url(filePath);
     const auto path = url.isLocalFile() ? url.toLocalFile() : filePath;
     const QDir folder = QFileInfo(path).absoluteDir();
-    const bool contentUri = filePath.startsWith(u"content://"_s);
-    if (!contentUri && !folder.mkpath(u"."_s)) {
+    if (!folder.mkpath(u"."_s)) {
         const QString message = tr("Can't create folder '%1'").arg(folder.absolutePath());
         showMessage(message, Error);
         return false;
     }
     QSaveFile file(path);
-    // A document provider cannot atomically rename a temporary file. Qt writes
-    // directly to the document explicitly selected by the user in that case.
-    file.setDirectWriteFallback(contentUri);
     if (!file.open(QIODevice::WriteOnly)
         || file.write(reinterpret_cast<const char *>(bytes.data()), qint64(bytes.size()))
                 != qint64(bytes.size())
@@ -1816,6 +1839,8 @@ void ZxEmulator::updateMediaActivity(const zxkit::MediaActivity &activity)
 
 void ZxEmulator::load(const QString &filePath, bool removeOnFail)
 {
+    if (m_tape->changePending())
+        return;
     const auto request = ++m_gameLoadRequest;
     if (ContentUri::isContent(filePath)) {
         QtConcurrent::run(&m_documentJobs, [filePath] {
@@ -1829,7 +1854,22 @@ void ZxEmulator::load(const QString &filePath, bool removeOnFail)
     finishLoad(filePath, removeOnFail, readMedia(filePath));
 }
 
-void ZxEmulator::finishLoad(const QString &filePath, bool removeOnFail, const MediaLoad &media)
+void ZxEmulator::finishLoad(const QString &filePath, bool removeOnFail, MediaLoad media)
+{
+    if (m_tape->changePending())
+        return;
+    if (media.error.isEmpty()
+        && zxkit::classifyMediaFile(media.file.extension, media.file.data)
+                == zxkit::MediaClass::Tape) {
+        m_tape->beforeReplacing([this, filePath, removeOnFail, media = std::move(media)] {
+            installMedia(filePath, removeOnFail, media);
+        });
+        return;
+    }
+    installMedia(filePath, removeOnFail, media);
+}
+
+void ZxEmulator::installMedia(const QString &filePath, bool removeOnFail, const MediaLoad &media)
 {
     const auto previousName = m_loadedFileName;
     m_loadedFileName = QFileInfo(media.name).completeBaseName();
@@ -1846,6 +1886,13 @@ void ZxEmulator::finishLoad(const QString &filePath, bool removeOnFail, const Me
     }
 
     m_recording->mediaLoaded();
+    if (mediaClass == zxkit::MediaClass::Tape) {
+        const auto &extension = media.file.extension;
+        const auto format = !media.archived && (extension == ".tap"sv || extension == ".tzx"sv)
+                ? QString::fromStdString(extension.substr(1))
+                : QString{};
+        m_tape->setSource(format.isEmpty() ? QString{} : filePath, format);
+    }
 
     if (m_settings && m_settings->autoLoad()) {
         if (mediaClass == zxkit::MediaClass::Tape)
@@ -1860,11 +1907,15 @@ void ZxEmulator::finishLoad(const QString &filePath, bool removeOnFail, const Me
     emit saveSnapshotEnabledChanged();
 }
 
-bool ZxEmulator::save(const QString &filePath)
+bool ZxEmulator::save(const QString &filePath, const QString &format)
 {
-    if (!saveMediaFile(filePath))
+    QString destination;
+    if (!saveMediaFile(filePath, format, &destination))
         return false;
-    showMessage(tr("File saved to '%1'").arg(filePath), Info);
+    showMessage(
+            tr("File saved to '%1'")
+                    .arg(ContentUri::isContent(destination) ? fileName(destination) : destination),
+            Info);
     return true;
 }
 
@@ -1881,25 +1932,6 @@ bool ZxEmulator::copyToFavourites(const QString &filePath)
     return !m_loadedFileName.isEmpty();
 }
 
-void ZxEmulator::remove(const QString &path)
-{
-    // Device folders hold the user's own files; Android's Files app manages them
-    if (ContentUri::isContent(path)) {
-        showMessage(tr("Spectacol doesn't delete files in device folders."), Warning);
-        return;
-    }
-    QFileInfo inf(path);
-    if (inf.isDir()) {
-        QDir dir(path);
-        for (const QFileInfo &item :
-             dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
-            remove(item.absoluteFilePath());
-        dir.rmdir(path);
-    } else {
-        QFile::remove(path);
-    }
-}
-
 bool ZxEmulator::isFolder(const QString &path)
 {
     return QFileInfo{ path }.isDir();
@@ -1907,7 +1939,12 @@ bool ZxEmulator::isFolder(const QString &path)
 
 QString ZxEmulator::fileName(const QString &path)
 {
-    return QFileInfo{ path }.fileName();
+    const QUrl url(path);
+#ifdef Q_OS_ANDROID
+    if (ContentUri::isContent(path))
+        return AndroidIntegration::displayName(url);
+#endif
+    return QFileInfo(url.isLocalFile() ? url.toLocalFile() : path).fileName();
 }
 
 QString ZxEmulator::folderName(const QString &path)

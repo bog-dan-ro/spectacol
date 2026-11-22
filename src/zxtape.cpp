@@ -18,10 +18,18 @@
 #include "zxtape.h"
 
 #include "zxemulator.h"
+#include "contenturi.h"
+
+#include <QFileInfo>
+
+#include <utility>
 
 using namespace Qt::StringLiterals;
 
-ZxTape::ZxTape(ZxEmulator *emulator) : QObject(emulator), m_zxEmulator(emulator) { }
+ZxTape::ZxTape(ZxEmulator *emulator) : QObject(emulator), m_zxEmulator(emulator)
+{
+    connect(emulator, &ZxEmulator::pausedChanged, this, &ZxTape::checkPendingChange);
+}
 
 QString ZxTape::suggestedFileName() const
 {
@@ -34,6 +42,7 @@ void ZxTape::setHasTape(bool hasTape)
         return;
     m_hasTape = hasTape;
     emit hasTapeChanged(hasTape);
+    emit insertedChanged();
 }
 
 void ZxTape::updateBrowseData()
@@ -89,10 +98,67 @@ void ZxTape::refreshData()
     setHasTape(hasTape);
 }
 
-void ZxTape::open(QString filePath)
+bool ZxTape::canSave() const
 {
-    m_zxEmulator->load(filePath);
-    refreshData();
+    if (m_sourcePath.isEmpty())
+        return false;
+    if (ContentUri::isContent(m_sourcePath))
+        return true;
+    const QFileInfo source(m_sourcePath);
+    return source.isFile() && source.isWritable();
+}
+
+bool ZxTape::inserted() const
+{
+    return m_blank || m_hasTape || !m_sourcePath.isEmpty();
+}
+
+void ZxTape::setSource(const QString &path, const QString &format)
+{
+    m_blank = false;
+    m_savedBlocks = m_zxEmulator->emulator().readLock()->tapeDeck().blocks().size();
+    m_sourcePath = path;
+    m_sourceFormat = format;
+    emit sourceChanged();
+    emit insertedChanged();
+}
+
+bool ZxTape::changePending() const
+{
+    return bool(m_pendingChange);
+}
+
+void ZxTape::beforeReplacing(std::function<void()> action)
+{
+    if (changePending())
+        return;
+    m_pendingChange = std::move(action);
+    m_waitingForPause = true;
+    m_zxEmulator->setPaused(true);
+}
+
+void ZxTape::checkPendingChange()
+{
+    // The Engine finishes its current frame before acknowledging the pause.
+    if (!m_waitingForPause || !m_zxEmulator->emulationQuiescent())
+        return;
+    m_waitingForPause = false;
+    if (m_zxEmulator->emulator().readLock()->tapeDeck().blocks().size() != m_savedBlocks) {
+        emit unsavedChanges();
+        return;
+    }
+    resolveChange(true);
+}
+
+void ZxTape::resolveChange(bool proceed)
+{
+    auto action = std::exchange(m_pendingChange, {});
+    if (!action)
+        return;
+    m_waitingForPause = false;
+    if (proceed)
+        action();
+    m_zxEmulator->setPaused(false);
 }
 
 void ZxTape::togglePlay()
@@ -110,22 +176,61 @@ void ZxTape::rewind()
 
 void ZxTape::clear()
 {
-    m_zxEmulator->withEmulator([](zxkit::Emulator &emulator) { emulator.tapeDeck().clear(); });
-    setHasTape(false);
-    setProgramName({});
-    setPlaying(false);
+    beforeReplacing([this] { resetDeck(false); });
 }
 
-bool ZxTape::write(QString filePath)
+void ZxTape::newBlank()
 {
+    beforeReplacing([this] { resetDeck(true); });
+}
+
+void ZxTape::resetDeck(bool blank)
+{
+    ++m_zxEmulator->m_gameLoadRequest;
+    m_zxEmulator->withEmulator([](zxkit::Emulator &emulator) { emulator.tapeDeck().clear(); });
+    setSource({}, {});
+    m_blank = blank;
     refreshData();
-    if (!m_hasTape) {
+    setPlaying(false);
+    emit insertedChanged();
+}
+
+bool ZxTape::save()
+{
+    return canSave() && write(m_sourcePath, m_sourceFormat, false);
+}
+
+bool ZxTape::saveAs(const QString &filePath, const QString &format)
+{
+    return write(filePath, format, true);
+}
+
+bool ZxTape::write(const QString &filePath, const QString &format, bool newExport)
+{
+    std::size_t blocks = 0;
+    std::vector<uint8_t> bytes;
+    if (!m_zxEmulator->withEmulator([&](zxkit::Emulator &emulator) {
+            const auto &deck = emulator.tapeDeck();
+            blocks = deck.blocks().size();
+            if (blocks)
+                bytes = emulator.saveMedia(format.toStdString());
+        }))
+        return false;
+    if (!blocks) {
         m_zxEmulator->showMessage(tr("The tape is empty. Enter SAVE in BASIC before exporting it."),
                                   ZxEmulator::Warning);
         return false;
     }
-    if (!m_zxEmulator->saveMediaFile(filePath))
+    const auto destination = m_zxEmulator->writeMediaBytes(filePath, bytes, newExport);
+    if (destination.isEmpty())
         return false;
-    m_zxEmulator->showMessage(tr("Saved %1").arg(filePath));
+    m_savedBlocks = blocks;
+    m_sourcePath = destination;
+    m_sourceFormat = format;
+    emit sourceChanged();
+    m_zxEmulator->showMessage(tr("Saved %1")
+                                      .arg(ContentUri::isContent(destination)
+                                                   ? m_zxEmulator->fileName(destination)
+                                                   : destination));
     return true;
 }

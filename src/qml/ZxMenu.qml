@@ -93,6 +93,17 @@ ZxMenuItem {
 
             ZxMenuItem {
                 text: qsTr("Save")
+                visible: ZxEmulator.tape.hasTape
+                onTriggered: {
+                    menuBar.close();
+                    if (!ZxEmulator.tape.canSave || !ZxEmulator.tape.save())
+                        pageLoader.source = "SaveTapePage.qml";
+                }
+            }
+
+            ZxMenuItem {
+                text: qsTr("Save as…")
+                visible: ZxEmulator.tape.hasTape
                 onTriggered: {
                     menuBar.close();
                     pageLoader.source = "SaveTapePage.qml";
@@ -121,6 +132,15 @@ ZxMenuItem {
                 onTriggered: {
                     menuBar.close();
                     pageLoader.source = "BrowseTapePage.qml";
+                }
+            }
+
+            ZxMenuItem {
+                text: qsTr("Eject")
+                visible: ZxEmulator.tape.inserted
+                onTriggered: {
+                    menuBar.close();
+                    ZxEmulator.tape.clear();
                 }
             }
         }

@@ -134,6 +134,9 @@ public slots:
     // A device folder's entry in the home folder (not a folder inside one)
     bool isDeviceFolder(int index);
     QString path(int index);
+    QString entryName(int index) const;
+    QString renameEntry(const QString &path, const QString &newName);
+    QString removeEntry(const QString &path);
     void cdUp();
     void rememberSelection(int index);
     void refresh();

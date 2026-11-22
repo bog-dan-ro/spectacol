@@ -27,6 +27,8 @@
 namespace ContentUri {
 
 bool isContent(const QString &path);
+// Some providers append their duplicate counter after an unrecognised extension.
+QString mediaFileName(const QString &name);
 
 // The same folder or file always has the same string: "tree/T" becomes "tree/T/document/T"
 // and the ids are encoded like Android's Uri.encode(). Other paths are returned unchanged.

@@ -58,19 +58,20 @@ def main():
     export = media + ["Down", "Down", "Right", "Down", "Down", "Down", "Return", "wait", "wait"]
     snapshot_as = media + ["Down", "Return", "wait", "wait"]
     new_tape = media + ["Down", "Down", "Right", "Down", "Return", "wait", "wait", "Return", "wait", "wait"]
-    start_record = media + ["Down", "Down", "Down", "Right", "Down", "Return"]
+    start_record = media + ["Down", "Down", "Down", "Down", "Right", "Down", "Return"]
     stop_record = ["click:50:24", "Down", "Down", "Down", "Return"]
     with tempfile.TemporaryDirectory(prefix="session-", dir=output) as temporary:
         session = Path(temporary)
         config = session / "config/Licentia"
         config.mkdir(parents=True)
         data = session / "data"
-        (config / "Spectacol.conf").write_text(
-            "[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath=" + str(data) + "\n[Peripherals]\njoystickPrompt=false\n")
+        fresh_settings = ("[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath="
+                          + str(data) + "\n[Peripherals]\njoystickPrompt=false\n")
+        (config / "Spectacol.conf").write_text(fresh_settings)
         env = os.environ | {"QT_QPA_PLATFORM": "offscreen",
                             "XDG_CONFIG_HOME": str(config.parent), "XDG_DATA_HOME": str(data)}
 
-        def run(name, keys=(), source=None, snapshot=False, repair=None):
+        def run(name, keys=(), source=None, snapshot=False, repair=None, fresh=False):
             seconds = max(3, 2 + len(keys) * 0.3)
             command = [str(args.binary.resolve()), "--machine", "48k", "--quit-after", str(seconds),
                        "--window-size", "1280x800", "--ui-screenshot", str(output / f"{name}-ui.png")]
@@ -90,11 +91,17 @@ def main():
                     repair_errors.append(str(error))
 
             worker = threading.Thread(target=repair_after_failure) if repair else None
+            run_env = env
+            if fresh:
+                local_config = session / name / "Licentia"
+                local_config.mkdir(parents=True)
+                (local_config / "Spectacol.conf").write_text(fresh_settings)
+                run_env = env | {"XDG_CONFIG_HOME": str(local_config.parent)}
             try:
                 with (output / f"{name}.log").open("w") as log:
                     if worker:
                         worker.start()
-                    subprocess.run(command, env=env, stdout=log, stderr=subprocess.STDOUT,
+                    subprocess.run(command, env=run_env, stdout=log, stderr=subprocess.STDOUT,
                                    check=True, timeout=seconds + 15)
             finally:
                 stopped.set()
@@ -145,6 +152,43 @@ def main():
         run("tape-reloaded", source=tape, snapshot=True)
         assert basic_bytes(output / "tape-reloaded.sna") == expected
         print("BASIC SAVE → portable TAP → reload: original program bytes match")
+
+        # Open a replacement through the ordinary tape browser after recording in BASIC.
+        replacement = data / "replacement.tap"
+        replacement.write_bytes(input_tape.read_bytes())
+
+        def open_tape(query):
+            return ["page:TapesFileBrowserPage.qml", "wait", "F3", "input:" + query,
+                    "Down", "Return", "wait", "wait"]
+
+        replace = open_tape("replacement")
+        save_as = ["page:SaveTapePage.qml", "wait", "Ctrl+A", "input:kept", "Return", "wait"]
+        run("tape-cancel-replace", save + replace + ["Escape", "wait"] + save_as, initial)
+        kept = data / "Saves/kept.tap"
+        assert tape_blocks(kept) == [header, block]
+        kept.unlink()
+
+        source = output / "save-in-place.tap"
+        source.write_bytes(input_tape.read_bytes())
+        run("tape-save-in-place", ["wait"] * 10 + save + replace + ["Left", "Return", "wait", "wait"],
+            source, fresh=True)
+        original_blocks = tape_blocks(input_tape)
+        recorded_blocks = tape_blocks(source)
+        assert recorded_blocks[:len(original_blocks) + 1] == original_blocks + [header], recorded_blocks
+        assert replacement.read_bytes() == input_tape.read_bytes()
+
+        run("tape-save-before-replace", save + ["wait"] * 4 + replace
+            + ["Left", "Return", "wait", "wait", "wait", "Ctrl+A", "input:kept", "Return"],
+            initial, fresh=True)
+        assert tape_blocks(kept) == [header, block]
+        kept.unlink()
+
+        eject = media + ["Down", "Down", "Right"] + ["Down"] * 8 + ["Return", "wait", "wait"]
+        run("tape-eject-discard", save + ["wait"] * 4 + eject + ["Right", "Return", "wait"] + save_as,
+            initial, fresh=True)
+        assert not kept.exists(), "Eject left the unsaved tape in the deck"
+        assert "The tape is empty" in (output / "tape-eject-discard.log").read_text()
+        print("Unsaved tape changes: Cancel, Save, Save As and Eject with Discard")
 
         # A new tape clears blocks while retaining the running BASIC program.
         run("empty-tape", new_tape + export + ["Return"], tape, snapshot=True)

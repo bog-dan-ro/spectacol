@@ -31,6 +31,9 @@ Dialog {
     property string text
     property string acceptText: qsTr("Yes")
     property string rejectText: qsTr("No")
+    property string alternateText
+    property var commit: null
+    signal alternateRequested
     // Answering yes loses something: the focus starts on no
     property bool destructive: false
     // Over the game no page turns the gamepad into keys: the dialog does it
@@ -100,25 +103,42 @@ Dialog {
 
             component Answer: DialogButton {
                 id: answer
-                property Item other
-                Keys.onLeftPressed: other.forceActiveFocus(Qt.TabFocusReason)
-                Keys.onRightPressed: other.forceActiveFocus(Qt.TabFocusReason)
-                Keys.onUpPressed: other.forceActiveFocus(Qt.TabFocusReason)
-                Keys.onDownPressed: other.forceActiveFocus(Qt.TabFocusReason)
+                required property Item previous
+                required property Item next
+                Layout.fillWidth: dialog.alternateText !== ""
+                Layout.minimumWidth: Theme.sp(16)
+                Keys.onLeftPressed: previous.forceActiveFocus(Qt.BacktabFocusReason)
+                Keys.onRightPressed: next.forceActiveFocus(Qt.TabFocusReason)
+                Keys.onUpPressed: previous.forceActiveFocus(Qt.BacktabFocusReason)
+                Keys.onDownPressed: next.forceActiveFocus(Qt.TabFocusReason)
             }
             Answer {
                 id: rejectButton
                 objectName: "confirmNo"
                 text: dialog.rejectText
-                other: acceptButton
+                previous: acceptButton
+                next: alternateButton.visible ? alternateButton : acceptButton
                 onClicked: dialog.reject()
+            }
+            Answer {
+                id: alternateButton
+                objectName: "confirmAlternate"
+                text: dialog.alternateText
+                visible: text !== ""
+                previous: rejectButton
+                next: acceptButton
+                onClicked: {
+                    dialog.close();
+                    dialog.alternateRequested();
+                }
             }
             Answer {
                 id: acceptButton
                 objectName: "confirmYes"
                 text: dialog.acceptText
-                other: rejectButton
-                onClicked: dialog.accept()
+                previous: alternateButton.visible ? alternateButton : rejectButton
+                next: rejectButton
+                onClicked: if (!dialog.commit || dialog.commit()) dialog.accept()
             }
         }
     }

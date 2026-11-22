@@ -52,9 +52,12 @@ QJniObject contentResolver()
 
 QJniObject parseUri(const QString &uri)
 {
+    // Android grants access to the encoded URI. QML's URL strings can have
+    // literal spaces, including the suffix added to duplicate export names.
+    const auto encoded = QUrl(uri).toString(QUrl::FullyEncoded);
     return QJniObject::callStaticObjectMethod("android/net/Uri", "parse",
                                               "(Ljava/lang/String;)Landroid/net/Uri;",
-                                              QJniObject::fromString(uri).object<jstring>());
+                                              QJniObject::fromString(encoded).object<jstring>());
 }
 
 QJniObject folderIntent()
@@ -296,11 +299,9 @@ QString renameDocument(const QString &uri, const QString &name)
             contentResolver().object(), parseUri(ContentUri::canonical(uri)).object(),
             QJniObject::fromString(name).object<jstring>());
     QJniEnvironment env;
-    if (env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose))
+    if (env.checkAndClearExceptions(QJniEnvironment::OutputMode::Verbose) || !document.isValid())
         return {};
-    // Providers whose ids don't change return no new URI
-    return document.isValid() ? ContentUri::canonical(document.toString())
-                              : ContentUri::canonical(uri);
+    return ContentUri::canonical(document.toString());
 }
 
 bool deleteDocument(const QString &uri)

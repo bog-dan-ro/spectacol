@@ -165,10 +165,10 @@ FocusScope {
             formats: ["mdr"]
             fileName: qsTr("Cartridge-%1.mdr").arg(page.drive + 1)
             folder: ZxEmulator.savesPath()
-            destinationPath: selectedPath || (folder + "/"
-                + fileName.trim().replace(/[\\/]/g, "_").replace(/\.mdr$/i, "") + ".mdr")
-            onAccepted: {
-                if (ZxEmulator.saveMicrodrive(page.drive, destinationPath))
+            destinationPath: folder + "/"
+                + fileName.trim().replace(/[\\/]/g, "_").replace(/\.mdr$/i, "") + ".mdr"
+            onAccepted: path => {
+                if (ZxEmulator.saveMicrodrive(page.drive, path))
                     view.sourceComponent = actions;
             }
             onCanceled: view.sourceComponent = actions

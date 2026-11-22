@@ -296,6 +296,10 @@ private slots:
     }
     void contentUris()
     {
+        QCOMPARE(ContentUri::mediaFileName(u"auld.szx (1)"_s), u"auld (1).szx"_s);
+        QCOMPARE(ContentUri::mediaFileName(u"demo.TAP (2)"_s), u"demo (2).TAP"_s);
+        QCOMPARE(ContentUri::mediaFileName(u"demo (2).tzx"_s), u"demo (2).tzx"_s);
+        QCOMPARE(ContentUri::mediaFileName(u"notes.txt (1)"_s), u"notes.txt (1)"_s);
         const auto tree = u"content://com.android.externalstorage.documents/tree/primary%3AGames"_s;
         const auto root = tree + u"/document/primary%3AGames"_s;
         const auto sub = tree + u"/document/primary%3AGames%2FSub"_s;

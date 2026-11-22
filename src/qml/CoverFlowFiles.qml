@@ -63,7 +63,17 @@ Item
         if (forgetDialog.visible) { forgetDialog.reject(); return true; }
         if (copyDialog.visible) { copyDialog.reject(); return true; }
         if (removeDialog.visible) { removeDialog.reject(); return true; }
+        if (renameDialog.visible) { renameDialog.reject(); return true; }
         return false;
+    }
+    function renameCurrent() {
+        const row = filesModel.currentIndex;
+        const path = filesModel.path(row);
+        if (!path || filesModel.isDeviceFolder(row))
+            return;
+        renameDialog.filePath = path;
+        renameField.text = filesModel.entryName(row);
+        renameDialog.open();
     }
     Component.onCompleted: {
         ZxEmulator.processInputEvents = false;
@@ -74,6 +84,7 @@ Item
     Keys.onPressed: event => {
         if (event.key === Qt.Key_F2) viewMode = (viewMode + 1) % 3;
         else if (event.key === Qt.Key_F3) search.forceActiveFocus();
+        else if (event.key === Qt.Key_F6) renameCurrent();
         else if (event.key === Qt.Key_Backspace) filesModel.cdUp();
         else if (event.key === Qt.Key_Home) folder = ZxEmulator.dataPath;
         else if (event.key === Qt.Key_Escape) {
@@ -105,7 +116,7 @@ Item
         buttonStartKey: Qt.Key_F2
         leftShoulderKey: Qt.Key_C
         rightShoulderKey: Qt.Key_P
-        leftTriggerKey: Qt.Key_Home
+        leftTriggerKey: Qt.Key_F6
         rightTriggerKey: fileList.deviceFolders ? Qt.Key_F4 : Qt.Key_unknown
     }
 
@@ -180,31 +191,58 @@ Item
 
     ConfirmDialog {
         id: removeDialog
-        text: qsTr("Remove \"%1\"?").arg(ZxEmulator.fileName(filePath))
-        acceptText: qsTr("Remove")
+        text: isDirectory ? qsTr("Delete \"%1\" and everything in it?").arg(fileName)
+                          : qsTr("Delete \"%1\"?").arg(fileName)
+        acceptText: qsTr("Delete")
         rejectText: qsTr("Cancel")
         destructive: true
         onClosed: fileList.focusFiles()
         property string filePath
+        property string fileName
+        property bool isDirectory
         onAccepted: {
-            ZxEmulator.remove(filePath)
-            filesModel.refresh();
-            filesView.currentIndex = 0;
+            const error = filesModel.removeEntry(filePath);
+            if (error)
+                messagePage.showMessage(ZxEmulator.Error, error);
         }
         function remove() {
             const row = filesModel.currentIndex;
+            const path = filesModel.path(row);
+            if (!path)
+                return;
             if (filesModel.isDeviceFolder(row)) {
-                forgetDialog.filePath = filesModel.path(row);
-                forgetDialog.fileName = ZxEmulator.fileName(forgetDialog.filePath) || filesModel.data(filesModel.index(row, 0));
+                forgetDialog.filePath = path;
+                forgetDialog.fileName = filesModel.entryName(row);
                 forgetDialog.open();
                 return;
             }
-            if (filesModel.inDeviceFolder) {
-                messagePage.showMessage(ZxEmulator.Info, qsTr("Spectacol doesn't delete files in device folders."));
-                return;
-            }
-            removeDialog.filePath = filesModel.path(row);
+            removeDialog.filePath = path;
+            removeDialog.fileName = filesModel.entryName(row);
+            removeDialog.isDirectory = filesModel.isDir(row);
             removeDialog.open();
+        }
+    }
+
+    FormDialog {
+        id: renameDialog
+        objectName: "browserRename"
+        property string filePath
+        title: qsTr("Rename")
+        acceptText: qsTr("Rename")
+        initialFocus: renameField
+        acceptable: renameField.text.trim().length > 0
+        onOpened: renameField.selectAll()
+        onClosed: fileList.focusFiles()
+        commit: () => {
+            errorMessage = filesModel.renameEntry(filePath, renameField.text);
+            return errorMessage === "";
+        }
+        FancyTextField {
+            id: renameField
+            objectName: "browserRenameName"
+            Layout.fillWidth: true
+            Accessible.name: qsTr("New name")
+            onAccepted: renameDialog.save()
         }
     }
 
@@ -325,13 +363,19 @@ Item
                 }
                 MouseArea {
                     anchors.fill: parent
-                    // The actions menu, for this file or folder (a tap would open a folder)
-                    onPressAndHold: {
+                    property bool contextOnRelease: false
+                    onPressed: contextOnRelease = false
+                    onPressAndHold: contextOnRelease = true
+                    onReleased: {
+                        if (!contextOnRelease)
+                            return;
                         filesView.forceActiveFocus();
                         filesView.currentIndex = index;
-                        fileActions.openMenu();
+                        Qt.callLater(fileActions.openMenu);
                     }
                     onClicked: {
+                        if (contextOnRelease)
+                            return;
                         // A click also gives the keys back to the covers, as in the list
                         filesView.forceActiveFocus();
                         if (isCurrentItem) {
@@ -354,13 +398,15 @@ Item
         hints: [
             { pad: "A", key: "Enter", text: qsTr("Open"), action: () => fileList.openRow(filesModel.currentIndex) },
             { pad: "B", key: "Esc", text: qsTr("Close"), action: () => fileList.fileSelected("") },
-            { pad: "X", key: "Del", text: qsTr("Remove"), action: () => removeDialog.remove() },
+            { pad: "X", key: "Del", text: filesModel.isDeviceFolder(filesModel.currentIndex) ? qsTr("Stop showing") : qsTr("Delete"), action: () => removeDialog.remove() },
             { pad: "L1", key: "C", text: qsTr("Copy"), action: () => fileList.copyCurrent() },
             { pad: "R1", key: "P", text: filesView.canCopy ? qsTr("Paste") : qsTr("Paste (copy first)"), action: () => copyDialog.copy() },
             { pad: "Y", key: "F3", text: qsTr("Search"), action: () => search.forceActiveFocus() },
             { pad: "Start", key: "F2", text: qsTr("View"), action: () => fileList.viewMode = (fileList.viewMode + 1) % 3 },
-            { pad: "L2", key: "Home", text: qsTr("Spectacol folder"), action: () => fileList.folder = ZxEmulator.dataPath }
-        ].concat(fileList.deviceFolders ? [
+            { pad: "", key: "Home", text: qsTr("Spectacol folder"), action: () => fileList.folder = ZxEmulator.dataPath }
+        ].concat(filesModel.currentIndex >= 0 && !filesModel.isDeviceFolder(filesModel.currentIndex) ? [
+            { pad: "L2", key: "F6", text: qsTr("Rename"), action: fileList.renameCurrent }
+        ] : []).concat(fileList.deviceFolders ? [
             { pad: "R2", key: "F4", text: qsTr("Add device folder…"), action: () => fileList.deviceStorage.addFolder() }
         ] : [])
     }

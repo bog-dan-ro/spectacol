@@ -16,6 +16,8 @@
 */
 
 #include "folderlistmodel.h"
+
+#include "contenturi.h"
 #include "screencache.h"
 
 #include <zxkit/media/MediaPreview.h>
@@ -234,6 +236,43 @@ QString FolderListModel::path(int index)
     return m_files[index].path;
 }
 
+QString FolderListModel::entryName(int index) const
+{
+    return size_t(index) < m_files.size() ? m_files[index].name : QString{};
+}
+
+QString FolderListModel::renameEntry(const QString &path, const QString &newName)
+{
+    const auto entry = std::ranges::find(m_allFiles, path, &Entry::path);
+    if (entry == m_allFiles.end() || entry->device)
+        return tr("Select a file or folder to rename.");
+    const auto name = newName.trimmed();
+    if (name.isEmpty() || name == u"."_s || name == u".."_s || name.contains(u'/')
+        || name.contains(u'\\') || name.contains(QChar::Null))
+        return tr("Enter a valid name.");
+    if (name == entry->name)
+        return {};
+
+    QString error;
+    const auto renamed = StorageFiles::rename(path, name, error);
+    if (!renamed.isEmpty()) {
+        QSettings().setValue(selectionKey(), renamed);
+        refresh();
+    }
+    return error;
+}
+
+QString FolderListModel::removeEntry(const QString &path)
+{
+    const auto entry = std::ranges::find(m_allFiles, path, &Entry::path);
+    if (entry == m_allFiles.end() || entry->device)
+        return tr("Select a file or folder to delete.");
+    QString error;
+    if (StorageFiles::remove(path, error))
+        refresh();
+    return error;
+}
+
 void FolderListModel::cdUp()
 {
     if (m_location.goUp())
@@ -266,7 +305,7 @@ QVariant FolderListModel::data(const QModelIndex &index, int role) const
     case TypeIcon:
         if (entry.dir)
             return entry.device ? u"qrc:/images/folder-device.svg"_s : u"qrc:/images/folder.svg"_s;
-        switch (zxkit::classifyMediaFile(entry.name.toStdString(), {})) {
+        switch (zxkit::classifyMediaFile(ContentUri::mediaFileName(entry.name).toStdString(), {})) {
         case zxkit::MediaClass::Disk:
             return u"qrc:/images/floppy.svg"_s;
         case zxkit::MediaClass::Tape:
@@ -280,7 +319,7 @@ QVariant FolderListModel::data(const QModelIndex &index, int role) const
             return data(index, TypeIcon);
         // What the listing knows, so the provider asks the storage nothing it doesn't cache
         return u"image://spectrum/"_s
-                + ScreenCover{ entry.path, entry.name, entry.size,
+                + ScreenCover{ entry.path, ContentUri::mediaFileName(entry.name), entry.size,
                                entry.modified.isValid() ? entry.modified.toMSecsSinceEpoch() : 0 }
                           .id();
     }
@@ -352,7 +391,7 @@ void FolderListModel::refresh()
                 return;
             m_allFiles.clear();
             for (const auto &file : files) {
-                if (file.dir || accepts(file.name, {}))
+                if (file.dir || accepts(ContentUri::mediaFileName(file.name), {}))
                     m_allFiles.push_back({ file.name, file.path, file.modified, file.dir, false,
                                            file.dir ? 0 : file.size });
             }

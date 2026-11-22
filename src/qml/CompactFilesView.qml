@@ -57,6 +57,7 @@ GridView {
         required property string typeIcon
         required property bool isDir
         required property bool isDevice
+        property bool contextOnRelease: false
         readonly property string folderIcon: isDevice ? "folder-device" : "folder"
         width: view.cellWidth - Theme.sp(1)
         height: view.cellHeight - Theme.sp(1)
@@ -104,15 +105,21 @@ GridView {
             }
         }
         onClicked: {
+            if (contextOnRelease)
+                return;
             view.currentIndex = index;
             view.forceActiveFocus();
             view.openRequested(index);
         }
-        // The actions menu, for this file or folder
-        onPressAndHold: {
+        onPressed: contextOnRelease = false
+        onPressAndHold: contextOnRelease = true
+        // Opening on release keeps the same touch from activating a menu item.
+        onReleased: {
+            if (!contextOnRelease)
+                return;
             view.currentIndex = index;
             view.forceActiveFocus();
-            view.contextRequested(index);
+            Qt.callLater(view.contextRequested, index);
         }
         Accessible.name: name
     }

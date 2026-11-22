@@ -26,26 +26,38 @@ import Spectacol
 Sheet {
     id: page
     crumb: qsTr("Media / Tape")
-    title: qsTr("Export tape")
+    title: qsTr("Save tape as")
+    onCloseRequested: mainScreen.closePage()
     hints: [
-        { pad: "A", key: "Enter", text: qsTr("Export"), action: () => page.writeTape() },
+        { pad: "A", key: "Enter", text: qsTr("Save"), action: () => page.writeTape(page.destination) },
         { pad: "B", key: "Esc", text: qsTr("Back"), action: () => mainScreen.closePage() }
     ]
-    Component.onCompleted: ZxEmulator.tape.refreshData()
+    Component.onCompleted: {
+        ZxEmulator.tape.refreshData();
+        Qt.callLater(() => fileName.forceActiveFocus(Qt.TabFocusReason));
+    }
     readonly property bool tapSupported: ZxEmulator.tape.canSaveTap()
     readonly property string suffix: formatChoice.currentText
-    function exportName() { return fileName.text.replace(/\.(tap|tzx)$/i, "") + "." + suffix; }
+    function exportName(name: string): string {
+        return name.trim().replace(/\.(tap|tzx)$/i, "") + "." + suffix;
+    }
+    readonly property string destination: ZxEmulator.tapeFilePath(exportName(fileName.text))
 
-    function writeTape(path) {
-        if (ZxEmulator.tape.write(path || ZxEmulator.tapeFilePath(page.exportName())))
-            pageLoader.source = "";
+    function writeTape(path: string) {
+        if (!ZxEmulator.tape.saveAs(path, suffix))
+            return;
+        if (mainScreen.saveTapeBeforeChange) {
+            mainScreen.saveTapeBeforeChange = false;
+            ZxEmulator.tape.resolveChange(true);
+        }
+        pageLoader.source = "";
     }
     FileDialog {
         id: deviceFile
         title: qsTr("Export tape to device storage")
         fileMode: FileDialog.SaveFile
         defaultSuffix: page.suffix
-        currentFile: "file://" + ZxEmulator.tapeFilePath(page.exportName())
+        currentFile: "file://" + page.destination
         onAccepted: page.writeTape(selectedFile.toString())
     }
 
@@ -72,14 +84,14 @@ Sheet {
             Layout.fillWidth: true
             focus: true
             selectByMouse: true
-            placeholderText: qsTr("Tape name.tap")
-            text: ZxEmulator.tape.suggestedFileName
+            placeholderText: qsTr("Tape name")
+            text: page.exportName(ZxEmulator.tape.suggestedFileName)
             font.pixelSize: Theme.body
-            onAccepted: page.writeTape()
+            onAccepted: page.writeTape(page.destination)
         }
         Text {
             Layout.fillWidth: true
-            text: ZxEmulator.tapeFilePath(page.exportName())
+            text: page.destination
             wrapMode: Text.WrapAnywhere
             font.pixelSize: Theme.caption
             color: Theme.textMuted
@@ -89,12 +101,13 @@ Sheet {
             objectName: "exportFormat"
             model: page.tapSupported ? ["tap", "tzx"] : ["tzx"]
             Accessible.name: qsTr("Tape export format")
+            onActivated: fileName.text = page.exportName(fileName.text)
         }
         Button {
-            text: qsTr("Export .%1").arg(page.suffix)
+            text: qsTr("Save .%1").arg(page.suffix)
             enabled: ZxEmulator.tape.hasTape
-            onClicked: page.writeTape()
-            Keys.onReturnPressed: page.writeTape()
+            onClicked: page.writeTape(page.destination)
+            Keys.onReturnPressed: page.writeTape(page.destination)
         }
         Button {
             visible: Qt.platform.os === "android"

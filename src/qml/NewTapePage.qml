@@ -32,7 +32,7 @@ Sheet {
     ]
     Component.onCompleted: ZxEmulator.tape.refreshData()
     function createTape() {
-        ZxEmulator.tape.clear();
+        ZxEmulator.tape.newBlank();
         pageLoader.source = "";
     }
     GamepadNavigation {
@@ -46,15 +46,15 @@ Sheet {
         spacing: Theme.sp(5)
         Text {
             Layout.fillWidth: true
-            visible: ZxEmulator.tape.hasTape
-            text: qsTr("This replaces the inserted tape. Export its blocks first if you want to keep them.")
+            visible: ZxEmulator.tape.inserted
+            text: qsTr("This replaces the inserted tape.")
             wrapMode: Text.Wrap
             font.pixelSize: Theme.body
             color: Theme.warning
         }
         Text {
             Layout.fillWidth: true
-            text: qsTr("Your program stays in memory.\n\n1. Create the blank tape.\n2. In BASIC, enter SAVE \"name\", then press Enter at the tape prompt.\n3. Choose Media → Tape → Save to export a .tap file.")
+            text: qsTr("Your program stays in memory.\n\n1. Create the blank tape.\n2. In BASIC, enter SAVE \"name\", then press Enter at the tape prompt.\n3. Choose Media → Tape → Save to save the tape image.")
             wrapMode: Text.Wrap
             font.pixelSize: Theme.body
             color: Theme.text

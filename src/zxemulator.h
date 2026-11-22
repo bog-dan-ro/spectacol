@@ -204,15 +204,16 @@ public:
             return false;
         }
     }
-    /// Loads any media file (the file is read before locking the emulator).
-    bool loadMediaFile(const QString &filePath);
     /// Copy a document-provider file into app storage while its URI grant is valid.
     Q_INVOKABLE void importFile(const QUrl &url, QObject *receiver, QJSValue done);
 #ifdef Q_OS_ANDROID
     void openExternalFile(const QUrl &url);
 #endif
     /// Saves a snapshot, the tape or a screenshot (the file is written after unlocking the emulator).
-    bool saveMediaFile(const QString &filePath);
+    bool saveMediaFile(const QString &filePath, const QString &format = {},
+                       QString *savedPath = nullptr);
+    QString writeMediaBytes(const QString &filePath, std::span<const uint8_t> bytes,
+                            bool newExport);
     /// Replaces local files atomically; selected Android documents use direct writes.
     /// Reports directory, write and commit failures.
     bool writeFileBytes(const QString &filePath, std::span<const uint8_t> bytes);
@@ -377,9 +378,8 @@ public slots:
     bool newMicrodrive(int drive);
     void ejectMicrodrive(int drive);
     bool saveMicrodrive(int drive, const QString &filePath);
-    bool save(const QString &filePath);
+    bool save(const QString &filePath, const QString &format = {});
     bool copyToFavourites(const QString &filePath);
-    void remove(const QString &path);
     bool isFolder(const QString &path);
     QString fileName(const QString &path);
     QString folderName(const QString &path);
@@ -500,11 +500,13 @@ private:
     static MediaLoad readMedia(const QString &path);
     std::pair<bool, zxkit::MediaClass> applyMedia(const QString &path, const MediaLoad &media,
                                                   int drive = -1);
-    void finishLoad(const QString &path, bool removeOnFail, const MediaLoad &media);
+    void finishLoad(const QString &path, bool removeOnFail, MediaLoad media);
+    void installMedia(const QString &path, bool removeOnFail, const MediaLoad &media);
     void importDocument(const QUrl &url, bool checkMedia, std::function<void(QString)> done);
     bool mountMicrodrive(int drive, std::span<const uint8_t> bytes, const QString &name,
                          const QString &sourcePath = {});
     friend class ZxImage;
+    friend class ZxTape;
 
 private:
     bool m_touchscreen = false;

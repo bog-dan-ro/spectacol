@@ -21,6 +21,9 @@
 
 #include <QObject>
 
+#include <cstddef>
+#include <functional>
+
 class ZxEmulator;
 class ZxTape : public QObject
 {
@@ -31,6 +34,8 @@ class ZxTape : public QObject
     Q_PROPERTY(QString programName MEMBER m_programName NOTIFY programNameChanged)
     Q_PROPERTY(bool playing READ playing NOTIFY playingChanged)
     Q_PROPERTY(QString suggestedFileName READ suggestedFileName NOTIFY programNameChanged)
+    Q_PROPERTY(bool canSave READ canSave NOTIFY sourceChanged)
+    Q_PROPERTY(bool inserted READ inserted NOTIFY insertedChanged)
 
 public:
     explicit ZxTape(ZxEmulator *parent = 0);
@@ -48,24 +53,43 @@ public:
     }
     void setPlaying(bool playing);
     QString suggestedFileName() const;
+    bool canSave() const;
+    bool inserted() const;
+    void setSource(const QString &path, const QString &format);
+    void beforeReplacing(std::function<void()> action);
+    bool changePending() const;
 
 public slots:
-    void open(QString filePath);
     void togglePlay();
     void rewind();
+    void newBlank();
     void clear();
-    bool write(QString filePath);
+    bool save();
+    bool saveAs(const QString &filePath, const QString &format);
+    void resolveChange(bool proceed);
 
 signals:
     void hasTapeChanged(bool hasTape);
     void programNameChanged();
     void playingChanged();
+    void sourceChanged();
+    void insertedChanged();
+    void unsavedChanges();
 
 private:
     void setHasTape(bool hasTape);
+    void checkPendingChange();
+    void resetDeck(bool blank);
+    bool write(const QString &filePath, const QString &format, bool newExport);
 
     bool m_hasTape = false;
     bool m_playing = false;
+    bool m_blank = false;
+    QString m_sourcePath;
+    QString m_sourceFormat;
+    std::size_t m_savedBlocks = 0;
+    std::function<void()> m_pendingChange;
+    bool m_waitingForPause = false;
     QString m_programName;
     ZxEmulator *m_zxEmulator = nullptr;
 };

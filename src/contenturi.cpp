@@ -132,6 +132,17 @@ bool isContent(const QString &path)
     return path.startsWith(scheme);
 }
 
+QString mediaFileName(const QString &name)
+{
+    static const QRegularExpression duplicate(
+            uR"(^(.*)(\.(?:szx|sna|z80|nex|tap|tzx))\s+(\([0-9]+\))$)"_s,
+            QRegularExpression::CaseInsensitiveOption);
+    const auto match = duplicate.match(name);
+    if (!match.hasMatch())
+        return name;
+    return match.captured(1) + u' ' + match.captured(3) + match.captured(2);
+}
+
 QString canonical(const QString &uri)
 {
     const auto parts = parse(uri);

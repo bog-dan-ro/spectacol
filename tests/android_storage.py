@@ -85,6 +85,12 @@ def main():
         shell("input", "tap", str((x1 + x2) // 2), str((y1 + y2) // 2))
         time.sleep(.7)
 
+    def long_press(text):
+        node = wait_for(lambda n: label(n) == text, repr(text))[0]
+        x1, y1, x2, y2 = map(int, re.findall(r"\d+", node.get("bounds")))
+        x, y = str((x1 + x2) // 2), str((y1 + y2) // 2)
+        shell("input", "swipe", x, y, x, y, "1400")
+
     def tap(text, what=None):
         press(wait_for(lambda n: label(n) == text, what or repr(text))[0])
 
@@ -259,15 +265,32 @@ def main():
             # After a restart Quick Open reopens the device folder with the saved grant.
             start(["--ui-keys", "page:FileBrowserPage.qml"])
             wait_for(lambda n: label(n) == "game-000.sna", "The game after a restart")
+            adb("push", str(fixture), games + "/Sub/rename-me.sna")
             tap("Sub")
             wait_for(lambda n: label(n) == token + ".sna", "The game in the subfolder after a restart")
+            long_press("rename-me.sna")
+            tap("Rename")
+            wait_for(lambda n: n.get("resource-id", "").endswith(".browserRenameName"),
+                     "The rename field")
+            shell("input", "text", "renamed.sna")
+            press(wait_for(lambda n: n.get("resource-id", "").endswith(".formSave"),
+                           "Confirm rename")[0])
+            wait_for(lambda n: label(n) == "renamed.sna", "The renamed file")
+            assert shell("cat", games + "/Sub/renamed.sna").stdout == expected
+            long_press("renamed.sna")
+            tap("Delete")
+            wait_for(lambda n: label(n) == 'Delete "renamed.sna"?', "Confirm device deletion")
+            tap("Delete")
+            assert gone("renamed.sna"), "the deleted file is still listed"
+            assert shell("test", "!", "-e", games + "/Sub/renamed.sna").returncode == 0
+            print("File Browser renamed and deleted a file in a granted device folder", flush=True)
             tap("Up a folder")
             wait_for(lambda n: label(n) == "Sub", "The device folder after a restart")
             tap("Up a folder")
             wait_for(lambda n: label(n) == "Recordings", "The Spectacol folder")
             wait_for(lambda n: label(n) == games_name, "The device folder in the Spectacol folder")
             tap("Page actions")
-            tap("Remove")
+            tap("Stop showing")
             # Spectacol's own dialog: it names the folder, and forgetting it is not deleting it
             message = wait_for(lambda n: label(n).startswith("Stop showing \""),
                                "Stop showing the device folder?")

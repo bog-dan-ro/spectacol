@@ -28,15 +28,15 @@ SaveFilePage {
     fileName: ZxEmulator.snapshotFileName()
     formats: ZxEmulator.snapshotFormats()
     folder: ZxEmulator.dataPath + "/Snapshots/"
-    destinationPath: selectedPath || ZxEmulator.snapshotFilePath(folder,
+    destinationPath: ZxEmulator.snapshotFilePath(folder,
         fileName.replace(/\.(szx|sna|z80|nex)$/i, "") + "." + selectedFormat)
     Component.onCompleted: {
         if (Qt.platform.os === "android" && folder !== ZxEmulator.dataPath
                 && !folder.startsWith(ZxEmulator.dataPath + "/"))
             folder = ZxEmulator.snapshotsPath();
     }
-    onAccepted: {
-        if (ZxEmulator.save(destinationPath))
+    onAccepted: path => {
+        if (ZxEmulator.save(path, selectedFormat))
             pageLoader.source = "";
     }
 

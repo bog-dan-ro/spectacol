@@ -32,12 +32,12 @@ CoverFlowFiles {
         property alias path: browser.folder
     }
 
-    onFileSelected: {
+    onFileSelected: filePath => {
         if (!filePath) {
             mainScreen.closePage();
             return;
         }
-        ZxEmulator.tape.open(filePath);
+        ZxEmulator.load(filePath);
         pageLoader.source = "";
     }
 }

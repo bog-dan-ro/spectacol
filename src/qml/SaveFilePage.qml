@@ -31,12 +31,12 @@ Sheet {
     property string destinationPath
     property list<string> formats: ["szx"]
     readonly property string selectedFormat: formatChoice.currentText
-    property string selectedPath
-    signal accepted
+    signal accepted(string path)
+    function save() { accepted(destinationPath); }
     signal canceled
     onCloseRequested: canceled()
     hints: [
-        { pad: "A", key: "Enter", text: qsTr("Save"), action: () => page.accepted() },
+        { pad: "A", key: "Enter", text: qsTr("Save"), action: page.save },
         { pad: "B", key: "Esc", text: qsTr("Cancel"), action: () => page.canceled() }
     ]
     GamepadNavigation {
@@ -54,11 +54,8 @@ Sheet {
         title: page.title
         fileMode: FileDialog.SaveFile
         defaultSuffix: page.selectedFormat
-        currentFile: "file://" + page.folder + "/" + page.fileName
-        onAccepted: {
-            page.selectedPath = selectedFile.toString();
-            page.accepted();
-        }
+        currentFile: "file://" + page.destinationPath
+        onAccepted: page.accepted(selectedFile.toString())
     }
     // Scrolls: a phone in landscape, or one with its keyboard up, is shorter than the form
     Flickable {
@@ -84,10 +81,10 @@ Sheet {
             Layout.fillWidth: true
             focus: true
             selectByMouse: true
-            onAccepted: page.accepted()
+            onAccepted: page.save()
         }
         Text {
-            text: qsTr("Folder")
+            text: Qt.platform.os === "android" ? qsTr("Spectacol folder") : qsTr("Folder")
             font.pixelSize: Theme.body
             color: Theme.text
         }
@@ -97,10 +94,10 @@ Sheet {
                 id: pathEdit
                 Layout.fillWidth: true
                 selectByMouse: true
-                onAccepted: page.accepted()
+                onAccepted: page.save()
             }
             Button {
-                text: Qt.platform.os === "android" ? qsTr("Export…") : qsTr("Browse")
+                text: Qt.platform.os === "android" ? qsTr("Export to device…") : qsTr("Browse")
                 onClicked: Qt.platform.os === "android" ? deviceFile.open() : browseFolder.open()
             }
         }
@@ -124,7 +121,6 @@ Sheet {
                 objectName: "exportFormat"
                 model: page.formats
                 onActivated: {
-                    page.selectedPath = "";
                     page.fileName = page.fileName.replace(/\.(szx|sna|z80|nex)$/i, "") + "." + currentText;
                 }
             }
@@ -140,8 +136,8 @@ Sheet {
         RowLayout {
             Button {
                 text: qsTr("Save")
-                onClicked: page.accepted()
-                Keys.onReturnPressed: page.accepted()
+                onClicked: page.save()
+                Keys.onReturnPressed: page.save()
             }
             Button {
                 text: qsTr("Cancel")

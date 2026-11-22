@@ -35,6 +35,7 @@ ApplicationWindow {
 
     property bool portrait: width < height
     property bool legacyImportPending: false
+    property bool saveTapeBeforeChange: false
 
     function offerPendingLegacyImport() {
         if (legacyImportPending && pageLoader.source.toString() === "" && menuBar.position === 0 && !quitDialog.visible) {
@@ -61,6 +62,10 @@ ApplicationWindow {
     // A page that has done its job clears pageLoader.source and goes to the game.
     function closePage() {
         const path = pageReturnPath;
+        if (saveTapeBeforeChange) {
+            saveTapeBeforeChange = false;
+            ZxEmulator.tape.resolveChange(false);
+        }
         pageLoader.source = "";
         if (path) {
             menuRestorePath = path;
@@ -73,6 +78,8 @@ ApplicationWindow {
         // Back answers the quit question (no) instead of asking it again
         if (quitDialog.visible)
             quitDialog.reject();
+        else if (unsavedTapeDialog.visible)
+            unsavedTapeDialog.reject();
         else if (DesktopInput.visible)
             DesktopInput.hide();
         else if (Qt.inputMethod.visible)
@@ -101,7 +108,7 @@ ApplicationWindow {
     // in each page: one that forgot left the sticks (sendNavigationKey) dead.
     // ZxEmulator.processInputEvents nests: exactly one block for each time this turns true.
     readonly property bool uiOwnsInput: menuBar.position > 0 || pageLoader.status === Loader.Ready
-                                        || quitDialog.visible
+                                        || quitDialog.visible || unsavedTapeDialog.visible
     onUiOwnsInputChanged: ZxEmulator.processInputEvents = !uiOwnsInput
     // The menu, for the overlay's drawer and the desktop layout's menu bar
     property ZxMenu zxMenu: ZxMenu {}
@@ -172,6 +179,39 @@ ApplicationWindow {
         onAccepted: ZxEmulator.quit()
     }
 
+    ConfirmDialog {
+        id: unsavedTapeDialog
+        objectName: "unsavedTapeDialog"
+        title: qsTr("Unsaved tape")
+        text: qsTr("Save changes to the current tape before continuing?")
+        acceptText: qsTr("Save")
+        alternateText: qsTr("Discard")
+        rejectText: qsTr("Cancel")
+        destructive: true
+        ownGamepad: true
+        commit: () => {
+            if (ZxEmulator.tape.canSave && ZxEmulator.tape.save()) {
+                ZxEmulator.tape.resolveChange(true);
+            } else {
+                mainScreen.saveTapeBeforeChange = true;
+            }
+            return true;
+        }
+        onClosed: {
+            if (mainScreen.saveTapeBeforeChange)
+                Qt.callLater(() => pageLoader.source = "SaveTapePage.qml");
+        }
+        onRejected: ZxEmulator.tape.resolveChange(false)
+        onAlternateRequested: ZxEmulator.tape.resolveChange(true)
+    }
+
+    Connections {
+        target: ZxEmulator.tape
+        function onUnsavedChanges() {
+            Qt.callLater(unsavedTapeDialog.open);
+        }
+    }
+
     Drawer {
         id: menuBar
         // Our flat drawer has no rounded-corner spacer above its header.
@@ -182,6 +222,8 @@ ApplicationWindow {
         onClosed: Qt.callLater(() => {
             // A page may open while the drawer is leaving. Popup focus
             // restoration must finish before the new page takes focus.
+            if (unsavedTapeDialog.visible)
+                return;
             if (pageLoader.status === Loader.Ready) {
                 if (typeof pageLoader.item.focusFiles === "function") pageLoader.item.focusFiles();
                 else pageLoader.item.forceActiveFocus(Qt.PopupFocusReason);
