@@ -440,7 +440,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         get_filename_component(linuxdeployPluginDir "${SPECTACOL_LINUXDEPLOY_PLUGIN_QT}" DIRECTORY)
         set(appDir "${CMAKE_BINARY_DIR}/AppDir")
         set(appImagePath
-            "${CMAKE_BINARY_DIR}/packages/Spectacol-${PROJECT_VERSION}-${CMAKE_SYSTEM_PROCESSOR}.AppImage")
+            "${CMAKE_BINARY_DIR}/packages/Spectacol-${PROJECT_VERSION}-linux-${CMAKE_SYSTEM_PROCESSOR}.AppImage")
         set(qtPluginsDir "${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS}")
         get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
         set(installConfig "")

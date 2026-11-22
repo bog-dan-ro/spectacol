@@ -159,7 +159,19 @@ method events to the original field, preserving its selection and validation.
 
 ### AppImage
 
-Use a complete Qt 6.11+ desktop SDK with Quick, Multimedia, ShaderTools, SVG and
+For a release build on Debian stable, run this from the checkout:
+
+```sh
+packaging/linux/build.sh
+```
+
+The Docker image includes the public Qt 6.12.0 desktop SDK, installed by
+aqtinstall without a Qt account, along with linuxdeploy and its Qt plugin.
+Docker caches the SDK between builds. The result is in
+`build/appimage-docker/packages/`. Use `--rebuild-image` to refresh Debian
+and reinstall Qt and the packaging tools.
+
+For a native build, use a complete Qt 6.11+ desktop SDK with Quick, Multimedia, ShaderTools, SVG and
 Wayland support, a C++23 compiler, Ninja, and
 [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy/releases) with its
 [Qt plugin](https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases).
@@ -177,12 +189,12 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
     -DSPECTACOL_LINUXDEPLOY=/path/to/linuxdeploy-x86_64.AppImage \
     -DSPECTACOL_LINUXDEPLOY_PLUGIN_QT=/path/to/linuxdeploy-plugin-qt-x86_64.AppImage
 cmake --build build --target appImage    # or: ninja -C build appImage
-./build/packages/Spectacol-1.6.0.5-x86_64.AppImage
+./build/packages/Spectacol-5.0.0.2-linux-x86_64.AppImage
 ```
 
 The target builds Spectacol and installs only the `Runtime` component into a fresh
 `build/AppDir`. linuxdeploy bundles Qt, QML imports, SVG/Wayland support and
-shared-library dependencies, then writes `build/packages/Spectacol-VERSION-ARCH.AppImage`.
+shared-library dependencies, then writes `build/packages/Spectacol-VERSION-linux-ARCH.AppImage`.
 The AppDir remains in the build directory for inspection.
 Build release AppImages on the oldest distribution you support: the build host's
 glibc and C++ runtime set the minimum host requirements. Build each architecture on a matching
@@ -204,7 +216,7 @@ Then run:
 APPIMAGE_EXTRACT_AND_RUN=1 QT_QPA_PLATFORM=offscreen \
     XDG_CONFIG_HOME="$PWD/build/package-check/config" \
     XDG_DATA_HOME="$PWD/build/package-check/data" \
-    ./build/packages/Spectacol-1.6.0.5-x86_64.AppImage \
+    ./build/packages/Spectacol-5.0.0.2-linux-x86_64.AppImage \
     --machine 48k --quit-after 3 --ui-screenshot "$PWD/build/package-check/ui.png"
 ```
 
