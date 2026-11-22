@@ -12,6 +12,8 @@
 
 #include <zxkit/core/Exception.h>
 
+#include <span>
+
 Disks::Disks(ZxEmulator *parent) : QObject{ parent }, m_zxEmulator(parent)
 {
     connect(m_zxEmulator->settings(), &ZxSettings::currentMachineChanged, this,
@@ -57,12 +59,14 @@ void Disks::insertDisk(int idx, const QString &path)
         return;
     }
     // Read the file before locking the emulator
-    const auto bytes = file.readAll() | std::ranges::to<std::vector<uint8_t>>();
+    const auto data = file.readAll();
     if (file.error() != QFileDevice::NoError) {
         m_zxEmulator->showMessage(tr("Can't read '%1': %2").arg(name, file.errorString()),
                                   ZxEmulator::Error);
         return;
     }
+    const std::span<const uint8_t> bytes(reinterpret_cast<const uint8_t *>(data.constData()),
+                                         std::size_t(data.size()));
     try {
         {
             auto emulator = m_zxEmulator->emulator().writeLock();
