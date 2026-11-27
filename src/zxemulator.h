@@ -37,9 +37,11 @@ Q_MOC_INCLUDE("zxrecording.h")
 Q_MOC_INCLUDE("zxsettings.h")
 
 #include <QGamepadManager>
+#include <QHash>
 #include <QJSValue>
 #include <QPointer>
 #include <QQmlEngine>
+#include <QQueue>
 #include <QThreadPool>
 #include <QUrl>
 #include <QVariantMap>
@@ -433,9 +435,10 @@ public slots:
     void pokeMemory(int address, int page, int value);
 
     void keyPress(int qtKey, int modifiers = 0, bool autoRepeat = false,
-                  bool virtualKeyboard = true);
+                  bool virtualKeyboard = true, quint32 nativeScanCode = 0,
+                  const QString &text = {});
     void keyRelease(int qtKey, int modifiers = 0, bool autoRepeat = false,
-                    bool virtualKeyboard = true);
+                    bool virtualKeyboard = true, quint32 nativeScanCode = 0);
     // The on-screen CoBra column, independent of the Spectrum modifier mapping.
     void setCobraKeyState(int qtKey, bool pressed);
     // An on-screen key that holds several keys (the Spectrum+ keys on the 48K), e.g. EDIT is
@@ -496,6 +499,9 @@ private:
     bool activateControllerGame(const QString &title);
     void setInputKeys(quint64 source, const QSet<int> &keys);
     void applyKeyChanges(const HeldKeyState::Changes &changes);
+    void applyPhysicalKeys();
+    void queuePhysicalChord(const QSet<int> &keys, bool extended);
+    void advancePhysicalChord();
     struct MediaLoad;
     static MediaLoad readMedia(const QString &path);
     std::pair<bool, zxkit::MediaClass> applyMedia(const QString &path, const MediaLoad &media,
@@ -532,6 +538,21 @@ private:
     uint8_t m_joystickButtons = 0; // zxkit::JoystickButtons
     ControllerInput m_controller;
     HeldKeyState m_heldKeys;
+    struct PhysicalKey
+    {
+        QSet<int> keys;
+        bool hostShift;
+        bool suppressHostShift;
+    };
+    struct PhysicalChord
+    {
+        QSet<int> keys;
+        uint64_t frames;
+    };
+    QHash<quint64, PhysicalKey> m_physicalKeys;
+    QQueue<PhysicalChord> m_physicalChords;
+    QTimer m_physicalChordTimer;
+    uint64_t m_physicalChordStartFrame = 0;
     FastForwardControl m_fastForwardControl;
     bool m_manualFastForward = false;
     bool m_tapeFastForward = false;

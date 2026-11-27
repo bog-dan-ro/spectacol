@@ -386,7 +386,8 @@ ApplicationWindow {
                 break;
             }
             if (!event.accepted && ZxEmulator.processInputEvents) {
-                ZxEmulator.keyPress(event.key, event.modifiers, event.isAutoRepeat, false);
+                ZxEmulator.keyPress(event.key, event.modifiers, event.isAutoRepeat, false,
+                                    event.nativeScanCode, event.text);
                 event.accepted = true;
             }
         }
@@ -403,7 +404,8 @@ ApplicationWindow {
                 break;
             }
             if (!event.accepted && ZxEmulator.processInputEvents) {
-                ZxEmulator.keyRelease(event.key, event.modifiers, event.isAutoRepeat, false);
+                ZxEmulator.keyRelease(event.key, event.modifiers, event.isAutoRepeat, false,
+                                      event.nativeScanCode);
                 event.accepted = true;
             }
         }

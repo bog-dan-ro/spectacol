@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     parser.addOption(uiScreenshotOption);
     const QCommandLineOption uiKeysOption(
             u"ui-keys"_s,
-            u"Press keys in the window, one every 300 ms from 1 s on, e.g. F5,Down,Return (to screenshot a page); click:X:Y clicks at a window position, click:NAME clicks a named UI item, page:NAME.qml opens a page, nav:ButtonA sends a gamepad navigation tap, nav:ButtonA:1/0 holds/releases it, nav:connect:ID and nav:disconnect:ID simulate hotplug, input:TEXT commits text through the input method, down:KEY and up:KEY only press or release a key (e.g. down:Control,0,up:Control), wait idles 300 ms."_s,
+            u"Press keys in the window, one every 300 ms from 1 s on, e.g. F5,Down,Return (to screenshot a page); click:X:Y clicks at a window position, click:NAME clicks a named UI item, page:NAME.qml opens a page, nav:ButtonA sends a gamepad navigation tap, nav:ButtonA:1/0 holds/releases it, nav:connect:ID and nav:disconnect:ID simulate hotplug, input:TEXT commits text through the input method, down:KEY and up:KEY only press or release a key (e.g. down:Control,0,up:Control), with an optional :SCANCODE for physical keys, wait idles 300 ms."_s,
             u"keys"_s);
     parser.addOption(windowSizeOption);
     parser.addOption(uiKeysOption);
@@ -423,22 +423,24 @@ int main(int argc, char *argv[])
                 continue;
             }
             if (keys[i].startsWith(u"down:"_s) || keys[i].startsWith(u"up:"_s)) {
-                // down:KEY / up:KEY: only press or release a key (a Qt::Key name without "Key_"), to
-                // hold a modifier around other keys, e.g. down:Control,0,up:Control
+                // An optional scan code lets a release use a different Qt::Key than its press.
+                const auto parts = keys[i].split(u':');
                 const bool down = keys[i].startsWith(u"down:"_s);
-                const QByteArray name = "Key_" + keys[i].section(u':', 1).trimmed().toLatin1();
+                const QByteArray name = "Key_" + parts[1].trimmed().toLatin1();
                 bool ok = false;
                 const int key = QMetaEnum::fromType<Qt::Key>().keyToValue(name.constData(), &ok);
-                if (!ok) {
+                bool scanOk = true;
+                const quint32 scanCode = parts.size() == 3 ? parts[2].toUInt(&scanOk) : 0;
+                if (!ok || !scanOk || parts.size() > 3) {
                     qWarning().noquote() << "Unknown key" << keys[i];
                     continue;
                 }
                 QTimer::singleShot(std::chrono::milliseconds(1000 + 300 * i), Qt::PreciseTimer,
-                                   &app, [key, down, window] {
+                                   &app, [key, scanCode, down, window] {
                                        if (auto *w = window()) {
                                            QKeyEvent event(down ? QEvent::KeyPress
                                                                 : QEvent::KeyRelease,
-                                                           key, Qt::NoModifier);
+                                                           key, Qt::NoModifier, scanCode, 0, 0);
                                            QCoreApplication::sendEvent(w, &event);
                                        }
                                    });

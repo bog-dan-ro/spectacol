@@ -153,6 +153,35 @@ struct MappedZxKeys
     std::optional<zxkit::ZxKey> modifier;
 };
 
+quint64 physicalKeyId(int qtKey, quint32 nativeScanCode)
+{
+    // Qt's logical key can change when a modifier is released before the key itself.
+    return nativeScanCode ? (quint64(1) << 32) | nativeScanCode : quint32(qtKey);
+}
+
+bool isHostPunctuation(int key)
+{
+    constexpr auto punctuation = "-=+{[]};:'\",<.>/?"sv;
+    return key >= ' ' && key <= '~' && punctuation.contains(static_cast<char>(key));
+}
+
+std::optional<zxkit::ZxKey> extendedPunctuationKey(int qtKey)
+{
+    using zxkit::ZxKey;
+    switch (qtKey) {
+    case Qt::Key_BracketLeft:
+        return ZxKey::Y;
+    case Qt::Key_BracketRight:
+        return ZxKey::U;
+    case Qt::Key_BraceLeft:
+        return ZxKey::F;
+    case Qt::Key_BraceRight:
+        return ZxKey::G;
+    default:
+        return std::nullopt;
+    }
+}
+
 // The CoBra's keyboard has a sixth column: CTRL, NO SCROLL, LINE FEED, ESC and F1-F4. The
 // host's keys for them, on a physical keyboard (the on-screen keyboard's Control is Symbol Shift).
 // Spectacol's own keys start at F5.
@@ -591,6 +620,10 @@ ZxEmulator::ZxEmulator(QObject *parent)
         if (m_settings->joystickPrompt())
             emit configureJoystick();
     });
+
+    m_physicalChordTimer.setTimerType(Qt::PreciseTimer);
+    m_physicalChordTimer.setInterval(8);
+    connect(&m_physicalChordTimer, &QTimer::timeout, this, &ZxEmulator::advancePhysicalChord);
 
     connect(m_controllerProfiles.get(), &ControllerProfiles::failed, this,
             [this](const QString &message) { showMessage(message, Error); });
@@ -2267,6 +2300,9 @@ void ZxEmulator::setInputKeys(quint64 source, const QSet<int> &keys)
 
 void ZxEmulator::releaseInputs()
 {
+    m_physicalChordTimer.stop();
+    m_physicalChords.clear();
+    m_physicalKeys.clear();
     m_fastForwardControl.clear();
     syncFastForward();
     m_controller.clear();
@@ -2342,7 +2378,63 @@ void ZxEmulator::setCobraKeyState(int qtKey, bool pressed)
     setInputKeys(kCobraKeys | quint32(qtKey), keys);
 }
 
-void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
+void ZxEmulator::applyPhysicalKeys()
+{
+    if (!m_physicalChords.isEmpty()) {
+        setInputKeys(kPhysicalKeys, m_physicalChords.head().keys);
+        return;
+    }
+
+    QSet<int> keys;
+    bool hostShiftHeld = false;
+    bool suppressHostShift = false;
+    for (const auto &key : std::as_const(m_physicalKeys)) {
+        hostShiftHeld |= key.hostShift;
+        suppressHostShift |= key.suppressHostShift;
+        if (!key.hostShift)
+            keys.unite(key.keys);
+    }
+    // A punctuation chord already supplies its Spectrum shift. Keep ownership of the PC Shift
+    // key so it becomes Caps Shift again after the punctuation key is released.
+    if (hostShiftHeld && !suppressHostShift)
+        keys.insert(int(zxkit::ZxKey::CapsShift));
+    setInputKeys(kPhysicalKeys, keys);
+}
+
+void ZxEmulator::queuePhysicalChord(const QSet<int> &keys, bool extended)
+{
+    const bool idle = m_physicalChords.isEmpty();
+    if (extended) {
+        using zxkit::ZxKey;
+        m_physicalChords.enqueue({ { int(ZxKey::CapsShift), int(ZxKey::SymbolShift) }, 2 });
+    }
+    // Give the ROM a complete scan in each phase, with time for its key state to expire
+    // between identical consecutive chords. Count emulated frames so this follows its speed.
+    m_physicalChords.enqueue({ keys, 2 });
+    m_physicalChords.enqueue({ {}, 3 });
+    if (idle) {
+        applyPhysicalKeys();
+        m_physicalChordStartFrame = emulator().readLock()->clock().frameCount();
+        m_physicalChordTimer.start();
+    }
+}
+
+void ZxEmulator::advancePhysicalChord()
+{
+    const auto frame = emulator().readLock()->clock().frameCount();
+    if (frame - m_physicalChordStartFrame < m_physicalChords.head().frames)
+        return;
+    m_physicalChords.dequeue();
+    applyPhysicalKeys();
+    if (m_physicalChords.isEmpty()) {
+        m_physicalChordTimer.stop();
+    } else {
+        m_physicalChordStartFrame = emulator().readLock()->clock().frameCount();
+    }
+}
+
+void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard,
+                          quint32 nativeScanCode, const QString &text)
 {
     if (m_paused || autoRepeat)
         return;
@@ -2352,9 +2444,16 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
                          key->second ? QSet<int>{ int(key->first) } : QSet<int>{});
         return;
     }
+    const auto id = physicalKeyId(qtKey, nativeScanCode);
+    if (!virtualKeyboard && m_physicalKeys.contains(id))
+        return;
+    if (!virtualKeyboard && text.size() == 1 && isHostPunctuation(text.front().unicode()))
+        qtKey = text.front().unicode();
+
     QSet<int> keys;
     bool cobra = false;
     std::optional<zxkit::NextKey> nextKey;
+    const auto extendedKey = virtualKeyboard ? std::nullopt : extendedPunctuationKey(qtKey);
     if (!virtualKeyboard) {
         const auto emulator = this->emulator().readLock();
         cobra = hasCobraKeyboard(*emulator);
@@ -2365,6 +2464,9 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
         keys.insert(0x100 + int(*nextKey));
     } else if (const auto key = cobra ? cobraKey(qtKey, modifiers) : std::nullopt) {
         keys.insert(int(*key));
+    } else if (extendedKey) {
+        keys.insert(int(zxkit::ZxKey::SymbolShift));
+        keys.insert(int(*extendedKey));
     } else {
         const auto mapped = mapQtKeyToZx(qtKey, modifiers);
         if (mapped.modifier)
@@ -2377,17 +2479,32 @@ void ZxEmulator::keyPress(int qtKey, int modifiers, bool autoRepeat, bool virtua
                 || qtKey == Qt::Key_Meta);
     if (!keys.isEmpty() && !hostModifier)
         m_recording->resumeOnGameplayInput();
-    setInputKeys((virtualKeyboard ? kVirtualKeys : kPhysicalKeys) | quint32(qtKey), keys);
+    if (virtualKeyboard) {
+        setInputKeys(kVirtualKeys | quint32(qtKey), keys);
+        return;
+    }
+
+    m_physicalKeys.insert(
+            id,
+            { extendedKey ? QSet<int>{} : keys, qtKey == Qt::Key_Shift, isHostPunctuation(qtKey) });
+    if (extendedKey || (!m_physicalChords.isEmpty() && !hostModifier && !keys.isEmpty()))
+        queuePhysicalChord(keys, extendedKey.has_value());
+    else
+        applyPhysicalKeys();
 }
 
-void ZxEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard)
+void ZxEmulator::keyRelease(int qtKey, int modifiers, bool autoRepeat, bool virtualKeyboard,
+                            quint32 nativeScanCode)
 {
     Q_UNUSED(modifiers)
     // Releases remain valid after pausing or opening a page. The stored press
     // owns its modifiers, even if the host release reports different ones.
     if (autoRepeat || (!virtualKeyboard && m_settings->recreatedSpectrum()))
         return;
-    setInputKeys((virtualKeyboard ? kVirtualKeys : kPhysicalKeys) | quint32(qtKey), {});
+    if (virtualKeyboard)
+        setInputKeys(kVirtualKeys | quint32(qtKey), {});
+    else if (m_physicalKeys.remove(physicalKeyId(qtKey, nativeScanCode)))
+        applyPhysicalKeys();
 }
 
 void ZxEmulator::gamepadAxisEvent(QGamepadManager::GamepadAxis axis, double value, bool touch)
