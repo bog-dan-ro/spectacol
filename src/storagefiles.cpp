@@ -35,10 +35,10 @@ using namespace Qt::StringLiterals;
 namespace StorageFiles {
 namespace {
 
-QString tr(const char *text)
+class Messages
 {
-    return QCoreApplication::translate("StorageFiles", text);
-}
+    Q_DECLARE_TR_FUNCTIONS(StorageFiles)
+};
 
 #ifdef Q_OS_ANDROID
 constexpr QStringView kFolderType = u"vnd.android.document/directory";
@@ -108,7 +108,7 @@ std::vector<uint8_t> read(const QString &path, qint64 limit, QString &error)
         opened = file.open(QIODevice::ReadOnly);
     }
     if (!opened) {
-        error = tr("Can't open '%1': %2").arg(path, file.errorString());
+        error = Messages::tr("Can't open '%1': %2").arg(path, file.errorString());
         return {};
     }
     const auto bytes = file.read(limit);
@@ -122,7 +122,7 @@ bool write(const QString &path, std::span<const uint8_t> bytes, QString &error)
         if (AndroidIntegration::writeDocument(path, bytes))
             return true;
 #endif
-        error = tr("Can't save '%1'.").arg(path);
+        error = Messages::tr("Can't save '%1'.").arg(path);
         return false;
     }
     QSaveFile file(path);
@@ -130,7 +130,7 @@ bool write(const QString &path, std::span<const uint8_t> bytes, QString &error)
         || file.write(reinterpret_cast<const char *>(bytes.data()), qint64(bytes.size()))
                 != qint64(bytes.size())
         || !file.commit()) {
-        error = tr("Can't save '%1': %2").arg(path, file.errorString());
+        error = Messages::tr("Can't save '%1': %2").arg(path, file.errorString());
         return false;
     }
     return true;
@@ -151,7 +151,7 @@ QString create(const QString &folder, const QString &name, std::span<const uint8
         AndroidIntegration::deleteDocument(document);
     }
 #endif
-    error = tr("Can't save '%1'.").arg(name);
+    error = Messages::tr("Can't save '%1'.").arg(name);
     return {};
 }
 
@@ -168,14 +168,14 @@ QString makeFolder(const QString &folder, const QString &name, QString &error)
             return document;
 #endif
     }
-    error = tr("Can't create folder '%1'.").arg(name);
+    error = Messages::tr("Can't create folder '%1'.").arg(name);
     return {};
 }
 
 QString rename(const QString &path, const QString &newName, QString &error)
 {
     if (isDocument(path) && ContentUri::canonical(path) == ContentUri::treeRoot(path)) {
-        error = tr("Can't rename the device folder itself.");
+        error = Messages::tr("Can't rename the device folder itself.");
         return {};
     }
     if (!isDocument(path)) {
@@ -189,7 +189,7 @@ QString rename(const QString &path, const QString &newName, QString &error)
             return document;
 #endif
     }
-    error = tr("Can't rename '%1' to '%2'.").arg(path, newName);
+    error = Messages::tr("Can't rename '%1' to '%2'.").arg(path, newName);
     return {};
 }
 
@@ -208,7 +208,7 @@ QString copy(const QString &source, const QString &folder, const QString &name,
         opened = input.open(QIODevice::ReadOnly);
     }
     if (!opened) {
-        error = tr("Can't open '%1': %2").arg(source, input.errorString());
+        error = Messages::tr("Can't open '%1': %2").arg(source, input.errorString());
         return {};
     }
     constexpr qint64 kBlock = 1024 * 1024;
@@ -228,7 +228,7 @@ QString copy(const QString &source, const QString &folder, const QString &name,
         QSaveFile output(target);
         if (output.open(QIODevice::WriteOnly) && pump(output) >= 0 && output.commit())
             return target;
-        error = tr("Can't save '%1': %2").arg(target, output.errorString());
+        error = Messages::tr("Can't save '%1': %2").arg(target, output.errorString());
         return {};
     }
 #ifdef Q_OS_ANDROID
@@ -245,7 +245,7 @@ QString copy(const QString &source, const QString &folder, const QString &name,
     if (existing.isEmpty() && !target.isEmpty())
         AndroidIntegration::deleteDocument(target);
 #endif
-    error = tr("Can't save '%1'.").arg(name);
+    error = Messages::tr("Can't save '%1'.").arg(name);
     return {};
 }
 
@@ -253,7 +253,7 @@ bool remove(const QString &path, QString &error)
 {
     // The folder the user granted is theirs: never removed from here
     if (isDocument(path) && ContentUri::canonical(path) == ContentUri::treeRoot(path)) {
-        error = tr("Can't remove the device folder itself.");
+        error = Messages::tr("Can't remove the device folder itself.");
         return false;
     }
     bool removed = false;
@@ -266,7 +266,7 @@ bool remove(const QString &path, QString &error)
 #endif
     }
     if (!removed)
-        error = tr("Can't remove '%1'.").arg(path);
+        error = Messages::tr("Can't remove '%1'.").arg(path);
     return removed;
 }
 

@@ -101,6 +101,17 @@ Sheet {
 
         SectionTitle { text: qsTr("Interface") }
         SettingRow {
+            id: languageRow
+            objectName: "uiLanguage"
+            readonly property var languageCodes: ["", "en", "ro"]
+            label: qsTr("Language")
+            description: qsTr("Changes take effect when Spectacol is relaunched.")
+            kind: "choice"
+            model: [qsTr("System language"), "English", "Română"]
+            currentIndex: Math.max(0, languageRow.languageCodes.indexOf(ZxEmulator.settings.uiLanguage))
+            onActivated: (index) => ZxEmulator.settings.uiLanguage = languageRow.languageCodes[index]
+        }
+        SettingRow {
             objectName: "graphicsApi"
             label: qsTr("Graphics API")
             description: qsTr("In use: %1. Changes take effect when Spectacol is relaunched.").arg(GraphicsSettings.activeApi)

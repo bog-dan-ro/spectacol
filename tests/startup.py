@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the startup machine and deferred legacy import in the compiled application.
+"""Check the startup machine, legacy import and language in the compiled application.
 
 Copyright (c) 2015-2026, BogDan Vatra. GPL-3.0-or-later.
 """
@@ -21,6 +21,7 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     cases = [
         ('fresh', '', [], 2, False),
+        ('romanian-welcome', '[Ui]\nlanguage=ro\n', [], 2, False),
         ('saved-48k', '[%General]\nmachine=48k\n', [], 1, False),
         ('saved-48k-ntsc', '[%General]\nmachine=48k_ntsc\n', [], 1, False),
         ('saved-128k', '[%General]\nmachine=128k\n', [], 2, False),
@@ -48,7 +49,8 @@ def main():
             if name == 'import-after-welcome':
                 command += ['--ui-keys', 'Escape']
             env = os.environ | {'QT_QPA_PLATFORM': 'offscreen', 'XDG_CONFIG_HOME': str(config.parent),
-                                'XDG_DATA_HOME': str(home / 'share'), 'SPECTACOL_TOUCHSCREEN': '0'}
+                                'XDG_DATA_HOME': str(home / 'share'), 'SPECTACOL_TOUCHSCREEN': '0',
+                                'LC_ALL': 'C', 'LANGUAGE': ''}
             result = subprocess.run(command, env=env, capture_output=True, text=True, timeout=25)
             (output / (name + '.log')).write_text(result.stdout + result.stderr)
             assert result.returncode == 0, (name, result.stderr)
@@ -63,6 +65,8 @@ def main():
                 assert 'choose the old folder' in text, (name, text)
             elif name == 'fresh':
                 assert 'gamepad in menus' in text, (name, text)
+            elif name == 'romanian-welcome':
+                assert 'meniuri' in text, (name, text)
             return name
 
         with ThreadPoolExecutor(max_workers=3) as pool:

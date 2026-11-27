@@ -102,6 +102,8 @@ FocusScope
         id: deviceFile
         title: qsTr("Open a file from device storage")
         fileMode: FileDialog.OpenFile
+        acceptLabel: qsTr("Open")
+        rejectLabel: qsTr("Cancel")
         nameFilters: [qsTr("All files (*)")]
         onAccepted: {
             ZxEmulator.importFile(selectedFile, fileList, path => {
@@ -281,7 +283,9 @@ FocusScope
         property string copyPath: ""
         onCopyPathChanged: {
             if (copyPath.length)
-                messagePage.showMessage(ZxEmulator.Info, "\"" + ZxEmulator.fileName(copyPath) + qsTr("\" copied to clipboard. Use <b>Paste</b> to paste it to another folder."))
+                messagePage.showMessage(ZxEmulator.Info,
+                                        qsTr("\"%1\" copied to clipboard. Use <b>Paste</b> to paste it to another folder.")
+                                        .arg(ZxEmulator.fileName(copyPath)))
         }
         property bool canCopy: {
             if (!copyPath.length)

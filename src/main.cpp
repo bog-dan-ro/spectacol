@@ -29,6 +29,7 @@
 #include <QKeyEvent>
 #include <QInputMethodEvent>
 #include <QKeySequence>
+#include <QLocale>
 #include <QMetaEnum>
 #include <QMouseEvent>
 #include <QPointingDevice>
@@ -43,6 +44,7 @@
 #include <QQuickItem>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QTranslator>
 #include <QUrl>
 #ifdef Q_OS_ANDROID
 #include "androidintegration.h"
@@ -59,6 +61,19 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(QString::fromLatin1(SPECTACOL_VERSION));
     app.setDesktopFileName(u"eu.licentia.games.spectacol"_s);
     app.setWindowIcon(QIcon(u":/images/spectacol.png"_s));
+
+    // Provide English plural forms when the chosen catalog has no translation.
+    QTranslator englishTranslator;
+    if (englishTranslator.load(u":/i18n/spectacol_en.qm"_s))
+        app.installTranslator(&englishTranslator);
+
+    QTranslator translator;
+    const auto language = ZxSettings::uiLanguage();
+    const auto locale = language.isEmpty() ? QLocale::system() : QLocale(language);
+    if (translator.load(locale, u"spectacol"_s, u"_"_s, u":/i18n"_s)
+        && translator.language() != u"en") {
+        app.installTranslator(&translator);
+    }
 
     QCommandLineParser parser;
     parser.setApplicationDescription(u"Spectacol, a ZX Spectrum emulator"_s);

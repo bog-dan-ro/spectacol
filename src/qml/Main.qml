@@ -533,7 +533,7 @@ ApplicationWindow {
                 dimmed: false
                 icon: checked ? "qrc:/images/sticky-shift-on.svg" : "qrc:/images/sticky-shift.svg"
                 Accessible.role: Accessible.CheckBox
-                Accessible.name: onScreen48Keyboard.cobraMode ? "Sticky CS/SS/CTRL" : "Sticky CS/SS"
+                Accessible.name: onScreen48Keyboard.cobraMode ? qsTr("Sticky CS/SS/CTRL") : qsTr("Sticky CS/SS")
                 Accessible.checkable: true
                 Accessible.checked: checked
                 Accessible.onToggleAction: checked = !checked

@@ -911,7 +911,8 @@ Sheet {
             wrapMode: Text.Wrap
             color: Theme.textMuted
             font.pixelSize: Theme.caption
-            text: (editorDialog.basic ? qsTr("Type keywords plainly. \\{KEYWORD} and \\xHH escapes keep the program's exact bytes.") + " " : "")
+            text: (editorDialog.basic ? qsTr("Type keywords plainly. %1 and %2 escapes keep the program's exact bytes.")
+                                        .arg("\\{KEYWORD}").arg("\\xHH") + " " : "")
                   + (editorDialog.note ? editorDialog.note + " " : "") + qsTr("F2, Ctrl+S or the gamepad's X saves.")
         }
         ScrollView {

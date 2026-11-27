@@ -90,6 +90,8 @@ FormDialog {
         options: Qt.platform.os === "android" ? 0 : FileDialog.DontUseNativeDialog
         title: dialog.title
         fileMode: dialog.saveFile ? FileDialog.SaveFile : FileDialog.OpenFile
+        acceptLabel: dialog.saveFile ? qsTr("Save") : qsTr("Open")
+        rejectLabel: qsTr("Cancel")
         defaultSuffix: dialog.defaultSuffix
         nameFilters: dialog.nameFilters
         onAccepted: {
@@ -102,6 +104,8 @@ FormDialog {
         id: folderPicker
         options: Qt.platform.os === "android" ? 0 : FolderDialog.DontUseNativeDialog
         title: dialog.title
+        acceptLabel: qsTr("Choose")
+        rejectLabel: qsTr("Cancel")
         onAccepted: { pathField.text = selectedFolder.toString(); pathField.forceActiveFocus(); }
         onRejected: browse.forceActiveFocus()
     }

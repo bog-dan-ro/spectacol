@@ -398,16 +398,16 @@ void withPeripheral(zxkit::Emulator &emulator, std::string_view id, F &&fn)
 
 } // namespace
 
-#define setRegisterValue(memberExpr)                                        \
-    bool ok = false;                                                        \
-    int val = value.toInt(&ok);                                             \
-    if (!ok)                                                                \
-        val = value.toInt(&ok, 16);                                         \
-    if (!ok) {                                                              \
-        emit error(Warning, tr("Value \"%1\" is not a number").arg(value)); \
-        return;                                                             \
-    }                                                                       \
-    emulator().writeLock()->cpu().registers().memberExpr;                   \
+#define setRegisterValue(memberExpr)                                                    \
+    bool ok = false;                                                                    \
+    int val = value.toInt(&ok);                                                         \
+    if (!ok)                                                                            \
+        val = value.toInt(&ok, 16);                                                     \
+    if (!ok) {                                                                          \
+        emit error(Warning, ZxEmulator::tr("Value \"%1\" is not a number").arg(value)); \
+        return;                                                                         \
+    }                                                                                   \
+    emulator().writeLock()->cpu().registers().memberExpr;                               \
     emit registersChanged();
 
 ZxEmulator *ZxEmulator::create(QQmlEngine *, QJSEngine *)

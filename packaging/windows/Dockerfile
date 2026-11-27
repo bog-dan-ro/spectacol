@@ -28,7 +28,7 @@ COPY mingw-w64-x86_64.cmake /opt/qt6/mingw-w64-x86_64.cmake
 FROM toolchain AS qt
 ARG QT_VERSION=6.12.0
 # The build machine needs every module whose tools the Windows build runs
-ARG QT_HOST_MODULES="qtbase qtsvg qtshadertools qtdeclarative"
+ARG QT_HOST_MODULES="qtbase qtsvg qtshadertools qtdeclarative qttools"
 ARG QT_WINDOWS_MODULES="qtbase qtsvg qtshadertools qtdeclarative qtmultimedia"
 # Empty: as many jobs as CPUs
 ARG BUILD_JOBS=
@@ -38,7 +38,10 @@ set -eu
 url="https://download.qt.io/official_releases/qt/${QT_VERSION%.*}/${QT_VERSION}/submodules"
 mkdir -p /qt/src
 cd /qt/src
-for module in $QT_WINDOWS_MODULES; do
+for module in $QT_HOST_MODULES $QT_WINDOWS_MODULES; do
+    if [ -d "$module" ]; then
+        continue
+    fi
     archive="$module-everywhere-src-$QT_VERSION.tar.xz"
     curl -fsSL --retry 3 -O "$url/$archive" -O "$url/$archive.sha256"
     sha256sum -c "$archive.sha256"
@@ -57,6 +60,9 @@ for module in $QT_HOST_MODULES; do
         # Only the tools run here: no OpenGL and no platform plugins needed
         /qt/src/qtbase/configure -prefix /opt/qt6/host -release \
             -nomake examples -nomake tests -no-dbus -no-feature-sql -no-opengl
+    elif [ "$module" = qttools ]; then
+        /opt/qt6/host/bin/qt-configure-module "/qt/src/$module" -- \
+            -DFEATURE_assistant=OFF -DFEATURE_designer=OFF
     else
         /opt/qt6/host/bin/qt-configure-module "/qt/src/$module"
     fi

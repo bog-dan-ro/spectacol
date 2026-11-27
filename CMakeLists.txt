@@ -30,9 +30,15 @@ if(ANDROID)
     list(APPEND CMAKE_FIND_ROOT_PATH "${CMAKE_BINARY_DIR}")
 endif()
 
-find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS Quick Multimedia ShaderTools GuiPrivate Concurrent)
+find_package(Qt6 ${QT_REQUIRED_VERSION} REQUIRED COMPONENTS
+    Quick Multimedia ShaderTools GuiPrivate Concurrent LinguistTools
+)
 
-qt_standard_project_setup(REQUIRES ${QT_REQUIRED_VERSION})
+qt_standard_project_setup(
+    REQUIRES ${QT_REQUIRED_VERSION}
+    I18N_SOURCE_LANGUAGE en
+    I18N_TRANSLATED_LANGUAGES ro
+)
 
 # Keep every QML module (Spectacol and QtGamepadLegacy) under one import path.
 # Qt Creator's QML code model only reads import paths from QML_IMPORT_PATH.

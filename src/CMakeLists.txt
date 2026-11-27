@@ -323,6 +323,17 @@ qt_add_resources(spectacol "uart_scripts"
     FILES uart/esp.js uart/pi.js
 )
 
+set_property(TARGET spectacol PROPERTY QT_EXCLUDE_SOURCES_FROM_TRANSLATION
+    "images/*" "roms/*" "shaders/*" "uart/*" "qtquickcontrols2.conf"
+)
+qt_add_translations(spectacol
+    SOURCE_TARGETS spectacol
+    TS_FILE_BASE spectacol
+    TS_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/translations"
+    LUPDATE_OPTIONS -locations none -sort-messages -no-obsolete
+    LRELEASE_OPTIONS -nounfinished
+)
+
 if(WIN32)
     set_target_properties(spectacol PROPERTIES
         WIN32_EXECUTABLE TRUE

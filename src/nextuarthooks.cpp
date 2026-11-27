@@ -134,8 +134,8 @@ public:
         if (result.isError()) {
             modules[ch] = {};
             methods[ch] = {};
-            host.reportError(
-                    QString(u"%1 UART hook: %2"_s).arg(ch ? u"Pi"_s : u"ESP"_s, result.toString()));
+            host.reportError(NextUartHooks::tr("%1 UART hook: %2")
+                                     .arg(ch ? u"Pi"_s : u"ESP"_s, result.toString()));
         }
         return result;
     }
@@ -207,7 +207,8 @@ public:
                 if (engine.hasError())
                     engine.catchError();
                 methods[ch] = {};
-                host.reportError(u"UART script must return an object with apiVersion: 1"_s);
+                host.reportError(
+                        NextUartHooks::tr("UART script must return an object with apiVersion: 1"));
             }
         }
         for (unsigned ch = 0; ch < 2; ++ch)

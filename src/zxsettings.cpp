@@ -792,6 +792,19 @@ void ZxSettings::setUiMode(UiMode mode)
     emit uiChanged();
 }
 
+QString ZxSettings::uiLanguage()
+{
+    return QSettings{}.value(u"Ui/language"_s).toString();
+}
+
+void ZxSettings::setUiLanguage(const QString &language)
+{
+    if (language == uiLanguage())
+        return;
+    QSettings{}.setValue(u"Ui/language"_s, language);
+    emit uiChanged();
+}
+
 bool ZxSettings::autoSaveOnExit() const
 {
     QSettings s;

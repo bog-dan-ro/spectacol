@@ -7,7 +7,7 @@ should also work on the other platforms Qt supports.
 
 - CMake 3.25 or later and Ninja (or another generator).
 - A C++23 compiler: GCC 14 or later, or Clang 18 or later.
-- Qt 6.11 or later with the Quick, Multimedia and ShaderTools modules (the Qt online installer has them).
+- Qt 6.11 or later with Quick, Multimedia, ShaderTools and LinguistTools (from Qt Tools on the build host).
 - zlib, optional: without a zlib package, ZxKit fetches and builds [zlib](https://github.com/madler/zlib).
 - Network access when configuring the first time: CMake's `FetchContent` downloads
   - [qtgamepadlegacy](https://github.com/bog-dan-ro/qtgamepadlegacy) (a pinned revision), the gamepad support;
@@ -26,6 +26,17 @@ cmake --build build
 ```
 
 Qt Creator opens `CMakeLists.txt` directly: pick a Qt 6 kit and build.
+
+## Translations
+
+Spectacol follows the system language by default. Choose **Options → General → Language** to
+select English or Romanian explicitly, then relaunch Spectacol to apply the change.
+
+Run `cmake --build build --target update_translations` after editing translatable strings, and
+edit the catalogs in `src/translations` with Qt Linguist. The regular build embeds the compiled
+catalogs in the application.
+
+## Launch options
 
 The command line:
 
@@ -235,7 +246,8 @@ packaging/windows/build.sh
 
 The first run builds the `spectacol-windows-build` image from `packaging/windows/Dockerfile`: Debian
 testing's MinGW-w64 (GCC with POSIX threads) and Qt 6.12 (qtbase, qtsvg, qtshadertools, qtdeclarative,
-qtmultimedia), built from source twice: for the tools that run during the build, and for Windows. This
+qtmultimedia), built from source for the host tools and the Windows runtime. The host also builds
+Qt Tools for LinguistTools. This
 takes a while; later runs reuse the image. The image tag follows the Dockerfile and the toolchain file, so
 changing them builds a new image (`docker image rm` removes old ones). `--rebuild-image` builds it again
 from scratch, e.g. to pick up Debian updates.

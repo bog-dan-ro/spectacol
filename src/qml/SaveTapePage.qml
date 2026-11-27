@@ -56,6 +56,8 @@ Sheet {
         id: deviceFile
         title: qsTr("Export tape to device storage")
         fileMode: FileDialog.SaveFile
+        acceptLabel: qsTr("Save")
+        rejectLabel: qsTr("Cancel")
         defaultSuffix: page.suffix
         currentFile: "file://" + page.destination
         onAccepted: page.writeTape(selectedFile.toString())

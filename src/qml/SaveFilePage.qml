@@ -46,6 +46,9 @@ Sheet {
     }
     FolderDialog {
         id: browseFolder
+        title: qsTr("Choose a folder")
+        acceptLabel: qsTr("Choose")
+        rejectLabel: qsTr("Cancel")
         currentFolder: "file://" + pathEdit.text
         onAccepted: pathEdit.text = decodeURIComponent(selectedFolder.toString().replace(/^file:\/\//, ""))
     }
@@ -53,6 +56,8 @@ Sheet {
         id: deviceFile
         title: page.title
         fileMode: FileDialog.SaveFile
+        acceptLabel: qsTr("Save")
+        rejectLabel: qsTr("Cancel")
         defaultSuffix: page.selectedFormat
         currentFile: "file://" + page.destinationPath
         onAccepted: page.accepted(selectedFile.toString())

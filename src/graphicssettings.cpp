@@ -66,12 +66,20 @@ void GraphicsSettings::setSelectedIndex(int index)
 
 QString GraphicsSettings::activeApi() const
 {
+    auto api = QQuickWindow::graphicsApi();
     for (auto *window : QGuiApplication::allWindows()) {
         auto *quick = qobject_cast<QQuickWindow *>(window);
-        if (quick && quick->isSceneGraphInitialized())
-            return GraphicsBackend::apiName(quick->rendererInterface()->graphicsApi());
+        if (quick && quick->isSceneGraphInitialized()) {
+            api = quick->rendererInterface()->graphicsApi();
+            break;
+        }
     }
-    return GraphicsBackend::apiName(QQuickWindow::graphicsApi());
+    const auto name = GraphicsBackend::apiName(api);
+    if (name == u"Software")
+        return tr("Software");
+    if (name == u"Unknown")
+        return tr("Unknown");
+    return name;
 }
 
 QString GraphicsSettings::measurements() const

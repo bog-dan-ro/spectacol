@@ -154,6 +154,8 @@ Sheet {
         title: qsTr("Import controller profile")
         nameFilters: [qsTr("Controller profiles (*.json)")]
         fileMode: FileDialog.OpenFile
+        acceptLabel: qsTr("Open")
+        rejectLabel: qsTr("Cancel")
         onAccepted: {
             const name = page.profiles.importProfile(selectedFile);
             if (name.length) page.selectedName = name;
@@ -165,6 +167,8 @@ Sheet {
         nameFilters: [qsTr("Controller profiles (*.json)")]
         defaultSuffix: "json"
         fileMode: FileDialog.SaveFile
+        acceptLabel: qsTr("Save")
+        rejectLabel: qsTr("Cancel")
         currentFolder: "file://" + ZxEmulator.dataPath
         onAccepted: page.profiles.exportProfile(page.selectedName, selectedFile)
     }

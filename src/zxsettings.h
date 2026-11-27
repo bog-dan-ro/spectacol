@@ -58,6 +58,7 @@ class ZxSettings : public QObject
     Q_PROPERTY(bool largeUi READ largeUi WRITE setLargeUi NOTIFY uiChanged)
     Q_PROPERTY(bool reduceMotion READ reduceMotion WRITE setReduceMotion NOTIFY uiChanged)
     Q_PROPERTY(UiMode uiMode READ uiMode WRITE setUiMode NOTIFY uiChanged)
+    Q_PROPERTY(QString uiLanguage READ uiLanguage WRITE setUiLanguage NOTIFY uiChanged)
     Q_PROPERTY(bool autoSaveOnExit READ autoSaveOnExit WRITE setAutoSaveOnExit NOTIFY
                        autoSaveOnExitChanged)
     Q_PROPERTY(int loaderAcceleration READ loaderAcceleration WRITE setLoaderAcceleration NOTIFY
@@ -289,6 +290,8 @@ public:
     void setReduceMotion(bool reduce);
     UiMode uiMode() const;
     void setUiMode(UiMode mode);
+    static QString uiLanguage();
+    void setUiLanguage(const QString &language);
 
     bool autoSaveOnExit() const;
     void setAutoSaveOnExit(bool autoSave);
