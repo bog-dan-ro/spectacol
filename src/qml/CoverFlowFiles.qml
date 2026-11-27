@@ -24,7 +24,7 @@ import Spectacol
 
 // @scope main.qml
 
-Item
+FocusScope
 {
     id : fileList
     signal fileSelected(string filePath);
@@ -265,6 +265,7 @@ Item
         anchors { left: parent.left; right: parent.right; top: artist_text_label.bottom; bottom: hintBar.top }
         clip: true
         visible: fileList.viewMode === 0
+        activeFocusOnTab: true
         model: visible ? filesModel : null
         onCurrentIndexChanged: if (visible && activeFocus) filesModel.currentIndex = currentIndex
         // Follow the model's remembered index for each folder. This is not a binding
@@ -390,6 +391,7 @@ Item
     }
     HintBar {
         id: hintBar
+        actionsFocusable: false
         visible: Theme.showHintBar
         height: visible ? implicitHeight : 0
         anchors.bottom: parent.bottom

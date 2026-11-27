@@ -48,10 +48,19 @@ ZxMenuItem {
     }
 
     ZxMenuItem {
+        readonly property FileBrowserPage browser: pageLoader.status === Loader.Ready ? pageLoader.item as FileBrowserPage : null
         text: qsTr("&File Browser")
         onTriggered: {
             menuBar.close();
-            pageLoader.source = "FileBrowserPage.qml";
+            if (browser)
+                browser.focusFiles();
+            else
+                pageLoader.source = "FileBrowserPage.qml";
+        }
+        onDesktopMenuClosed: {
+            // The popup can restore the menu bar's focus during its exit transition.
+            if (browser && !browser.activeFocus)
+                browser.focusFiles();
         }
     }
 

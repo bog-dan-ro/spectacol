@@ -18,6 +18,7 @@ from joysticks import read_snapshot
 POKES = ['F5'] + ['Down'] * 6 + ['Return'] + ['Down'] * 5 + ['Return', 'wait', 'wait']
 MACHINES = ['F5'] + ['Down'] * 6 + ['Return', 'Return', 'wait', 'F2', 'wait']
 BROWSER = ['F5', 'Down', 'Down', 'Return', 'wait', 'wait']
+DESKTOP_BROWSER = ['click:50:24', 'click:50:126']
 SYMBOLS = DEBUGGER + [pad('X')] + [pad('Down')] * 6 + [pad('A'), 'wait']
 ERRORS = ('ReferenceError', 'TypeError', 'Binding loop', 'Cannot assign', 'is not a type',
           'Unavailable UI item', 'Required property', 'No such method', 'Unable to assign',
@@ -52,23 +53,32 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     binary = args.binary.resolve()
 
-    def run(name, keys, *, size='1280x800', trainer=False, folder=False, extra='', source=True, home=None):
+    def run(name, keys, *, size='1280x800', trainer=False, folder=False, extra='', source=True, home=None,
+            desktop_browser=False):
         home = home or output / name
         config = home / 'config/Licentia'
         config.mkdir(parents=True, exist_ok=True)
         data = home / 'data'
         data.mkdir(parents=True, exist_ok=True)
+        browse_folder = data
+        if desktop_browser:
+            browse_folder = data / 'browser'
+            browse_folder.mkdir(exist_ok=True)
+            extra += f'[FileBrowser]\npath={browse_folder}\n'
         conf = config / 'Spectacol.conf'
-        if not conf.exists():
+        if desktop_browser or not conf.exists():
             conf.write_text(f'[General]\nfirst_start=false\nautoSaveOnExit=false\ndataPath={data}\n'
                             f'[Peripherals]\njoystickPrompt=false\n[Ui]\nmode=2\n{extra}')
-        game = data / 'Feature Game.sna'
+        game = browse_folder / 'Feature Game.sna'
         program(game)
-        another = data / 'Another Game.sna'
+        another = browse_folder / 'Another Game.sna'
         program(another)
         memory = bytearray(another.read_bytes())
         memory[27 + 0x5001] = 0x99
         another.write_bytes(memory)
+        if desktop_browser:
+            memory[27 + 0x5001] = 0x55
+            (browse_folder / 'Last Game.sna').write_bytes(memory)
         if trainer:
             (data / 'Feature Game.POK').write_text('NInfinite lives\nZ 8 36864 77 0\nNChoose energy\nZ 8 36865 256 0\nY\n')
         if folder:
@@ -157,6 +167,21 @@ def main():
         elif name == 'browser-stick-open':
             snapshot, *_ = run(name, BROWSER + [pad('Start'), 'End', 'nav:AxisLeftY:-1', 'nav:AxisLeftY:0', pad('A')])
             assert read_snapshot(snapshot)[0][0x5001] == 0x99
+        elif name == 'browser-desktop-keys':
+            keys = ['click:50:24', 'Down', 'Down', 'Return', 'Left', 'Return']
+            snapshot, *_ = run(name, keys, source=False, desktop_browser=True)
+            assert read_snapshot(snapshot)[0][0x5001] == 0x55
+        elif name == 'browser-desktop-reopen':
+            keys = DESKTOP_BROWSER + ['F3'] + DESKTOP_BROWSER + ['Right', 'Return']
+            snapshot, *_ = run(name, keys, source=False, desktop_browser=True)
+            assert read_snapshot(snapshot)[0][0x5000:0x5002] == b'\x43\x00'
+        elif name == 'browser-desktop-tab':
+            # Tab reaches Up, which Space activates without closing the browser.
+            _, text, conf, home = run(name, DESKTOP_BROWSER + ['Tab', 'Space'], source=False, desktop_browser=True)
+            assert 'search filenames' in text and f'\npath={home / "data"}\n' in conf.read_text(), text
+        elif name == 'browser-desktop-escape':
+            _, text, *_ = run(name, DESKTOP_BROWSER + ['Esc'], source=False, desktop_browser=True)
+            assert 'search filenames' not in text and 'up a folder' not in text, text
         elif name == 'rom-stick':
             snapshot, *_ = run(name, MACHINES + ['nav:AxisLeftY:1', 'nav:AxisLeftY:0', pad('A'), 'input:{ROM}', 'Return', 'click:romRestart', 'wait'])
             assert pc(snapshot) == 0, hex(pc(snapshot))
@@ -200,6 +225,7 @@ def main():
 
     cases = ['trainer-toggle', 'trainer-restore', 'trainer-value', 'trainer-value-cancel', 'trainer-folder',
              'rom-invalid-size', 'rom-persistence', 'rom-back', 'browser-list-search', 'browser-grid-pad',
+             'browser-desktop-keys', 'browser-desktop-reopen', 'browser-desktop-tab', 'browser-desktop-escape',
              'browser-persistence', 'symbols-import-jump', 'symbols-invalid', 'symbols-back',
              'browser-phone', 'browser-phone-hints-scroll', 'symbols-phone', 'browser-open-pad', 'browser-open-touch', 'browser-stick-open', 'rom-stick', 'machine-stick', 'rom-picker-back', 'folder-picker-back']
     def checked(name):

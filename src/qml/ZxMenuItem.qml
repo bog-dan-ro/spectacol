@@ -5,6 +5,7 @@ Item {
 
     signal triggered()
     signal aboutToShow()
+    signal desktopMenuClosed()
 
     function trigger() {
         if (enabled)

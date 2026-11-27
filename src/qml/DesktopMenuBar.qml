@@ -55,7 +55,9 @@ MenuBar {
         let width = Theme.sp(50);
         for (const child of items) {
             if (child.children.length > 0) {
-                menu.addMenu(menuComponent.createObject(menu, { title: plainText(child.text), source: child }));
+                menu.addMenu(menuComponent.createObject(menu, {
+                    title: plainText(child.text), source: child, rootPopup: menu.rootPopup
+                }));
             } else {
                 // "..." opens a page: "…" as desktop menus do
                 const item = itemComponent.createObject(menu.contentItem, {
@@ -75,7 +77,15 @@ MenuBar {
             id: menu
             // a ZxMenuItem, or null for the top level actions
             property var source: null
+            property Menu rootPopup: menu
+            property ZxMenuItem pendingAction
             onAboutToShow: bar.fill(menu)
+            onClosed: {
+                if (pendingAction) {
+                    Qt.callLater(pendingAction.desktopMenuClosed);
+                    pendingAction = null;
+                }
+            }
             background: Rectangle {
                 implicitWidth: Theme.sp(50)
                 radius: Theme.radiusSmall
@@ -91,7 +101,14 @@ MenuBar {
         MenuItem {
             property var source
             enabled: source ? source.enabled : false
-            onTriggered: source.trigger()
+            onTriggered: {
+                const popup = menu.rootPopup;
+                if (popup.visible)
+                    popup.pendingAction = source;
+                else
+                    Qt.callLater(source.desktopMenuClosed);
+                source.trigger();
+            }
         }
     }
 

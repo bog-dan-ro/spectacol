@@ -26,6 +26,7 @@ import Spectacol
 Item {
     id: bar
     property var hints: []
+    property bool actionsFocusable: true
     readonly property bool compact: Theme.touchScreenUi || width < Theme.sp(150)
     readonly property bool gamepad: Theme.gamepadHints
     readonly property var shownHints: Theme.remoteHints
@@ -85,7 +86,7 @@ Item {
                     implicitWidth: content.implicitWidth + (bar.plainActions ? Theme.sp(4) : 0)
                     implicitHeight: bar.compact ? Theme.rowHeight : Math.max(content.implicitHeight, Theme.sp(8))
                     enabled: actionable
-                    activeFocusOnTab: actionable
+                    focusPolicy: actionable && bar.actionsFocusable ? Qt.TabFocus : Qt.NoFocus
                     Accessible.name: modelData.text
                     Accessible.role: actionable ? Accessible.Button : Accessible.StaticText
                     Accessible.onPressAction: if (actionable) modelData.action()
