@@ -312,12 +312,7 @@ Details parseDetails(const QJsonObject &object, const Endpoints &endpoints, int 
 
 QString downloadName(int source, const QString &id, const Media &file)
 {
-    const auto hash = QString::fromLatin1(
-            QCryptographicHash::hash(file.url.toEncoded(), QCryptographicHash::Sha256)
-                    .toHex()
-                    .left(10));
-    QString name =
-            (source == 1 ? u"zxinfo-"_s : u"archive-"_s) + id + u'-' + hash + u'-' + file.name;
+    QString name = file.name;
     for (QChar &ch : name)
         if (ch.unicode() < 32 || ch.unicode() == 127 || u"<>:\"/\\|?*"_s.contains(ch))
             ch = u'_';
