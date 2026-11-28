@@ -6,7 +6,7 @@ Spectacol is a ZX Spectrum emulator: the emulation core is [ZxKit](https://githu
 
 ## Build
 
-The project uses CMake and needs Qt ≥ 6.11 (Quick, Multimedia, ShaderTools) and C++23. `BUILD.md` describes the build, Linux Flatpak/AppImage packaging and the Windows package (`packaging/windows/build.sh`, cross-compiled in Docker); the Android CMake build uses Qt’s Android toolchain, NDK r27c and JDK 21.
+The project uses CMake and needs Qt ≥ 6.11 (Quick, Multimedia, ShaderTools) and C++23. `BUILD.md` describes the build, Linux AppImage packaging and the Windows package (`packaging/windows/build.sh`, cross-compiled in Docker); the Android CMake build uses Qt’s Android toolchain, NDK r27c and JDK 21.
 
 ```sh
 git submodule update --init --recursive   # android_openssl (Android only)

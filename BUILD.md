@@ -115,41 +115,6 @@ AppStream metadata, ROM notices and third-party licenses. They include the
 QtGamepadLegacy libraries, QML module and controller backends. Generated files
 stay under `build/`.
 
-### Flatpak
-
-Install Flatpak 1.15.6 or later and `flatpak-builder` from your distribution, then add Flathub
-and its KDE 6.11 SDK/runtime:
-
-```sh
-flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install --user flathub org.kde.Sdk//6.11 org.kde.Platform//6.11
-flatpak-builder --user --force-clean --jobs=4 \
-    --state-dir=build/flatpak-state --repo=build/flatpak-repo \
-    build/flatpak packaging/flatpak/eu.licentia.games.spectacol.yaml
-mkdir -p build/packages
-flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
-    build/flatpak-repo build/packages/Spectacol.flatpak eu.licentia.games.spectacol
-flatpak install --user build/packages/Spectacol.flatpak
-flatpak run eu.licentia.games.spectacol
-```
-
-The manifest builds the current Spectacol working tree. Dependencies are pinned
-and downloaded by Flatpak Builder before the network-isolated build;
-`FetchContent` uses those local sources. Update the dependency revisions in both
-`CMakeLists.txt` and the manifest together. The pinned QtGamepadLegacy revision
-supports Qt 6.11 and retains the Android build fixes.
-
-The sandbox grants graphics, audio, network and controller access, including
-read-only access to `/run/udev` for QtGamepadLegacy's controller discovery.
-This lets it identify controllers such as Steam Input's virtual gamepad on Steam Deck.
-Home and removable-media access support Spectacol's built-in file browser, writable disks
-and SD images. Settings use Flatpak's private configuration directory; game data
-defaults to `~/Spectacol` or the folder selected in the app. Host
-serial ports for physical UART adapters need a separate user override; the
-default package supports the JavaScript UART hooks and network adapters.
-This is a local bundle recipe; publishing to Flathub also requires a release
-source and Flathub submission.
-
 ### Desktop text input
 
 When an editable field gains focus, desktop builds open Spectacol's ZX on-screen
@@ -165,8 +130,8 @@ Android and iOS continue using their system keyboards.
 On Linux, keyboard detection reads `/sys/class/input`, including USB and Bluetooth
 keyboards. Steam Input's virtual keyboard and the Steam Deck controller's keyboard
 interface do not count as physical keyboards. Attachment and removal are checked
-once per second, including inside Flatpak. Text is committed through Qt's input
-method events to the original field, preserving its selection and validation.
+once per second. Text is committed through Qt's input method events to the
+original field, preserving its selection and validation.
 
 ### AppImage
 

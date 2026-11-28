@@ -63,8 +63,6 @@ endif()
 
 add_custom_target(packaging
     SOURCES
-        packaging/flatpak/eu.licentia.games.spectacol.yaml
-        packaging/flatpak/screen0.png
         packaging/linux/eu.licentia.games.spectacol.desktop
         packaging/linux/eu.licentia.games.spectacol.metainfo.xml
         packaging/linux/eu.licentia.games.spectacol.png
